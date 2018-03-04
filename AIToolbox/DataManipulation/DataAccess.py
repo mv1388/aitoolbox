@@ -6,6 +6,7 @@ import csv
 import cPickle as pickle
 import networkx as nx
 import codecs
+import json
 
 # try:
 #     import snap
@@ -547,6 +548,17 @@ class FileDataAccessor:
                         yield row_list
                     else:
                         yield [row_list[idx] for idx in column_query_idx]
+        elif self.data_type == 'json':
+            with open(self.data_file_full_path) as json_file:
+                json_data_list = json.load(json_file)
+                for el in json_data_list:
+                    if column_query_idx is None:
+                        yield el
+                    else:
+                        if len(column_query_idx) == 1:
+                            yield el[column_query_idx[0]]
+                        else:
+                            yield {idx: el[idx] for idx in column_query_idx}
         else:
             print 'Not supported data format'
 
@@ -573,7 +585,12 @@ class FileDataAccessor:
 
         """
         if max_element_limit <= 0:
-            return [row for row in self.query_db_generator(column_query_idx)]
+            if self.data_type == 'json' and column_query_idx is None:
+                with open(self.data_file_full_path) as json_file:
+                    json_data_list = json.load(json_file)
+                return json_data_list
+            else:
+                return [row for row in self.query_db_generator(column_query_idx)]
         else:
             table = []
             for idx, row in enumerate(self.query_db_generator(column_query_idx)):
@@ -596,6 +613,8 @@ class FileDataAccessor:
             self.save_data_to_text_file(data)
         elif self.data_type == 'csv':
             self.save_data_to_csv_file(data)
+        elif self.data_type == 'json':
+            self.save_data_to_json_file(data)
         else:
             print 'Not supported data format'
 
@@ -625,6 +644,18 @@ class FileDataAccessor:
         with open(self.data_file_full_path, 'w') as f:
             writer = csv.writer(f)
             writer.writerows(data)
+
+    def save_data_to_json_file(self, data):
+        """
+
+        Args:
+            data:
+
+        Returns:
+
+        """
+        with open(self.data_file_full_path, 'w') as f:
+            json.dump(data, f, ensure_ascii=False)
 
     def ordered_append_save(self, file_id, data, delimiter='\n', verbose=False):
         """
