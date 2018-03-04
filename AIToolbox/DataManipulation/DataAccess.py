@@ -15,8 +15,9 @@ import json
 
 
 """
-Classes and procedures for extracting data form the data base or disk based files.
-The extracted data is then used to build graphs
+
+Classes and procedures for extracting data form the database or disk based files.
+
 """
 
 
@@ -486,7 +487,7 @@ class FileDataAccessor:
         Args:
             data_folder_path:
             data_file_name:
-            data_type (str): Currently supported: 'txt', 'csv', 'pickle-dict'
+            data_type (str): Currently supported: 'txt', 'csv', 'json', 'pickle-dict'
             data_type_options:
         """
         self.data_folder_path = data_folder_path
