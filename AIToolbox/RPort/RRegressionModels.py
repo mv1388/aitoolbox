@@ -9,10 +9,11 @@ class RRegressionModel:
     def __init__(self, X, y, X_names=None, y_names=None):
         """
 
-        :param X:
-        :param y:
-        :param X_names:
-        :param y_names:
+        Args:
+            X:
+            y:
+            X_names:
+            y_names:
         """
         self.X = np.array(X)
         self.y = np.array(y)
@@ -38,19 +39,24 @@ class RRegressionModel:
     def poisson_regression_fit(self, formula, regression_family):
         """
 
-        :param formula:
-        :param regression_family:
-        :return:
+        Args:
+            formula:
+            regression_family:
+
+        Returns:
+
         """
         self.fit = self.stats.glm(formula, data=self.R_data_frame, family=regression_family)
-
         return self
 
     def predict(self, X_new):
         """
 
-        :param X_new:
-        :return:
+        Args:
+            X_new:
+
+        Returns:
+
         """
         data_frame_pandas_new = DataFrame(X_new)
         data_frame_pandas_new.columns = self.X_names
@@ -63,6 +69,10 @@ class RRegressionModel:
         return prediction
 
     def print_summary(self):
-        base = importr('base')
+        """
 
+        Returns:
+
+        """
+        base = importr('base')
         print(base.summary(self.fit))
