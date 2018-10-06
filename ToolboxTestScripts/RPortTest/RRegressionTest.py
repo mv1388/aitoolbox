@@ -19,5 +19,5 @@ y_test = iris_ds.data[120:, -1]
 rrm = RRegressionModel(X, y)
 prediction = rrm.poisson_regression_fit("y_attr ~ .", "poisson").predict(X_test)
 
-print y
-print prediction
+print(y)
+print(prediction)

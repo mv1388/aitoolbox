@@ -12,7 +12,7 @@ rest_consumer = tac.TwitterAPIREST(creds)
 
 public_tweets = rest_consumer.api.user_timeline("1591684358", count=50)
 for tweet in public_tweets:
-    print tweet
+    print(tweet)
 
 
 # trends = api.trends_available()
