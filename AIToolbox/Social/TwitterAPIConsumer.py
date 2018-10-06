@@ -1,7 +1,7 @@
 import tweepy
 import json
 
-import AIToolbox.DataManipulation.DatabaseAccess as dba
+import AIToolbox.DataManipulation.DataAccess.MongoDB as dba
 
 
 class TwitterAPIConsumerCredentials:
