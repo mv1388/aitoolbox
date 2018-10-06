@@ -25,3 +25,4 @@ setup(name='AIToolbox',
                         'joblib'],
 
       zip_safe=False)
+
