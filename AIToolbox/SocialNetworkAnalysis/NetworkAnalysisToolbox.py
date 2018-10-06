@@ -1,6 +1,5 @@
 from multiprocessing import Pool
 import itertools
-import networkx as nx
 import numpy
 
 from AIToolbox.SocialNetworkAnalysis.ParallelExecution import *
