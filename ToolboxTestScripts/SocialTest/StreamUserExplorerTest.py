@@ -1,4 +1,4 @@
-import AIToolbox.Social.TwitterAPI.TwitterAPIConsumer as tac
+import AIToolbox.Social.TwitterAPIConsumer as tac
 
 consumer_key = "Uxke6pw6Q56l16olV5iiT4q4F"
 consumer_secret = "AxHr3elTSe4AeDyb1apBtJ7qlZbmc0NghpYx76djtyl9UoP74D"

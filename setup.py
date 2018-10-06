@@ -8,5 +8,5 @@ setup(name='AIToolbox',
       description='Toolbox of useful functions often needed in different AI oriented projects',
       long_description=open('README.md').read(),
 
-      packages=['AIToolbox', ],
+      packages=['AIToolbox', 'AIToolbox.DataManipulation', 'AIToolbox.RPort', 'AIToolbox.Social'],
       zip_safe=False)

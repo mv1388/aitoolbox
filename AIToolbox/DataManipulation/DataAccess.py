@@ -48,7 +48,7 @@ class SQLiteDataAccessor:
                 db_insert_query = 'INSERT INTO SomeTable (feat1, feat2) VALUES ({values})'
 
             Using the data aggregator (example for TextDataStatsAggregator):
-                # Text stats calculation aggregator setup
+                # NLP stats calculation aggregator setup
                 output_file_name = 'user_text_stats_TEST.p'
                 stats_file_data_saver = FileDataAccessor(data_folder_path=output_database_path,
                                                          data_file_name=output_file_name,
@@ -738,7 +738,7 @@ class DataAggregator:
             database_name = 'so-dump.db'
             sql_query = '''SELECT OwnerUserId, Body FROM UserText_ONLY_accept_min2_1Column'''
 
-            # Text stats aggregator setup
+            # NLP stats aggregator setup
             output_data_path = '/Users/markovidoni/PycharmProjects/UniPostgrad/MSc_project/data/SO_db'
             output_file_name = 'user_text_stats_TEST_TEST.p'
             stats_file_data_saver = FileDataAccessor(data_folder_path=output_data_path, data_file_name=output_file_name,

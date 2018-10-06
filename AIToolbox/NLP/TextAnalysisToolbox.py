@@ -16,7 +16,7 @@ class TextDataPreparation:
                 database_name = 'so-dump.db'
                 sql_query = '''SELECT OwnerUserId, Body FROM UserText_ONLY_accept_min2_1Column_NOL'''
 
-                # Text stats aggregator setup
+                # NLP stats aggregator setup
                 output_data_path = '/Users/markovidoni/PycharmProjects/UniPostgrad/MSc_project/data/SO_db/W_NO_LOOPS/NO_CODE'
                 output_file_name = 'user_HTML_stats_TEST.p'
                 stats_file_data_saver = FileDataAccessor(data_folder_path=output_data_path,
@@ -118,8 +118,8 @@ class TextDataPreparation:
                                                    verbose=(verbose is True or verbose == 1))
 
             if verbose is True or verbose == 2:
-                print '===========================================================\n'
-                print text_body
+                print('===========================================================\n')
+                print(text_body)
                 # print clean_text
 
         # if isinstance(data_saver, SQLiteDataAccessor):
@@ -217,9 +217,7 @@ class TextDataPreparation:
                                                verbose=(verbose is True or verbose == 1))
 
 
-class TextDataAggregator:
-    __metaclass__ = ABCMeta
-
+class TextDataAggregator(metaclass=ABCMeta):
     @abstractmethod
     def compute(self, data_id, data_list):
         pass
@@ -247,7 +245,7 @@ class TextDataStatsAggregator(TextDataAggregator):
 
         """
         if self.verbose:
-            print 'Calculating stats for userID: ' + str(usr_id)
+            print('Calculating stats for userID: ' + str(usr_id))
 
         curr_usr_stats = {}
 
@@ -289,7 +287,7 @@ class HTMLDataStatsAggregator(TextDataAggregator):
 
         """
         if self.verbose:
-            print 'Calculating stats for userID: ' + str(usr_id)
+            print('Calculating stats for userID: ' + str(usr_id))
 
         curr_usr_stats = {}
 
@@ -362,7 +360,7 @@ class Doc2vecExtractor:
 
         """
         if verbose:
-            print 'Starting the train corpus construction.'
+            print('Starting the train corpus construction.')
 
         if one_el_per_usr:
             self.train_corpus = list(self.read_corpus_1_el_per_usr(tokens_only=tokens_only))
@@ -455,7 +453,7 @@ class Doc2vecExtractor:
         if self.train_corpus is None:
             raise ValueError('Train corpus has not been constructed yet')
         if verbose:
-            print 'Gensim start'
+            print('Gensim start')
 
         self.model = gensim.models.doc2vec.Doc2Vec(size=size, min_count=min_count, iter=iter, **kwargs)
         self.model.build_vocab(self.train_corpus)

@@ -3,7 +3,7 @@ import itertools
 import networkx as nx
 import numpy
 
-from AIToolbox.SocialNetwork.ParallelExecution import *
+from AIToolbox.SocialNetworkAnalysis.ParallelExecution import *
 
 
 """     
