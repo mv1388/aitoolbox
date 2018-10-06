@@ -1,6 +1,3 @@
 .DS_Store
 .idea/
 data/
-
-/AIToolbox.egg-info
-/dist
