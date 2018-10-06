@@ -37,7 +37,7 @@ class RPyDataHandler:
         read_data = None # Find fn to read data from .rda which contains data frame
 
         if self.data is not None:
-            print "Data already present in Data Handler. Just returning data and not saving it."
+            print("Data already present in Data Handler. Just returning data and not saving it.")
             return read_data
         elif self.data is None:
             self.data = read_data

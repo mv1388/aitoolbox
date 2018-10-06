@@ -55,7 +55,7 @@ class MongoDBWriter:
             self.insert_buffer = []
 
             if self.verbose:
-                print "Inserted a batch of: " + str(self.batch_insert_size) + ' new documents.'
+                print("Inserted a batch of: " + str(self.batch_insert_size) + ' new documents.')
 
 
 class MongoDBMultiTopicWriter:
@@ -111,7 +111,7 @@ class MongoDBMultiTopicWriter:
             self.topic_insert_buffer[topic_collection_name] = []
 
             if self.verbose:
-                print "Inserted a batch of: " + str(self.batch_insert_size) + ' new documents.'
+                print("Inserted a batch of: " + str(self.batch_insert_size) + ' new documents.')
 
 
 class DBConnection:

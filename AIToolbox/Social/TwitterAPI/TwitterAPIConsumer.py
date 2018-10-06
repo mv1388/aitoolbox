@@ -45,7 +45,7 @@ class TwitterAPIStreamer:
             twitter_api_credentials:
         """
         if not twitter_api_credentials.check_if_info_complete():
-            print "Not all API credentials present in the provided credentials object."
+            print("Not all API credentials present in the provided credentials object.")
 
         self.twitter_api_credentials = twitter_api_credentials
 
@@ -102,10 +102,10 @@ class TwitterAPIStreamer:
             if type(listener) == SaveToFileListener:
                 listener.output_file.close()
         except:
-            print '\t\tNetwork connection problem'
+            print('\t\tNetwork connection problem')
 
             if auto_resume:
-                print '\t\tResuming streaming'
+                print('\t\tResuming streaming')
                 self.start_streaming(listener, stream_filter, auto_resume)
 
         # if auto_resume:
@@ -144,7 +144,7 @@ class PrintOutputListener(tweepy.StreamListener):
         text = json.loads(raw_data)
 
         try:
-            print(text["text"])
+            print((text["text"]))
         except KeyError:
             print("NO TEXT")
 
@@ -195,7 +195,7 @@ class SaveToFileListener(PrintOutputListener):
         text = json.loads(raw_data)
 
         try:
-            print(text["text"])
+            print((text["text"]))
         except KeyError:
             print("NO TEXT")
 
@@ -239,7 +239,7 @@ class SaveToMongoDBListener(PrintOutputListener):
 
         if self.output_tweets:
             try:
-                print(json_data['text'])
+                print((json_data['text']))
             except KeyError:
                 print("NO TEXT")
 
@@ -247,7 +247,7 @@ class SaveToMongoDBListener(PrintOutputListener):
             self.output_count += 1
 
             if self.output_count % 100 == 0:
-                print 'Number of tweets saved: ' + str(self.output_count)
+                print('Number of tweets saved: ' + str(self.output_count))
 
         return True
 
@@ -291,7 +291,7 @@ class SaveBatchToMongoDBListener(PrintOutputListener):
 
         if self.output_tweets:
             try:
-                print(json_data['text'])
+                print((json_data['text']))
             except KeyError:
                 print("NO TEXT")
 
@@ -299,7 +299,7 @@ class SaveBatchToMongoDBListener(PrintOutputListener):
             self.output_count += 1
 
             if self.output_count % self.batch_insert_size == 0:
-                print '\tNumber of tweets saved: ' + str(self.output_count)
+                print('\tNumber of tweets saved: ' + str(self.output_count))
 
         return True
 
@@ -401,7 +401,7 @@ class SaveMultipleTopicsBatchToMongoDBListener(PrintOutputListener):
 
         if self.output_tweets:
             try:
-                print(json_data['text'])
+                print((json_data['text']))
             except KeyError:
                 print("NO TEXT")
 
@@ -409,12 +409,12 @@ class SaveMultipleTopicsBatchToMongoDBListener(PrintOutputListener):
             self.output_count += 1
 
             if self.output_count % self.batch_insert_size == 0:
-                print '\tNumber of tweets saved: ' + str(self.output_count)
+                print('\tNumber of tweets saved: ' + str(self.output_count))
 
             if found_destination is False:
-                print "Didn't find the topic destination"
+                print("Didn't find the topic destination")
                 try:
-                    print(json_data['text'])
+                    print((json_data['text']))
                 except KeyError:
                     print("NO TEXT")
 
@@ -470,9 +470,9 @@ class StreamUserExploreListener(PrintOutputListener):
         current_user_output_file.close()
 
         if self.verbose:
-            print current_status.text
-            print current_user_tweets
-            print "\n"
+            print(current_status.text)
+            print(current_user_tweets)
+            print("\n")
 
 
 class TwitterAPIREST:
@@ -482,7 +482,7 @@ class TwitterAPIREST:
         :param twitter_api_credentials:
         """
         if not twitter_api_credentials.check_if_info_complete():
-            print "Not all API credentials present in the provided credentials object."
+            print("Not all API credentials present in the provided credentials object.")
 
         self.twitter_api_credentials = twitter_api_credentials
 

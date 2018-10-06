@@ -3,7 +3,7 @@ import itertools
 import networkx as nx
 import numpy
 
-from ParallelExecution import TaskParallelizator
+from AIToolbox.SocialNetwork.ParallelExecution import *
 
 
 """     
@@ -192,7 +192,7 @@ def structural_holes(graph, includeOutLinks=True, includeInLinks=False, wholeNet
     """
 
     if not hasattr(graph, "predecessors"):
-        print "graph is undirected... setting includeOutLinks to True and includeInLinks to False"
+        print("graph is undirected... setting includeOutLinks to True and includeInLinks to False")
         includeOutLinks = True
         includeInLinks = False
 

@@ -3,7 +3,7 @@ import mysql.connector
 from pymongo import MongoClient
 import os
 import csv
-import cPickle as pickle
+import pickle
 import networkx as nx
 import codecs
 import json
@@ -152,7 +152,7 @@ class SQLiteDataAccessor:
 
         """
         for row in self.query_db_generator(sql_query):
-            print row
+            print(row)
 
     def query_db_table(self, sql_query):
         """
@@ -286,7 +286,7 @@ class SQLiteDataAccessor:
                     self.data_aggregator.compute(self.append_current_file_id, self.append_current_file_data_buffer)
 
             if verbose:
-                print '=========  New table row added. UserId: ' + str(file_id)
+                print('=========  New table row added. UserId: ' + str(file_id))
 
             # Clean data buffer from previous user and prepare to start filling it for the new user
             self.append_current_file_data_buffer = []
@@ -308,7 +308,7 @@ class SQLiteDataAccessor:
         self.db_conn.execute(insert_query, buffer_data)
 
         if verbose:
-            print 'Inserted data into database.'
+            print('Inserted data into database.')
 
 
 class MySQLDataAccessor(SQLiteDataAccessor):
@@ -447,7 +447,7 @@ class MongoDBDataAccessor(SQLiteDataAccessor):
         self.collection.insert_many(buffer_data)
 
         if verbose:
-            print 'Inserted data to DB.'
+            print('Inserted data to DB.')
 
     def persist_buffer_data_to_db(self, clean_buffer=True, verbose=False):
         """
@@ -465,12 +465,12 @@ class MongoDBDataAccessor(SQLiteDataAccessor):
         self.collection.insert_many(self.insert_buffer)
 
         if verbose:
-            print "Inserted a batch of: " + str(len(self.insert_buffer)) + ' new documents.'
+            print("Inserted a batch of: " + str(len(self.insert_buffer)) + ' new documents.')
 
         if clean_buffer:
             self.insert_buffer = []
             if verbose:
-                print 'Cleaned the buffer.'
+                print('Cleaned the buffer.')
 
 
 class FileDataAccessor:
@@ -561,7 +561,7 @@ class FileDataAccessor:
                         else:
                             yield {idx: el[idx] for idx in column_query_idx}
         else:
-            print 'Not supported data format'
+            print('Not supported data format')
 
     def query_db_print(self, column_query_idx):
         """
@@ -573,7 +573,7 @@ class FileDataAccessor:
 
         """
         for row in self.query_db_generator(column_query_idx):
-            print row
+            print(row)
 
     def query_db_table(self, column_query_idx, max_element_limit=0):
         """
@@ -617,7 +617,7 @@ class FileDataAccessor:
         elif self.data_type == 'json':
             self.save_data_to_json_file(data)
         else:
-            print 'Not supported data format'
+            print('Not supported data format')
 
     def save_data_to_text_file(self, data):
         """
@@ -672,7 +672,7 @@ class FileDataAccessor:
         """
         if file_id != self.append_current_file_id:
             if verbose:
-                print '=========  New file opened. FileId: ' + str(file_id)
+                print('=========  New file opened. FileId: ' + str(file_id))
 
             # Close previous file
             if self.append_current_file is not None:
@@ -687,7 +687,7 @@ class FileDataAccessor:
             self.append_current_file_id = file_id
 
         if verbose:
-            print 'Appending to file: ' + str(file_id)
+            print('Appending to file: ' + str(file_id))
 
         self.append_current_file.write(data + delimiter)
 
@@ -800,7 +800,7 @@ class DataAggregator:
                 self.data_aggregator.compute(self.append_current_file_id, self.append_current_file_data_buffer)
 
             if verbose:
-                print '=========  New table row added. UserId: ' + str(file_id)
+                print('=========  New table row added. UserId: ' + str(file_id))
 
             # Clean data buffer from previous user and prepare to start filling it for the new user
             self.append_current_file_data_buffer = []
@@ -869,7 +869,7 @@ class GraphDataAccessor:
 
         """
         if verbose:
-            print 'Start building graph'
+            print('Start building graph')
             for iteration, (asker_id, responder_id) in enumerate(db_accessor.query_db_generator(query)):
                 if self.asker_responder_direction:
                     self.graph.add_edge(asker_id, responder_id)
@@ -877,10 +877,10 @@ class GraphDataAccessor:
                     self.graph.add_edge(responder_id, asker_id)
 
                 if iteration % granularity == 0:
-                    print iteration
+                    print(iteration)
                 if iteration > max_num_connections > 0:
                     break
-            print 'Finished building graph'
+            print('Finished building graph')
         else:
             for asker_id, responder_id in db_accessor.query_db_generator(query):
                 if self.asker_responder_direction:
@@ -906,14 +906,14 @@ class GraphDataAccessor:
 
         """
         if verbose:
-            print 'Start building graph'
+            print('Start building graph')
             for iteration, (asker_id, responder_id, weight) in enumerate(db_accessor.query_db_generator(query)):
                 self.graph.add_edge(asker_id, responder_id, weight=weight)
                 if iteration % granularity == 0:
-                    print iteration
+                    print(iteration)
                 if iteration > max_num_connections > 0:
                     break
-            print 'Finished building graph'
+            print('Finished building graph')
         else:
             for asker_id, responder_id, weight in db_accessor.query_db_generator(query):
                 self.graph.add_edge(asker_id, responder_id, weight=weight)
@@ -933,52 +933,52 @@ class GraphDataAccessor:
         raise NotImplementedError
 
 
-class SNAPGraphBuilder:
-    """
-    Make sure that SNAP library is installed in the interpreter you are using.
-    Also make sure that SNAP library import is uncommented at the top of this code file and that import doesn't throw
-    an ImportError exception.
-    """
-
-    def __init__(self, directed=False, asker_responder_direction=True):
-        """
-
-        Args:
-            directed (bool):
-            asker_responder_direction (bool):
-        """
-        self.asker_responder_direction = asker_responder_direction
-
-        if not directed:
-            self.graph = snap.TUNGraph.New()
-        else:
-            self.graph = snap.TNGraph.New()
-
-    def build_graph_from_db(self, db_accessor, query_nodes, query_edges,
-                            verbose=False, granularity=100000, max_num_connections=10000000):
-        """
-
-        Args:
-            db_accessor (SQLiteDataAccessor or FileDataAccessor):
-            query_nodes (str):
-            query_edges (str):
-            verbose (bool): not implemented yet
-            granularity (int): not implemented yet, possibly deprecated
-            max_num_connections (int): not implemented yet, possibly deprecated
-
-        Returns:
-
-        """
-        for node_id in db_accessor.query_db_generator(query_nodes):
-            self.graph.AddNode(int(node_id[0]))
-
-        for asker_id, responder_id in db_accessor.query_db_generator(query_edges):
-            if self.asker_responder_direction:
-                self.graph.AddEdge(int(asker_id), int(responder_id))
-            else:
-                self.graph.AddEdge(int(responder_id), int(asker_id))
-
-        return self.graph
+# class SNAPGraphBuilder:
+#     """
+#     Make sure that SNAP library is installed in the interpreter you are using.
+#     Also make sure that SNAP library import is uncommented at the top of this code file and that import doesn't throw
+#     an ImportError exception.
+#     """
+#
+#     def __init__(self, directed=False, asker_responder_direction=True):
+#         """
+#
+#         Args:
+#             directed (bool):
+#             asker_responder_direction (bool):
+#         """
+#         self.asker_responder_direction = asker_responder_direction
+#
+#         if not directed:
+#             self.graph = snap.TUNGraph.New()
+#         else:
+#             self.graph = snap.TNGraph.New()
+#
+#     def build_graph_from_db(self, db_accessor, query_nodes, query_edges,
+#                             verbose=False, granularity=100000, max_num_connections=10000000):
+#         """
+#
+#         Args:
+#             db_accessor (SQLiteDataAccessor or FileDataAccessor):
+#             query_nodes (str):
+#             query_edges (str):
+#             verbose (bool): not implemented yet
+#             granularity (int): not implemented yet, possibly deprecated
+#             max_num_connections (int): not implemented yet, possibly deprecated
+#
+#         Returns:
+#
+#         """
+#         for node_id in db_accessor.query_db_generator(query_nodes):
+#             self.graph.AddNode(int(node_id[0]))
+#
+#         for asker_id, responder_id in db_accessor.query_db_generator(query_edges):
+#             if self.asker_responder_direction:
+#                 self.graph.AddEdge(int(asker_id), int(responder_id))
+#             else:
+#                 self.graph.AddEdge(int(responder_id), int(asker_id))
+#
+#         return self.graph
 
 
 class PajekDataAccessor:
@@ -1029,18 +1029,18 @@ def get_user_reputation_lookup(database_path, database_name, sql_query,
         if usr_id not in user_reputation:
             user_reputation[usr_id] = rep
         else:
-            print "Duplicate user"
+            print("Duplicate user")
 
     data_accessor.close_connection()
 
     if verbose:
-        print "Done! Number of users: " + str(len(user_reputation))
+        print("Done! Number of users: " + str(len(user_reputation)))
 
     if output_file_path is not None:
         if verbose:
-            print 'Saving to disk'
+            print('Saving to disk')
         pickle.dump(user_reputation, open(output_file_path, 'wb'))
     else:
         if verbose:
-            print 'Returning dict'
+            print('Returning dict')
         return user_reputation

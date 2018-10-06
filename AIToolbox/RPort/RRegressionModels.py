@@ -65,4 +65,4 @@ class RRegressionModel:
     def print_summary(self):
         base = importr('base')
 
-        print base.summary(self.fit)
+        print(base.summary(self.fit))
