@@ -24,13 +24,14 @@ def basic_tokenize(text, use_word_tokenize=True, rm_non_alphanum=True, start_lab
     """
 
     Args:
-        text:
-        use_word_tokenize:
-        rm_non_alphanum:
-        start_label:
-        end_label:
+        text (str):
+        use_word_tokenize (bool):
+        rm_non_alphanum (bool):
+        start_label (str):
+        end_label (str):
 
     Returns:
+        list:
 
     """
     if rm_non_alphanum:
@@ -55,11 +56,12 @@ def prepare_vocab_mapping(vocab, padding=True, special_labels=('<OOV>',)):
     """
 
     Args:
-        vocab:
-        padding:
-        special_labels:
+        vocab (list):
+        padding (bool):
+        special_labels (list, tuple):
 
     Returns:
+        (dict, int):
 
     """
     vocab = set(vocab)
@@ -76,42 +78,44 @@ def prepare_vocab_mapping(vocab, padding=True, special_labels=('<OOV>',)):
     return word2idx, vocab_size
 
 
-def vectorize_one_text(text_list, word_idx):
+def vectorize_one_text(text_tokens, word_idx):
     """
 
     Args:
-        text_list:
-        word_idx:
+        text_tokens (list):
+        word_idx (dict):
 
     Returns:
+        list: text tokens converted into idx numbers
 
     """
-    return [word_idx[w] if w in word_idx else word_idx['<OOV>'] for w in text_list]
+    return [word_idx[w] if w in word_idx else word_idx['<OOV>'] for w in text_tokens]
 
 
-def vectorize_text(texts_list, word_idx, text_maxlen=None, shorten_text_mode='end'):
+def vectorize_text(text_tokens_lists, word_idx, text_maxlen=None, shorten_text_mode='end'):
     """
 
     Args:
-        texts_list:
-        word_idx:
-        text_maxlen:
-        shorten_text_mode:
+        text_tokens_lists (list):
+        word_idx (dict):
+        text_maxlen (int, None):
+        shorten_text_mode (str):
 
     Returns:
+         list:
 
     """
     if text_maxlen is not None and text_maxlen > 0:
         if shorten_text_mode == 'end':
-            text_idx_list = [vectorize_one_text(text_list[:text_maxlen], word_idx) for text_list in texts_list]
+            text_idx_list = [vectorize_one_text(text_list[:text_maxlen], word_idx) for text_list in text_tokens_lists]
         elif shorten_text_mode == 'start':
             text_idx_list = [vectorize_one_text(text_list[len(text_list)-text_maxlen:], word_idx)
                              if len(text_list) > text_maxlen else
                              vectorize_one_text(text_list, word_idx)
-                             for text_list in texts_list]
+                             for text_list in text_tokens_lists]
         else:
             raise ValueError('shorten_text_mode not end or start')
     else:
-        text_idx_list = [vectorize_one_text(text_list, word_idx) for text_list in texts_list]
+        text_idx_list = [vectorize_one_text(text_list, word_idx) for text_list in text_tokens_lists]
 
     return text_idx_list

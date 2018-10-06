@@ -5,11 +5,12 @@ def process_context_text(context_text, use_word_tokenize=True, rm_non_alphanum=T
     """
 
     Args:
-        context_text:
-        use_word_tokenize:
-        rm_non_alphanum:
+        context_text (str):
+        use_word_tokenize (bool):
+        rm_non_alphanum (bool):
 
     Returns:
+        list:
 
     """
     return basic_tokenize(context_text, use_word_tokenize, rm_non_alphanum,
@@ -20,11 +21,12 @@ def process_question_text(question_text, use_word_tokenize=True, rm_non_alphanum
     """
 
     Args:
-        question_text:
-        use_word_tokenize:
-        rm_non_alphanum:
+        question_text (str):
+        use_word_tokenize (bool):
+        rm_non_alphanum (bool):
 
     Returns:
+        list:
 
     """
     return basic_tokenize(question_text, use_word_tokenize, rm_non_alphanum,
@@ -35,11 +37,12 @@ def process_answer_text(answer_text, use_word_tokenize=True, rm_non_alphanum=Tru
     """
 
     Args:
-        answer_text:
-        use_word_tokenize:
-        rm_non_alphanum:
+        answer_text (str):
+        use_word_tokenize (bool):
+        rm_non_alphanum (bool):
 
     Returns:
+        list:
 
     """
     return basic_tokenize(answer_text, use_word_tokenize, rm_non_alphanum,
@@ -50,11 +53,13 @@ def build_dataset(data_json, use_word_tokenize=True, rm_non_alphanum=True):
     """
 
     Args:
-        data_json:
-        use_word_tokenize:
-        rm_non_alphanum:
+        data_json (list): list of dicts comming from the read json file
+        use_word_tokenize (bool):
+        rm_non_alphanum (bool):
 
     Returns:
+        (list, list, list, list, set, set, set, int, int):
+
 
     """
     print('Building datasets')
@@ -117,4 +122,3 @@ def build_dataset(data_json, use_word_tokenize=True, rm_non_alphanum=True):
     return context_text_list, question_text_list, answer_text_list, answer_start_idx_list, \
            vocab_context_text, vocab_question_text, vocab_answer_text, \
            max_context_text_len, max_question_text_len
-
