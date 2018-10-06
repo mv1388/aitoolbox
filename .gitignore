@@ -2,4 +2,6 @@
 .idea/
 data/
 
+*.pyc
+
 /AIToolbox.egg-info
