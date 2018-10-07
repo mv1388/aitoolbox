@@ -46,7 +46,6 @@ class TextDataStatsAggregator(TextDataAggregator):
         self.data_saver.persist_data_to_db(curr_usr_stats, usr_id)
 
 
-
 class HTMLDataStatsAggregator(TextDataAggregator):
     """
     IMPORTANT!
