@@ -49,14 +49,17 @@ def process_answer_text(answer_text, use_word_tokenize=True, rm_non_alphanum=Tru
                           start_label='START_ANSW', end_label='END_ANSW')
 
 
-def build_dataset(data_json, use_word_tokenize=True, rm_non_alphanum=True,
+def build_dataset(data_json, use_word_tokenize=True,
+                  rm_non_alphanum_ctx=True, rm_non_alphanum_question=True, rm_non_alphanum_answer=True,
                   skip_examples_w_span=True, skip_is_impossible=True):
     """
 
     Args:
         data_json (list): list of dicts comming from the read json file
         use_word_tokenize (bool):
-        rm_non_alphanum (bool):
+        rm_non_alphanum_ctx (bool):
+        rm_non_alphanum_question (bool):
+        rm_non_alphanum_answer (bool):
         skip_examples_w_span (bool):
         skip_is_impossible (bool):
 
@@ -86,7 +89,7 @@ def build_dataset(data_json, use_word_tokenize=True, rm_non_alphanum=True,
 
         for paragraph in paragraphs_list:
             context_paragraph = paragraph['context']
-            context_paragraph = process_context_text(context_paragraph, use_word_tokenize, rm_non_alphanum)
+            context_paragraph = process_context_text(context_paragraph, use_word_tokenize, rm_non_alphanum_ctx)
 
             question_answer_list = paragraph['qas']
 
@@ -101,11 +104,11 @@ def build_dataset(data_json, use_word_tokenize=True, rm_non_alphanum=True,
                     continue
 
                 question_text = question_answer_dict['question']
-                question_text = process_question_text(question_text, use_word_tokenize, rm_non_alphanum)
+                question_text = process_question_text(question_text, use_word_tokenize, rm_non_alphanum_question)
 
                 for answer_dict in answer_list:
                     answer_text = answer_dict['text']
-                    answer_text = process_answer_text(answer_text, use_word_tokenize, rm_non_alphanum)
+                    answer_text = process_answer_text(answer_text, use_word_tokenize, rm_non_alphanum_answer)
 
                     answer_start_idx = answer_dict['answer_start']
                     first_answ_span = find_sub_list(answer_text[1:-1], context_paragraph)

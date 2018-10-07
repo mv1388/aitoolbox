@@ -2,9 +2,6 @@ from multiprocessing import Pool
 import itertools
 import numpy
 
-from AIToolbox.SocialNetworkAnalysis.ParallelExecution import *
-
-
 """     
         TODO:
         

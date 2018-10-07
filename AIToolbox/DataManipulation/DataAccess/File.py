@@ -13,10 +13,10 @@ class FileDataAccessor:
             data_accessor = FileDataAccessor(data_folder_path='data/', data_file_name='full_graph.txt')
 
         Args:
-            data_folder_path:
-            data_file_name:
+            data_folder_path (str):
+            data_file_name (str):
             data_type (str): Currently supported: 'txt', 'csv', 'json', 'pickle-dict'
-            data_type_options:
+            data_type_options (str):
         """
         self.data_folder_path = data_folder_path
         self.data_file_name = data_file_name
@@ -95,7 +95,7 @@ class FileDataAccessor:
         """
 
         Args:
-            column_query_idx:
+            column_query_idx (list):
 
         Returns:
 
@@ -107,8 +107,8 @@ class FileDataAccessor:
         """
 
         Args:
-            column_query_idx:
-            max_element_limit:
+            column_query_idx (list):
+            max_element_limit (int):
 
         Returns:
 
@@ -133,7 +133,7 @@ class FileDataAccessor:
         Interface method
 
         Args:
-            data:
+            data (list):
 
         Returns:
 
@@ -151,7 +151,7 @@ class FileDataAccessor:
         """
 
         Args:
-            data:
+            data (list):
 
         Returns:
 
@@ -164,7 +164,7 @@ class FileDataAccessor:
         """
 
         Args:
-            data:
+            data (list):
 
         Returns:
 
@@ -178,7 +178,7 @@ class FileDataAccessor:
         """
 
         Args:
-            data:
+            data (list):
 
         Returns:
 
@@ -190,12 +190,13 @@ class FileDataAccessor:
         """
 
         Args:
-            file_id:
-            data:
-            delimiter:
-            verbose:
+            file_id (int):
+            data (list):
+            delimiter (str):
+            verbose (bool):
 
         Returns:
+            None
 
         """
         if file_id != self.append_current_file_id:
@@ -231,11 +232,12 @@ class FileDataAccessor:
                 This way a common, data saver independent interface can be used by the code using these savers.
 
         Args:
-            buffer_data:
-            buffer_id:
-            verbose:
+            buffer_data (list):
+            buffer_id (int):
+            verbose (bool):
 
         Returns:
+            None
 
         """
         if self.data_type == 'pickle-dict':
