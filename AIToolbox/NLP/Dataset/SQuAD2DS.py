@@ -1,3 +1,4 @@
+from tqdm import tqdm
 from AIToolbox.NLP.DataPrep.core import *
 
 
@@ -83,7 +84,7 @@ def build_dataset(data_json, use_word_tokenize=True,
     max_context_text_len = 0
     max_question_text_len = 0
 
-    for wiki_page in data_json:
+    for wiki_page in tqdm(data_json):
         title = wiki_page['title']
         paragraphs_list = wiki_page['paragraphs']
 

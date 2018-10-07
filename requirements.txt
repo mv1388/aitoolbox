@@ -9,3 +9,4 @@ pandas
 rpy2
 tweepy
 joblib
+tqdm
