@@ -49,13 +49,16 @@ def process_answer_text(answer_text, use_word_tokenize=True, rm_non_alphanum=Tru
                           start_label='START_ANSW', end_label='END_ANSW')
 
 
-def build_dataset(data_json, use_word_tokenize=True, rm_non_alphanum=True):
+def build_dataset(data_json, use_word_tokenize=True, rm_non_alphanum=True,
+                  skip_examples_w_span=True, skip_is_impossible=True):
     """
 
     Args:
         data_json (list): list of dicts comming from the read json file
         use_word_tokenize (bool):
         rm_non_alphanum (bool):
+        skip_examples_w_span (bool):
+        skip_is_impossible (bool):
 
     Returns:
         (list, list, list, list, set, set, set, int, int):
@@ -63,6 +66,7 @@ def build_dataset(data_json, use_word_tokenize=True, rm_non_alphanum=True):
 
     """
     print('Building datasets')
+    is_impossible_ctr = span_not_found_ctr = total_ctr = 0
 
     context_text_list = []
     question_text_list = []
@@ -88,13 +92,16 @@ def build_dataset(data_json, use_word_tokenize=True, rm_non_alphanum=True):
 
             for question_answer_dict in question_answer_list:
                 is_impossible = question_answer_dict['is_impossible']
-                if is_impossible:
+
+                answer_list = question_answer_dict['answers']
+                total_ctr += len(answer_list)
+
+                if skip_is_impossible and is_impossible:
+                    is_impossible_ctr += 1
                     continue
 
                 question_text = question_answer_dict['question']
                 question_text = process_question_text(question_text, use_word_tokenize, rm_non_alphanum)
-
-                answer_list = question_answer_dict['answers']
 
                 for answer_dict in answer_list:
                     answer_text = answer_dict['text']
@@ -103,8 +110,8 @@ def build_dataset(data_json, use_word_tokenize=True, rm_non_alphanum=True):
                     answer_start_idx = answer_dict['answer_start']
                     first_answ_span = find_sub_list(answer_text[1:-1], context_paragraph)
 
-                    if first_answ_span is None:
-                        # print('aaaaaa')
+                    if skip_examples_w_span and first_answ_span is None:
+                        span_not_found_ctr += 1
                         continue
 
                     context_text_list.append(context_paragraph)
@@ -118,6 +125,9 @@ def build_dataset(data_json, use_word_tokenize=True, rm_non_alphanum=True):
 
                     max_context_text_len = max(max_context_text_len, len(context_paragraph))
                     max_question_text_len = max(max_question_text_len, len(question_text))
+
+    print('is_impossible skip num: {}; % of all rows: {}'.format(is_impossible_ctr, is_impossible_ctr / total_ctr))
+    print('span_not_found skip num: {}; % of all rows: {}'.format(span_not_found_ctr, span_not_found_ctr / total_ctr))
 
     return context_text_list, question_text_list, answer_text_list, answer_start_idx_list, \
            vocab_context_text, vocab_question_text, vocab_answer_text, \

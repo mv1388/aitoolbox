@@ -15,8 +15,8 @@ class TextDataStatsAggregator(TextDataAggregator):
         """
 
         Args:
-            data_saver (MyDataAnalysis.DataAccess.SQLiteDataAccessor, FileDataAccessor):
-            verbose:
+            data_saver (MyDataAnalysis.DataAccess.SQLiteDataAccessor or FileDataAccessor):
+            verbose (bool):
         """
         self.data_saver = data_saver
         self.verbose = verbose
@@ -25,10 +25,11 @@ class TextDataStatsAggregator(TextDataAggregator):
         """
 
         Args:
-            usr_id:
+            usr_id (int):
             text_list (list): List of all the posts made by a certain user
 
         Returns:
+            None
 
         """
         if self.verbose:
@@ -57,8 +58,8 @@ class HTMLDataStatsAggregator(TextDataAggregator):
         """
 
         Args:
-            data_saver (MyDataAnalysis.DataAccess.SQLiteDataAccessor, FileDataAccessor):
-            verbose:
+            data_saver (MyDataAnalysis.DataAccess.SQLiteDataAccessor or FileDataAccessor):
+            verbose (bool):
         """
         self.data_saver = data_saver
         self.verbose = verbose
@@ -67,10 +68,11 @@ class HTMLDataStatsAggregator(TextDataAggregator):
         """
 
         Args:
-            usr_id:
-            html_text_list:
+            usr_id (int):
+            html_text_list (list):
 
         Returns:
+            None
 
         """
         if self.verbose:
