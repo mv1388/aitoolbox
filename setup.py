@@ -1,5 +1,6 @@
 from setuptools import setup, find_packages
 
+
 setup(name='AIToolbox',
       version='0.0.4',
       author='Marko Vidoni',
@@ -22,7 +23,8 @@ setup(name='AIToolbox',
                         'pandas',
                         'rpy2',
                         'tweepy',
-                        'joblib'],
+                        'joblib',
+                        'tqdm'],
 
       test_suite='tests',
       tests_require=['nose'],

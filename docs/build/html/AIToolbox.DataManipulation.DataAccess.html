@@ -1,0 +1,473 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>AIToolbox.DataManipulation.DataAccess package &#8212; AIToolbox 0.0.4 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="AIToolbox.DataManipulation.aggregation package" href="AIToolbox.DataManipulation.aggregation.html" />
+    <link rel="prev" title="AIToolbox.DataManipulation package" href="AIToolbox.DataManipulation.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="aitoolbox-datamanipulation-dataaccess-package">
+<h1>AIToolbox.DataManipulation.DataAccess package<a class="headerlink" href="#aitoolbox-datamanipulation-dataaccess-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-AIToolbox.DataManipulation.DataAccess.File">
+<span id="aitoolbox-datamanipulation-dataaccess-file-module"></span><h2>AIToolbox.DataManipulation.DataAccess.File module<a class="headerlink" href="#module-AIToolbox.DataManipulation.DataAccess.File" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="AIToolbox.DataManipulation.DataAccess.File.FileDataAccessor">
+<em class="property">class </em><code class="descclassname">AIToolbox.DataManipulation.DataAccess.File.</code><code class="descname">FileDataAccessor</code><span class="sig-paren">(</span><em>data_folder_path=''</em>, <em>data_file_name=''</em>, <em>data_type='txt'</em>, <em>data_type_options='t'</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.DataManipulation.DataAccess.File.FileDataAccessor" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="AIToolbox.DataManipulation.DataAccess.File.FileDataAccessor.ordered_append_save">
+<code class="descname">ordered_append_save</code><span class="sig-paren">(</span><em>file_id</em>, <em>data</em>, <em>delimiter='\n'</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.DataManipulation.DataAccess.File.FileDataAccessor.ordered_append_save" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Args:</dt>
+<dd>file_id (int):
+data (list):
+delimiter (str):
+verbose (bool):</dd>
+<dt>Returns:</dt>
+<dd>None</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.DataManipulation.DataAccess.File.FileDataAccessor.persist_data_to_db">
+<code class="descname">persist_data_to_db</code><span class="sig-paren">(</span><em>buffer_data</em>, <em>buffer_id=None</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.DataManipulation.DataAccess.File.FileDataAccessor.persist_data_to_db" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is a general interface method for persisting data to disk.</p>
+<p>Currently only saving to pickle in a form of a dict is supported. Extend if needed (pickle as a table,
+text file table, csv)</p>
+<dl class="docutils">
+<dt>NOTICE: Naming of the function: even though it says to_db it is actually not really saving to the database.</dt>
+<dd>Such name was only used to be compatible with the corresponding function in the SQLiteDataAccessor.
+This way a common, data saver independent interface can be used by the code using these savers.</dd>
+<dt>Args:</dt>
+<dd>buffer_data (list):
+buffer_id (int):
+verbose (bool):</dd>
+<dt>Returns:</dt>
+<dd>None</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.DataManipulation.DataAccess.File.FileDataAccessor.query_db_generator">
+<code class="descname">query_db_generator</code><span class="sig-paren">(</span><em>column_query_idx</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.DataManipulation.DataAccess.File.FileDataAccessor.query_db_generator" title="Permalink to this definition">¶</a></dt>
+<dd><p>IMPORTANT: must be named query_db_generator</p>
+<p>if data type is TXT, self.data_type_options must specify the separator used in the saved data.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>column_query_idx (list or None): set to None to get all the columns in the file</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.DataManipulation.DataAccess.File.FileDataAccessor.query_db_print">
+<code class="descname">query_db_print</code><span class="sig-paren">(</span><em>column_query_idx</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.DataManipulation.DataAccess.File.FileDataAccessor.query_db_print" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Args:</dt>
+<dd>column_query_idx (list or None):</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.DataManipulation.DataAccess.File.FileDataAccessor.query_db_table">
+<code class="descname">query_db_table</code><span class="sig-paren">(</span><em>column_query_idx</em>, <em>max_element_limit=0</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.DataManipulation.DataAccess.File.FileDataAccessor.query_db_table" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Args:</dt>
+<dd>column_query_idx (list or None):
+max_element_limit (int):</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.DataManipulation.DataAccess.File.FileDataAccessor.save_data_to_csv_file">
+<code class="descname">save_data_to_csv_file</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.DataManipulation.DataAccess.File.FileDataAccessor.save_data_to_csv_file" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Args:</dt>
+<dd>data (list):</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.DataManipulation.DataAccess.File.FileDataAccessor.save_data_to_file">
+<code class="descname">save_data_to_file</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.DataManipulation.DataAccess.File.FileDataAccessor.save_data_to_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Interface method</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>data (list):</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.DataManipulation.DataAccess.File.FileDataAccessor.save_data_to_json_file">
+<code class="descname">save_data_to_json_file</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.DataManipulation.DataAccess.File.FileDataAccessor.save_data_to_json_file" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Args:</dt>
+<dd>data (list):</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.DataManipulation.DataAccess.File.FileDataAccessor.save_data_to_text_file">
+<code class="descname">save_data_to_text_file</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.DataManipulation.DataAccess.File.FileDataAccessor.save_data_to_text_file" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Args:</dt>
+<dd>data (list):</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-AIToolbox.DataManipulation.DataAccess.GraphData">
+<span id="aitoolbox-datamanipulation-dataaccess-graphdata-module"></span><h2>AIToolbox.DataManipulation.DataAccess.GraphData module<a class="headerlink" href="#module-AIToolbox.DataManipulation.DataAccess.GraphData" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="AIToolbox.DataManipulation.DataAccess.GraphData.GraphDataAccessor">
+<em class="property">class </em><code class="descclassname">AIToolbox.DataManipulation.DataAccess.GraphData.</code><code class="descname">GraphDataAccessor</code><span class="sig-paren">(</span><em>directed=False</em>, <em>asker_responder_direction=True</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.DataManipulation.DataAccess.GraphData.GraphDataAccessor" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="AIToolbox.DataManipulation.DataAccess.GraphData.GraphDataAccessor.build_graph_from_db">
+<code class="descname">build_graph_from_db</code><span class="sig-paren">(</span><em>db_accessor</em>, <em>query</em>, <em>verbose=False</em>, <em>granularity=100000</em>, <em>max_num_connections=10000000</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.DataManipulation.DataAccess.GraphData.GraphDataAccessor.build_graph_from_db" title="Permalink to this definition">¶</a></dt>
+<dd><p>max_num_connections only works if verbose is True</p>
+<dl class="docutils">
+<dt>Examples:</dt>
+<dd><p class="first">When using SQLLiteDataAccessor to access data from the database:</p>
+<p>my_query_full_graph = ‘’‘select QuestionUserId, AnswerUserId from QAFullGraph’‘’
+graph_builder = GraphDataAccessor(directed=True)
+graph_directed = graph_builder.build_graph_from_db(data_accessor, my_query_full_graph,</p>
+<blockquote>
+<div>verbose=True, max_num_connections=-1)</div></blockquote>
+<p>When using FileDataAccessor to access data from the disk file:</p>
+<p>column_query_idx = [1, 3]
+graph_builder = GraphDataAccessor(directed=True)
+graph_directed = graph_builder.build_graph_from_db(data_accessor, column_query_idx,</p>
+<blockquote class="last">
+<div>verbose=True, max_num_connections=-1)</div></blockquote>
+</dd>
+<dt>Args:</dt>
+<dd>db_accessor (SQLiteDataAccessor, FileDataAccessor):
+query (str):
+verbose (bool):
+granularity (int):
+max_num_connections (int):</dd>
+</dl>
+<p>Returns: networkx.Graph</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.DataManipulation.DataAccess.GraphData.GraphDataAccessor.build_weighted_graph_from_db">
+<code class="descname">build_weighted_graph_from_db</code><span class="sig-paren">(</span><em>db_accessor</em>, <em>query</em>, <em>verbose=False</em>, <em>granularity=100000</em>, <em>max_num_connections=10000000</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.DataManipulation.DataAccess.GraphData.GraphDataAccessor.build_weighted_graph_from_db" title="Permalink to this definition">¶</a></dt>
+<dd><p>max_num_connections only works if verbose is True</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>db_accessor:
+query:
+verbose (bool):
+granularity (int):
+max_num_connections (int):</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.DataManipulation.DataAccess.GraphData.GraphDataAccessor.save_graph">
+<code class="descname">save_graph</code><span class="sig-paren">(</span><em>graph</em>, <em>db_accessor</em>, <em>save_query</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.DataManipulation.DataAccess.GraphData.GraphDataAccessor.save_graph" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Args:</dt>
+<dd>graph:
+db_accessor:
+save_query:</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.DataManipulation.DataAccess.GraphData.PajekDataAccessor">
+<em class="property">class </em><code class="descclassname">AIToolbox.DataManipulation.DataAccess.GraphData.</code><code class="descname">PajekDataAccessor</code><a class="headerlink" href="#AIToolbox.DataManipulation.DataAccess.GraphData.PajekDataAccessor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Still need to decide what the functionality is going to be… basically some code is needed to prepare the dataset
+that can be used with Pajek.</p>
+<dl class="docutils">
+<dt>Probably need:</dt>
+<dd>load from SQLite DB and create Pajek input file
+load from file on disk and create Pajek input</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="aitoolbox-datamanipulation-dataaccess-mongodb-module">
+<h2>AIToolbox.DataManipulation.DataAccess.MongoDB module<a class="headerlink" href="#aitoolbox-datamanipulation-dataaccess-mongodb-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="aitoolbox-datamanipulation-dataaccess-mysql-module">
+<h2>AIToolbox.DataManipulation.DataAccess.MySQL module<a class="headerlink" href="#aitoolbox-datamanipulation-dataaccess-mysql-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-AIToolbox.DataManipulation.DataAccess.SQLite">
+<span id="aitoolbox-datamanipulation-dataaccess-sqlite-module"></span><h2>AIToolbox.DataManipulation.DataAccess.SQLite module<a class="headerlink" href="#module-AIToolbox.DataManipulation.DataAccess.SQLite" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="AIToolbox.DataManipulation.DataAccess.SQLite.SQLiteDataAccessor">
+<em class="property">class </em><code class="descclassname">AIToolbox.DataManipulation.DataAccess.SQLite.</code><code class="descname">SQLiteDataAccessor</code><span class="sig-paren">(</span><em>db_path='/Volumes/Zunanji Disk/MSc_StackOverflow_dump/'</em>, <em>db_name='so-dump.db'</em>, <em>db_create_query=None</em>, <em>db_insert_query=None</em>, <em>data_aggregator=None</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.DataManipulation.DataAccess.SQLite.SQLiteDataAccessor" title="Permalink to this definition">¶</a></dt>
+<dd><p>SQLite access class
+For now can: query data and :</p>
+<blockquote>
+<div><ul class="simple">
+<li>print to console</li>
+<li>return 2D list - table</li>
+<li>save data to file on disk in text format with specified delimiter</li>
+<li>save to disk in CSV</li>
+<li>save to disk the 2D table in one part (potential for memory problem if query return too big)</li>
+<li><dl class="first docutils">
+<dt>save to dist the 2d table in partitions (to solve the memory problem).</dt>
+<dd>Flush to disk when enough data has accumulated.</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<dl class="method">
+<dt id="AIToolbox.DataManipulation.DataAccess.SQLite.SQLiteDataAccessor.close_connection">
+<code class="descname">close_connection</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.DataManipulation.DataAccess.SQLite.SQLiteDataAccessor.close_connection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.DataManipulation.DataAccess.SQLite.SQLiteDataAccessor.execute_query">
+<code class="descname">execute_query</code><span class="sig-paren">(</span><em>sql_query</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.DataManipulation.DataAccess.SQLite.SQLiteDataAccessor.execute_query" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Args:</dt>
+<dd>sql_query (str):</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.DataManipulation.DataAccess.SQLite.SQLiteDataAccessor.ordered_append_save">
+<code class="descname">ordered_append_save</code><span class="sig-paren">(</span><em>file_id</em>, <em>data</em>, <em>delimiter='\n'</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.DataManipulation.DataAccess.SQLite.SQLiteDataAccessor.ordered_append_save" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Args:</dt>
+<dd>file_id (int): In this case file means row in teh SQLite table. Each row in the table is one user.
+data (str): In this initial implementation, data is meant to be a str clean text coming from the user’s post
+delimiter (str):
+verbose (bool):</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.DataManipulation.DataAccess.SQLite.SQLiteDataAccessor.persist_data_to_db">
+<code class="descname">persist_data_to_db</code><span class="sig-paren">(</span><em>buffer_data</em>, <em>buffer_id=None</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.DataManipulation.DataAccess.SQLite.SQLiteDataAccessor.persist_data_to_db" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">buffer_data (list):
+buffer_id (None): In this function, this parameter is useless. Present here just for compatibility with</p>
+<blockquote>
+<div>FileDataAccessor’s persist buffer function</div></blockquote>
+<p class="last">verbose (bool):</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.DataManipulation.DataAccess.SQLite.SQLiteDataAccessor.query_db_csv_save">
+<code class="descname">query_db_csv_save</code><span class="sig-paren">(</span><em>sql_query</em>, <em>file_path</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.DataManipulation.DataAccess.SQLite.SQLiteDataAccessor.query_db_csv_save" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Args:</dt>
+<dd>sql_query (str):
+file_path (str):</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.DataManipulation.DataAccess.SQLite.SQLiteDataAccessor.query_db_dump">
+<code class="descname">query_db_dump</code><span class="sig-paren">(</span><em>sql_query</em>, <em>dump_file_path</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.DataManipulation.DataAccess.SQLite.SQLiteDataAccessor.query_db_dump" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Args:</dt>
+<dd>sql_query (str):
+dump_file_path (str):</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.DataManipulation.DataAccess.SQLite.SQLiteDataAccessor.query_db_dump_partitioned">
+<code class="descname">query_db_dump_partitioned</code><span class="sig-paren">(</span><em>sql_query</em>, <em>dump_file_folder_path</em>, <em>dump_file_name</em>, <em>spill_thresh=10000</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.DataManipulation.DataAccess.SQLite.SQLiteDataAccessor.query_db_dump_partitioned" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Args:</dt>
+<dd>sql_query (str):
+dump_file_folder_path (str):
+dump_file_name (str):
+spill_thresh (str):</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.DataManipulation.DataAccess.SQLite.SQLiteDataAccessor.query_db_generator">
+<code class="descname">query_db_generator</code><span class="sig-paren">(</span><em>sql_query</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.DataManipulation.DataAccess.SQLite.SQLiteDataAccessor.query_db_generator" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Args:</dt>
+<dd>sql_query (str):</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.DataManipulation.DataAccess.SQLite.SQLiteDataAccessor.query_db_print">
+<code class="descname">query_db_print</code><span class="sig-paren">(</span><em>sql_query</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.DataManipulation.DataAccess.SQLite.SQLiteDataAccessor.query_db_print" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Args:</dt>
+<dd>sql_query (str):</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.DataManipulation.DataAccess.SQLite.SQLiteDataAccessor.query_db_table">
+<code class="descname">query_db_table</code><span class="sig-paren">(</span><em>sql_query</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.DataManipulation.DataAccess.SQLite.SQLiteDataAccessor.query_db_table" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Args:</dt>
+<dd>sql_query (str):</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.DataManipulation.DataAccess.SQLite.SQLiteDataAccessor.query_db_text_save">
+<code class="descname">query_db_text_save</code><span class="sig-paren">(</span><em>sql_query</em>, <em>file_path</em>, <em>separator='\t'</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.DataManipulation.DataAccess.SQLite.SQLiteDataAccessor.query_db_text_save" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Args:</dt>
+<dd>sql_query (str):
+file_path (str):
+separator (str):</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.DataManipulation.DataAccess.SQLite.SQLiteDataAccessor.save_data_to_db">
+<code class="descname">save_data_to_db</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.DataManipulation.DataAccess.SQLite.SQLiteDataAccessor.save_data_to_db" title="Permalink to this definition">¶</a></dt>
+<dd><p>Possible duplication with persist_data_to_db() method which is already implemented below.</p>
+<p>Check it if I really need to implement this one as well!</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>data:</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-AIToolbox.DataManipulation.DataAccess">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-AIToolbox.DataManipulation.DataAccess" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">AIToolbox.DataManipulation.DataAccess package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-AIToolbox.DataManipulation.DataAccess.File">AIToolbox.DataManipulation.DataAccess.File module</a></li>
+<li><a class="reference internal" href="#module-AIToolbox.DataManipulation.DataAccess.GraphData">AIToolbox.DataManipulation.DataAccess.GraphData module</a></li>
+<li><a class="reference internal" href="#aitoolbox-datamanipulation-dataaccess-mongodb-module">AIToolbox.DataManipulation.DataAccess.MongoDB module</a></li>
+<li><a class="reference internal" href="#aitoolbox-datamanipulation-dataaccess-mysql-module">AIToolbox.DataManipulation.DataAccess.MySQL module</a></li>
+<li><a class="reference internal" href="#module-AIToolbox.DataManipulation.DataAccess.SQLite">AIToolbox.DataManipulation.DataAccess.SQLite module</a></li>
+<li><a class="reference internal" href="#module-AIToolbox.DataManipulation.DataAccess">Module contents</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="AIToolbox.DataManipulation.html">AIToolbox.DataManipulation package</a><ul>
+      <li>Previous: <a href="AIToolbox.DataManipulation.html" title="previous chapter">AIToolbox.DataManipulation package</a></li>
+      <li>Next: <a href="AIToolbox.DataManipulation.aggregation.html" title="next chapter">AIToolbox.DataManipulation.aggregation package</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/AIToolbox.DataManipulation.DataAccess.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Marko.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/AIToolbox.DataManipulation.DataAccess.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
