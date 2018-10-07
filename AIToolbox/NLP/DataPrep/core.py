@@ -56,9 +56,9 @@ def prepare_vocab_mapping(vocab, padding=True, special_labels=('<OOV>',)):
     """
 
     Args:
-        vocab (list):
+        vocab (list or set):
         padding (bool):
-        special_labels (list, tuple):
+        special_labels (list or tuple):
 
     Returns:
         (dict, int):
@@ -98,7 +98,7 @@ def vectorize_text(text_tokens_lists, word_idx, text_maxlen=None, shorten_text_m
     Args:
         text_tokens_lists (list):
         word_idx (dict):
-        text_maxlen (int, None):
+        text_maxlen (int or None):
         shorten_text_mode (str):
 
     Returns:
