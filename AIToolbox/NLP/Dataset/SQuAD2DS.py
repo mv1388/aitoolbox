@@ -1,55 +1,72 @@
-import re
-from nltk.tokenize import word_tokenize
-
-
-"""
-            Not my code, so be careful
-            
-            Got this from github project
-"""
-
-
-def find_sub_list(sl, l):
-    sll = len(sl)
-    for ind in (i for i, e in enumerate(l) if e == sl[0]):
-        if l[ind:ind+sll] == sl:
-            return ind, ind+sll-1
+from AIToolbox.NLP.DataPrep.core import *
 
 
 def process_context_text(context_text, use_word_tokenize=True, rm_non_alphanum=True):
-    if rm_non_alphanum:
-        context_text = re.sub(r'\([^)]*\)', '', context_text)
-        context_text = context_text.replace('-', ' ')
-        context_text = re.sub(r'[^0-9a-zA-Z. ]', '', context_text)
+    """
 
-    if use_word_tokenize:
-        main_text_token = ['START_DOC'] + [el.lower() for el in word_tokenize(context_text)] + ['END_DOC']
-    else:
-        main_text_token = ['START_DOC'] + context_text.lower().split() + ['END_DOC']
+    Args:
+        context_text (str):
+        use_word_tokenize (bool):
+        rm_non_alphanum (bool):
 
-    return main_text_token
+    Returns:
+        list:
+
+    """
+    return basic_tokenize(context_text, use_word_tokenize, rm_non_alphanum,
+                          start_label='START_DOC', end_label='END_DOC')
 
 
 def process_question_text(question_text, use_word_tokenize=True, rm_non_alphanum=True):
-    if use_word_tokenize:
-        question_text = ['START_Q'] + [el.lower() for el in word_tokenize(question_text)] + ['END_Q']
-    else:
-        question_text = ['START_Q'] + question_text.lower().split() + ['END_Q']
+    """
 
-    return question_text
+    Args:
+        question_text (str):
+        use_word_tokenize (bool):
+        rm_non_alphanum (bool):
+
+    Returns:
+        list:
+
+    """
+    return basic_tokenize(question_text, use_word_tokenize, rm_non_alphanum,
+                          start_label='START_Q', end_label='END_Q')
 
 
 def process_answer_text(answer_text, use_word_tokenize=True, rm_non_alphanum=True):
-    if use_word_tokenize:
-        answer_text = ['START_ANSW'] + [el.lower() for el in word_tokenize(answer_text)] + ['END_ANSW']
-    else:
-        answer_text = ['START_ANSW'] + answer_text.lower().split() + ['END_ANSW']
+    """
 
-    return answer_text
+    Args:
+        answer_text (str):
+        use_word_tokenize (bool):
+        rm_non_alphanum (bool):
+
+    Returns:
+        list:
+
+    """
+    return basic_tokenize(answer_text, use_word_tokenize, rm_non_alphanum,
+                          start_label='START_ANSW', end_label='END_ANSW')
 
 
-def build_dataset(data_json, use_word_tokenize=True, rm_non_alphanum=True):
+def build_dataset(data_json, use_word_tokenize=True, rm_non_alphanum=True,
+                  skip_examples_w_span=True, skip_is_impossible=True):
+    """
+
+    Args:
+        data_json (list): list of dicts comming from the read json file
+        use_word_tokenize (bool):
+        rm_non_alphanum (bool):
+        skip_examples_w_span (bool):
+        skip_is_impossible (bool):
+
+    Returns:
+        (list, list, list, list, set, set, set, int, int):
+
+
+    """
     print('Building datasets')
+    is_impossible_ctr = span_not_found_ctr = total_ctr = 0
 
     context_text_list = []
     question_text_list = []
@@ -75,13 +92,16 @@ def build_dataset(data_json, use_word_tokenize=True, rm_non_alphanum=True):
 
             for question_answer_dict in question_answer_list:
                 is_impossible = question_answer_dict['is_impossible']
-                if is_impossible:
+
+                answer_list = question_answer_dict['answers']
+                total_ctr += len(answer_list)
+
+                if skip_is_impossible and is_impossible:
+                    is_impossible_ctr += 1
                     continue
 
                 question_text = question_answer_dict['question']
                 question_text = process_question_text(question_text, use_word_tokenize, rm_non_alphanum)
-
-                answer_list = question_answer_dict['answers']
 
                 for answer_dict in answer_list:
                     answer_text = answer_dict['text']
@@ -90,8 +110,8 @@ def build_dataset(data_json, use_word_tokenize=True, rm_non_alphanum=True):
                     answer_start_idx = answer_dict['answer_start']
                     first_answ_span = find_sub_list(answer_text[1:-1], context_paragraph)
 
-                    if first_answ_span is None:
-                        # print('aaaaaa')
+                    if skip_examples_w_span and first_answ_span is None:
+                        span_not_found_ctr += 1
                         continue
 
                     context_text_list.append(context_paragraph)
@@ -106,31 +126,9 @@ def build_dataset(data_json, use_word_tokenize=True, rm_non_alphanum=True):
                     max_context_text_len = max(max_context_text_len, len(context_paragraph))
                     max_question_text_len = max(max_question_text_len, len(question_text))
 
+    print('is_impossible skip num: {}; % of all rows: {}'.format(is_impossible_ctr, is_impossible_ctr / total_ctr))
+    print('span_not_found skip num: {}; % of all rows: {}'.format(span_not_found_ctr, span_not_found_ctr / total_ctr))
+
     return context_text_list, question_text_list, answer_text_list, answer_start_idx_list, \
            vocab_context_text, vocab_question_text, vocab_answer_text, \
            max_context_text_len, max_question_text_len
-
-
-def prepare_vocab_mapping(vocab):
-    vocab = set(vocab)
-    vocab = sorted(vocab)
-
-    word2idx = dict((c, i + 2) for i, c in enumerate(vocab))
-    word2idx['<OOV>'] = 1
-
-    vocab_size = len(word2idx) + 1
-
-    return word2idx, vocab_size
-
-
-def vectorize_one_text(text_list, word_idx):
-    return [word_idx[w] if w in word_idx else word_idx['<OOV>'] for w in text_list]
-
-
-def vectorize_text(texts_list, word_idx, text_maxlen=None):
-    text_idx_list = [vectorize_one_text(text_list, word_idx) for text_list in texts_list]
-
-    if text_maxlen is not None and text_maxlen > 0:
-        raise ValueError( )
-
-    return text_idx_list

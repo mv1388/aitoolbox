@@ -9,10 +9,10 @@ class TwitterAPIConsumerCredentials:
         """
 
         Args:
-            consumer_key:
-            consumer_secret:
-            access_token:
-            access_token_secret:
+            consumer_key (str):
+            consumer_secret (str):
+            access_token (str):
+            access_token_secret (str):
         """
         self.consumer_key = consumer_key
         self.consumer_secret = consumer_secret
@@ -29,6 +29,7 @@ class TwitterAPIConsumerCredentials:
         """
 
         Returns:
+            bool:
 
         """
         return self.consumer_key is not None and \
@@ -42,7 +43,7 @@ class TwitterAPIStreamer:
         """
 
         Args:
-            twitter_api_credentials:
+            twitter_api_credentials (TwitterAPIConsumerCredentials):
         """
         if not twitter_api_credentials.check_if_info_complete():
             print("Not all API credentials present in the provided credentials object.")
@@ -61,11 +62,12 @@ class TwitterAPIStreamer:
         """
 
         Args:
-            listener:
-            stream_filter:
-            auto_resume:
+            listener (tweepy.StreamListener):
+            stream_filter (bool):
+            auto_resume (bool):
 
         Returns:
+            None
 
         """
 
@@ -479,7 +481,8 @@ class TwitterAPIREST:
     def __init__(self, twitter_api_credentials):
         """
 
-        :param twitter_api_credentials:
+        Args:
+            twitter_api_credentials (TwitterAPIConsumerCredentials):
         """
         if not twitter_api_credentials.check_if_info_complete():
             print("Not all API credentials present in the provided credentials object.")
@@ -496,9 +499,12 @@ class TwitterAPIREST:
     def get_user_time_line(self, user_id, tweet_num_bound):
         """
 
-        :param user_id:
-        :param tweet_num_bound:
-        :return:
+        Args:
+            user_id:
+            tweet_num_bound:
+
+        Returns:
+
         """
         return self.api.user_timeline(user_id, count=tweet_num_bound)
 
