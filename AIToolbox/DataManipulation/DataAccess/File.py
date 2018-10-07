@@ -56,7 +56,7 @@ class FileDataAccessor:
         if data type is TXT, self.data_type_options must specify the separator used in the saved data.
 
         Args:
-            column_query_idx (list): set to None to get all the columns in the file
+            column_query_idx (list or None): set to None to get all the columns in the file
 
         Returns:
 
@@ -95,7 +95,7 @@ class FileDataAccessor:
         """
 
         Args:
-            column_query_idx (list):
+            column_query_idx (list or None):
 
         Returns:
 
@@ -107,7 +107,7 @@ class FileDataAccessor:
         """
 
         Args:
-            column_query_idx (list):
+            column_query_idx (list or None):
             max_element_limit (int):
 
         Returns:
