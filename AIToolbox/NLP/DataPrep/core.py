@@ -2,21 +2,24 @@ import re
 from nltk.tokenize import word_tokenize
 
 
-def find_sub_list(sl, l):
+def find_sub_list(sub_list, main_list):
     """Find starting and ending position of a sublist in a longer list.
 
 
     Args:
-        sl (list): sublist
-        l (list): main longer list
+        sub_list (list): sublist
+        main_list (list): main longer list
 
     Returns:
         (int, int): start and end index in the list l. Returns None if sublist is not found in the main list.
 
     """
-    sll = len(sl)
-    for ind in (i for i, e in enumerate(l) if e == sl[0]):
-        if l[ind:ind+sll] == sl:
+    if len(sub_list) > len(main_list):
+        raise ValueError('len(sub_list) > len(main_list); should be len(sub_list) <= len(main_list)')
+
+    sll = len(sub_list)
+    for ind in (i for i, e in enumerate(main_list) if e == sub_list[0]):
+        if main_list[ind:ind+sll] == sub_list:
             return ind, ind+sll-1
 
 

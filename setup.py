@@ -10,7 +10,7 @@ setup(name='AIToolbox',
 
       python_requires='>=3.6.0',
 
-      packages=find_packages(exclude=['ToolboxTestScripts', 'deprecated']),
+      packages=find_packages(exclude=['tests', 'ToolboxUseScripts', 'deprecated']),
 
       install_requires=['mysql-connector-python',
                         'pymongo',
@@ -23,5 +23,8 @@ setup(name='AIToolbox',
                         'rpy2',
                         'tweepy',
                         'joblib'],
+
+      test_suite='tests',
+      tests_require=['nose'],
 
       zip_safe=False)
