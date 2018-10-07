@@ -116,7 +116,7 @@ class SQLiteDataAccessor:
         """
 
         Args:
-            sql_query:
+            sql_query (str):
 
         Returns:
 
@@ -129,7 +129,7 @@ class SQLiteDataAccessor:
         """
 
         Args:
-            sql_query:
+            sql_query (str):
 
         Returns:
 
@@ -141,7 +141,7 @@ class SQLiteDataAccessor:
         """
 
         Args:
-            sql_query:
+            sql_query (str):
 
         Returns:
 
@@ -152,9 +152,9 @@ class SQLiteDataAccessor:
         """
 
         Args:
-            sql_query:
-            file_path:
-            separator:
+            sql_query (str):
+            file_path (str):
+            separator (str):
 
         Returns:
 
@@ -167,8 +167,8 @@ class SQLiteDataAccessor:
         """
 
         Args:
-            sql_query:
-            file_path:
+            sql_query (str):
+            file_path (str):
 
         Returns:
 
@@ -186,8 +186,8 @@ class SQLiteDataAccessor:
         """
 
         Args:
-            sql_query:
-            dump_file_path:
+            sql_query (str):
+            dump_file_path (str):
 
         Returns:
 
@@ -198,10 +198,10 @@ class SQLiteDataAccessor:
         """
 
         Args:
-            sql_query:
-            dump_file_folder_path:
-            dump_file_name:
-            spill_thresh:
+            sql_query (str):
+            dump_file_folder_path (str):
+            dump_file_name (str):
+            spill_thresh (str):
 
         Returns:
 
@@ -247,7 +247,7 @@ class SQLiteDataAccessor:
             file_id (int): In this case file means row in teh SQLite table. Each row in the table is one user.
             data (str): In this initial implementation, data is meant to be a str clean text coming from the user's post
             delimiter (str):
-            verbose:
+            verbose (bool):
 
         Returns:
 

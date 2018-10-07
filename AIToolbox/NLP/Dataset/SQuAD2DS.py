@@ -55,7 +55,7 @@ def build_dataset(data_json, use_word_tokenize=True,
     """
 
     Args:
-        data_json (list): list of dicts comming from the read json file
+        data_json (list): list of dicts coming from the read json file
         use_word_tokenize (bool):
         rm_non_alphanum_ctx (bool):
         rm_non_alphanum_question (bool):

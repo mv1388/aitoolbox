@@ -9,10 +9,10 @@ class MySQLDataAccessor(SQLiteDataAccessor):
         """
 
         Args:
-            host:
-            database:
-            user:
-            password:
+            host (str):
+            database (str):
+            user (str):
+            password (str):
             **kwargs:
         """
         SQLiteDataAccessor.__init__(self, **kwargs)

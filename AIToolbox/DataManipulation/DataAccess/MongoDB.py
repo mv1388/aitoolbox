@@ -15,9 +15,9 @@ class MongoDBDataAccessor(SQLiteDataAccessor):
         """
 
         Args:
-            db_name:
-            collection_name:
-            batch_insert_size:
+            db_name (str):
+            collection_name (str):
+            batch_insert_size (int):
             **kwargs:
         """
         SQLiteDataAccessor.__init__(self, **kwargs)
@@ -107,8 +107,8 @@ class MongoDBDataAccessor(SQLiteDataAccessor):
         """
 
         Args:
-            clean_buffer:
-            verbose:
+            clean_buffer (bool):
+            verbose (bool):
 
         Returns:
 
@@ -132,10 +132,10 @@ class MongoDBWriter:
         """
 
         Args:
-            db_name:
-            collection_name:
-            batch_insert_size:
-            verbose:
+            db_name (str):
+            collection_name (str):
+            batch_insert_size (int):
+            verbose (bool):
         """
         self.verbose = verbose
 
@@ -179,11 +179,11 @@ class MongoDBMultiTopicWriter:
         """
 
         Args:
-            db_name:
+            db_name (str):
             collections_topics:
             unclaimed_collection:
-            batch_insert_size:
-            verbose:
+            batch_insert_size (int):
+            verbose (bool):
         """
         self.verbose = verbose
 

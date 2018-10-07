@@ -84,9 +84,9 @@ class GraphDataAccessor:
         Args:
             db_accessor:
             query:
-            verbose:
-            granularity:
-            max_num_connections:
+            verbose (bool):
+            granularity (int):
+            max_num_connections (int):
 
         Returns:
 
