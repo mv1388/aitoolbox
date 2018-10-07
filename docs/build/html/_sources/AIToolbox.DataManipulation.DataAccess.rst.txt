@@ -1,43 +1,43 @@
-AIToolbox\.DataManipulation\.DataAccess package
-===============================================
+AIToolbox.DataManipulation.DataAccess package
+=============================================
 
 Submodules
 ----------
 
-AIToolbox\.DataManipulation\.DataAccess\.File module
-----------------------------------------------------
+AIToolbox.DataManipulation.DataAccess.File module
+-------------------------------------------------
 
 .. automodule:: AIToolbox.DataManipulation.DataAccess.File
     :members:
     :undoc-members:
     :show-inheritance:
 
-AIToolbox\.DataManipulation\.DataAccess\.GraphData module
----------------------------------------------------------
+AIToolbox.DataManipulation.DataAccess.GraphData module
+------------------------------------------------------
 
 .. automodule:: AIToolbox.DataManipulation.DataAccess.GraphData
     :members:
     :undoc-members:
     :show-inheritance:
 
-AIToolbox\.DataManipulation\.DataAccess\.MongoDB module
--------------------------------------------------------
+AIToolbox.DataManipulation.DataAccess.MongoDB module
+----------------------------------------------------
 
 .. automodule:: AIToolbox.DataManipulation.DataAccess.MongoDB
     :members:
     :undoc-members:
     :show-inheritance:
 
-AIToolbox\.DataManipulation\.DataAccess\.MySQL module
------------------------------------------------------
+AIToolbox.DataManipulation.DataAccess.MySQL module
+--------------------------------------------------
 
 .. automodule:: AIToolbox.DataManipulation.DataAccess.MySQL
     :members:
     :undoc-members:
     :show-inheritance:
 
-AIToolbox\.DataManipulation\.DataAccess\.SQLite module
-------------------------------------------------------
+AIToolbox.DataManipulation.DataAccess.SQLite module
+---------------------------------------------------
 
 .. automodule:: AIToolbox.DataManipulation.DataAccess.SQLite
     :members:

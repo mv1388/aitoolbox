@@ -1,5 +1,5 @@
-AIToolbox\.Social package
-=========================
+AIToolbox.Social package
+========================
 
 Subpackages
 -----------
@@ -11,16 +11,16 @@ Subpackages
 Submodules
 ----------
 
-AIToolbox\.Social\.InstagramAPIConsumer module
-----------------------------------------------
+AIToolbox.Social.InstagramAPIConsumer module
+--------------------------------------------
 
 .. automodule:: AIToolbox.Social.InstagramAPIConsumer
     :members:
     :undoc-members:
     :show-inheritance:
 
-AIToolbox\.Social\.TwitterAPIConsumer module
---------------------------------------------
+AIToolbox.Social.TwitterAPIConsumer module
+------------------------------------------
 
 .. automodule:: AIToolbox.Social.TwitterAPIConsumer
     :members:

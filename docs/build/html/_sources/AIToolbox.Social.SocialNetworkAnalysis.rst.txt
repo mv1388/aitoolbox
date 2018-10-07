@@ -1,19 +1,19 @@
-AIToolbox\.Social\.SocialNetworkAnalysis package
-================================================
+AIToolbox.Social.SocialNetworkAnalysis package
+==============================================
 
 Submodules
 ----------
 
-AIToolbox\.Social\.SocialNetworkAnalysis\.NetworkAnalysisToolbox module
------------------------------------------------------------------------
+AIToolbox.Social.SocialNetworkAnalysis.NetworkAnalysisToolbox module
+--------------------------------------------------------------------
 
 .. automodule:: AIToolbox.Social.SocialNetworkAnalysis.NetworkAnalysisToolbox
     :members:
     :undoc-members:
     :show-inheritance:
 
-AIToolbox\.Social\.SocialNetworkAnalysis\.ParallelExecution module
-------------------------------------------------------------------
+AIToolbox.Social.SocialNetworkAnalysis.ParallelExecution module
+---------------------------------------------------------------
 
 .. automodule:: AIToolbox.Social.SocialNetworkAnalysis.ParallelExecution
     :members:

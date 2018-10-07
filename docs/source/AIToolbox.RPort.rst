@@ -1,11 +1,11 @@
-AIToolbox\.RPort package
-========================
+AIToolbox.RPort package
+=======================
 
 Submodules
 ----------
 
-AIToolbox\.RPort\.RRegressionModels module
-------------------------------------------
+AIToolbox.RPort.RRegressionModels module
+----------------------------------------
 
 .. automodule:: AIToolbox.RPort.RRegressionModels
     :members:

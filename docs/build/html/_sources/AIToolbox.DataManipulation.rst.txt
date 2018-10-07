@@ -1,5 +1,5 @@
-AIToolbox\.DataManipulation package
-===================================
+AIToolbox.DataManipulation package
+==================================
 
 Subpackages
 -----------

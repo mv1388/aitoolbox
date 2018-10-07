@@ -1,5 +1,5 @@
-AIToolbox\.NLP\.Models package
-==============================
+AIToolbox.NLP.Models package
+============================
 
 Subpackages
 -----------

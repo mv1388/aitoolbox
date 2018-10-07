@@ -1,11 +1,11 @@
-AIToolbox\.DataManipulation\.aggregation package
-================================================
+AIToolbox.DataManipulation.aggregation package
+==============================================
 
 Submodules
 ----------
 
-AIToolbox\.DataManipulation\.aggregation\.wrapper module
---------------------------------------------------------
+AIToolbox.DataManipulation.aggregation.wrapper module
+-----------------------------------------------------
 
 .. automodule:: AIToolbox.DataManipulation.aggregation.wrapper
     :members:

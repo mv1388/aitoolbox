@@ -1,5 +1,5 @@
-AIToolbox\.NLP package
-======================
+AIToolbox.NLP package
+=====================
 
 Subpackages
 -----------
@@ -13,16 +13,16 @@ Subpackages
 Submodules
 ----------
 
-AIToolbox\.NLP\.Aggregators module
-----------------------------------
+AIToolbox.NLP.Aggregators module
+--------------------------------
 
 .. automodule:: AIToolbox.NLP.Aggregators
     :members:
     :undoc-members:
     :show-inheritance:
 
-AIToolbox\.NLP\.MScThesisDataPrep module
-----------------------------------------
+AIToolbox.NLP.MScThesisDataPrep module
+--------------------------------------
 
 .. automodule:: AIToolbox.NLP.MScThesisDataPrep
     :members:

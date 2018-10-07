@@ -1,11 +1,11 @@
-AIToolbox\.NLP\.DataPrep package
-================================
+AIToolbox.NLP.DataPrep package
+==============================
 
 Submodules
 ----------
 
-AIToolbox\.NLP\.DataPrep\.core module
--------------------------------------
+AIToolbox.NLP.DataPrep.core module
+----------------------------------
 
 .. automodule:: AIToolbox.NLP.DataPrep.core
     :members:
