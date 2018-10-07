@@ -1,4 +1,4 @@
-# DATA SCIENCE TOOLBOX #
+# AI TOOLBOX #
 
 ### Todo ###
 
