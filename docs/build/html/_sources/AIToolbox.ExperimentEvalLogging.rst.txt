@@ -1,19 +1,19 @@
-AIToolbox\.ExperimentEvalLogging package
-========================================
+AIToolbox.ExperimentEvalLogging package
+=======================================
 
 Submodules
 ----------
 
-AIToolbox\.ExperimentEvalLogging\.Eval module
----------------------------------------------
+AIToolbox.ExperimentEvalLogging.Eval module
+-------------------------------------------
 
 .. automodule:: AIToolbox.ExperimentEvalLogging.Eval
     :members:
     :undoc-members:
     :show-inheritance:
 
-AIToolbox\.ExperimentEvalLogging\.ExperimentSaver module
---------------------------------------------------------
+AIToolbox.ExperimentEvalLogging.ExperimentSaver module
+------------------------------------------------------
 
 .. automodule:: AIToolbox.ExperimentEvalLogging.ExperimentSaver
     :members:

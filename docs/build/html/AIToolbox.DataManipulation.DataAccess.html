@@ -4,23 +4,16 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>AIToolbox.DataManipulation.DataAccess package &#8212; AIToolbox 0.0.4 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '0.0.4',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="AIToolbox.DataManipulation.aggregation package" href="AIToolbox.DataManipulation.aggregation.html" />
@@ -31,13 +24,14 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head>
-  <body>
+  </head><body>
   
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
+          
+
           <div class="body" role="main">
             
   <div class="section" id="aitoolbox-datamanipulation-dataaccess-package">
@@ -50,7 +44,8 @@
 <dl class="class">
 <dt id="AIToolbox.DataManipulation.DataAccess.File.FileDataAccessor">
 <em class="property">class </em><code class="descclassname">AIToolbox.DataManipulation.DataAccess.File.</code><code class="descname">FileDataAccessor</code><span class="sig-paren">(</span><em>data_folder_path=''</em>, <em>data_file_name=''</em>, <em>data_type='txt'</em>, <em>data_type_options='t'</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.DataManipulation.DataAccess.File.FileDataAccessor" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="method">
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
 <dt id="AIToolbox.DataManipulation.DataAccess.File.FileDataAccessor.ordered_append_save">
 <code class="descname">ordered_append_save</code><span class="sig-paren">(</span><em>file_id</em>, <em>data</em>, <em>delimiter='\n'</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.DataManipulation.DataAccess.File.FileDataAccessor.ordered_append_save" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="docutils">
@@ -165,7 +160,8 @@ max_element_limit (int):</dd>
 <dl class="class">
 <dt id="AIToolbox.DataManipulation.DataAccess.GraphData.GraphDataAccessor">
 <em class="property">class </em><code class="descclassname">AIToolbox.DataManipulation.DataAccess.GraphData.</code><code class="descname">GraphDataAccessor</code><span class="sig-paren">(</span><em>directed=False</em>, <em>asker_responder_direction=True</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.DataManipulation.DataAccess.GraphData.GraphDataAccessor" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="method">
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
 <dt id="AIToolbox.DataManipulation.DataAccess.GraphData.GraphDataAccessor.build_graph_from_db">
 <code class="descname">build_graph_from_db</code><span class="sig-paren">(</span><em>db_accessor</em>, <em>query</em>, <em>verbose=False</em>, <em>granularity=100000</em>, <em>max_num_connections=10000000</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.DataManipulation.DataAccess.GraphData.GraphDataAccessor.build_graph_from_db" title="Permalink to this definition">¶</a></dt>
 <dd><p>max_num_connections only works if verbose is True</p>
@@ -226,7 +222,8 @@ save_query:</dd>
 <dl class="class">
 <dt id="AIToolbox.DataManipulation.DataAccess.GraphData.PajekDataAccessor">
 <em class="property">class </em><code class="descclassname">AIToolbox.DataManipulation.DataAccess.GraphData.</code><code class="descname">PajekDataAccessor</code><a class="headerlink" href="#AIToolbox.DataManipulation.DataAccess.GraphData.PajekDataAccessor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Still need to decide what the functionality is going to be… basically some code is needed to prepare the dataset
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Still need to decide what the functionality is going to be… basically some code is needed to prepare the dataset
 that can be used with Pajek.</p>
 <dl class="docutils">
 <dt>Probably need:</dt>
@@ -236,18 +233,145 @@ load from file on disk and create Pajek input</dd>
 </dd></dl>
 
 </div>
-<div class="section" id="aitoolbox-datamanipulation-dataaccess-mongodb-module">
-<h2>AIToolbox.DataManipulation.DataAccess.MongoDB module<a class="headerlink" href="#aitoolbox-datamanipulation-dataaccess-mongodb-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-AIToolbox.DataManipulation.DataAccess.MongoDB">
+<span id="aitoolbox-datamanipulation-dataaccess-mongodb-module"></span><h2>AIToolbox.DataManipulation.DataAccess.MongoDB module<a class="headerlink" href="#module-AIToolbox.DataManipulation.DataAccess.MongoDB" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="AIToolbox.DataManipulation.DataAccess.MongoDB.MongoDBDataAccessor">
+<em class="property">class </em><code class="descclassname">AIToolbox.DataManipulation.DataAccess.MongoDB.</code><code class="descname">MongoDBDataAccessor</code><span class="sig-paren">(</span><em>db_name</em>, <em>collection_name</em>, <em>batch_insert_size=1</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.DataManipulation.DataAccess.MongoDB.MongoDBDataAccessor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.DataManipulation.DataAccess.SQLite.SQLiteDataAccessor" title="AIToolbox.DataManipulation.DataAccess.SQLite.SQLiteDataAccessor"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.DataManipulation.DataAccess.SQLite.SQLiteDataAccessor</span></code></a></p>
+<p>MongoDB data access. Decide if it really needs to follow the rules and inherit from the SQLiteDataAccessor.
+- DB is quite different, do I still want the same interface?
+- A lot of currently inherited functions might not work, try to prevent that.</p>
+<dl class="method">
+<dt id="AIToolbox.DataManipulation.DataAccess.MongoDB.MongoDBDataAccessor.batch_append_save">
+<code class="descname">batch_append_save</code><span class="sig-paren">(</span><em>data</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.DataManipulation.DataAccess.MongoDB.MongoDBDataAccessor.batch_append_save" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Args:</dt>
+<dd>data:
+verbose:</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.DataManipulation.DataAccess.MongoDB.MongoDBDataAccessor.persist_buffer_data_to_db">
+<code class="descname">persist_buffer_data_to_db</code><span class="sig-paren">(</span><em>clean_buffer=True</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.DataManipulation.DataAccess.MongoDB.MongoDBDataAccessor.persist_buffer_data_to_db" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Args:</dt>
+<dd>clean_buffer (bool):
+verbose (bool):</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.DataManipulation.DataAccess.MongoDB.MongoDBDataAccessor.persist_data_to_db">
+<code class="descname">persist_data_to_db</code><span class="sig-paren">(</span><em>buffer_data</em>, <em>buffer_id=None</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.DataManipulation.DataAccess.MongoDB.MongoDBDataAccessor.persist_data_to_db" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">buffer_data (list):
+buffer_id (None): In this function, this parameter is useless. Present here just for compatibility with</p>
+<blockquote>
+<div>FileDataAccessor’s persist buffer function</div></blockquote>
+<p class="last">verbose (bool):</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.DataManipulation.DataAccess.MongoDB.MongoDBDataAccessor.query_db_dict">
+<code class="descname">query_db_dict</code><span class="sig-paren">(</span><em>sql_query</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.DataManipulation.DataAccess.MongoDB.MongoDBDataAccessor.query_db_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>If MongoDB already returns the dict then delete this method.
+Otherwise, if each element gets returned separately (like rows in the table), then implement</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>sql_query:</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.DataManipulation.DataAccess.MongoDB.MongoDBDataAccessor.query_db_generator">
+<code class="descname">query_db_generator</code><span class="sig-paren">(</span><em>sql_query</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.DataManipulation.DataAccess.MongoDB.MongoDBDataAccessor.query_db_generator" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Args:</dt>
+<dd>sql_query:</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.DataManipulation.DataAccess.MongoDB.MongoDBMultiTopicWriter">
+<em class="property">class </em><code class="descclassname">AIToolbox.DataManipulation.DataAccess.MongoDB.</code><code class="descname">MongoDBMultiTopicWriter</code><span class="sig-paren">(</span><em>db_name</em>, <em>collections_topics</em>, <em>unclaimed_collection</em>, <em>batch_insert_size=1</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.DataManipulation.DataAccess.MongoDB.MongoDBMultiTopicWriter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="AIToolbox.DataManipulation.DataAccess.MongoDB.MongoDBMultiTopicWriter.check_consistency">
+<code class="descname">check_consistency</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.DataManipulation.DataAccess.MongoDB.MongoDBMultiTopicWriter.check_consistency" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.DataManipulation.DataAccess.MongoDB.MongoDBMultiTopicWriter.multi_topic_batch_insert">
+<code class="descname">multi_topic_batch_insert</code><span class="sig-paren">(</span><em>document</em>, <em>topic_collection_name</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.DataManipulation.DataAccess.MongoDB.MongoDBMultiTopicWriter.multi_topic_batch_insert" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Args:</dt>
+<dd>document:
+topic_collection_name:</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.DataManipulation.DataAccess.MongoDB.MongoDBWriter">
+<em class="property">class </em><code class="descclassname">AIToolbox.DataManipulation.DataAccess.MongoDB.</code><code class="descname">MongoDBWriter</code><span class="sig-paren">(</span><em>db_name</em>, <em>collection_name</em>, <em>batch_insert_size=1</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.DataManipulation.DataAccess.MongoDB.MongoDBWriter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="AIToolbox.DataManipulation.DataAccess.MongoDB.MongoDBWriter.batch_insert">
+<code class="descname">batch_insert</code><span class="sig-paren">(</span><em>document</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.DataManipulation.DataAccess.MongoDB.MongoDBWriter.batch_insert" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Args:</dt>
+<dd>document:</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.DataManipulation.DataAccess.MongoDB.MongoDBWriter.check_consistency">
+<code class="descname">check_consistency</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.DataManipulation.DataAccess.MongoDB.MongoDBWriter.check_consistency" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </div>
-<div class="section" id="aitoolbox-datamanipulation-dataaccess-mysql-module">
-<h2>AIToolbox.DataManipulation.DataAccess.MySQL module<a class="headerlink" href="#aitoolbox-datamanipulation-dataaccess-mysql-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-AIToolbox.DataManipulation.DataAccess.MySQL">
+<span id="aitoolbox-datamanipulation-dataaccess-mysql-module"></span><h2>AIToolbox.DataManipulation.DataAccess.MySQL module<a class="headerlink" href="#module-AIToolbox.DataManipulation.DataAccess.MySQL" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="AIToolbox.DataManipulation.DataAccess.MySQL.MySQLDataAccessor">
+<em class="property">class </em><code class="descclassname">AIToolbox.DataManipulation.DataAccess.MySQL.</code><code class="descname">MySQLDataAccessor</code><span class="sig-paren">(</span><em>host</em>, <em>database</em>, <em>user</em>, <em>password</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.DataManipulation.DataAccess.MySQL.MySQLDataAccessor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.DataManipulation.DataAccess.SQLite.SQLiteDataAccessor" title="AIToolbox.DataManipulation.DataAccess.SQLite.SQLiteDataAccessor"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.DataManipulation.DataAccess.SQLite.SQLiteDataAccessor</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.DataManipulation.DataAccess.MySQL.MySQLDataAccessor.query_db_generator">
+<code class="descname">query_db_generator</code><span class="sig-paren">(</span><em>sql_query</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.DataManipulation.DataAccess.MySQL.MySQLDataAccessor.query_db_generator" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Args:</dt>
+<dd>sql_query (str):</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="module-AIToolbox.DataManipulation.DataAccess.SQLite">
 <span id="aitoolbox-datamanipulation-dataaccess-sqlite-module"></span><h2>AIToolbox.DataManipulation.DataAccess.SQLite module<a class="headerlink" href="#module-AIToolbox.DataManipulation.DataAccess.SQLite" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="AIToolbox.DataManipulation.DataAccess.SQLite.SQLiteDataAccessor">
 <em class="property">class </em><code class="descclassname">AIToolbox.DataManipulation.DataAccess.SQLite.</code><code class="descname">SQLiteDataAccessor</code><span class="sig-paren">(</span><em>db_path='/Volumes/Zunanji Disk/MSc_StackOverflow_dump/'</em>, <em>db_name='so-dump.db'</em>, <em>db_create_query=None</em>, <em>db_insert_query=None</em>, <em>data_aggregator=None</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.DataManipulation.DataAccess.SQLite.SQLiteDataAccessor" title="Permalink to this definition">¶</a></dt>
-<dd><p>SQLite access class
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>SQLite access class
 For now can: query data and :</p>
 <blockquote>
 <div><ul class="simple">
@@ -405,23 +529,46 @@ separator (str):</dd>
 
 
           </div>
+          
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">AIToolbox.DataManipulation.DataAccess package</a><ul>
-<li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-AIToolbox.DataManipulation.DataAccess.File">AIToolbox.DataManipulation.DataAccess.File module</a></li>
-<li><a class="reference internal" href="#module-AIToolbox.DataManipulation.DataAccess.GraphData">AIToolbox.DataManipulation.DataAccess.GraphData module</a></li>
-<li><a class="reference internal" href="#aitoolbox-datamanipulation-dataaccess-mongodb-module">AIToolbox.DataManipulation.DataAccess.MongoDB module</a></li>
-<li><a class="reference internal" href="#aitoolbox-datamanipulation-dataaccess-mysql-module">AIToolbox.DataManipulation.DataAccess.MySQL module</a></li>
-<li><a class="reference internal" href="#module-AIToolbox.DataManipulation.DataAccess.SQLite">AIToolbox.DataManipulation.DataAccess.SQLite module</a></li>
-<li><a class="reference internal" href="#module-AIToolbox.DataManipulation.DataAccess">Module contents</a></li>
+<h1 class="logo"><a href="index.html">AIToolbox</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="AIToolbox.DataManipulation.html">AIToolbox.DataManipulation package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="AIToolbox.DataManipulation.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">AIToolbox.DataManipulation.DataAccess package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-AIToolbox.DataManipulation.DataAccess.File">AIToolbox.DataManipulation.DataAccess.File module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-AIToolbox.DataManipulation.DataAccess.GraphData">AIToolbox.DataManipulation.DataAccess.GraphData module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-AIToolbox.DataManipulation.DataAccess.MongoDB">AIToolbox.DataManipulation.DataAccess.MongoDB module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-AIToolbox.DataManipulation.DataAccess.MySQL">AIToolbox.DataManipulation.DataAccess.MySQL module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-AIToolbox.DataManipulation.DataAccess.SQLite">AIToolbox.DataManipulation.DataAccess.SQLite module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-AIToolbox.DataManipulation.DataAccess">Module contents</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="AIToolbox.DataManipulation.aggregation.html">AIToolbox.DataManipulation.aggregation package</a></li>
 </ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="AIToolbox.DataManipulation.html#module-AIToolbox.DataManipulation">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="AIToolbox.ExperimentEvalLogging.html">AIToolbox.ExperimentEvalLogging package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="AIToolbox.NLP.html">AIToolbox.NLP package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="AIToolbox.RPort.html">AIToolbox.RPort package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="AIToolbox.Social.html">AIToolbox.Social package</a></li>
+</ul>
+
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
@@ -433,21 +580,16 @@ separator (str):</dd>
   </ul></li>
 </ul>
 </div>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/AIToolbox.DataManipulation.DataAccess.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -458,8 +600,8 @@ separator (str):</dd>
       &copy;2018, Marko.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.11</a>
       
       |
       <a href="_sources/AIToolbox.DataManipulation.DataAccess.rst.txt"
