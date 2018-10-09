@@ -292,3 +292,19 @@ class SQLiteDataAccessor:
 
         if verbose:
             print('Inserted data into database.')
+
+
+class SQLiteDataAccessorORM:
+    """
+    Implement the operations on the SQLite DB using the sqlalcehmy instead of writing the sql queries
+    """
+    
+    def __init__(self, db_path, db_name):
+        self.db_path = db_path
+        self.db_name = db_name
+
+    def query_db_generator(self, sql_query):
+        raise NotImplementedError
+
+    def persist_data_to_db(self, buffer_data, buffer_id=None, verbose=False):
+        raise NotImplementedError
