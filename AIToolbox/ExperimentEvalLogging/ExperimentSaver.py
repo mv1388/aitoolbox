@@ -11,8 +11,30 @@ class BasicResultSaver:
         self.result_dump_path = result_dump_path
 
     def record_result(self, experiment_descr, training_history, test_loss, test_acc):
+        """
+
+        Args:
+            experiment_descr:
+            training_history:
+            test_loss:
+            test_acc:
+
+        Returns:
+
+        """
         data_record = {'experiment_description': experiment_descr,
                        'train_hostory': training_history,
                        'test_loss_acc': (test_loss, test_acc)}
 
         pickle.dump(data_record, open(self.result_dump_path, 'wb'))
+
+    def check_if_experiment_exists(self, experiment_descr):
+        """
+
+        Args:
+            experiment_descr:
+
+        Returns:
+
+        """
+        raise NotImplementedError

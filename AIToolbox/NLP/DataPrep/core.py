@@ -5,7 +5,6 @@ from nltk.tokenize import word_tokenize
 def find_sub_list(sub_list, main_list):
     """Find starting and ending position of a sublist in a longer list.
 
-
     Args:
         sub_list (list): sublist
         main_list (list): main longer list
