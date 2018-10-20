@@ -1,7 +1,14 @@
+from abc import ABC, abstractmethod
 import boto3
 import botocore
 import os
 import shutil
+
+
+class AbstractDatasetFetcher(ABC):
+    @abstractmethod
+    def fetch_dataset(self, local_dataset_folder_path, protect_local_folder=True):
+        pass
 
 
 class SmartDatasetFetcher:
@@ -61,7 +68,7 @@ class SmartDatasetFetcher:
         return False
 
 
-class SQuAD2DatasetFetcher(SmartDatasetFetcher):
+class SQuAD2DatasetFetcher(AbstractDatasetFetcher, SmartDatasetFetcher):
     def __init__(self, bucket_name='dataset-store'):
         """
 
