@@ -1,5 +1,23 @@
 from tqdm import tqdm
+from AIToolbox.AWS.DataAccess import SQuAD2DatasetFetcher
 from AIToolbox.NLP.DataPrep.core import *
+
+
+def get_dataset_local_copy(local_dataset_folder_path, protect_local_folder=True):
+    """Interface method for getting a local copy of SQuAD2 dataset
+
+    If a local copy is not found, dataset is automatically downloaded from S3.
+
+    Args:
+        local_dataset_folder_path (str):
+        protect_local_folder (bool):
+
+    Returns:
+        None
+
+    """
+    dataset_fetcher = SQuAD2DatasetFetcher(bucket_name='dataset-store')
+    dataset_fetcher.fetch_dataset(local_dataset_folder_path, protect_local_folder)
 
 
 def process_context_text(context_text, use_word_tokenize=True, rm_non_alphanum=True):

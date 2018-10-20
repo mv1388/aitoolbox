@@ -6,6 +6,7 @@ Subpackages
 
 .. toctree::
 
+    AIToolbox.AWS
     AIToolbox.DataManipulation
     AIToolbox.ExperimentEvalLogging
     AIToolbox.NLP

@@ -65,6 +65,20 @@ skip_is_impossible (bool):</dd>
 </dd></dl>
 
 <dl class="function">
+<dt id="AIToolbox.NLP.Dataset.SQuAD2DS.get_dataset_local_copy">
+<code class="descclassname">AIToolbox.NLP.Dataset.SQuAD2DS.</code><code class="descname">get_dataset_local_copy</code><span class="sig-paren">(</span><em>local_dataset_folder_path</em>, <em>protect_local_folder=True</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.NLP.Dataset.SQuAD2DS.get_dataset_local_copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Interface method for getting a local copy of SQuAD2 dataset</p>
+<p>If a local copy is not found, dataset is automatically downloaded from S3.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>local_dataset_folder_path (str):
+protect_local_folder (bool):</dd>
+<dt>Returns:</dt>
+<dd>None</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
 <dt id="AIToolbox.NLP.Dataset.SQuAD2DS.process_answer_text">
 <code class="descclassname">AIToolbox.NLP.Dataset.SQuAD2DS.</code><code class="descname">process_answer_text</code><span class="sig-paren">(</span><em>answer_text</em>, <em>use_word_tokenize=True</em>, <em>rm_non_alphanum=True</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.NLP.Dataset.SQuAD2DS.process_answer_text" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="docutils">
