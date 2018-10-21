@@ -147,6 +147,7 @@ model = build_FastQA_RNN_concat_model_GLOVE(rnn, 400, 20, 8000, 400, 0, 50, 0.2)
 
 
 local_model_result_folder_path = '/Users/markovidoni/PycharmProjects/MemoryNet/models_results'
+# local_model_result_folder_path = '/home/ec2-user/project/models_results'
 
 m_saver = KerasS3ModelSaver(local_model_result_folder_path=local_model_result_folder_path)
 m_saver.save_model(model=model, project_name='QA_QAngaroo', experiment_name='AAAAAFastQA_RNN_concat_model_GLOVE',

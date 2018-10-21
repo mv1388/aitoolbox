@@ -131,3 +131,31 @@ class KerasS3ModelSaver(AbstractModelSaver, SmartModelSaver):
 
         self.save_file(local_file_path=model_local_path, s3_file_path=model_s3_path)
         self.save_file(local_file_path=model_weights_local_path, s3_file_path=model_weights_s3_path)
+
+
+class TensorFlowS3ModelSaver(AbstractModelSaver, SmartModelSaver):
+    def __init__(self, bucket_name='model-result', local_model_result_folder_path='model_result'):
+        """
+
+        Args:
+            bucket_name (str):
+            local_model_result_folder_path (str):
+        """
+        SmartModelSaver.__init__(self, bucket_name, local_model_result_folder_path)
+
+    def save_model(self, model, project_name, experiment_name, protect_existing_folder=True):
+        raise NotImplementedError
+
+
+class PyTorchS3ModelSaver(AbstractModelSaver, SmartModelSaver):
+    def __init__(self, bucket_name='model-result', local_model_result_folder_path='model_result'):
+        """
+
+        Args:
+            bucket_name (str):
+            local_model_result_folder_path (str):
+        """
+        SmartModelSaver.__init__(self, bucket_name, local_model_result_folder_path)
+
+    def save_model(self, model, project_name, experiment_name, protect_existing_folder=True):
+        raise NotImplementedError
