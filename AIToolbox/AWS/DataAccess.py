@@ -60,7 +60,7 @@ class SmartDatasetFetcher:
             print('Local folder exists and protect_local_folder in True: leaving local folder as it is.')
             return True
 
-        if os.path.exists(os.path.join(local_dataset_folder_path, dataset_name)):
+        if os.path.exists(os.path.join(local_dataset_folder_path, dataset_name)) and not protect_local_folder:
             print('Local folder exists and protect_local_folder in False: deleting local folder copy')
             shutil.rmtree(os.path.join(local_dataset_folder_path, dataset_name))
 
@@ -93,3 +93,44 @@ class SQuAD2DatasetFetcher(AbstractDatasetFetcher, SmartDatasetFetcher):
                             local_file_path=os.path.join(local_dataset_folder_path, 'SQuAD2', 'train-v2.0.json'))
             self.fetch_file(s3_file_path='SQuAD2/dev-v2.0.json',
                             local_file_path=os.path.join(local_dataset_folder_path, 'SQuAD2', 'dev-v2.0.json'))
+
+    def fetch_preprocessed_dataset(self, local_dataset_folder_path, preprocess_folder_name, protect_local_folder=True):
+        """
+
+        Args:
+            local_dataset_folder_path (str):
+            preprocess_folder_name (str):
+            protect_local_folder (bool):
+
+        Returns:
+            None
+
+        """
+        raise NotImplementedError
+
+
+class QAngarooDSDatasetFetcher(AbstractDatasetFetcher, SmartDatasetFetcher):
+    def __init__(self, bucket_name='dataset-store'):
+        """
+
+        Args:
+            bucket_name (str):
+        """
+        SmartDatasetFetcher.__init__(self, bucket_name)
+
+    def fetch_dataset(self, local_dataset_folder_path, protect_local_folder=True):
+        """
+
+        Args:
+            local_dataset_folder_path (str):
+            protect_local_folder (bool):
+
+        Returns:
+            None
+
+        """
+
+        raise NotImplementedError
+
+        if not self.exists_local_dataset_folder(local_dataset_folder_path, 'qangaroo_v1', protect_local_folder):
+            pass
