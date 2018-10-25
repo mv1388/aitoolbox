@@ -1,6 +1,8 @@
 # AI TOOLBOX #
 
-### Todo ###
 
-* Single stream, multiple topic filter. Split the tweets locally so you can listen effectively to 2 or more streams at the same time.
+# Requesting Spot Instances on AWS
+
+https://chatbotslife.com/aws-setup-for-deep-learning-fda04db6df75
+
 

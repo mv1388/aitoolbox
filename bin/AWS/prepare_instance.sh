@@ -24,7 +24,9 @@ key_path=$1
 ec2_instance_address=$2
 
 AIToolbox_version=$3
+
 dataset_name=$4
+preproc_dataset=$5
 
 
 scp -i $key_path ../../dist/AIToolbox-$AIToolbox_version.tar.gz  ec2-user@$ec2_instance_address:~/.
@@ -48,7 +50,7 @@ source activate tensorflow_p36
 pip install AIToolbox-$AIToolbox_version.tar.gz
 
 if [ $dataset_name != '' ]; then
-    ./download_data.sh $dataset_name ~/project/data
+    ./download_data.sh ~/project/data $dataset_name $preproc_dataset
 fi
 " > finish_prepare_instance.sh
 
