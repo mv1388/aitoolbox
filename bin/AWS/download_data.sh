@@ -18,7 +18,7 @@ function download_cnn_dailymail {
     local download_path=$1
     local preproc_dataset=$2
 
-    if [ -z "$preproc_dataset" ]; then
+    if [ $preproc_dataset == "orig" ]; then
         echo Downloading original SQuAD2 dataset from S3... not yet uploaded
 
     elif [ $preproc_dataset == "abisee" ]; then
@@ -44,7 +44,7 @@ function download_qangaroo {
     local download_path=$1
     local preproc_dataset=$2
 
-    if [ -z "$preproc_dataset" ]; then
+    if [ $preproc_dataset == "orig" ]; then
         echo Downloading both original qangaroo datsets: medhop and wikihop
         echo "Location: $download_path"
         aws s3 cp s3://dataset-store/qangaroo_v1 $download_path/qangaroo_v1 --recursive

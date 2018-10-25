@@ -2,7 +2,7 @@
 
 # Example how to run:
 
-# ./prepare_instance.sh <SSH_KEY_LOCATION> ec2-54-194-81-48.eu-west-1.compute.amazonaws.com 0.0.7 SQuAD2
+# ./prepare_instance.sh <SSH_KEY_LOCATION> ec2-34-251-236-206.eu-west-1.compute.amazonaws.com 0.0.7 SQuAD2 orig ~/PycharmProjects/MemoryNet
 
 # When you get ssh-ed to the instance finish the instance prep process by running:
 
@@ -28,9 +28,14 @@ AIToolbox_version=$3
 dataset_name=$4
 preproc_dataset=$5
 
+local_project_path=$6
 
-scp -i $key_path ../../dist/AIToolbox-$AIToolbox_version.tar.gz  ec2-user@$ec2_instance_address:~/.
-scp -i $key_path download_data.sh  ec2-user@$ec2_instance_address:~/.
+
+ssh -i $key_path ec2-user@$ec2_instance_address 'mkdir ~/project ; mkdir ~/project/data ; mkdir ~/project/model_results'
+
+scp -i $key_path ../../dist/AIToolbox-$AIToolbox_version.tar.gz  ec2-user@$ec2_instance_address:~/project
+scp -i $key_path download_data.sh  ec2-user@$ec2_instance_address:~/project
+scp -i $key_path run_experiment.sh  ec2-user@$ec2_instance_address:~/project
 
 echo "#!/usr/bin/env bash
 
@@ -39,12 +44,7 @@ sudo -H pip install awscli --upgrade
 
 aws configure
 
-mkdir project
-mv AIToolbox-$AIToolbox_version.tar.gz project/
-mv download_data.sh project/
 cd project
-mkdir model_results
-mkdir data
 
 source activate tensorflow_p36
 pip install AIToolbox-$AIToolbox_version.tar.gz
@@ -56,7 +56,11 @@ fi
 
 chmod u+x finish_prepare_instance.sh
 scp -i $key_path finish_prepare_instance.sh  ec2-user@$ec2_instance_address:~/.
-
 rm finish_prepare_instance.sh
+
+if [ ! -z "$local_project_path" ]; then
+    echo Uploading project folder $local_project_path
+    source $local_project_path/AWS_run_scripts/AWS_core_scripts/aws_project_upload.sh $key_path $ec2_instance_address "~/project" $local_project_path
+fi
 
 ssh -i $key_path ec2-user@$ec2_instance_address
