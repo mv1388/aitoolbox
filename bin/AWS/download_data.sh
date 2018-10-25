@@ -1,38 +1,23 @@
 #!/usr/bin/env bash
 
+# Data folder: ~/project/data (most likely)
 download_path=$1
 dataset=$2
 preproc_dataset=$3
 
 
-aws s3 cp /Users/markovidoni/PycharmProjects/UCL_PhD_HW/data/gloveEmb/glove.6B.50d.txt.zip s3://dataset-store/glove-embeddings/glove.6B.50d.txt.zip
-
-aws s3 cp /Users/markovidoni/PycharmProjects/UCL_PhD_HW/data/gloveEmb/glove.6B.100d.txt.zip s3://dataset-store/glove-embeddings/glove.6B.100d.txt.zip
-
-aws s3 cp /Users/markovidoni/PycharmProjects/UCL_PhD_HW/data/gloveEmb/glove.6B.200d.txt.zip s3://dataset-store/glove-embeddings/glove.6B.200d.txt.zip
-
-aws s3 cp /Users/markovidoni/PycharmProjects/UCL_PhD_HW/data/gloveEmb/glove.6B.300d.txt.zip s3://dataset-store/glove-embeddings/glove.6B.300d.txt.zip
-
-
-
 function download_SQuAD2 {
-    download_path=$1
+    local download_path=$1
+
     echo Downloading SQuAD2 dataset from S3
     echo "Location: $download_path"
     aws s3 cp s3://dataset-store/SQuAD2 $download_path/SQuAD2 --recursive
 }
 
-function download_cnn-dailymail {
+function download_cnn_dailymail {
+    local download_path=$1
+    local preproc_dataset=$2
 
-
-}
-
-if [ $dataset == "SQuAD2" ]; then
-    echo Downloading SQuAD2 dataset from S3
-    echo "Location: $download_path"
-    aws s3 cp s3://dataset-store/SQuAD2 $download_path/SQuAD2 --recursive
-
-elif [ $dataset == "cnn-dailymail" ]; then
     if [ -z "$preproc_dataset" ]; then
         echo Downloading original SQuAD2 dataset from S3... not yet uploaded
 
@@ -53,8 +38,12 @@ elif [ $dataset == "cnn-dailymail" ]; then
     else
         echo Did not find specified preprocessed dataset. Nothing will be downloaded
     fi
+}
 
-elif [ $dataset == "qangaroo" ]; then
+function download_qangaroo {
+    local download_path=$1
+    local preproc_dataset=$2
+
     if [ -z "$preproc_dataset" ]; then
         echo Downloading both original qangaroo datsets: medhop and wikihop
         echo "Location: $download_path"
@@ -75,28 +64,49 @@ elif [ $dataset == "qangaroo" ]; then
     else
         echo Did not find specified preprocessed dataset. Nothing will be downloaded
     fi
+}
 
+function download_glove {
+    local download_path=$1
+    local preproc_dataset=$2
 
-elif [ $dataset == "glove" ]; then
     if [ $preproc_dataset == "50" ]; then
         echo Downloading glove embeddings with dimension 50
         aws s3 cp s3://dataset-store/glove-embeddings/glove.6B.50d.txt.zip $download_path/glove-embeddings/glove.6B.50d.txt.zip
         unzip $download_path/glove-embeddings/glove.6B.50d.txt.zip -d $download_path/glove-embeddings/
+        rm -r $download_path/glove-embeddings/__MACOSX
     elif [ $preproc_dataset == "100" ]; then
         echo Downloading glove embeddings with dimension 100
         aws s3 cp s3://dataset-store/glove-embeddings/glove.6B.100d.txt.zip $download_path/glove-embeddings/glove.6B.100d.txt.zip
         unzip $download_path/glove-embeddings/glove.6B.100d.txt.zip -d $download_path/glove-embeddings/
+        rm -r $download_path/glove-embeddings/__MACOSX
     elif [ $preproc_dataset == "200" ]; then
         echo Downloading glove embeddings with dimension 200
         aws s3 cp s3://dataset-store/glove-embeddings/glove.6B.200d.txt.zip $download_path/glove-embeddings/glove.6B.200d.txt.zip
         unzip $download_path/glove-embeddings/glove.6B.200d.txt.zip -d $download_path/glove-embeddings/
+        rm -r $download_path/glove-embeddings/__MACOSX
     elif [ $preproc_dataset == "300" ]; then
         echo Downloading glove embeddings with dimension 300
         aws s3 cp s3://dataset-store/glove-embeddings/glove.6B.300d.txt.zip $download_path/glove-embeddings/glove.6B.300d.txt.zip
         unzip $download_path/glove-embeddings/glove.6B.300d.txt.zip -d $download_path/glove-embeddings/
+        rm -r $download_path/glove-embeddings/__MACOSX
     else
         echo Specified glove embeddings dimension is not supported: 50, 100, 200, 300.
     fi
+}
+
+
+if [ $dataset == "SQuAD2" ]; then
+    download_SQuAD2 $download_path
+
+elif [ $dataset == "cnn-dailymail" ]; then
+    download_cnn_dailymail $download_path $preproc_dataset
+
+elif [ $dataset == "qangaroo" ]; then
+    download_qangaroo $download_path $preproc_dataset
+
+elif [ $dataset == "glove" ]; then
+    download_glove $download_path $preproc_dataset
 
 else
     echo Specified dataset not supported
