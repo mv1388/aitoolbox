@@ -12,7 +12,7 @@ class AbstractModelSaver(ABC):
 
 
 class SmartModelSaver:
-    def __init__(self, bucket_name='model-result', local_model_result_folder_path='model_result'):
+    def __init__(self, bucket_name='model-result', local_model_result_folder_path='~/project/model_result'):
         """
 
         Args:
@@ -23,7 +23,7 @@ class SmartModelSaver:
         self.s3_client = boto3.client('s3')
         self.s3_resource = boto3.resource('s3')
 
-        self.local_model_result_folder_path = local_model_result_folder_path
+        self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
 
     def save_file(self, local_file_path, s3_file_path):
         """
@@ -35,7 +35,8 @@ class SmartModelSaver:
         Returns:
             None
         """
-        self.s3_client.upload_file(local_file_path, self.bucket_name, s3_file_path)
+        self.s3_client.upload_file(os.path.expanduser(local_file_path),
+                                   self.bucket_name, s3_file_path)
 
     def exists_model_experiment_S3_folder(self, s3_project_folder_path, model_experiment_name, protect_local_folder=True):
         """
@@ -83,7 +84,7 @@ class SmartModelSaver:
 
 
 class KerasS3ModelSaver(AbstractModelSaver, SmartModelSaver):
-    def __init__(self, bucket_name='model-result', local_model_result_folder_path='model_result'):
+    def __init__(self, bucket_name='model-result', local_model_result_folder_path='~/project/model_result'):
         """
 
         Args:
@@ -105,7 +106,8 @@ class KerasS3ModelSaver(AbstractModelSaver, SmartModelSaver):
             None
 
         Examples:
-            local_model_result_folder_path = '/Users/markovidoni/PycharmProjects/MemoryNet/models_results'
+            local_model_result_folder_path = '~/project/model_results'
+            # local_model_result_folder_path = '/Users/markovidoni/PycharmProjects/MemoryNet/model_results'
             m_saver = KerasS3ModelSaver(local_model_result_folder_path=local_model_result_folder_path)
             m_saver.save_model(model=model,
                                project_name='QA_QAngaroo', experiment_name='AAAAAFastQA_RNN_concat_model_GLOVE',
@@ -134,7 +136,7 @@ class KerasS3ModelSaver(AbstractModelSaver, SmartModelSaver):
 
 
 class TensorFlowS3ModelSaver(AbstractModelSaver, SmartModelSaver):
-    def __init__(self, bucket_name='model-result', local_model_result_folder_path='model_result'):
+    def __init__(self, bucket_name='model-result', local_model_result_folder_path='~/project/model_result'):
         """
 
         Args:
@@ -148,7 +150,7 @@ class TensorFlowS3ModelSaver(AbstractModelSaver, SmartModelSaver):
 
 
 class PyTorchS3ModelSaver(AbstractModelSaver, SmartModelSaver):
-    def __init__(self, bucket_name='model-result', local_model_result_folder_path='model_result'):
+    def __init__(self, bucket_name='model-result', local_model_result_folder_path='~/project/model_result'):
         """
 
         Args:
