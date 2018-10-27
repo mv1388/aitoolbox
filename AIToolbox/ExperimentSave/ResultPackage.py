@@ -134,6 +134,7 @@ class ClassificationResultPackage(AbstractResultPackage):
         """
         accuracy_result = AccuracyMetric(self.y_true, self.y_predicted).get_metric_dict()
         roc_auc_result = ROCAUCMetric(self.y_true, self.y_predicted).get_metric_dict()
-        f1_score_result = F1ScoreMetric(self.y_true, self.y_predicted).get_metric_dict()
+        # Causing problems in default mode. With proper selection of parameters it could work for multiclass
+        # f1_score_result = F1ScoreMetric(self.y_true, self.y_predicted).get_metric_dict()
 
-        self.results_dict = {**accuracy_result, **roc_auc_result, **f1_score_result}
+        self.results_dict = {**accuracy_result, **roc_auc_result}
