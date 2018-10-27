@@ -10,7 +10,7 @@ class AbstractLocalModelSaver(ABC):
         pass
 
 
-class SmartLocalModelSaver:
+class BaseLocalModelSaver:
     def __init__(self, local_model_result_folder_path='~/project/model_result'):
         """
 
@@ -44,14 +44,14 @@ class SmartLocalModelSaver:
         return experiment_model_path
 
 
-class KerasLocalModelSaver(AbstractLocalModelSaver, SmartLocalModelSaver):
+class KerasLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
     def __init__(self, local_model_result_folder_path='~/project/model_result'):
         """
 
         Args:
             local_model_result_folder_path (str):
         """
-        SmartLocalModelSaver.__init__(self, local_model_result_folder_path)
+        BaseLocalModelSaver.__init__(self, local_model_result_folder_path)
 
     def save_model(self, model, project_name, experiment_name, experiment_timestamp=None, protect_existing_folder=True):
         """
@@ -83,27 +83,27 @@ class KerasLocalModelSaver(AbstractLocalModelSaver, SmartLocalModelSaver):
         return model_name, model_weights_name, model_local_path, model_weights_local_path
 
 
-class TensorFlowLocalModelSaver(AbstractLocalModelSaver, SmartLocalModelSaver):
+class TensorFlowLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
     def __init__(self, local_model_result_folder_path='~/project/model_result'):
         """
 
         Args:
             local_model_result_folder_path (str):
         """
-        SmartLocalModelSaver.__init__(self, local_model_result_folder_path)
+        BaseLocalModelSaver.__init__(self, local_model_result_folder_path)
 
     def save_model(self, model, project_name, experiment_name, experiment_timestamp=None, protect_existing_folder=True):
         raise NotImplementedError
 
 
-class PyTorchLocalModelSaver(AbstractLocalModelSaver, SmartLocalModelSaver):
+class PyTorchLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
     def __init__(self, local_model_result_folder_path='~/project/model_result'):
         """
 
         Args:
             local_model_result_folder_path (str):
         """
-        SmartLocalModelSaver.__init__(self, local_model_result_folder_path)
+        BaseLocalModelSaver.__init__(self, local_model_result_folder_path)
 
     def save_model(self, model, project_name, experiment_name, experiment_timestamp=None, protect_existing_folder=True):
         raise NotImplementedError

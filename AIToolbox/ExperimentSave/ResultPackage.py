@@ -10,10 +10,10 @@ class AbstractResultPackage(ABC):
         """
 
         Args:
-            y_true:
-            y_predicted:
-            hyperparameters:
-            strict_content_check:
+            y_true (numpy.array or list):
+            y_predicted (numpy.array or list):
+            hyperparameters (dict):
+            strict_content_check (bool):
         """
         self.strict_content_check = strict_content_check
 
@@ -88,6 +88,14 @@ class AbstractResultPackage(ABC):
 
 class ClassificationResultPackage(AbstractResultPackage):
     def __init__(self, y_true, y_predicted, hyperparameters=None, strict_content_check=False):
+        """
+
+        Args:
+            y_true (numpy.array or list):
+            y_predicted (numpy.array or list):
+            hyperparameters (dict):
+            strict_content_check (bool):
+        """
         AbstractResultPackage.__init__(self, y_true, y_predicted, hyperparameters, strict_content_check)
 
     def prepare_results_dict(self):

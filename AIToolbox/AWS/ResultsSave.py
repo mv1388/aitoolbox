@@ -14,7 +14,7 @@ class AbstractResultsSaver(ABC):
         pass
 
 
-class SmartResultsSaver:
+class BaseResultsSaver:
     def __init__(self, bucket_name='model-result', local_results_folder_path='~/project/model_result'):
         """
 
@@ -42,13 +42,23 @@ class SmartResultsSaver:
                                    self.bucket_name, s3_file_path)
 
     def create_experiment_S3_folder_structure(self, project_name, experiment_name, experiment_timestamp):
+        """
+
+        Args:
+            project_name (str):
+            experiment_name (str):
+            experiment_timestamp (str):
+
+        Returns:
+            str:
+        """
         experiment_s3_path = os.path.join(project_name,
                                           experiment_name + '_' + experiment_timestamp,
                                           'results')
         return experiment_s3_path
 
 
-class S3ResultsSaver(AbstractResultsSaver, SmartResultsSaver):
+class S3ResultsSaver(AbstractResultsSaver, BaseResultsSaver):
     def __init__(self, bucket_name='model-result', local_model_result_folder_path='~/project/model_result'):
         """
 
@@ -56,11 +66,24 @@ class S3ResultsSaver(AbstractResultsSaver, SmartResultsSaver):
             bucket_name (str):
             local_model_result_folder_path (str):
         """
-        SmartResultsSaver.__init__(self, bucket_name, local_model_result_folder_path)
+        BaseResultsSaver.__init__(self, bucket_name, local_model_result_folder_path)
         self.local_results_saver = LocalResultsSaver(local_model_result_folder_path)
 
     def save_experiment_results(self, result_package, project_name, experiment_name, experiment_timestamp=None,
                                 save_true_pred_labels=False, protect_existing_folder=True):
+        """
+
+        Args:
+            result_package (AIToolbox.ExperimentSave.ResultPackage.AbstractResultPackage):
+            project_name (str):
+            experiment_name (str):
+            experiment_timestamp (str):
+            save_true_pred_labels (bool):
+            protect_existing_folder (bool):
+
+        Returns:
+            (str, str):
+        """
         if experiment_timestamp is None:
             experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
 

@@ -9,8 +9,8 @@ class AbstractMetric(ABC):
         """
 
         Args:
-            y_true (numpy.core.multiarray or list):
-            y_predicted (numpy.core.multiarray or list):
+            y_true (numpy.array or list):
+            y_predicted (numpy.array or list):
         """
         self.metric_name = None
         self.y_true = np.array(y_true)
@@ -45,13 +45,13 @@ class AccuracyMetric(AbstractMetric):
         """
 
         Args:
-            y_true:
-            y_predicted:
-            y_predicted_label_thresh:
+            y_true (numpy.array or list):
+            y_predicted (numpy.array or list):
+            y_predicted_label_thresh (float):
         """
         self.y_predicted_label_thresh = y_predicted_label_thresh
         AbstractMetric.__init__(self, y_true, y_predicted)
-        self.metric_name = 'accuracy'
+        self.metric_name = 'Accuracy'
 
     def calculate_metric(self):
         y_label_predicted = np.where(self.y_predicted > self.y_predicted_label_thresh, 1, 0)
@@ -63,8 +63,8 @@ class ROCAUCMetric(AbstractMetric):
         """
 
         Args:
-            y_true (numpy.core.multiarray or list):
-            y_predicted (numpy.core.multiarray or list):
+            y_true (numpy.array or list):
+            y_predicted (numpy.array or list):
         """
         AbstractMetric.__init__(self, y_true, y_predicted)
         self.metric_name = 'ROC_AUC'
@@ -78,8 +78,8 @@ class PrecisionRecallCurveAUCMetric(AbstractMetric):
         """
 
         Args:
-            y_true (numpy.core.multiarray or list):
-            y_predicted (numpy.core.multiarray or list):
+            y_true (numpy.array or list):
+            y_predicted (numpy.array or list):
         """
         AbstractMetric.__init__(self, y_true, y_predicted)
         self.metric_name = 'PrecisionRecall_curve_AUC'

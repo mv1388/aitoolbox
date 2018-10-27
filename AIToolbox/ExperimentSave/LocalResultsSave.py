@@ -3,6 +3,7 @@ import os
 import time
 import datetime
 import pickle
+import json
 
 
 class AbstractLocalResultsSaver(ABC):
@@ -17,7 +18,7 @@ class AbstractLocalResultsSaver(ABC):
         pass
 
 
-class SmartLocalResultsSaver:
+class BaseLocalResultsSaver:
     def __init__(self, local_model_result_folder_path='~/project/model_result', file_format='pickle'):
         """
 
@@ -57,25 +58,41 @@ class SmartLocalResultsSaver:
         return experiment_results_path
 
     def save_file(self, result_dict, file_name_w_type, file_local_path_w_type):
+        """
+
+        Args:
+            result_dict (dict):
+            file_name_w_type (str):
+            file_local_path_w_type (str):
+
+        Returns:
+            (str, str)
+        """
         if self.file_format == 'pickle':
             file_name = file_name_w_type + '.p'
             file_local_path = file_local_path_w_type + '.p'
             with open(file_local_path, 'wb') as f:
                 pickle.dump(result_dict, f)
             return file_name, file_local_path
-
         elif self.file_format == 'json':
-            raise NotImplementedError
+            file_name = file_name_w_type + '.json'
+            file_local_path = file_local_path_w_type + '.json'
+            with open(file_local_path, 'w') as f:
+                json.dump(result_dict, f, sort_keys=True, indent=4)
+            return file_name, file_local_path
+        else:
+            raise ValueError('file_format setting not supported: can select only pickle or json')
 
 
-class LocalResultsSaver(AbstractLocalResultsSaver, SmartLocalResultsSaver):
-    def __init__(self, local_model_result_folder_path='~/project/model_result'):
+class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
+    def __init__(self, local_model_result_folder_path='~/project/model_result', file_format='pickle'):
         """
 
         Args:
-            local_model_result_folder_path:
+            local_model_result_folder_path (str):
+            file_format (str)
         """
-        SmartLocalResultsSaver.__init__(self, local_model_result_folder_path)
+        BaseLocalResultsSaver.__init__(self, local_model_result_folder_path, file_format)
 
     def save_experiment_results(self, result_package, project_name, experiment_name, experiment_timestamp=None,
                                 save_true_pred_labels=False, protect_existing_folder=True):
@@ -123,6 +140,20 @@ class LocalResultsSaver(AbstractLocalResultsSaver, SmartLocalResultsSaver):
     def save_experiment_results_separate_files(self, result_package, project_name, experiment_name,
                                                experiment_timestamp=None, save_true_pred_labels=False,
                                                protect_existing_folder=True):
+        """
+
+        Args:
+            result_package (AIToolbox.ExperimentSave.ResultPackage.AbstractResultPackage):
+            project_name (str):
+            experiment_name (str):
+            experiment_timestamp (str or None):
+            save_true_pred_labels (bool):
+            protect_existing_folder (bool):
+
+        Returns:
+            paths to locally saved results... so that S3 version can take them and upload to S3
+
+        """
         experiment_results_local_path = self.create_experiment_local_folder_structure(project_name, experiment_name,
                                                                                       experiment_timestamp)
 
