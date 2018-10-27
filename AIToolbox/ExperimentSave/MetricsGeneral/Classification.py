@@ -1,46 +1,10 @@
-from abc import ABC, abstractmethod
+from AIToolbox.ExperimentSave.MetricsGeneral.BaseMetric import AbstractBaseMetric
 
 import numpy as np
-from sklearn.metrics import roc_auc_score, accuracy_score
+from sklearn.metrics import roc_auc_score, precision_recall_curve, auc, accuracy_score, f1_score, precision_score, recall_score
 
 
-class AbstractMetric(ABC):
-    def __init__(self, y_true, y_predicted):
-        """
-
-        Args:
-            y_true (numpy.array or list):
-            y_predicted (numpy.array or list):
-        """
-        self.metric_name = None
-        self.y_true = np.array(y_true)
-        self.y_predicted = np.array(y_predicted)
-        self.metric_result = None
-
-        self.calculate_metric()
-
-    def get_metric(self):
-        """
-
-        Returns:
-            float:
-        """
-        return self.metric_result
-
-    def get_metric_dict(self):
-        """
-
-        Returns:
-            dict:
-        """
-        return {self.metric_name: self.metric_result}
-
-    @abstractmethod
-    def calculate_metric(self):
-        pass
-
-
-class AccuracyMetric(AbstractMetric):
+class AccuracyMetric(AbstractBaseMetric):
     def __init__(self, y_true, y_predicted, y_predicted_label_thresh=0.5):
         """
 
@@ -50,7 +14,7 @@ class AccuracyMetric(AbstractMetric):
             y_predicted_label_thresh (float):
         """
         self.y_predicted_label_thresh = y_predicted_label_thresh
-        AbstractMetric.__init__(self, y_true, y_predicted)
+        AbstractBaseMetric.__init__(self, y_true, y_predicted)
         self.metric_name = 'Accuracy'
 
     def calculate_metric(self):
@@ -58,7 +22,7 @@ class AccuracyMetric(AbstractMetric):
         self.metric_result = accuracy_score(self.y_true, y_label_predicted)
 
 
-class ROCAUCMetric(AbstractMetric):
+class ROCAUCMetric(AbstractBaseMetric):
     def __init__(self, y_true, y_predicted):
         """
 
@@ -66,14 +30,14 @@ class ROCAUCMetric(AbstractMetric):
             y_true (numpy.array or list):
             y_predicted (numpy.array or list):
         """
-        AbstractMetric.__init__(self, y_true, y_predicted)
+        AbstractBaseMetric.__init__(self, y_true, y_predicted)
         self.metric_name = 'ROC_AUC'
 
     def calculate_metric(self):
         self.metric_result = roc_auc_score(self.y_true, self.y_predicted)
 
 
-class PrecisionRecallCurveAUCMetric(AbstractMetric):
+class PrecisionRecallCurveAUCMetric(AbstractBaseMetric):
     def __init__(self, y_true, y_predicted):
         """
 
@@ -81,8 +45,60 @@ class PrecisionRecallCurveAUCMetric(AbstractMetric):
             y_true (numpy.array or list):
             y_predicted (numpy.array or list):
         """
-        AbstractMetric.__init__(self, y_true, y_predicted)
-        self.metric_name = 'PrecisionRecall_curve_AUC'
+        AbstractBaseMetric.__init__(self, y_true, y_predicted)
+        self.metric_name = 'PrecisionRecall_AUC'
 
     def calculate_metric(self):
-        raise NotImplementedError
+        precision, recall, thresholds = precision_recall_curve(self.y_true, self.y_predicted)
+        self.metric_result = auc(recall, precision)
+
+
+class F1ScoreMetric(AbstractBaseMetric):
+    def __init__(self, y_true, y_predicted, y_predicted_label_thresh=0.5):
+        """
+
+        Args:
+            y_true (numpy.array or list):
+            y_predicted (numpy.array or list):
+        """
+        self.y_predicted_label_thresh = y_predicted_label_thresh
+        AbstractBaseMetric.__init__(self, y_true, y_predicted)
+        self.metric_name = 'F1_score'
+
+    def calculate_metric(self):
+        y_label_predicted = np.where(self.y_predicted > self.y_predicted_label_thresh, 1, 0)
+        self.metric_result = f1_score(self.y_true, y_label_predicted)
+
+
+class PrecisionMetric(AbstractBaseMetric):
+    def __init__(self, y_true, y_predicted, y_predicted_label_thresh=0.5):
+        """
+
+        Args:
+            y_true (numpy.array or list):
+            y_predicted (numpy.array or list):
+        """
+        self.y_predicted_label_thresh = y_predicted_label_thresh
+        AbstractBaseMetric.__init__(self, y_true, y_predicted)
+        self.metric_name = 'Precision'
+
+    def calculate_metric(self):
+        y_label_predicted = np.where(self.y_predicted > self.y_predicted_label_thresh, 1, 0)
+        self.metric_result = precision_score(self.y_true, y_label_predicted)
+
+
+class RecallMetric(AbstractBaseMetric):
+    def __init__(self, y_true, y_predicted, y_predicted_label_thresh=0.5):
+        """
+
+        Args:
+            y_true (numpy.array or list):
+            y_predicted (numpy.array or list):
+        """
+        self.y_predicted_label_thresh = y_predicted_label_thresh
+        AbstractBaseMetric.__init__(self, y_true, y_predicted)
+        self.metric_name = 'Recall'
+
+    def calculate_metric(self):
+        y_label_predicted = np.where(self.y_predicted > self.y_predicted_label_thresh, 1, 0)
+        self.metric_result = recall_score(self.y_true, y_label_predicted)

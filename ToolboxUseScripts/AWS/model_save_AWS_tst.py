@@ -142,13 +142,15 @@ from AIToolbox.AWS.ModelSave import KerasS3ModelSaver
 from AIToolbox.AWS.ResultsSave import S3ResultsSaver
 from AIToolbox.ExperimentSave.ResultPackage import ClassificationResultPackage
 
+import numpy as np
+
 
 local_model_result_folder_path = '~/PycharmProjects/MemoryNet/model_results'
 # local_model_result_folder_path = '/home/ec2-user/project/model_results'
 
 m_saver = KerasS3ModelSaver(local_model_result_folder_path=local_model_result_folder_path)
-s3_model_path, experiment_timestamp = m_saver.save_model(model=model, project_name='QA_QAngaroo', experiment_name='json_test2',
-                                                   protect_existing_folder=True)
+s3_model_path, experiment_timestamp = m_saver.save_model(model=model, project_name='QA_QAngaroo', experiment_name='separate_files2',
+                                                         protect_existing_folder=True)
 print(s3_model_path)
 print(experiment_timestamp)
 
@@ -157,9 +159,11 @@ y_pred = [random.uniform(0, 1) for _ in range(100)]
 class_pkg = ClassificationResultPackage(y, y_pred, hyperparameters={'bash_script_path':'dasdassd'})
 
 res_saver = S3ResultsSaver(local_model_result_folder_path=local_model_result_folder_path)
+# res_saver.local_results_saver.file_format = 'pickle'
+
 s3_res_path, experiment_timestamp2 = res_saver.save_experiment_results(result_package=class_pkg,
-                                                                       project_name='QA_QAngaroo', experiment_name='json_test2',
+                                                                       project_name='QA_QAngaroo', experiment_name='separate_files2',
                                                                        experiment_timestamp=experiment_timestamp,
+                                                                       save_true_pred_labels=True,
+                                                                       separate_files=True,
                                                                        protect_existing_folder=True)
-
-

@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
-import os
+import numpy as np
 
-from AIToolbox.ExperimentSave.MetricsGeneral.Classification import AccuracyMetric, ROCAUCMetric
+from AIToolbox.ExperimentSave.MetricsGeneral.Classification import AccuracyMetric, ROCAUCMetric, PrecisionRecallCurveAUCMetric, F1ScoreMetric
 
 
 class AbstractResultPackage(ABC):
@@ -17,8 +17,8 @@ class AbstractResultPackage(ABC):
         """
         self.strict_content_check = strict_content_check
 
-        self.y_true = y_true
-        self.y_predicted = y_predicted
+        self.y_true = np.array(y_true)
+        self.y_predicted = np.array(y_predicted)
 
         self.results_dict = None
         self.hyperparameters = hyperparameters
@@ -106,5 +106,7 @@ class ClassificationResultPackage(AbstractResultPackage):
         """
         accuracy_result = AccuracyMetric(self.y_true, self.y_predicted).get_metric_dict()
         roc_auc_result = ROCAUCMetric(self.y_true, self.y_predicted).get_metric_dict()
+        pr_auc_result = PrecisionRecallCurveAUCMetric(self.y_true, self.y_predicted).get_metric_dict()
+        f1_score_result = F1ScoreMetric(self.y_true, self.y_predicted).get_metric_dict()
 
-        self.results_dict = {**accuracy_result, **roc_auc_result}
+        self.results_dict = {**accuracy_result, **roc_auc_result, **pr_auc_result, **f1_score_result}

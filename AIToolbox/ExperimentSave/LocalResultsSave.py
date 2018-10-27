@@ -125,7 +125,7 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
                                        'hyperparameters': hyperparameters}
 
         if save_true_pred_labels:
-            exp_results_hyperparam_dict = {'y_true': result_package.y_true, 'y_predicted': result_package.y_predicted,
+            exp_results_hyperparam_dict = {'y_true': result_package.y_true.tolist(), 'y_predicted': result_package.y_predicted.tolist(),
                                            **exp_results_hyperparam_dict}
 
         results_file_name_w_type = 'results_hyperParams_{}_{}'.format(experiment_name, experiment_timestamp)
@@ -179,18 +179,18 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
         hyperparams_file_name, hyperparams_file_local_path = self.save_file(experiment_hyperparam_dict,
                                                                             hyperparams_file_name_w_type,
                                                                             hyperparams_file_local_path_w_type)
-        labels_file_name_path = None
+
+        saved_results_paths = [[results_file_name, results_file_local_path],
+                               [hyperparams_file_name, hyperparams_file_local_path]]
 
         if save_true_pred_labels:
-            experiment_true_pred_labels_dict = {'y_true': result_package.y_true, 'y_predicted': result_package.y_predicted}
+            experiment_true_pred_labels_dict = {'y_true': result_package.y_true.tolist(), 'y_predicted': result_package.y_predicted.tolist()}
 
             labels_file_name_w_type = 'true_pred_labels_{}_{}'.format(experiment_name, experiment_timestamp)
             labels_file_local_path_w_type = os.path.join(experiment_results_local_path, labels_file_name_w_type)
             labels_file_name, labels_file_local_path = self.save_file(experiment_true_pred_labels_dict,
                                                                       labels_file_name_w_type,
                                                                       labels_file_local_path_w_type)
-            labels_file_name_path = [labels_file_name, labels_file_local_path]
+            saved_results_paths.append([labels_file_name, labels_file_local_path])
 
-        return results_file_name, results_file_local_path, \
-               hyperparams_file_name, hyperparams_file_local_path, \
-               labels_file_name_path
+        return saved_results_paths

@@ -1,7 +1,9 @@
 from AIToolbox.ExperimentSave.MetricsGeneral.BaseMetric import AbstractBaseMetric
 
+from sklearn.metrics import mean_squared_error, mean_absolute_error
 
-class ROGUEMetric(AbstractBaseMetric):
+
+class MeanSquaredErrorMetric(AbstractBaseMetric):
     def __init__(self, y_true, y_predicted):
         """
 
@@ -10,13 +12,13 @@ class ROGUEMetric(AbstractBaseMetric):
             y_predicted (numpy.array or list):
         """
         AbstractBaseMetric.__init__(self, y_true, y_predicted)
-        self.metric_name = 'ROGUE'
+        self.metric_name = 'Mean_squared_error'
 
     def calculate_metric(self):
-        raise NotImplementedError
+        self.metric_result = mean_squared_error(self.y_true, self.y_predicted)
 
 
-class BLUEScoreMetric(AbstractBaseMetric):
+class MeanAbsoluteErrorMetric(AbstractBaseMetric):
     def __init__(self, y_true, y_predicted):
         """
 
@@ -25,22 +27,8 @@ class BLUEScoreMetric(AbstractBaseMetric):
             y_predicted (numpy.array or list):
         """
         AbstractBaseMetric.__init__(self, y_true, y_predicted)
-        self.metric_name = 'BLUE_score'
+        self.metric_name = 'Mean_absolute_error'
 
     def calculate_metric(self):
-        raise NotImplementedError
+        self.metric_result = mean_absolute_error(self.y_true, self.y_predicted)
 
-
-class PerplexityMetric(AbstractBaseMetric):
-    def __init__(self, y_true, y_predicted):
-        """
-
-        Args:
-            y_true (numpy.array or list):
-            y_predicted (numpy.array or list):
-        """
-        AbstractBaseMetric.__init__(self, y_true, y_predicted)
-        self.metric_name = 'Perplexity'
-
-    def calculate_metric(self):
-        raise NotImplementedError
