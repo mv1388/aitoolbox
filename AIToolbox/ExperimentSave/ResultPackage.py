@@ -86,7 +86,7 @@ class AbstractResultPackage(ABC):
         pass
 
 
-class ClassificationResultPackage(AbstractResultPackage):
+class BinaryClassificationResultPackage(AbstractResultPackage):
     def __init__(self, y_true, y_predicted, hyperparameters=None, strict_content_check=False):
         """
 
@@ -110,3 +110,30 @@ class ClassificationResultPackage(AbstractResultPackage):
         f1_score_result = F1ScoreMetric(self.y_true, self.y_predicted).get_metric_dict()
 
         self.results_dict = {**accuracy_result, **roc_auc_result, **pr_auc_result, **f1_score_result}
+
+
+class ClassificationResultPackage(AbstractResultPackage):
+    def __init__(self, y_true, y_predicted, hyperparameters=None, strict_content_check=False):
+        """
+
+        Without Precision-Recall metric which is available only for binary classification problems.
+
+        Args:
+            y_true (numpy.array or list):
+            y_predicted (numpy.array or list):
+            hyperparameters (dict):
+            strict_content_check (bool):
+        """
+        AbstractResultPackage.__init__(self, y_true, y_predicted, hyperparameters, strict_content_check)
+
+    def prepare_results_dict(self):
+        """
+
+        Returns:
+            None:
+        """
+        accuracy_result = AccuracyMetric(self.y_true, self.y_predicted).get_metric_dict()
+        roc_auc_result = ROCAUCMetric(self.y_true, self.y_predicted).get_metric_dict()
+        f1_score_result = F1ScoreMetric(self.y_true, self.y_predicted).get_metric_dict()
+
+        self.results_dict = {**accuracy_result, **roc_auc_result, **f1_score_result}
