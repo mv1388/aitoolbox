@@ -10,3 +10,4 @@ tweepy
 joblib
 tqdm
 boto3
+scikit-learn

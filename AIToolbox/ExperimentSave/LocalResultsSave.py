@@ -1,0 +1,165 @@
+from abc import ABC, abstractmethod
+import os
+import time
+import datetime
+import pickle
+
+
+class AbstractLocalResultsSaver(ABC):
+    @abstractmethod
+    def save_experiment_results(self, result_package, project_name, experiment_name, experiment_timestamp=None,
+                                save_true_pred_labels=False, protect_existing_folder=True):
+        pass
+
+    @abstractmethod
+    def save_experiment_results_separate_files(self, result_package, project_name, experiment_name, experiment_timestamp,
+                                               save_true_pred_labels=False, protect_existing_folder=True):
+        pass
+
+
+class SmartLocalResultsSaver:
+    def __init__(self, local_model_result_folder_path='~/project/model_result', file_format='pickle'):
+        """
+
+        Args:
+            local_model_result_folder_path (str):
+            file_format (str): pickle or json
+        """
+        self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
+        self.file_format = file_format
+
+        if self.file_format not in ['pickle', 'json']:
+            print('Warning: file format should be: pickle or json. Setting it to default pickle')
+            self.file_format = 'pickle'
+
+    def create_experiment_local_folder_structure(self, project_name, experiment_name, experiment_timestamp):
+        """
+
+        Args:
+            project_name (str):
+            experiment_name (str):
+            experiment_timestamp (str):
+
+        Returns:
+            str:
+        """
+        if not os.path.exists(os.path.join(self.local_model_result_folder_path, project_name)):
+            os.mkdir(os.path.join(self.local_model_result_folder_path, project_name))
+
+        experiment_path = os.path.join(self.local_model_result_folder_path, project_name,
+                                       experiment_name + '_' + experiment_timestamp)
+
+        if not os.path.exists(experiment_path):
+            os.mkdir(experiment_path)
+
+        experiment_results_path = os.path.join(experiment_path, 'results')
+        os.mkdir(experiment_results_path)
+        return experiment_results_path
+
+    def save_file(self, result_dict, file_name_w_type, file_local_path_w_type):
+        if self.file_format == 'pickle':
+            file_name = file_name_w_type + '.p'
+            file_local_path = file_local_path_w_type + '.p'
+            with open(file_local_path, 'wb') as f:
+                pickle.dump(result_dict, f)
+            return file_name, file_local_path
+
+        elif self.file_format == 'json':
+            raise NotImplementedError
+
+
+class LocalResultsSaver(AbstractLocalResultsSaver, SmartLocalResultsSaver):
+    def __init__(self, local_model_result_folder_path='~/project/model_result'):
+        """
+
+        Args:
+            local_model_result_folder_path:
+        """
+        SmartLocalResultsSaver.__init__(self, local_model_result_folder_path)
+
+    def save_experiment_results(self, result_package, project_name, experiment_name, experiment_timestamp=None,
+                                save_true_pred_labels=False, protect_existing_folder=True):
+        """
+
+        Args:
+            result_package (AIToolbox.ExperimentSave.ResultPackage.AbstractResultPackage):
+            project_name (str):
+            experiment_name (str):
+            experiment_timestamp (str or None):
+            save_true_pred_labels (bool):
+            protect_existing_folder (bool):
+
+        Returns:
+            paths to locally saved results... so that S3 version can take them and upload to S3
+
+        """
+        if experiment_timestamp is None:
+            experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
+
+        experiment_results_local_path = self.create_experiment_local_folder_structure(project_name, experiment_name,
+                                                                                      experiment_timestamp)
+
+        results = result_package.get_results()
+        hyperparameters = result_package.get_hyperparameters()
+
+        exp_results_hyperparam_dict = {'experiment_name': experiment_name,
+                                       'experiment_results_local_path': experiment_results_local_path,
+                                       'results': results,
+                                       'hyperparameters': hyperparameters}
+
+        if save_true_pred_labels:
+            exp_results_hyperparam_dict = {'y_true': result_package.y_true, 'y_predicted': result_package.y_predicted,
+                                           **exp_results_hyperparam_dict}
+
+        results_file_name_w_type = 'results_hyperParams_{}_{}'.format(experiment_name, experiment_timestamp)
+        results_file_local_path_w_type = os.path.join(experiment_results_local_path, results_file_name_w_type)
+
+        results_file_name, results_file_local_path = self.save_file(exp_results_hyperparam_dict,
+                                                                    results_file_name_w_type,
+                                                                    results_file_local_path_w_type)
+
+        return results_file_name, results_file_local_path
+
+    def save_experiment_results_separate_files(self, result_package, project_name, experiment_name,
+                                               experiment_timestamp=None, save_true_pred_labels=False,
+                                               protect_existing_folder=True):
+        experiment_results_local_path = self.create_experiment_local_folder_structure(project_name, experiment_name,
+                                                                                      experiment_timestamp)
+
+        results = result_package.get_results()
+        hyperparameters = result_package.get_hyperparameters()
+
+        experiment_results_dict = {'experiment_name': experiment_name,
+                                   'experiment_results_local_path': experiment_results_local_path,
+                                   'results': results}
+
+        experiment_hyperparam_dict = {'experiment_name': experiment_name,
+                                      'experiment_results_local_path': experiment_results_local_path,
+                                      'hyperparameters': hyperparameters}
+
+        results_file_name_w_type = 'results_{}_{}'.format(experiment_name, experiment_timestamp)
+        results_file_local_path_w_type = os.path.join(experiment_results_local_path, results_file_name_w_type)
+        results_file_name, results_file_local_path = self.save_file(experiment_results_dict,
+                                                                    results_file_name_w_type,
+                                                                    results_file_local_path_w_type)
+
+        hyperparams_file_name_w_type = 'hyperparams_{}_{}'.format(experiment_name, experiment_timestamp)
+        hyperparams_file_local_path_w_type = os.path.join(experiment_results_local_path, hyperparams_file_name_w_type)
+        hyperparams_file_name, hyperparams_file_local_path = self.save_file(experiment_hyperparam_dict,
+                                                                            hyperparams_file_name_w_type,
+                                                                            hyperparams_file_local_path_w_type)
+        labels_file_name_path = None
+
+        if save_true_pred_labels:
+            experiment_true_pred_labels_dict = {'y_true': result_package.y_true, 'y_predicted': result_package.y_predicted}
+
+            labels_file_name_w_type = 'true_pred_labels_{}_{}'.format(experiment_name, experiment_timestamp)
+            labels_file_local_path_w_type = os.path.join(experiment_results_local_path, labels_file_name_w_type)
+            labels_file_name, labels_file_local_path = self.save_file(experiment_true_pred_labels_dict,
+                                                                      labels_file_name_w_type,
+                                                                      labels_file_local_path_w_type)
+            labels_file_name_path = [labels_file_name, labels_file_local_path]
+
+        return results_file_name, results_file_local_path, \
+               hyperparams_file_name, hyperparams_file_local_path, \
+               labels_file_name_path

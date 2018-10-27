@@ -1,5 +1,3 @@
-from AIToolbox.AWS.DataSave import KerasS3ModelSaver
-
 from keras import backend as K
 # from keras.engine.topology import Layer, InputSpec
 from keras.activations import softmax
@@ -10,6 +8,10 @@ from keras.models import Model
 from keras.regularizers import L1L2
 
 import tensorflow as tf
+
+from sklearn.datasets import make_classification
+import random
+
 
 class RepeatVector4D(layers.Layer):
 
@@ -145,10 +147,29 @@ model = build_FastQA_RNN_concat_model_GLOVE(rnn, 400, 20, 8000, 400, 0, 50, 0.2)
 # s3.upload_file('my_model_weights.h5', 'model-result', 'textProject/testExperiment/weights/my_model_weights.h5')
 
 
+from AIToolbox.AWS.ModelSave import KerasS3ModelSaver
 
-local_model_result_folder_path = '/Users/markovidoni/PycharmProjects/MemoryNet/model_results'
+local_model_result_folder_path = '~/PycharmProjects/MemoryNet/model_results'
 # local_model_result_folder_path = '/home/ec2-user/project/model_results'
 
 m_saver = KerasS3ModelSaver(local_model_result_folder_path=local_model_result_folder_path)
-m_saver.save_model(model=model, project_name='QA_QAngaroo', experiment_name='AAAAAFastQA_RNN_concat_model_GLOVE',
-                   protect_existing_folder=True)
+s3_model_path, experiment_timestamp = m_saver.save_model(model=model, project_name='QA_QAngaroo', experiment_name='COMBOEVERITHING_33ffdfds',
+                                                   protect_existing_folder=True)
+print(s3_model_path)
+print(experiment_timestamp)
+
+
+from AIToolbox.AWS.ResultsSave import S3ResultsSaver
+from AIToolbox.ExperimentSave.ResultPackage import ClassificationResultPackage
+
+_, y = make_classification(100)
+y_pred = [random.uniform(0, 1) for _ in range(100)]
+class_pkg = ClassificationResultPackage(y, y_pred, hyperparameters={'bash_script_path':'dasdassd'})
+
+res_saver = S3ResultsSaver(local_model_result_folder_path=local_model_result_folder_path)
+s3_res_path, experiment_timestamp2 = res_saver.save_experiment_results(result_package=class_pkg,
+                                                                       project_name='QA_QAngaroo', experiment_name='COMBOEVERITHING_33ffdfds',
+                                                                       experiment_timestamp=experiment_timestamp,
+                                                                       protect_existing_folder=True)
+
+
