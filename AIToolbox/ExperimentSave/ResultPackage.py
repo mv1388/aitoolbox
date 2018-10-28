@@ -1,7 +1,11 @@
 from abc import ABC, abstractmethod
 import numpy as np
 
-from AIToolbox.ExperimentSave.MetricsGeneral.Classification import AccuracyMetric, ROCAUCMetric, PrecisionRecallCurveAUCMetric, F1ScoreMetric
+from AIToolbox.ExperimentSave.MetricsGeneral.BaseMetric import AbstractBaseMetric
+
+from AIToolbox.ExperimentSave.MetricsGeneral.Classification import AccuracyMetric, ROCAUCMetric, \
+    PrecisionRecallCurveAUCMetric, F1ScoreMetric
+from AIToolbox.ExperimentSave.MetricsGeneral.Regression import MeanSquaredErrorMetric, MeanAbsoluteErrorMetric
 
 
 class AbstractResultPackage(ABC):
@@ -86,6 +90,48 @@ class AbstractResultPackage(ABC):
         pass
 
 
+class GeneralResultPackage(AbstractResultPackage):
+    def __init__(self, y_true, y_predicted, metrics_list, hyperparameters=None, strict_content_check=False):
+        """
+
+        Args:
+            y_true (numpy.array or list):
+            y_predicted (numpy.array or list):
+            metrics_list (list): List of objects which are inherited from
+                AIToolbox.ExperimentSave.MetricsGeneral.BaseMetric.AbstractBaseMetric
+            hyperparameters (dict):
+            strict_content_check (bool):
+        """
+        self.metrics_list = metrics_list
+        AbstractResultPackage.__init__(self, y_true, y_predicted, hyperparameters, strict_content_check)
+
+    def prepare_results_dict(self):
+        """
+
+        Returns:
+            None:
+        """
+        self.qa_check_hyperparameters_dict()
+        self.results_dict = {}
+
+        for metric in self.metrics_list:
+            metric_result_dict = metric(self.y_true, self.y_predicted).get_metric_dict()
+            self.results_dict = {**self.results_dict, **metric_result_dict}
+
+    def qa_check_metrics_list(self):
+        """
+
+        Returns:
+            None
+        """
+        if len(self.metrics_list) == 0:
+            self.warn_about_result_data_problem('Metrics list is empty')
+
+        for metric in self.metrics_list:
+            if not isinstance(metric, AbstractBaseMetric):
+                self.warn_about_result_data_problem('Metric is not inherited from AbstractBaseMetric class')
+
+
 class BinaryClassificationResultPackage(AbstractResultPackage):
     def __init__(self, y_true, y_predicted, hyperparameters=None, strict_content_check=False):
         """
@@ -138,3 +184,27 @@ class ClassificationResultPackage(AbstractResultPackage):
         # f1_score_result = F1ScoreMetric(self.y_true, self.y_predicted).get_metric_dict()
 
         self.results_dict = {**accuracy_result, **roc_auc_result}
+
+        
+class RegressionResultPackage(AbstractResultPackage):
+    def __init__(self, y_true, y_predicted, hyperparameters=None, strict_content_check=False):
+        """
+
+        Args:
+            y_true (numpy.array or list):
+            y_predicted (numpy.array or list):
+            hyperparameters (dict):
+            strict_content_check (bool):
+        """
+        AbstractResultPackage.__init__(self, y_true, y_predicted, hyperparameters, strict_content_check)
+
+    def prepare_results_dict(self):
+        """
+
+        Returns:
+            None:
+        """
+        mse_result = MeanSquaredErrorMetric(self.y_true, self.y_predicted).get_metric_dict()
+        mae_result = MeanAbsoluteErrorMetric(self.y_true, self.y_predicted).get_metric_dict()
+
+        self.results_dict = {**mse_result, **mae_result}

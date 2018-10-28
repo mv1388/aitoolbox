@@ -14,7 +14,6 @@ import random
 
 
 class RepeatVector4D(layers.Layer):
-
     def __init__(self, n, **kwargs):
         self.n = n
         # self.input_spec = [InputSpec(ndim=3)]
@@ -28,8 +27,8 @@ class RepeatVector4D(layers.Layer):
         pattern = K.stack([1, self.n, 1, 1])
         return K.tile(x, pattern)
 
-class RepeatVector4D_2(layers.Layer):
 
+class RepeatVector4D_2(layers.Layer):
     def __init__(self, n, **kwargs):
         self.n = n
         # self.input_spec = [InputSpec(ndim=3)]
@@ -42,6 +41,7 @@ class RepeatVector4D_2(layers.Layer):
         x = K.expand_dims(x, 2)
         pattern = K.stack([1, 1, self.n, 1])
         return K.tile(x, pattern)
+
 
 def build_FastQA_RNN_concat_model_GLOVE(RNN, story_maxlen, query_maxlen, vocab_size, span_max_idx, span_max_len,
                                         EMBED_HIDDEN_SIZE, dropout_rate):

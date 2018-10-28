@@ -16,7 +16,7 @@ class ROGUEMetric(AbstractBaseMetric):
         raise NotImplementedError
 
 
-class BLUEScoreMetric(AbstractBaseMetric):
+class BLEUScoreMetric(AbstractBaseMetric):
     def __init__(self, y_true, y_predicted):
         """
 
@@ -25,7 +25,7 @@ class BLUEScoreMetric(AbstractBaseMetric):
             y_predicted (numpy.array or list):
         """
         AbstractBaseMetric.__init__(self, y_true, y_predicted)
-        self.metric_name = 'BLUE_score'
+        self.metric_name = 'BLEU_score'
 
     def calculate_metric(self):
         raise NotImplementedError
