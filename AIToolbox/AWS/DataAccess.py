@@ -3,6 +3,7 @@ import boto3
 import botocore
 import os
 import shutil
+import zipfile
 
 
 class AbstractDatasetFetcher(ABC):
@@ -75,6 +76,11 @@ class SmartDatasetFetcher:
 
     def preproc_dataset_available(self, preproc_dataset_name):
         return preproc_dataset_name in self.available_prepocessed_datasets
+
+    @staticmethod
+    def unzip_file(file_path, target_dir_path):
+        with zipfile.ZipFile(file_path, 'r') as zip_ref:
+            zip_ref.extractall(target_dir_path)
 
 
 class SQuAD2DatasetFetcher(AbstractDatasetFetcher, SmartDatasetFetcher):
@@ -172,17 +178,21 @@ class CNNDailyMailDSDatasetFetcher(AbstractDatasetFetcher, SmartDatasetFetcher):
         if not self.exists_local_dataset_folder('cnn_dailymail', protect_local_folder):
 
             if preprocess_name == 'abisee':
+                cnn_local_path = os.path.join(self.local_dataset_folder_path, 'cnn_dailymail', 'cnn_stories_tokenized.zip')
+                dm_local_path = os.path.join(self.local_dataset_folder_path, 'cnn_dailymail', 'dm_stories_tokenized.zip')
                 self.fetch_file(s3_file_path='cnn-dailymail/preproc/abisee/cnn_stories_tokenized.zip',
-                                local_file_path=os.path.join(self.local_dataset_folder_path, 'cnn_dailymail', 'cnn_stories_tokenized.zip'))
+                                local_file_path=cnn_local_path)
                 self.fetch_file(s3_file_path='cnn-dailymail/preproc/abisee/dm_stories_tokenized.zip',
-                                local_file_path=os.path.join(self.local_dataset_folder_path, 'cnn_dailymail', 'dm_stories_tokenized.zip'))
-
-                # TODO: add unzip
+                                local_file_path=dm_local_path)
+                self.unzip_file(cnn_local_path, cnn_local_path[:-4])
+                self.unzip_file(dm_local_path, dm_local_path[:-4])
 
             elif preprocess_name == 'danqi':
+                cnn_local_path = os.path.join(self.local_dataset_folder_path, 'cnn_dailymail', 'cnn.tar.gz')
+                dm_local_path = os.path.join(self.local_dataset_folder_path, 'cnn_dailymail', 'dailymail.tar.gz')
                 self.fetch_file(s3_file_path='cnn-dailymail/preproc/danqi/cnn.tar.gz',
-                                local_file_path=os.path.join(self.local_dataset_folder_path, 'cnn_dailymail', 'cnn.tar.gz'))
+                                local_file_path=cnn_local_path)
                 self.fetch_file(s3_file_path='cnn-dailymail/preproc/danqi/dailymail.tar.gz',
-                                local_file_path=os.path.join(self.local_dataset_folder_path, 'cnn_dailymail', 'dailymail.tar.gz'))
-
-                # TODO: add unzip
+                                local_file_path=dm_local_path)
+                self.unzip_file(cnn_local_path, cnn_local_path[:-4])
+                self.unzip_file(dm_local_path, dm_local_path[:-4])

@@ -1,7 +1,7 @@
 from AIToolbox.AWS.DataAccess import CNNDailyMailDSDatasetFetcher
 
 
-def get_dataset_local_copy(local_dataset_folder_path, preprocess_name='abisee', protect_local_folder=True):
+def get_preproc_dataset_local_copy(local_dataset_folder_path, preprocess_name='abisee', protect_local_folder=True):
     """Interface method for getting a local copy of CNN/DailyMail dataset
 
     If a local copy is not found, dataset is automatically downloaded from S3.
