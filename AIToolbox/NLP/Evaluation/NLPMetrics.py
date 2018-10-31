@@ -5,6 +5,12 @@ class ROGUEMetric(AbstractBaseMetric):
     def __init__(self, y_true, y_predicted):
         """
 
+        Use this package:
+
+            https://pypi.org/project/pyrouge/
+            https://github.com/bheinzerling/pyrouge
+
+
         Args:
             y_true (numpy.array or list):
             y_predicted (numpy.array or list):

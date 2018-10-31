@@ -26,6 +26,7 @@ setup(name='AIToolbox',
                         'joblib',
                         'tqdm',
                         'boto3',
+                        'botocore',
                         'scikit-learn'],
 
       test_suite='tests',

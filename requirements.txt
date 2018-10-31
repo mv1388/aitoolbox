@@ -10,4 +10,5 @@ tweepy
 joblib
 tqdm
 boto3
+botocore
 scikit-learn

@@ -19,7 +19,7 @@ function download_cnn_dailymail {
     local preproc_dataset=$2
 
     if [ $preproc_dataset == "orig" ]; then
-        echo Downloading original SQuAD2 dataset from S3... not yet uploaded
+        echo Downloading original CNN-DailyMail dataset from S3... not yet uploaded
 
     elif [ $preproc_dataset == "abisee" ]; then
         echo Downloading preprocessed SQuAD2 dataset: \"abisee\"
