@@ -2,6 +2,6 @@
 
 pkgversion=$1
 
-source activate Py36
+source activate /Users/markovidoni/anaconda/envs/Py36
 
 sudo pip install dist/AIToolbox-$pkgversion.tar.gz

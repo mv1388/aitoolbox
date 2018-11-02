@@ -9,23 +9,26 @@ from AIToolbox.ExperimentSave.LocalModelSave import KerasLocalModelSaver, Tensor
 
 class AbstractModelSaver(ABC):
     @abstractmethod
-    def save_model(self, model, project_name, experiment_name, experiment_timestamp=None, protect_existing_folder=True):
+    def save_model(self, model, project_name, experiment_name, experiment_timestamp=None, epoch=None, protect_existing_folder=True):
         pass
 
 
 class BaseModelSaver:
-    def __init__(self, bucket_name='model-result', local_model_result_folder_path='~/project/model_result'):
+    def __init__(self, bucket_name='model-result', local_model_result_folder_path='~/project/model_result',
+                 checkpoint_model=False):
         """
 
         Args:
             bucket_name (str):
             local_model_result_folder_path (str):
+            checkpoint_model (bool):
         """
         self.bucket_name = bucket_name
         self.s3_client = boto3.client('s3')
         self.s3_resource = boto3.resource('s3')
 
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
+        self.checkpoint_model = checkpoint_model
 
     def save_file(self, local_file_path, s3_file_path):
         """
@@ -53,22 +56,24 @@ class BaseModelSaver:
         """
         experiment_s3_path = os.path.join(project_name,
                                           experiment_name + '_' + experiment_timestamp,
-                                          'model')
+                                          'model' if not self.checkpoint_model else 'checkpoint_model')
         return experiment_s3_path
 
 
 class KerasS3ModelSaver(AbstractModelSaver, BaseModelSaver):
-    def __init__(self, bucket_name='model-result', local_model_result_folder_path='~/project/model_result'):
+    def __init__(self, bucket_name='model-result', local_model_result_folder_path='~/project/model_result',
+                 checkpoint_model=False):
         """
 
         Args:
             bucket_name (str):
             local_model_result_folder_path (str):
+            checkpoint_model (bool):
         """
-        BaseModelSaver.__init__(self, bucket_name, local_model_result_folder_path)
-        self.keras_local_saver = KerasLocalModelSaver(local_model_result_folder_path)
+        BaseModelSaver.__init__(self, bucket_name, local_model_result_folder_path, checkpoint_model)
+        self.keras_local_saver = KerasLocalModelSaver(local_model_result_folder_path, checkpoint_model)
 
-    def save_model(self, model, project_name, experiment_name, experiment_timestamp=None, protect_existing_folder=True):
+    def save_model(self, model, project_name, experiment_name, experiment_timestamp=None, epoch=None, protect_existing_folder=True):
         """
 
         Args:
@@ -76,6 +81,7 @@ class KerasS3ModelSaver(AbstractModelSaver, BaseModelSaver):
             project_name (str):
             experiment_name (str):
             experiment_timestamp (str or None):
+            epoch (int or None):
             protect_existing_folder (bool):
 
         Returns:
@@ -94,7 +100,7 @@ class KerasS3ModelSaver(AbstractModelSaver, BaseModelSaver):
             experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
 
         saved_local_model_details = self.keras_local_saver.save_model(model, project_name, experiment_name,
-                                                                      experiment_timestamp, protect_existing_folder)
+                                                                      experiment_timestamp, epoch, protect_existing_folder)
 
         model_name, model_weights_name, model_local_path, model_weights_local_path = saved_local_model_details
 
@@ -109,30 +115,34 @@ class KerasS3ModelSaver(AbstractModelSaver, BaseModelSaver):
 
 
 class TensorFlowS3ModelSaver(AbstractModelSaver, BaseModelSaver):
-    def __init__(self, bucket_name='model-result', local_model_result_folder_path='~/project/model_result'):
+    def __init__(self, bucket_name='model-result', local_model_result_folder_path='~/project/model_result',
+                 checkpoint_model=False):
         """
 
         Args:
             bucket_name (str):
             local_model_result_folder_path (str):
+            checkpoint_model (bool):
         """
-        BaseModelSaver.__init__(self, bucket_name, local_model_result_folder_path)
-        self.tf_local_saver = TensorFlowLocalModelSaver(local_model_result_folder_path)
+        BaseModelSaver.__init__(self, bucket_name, local_model_result_folder_path, checkpoint_model)
+        self.tf_local_saver = TensorFlowLocalModelSaver(local_model_result_folder_path, checkpoint_model)
 
-    def save_model(self, model, project_name, experiment_name, experiment_timestamp=None, protect_existing_folder=True):
+    def save_model(self, model, project_name, experiment_name, experiment_timestamp=None, epoch=None, protect_existing_folder=True):
         raise NotImplementedError
 
 
 class PyTorchS3ModelSaver(AbstractModelSaver, BaseModelSaver):
-    def __init__(self, bucket_name='model-result', local_model_result_folder_path='~/project/model_result'):
+    def __init__(self, bucket_name='model-result', local_model_result_folder_path='~/project/model_result',
+                 checkpoint_model=False):
         """
 
         Args:
             bucket_name (str):
             local_model_result_folder_path (str):
+            checkpoint_model (bool):
         """
-        BaseModelSaver.__init__(self, bucket_name, local_model_result_folder_path)
-        self.pytorch_local_saver = PyTorchLocalModelSaver(local_model_result_folder_path)
+        BaseModelSaver.__init__(self, bucket_name, local_model_result_folder_path, checkpoint_model)
+        self.pytorch_local_saver = PyTorchLocalModelSaver(local_model_result_folder_path, checkpoint_model)
 
-    def save_model(self, model, project_name, experiment_name, experiment_timestamp=None, protect_existing_folder=True):
+    def save_model(self, model, project_name, experiment_name, experiment_timestamp=None, epoch=None, protect_existing_folder=True):
         raise NotImplementedError
