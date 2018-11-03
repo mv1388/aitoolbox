@@ -3,6 +3,8 @@ import os
 import time
 import datetime
 
+import torch
+
 
 class AbstractLocalModelSaver(ABC):
     @abstractmethod
@@ -124,4 +126,36 @@ class PyTorchLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
         BaseLocalModelSaver.__init__(self, local_model_result_folder_path, checkpoint_model)
 
     def save_model(self, model, project_name, experiment_name, experiment_timestamp=None, epoch=None, protect_existing_folder=True):
-        raise NotImplementedError
+        """
+
+        Args:
+            model :
+            project_name (str):
+            experiment_name (str):
+            experiment_timestamp (str or None):
+            epoch (int or None):
+            protect_existing_folder (bool):
+
+        Returns:
+            (str, str, str, str):
+
+        """
+        if experiment_timestamp is None:
+            experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
+
+        experiment_model_local_path = self.create_experiment_local_folder_structure(project_name, experiment_name, experiment_timestamp)
+
+        if epoch is None:
+            model_name = 'model_{}_{}.h5'.format(experiment_name, experiment_timestamp)
+            model_weights_name = 'modelWeights_{}_{}.h5'.format(experiment_name, experiment_timestamp)
+        else:
+            model_name = 'model_{}_{}_E{}.h5'.format(experiment_name, experiment_timestamp, epoch)
+            model_weights_name = 'modelWeights_{}_{}_E{}.h5'.format(experiment_name, experiment_timestamp, epoch)
+
+        model_local_path = os.path.join(experiment_model_local_path, model_name)
+        model_weights_local_path = os.path.join(experiment_model_local_path, model_weights_name)
+
+        torch.save(model, model_local_path)
+        torch.save(model.state_dict(), model_weights_local_path)
+
+        return model_name, model_weights_name, model_local_path, model_weights_local_path

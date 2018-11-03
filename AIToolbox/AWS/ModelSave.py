@@ -145,4 +145,41 @@ class PyTorchS3ModelSaver(AbstractModelSaver, BaseModelSaver):
         self.pytorch_local_saver = PyTorchLocalModelSaver(local_model_result_folder_path, checkpoint_model)
 
     def save_model(self, model, project_name, experiment_name, experiment_timestamp=None, epoch=None, protect_existing_folder=True):
-        raise NotImplementedError
+        """
+
+        Args:
+            model (keras.engine.training.Model):
+            project_name (str):
+            experiment_name (str):
+            experiment_timestamp (str or None):
+            epoch (int or None):
+            protect_existing_folder (bool):
+
+        Returns:
+            (str, str):
+
+        Examples:
+            local_model_result_folder_path = '~/project/model_results'
+            # local_model_result_folder_path = '~/PycharmProjects/MemoryNet/model_results'
+            m_saver = PyTorchLocalModelSaver(local_model_result_folder_path=local_model_result_folder_path)
+            m_saver.save_model(model=model,
+                               project_name='QA_QAngaroo', experiment_name='FastQA_RNN_concat_model_GLOVE',
+                               protect_existing_folder=False)
+
+        """
+        if experiment_timestamp is None:
+            experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
+
+        saved_local_model_details = self.pytorch_local_saver.save_model(model, project_name, experiment_name,
+                                                                        experiment_timestamp, epoch, protect_existing_folder)
+
+        model_name, model_weights_name, model_local_path, model_weights_local_path = saved_local_model_details
+
+        experiment_s3_path = self.create_experiment_S3_folder_structure(project_name, experiment_name, experiment_timestamp)
+        model_s3_path = os.path.join(experiment_s3_path, model_name)
+        model_weights_s3_path = os.path.join(experiment_s3_path, model_weights_name)
+
+        self.save_file(local_file_path=model_local_path, s3_file_path=model_s3_path)
+        self.save_file(local_file_path=model_weights_local_path, s3_file_path=model_weights_s3_path)
+
+        return model_s3_path, experiment_timestamp
