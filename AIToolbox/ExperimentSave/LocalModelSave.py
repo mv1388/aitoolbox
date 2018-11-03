@@ -3,8 +3,6 @@ import os
 import time
 import datetime
 
-import torch
-
 
 class AbstractLocalModelSaver(ABC):
     @abstractmethod
@@ -155,6 +153,7 @@ class PyTorchLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
         model_local_path = os.path.join(experiment_model_local_path, model_name)
         model_weights_local_path = os.path.join(experiment_model_local_path, model_weights_name)
 
+        import torch
         torch.save(model, model_local_path)
         torch.save(model.state_dict(), model_weights_local_path)
 

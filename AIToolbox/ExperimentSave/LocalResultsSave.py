@@ -118,17 +118,19 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
 
         results = result_package.get_results()
         hyperparameters = result_package.get_hyperparameters()
+        training_history = result_package.get_training_history()
 
         exp_results_hyperparam_dict = {'experiment_name': experiment_name,
                                        'experiment_results_local_path': experiment_results_local_path,
                                        'results': results,
-                                       'hyperparameters': hyperparameters}
+                                       'hyperparameters': hyperparameters,
+                                       'training_history': training_history}
 
         if save_true_pred_labels:
             exp_results_hyperparam_dict = {'y_true': result_package.y_true.tolist(), 'y_predicted': result_package.y_predicted.tolist(),
                                            **exp_results_hyperparam_dict}
 
-        results_file_name_w_type = 'results_hyperParams_{}_{}'.format(experiment_name, experiment_timestamp)
+        results_file_name_w_type = 'results_hyperParams_hist_{}_{}'.format(experiment_name, experiment_timestamp)
         results_file_local_path_w_type = os.path.join(experiment_results_local_path, results_file_name_w_type)
 
         results_file_name, results_file_local_path = self.save_file(exp_results_hyperparam_dict,
@@ -159,6 +161,7 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
 
         results = result_package.get_results()
         hyperparameters = result_package.get_hyperparameters()
+        training_history = result_package.get_training_history()
 
         experiment_results_dict = {'experiment_name': experiment_name,
                                    'experiment_results_local_path': experiment_results_local_path,
@@ -167,6 +170,10 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
         experiment_hyperparam_dict = {'experiment_name': experiment_name,
                                       'experiment_results_local_path': experiment_results_local_path,
                                       'hyperparameters': hyperparameters}
+
+        experiment_train_hist_dict = {'experiment_name': experiment_name,
+                                      'experiment_results_local_path': experiment_results_local_path,
+                                      'hyperparameters': training_history}
 
         results_file_name_w_type = 'results_{}_{}'.format(experiment_name, experiment_timestamp)
         results_file_local_path_w_type = os.path.join(experiment_results_local_path, results_file_name_w_type)
@@ -180,8 +187,15 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
                                                                             hyperparams_file_name_w_type,
                                                                             hyperparams_file_local_path_w_type)
 
+        train_hist_file_name_w_type = 'train_history_{}_{}'.format(experiment_name, experiment_timestamp)
+        train_hist_file_local_path_w_type = os.path.join(experiment_results_local_path, train_hist_file_name_w_type)
+        train_hist_file_name, train_hist_file_local_path = self.save_file(experiment_results_dict,
+                                                                          train_hist_file_name_w_type,
+                                                                          train_hist_file_local_path_w_type)
+
         saved_results_paths = [[results_file_name, results_file_local_path],
-                               [hyperparams_file_name, hyperparams_file_local_path]]
+                               [hyperparams_file_name, hyperparams_file_local_path],
+                               [train_hist_file_name, train_hist_file_local_path]]
 
         if save_true_pred_labels:
             experiment_true_pred_labels_dict = {'y_true': result_package.y_true.tolist(), 'y_predicted': result_package.y_predicted.tolist()}

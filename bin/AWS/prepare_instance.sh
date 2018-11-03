@@ -2,7 +2,7 @@
 
 # Example how to run:
 
-# ./prepare_instance.sh <SSH_KEY_LOCATION> ec2-34-251-236-206.eu-west-1.compute.amazonaws.com 0.0.7 SQuAD2 orig ~/PycharmProjects/MemoryNet
+# ./prepare_instance.sh <SSH_KEY_LOCATION> ec2-34-251-236-206.eu-west-1.compute.amazonaws.com 0.1 SQuAD2 orig ~/PycharmProjects/MemoryNet
 
 # When you get ssh-ed to the instance finish the instance prep process by running:
 
