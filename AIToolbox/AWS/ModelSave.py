@@ -148,7 +148,7 @@ class PyTorchS3ModelSaver(AbstractModelSaver, BaseModelSaver):
         """
 
         Args:
-            model (keras.engine.training.Model):
+            model (torch.nn.modules.Module):
             project_name (str):
             experiment_name (str):
             experiment_timestamp (str or None):

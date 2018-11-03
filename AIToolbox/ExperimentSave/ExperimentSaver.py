@@ -94,7 +94,7 @@ class FullPyTorchExperimentS3Saver(AbstractExperimentSaver):
         """
 
         Args:
-            model (keras.engine.training.Model):
+            model (torch.nn.modules.Module):
             result_package (AIToolbox.ExperimentSave.ResultPackage.AbstractResultPackage):
             save_true_pred_labels (bool):
             separate_files (bool):

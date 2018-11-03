@@ -129,7 +129,7 @@ class PyTorchLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
         """
 
         Args:
-            model :
+            model (torch.nn.modules.Module):
             project_name (str):
             experiment_name (str):
             experiment_timestamp (str or None):
@@ -146,11 +146,11 @@ class PyTorchLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
         experiment_model_local_path = self.create_experiment_local_folder_structure(project_name, experiment_name, experiment_timestamp)
 
         if epoch is None:
-            model_name = 'model_{}_{}.h5'.format(experiment_name, experiment_timestamp)
-            model_weights_name = 'modelWeights_{}_{}.h5'.format(experiment_name, experiment_timestamp)
+            model_name = 'model_{}_{}.pth'.format(experiment_name, experiment_timestamp)
+            model_weights_name = 'modelWeights_{}_{}.pth'.format(experiment_name, experiment_timestamp)
         else:
-            model_name = 'model_{}_{}_E{}.h5'.format(experiment_name, experiment_timestamp, epoch)
-            model_weights_name = 'modelWeights_{}_{}_E{}.h5'.format(experiment_name, experiment_timestamp, epoch)
+            model_name = 'model_{}_{}_E{}.pth'.format(experiment_name, experiment_timestamp, epoch)
+            model_weights_name = 'modelWeights_{}_{}_E{}.pth'.format(experiment_name, experiment_timestamp, epoch)
 
         model_local_path = os.path.join(experiment_model_local_path, model_name)
         model_weights_local_path = os.path.join(experiment_model_local_path, model_weights_name)
