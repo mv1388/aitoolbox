@@ -84,9 +84,11 @@ class PyTorchTrainingHistory(AbstractTrainingHistory):
         AbstractTrainingHistory.__init__(self, strict_content_check)
 
     def prepare_train_history_dict(self):
+        """
 
-        raise NotImplementedError
+        Returns:
 
+        """
         self.train_history_dict = {'history': self.history,
                                    'epoch': self.epoch}
 

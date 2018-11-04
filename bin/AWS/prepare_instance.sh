@@ -2,9 +2,9 @@
 
 # Example how to run:
 
-# ./prepare_instance.sh <SSH_KEY_LOCATION> ec2-34-251-236-206.eu-west-1.compute.amazonaws.com 0.1 SQuAD2 orig ~/PycharmProjects/MemoryNet
+# ./prepare_instance.sh <SSH_KEY_LOCATION> ec2-34-251-236-206.eu-west-1.compute.amazonaws.com TF 0.1 SQuAD2 orig ~/PycharmProjects/MemoryNet
 
-# ./prepare_instance.sh <SSH_KEY_LOCATION> ec2-34-251-236-206.eu-west-1.compute.amazonaws.com 0.1 cnn-dailymail abisee ~/PycharmProjects/MemoryNet
+# ./prepare_instance.sh <SSH_KEY_LOCATION> ec2-34-251-236-206.eu-west-1.compute.amazonaws.com pytorch 0.1 cnn-dailymail abisee ~/PycharmProjects/MemoryNet
 
 # When you get ssh-ed to the instance finish the instance prep process by running:
 
@@ -27,12 +27,23 @@
 key_path=$1
 ec2_instance_address=$2
 
-AIToolbox_version=$3
+DL_framework=$3
 
-dataset_name=$4
-preproc_dataset=$5
+AIToolbox_version=$4
 
-local_project_path=$6
+dataset_name=$5
+preproc_dataset=$6
+
+local_project_path=$7
+
+
+if [ $DL_framework == "TF" ]; then
+    py_env="tensorflow_p36"
+elif [ $DL_framework == "pytorch" ]; then
+    py_env="pytorch_p36"
+else
+    py_env="tensorflow_p36"
+fi
 
 
 ssh -i $key_path ec2-user@$ec2_instance_address 'mkdir ~/project ; mkdir ~/project/data ; mkdir ~/project/model_results'
@@ -50,7 +61,8 @@ aws configure
 
 cd project
 
-source activate tensorflow_p36
+source activate $py_env
+
 pip install AIToolbox-$AIToolbox_version.tar.gz
 
 if [ $dataset_name != '' ]; then
