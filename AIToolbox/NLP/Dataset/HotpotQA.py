@@ -11,7 +11,7 @@ from AIToolbox.AWS.DataAccess import HotpotQADatasetFetcher
 """
 
 
-def get_preproc_dataset_local_copy(local_dataset_folder_path, protect_local_folder=True):
+def get_dataset_local_copy(local_dataset_folder_path, protect_local_folder=True):
     """Interface method for getting a local copy of HotpotQA dataset
 
     If a local copy is not found, dataset is automatically downloaded from S3.

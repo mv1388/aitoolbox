@@ -24,16 +24,16 @@ function download_cnn_dailymail {
     elif [ $preproc_dataset == "abisee" ]; then
         echo Downloading preprocessed SQuAD2 dataset: \"abisee\"
         echo "Location: $download_path"
-        aws s3 cp s3://dataset-store/cnn-dailymail/preproc/abisee $download_path/cnn-dailymail/abisee --recursive
-        unzip $download_path/cnn-dailymail/abisee/cnn_stories_tokenized.zip -d $download_path/cnn-dailymail/abisee/
-        unzip $download_path/cnn-dailymail/abisee/dm_stories_tokenized.zip -d $download_path/cnn-dailymail/abisee/
+        aws s3 cp s3://dataset-store/cnn-dailymail/preproc/abisee $download_path/cnn-dailymail-abisee --recursive
+        unzip $download_path/cnn-dailymail-abisee/cnn_stories_tokenized.zip -d $download_path/cnn-dailymail-abisee/
+        unzip $download_path/cnn-dailymail-abisee/dm_stories_tokenized.zip -d $download_path/cnn-dailymail-abisee/
 
     elif [ $preproc_dataset == "danqi" ]; then
         echo Downloading preprocessed SQuAD2 dataset: \"danqi\"
         echo "Location: $download_path"
-        aws s3 cp s3://dataset-store/cnn-dailymail/preproc/danqi $download_path/cnn-dailymail/danqi --recursive
-        unzip $download_path/cnn-dailymail/danqi/cnn.tar.gz -d $download_path/cnn-dailymail/danqi/
-        unzip $download_path/cnn-dailymail/danqi/dailymail.tar.gz -d $download_path/cnn-dailymail/danqi/
+        aws s3 cp s3://dataset-store/cnn-dailymail/preproc/danqi $download_path/cnn-dailymail-danqi --recursive
+        tar xvf $download_path/cnn-dailymail-danqi/cnn.tar.gz -C $download_path/cnn-dailymail-danqi/
+        tar xvf $download_path/cnn-dailymail-danqi/dailymail.tar.gz -C $download_path/cnn-dailymail-danqi/
 
     else
         echo Did not find specified preprocessed dataset. Nothing will be downloaded
