@@ -1,4 +1,4 @@
-from AIToolbox.AWS.DataAccess import CNNDailyMailDSDatasetFetcher
+from AIToolbox.AWS.DataAccess import CNNDailyMailDatasetFetcher
 
 
 def get_preproc_dataset_local_copy(local_dataset_folder_path, preprocess_name='abisee', protect_local_folder=True):
@@ -15,5 +15,5 @@ def get_preproc_dataset_local_copy(local_dataset_folder_path, preprocess_name='a
         None
 
     """
-    dataset_fetcher = CNNDailyMailDSDatasetFetcher(bucket_name='dataset-store', local_dataset_folder_path=local_dataset_folder_path)
+    dataset_fetcher = CNNDailyMailDatasetFetcher(bucket_name='dataset-store', local_dataset_folder_path=local_dataset_folder_path)
     dataset_fetcher.fetch_preprocessed_dataset(preprocess_name, protect_local_folder)

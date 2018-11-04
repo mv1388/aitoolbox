@@ -1,4 +1,4 @@
-from AIToolbox.AWS.DataAccess import QAngarooDSDatasetFetcher
+from AIToolbox.AWS.DataAccess import QAngarooDatasetFetcher
 
 
 def get_dataset_local_copy(local_dataset_folder_path, protect_local_folder=True):
@@ -14,5 +14,5 @@ def get_dataset_local_copy(local_dataset_folder_path, protect_local_folder=True)
         None
 
     """
-    dataset_fetcher = QAngarooDSDatasetFetcher(bucket_name='dataset-store', local_dataset_folder_path=local_dataset_folder_path)
+    dataset_fetcher = QAngarooDatasetFetcher(bucket_name='dataset-store', local_dataset_folder_path=local_dataset_folder_path)
     dataset_fetcher.fetch_dataset(protect_local_folder)

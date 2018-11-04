@@ -110,7 +110,7 @@ class SQuAD2DatasetFetcher(AbstractDatasetFetcher, SmartDatasetFetcher):
                             local_file_path=os.path.join(self.local_dataset_folder_path, 'SQuAD2', 'dev-v2.0.json'))
 
 
-class QAngarooDSDatasetFetcher(AbstractDatasetFetcher, SmartDatasetFetcher):
+class QAngarooDatasetFetcher(AbstractDatasetFetcher, SmartDatasetFetcher):
     def __init__(self, bucket_name='dataset-store', local_dataset_folder_path='~/project/data'):
         """
 
@@ -131,13 +131,17 @@ class QAngarooDSDatasetFetcher(AbstractDatasetFetcher, SmartDatasetFetcher):
 
         """
         if not self.exists_local_dataset_folder('qangaroo_v1', protect_local_folder):
+            medhop_local_path = os.path.join(self.local_dataset_folder_path, 'qangaroo_v1', 'medhop.zip')
+            wikihop_local_path = os.path.join(self.local_dataset_folder_path, 'qangaroo_v1', 'wikihop.zip')
             self.fetch_file(s3_file_path='qangaroo_v1/medhop.zip',
-                            local_file_path=os.path.join(self.local_dataset_folder_path, 'qangaroo_v1', 'medhop.zip'))
+                            local_file_path=medhop_local_path)
             self.fetch_file(s3_file_path='qangaroo_v1/wikihop.zip',
-                            local_file_path=os.path.join(self.local_dataset_folder_path, 'qangaroo_v1', 'wikihop.zip'))
+                            local_file_path=wikihop_local_path)
+            self.unzip_file(medhop_local_path, medhop_local_path[:-4])
+            self.unzip_file(wikihop_local_path, wikihop_local_path[:-4])
 
 
-class CNNDailyMailDSDatasetFetcher(AbstractDatasetFetcher, SmartDatasetFetcher):
+class CNNDailyMailDatasetFetcher(AbstractDatasetFetcher, SmartDatasetFetcher):
     def __init__(self, bucket_name='dataset-store', local_dataset_folder_path='~/project/data'):
         """
 
@@ -196,3 +200,36 @@ class CNNDailyMailDSDatasetFetcher(AbstractDatasetFetcher, SmartDatasetFetcher):
                                 local_file_path=dm_local_path)
                 self.unzip_file(cnn_local_path, cnn_local_path[:-4])
                 self.unzip_file(dm_local_path, dm_local_path[:-4])
+
+
+class HotpotQADatasetFetcher(AbstractDatasetFetcher, SmartDatasetFetcher):
+    def __init__(self, bucket_name='dataset-store', local_dataset_folder_path='~/project/data'):
+        """
+
+        https://hotpotqa.github.io/
+        https://arxiv.org/pdf/1809.09600.pdf
+
+        https://github.com/hotpotqa/hotpot
+
+
+        Args:
+            bucket_name (str):
+            local_dataset_folder_path (str):
+        """
+        SmartDatasetFetcher.__init__(self, bucket_name, local_dataset_folder_path)
+
+    def fetch_dataset(self, protect_local_folder=True):
+        """
+
+        Args:
+            protect_local_folder (bool):
+
+        Returns:
+            None
+
+        """
+        if not self.exists_local_dataset_folder('HotpotQA', protect_local_folder):
+            hotpotqa_local_path = os.path.join(self.local_dataset_folder_path, 'HotpotQA', 'HotpotQA.zip')
+            self.fetch_file(s3_file_path='HotpotQA/HotpotQA.zip',
+                            local_file_path=hotpotqa_local_path)
+            self.unzip_file(hotpotqa_local_path, hotpotqa_local_path[:-4])

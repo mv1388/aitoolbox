@@ -66,6 +66,16 @@ function download_qangaroo {
     fi
 }
 
+function download_HotpotQA {
+    local download_path=$1
+#    local preproc_dataset=$2
+
+    echo Downloading HotpotQA dataset from S3
+    echo "Location: $download_path"
+    aws s3 cp s3://dataset-store/HotpotQA $download_path/HotpotQA --recursive
+    unzip $download_path/HotpotQA/HotpotQA.zip -d $download_path/HotpotQA/
+}
+
 function download_glove {
     local download_path=$1
     local preproc_dataset=$2
@@ -104,6 +114,9 @@ elif [ $dataset == "cnn-dailymail" ]; then
 
 elif [ $dataset == "qangaroo" ]; then
     download_qangaroo $download_path $preproc_dataset
+
+elif [ $dataset == "HotpotQA" ]; then
+    download_HotpotQA $download_path
 
 elif [ $dataset == "glove" ]; then
     download_glove $download_path $preproc_dataset
