@@ -8,7 +8,7 @@
 pkgversion=$1
 uninstallPrevious=$2
 
-source activate /Users/markovidoni/anaconda/envs/Py36
+source activate py36
 
 if [ $uninstallPrevious == "--uninstall" ]; then
     sudo pip uninstall AIToolbox

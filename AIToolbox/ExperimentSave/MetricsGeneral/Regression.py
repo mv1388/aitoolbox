@@ -31,4 +31,3 @@ class MeanAbsoluteErrorMetric(AbstractBaseMetric):
 
     def calculate_metric(self):
         self.metric_result = mean_absolute_error(self.y_true, self.y_predicted)
-

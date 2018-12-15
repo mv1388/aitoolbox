@@ -1,5 +1,9 @@
+import json
+import pickle
+import os
 from tqdm import tqdm
 from AIToolbox.AWS.DataAccess import SQuAD2DatasetFetcher
+from AIToolbox.NLP.DataPrep.vocabulary import Vocabulary
 from AIToolbox.NLP.DataPrep.core import *
 
 
@@ -20,137 +24,160 @@ def get_dataset_local_copy(local_dataset_folder_path, protect_local_folder=True)
     dataset_fetcher.fetch_dataset(protect_local_folder)
 
 
-def process_context_text(context_text, use_word_tokenize=True, rm_non_alphanum=True):
-    """
+class SQuAD2DatasetPrepareResult:
+    def __init__(self, dataset_name, dataset_type='train', vocab_memory_safeguard=True):
+        self.dataset_name = dataset_name
+        self.dataset_type = dataset_type
+        self.vocab_memory_safeguard = vocab_memory_safeguard
 
-    Args:
-        context_text (str):
-        use_word_tokenize (bool):
-        rm_non_alphanum (bool):
+        self.context_text_list = None
+        self.question_text_list = None
+        self.answer_text_list = None
+        self.orig_answer_start_end_tuple_list = None
+        self.answer_start_end_tuple_list = None
 
-    Returns:
-        list:
+        self.vocab = None
+        self.max_ctx_qs_len = None
 
-    """
-    return basic_tokenize(context_text, use_word_tokenize, rm_non_alphanum,
-                          start_label='START_DOC', end_label='END_DOC')
+    def store_data(self, context_text_list, question_text_list, answer_text_list,
+                   orig_answer_start_end_tuple_list, answer_start_end_tuple_list):
+        self.context_text_list = context_text_list
+        self.question_text_list = question_text_list
+        self.answer_text_list = answer_text_list
+        self.orig_answer_start_end_tuple_list = orig_answer_start_end_tuple_list
+        self.answer_start_end_tuple_list = answer_start_end_tuple_list
 
+    def store_vocab(self, vocab):
+        if not self.vocab_memory_safeguard:
+            self.vocab = vocab
+        else:
+            print('vocab_memory_safeguard is on... not saving the vocabulary')
 
-def process_question_text(question_text, use_word_tokenize=True, rm_non_alphanum=True):
-    """
-
-    Args:
-        question_text (str):
-        use_word_tokenize (bool):
-        rm_non_alphanum (bool):
-
-    Returns:
-        list:
-
-    """
-    return basic_tokenize(question_text, use_word_tokenize, rm_non_alphanum,
-                          start_label='START_Q', end_label='END_Q')
-
-
-def process_answer_text(answer_text, use_word_tokenize=True, rm_non_alphanum=True):
-    """
-
-    Args:
-        answer_text (str):
-        use_word_tokenize (bool):
-        rm_non_alphanum (bool):
-
-    Returns:
-        list:
-
-    """
-    return basic_tokenize(answer_text, use_word_tokenize, rm_non_alphanum,
-                          start_label='START_ANSW', end_label='END_ANSW')
+    def store_max_context_questions_max_len(self, max_ctx_qs_len):
+        self.max_ctx_qs_len = max_ctx_qs_len
 
 
-def build_dataset(data_json, use_word_tokenize=True,
-                  rm_non_alphanum_ctx=True, rm_non_alphanum_question=True, rm_non_alphanum_answer=True,
-                  skip_examples_w_span=True, skip_is_impossible=True):
-    """
+class SQuAD2DataPreparation:
+    def __init__(self, train_path, dev_path, skip_is_impossible=True, skip_examples_w_span=True):
+        self.train_path = train_path
+        self.dev_path = dev_path
+        self.train_data = self.load_json_file(self.train_path)
+        self.dev_data = self.load_json_file(self.dev_path)
 
-    Args:
-        data_json (list): list of dicts coming from the read json file
-        use_word_tokenize (bool):
-        rm_non_alphanum_ctx (bool):
-        rm_non_alphanum_question (bool):
-        rm_non_alphanum_answer (bool):
-        skip_examples_w_span (bool):
-        skip_is_impossible (bool):
+        self.skip_is_impossible = skip_is_impossible
+        self.is_impossible_ctr = 0
 
-    Returns:
-        (list, list, list, list, set, set, set, int, int):
+        self.skip_examples_w_span = skip_examples_w_span
+        self.span_not_found_ctr = 0
 
+        self.vocab = Vocabulary('SQuAD2', document_level=False)
 
-    """
-    print('Building datasets')
-    is_impossible_ctr = span_not_found_ctr = total_ctr = 0
+    def process_data(self, dump_folder_path=None):
+        train_data = self.build_dataset(self.train_data, 'train')
+        dev_data = self.build_dataset(self.dev_data, 'dev')
 
-    context_text_list = []
-    question_text_list = []
-    answer_text_list = []
-    answer_start_idx_list = []
+        if dump_folder_path is not None:
+            with open(os.path.join(dump_folder_path, 'train_data_SQuAD2.p'), 'wb') as f:
+                pickle.dump(train_data, f)
+            with open(os.path.join(dump_folder_path, 'dev_data_SQuAD2.p'), 'wb') as f:
+                pickle.dump(dev_data, f)
 
-    vocab_context_text = set()
-    vocab_question_text = set()
-    vocab_answer_text = set()
+        return train_data, dev_data, self.vocab
 
-    max_context_text_len = 0
-    max_question_text_len = 0
+    def load_json_file(self, file_path):
+        with open(file_path) as f:
+            data = json.load(f)['data']
+        return data
 
-    for wiki_page in tqdm(data_json):
-        title = wiki_page['title']
-        paragraphs_list = wiki_page['paragraphs']
+    def load_prep_dumps(self, dump_folder_path):
+        with open(os.path.join(dump_folder_path, 'train_data_SQuAD2.p'), 'rb') as f:
+            train_data = pickle.load(f)
+        with open(os.path.join(dump_folder_path, 'dev_data_SQuAD2.p'), 'rb') as f:
+            dev_data = pickle.load(f)
 
-        for paragraph in paragraphs_list:
-            context_paragraph = paragraph['context']
-            context_paragraph = process_context_text(context_paragraph, use_word_tokenize, rm_non_alphanum_ctx)
+        return train_data, dev_data, train_data.vocab
 
-            question_answer_list = paragraph['qas']
+    def build_dataset(self, data_json, dataset_name):
+        context_text_list = []
+        question_text_list = []
+        answer_text_list = []
+        orig_answer_start_end_tuple_list = []
+        answer_start_end_tuple_list = []
 
-            for question_answer_dict in question_answer_list:
-                is_impossible = question_answer_dict['is_impossible']
+        max_context_text_len = 0
+        max_question_text_len = 0
 
-                answer_list = question_answer_dict['answers']
-                total_ctr += len(answer_list)
+        prep_dataset_result = SQuAD2DatasetPrepareResult('SQuAD2', dataset_name,
+                                                         vocab_memory_safeguard=dataset_name == 'train')
 
-                if skip_is_impossible and is_impossible:
-                    is_impossible_ctr += 1
-                    continue
+        for wiki_page in tqdm(data_json, total=len(data_json), desc=dataset_name):
+            title = wiki_page['title']
+            paragraphs_list = wiki_page['paragraphs']
+            for paragraph in paragraphs_list:
+                context_paragraph = paragraph['context']
+                context_paragraph_tokens = self.process_context_text(context_paragraph, dataset_name == 'train')
 
-                question_text = question_answer_dict['question']
-                question_text = process_question_text(question_text, use_word_tokenize, rm_non_alphanum_question)
+                question_answer_list = paragraph['qas']
 
-                for answer_dict in answer_list:
-                    answer_text = answer_dict['text']
-                    answer_text = process_answer_text(answer_text, use_word_tokenize, rm_non_alphanum_answer)
+                for question_answer_dict in question_answer_list:
+                    is_impossible = question_answer_dict['is_impossible']
+                    answer_list = question_answer_dict['answers']
 
-                    answer_start_idx = answer_dict['answer_start']
-                    first_answ_span = find_sub_list(answer_text[1:-1], context_paragraph)
-
-                    if skip_examples_w_span and first_answ_span is None:
-                        span_not_found_ctr += 1
+                    if self.skip_is_impossible and is_impossible:
+                        self.is_impossible_ctr += 1
                         continue
 
-                    context_text_list.append(context_paragraph)
-                    question_text_list.append(question_text)
-                    answer_text_list.append(answer_text)
-                    answer_start_idx_list.append(answer_start_idx)
+                    question_text = question_answer_dict['question']
+                    question_text_tokens = self.process_question_text(question_text, dataset_name == 'train')
 
-                    vocab_context_text |= set(context_paragraph)
-                    vocab_question_text |= set(question_text)
-                    vocab_answer_text |= set(answer_text)
+                    for answer_dict in answer_list:
+                        answer_text = answer_dict['text']
+                        answer_text_tokens = self.process_answer_text(answer_text, dataset_name == 'train')
 
-                    max_context_text_len = max(max_context_text_len, len(context_paragraph))
-                    max_question_text_len = max(max_question_text_len, len(question_text))
+                        orig_answer_start_idx = answer_dict['answer_start']
+                        orig_answer_end_idx = answer_dict['answer_start'] + len(answer_dict['text'])
+                        orig_answer_start_end_tuple = (orig_answer_start_idx, orig_answer_end_idx)
 
-    print('is_impossible skip num: {}; % of all rows: {}'.format(is_impossible_ctr, is_impossible_ctr / total_ctr))
-    print('span_not_found skip num: {}; % of all rows: {}'.format(span_not_found_ctr, span_not_found_ctr / total_ctr))
+                        first_answ_span_tokens = find_sub_list(answer_text_tokens, context_paragraph_tokens)
+                        if self.skip_examples_w_span and first_answ_span_tokens is None:
+                            self.span_not_found_ctr += 1
+                            continue
 
-    return context_text_list, question_text_list, answer_text_list, answer_start_idx_list, \
-           vocab_context_text, vocab_question_text, vocab_answer_text, \
-           max_context_text_len, max_question_text_len
+                        context_text_list.append(context_paragraph_tokens)
+                        question_text_list.append(question_text_tokens)
+                        answer_text_list.append(answer_text_tokens)
+                        orig_answer_start_end_tuple_list.append(orig_answer_start_end_tuple)
+                        answer_start_end_tuple_list.append(first_answ_span_tokens)
+
+                        max_context_text_len = max(max_context_text_len, len(context_paragraph_tokens))
+                        max_question_text_len = max(max_question_text_len, len(question_text_tokens))
+
+        prep_dataset_result.store_data(context_text_list, question_text_list, answer_text_list,
+                                       orig_answer_start_end_tuple_list, answer_start_end_tuple_list)
+
+        prep_dataset_result.store_vocab(self.vocab)
+        max_ctx_qs_len = {'context': max_context_text_len, 'questions': max_question_text_len}
+        prep_dataset_result.store_max_context_questions_max_len(max_ctx_qs_len)
+
+        return prep_dataset_result
+
+    def process_context_text(self, context_text, is_train):
+        norm_context_text = normalize_string(context_text)
+        token_norm_context_text = norm_context_text.split(' ')
+        if is_train:
+            self.vocab.add_sentence(token_norm_context_text)
+        return token_norm_context_text
+
+    def process_question_text(self, question_text, is_train):
+        norm_context_text = normalize_string(question_text)
+        token_norm_context_text = norm_context_text.split(' ')
+        if is_train:
+            self.vocab.add_sentence(token_norm_context_text)
+        return token_norm_context_text
+
+    def process_answer_text(self, answer_text, is_train):
+        norm_context_text = normalize_string(answer_text)
+        token_norm_context_text = norm_context_text.split(' ')
+        if is_train:
+            self.vocab.add_sentence(token_norm_context_text)
+        return token_norm_context_text

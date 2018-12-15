@@ -5,3 +5,4 @@ data/
 *.pyc
 
 /AIToolbox.egg-info
+.mypy_cache
