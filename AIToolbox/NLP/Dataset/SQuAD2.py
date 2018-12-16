@@ -7,6 +7,7 @@ from AIToolbox.NLP.DataPrep.vocabulary import Vocabulary
 from AIToolbox.NLP.DataPrep.core import *
 
 
+
 def get_dataset_local_copy(local_dataset_folder_path, protect_local_folder=True):
     """Interface method for getting a local copy of SQuAD2 dataset
 
