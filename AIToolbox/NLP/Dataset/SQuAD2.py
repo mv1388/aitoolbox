@@ -26,6 +26,13 @@ def get_dataset_local_copy(local_dataset_folder_path, protect_local_folder=True)
 
 class SQuAD2DatasetPrepareResult:
     def __init__(self, dataset_name, dataset_type='train', vocab_memory_safeguard=True):
+        """
+
+        Args:
+            dataset_name:
+            dataset_type:
+            vocab_memory_safeguard:
+        """
         self.dataset_name = dataset_name
         self.dataset_type = dataset_type
         self.vocab_memory_safeguard = vocab_memory_safeguard
@@ -41,6 +48,18 @@ class SQuAD2DatasetPrepareResult:
 
     def store_data(self, context_text_list, question_text_list, answer_text_list,
                    orig_answer_start_end_tuple_list, answer_start_end_tuple_list):
+        """
+
+        Args:
+            context_text_list:
+            question_text_list:
+            answer_text_list:
+            orig_answer_start_end_tuple_list:
+            answer_start_end_tuple_list:
+
+        Returns:
+
+        """
         self.context_text_list = context_text_list
         self.question_text_list = question_text_list
         self.answer_text_list = answer_text_list
@@ -48,17 +67,41 @@ class SQuAD2DatasetPrepareResult:
         self.answer_start_end_tuple_list = answer_start_end_tuple_list
 
     def store_vocab(self, vocab):
+        """
+
+        Args:
+            vocab:
+
+        Returns:
+
+        """
         if not self.vocab_memory_safeguard:
             self.vocab = vocab
         else:
             print('vocab_memory_safeguard is on... not saving the vocabulary')
 
     def store_max_context_questions_max_len(self, max_ctx_qs_len):
+        """
+
+        Args:
+            max_ctx_qs_len:
+
+        Returns:
+
+        """
         self.max_ctx_qs_len = max_ctx_qs_len
 
 
 class SQuAD2DataPreparation:
     def __init__(self, train_path, dev_path, skip_is_impossible=True, skip_examples_w_span=True):
+        """
+
+        Args:
+            train_path:
+            dev_path:
+            skip_is_impossible:
+            skip_examples_w_span:
+        """
         self.train_path = train_path
         self.dev_path = dev_path
         self.train_data = self.load_json_file(self.train_path)
@@ -73,6 +116,14 @@ class SQuAD2DataPreparation:
         self.vocab = Vocabulary('SQuAD2', document_level=False)
 
     def process_data(self, dump_folder_path=None):
+        """
+
+        Args:
+            dump_folder_path:
+
+        Returns:
+
+        """
         train_data = self.build_dataset(self.train_data, 'train')
         dev_data = self.build_dataset(self.dev_data, 'dev')
 
@@ -84,20 +135,69 @@ class SQuAD2DataPreparation:
 
         return train_data, dev_data, self.vocab
 
-    def load_json_file(self, file_path):
-        with open(file_path) as f:
-            data = json.load(f)['data']
-        return data
+    def vectorize_data(self, train_data=None, dev_data=None, vocab=None, dump_folder_path=None):
+        """
 
-    def load_prep_dumps(self, dump_folder_path):
-        with open(os.path.join(dump_folder_path, 'train_data_SQuAD2.p'), 'rb') as f:
-            train_data = pickle.load(f)
-        with open(os.path.join(dump_folder_path, 'dev_data_SQuAD2.p'), 'rb') as f:
-            dev_data = pickle.load(f)
+        Args:
+            train_data:
+            dev_data:
+            vocab:
+            dump_folder_path:
 
-        return train_data, dev_data, train_data.vocab
+        Returns:
+
+        """
+        if train_data is None and dev_data is None and vocab is None:
+            train_data, dev_data, vocab = self.process_data(dump_folder_path)
+
+        vect_train_data = self.get_vectorized_data_prep_result(train_data, vocab)
+        vect_dev_data = self.get_vectorized_data_prep_result(dev_data, vocab)
+
+        if dump_folder_path is not None:
+            with open(os.path.join(dump_folder_path, 'vect_train_data_SQuAD2.p'), 'wb') as f:
+                pickle.dump(train_data, f)
+            with open(os.path.join(dump_folder_path, 'vect_dev_data_SQuAD2.p'), 'wb') as f:
+                pickle.dump(dev_data, f)
+
+        return vect_train_data, vect_dev_data, vocab
+
+    def get_vectorized_data_prep_result(self, data_prep_result, vocab):
+        """
+
+        Args:
+            data_prep_result:
+            vocab:
+
+        Returns:
+
+        """
+        dataset_type = data_prep_result.dataset_type
+
+        vect_data_result = SQuAD2DatasetPrepareResult('SQuAD2', dataset_type,
+                                                      vocab_memory_safeguard=dataset_type == 'train')
+
+        vect_data_result.store_data(
+            [vocab.convert_sent2idx_sent(ctx) for ctx in data_prep_result.context_text_list],
+            [vocab.convert_sent2idx_sent(qus) for qus in data_prep_result.question_text_list],
+            [vocab.convert_sent2idx_sent(answ) for answ in data_prep_result.answer_text_list],
+            data_prep_result.orig_answer_start_end_tuple_list,
+            data_prep_result.answer_start_end_tuple_list
+        )
+        vect_data_result.store_vocab(vocab)
+        vect_data_result.store_max_context_questions_max_len(data_prep_result.max_ctx_qs_len)
+
+        return vect_data_result
 
     def build_dataset(self, data_json, dataset_name):
+        """
+
+        Args:
+            data_json:
+            dataset_name:
+
+        Returns:
+
+        """
         context_text_list = []
         question_text_list = []
         answer_text_list = []
@@ -162,6 +262,15 @@ class SQuAD2DataPreparation:
         return prep_dataset_result
 
     def process_context_text(self, context_text, is_train):
+        """
+
+        Args:
+            context_text:
+            is_train:
+
+        Returns:
+
+        """
         norm_context_text = normalize_string(context_text)
         token_norm_context_text = norm_context_text.split(' ')
         if is_train:
@@ -169,6 +278,15 @@ class SQuAD2DataPreparation:
         return token_norm_context_text
 
     def process_question_text(self, question_text, is_train):
+        """
+
+        Args:
+            question_text:
+            is_train:
+
+        Returns:
+
+        """
         norm_context_text = normalize_string(question_text)
         token_norm_context_text = norm_context_text.split(' ')
         if is_train:
@@ -176,8 +294,62 @@ class SQuAD2DataPreparation:
         return token_norm_context_text
 
     def process_answer_text(self, answer_text, is_train):
+        """
+
+        Args:
+            answer_text:
+            is_train:
+
+        Returns:
+
+        """
         norm_context_text = normalize_string(answer_text)
         token_norm_context_text = norm_context_text.split(' ')
         if is_train:
             self.vocab.add_sentence(token_norm_context_text)
         return token_norm_context_text
+
+    def load_json_file(self, file_path):
+        """
+
+        Args:
+            file_path:
+
+        Returns:
+
+        """
+        with open(file_path) as f:
+            data = json.load(f)['data']
+        return data
+
+    def load_prep_dumps(self, dump_folder_path):
+        """
+
+        Args:
+            dump_folder_path:
+
+        Returns:
+
+        """
+        with open(os.path.join(dump_folder_path, 'train_data_SQuAD2.p'), 'rb') as f:
+            train_data = pickle.load(f)
+        with open(os.path.join(dump_folder_path, 'dev_data_SQuAD2.p'), 'rb') as f:
+            dev_data = pickle.load(f)
+
+        return train_data, dev_data, train_data.vocab
+
+    def load_vect_prep_dumps(self, dump_folder_path):
+        """
+
+        Args:
+            dump_folder_path:
+
+        Returns:
+
+        """
+        with open(os.path.join(dump_folder_path, 'vect_train_data_SQuAD2.p'), 'rb') as f:
+            train_data = pickle.load(f)
+        with open(os.path.join(dump_folder_path, 'vect_dev_data_SQuAD2.p'), 'rb') as f:
+            dev_data = pickle.load(f)
+
+        return train_data, dev_data, train_data.vocab
