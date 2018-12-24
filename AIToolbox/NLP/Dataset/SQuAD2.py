@@ -25,7 +25,7 @@ def get_dataset_local_copy(local_dataset_folder_path, protect_local_folder=True)
 
 
 class SQuAD2DatasetPrepareResult:
-    def __init__(self, dataset_name, dataset_type='train', vocab_memory_safeguard=True):
+    def __init__(self, dataset_name, dataset_type='train', save_vocab=True):
         """
 
         Args:
@@ -35,7 +35,7 @@ class SQuAD2DatasetPrepareResult:
         """
         self.dataset_name = dataset_name
         self.dataset_type = dataset_type
-        self.vocab_memory_safeguard = vocab_memory_safeguard
+        self.save_vocab = save_vocab
 
         self.context_text_list = None
         self.question_text_list = None
@@ -75,10 +75,10 @@ class SQuAD2DatasetPrepareResult:
         Returns:
 
         """
-        if not self.vocab_memory_safeguard:
+        if self.save_vocab:
             self.vocab = vocab
         else:
-            print('vocab_memory_safeguard is on... not saving the vocabulary')
+            print('save_vocab is on False... not saving the vocabulary')
 
     def store_max_context_questions_max_len(self, max_ctx_qs_len):
         """
@@ -153,11 +153,14 @@ class SQuAD2DataPreparation:
         vect_train_data = self.get_vectorized_data_prep_result(train_data, vocab)
         vect_dev_data = self.get_vectorized_data_prep_result(dev_data, vocab)
 
+        print(vect_train_data.vocab)
+        # print(vect_dev_data.vocab)
+
         if dump_folder_path is not None:
             with open(os.path.join(dump_folder_path, 'vect_train_data_SQuAD2.p'), 'wb') as f:
-                pickle.dump(train_data, f)
+                pickle.dump(vect_train_data, f)
             with open(os.path.join(dump_folder_path, 'vect_dev_data_SQuAD2.p'), 'wb') as f:
-                pickle.dump(dev_data, f)
+                pickle.dump(vect_dev_data, f)
 
         return vect_train_data, vect_dev_data, vocab
 
@@ -174,7 +177,7 @@ class SQuAD2DataPreparation:
         dataset_type = data_prep_result.dataset_type
 
         vect_data_result = SQuAD2DatasetPrepareResult('SQuAD2', dataset_type,
-                                                      vocab_memory_safeguard=dataset_type == 'train')
+                                                      save_vocab=dataset_type == 'train')
 
         vect_data_result.store_data(
             [vocab.convert_sent2idx_sent(ctx) for ctx in data_prep_result.context_text_list],
@@ -208,7 +211,7 @@ class SQuAD2DataPreparation:
         max_question_text_len = 0
 
         prep_dataset_result = SQuAD2DatasetPrepareResult('SQuAD2', dataset_name,
-                                                         vocab_memory_safeguard=dataset_name == 'train')
+                                                         save_vocab=dataset_name == 'train')
 
         for wiki_page in tqdm(data_json, total=len(data_json), desc=dataset_name):
             title = wiki_page['title']

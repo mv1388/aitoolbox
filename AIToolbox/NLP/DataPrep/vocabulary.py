@@ -26,7 +26,7 @@ class Vocabulary:
             self.index2word = {PAD_token: "PAD", OOV_token: "OOV", SOS_token: "SOS", EOS_token: "EOS"}
             self.num_words = 4  # Count SOS, EOS, PAD
         else:
-            self.index2word = {PAD_token: "PAD",OOV_token: "OOV", SOS_token: "SOS", EOS_token: "EOS", SOD_token: "SOD", EOD_token: "EOD"}
+            self.index2word = {PAD_token: "PAD", OOV_token: "OOV", SOS_token: "SOS", EOS_token: "EOS", SOD_token: "SOD", EOD_token: "EOD"}
             self.num_words = 6
 
     def add_sentence(self, sentence_tokens):
