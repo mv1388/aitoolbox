@@ -12,3 +12,6 @@ tqdm
 boto3
 botocore
 scikit-learn
+allennlp
+torch
+torchvision
