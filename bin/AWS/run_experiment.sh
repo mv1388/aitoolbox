@@ -6,6 +6,7 @@ export PYTHONPATH=${PYTHONPATH}:$project_root_path
 terminate_cmd=$1
 aws_instance_id=$2
 
+# TODO: add tmux
 
 source $project_root_path/AWS_run_scripts/AWS_core_scripts/aws_run_experiments_project.sh $project_root_path
 

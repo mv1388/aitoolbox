@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source activate /Users/markovidoni/anaconda/envs/Py36
+source activate py36
 
 python setup.py test
 
