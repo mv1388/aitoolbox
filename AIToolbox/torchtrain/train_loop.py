@@ -4,6 +4,8 @@ import datetime
 import numpy as np
 import torch
 
+from AIToolbox.AWS.model_save import PyTorchS3ModelSaver
+
 
 class TrainLoop:
     def __init__(self, model,
@@ -69,8 +71,19 @@ class TrainLoop:
             print(f'AVG TRAIN LOSS: {np.mean(loss_avg)}')
             loss_avg = []
 
-            val_loss_batch = self.evaluate_loss_on_validation()
-            print(f'VAL LOSS: {val_loss_batch}')
+            self.on_end_of_epoch(epoch)
+
+    def on_end_of_epoch(self, epoch):
+        """
+
+        Args:
+            epoch (int):
+
+        Returns:
+
+        """
+        val_loss_batch = self.evaluate_loss_on_validation()
+        print(f'VAL LOSS: {val_loss_batch}')
 
     def evaluate_loss_on_validation(self):
         """
@@ -92,10 +105,35 @@ class TrainLoop:
         return np.mean(val_loss_avg)
 
 
-class TrainLoopCheckpoint(TrainLoop):
+class TrainLoopModelCheckpoint(TrainLoop):
     def __init__(self, model,
                  train_loader, validation_loader,
                  batch_model_feed_def,
-                 optimizer, criterion):
+                 optimizer, criterion,
+                 project_name, experiment_name, local_model_result_folder_path):
         TrainLoop.__init__(self, model, train_loader, validation_loader, batch_model_feed_def, optimizer, criterion)
+        self.project_name = project_name
+        self.experiment_name = experiment_name
+        self.local_model_result_folder_path = local_model_result_folder_path
 
+        self.model_checkpointer = PyTorchS3ModelSaver(local_model_result_folder_path=local_model_result_folder_path,
+                                                      checkpoint_model=True)
+
+    def on_end_of_epoch(self, epoch):
+        """
+
+        Args:
+            epoch (int):
+
+        Returns:
+
+        """
+        val_loss_batch = self.evaluate_loss_on_validation()
+        print(f'VAL LOSS: {val_loss_batch}')
+
+        self.model_checkpointer.save_model(model=self.model,
+                                           project_name=self.project_name,
+                                           experiment_name=self.experiment_name,
+                                           experiment_timestamp=self.experiment_timestamp,
+                                           epoch=epoch,
+                                           protect_existing_folder=True)
