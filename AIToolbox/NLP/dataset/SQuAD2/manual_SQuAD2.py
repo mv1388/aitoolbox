@@ -2,9 +2,10 @@ import json
 import pickle
 import os
 from tqdm import tqdm
+
 from AIToolbox.AWS.DataAccess import SQuAD2DatasetFetcher
-from AIToolbox.NLP.DataPrep.vocabulary import Vocabulary
-from AIToolbox.NLP.DataPrep.core import *
+from AIToolbox.NLP.core.vocabulary import Vocabulary
+from AIToolbox.NLP.core.core import *
 
 
 def get_dataset_local_copy(local_dataset_folder_path, protect_local_folder=True):

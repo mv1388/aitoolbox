@@ -6,7 +6,7 @@
 # df.fetch_dataset()
 
 
-from AIToolbox.NLP.Dataset import SQuAD2, HotpotQA, QAngaroo, CNNDailyMail
+from AIToolbox.NLP.dataset import SQuAD2, HotpotQA, QAngaroo, CNNDailyMail
 
 path = '/Users/markovidoni/PycharmProjects/MemoryNet/test_data_dir'
 

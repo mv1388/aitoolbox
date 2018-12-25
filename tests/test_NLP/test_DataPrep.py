@@ -1,5 +1,5 @@
 import unittest
-from AIToolbox.NLP.DataPrep import core
+from AIToolbox.NLP.core import core
 
 
 class TestCore_find_sub_list(unittest.TestCase):
