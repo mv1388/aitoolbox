@@ -11,7 +11,20 @@ def train_loop(model,
                train_loader, validation_loader,
                batch_model_feed_def,
                num_epoch, optimizer, criterion):
+    """
 
+    Args:
+        model:
+        train_loader:
+        validation_loader:
+        batch_model_feed_def:
+        num_epoch:
+        optimizer:
+        criterion:
+
+    Returns:
+
+    """
     USE_CUDA = torch.cuda.is_available()
     device = torch.device("cuda" if USE_CUDA else "cpu")
 
@@ -44,6 +57,18 @@ def train_loop(model,
 
 def evaluate_loss_on_validation(model, validation_loader,
                                 batch_model_feed_def, criterion, device):
+    """
+
+    Args:
+        model:
+        validation_loader:
+        batch_model_feed_def:
+        criterion:
+        device:
+
+    Returns:
+
+    """
     model.eval()
     val_loss_avg = []
 

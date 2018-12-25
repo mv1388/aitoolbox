@@ -45,7 +45,7 @@ class SQuAD2ConcatContextDatasetReader:
 
         with open(file_path) as dataset_file:
             dataset_json = json.load(dataset_file)
-            self.dataset = dataset_json['data'][:2]
+            self.dataset = dataset_json['data']
 
         self.vocab = Vocabulary('SQuAD2', document_level=False)
 
