@@ -2,7 +2,11 @@ import torch
 
 
 def qa_concat_ctx_span_collate_fn(data):
-    """Creates mini-batch tensors from the list of tuples (src_seq, trg_seq).
+    """
+    TODO: Write the actual docstring
+
+
+    Creates mini-batch tensors from the list of tuples (src_seq, trg_seq).
     We should build a custom collate_fn rather than using default collate_fn,
     because merging sequences (including padding) is not supported in default.
     Seqeuences are padded to the maximum length of mini-batch sequences (dynamic padding).
