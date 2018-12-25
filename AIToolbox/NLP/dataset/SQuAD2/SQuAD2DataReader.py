@@ -8,13 +8,12 @@ from allennlp.data.dataset_readers.reading_comprehension import util
 from AIToolbox.AWS.data_access import SQuAD2DatasetFetcher
 from AIToolbox.NLP.core.vocabulary import Vocabulary
 
-
 """
 
     Implementation relying on the allennlp library for the data processing instead of AIToolbox's NLP core package functions 
-    
+
     Faster processing, however, now non alphanum remove, etc.
-    
+
 """
 
 
@@ -31,7 +30,8 @@ def get_dataset_local_copy(local_dataset_folder_path, protect_local_folder=True)
         None
 
     """
-    dataset_fetcher = SQuAD2DatasetFetcher(bucket_name='dataset-store', local_dataset_folder_path=local_dataset_folder_path)
+    dataset_fetcher = SQuAD2DatasetFetcher(bucket_name='dataset-store',
+                                           local_dataset_folder_path=local_dataset_folder_path)
     dataset_fetcher.fetch_dataset(protect_local_folder)
 
 
@@ -50,25 +50,25 @@ class SQuAD2ConcatContextDatasetReader:
         self.vocab = Vocabulary('SQuAD2', document_level=False)
 
     def read(self):
+        """Read SQuAD data. Tested and it works
+
+        Returns:
+
+        """
         data = []
 
         for article in tqdm(self.dataset, total=len(self.dataset)):
             for paragraph_json in article['paragraphs']:
-                paragraph = paragraph_json["context"]
-                tokenized_paragraph = self._tokenizer.tokenize(paragraph)
 
-                if self.is_train:
-                    self.vocab.add_sentence(tokenized_paragraph)
+                paragraph_text = paragraph_json["context"]
+                tokenized_paragraph = self.tokenize_process_paragraph(paragraph_text)
 
                 for question_answer in paragraph_json['qas']:
                     if question_answer['is_impossible']:
                         continue
 
                     question_text = question_answer["question"].strip().replace("\n", "")
-                    tokenized_question = self._tokenizer.tokenize(question_text)
-
-                    if self.is_train:
-                        self.vocab.add_sentence(tokenized_question)
+                    tokenized_question = self.tokenize_process_question(question_text)
 
                     answer_texts = [answer['text'] for answer in question_answer['answers']]
 
@@ -77,7 +77,6 @@ class SQuAD2ConcatContextDatasetReader:
 
                     example = self.process_example(tokenized_paragraph, tokenized_question,
                                                    zip(span_starts, span_ends), answer_texts)
-                    # yield example
                     data.append(example)
 
         return data, self.vocab
@@ -99,4 +98,62 @@ class SQuAD2ConcatContextDatasetReader:
             candidate_answers[(span_start, span_end)] += 1
         span_start, span_end = candidate_answers.most_common(1)[0][0]
 
-        return paragraph_tokens, question_tokens, (span_start, span_end) #, answer_texts
+        return paragraph_tokens, question_tokens, (span_start, span_end)  # , answer_texts
+
+    def tokenize_process_paragraph(self, paragraph_text):
+        tokenized_paragraph = self._tokenizer.tokenize(paragraph_text)
+
+        if self.is_train:
+            self.vocab.add_sentence(tokenized_paragraph)
+
+        return tokenized_paragraph
+
+    def tokenize_process_question(self, question_text):
+        tokenized_question = self._tokenizer.tokenize(question_text)
+
+        if self.is_train:
+            self.vocab.add_sentence(tokenized_question)
+
+        return tokenized_question
+
+
+class GeneratorSQuAD2ConcatContextDatasetReader(SQuAD2ConcatContextDatasetReader):
+    """
+
+        This implementation with the generator has not been tested yet.
+
+        Check especially in the read() if calling list(self.read_generator()) also in turn fills the self.vocab,
+        thus you get returned a complete vocabulary
+
+
+    """
+
+    def __init__(self, file_path, tokenizer=None, is_train=True):
+        SQuAD2ConcatContextDatasetReader.__init__(self, file_path, tokenizer, is_train)
+
+    def read(self):
+        return list(self.read_generator()), self.vocab
+
+    def read_generator(self):
+        for article in tqdm(self.dataset, total=len(self.dataset)):
+            for paragraph_json in article['paragraphs']:
+
+                paragraph_text = paragraph_json["context"]
+                tokenized_paragraph = self.tokenize_process_paragraph(paragraph_text)
+
+                for question_answer in paragraph_json['qas']:
+                    if question_answer['is_impossible']:
+                        continue
+
+                    question_text = question_answer["question"].strip().replace("\n", "")
+                    tokenized_question = self.tokenize_process_question(question_text)
+
+                    answer_texts = [answer['text'] for answer in question_answer['answers']]
+
+                    span_starts = [answer['answer_start'] for answer in question_answer['answers']]
+                    span_ends = [start + len(answer) for start, answer in zip(span_starts, answer_texts)]
+
+                    example = self.process_example(tokenized_paragraph, tokenized_question,
+                                                   zip(span_starts, span_ends), answer_texts)
+
+                    yield example
