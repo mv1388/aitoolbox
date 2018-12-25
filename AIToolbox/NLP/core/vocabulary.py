@@ -16,6 +16,7 @@ class Vocabulary:
 
         Args:
             name (str):
+            document_level (bool):
         """
         self.name = name
         self.document_level = document_level
