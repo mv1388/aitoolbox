@@ -2,32 +2,32 @@ from AIToolbox.ExperimentSave.MetricsGeneral.BaseMetric import AbstractBaseMetri
 
 
 class AttentionHeatMap(AbstractBaseMetric):
-    def __init__(self, attention_matrix, attention_word):
+    def __init__(self, attention_matrix, attention_sent):
         """
 
         Args:
             attention_matrix (numpy.array):
-            attention_word (str):
+            attention_sent (str):
         """
         self.attention_matrix = attention_matrix
 
         AbstractBaseMetric.__init__(self, None, None)
-        self.metric_name = 'AttentionHeatMap_' + attention_word
+        self.metric_name = 'AttentionHeatMap_' + attention_sent if len(attention_sent) < 20 else attention_sent[:20]
 
     def calculate_metric(self):
         raise NotImplementedError
 
 
 class AttentionMultipleHeatMaps(AttentionHeatMap):
-    def __init__(self, attention_matrices, attention_words):
+    def __init__(self, attention_matrices, attention_sents):
         """
 
         Args:
             attention_matrices (numpy.array):
-            attention_words (list):
+            attention_sents (list):
         """
         self.attention_matrices = attention_matrices
-        self.attention_words = attention_words
+        self.attention_sents = attention_sents
 
         AbstractBaseMetric.__init__(self, None, None)
         self.metric_name = 'AttentionMultipleHeatMaps'
@@ -35,5 +35,5 @@ class AttentionMultipleHeatMaps(AttentionHeatMap):
     def calculate_metric(self):
         raise NotImplementedError
 
-        self.metric_result = {attn_word: self.attention_matrices[i] for i, attn_word in enumerate(self.attention_words)}
+        self.metric_result = {attn_sent: self.attention_matrices[i] for i, attn_sent in enumerate(self.attention_sents)}
 
