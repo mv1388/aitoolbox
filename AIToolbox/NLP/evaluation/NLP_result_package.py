@@ -1,6 +1,6 @@
-from AIToolbox.ExperimentSave.ResultPackage import AbstractResultPackage
-from AIToolbox.ExperimentSave.MetricsGeneral.Classification import AccuracyMetric
-from AIToolbox.NLP.Evaluation.NLPMetrics import BLEUScoreMetric, PerplexityMetric, ROGUEMetric
+from AIToolbox.experimet_save.result_package import AbstractResultPackage
+from AIToolbox.experimet_save.core_metrics.classification import AccuracyMetric
+from AIToolbox.NLP.evaluation.NLP_metrics import BLEUScoreMetric, PerplexityMetric, ROGUEMetric
 
 
 class QuestionAnswerResultPackage(AbstractResultPackage):
@@ -11,7 +11,7 @@ class QuestionAnswerResultPackage(AbstractResultPackage):
             y_true (numpy.array or list):
             y_predicted (numpy.array or list):
             hyperparameters (dict):
-            training_history (AIToolbox.ExperimentSave.TrainingHistory.AbstractTrainingHistory):
+            training_history (AIToolbox.ExperimentSave.training_history.AbstractTrainingHistory):
             strict_content_check (bool):
         """
         AbstractResultPackage.__init__(self, y_true, y_predicted, hyperparameters, training_history, strict_content_check)
@@ -38,7 +38,7 @@ class QuestionAnswerSpanClassificationResultPackage(AbstractResultPackage):
             y_span_end_true (numpy.array or list):
             y_span_end_predicted (numpy.array or list):
             hyperparameters (dict):
-            training_history (AIToolbox.ExperimentSave.TrainingHistory.AbstractTrainingHistory):
+            training_history (AIToolbox.ExperimentSave.training_history.AbstractTrainingHistory):
             strict_content_check (bool):
         """
         self.y_span_start_true = y_span_start_true
@@ -74,7 +74,7 @@ class TextSummarizationResultPackage(AbstractResultPackage):
             y_true (numpy.array or list):
             y_predicted (numpy.array or list):
             hyperparameters (dict):
-            training_history (AIToolbox.ExperimentSave.TrainingHistory.AbstractTrainingHistory):
+            training_history (AIToolbox.ExperimentSave.training_history.AbstractTrainingHistory):
             strict_content_check (bool):
         """
         AbstractResultPackage.__init__(self, y_true, y_predicted, hyperparameters, training_history, strict_content_check)
@@ -98,7 +98,7 @@ class MachineTranslationResultPackage(AbstractResultPackage):
             y_true (numpy.array or list):
             y_predicted (numpy.array or list):
             hyperparameters (dict):
-            training_history (AIToolbox.ExperimentSave.TrainingHistory.AbstractTrainingHistory):
+            training_history (AIToolbox.ExperimentSave.training_history.AbstractTrainingHistory):
             strict_content_check (bool):
         """
         AbstractResultPackage.__init__(self, y_true, y_predicted, hyperparameters, training_history, strict_content_check)

@@ -1,6 +1,6 @@
 import mysql.connector
 
-from AIToolbox.DataManipulation.DataAccess.SQLite import *
+from AIToolbox.data_manipulation.data_access.SQLite import *
 
 
 class MySQLDataAccessor(SQLiteDataAccessor):

@@ -15,7 +15,7 @@ class TextDataStatsAggregator(TextDataAggregator):
         """
 
         Args:
-            data_saver (MyDataAnalysis.DataAccess.SQLiteDataAccessor or FileDataAccessor):
+            data_saver (MyDataAnalysis.data_access.SQLiteDataAccessor or FileDataAccessor):
             verbose (bool):
         """
         self.data_saver = data_saver
@@ -58,7 +58,7 @@ class HTMLDataStatsAggregator(TextDataAggregator):
         """
 
         Args:
-            data_saver (MyDataAnalysis.DataAccess.SQLiteDataAccessor or FileDataAccessor):
+            data_saver (MyDataAnalysis.data_access.SQLiteDataAccessor or FileDataAccessor):
             verbose (bool):
         """
         self.data_saver = data_saver

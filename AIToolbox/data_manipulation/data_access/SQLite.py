@@ -74,7 +74,7 @@ class SQLiteDataAccessor:
         """
         Check if this could be used to automatically commit after finished writing to the DB.
         So no need to do it specifically in some non-data related code.
-        This should keep all the data and database logic isolated to DataAccess module.
+        This should keep all the data and database logic isolated to data_access module.
         """
         if self.db_create_query is not None:
             # Flush to database the last content buffer

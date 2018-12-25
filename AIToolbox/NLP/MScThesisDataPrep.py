@@ -31,10 +31,10 @@ class TextDataPreparation:
 
 
         Args:
-            html_data_aggregator (DataAccess.DataAggregator): An additional DataAggregator which works at the initial
+            html_data_aggregator (data_access.DataAggregator): An additional DataAggregator which works at the initial
                 part of the data pipeline. It processes the raw HTML text data. The other DataAggregator which can also
                 be used works on the lower level, right before the cleaned text data is saved to database. That
-                aggregator is found in the DataAccess accessor objects. So in short, there can be 2 separate
+                aggregator is found in the data_access accessor objects. So in short, there can be 2 separate
                 DataAggregators: one for html data present at TextDataPreparation (this) object level and the other
                 present in SQLiteDataAccessor object working on cleaned text data.
             only_html_aggregation (bool): set to True to perform only the HTML stats aggregation with

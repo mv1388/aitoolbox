@@ -1,4 +1,4 @@
-# import AIToolbox.Social.InstagramAPI.InstagramAPIConsumer as iac
+# import AIToolbox.social.InstagramAPI.InstagramAPIConsumer as iac
 #
 # import instagram
 #
