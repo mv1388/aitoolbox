@@ -4,9 +4,9 @@ from pymongo import MongoClient
 """
     OLD code
     
-    still used database API for Social.twitter streamer
+    still used database API for social.twitter streamer
     
-    Don't delete until twitter streamer is rewritten for DataAccess library
+    Don't delete until twitter streamer is rewritten for data_access library
 
 """
 

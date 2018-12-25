@@ -2,8 +2,8 @@ from abc import ABC, abstractmethod
 import time
 import datetime
 
-from AIToolbox.AWS.ModelSave import KerasS3ModelSaver, PyTorchS3ModelSaver
-from AIToolbox.AWS.ResultsSave import S3ResultsSaver
+from AIToolbox.AWS.model_save import KerasS3ModelSaver, PyTorchS3ModelSaver
+from AIToolbox.AWS.results_save import S3ResultsSaver
 
 
 class AbstractExperimentSaver(ABC):
@@ -42,7 +42,7 @@ class FullKerasExperimentS3Saver(AbstractExperimentSaver):
 
         Args:
             model (keras.engine.training.Model):
-            result_package (AIToolbox.ExperimentSave.ResultPackage.AbstractResultPackage):
+            result_package (AIToolbox.ExperimentSave.result_package.AbstractResultPackage):
             save_true_pred_labels (bool):
             separate_files (bool):
             protect_existing_folder (bool):
@@ -95,7 +95,7 @@ class FullPyTorchExperimentS3Saver(AbstractExperimentSaver):
 
         Args:
             model (torch.nn.modules.Module):
-            result_package (AIToolbox.ExperimentSave.ResultPackage.AbstractResultPackage):
+            result_package (AIToolbox.ExperimentSave.result_package.AbstractResultPackage):
             save_true_pred_labels (bool):
             separate_files (bool):
             protect_existing_folder (bool):
