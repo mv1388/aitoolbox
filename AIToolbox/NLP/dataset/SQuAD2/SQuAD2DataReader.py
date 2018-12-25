@@ -36,7 +36,7 @@ def get_dataset_local_copy(local_dataset_folder_path, protect_local_folder=True)
 
 
 class SQuAD2ConcatContextDatasetReader:
-    def __init__(self, file_path, tokenizer=None, is_train=True):
+    def __init__(self, file_path, tokenizer=None, is_train=True, dev_mode_size=None):
         self.file_path = file_path
         self.is_train = is_train
         self.dataset = None
@@ -46,6 +46,9 @@ class SQuAD2ConcatContextDatasetReader:
         with open(file_path) as dataset_file:
             dataset_json = json.load(dataset_file)
             self.dataset = dataset_json['data']
+
+        if dev_mode_size is not None and dev_mode_size > 0:
+            self.dataset = self.dataset[:dev_mode_size]
 
         self.vocab = Vocabulary('SQuAD2', document_level=False)
 
