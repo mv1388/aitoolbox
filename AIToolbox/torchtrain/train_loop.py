@@ -1,10 +1,10 @@
 from tqdm import tqdm
 import time
 import datetime
-
 import numpy as np
-
 import torch
+
+from AIToolbox.AWS.model_save import PyTorchS3ModelSaver
 
 
 class TrainLoop:
@@ -15,9 +15,9 @@ class TrainLoop:
         """
 
         Args:
-            model:
-            train_loader:
-            validation_loader:
+            model (torch.nn.modules.Module):
+            train_loader (torch.utils.data.DataLoader):
+            validation_loader (torch.utils.data.DataLoader):
             batch_model_feed_def:
             optimizer:
             criterion:
@@ -32,6 +32,11 @@ class TrainLoop:
         USE_CUDA = torch.cuda.is_available()
         self.device = torch.device("cuda" if USE_CUDA else "cpu")
 
+        self.experiment_timestamp = None
+
+        # TODO: implement history tracking
+        self.history = None
+
     def __call__(self, num_epoch):
         self.do_train(num_epoch)
 
@@ -39,13 +44,13 @@ class TrainLoop:
         """
 
         Args:
-            num_epoch:
+            num_epoch (int):
 
         Returns:
 
         """
         loss_avg = []
-        experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
+        self.experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
 
         self.model = self.model.to(self.device)
         self.model.train()
@@ -66,14 +71,25 @@ class TrainLoop:
             print(f'AVG TRAIN LOSS: {np.mean(loss_avg)}')
             loss_avg = []
 
-            val_loss_batch = self.evaluate_loss_on_validation()
-            print(f'VAL LOSS: {val_loss_batch}')
+            self.on_end_of_epoch(epoch)
+
+    def on_end_of_epoch(self, epoch):
+        """
+
+        Args:
+            epoch (int):
+
+        Returns:
+
+        """
+        val_loss_batch = self.evaluate_loss_on_validation()
+        print(f'VAL LOSS: {val_loss_batch}')
 
     def evaluate_loss_on_validation(self):
         """
 
         Returns:
-
+            float:
         """
         self.model.eval()
         val_loss_avg = []
@@ -89,95 +105,35 @@ class TrainLoop:
         return np.mean(val_loss_avg)
 
 
-def train_loop(model,
-               train_loader, validation_loader,
-               batch_model_feed_def,
-               num_epoch, optimizer, criterion):
-    """
+class TrainLoopModelCheckpoint(TrainLoop):
+    def __init__(self, model,
+                 train_loader, validation_loader,
+                 batch_model_feed_def,
+                 optimizer, criterion,
+                 project_name, experiment_name, local_model_result_folder_path):
+        TrainLoop.__init__(self, model, train_loader, validation_loader, batch_model_feed_def, optimizer, criterion)
+        self.project_name = project_name
+        self.experiment_name = experiment_name
+        self.local_model_result_folder_path = local_model_result_folder_path
 
-    Args:
-        model:
-        train_loader:
-        validation_loader:
-        batch_model_feed_def:
-        num_epoch (int):
-        optimizer:
-        criterion:
+        self.model_checkpointer = PyTorchS3ModelSaver(local_model_result_folder_path=local_model_result_folder_path,
+                                                      checkpoint_model=True)
 
-    Returns:
+    def on_end_of_epoch(self, epoch):
+        """
 
-    """
-    USE_CUDA = torch.cuda.is_available()
-    device = torch.device("cuda" if USE_CUDA else "cpu")
+        Args:
+            epoch (int):
 
-    loss_avg = []
-    experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
+        Returns:
 
-    model = model.to(device)
-    model.train()
-
-    for epoch in range(num_epoch):
-        print(f'Epoch: {epoch + 1}')
-
-        for batch_data in tqdm(train_loader):
-            loss_batch = batch_model_feed_def(model, batch_data, criterion, device)
-
-            # print(f'Loss: {loss_batch}')
-            loss_avg.append(float(loss_batch))
-
-            optimizer.zero_grad()
-            loss_batch.backward()
-            optimizer.step()
-
-        print(f'AVG TRAIN LOSS: {np.mean(loss_avg)}')
-        loss_avg = []
-
-        val_loss_batch = evaluate_loss_on_validation(model, validation_loader,
-                                                     batch_model_feed_def, criterion, device)
+        """
+        val_loss_batch = self.evaluate_loss_on_validation()
         print(f'VAL LOSS: {val_loss_batch}')
 
-
-def evaluate_loss_on_validation(model, validation_loader,
-                                batch_model_feed_def, criterion, device):
-    """
-
-    Args:
-        model:
-        validation_loader:
-        batch_model_feed_def:
-        criterion:
-        device:
-
-    Returns:
-
-    """
-    model.eval()
-    val_loss_avg = []
-
-    with torch.no_grad():
-        for batch_data in tqdm(validation_loader):
-            val_loss_batch = batch_model_feed_def(model, batch_data, criterion, device)
-
-            val_loss_avg.append(float(val_loss_batch))
-
-    model.train()
-
-    return np.mean(val_loss_avg)
-
-
-def squad_batch_model_feed(model, batch_data, criterion, device):
-    paragraph_batch, paragraph_lengths, question_batch, question_lengths, span = batch_data
-
-    paragraph_batch = paragraph_batch.to(device)
-    paragraph_lengths = paragraph_lengths.to(device)
-    question_batch = question_batch.to(device)
-    question_lengths = question_lengths.to(device)
-    span = span.to(device)
-
-    output_start_span, output_end_span = model(paragraph_batch, question_batch, paragraph_lengths, question_lengths)
-
-    loss1 = criterion(output_start_span, span[:, 0].long())
-    loss2 = criterion(output_end_span, span[:, 1].long())
-    loss = loss1 + loss2
-
-    return loss
+        self.model_checkpointer.save_model(model=self.model,
+                                           project_name=self.project_name,
+                                           experiment_name=self.experiment_name,
+                                           experiment_timestamp=self.experiment_timestamp,
+                                           epoch=epoch,
+                                           protect_existing_folder=True)
