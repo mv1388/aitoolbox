@@ -18,7 +18,7 @@ def train_loop(model,
         train_loader:
         validation_loader:
         batch_model_feed_def:
-        num_epoch:
+        num_epoch (int):
         optimizer:
         criterion:
 
