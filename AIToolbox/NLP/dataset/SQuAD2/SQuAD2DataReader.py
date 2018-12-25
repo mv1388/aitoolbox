@@ -5,6 +5,7 @@ from tqdm import tqdm
 from allennlp.data.tokenizers import WordTokenizer
 from allennlp.data.dataset_readers.reading_comprehension import util
 
+from AIToolbox.AWS.DataAccess import SQuAD2DatasetFetcher
 from AIToolbox.NLP.core.vocabulary import Vocabulary
 
 
@@ -15,6 +16,23 @@ from AIToolbox.NLP.core.vocabulary import Vocabulary
     Faster processing, however, now non alphanum remove, etc.
     
 """
+
+
+def get_dataset_local_copy(local_dataset_folder_path, protect_local_folder=True):
+    """Interface method for getting a local copy of SQuAD2 dataset
+
+    If a local copy is not found, dataset is automatically downloaded from S3.
+
+    Args:
+        local_dataset_folder_path (str):
+        protect_local_folder (bool):
+
+    Returns:
+        None
+
+    """
+    dataset_fetcher = SQuAD2DatasetFetcher(bucket_name='dataset-store', local_dataset_folder_path=local_dataset_folder_path)
+    dataset_fetcher.fetch_dataset(protect_local_folder)
 
 
 class SQuAD2ConcatContextDatasetReader:
