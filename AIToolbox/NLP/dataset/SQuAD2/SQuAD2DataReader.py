@@ -131,8 +131,8 @@ class GeneratorSQuAD2ConcatContextDatasetReader(SQuAD2ConcatContextDatasetReader
 
     """
 
-    def __init__(self, file_path, tokenizer=None, is_train=True):
-        SQuAD2ConcatContextDatasetReader.__init__(self, file_path, tokenizer, is_train)
+    def __init__(self, file_path, tokenizer=None, is_train=True, dev_mode_size=None):
+        SQuAD2ConcatContextDatasetReader.__init__(self, file_path, tokenizer, is_train, dev_mode_size)
 
     def read(self):
         return list(self.read_generator()), self.vocab
