@@ -34,6 +34,21 @@ class TestCore_find_sub_list(unittest.TestCase):
         )
 
 
+class TestCore_normalize_string(unittest.TestCase):
+    def test_single_sent(self):
+        self.assertEqual(
+            core.normalize_string('For this purpose, we propose a hierarchical attention model to capture the '
+                                  'context in a structured and dynamic manner.'),
+            'for this purpose we propose a hierarchical attention model to capture the context in a structured and dynamic manner .'
+        )
+
+    def test_numeric_include(self):
+        self.assertEqual(
+            core.normalize_string('For this purpose, we propose a 2-hierarchical 345 attention model to capture.'),
+            'for this purpose we propose a 2 hierarchical 345 attention model to capture .'
+        )
+
+
 # class TestCore_prepare_vocab_mapping(unittest.TestCase):
 #     def test_prepare_vocab_mapping_no_pad_no_special_label(self):
 #         vocab = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
