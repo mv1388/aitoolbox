@@ -34,24 +34,28 @@ def train_loop(model,
             loss_batch.backward()
             optimizer.step()
 
-        print(f'AVG LOSS: {np.mean(loss_avg)}')
+        print(f'AVG TRAIN LOSS: {np.mean(loss_avg)}')
         loss_avg = []
 
         val_loss_batch = evaluate_loss_on_validation(model, validation_loader,
                                                      batch_model_feed_def, criterion, device)
-        print(f'VAL LOSS: {np.mean(float(val_loss_batch))}')
+        print(f'VAL LOSS: {val_loss_batch}')
 
 
 def evaluate_loss_on_validation(model, validation_loader,
                                 batch_model_feed_def, criterion, device):
     model.eval()
+    val_loss_avg = []
 
     with torch.no_grad():
-        val_loss_batch = batch_model_feed_def(model, validation_loader, criterion, device)
+        for batch_data in tqdm(validation_loader):
+            val_loss_batch = batch_model_feed_def(model, batch_data, criterion, device)
+
+            val_loss_avg.append(float(val_loss_batch))
 
     model.train()
 
-    return val_loss_batch
+    return np.mean(val_loss_avg)
 
 
 def squad_batch_model_feed(model, batch_data, criterion, device):
