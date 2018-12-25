@@ -1,2 +1,0 @@
-from AIToolbox.NLP.dataset.SQuAD2.torch_collate_fns import qa_concat_ctx_span_collate_fn
-
