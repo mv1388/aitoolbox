@@ -32,6 +32,9 @@ class TrainLoop:
         USE_CUDA = torch.cuda.is_available()
         self.device = torch.device("cuda" if USE_CUDA else "cpu")
 
+    def __call__(self, num_epoch):
+        self.do_train(num_epoch)
+
     def do_train(self, num_epoch):
         """
 
