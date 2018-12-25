@@ -1,4 +1,4 @@
-from AIToolbox.ExperimentSave.MetricsGeneral.BaseMetric import AbstractBaseMetric
+from AIToolbox.experimet_save.core_metrics.base_metric import AbstractBaseMetric
 
 
 class ROGUEMetric(AbstractBaseMetric):

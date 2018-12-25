@@ -138,9 +138,9 @@ rnn = recurrent.GRU
 model = build_FastQA_RNN_concat_model_GLOVE(rnn, 400, 20, 8000, 400, 0, 50, 0.2)
 
 
-from AIToolbox.AWS.ModelSave import KerasS3ModelSaver
-from AIToolbox.AWS.ResultsSave import S3ResultsSaver
-from AIToolbox.ExperimentSave.ResultPackage import ClassificationResultPackage
+from AIToolbox.AWS.model_save import KerasS3ModelSaver
+from AIToolbox.AWS.results_save import S3ResultsSaver
+from AIToolbox.experimet_save.result_package import ClassificationResultPackage
 
 import numpy as np
 

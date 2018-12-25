@@ -99,7 +99,7 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
         """
 
         Args:
-            result_package (AIToolbox.ExperimentSave.ResultPackage.AbstractResultPackage):
+            result_package (AIToolbox.experiment_save.result_package.AbstractResultPackage):
             project_name (str):
             experiment_name (str):
             experiment_timestamp (str or None):
@@ -145,7 +145,7 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
         """
 
         Args:
-            result_package (AIToolbox.ExperimentSave.ResultPackage.AbstractResultPackage):
+            result_package (AIToolbox.ExperimentSave.result_package.AbstractResultPackage):
             project_name (str):
             experiment_name (str):
             experiment_timestamp (str or None):

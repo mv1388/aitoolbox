@@ -4,7 +4,7 @@ import os
 import time
 import datetime
 
-from AIToolbox.ExperimentSave.LocalResultsSave import LocalResultsSaver
+from AIToolbox.experimet_save.local_results_save import LocalResultsSaver
 
 
 class AbstractResultsSaver(ABC):
@@ -74,7 +74,7 @@ class S3ResultsSaver(AbstractResultsSaver, BaseResultsSaver):
         """
 
         Args:
-            result_package (AIToolbox.ExperimentSave.ResultPackage.AbstractResultPackage):
+            result_package (AIToolbox.experiment_save.result_package.AbstractResultPackage):
             project_name (str):
             experiment_name (str):
             experiment_timestamp (str):

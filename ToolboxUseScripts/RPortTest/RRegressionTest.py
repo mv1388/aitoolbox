@@ -1,4 +1,4 @@
-from AIToolbox.RPort.RRegressionModels import RRegressionModel
+from AIToolbox.RPort.R_regression_models import RRegressionModel
 from sklearn import datasets
 
 from numpy.random import randint

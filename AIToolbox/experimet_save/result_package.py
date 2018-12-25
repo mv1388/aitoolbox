@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
 import numpy as np
 
-from AIToolbox.ExperimentSave.MetricsGeneral.BaseMetric import AbstractBaseMetric
+from AIToolbox.experimet_save.core_metrics.base_metric import AbstractBaseMetric
 
-from AIToolbox.ExperimentSave.MetricsGeneral.Classification import AccuracyMetric, ROCAUCMetric, \
+from AIToolbox.experimet_save.core_metrics.classification import AccuracyMetric, ROCAUCMetric, \
     PrecisionRecallCurveAUCMetric, F1ScoreMetric
-from AIToolbox.ExperimentSave.MetricsGeneral.Regression import MeanSquaredErrorMetric, MeanAbsoluteErrorMetric
+from AIToolbox.experimet_save.core_metrics.regression import MeanSquaredErrorMetric, MeanAbsoluteErrorMetric
 
 
 class AbstractResultPackage(ABC):
@@ -17,7 +17,7 @@ class AbstractResultPackage(ABC):
             y_true (numpy.array or list):
             y_predicted (numpy.array or list):
             hyperparameters (dict or None):
-            training_history (AIToolbox.ExperimentSave.TrainingHistory.AbstractTrainingHistory):
+            training_history (AIToolbox.ExperimentSave.training_history.AbstractTrainingHistory):
             strict_content_check (bool):
         """
         self.strict_content_check = strict_content_check
@@ -110,9 +110,9 @@ class GeneralResultPackage(AbstractResultPackage):
             y_true (numpy.array or list):
             y_predicted (numpy.array or list):
             metrics_list (list): List of objects which are inherited from
-                AIToolbox.ExperimentSave.MetricsGeneral.BaseMetric.AbstractBaseMetric
+                AIToolbox.experimet_save.core_metrics.BaseMetric.AbstractBaseMetric
             hyperparameters (dict):
-            training_history (AIToolbox.ExperimentSave.TrainingHistory.AbstractTrainingHistory):
+            training_history (AIToolbox.ExperimentSave.training_history.AbstractTrainingHistory):
             strict_content_check (bool):
         """
         self.metrics_list = metrics_list
@@ -153,7 +153,7 @@ class BinaryClassificationResultPackage(AbstractResultPackage):
             y_true (numpy.array or list):
             y_predicted (numpy.array or list):
             hyperparameters (dict):
-            training_history (AIToolbox.ExperimentSave.TrainingHistory.AbstractTrainingHistory):
+            training_history (AIToolbox.ExperimentSave.training_history.AbstractTrainingHistory):
             strict_content_check (bool):
         """
         AbstractResultPackage.__init__(self, y_true, y_predicted, hyperparameters, training_history, strict_content_check)
@@ -182,7 +182,7 @@ class ClassificationResultPackage(AbstractResultPackage):
             y_true (numpy.array or list):
             y_predicted (numpy.array or list):
             hyperparameters (dict):
-            training_history (AIToolbox.ExperimentSave.TrainingHistory.AbstractTrainingHistory):
+            training_history (AIToolbox.ExperimentSave.training_history.AbstractTrainingHistory):
             strict_content_check (bool):
         """
         AbstractResultPackage.__init__(self, y_true, y_predicted, hyperparameters, training_history, strict_content_check)
@@ -211,7 +211,7 @@ class RegressionResultPackage(AbstractResultPackage):
             y_true (numpy.array or list):
             y_predicted (numpy.array or list):
             hyperparameters (dict):
-            training_history (AIToolbox.ExperimentSave.TrainingHistory.AbstractTrainingHistory):
+            training_history (AIToolbox.ExperimentSave.training_history.AbstractTrainingHistory):
             strict_content_check (bool):
         """
         AbstractResultPackage.__init__(self, y_true, y_predicted, hyperparameters, training_history, strict_content_check)
