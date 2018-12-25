@@ -36,4 +36,3 @@ class AttentionMultipleHeatMaps(AttentionHeatMap):
         raise NotImplementedError
 
         self.metric_result = {attn_sent: self.attention_matrices[i] for i, attn_sent in enumerate(self.attention_sents)}
-
