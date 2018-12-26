@@ -73,6 +73,8 @@ class TrainLoop:
 
             self.on_end_of_epoch(epoch)
 
+        self.on_end_of_training()
+
     def on_end_of_epoch(self, epoch):
         """
 
@@ -84,6 +86,16 @@ class TrainLoop:
         """
         val_loss_batch = self.evaluate_loss_on_validation()
         print(f'VAL LOSS: {val_loss_batch}')
+
+    def on_end_of_training(self):
+        pass
+
+        raise NotImplementedError
+
+    def record_epoch_history(self):
+        pass
+
+        raise NotImplementedError
 
     def evaluate_loss_on_validation(self):
         """
@@ -111,6 +123,19 @@ class TrainLoopModelCheckpoint(TrainLoop):
                  batch_model_feed_def,
                  optimizer, criterion,
                  project_name, experiment_name, local_model_result_folder_path):
+        """
+
+        Args:
+            model (torch.nn.modules.Module):
+            train_loader (torch.utils.data.DataLoader):
+            validation_loader (torch.utils.data.DataLoader):
+            batch_model_feed_def:
+            optimizer:
+            criterion:
+            project_name (str):
+            experiment_name (str):
+            local_model_result_folder_path (str):
+        """
         TrainLoop.__init__(self, model, train_loader, validation_loader, batch_model_feed_def, optimizer, criterion)
         self.project_name = project_name
         self.experiment_name = experiment_name
@@ -137,3 +162,6 @@ class TrainLoopModelCheckpoint(TrainLoop):
                                            experiment_timestamp=self.experiment_timestamp,
                                            epoch=epoch,
                                            protect_existing_folder=True)
+
+    def on_end_of_training(self):
+        pass
