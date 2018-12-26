@@ -27,7 +27,7 @@ class TrainLoop:
         self.model = model
         self.train_loader = train_loader
         self.validation_loader = validation_loader
-        self.batch_model_feed_def = batch_model_feed_def()
+        self.batch_model_feed_def = batch_model_feed_def
         self.optimizer = optimizer
         self.criterion = criterion
 
