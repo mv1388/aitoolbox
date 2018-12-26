@@ -135,7 +135,7 @@ class TrainLoop:
         return y_test, y_pred
 
 
-class TrainLoopModelSave(TrainLoop):
+class TrainLoopModelEndSave(TrainLoop):
     def __init__(self, model,
                  train_loader, validation_loader,
                  batch_model_feed_def,
@@ -180,7 +180,7 @@ class TrainLoopModelSave(TrainLoop):
         self.results_saver.save_experiment(self.model, result_pkg, save_true_pred_labels=True)
 
 
-class TrainLoopModelCheckpointSave(TrainLoopModelSave):
+class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
     def __init__(self, model,
                  train_loader, validation_loader,
                  batch_model_feed_def,
@@ -201,10 +201,10 @@ class TrainLoopModelCheckpointSave(TrainLoopModelSave):
             local_model_result_folder_path (str):
             result_package_class:
         """
-        TrainLoopModelSave.__init__(self, model, train_loader, validation_loader, batch_model_feed_def, 
-                                    optimizer, criterion, 
-                                    project_name, experiment_name, local_model_result_folder_path, 
-                                    args, result_package_class)
+        TrainLoopModelEndSave.__init__(self, model, train_loader, validation_loader, batch_model_feed_def,
+                                       optimizer, criterion,
+                                       project_name, experiment_name, local_model_result_folder_path,
+                                       args, result_package_class)
 
         self.model_checkpointer = PyTorchS3ModelSaver(local_model_result_folder_path=self.local_model_result_folder_path,
                                                       checkpoint_model=True)
@@ -224,3 +224,40 @@ class TrainLoopModelCheckpointSave(TrainLoopModelSave):
                                            experiment_timestamp=self.experiment_timestamp,
                                            epoch=epoch,
                                            protect_existing_folder=True)
+
+
+class TrainLoopModelCheckpoint(TrainLoopModelCheckpointEndSave):
+    def __init__(self, model,
+                 train_loader, validation_loader,
+                 batch_model_feed_def,
+                 optimizer, criterion,
+                 project_name, experiment_name, local_model_result_folder_path, args,
+                 result_package_class):
+        """
+
+        Args:
+            model (torch.nn.modules.Module):
+            train_loader (torch.utils.data.DataLoader):
+            validation_loader (torch.utils.data.DataLoader):
+            batch_model_feed_def:
+            optimizer:
+            criterion:
+            project_name (str):
+            experiment_name (str):
+            local_model_result_folder_path (str):
+            result_package_class:
+        """
+        TrainLoopModelCheckpointEndSave.__init__(self, model, train_loader, validation_loader, batch_model_feed_def,
+                                                 optimizer, criterion,
+                                                 project_name, experiment_name, local_model_result_folder_path,
+                                                 args, result_package_class)
+
+    def on_end_of_training(self):
+        """Disable on end of training hook which is inherited
+
+        The train loop consequently only checkpoints the models after each epoch but does nothing at the end of training
+
+        Returns:
+            None
+        """
+        return None
