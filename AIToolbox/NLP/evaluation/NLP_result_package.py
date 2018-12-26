@@ -1,5 +1,5 @@
-from AIToolbox.experimet_save.result_package import AbstractResultPackage
-from AIToolbox.experimet_save.core_metrics.classification import AccuracyMetric
+from AIToolbox.experiment_save.result_package import AbstractResultPackage
+from AIToolbox.experiment_save.core_metrics.classification import AccuracyMetric
 from AIToolbox.NLP.evaluation.NLP_metrics import BLEUScoreMetric, PerplexityMetric, ROGUEMetric
 
 
