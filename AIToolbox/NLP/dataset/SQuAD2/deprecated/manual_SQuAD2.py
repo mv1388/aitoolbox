@@ -103,8 +103,8 @@ class SQuAD2DataPreparation:
             skip_is_impossible:
             skip_examples_w_span:
         """
-        self.train_path = train_path
-        self.dev_path = dev_path
+        self.train_path = os.path.expanduser(train_path)
+        self.dev_path = os.path.expanduser(dev_path)
         self.train_data = self.load_json_file(self.train_path)
         self.dev_data = self.load_json_file(self.dev_path)
 
@@ -322,6 +322,7 @@ class SQuAD2DataPreparation:
         Returns:
 
         """
+        file_path = os.path.expanduser(file_path)
         with open(file_path) as f:
             data = json.load(f)['data']
         return data
@@ -335,6 +336,7 @@ class SQuAD2DataPreparation:
         Returns:
 
         """
+        dump_folder_path = os.path.expanduser(dump_folder_path)
         with open(os.path.join(dump_folder_path, 'train_data_SQuAD2.p'), 'rb') as f:
             train_data = pickle.load(f)
         with open(os.path.join(dump_folder_path, 'dev_data_SQuAD2.p'), 'rb') as f:
@@ -351,6 +353,7 @@ class SQuAD2DataPreparation:
         Returns:
 
         """
+        dump_folder_path = os.path.expanduser(dump_folder_path)
         with open(os.path.join(dump_folder_path, 'vect_train_data_SQuAD2.p'), 'rb') as f:
             train_data = pickle.load(f)
         with open(os.path.join(dump_folder_path, 'vect_dev_data_SQuAD2.p'), 'rb') as f:
