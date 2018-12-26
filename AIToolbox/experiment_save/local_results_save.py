@@ -130,7 +130,7 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
             exp_results_hyperparam_dict = {'y_true': result_package.y_true.tolist(), 'y_predicted': result_package.y_predicted.tolist(),
                                            **exp_results_hyperparam_dict}
 
-        results_file_name_w_type = 'results_hyperParams_hist_{}_{}'.format(experiment_name, experiment_timestamp)
+        results_file_name_w_type = f'results_hyperParams_hist_{experiment_name}_{experiment_timestamp}'
         results_file_local_path_w_type = os.path.join(experiment_results_local_path, results_file_name_w_type)
 
         results_file_name, results_file_local_path = self.save_file(exp_results_hyperparam_dict,
@@ -175,13 +175,13 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
                                       'experiment_results_local_path': experiment_results_local_path,
                                       'hyperparameters': training_history}
 
-        results_file_name_w_type = 'results_{}_{}'.format(experiment_name, experiment_timestamp)
+        results_file_name_w_type = f'results_{experiment_name}_{experiment_timestamp}'
         results_file_local_path_w_type = os.path.join(experiment_results_local_path, results_file_name_w_type)
         results_file_name, results_file_local_path = self.save_file(experiment_results_dict,
                                                                     results_file_name_w_type,
                                                                     results_file_local_path_w_type)
 
-        hyperparams_file_name_w_type = 'hyperparams_{}_{}'.format(experiment_name, experiment_timestamp)
+        hyperparams_file_name_w_type = f'hyperparams_{experiment_name}_{experiment_timestamp}'
         hyperparams_file_local_path_w_type = os.path.join(experiment_results_local_path, hyperparams_file_name_w_type)
         hyperparams_file_name, hyperparams_file_local_path = self.save_file(experiment_hyperparam_dict,
                                                                             hyperparams_file_name_w_type,
