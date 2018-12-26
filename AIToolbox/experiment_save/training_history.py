@@ -95,5 +95,4 @@ class PyTorchTrainingHistory(AbstractTrainingHistory):
     def qa_check_history_records(self):
         for k in self.history:
             if len(self.history[k]) != len(self.epoch):
-                self.warn_about_result_data_problem('Warning: Train history records not of the same size. '
-                                                    'Problem with: {}'.format(k))
+                self.warn_about_result_data_problem(f'Warning: Train history records not of the same size. Problem with: {k}')
