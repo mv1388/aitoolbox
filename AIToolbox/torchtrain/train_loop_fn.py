@@ -5,6 +5,14 @@ import numpy as np
 import torch
 
 
+"""
+    
+    Semi-deprecated: rather use the train loop classes which now include additional functionality
+                        such as experiment checkpointing and saving 
+    
+"""
+
+
 def train_loop(model,
                train_loader, validation_loader,
                batch_model_feed_def,
