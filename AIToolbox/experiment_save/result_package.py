@@ -20,6 +20,7 @@ class AbstractResultPackage(ABC):
             training_history (AIToolbox.ExperimentSave.training_history.AbstractTrainingHistory):
             strict_content_check (bool):
         """
+        self.pkg_name = None
         self.strict_content_check = strict_content_check
 
         self.y_true = np.array(y_true)
@@ -226,3 +227,27 @@ class RegressionResultPackage(AbstractResultPackage):
         mae_result = MeanAbsoluteErrorMetric(self.y_true, self.y_predicted).get_metric_dict()
 
         self.results_dict = {**mse_result, **mae_result}
+
+
+class MultipleResultPackageWrapper(AbstractResultPackage):
+    def __init__(self, result_packages, hyperparameters=None, training_history=None, strict_content_check=False):
+        """
+
+        Args:
+            result_packages (list):
+            hyperparameters (dict):
+            training_history (AIToolbox.ExperimentSave.training_history.AbstractTrainingHistory):
+            strict_content_check (bool):
+        """
+        self.result_packages = result_packages
+        AbstractResultPackage.__init__(self, None, None, hyperparameters, training_history, strict_content_check)
+
+    def prepare_results_dict(self):
+        self.results_dict = {}
+
+        for i, result_pkg in enumerate(self.result_packages):
+            if result_pkg.pkg_name is not None:
+                suffix = '' if result_pkg.pkg_name not in self.results_dict else str(i)
+                self.results_dict[result_pkg.pkg_name + suffix] = result_pkg.get_results()
+            else:
+                self.results_dict[f'ResultPackage{i}'] = result_pkg.get_results()
