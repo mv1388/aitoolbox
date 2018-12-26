@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
 import numpy as np
 
-from AIToolbox.experimet_save.core_metrics.base_metric import AbstractBaseMetric
+from AIToolbox.experiment_save.core_metrics.base_metric import AbstractBaseMetric
 
-from AIToolbox.experimet_save.core_metrics.classification import AccuracyMetric, ROCAUCMetric, \
+from AIToolbox.experiment_save.core_metrics.classification import AccuracyMetric, ROCAUCMetric, \
     PrecisionRecallCurveAUCMetric, F1ScoreMetric
-from AIToolbox.experimet_save.core_metrics.regression import MeanSquaredErrorMetric, MeanAbsoluteErrorMetric
+from AIToolbox.experiment_save.core_metrics.regression import MeanSquaredErrorMetric, MeanAbsoluteErrorMetric
 
 
 class AbstractResultPackage(ABC):
@@ -110,7 +110,7 @@ class GeneralResultPackage(AbstractResultPackage):
             y_true (numpy.array or list):
             y_predicted (numpy.array or list):
             metrics_list (list): List of objects which are inherited from
-                AIToolbox.experimet_save.core_metrics.BaseMetric.AbstractBaseMetric
+                AIToolbox.experiment_save.core_metrics.BaseMetric.AbstractBaseMetric
             hyperparameters (dict):
             training_history (AIToolbox.ExperimentSave.training_history.AbstractTrainingHistory):
             strict_content_check (bool):

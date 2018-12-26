@@ -1,4 +1,4 @@
-from AIToolbox.experimet_save.core_metrics.base_metric import AbstractBaseMetric
+from AIToolbox.experiment_save.core_metrics.base_metric import AbstractBaseMetric
 
 
 class AttentionHeatMap(AbstractBaseMetric):
