@@ -1,3 +1,4 @@
+import os
 import json
 from collections import Counter
 from tqdm import tqdm
@@ -37,13 +38,13 @@ def get_dataset_local_copy(local_dataset_folder_path, protect_local_folder=True)
 
 class SQuAD2ConcatContextDatasetReader:
     def __init__(self, file_path, tokenizer=None, is_train=True, dev_mode_size=None):
-        self.file_path = file_path
+        self.file_path = os.path.expanduser(file_path)
         self.is_train = is_train
         self.dataset = None
 
         self._tokenizer = tokenizer or WordTokenizer()
 
-        with open(file_path) as dataset_file:
+        with open(self.file_path) as dataset_file:
             dataset_json = json.load(dataset_file)
             self.dataset = dataset_json['data']
 
