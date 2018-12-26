@@ -189,7 +189,7 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
 
         train_hist_file_name_w_type = 'train_history_{}_{}'.format(experiment_name, experiment_timestamp)
         train_hist_file_local_path_w_type = os.path.join(experiment_results_local_path, train_hist_file_name_w_type)
-        train_hist_file_name, train_hist_file_local_path = self.save_file(experiment_results_dict,
+        train_hist_file_name, train_hist_file_local_path = self.save_file(experiment_train_hist_dict,
                                                                           train_hist_file_name_w_type,
                                                                           train_hist_file_local_path_w_type)
 
