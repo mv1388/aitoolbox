@@ -20,7 +20,7 @@ class TrainLoop:
             model (torch.nn.modules.Module):
             train_loader (torch.utils.data.DataLoader):
             validation_loader (torch.utils.data.DataLoader):
-            batch_model_feed_def:
+            batch_model_feed_def (AIToolbox.torchtrain.batch_model_feed_defs.AbstractModelFeedDefinition):
             optimizer:
             criterion:
         """
@@ -62,7 +62,7 @@ class TrainLoop:
             print(f'Epoch: {epoch + 1}')
 
             for batch_data in tqdm(self.train_loader):
-                loss_batch = self.batch_model_feed_def(self.model, batch_data, self.criterion, self.device)
+                loss_batch = self.batch_model_feed_def.get_loss(self.model, batch_data, self.criterion, self.device)
 
                 # print(f'Loss: {loss_batch}')
                 self.loss_avg.append(float(loss_batch))
@@ -108,7 +108,7 @@ class TrainLoop:
 
         with torch.no_grad():
             for batch_data in tqdm(self.validation_loader):
-                val_loss_batch = self.batch_model_feed_def(self.model, batch_data, self.criterion, self.device)
+                val_loss_batch = self.batch_model_feed_def.get_loss(self.model, batch_data, self.criterion, self.device)
 
                 val_loss_avg.append(float(val_loss_batch))
 
@@ -117,8 +117,22 @@ class TrainLoop:
         return np.mean(val_loss_avg)
     
     def predict_on_validation_set(self):
-        
-        raise NotImplementedError
+        y_test, y_pred = [], []
+
+        self.model.eval()
+
+        with torch.no_grad():
+            for batch_data in tqdm(self.validation_loader):
+                y_test_batch, y_pred_batch = self.batch_model_feed_def.get_predictions(self.model, batch_data, self.device)
+
+                # TODO: check if it is the best idea to append predictions to the list and not to some torch tensor
+                # TODO: also if append is the best option and not the concat
+                y_test.append(y_test_batch)
+                y_pred.append(y_pred_batch)
+
+        self.model.train()
+
+        return y_test, y_pred
 
 
 class TrainLoopModelSave(TrainLoop):
@@ -158,10 +172,8 @@ class TrainLoopModelSave(TrainLoop):
         # TODO: implement record_epoch_history() to enable the use of self.train_history
         train_hist_pkg = PyTorchTrainingHistory(self.train_history, 
                                                 list(range(len(self.train_history[list(self.train_history.keys())[0]]))))
-        
-        # TODO: predict_on_validation_set() needs to be implemented in TrainLoop class
+
         y_test, y_pred = self.predict_on_validation_set()
-        
         result_pkg = self.result_package_class(y_test, y_pred, 
                                                hyperparameters=self.args, training_history=train_hist_pkg)
         
