@@ -82,11 +82,11 @@ class KerasLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
         experiment_model_local_path = self.create_experiment_local_folder_structure(project_name, experiment_name, experiment_timestamp)
 
         if epoch is None:
-            model_name = 'model_{}_{}.h5'.format(experiment_name, experiment_timestamp)
-            model_weights_name = 'modelWeights_{}_{}.h5'.format(experiment_name, experiment_timestamp)
+            model_name = f'model_{experiment_name}_{experiment_timestamp}.h5'
+            model_weights_name = f'modelWeights_{experiment_name}_{experiment_timestamp}.h5'
         else:
-            model_name = 'model_{}_{}_E{}.h5'.format(experiment_name, experiment_timestamp, epoch)
-            model_weights_name = 'modelWeights_{}_{}_E{}.h5'.format(experiment_name, experiment_timestamp, epoch)
+            model_name = f'model_{experiment_name}_{experiment_timestamp}_E{epoch}.h5'
+            model_weights_name = f'modelWeights_{experiment_name}_{experiment_timestamp}_E{epoch}.h5'
 
         model_local_path = os.path.join(experiment_model_local_path, model_name)
         model_weights_local_path = os.path.join(experiment_model_local_path, model_weights_name)
@@ -144,11 +144,11 @@ class PyTorchLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
         experiment_model_local_path = self.create_experiment_local_folder_structure(project_name, experiment_name, experiment_timestamp)
 
         if epoch is None:
-            model_name = 'model_{}_{}.pth'.format(experiment_name, experiment_timestamp)
-            model_weights_name = 'modelWeights_{}_{}.pth'.format(experiment_name, experiment_timestamp)
+            model_name = f'model_{experiment_name}_{experiment_timestamp}.pth'
+            model_weights_name = f'modelWeights_{experiment_name}_{experiment_timestamp}.pth'
         else:
-            model_name = 'model_{}_{}_E{}.pth'.format(experiment_name, experiment_timestamp, epoch)
-            model_weights_name = 'modelWeights_{}_{}_E{}.pth'.format(experiment_name, experiment_timestamp, epoch)
+            model_name = f'model_{experiment_name}_{experiment_timestamp}_E{epoch}.pth'
+            model_weights_name = f'modelWeights_{experiment_name}_{experiment_timestamp}_E{epoch}.pth'
 
         model_local_path = os.path.join(experiment_model_local_path, model_name)
         model_weights_local_path = os.path.join(experiment_model_local_path, model_weights_name)
