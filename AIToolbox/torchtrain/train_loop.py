@@ -4,10 +4,8 @@ import datetime
 import numpy as np
 import torch
 
-from AIToolbox.experiment_save.experiment_saver import FullPyTorchExperimentS3Saver
-from AIToolbox.experiment_save.training_history import PyTorchTrainingHistory
 from AIToolbox.torchtrain.callbacks.callback_handler import CallbacksHandler
-from AIToolbox.torchtrain.callbacks.callbacks import ModelCheckpointCallback
+from AIToolbox.torchtrain.callbacks.callbacks import ModelCheckpointCallback, ModelTrainEndSaveCallback
 
 
 class TrainLoop:
@@ -160,25 +158,55 @@ class TrainLoop:
         return y_test, y_pred
 
 
-class TrainLoopModelEndSave(TrainLoop):
+class TrainLoopModelCheckpoint(TrainLoop):
     def __init__(self, model,
                  train_loader, validation_loader,
                  batch_model_feed_def,
                  optimizer, criterion,
-                 project_name, experiment_name, local_model_result_folder_path, args,
-                 result_package_class):
+                 project_name, experiment_name, local_model_result_folder_path):
         """
 
         Args:
             model (torch.nn.modules.Module):
             train_loader (torch.utils.data.DataLoader):
             validation_loader (torch.utils.data.DataLoader):
-            batch_model_feed_def:
+            batch_model_feed_def (AIToolbox.torchtrain.batch_model_feed_defs.AbstractModelFeedDefinition):
             optimizer:
             criterion:
             project_name (str):
             experiment_name (str):
             local_model_result_folder_path (str):
+        """
+        TrainLoop.__init__(self, model, train_loader, validation_loader, batch_model_feed_def, optimizer, criterion)
+        self.project_name = project_name
+        self.experiment_name = experiment_name
+        self.local_model_result_folder_path = local_model_result_folder_path
+
+        self.callbacks_handler.register_callbacks([
+            ModelCheckpointCallback(self.project_name, self.experiment_name, self.local_model_result_folder_path)
+        ])
+
+
+class TrainLoopModelEndSave(TrainLoop):
+    def __init__(self, model,
+                 train_loader, validation_loader,
+                 batch_model_feed_def,
+                 optimizer, criterion,
+                 project_name, experiment_name, local_model_result_folder_path,
+                 args, result_package_class):
+        """
+
+        Args:
+            model (torch.nn.modules.Module):
+            train_loader (torch.utils.data.DataLoader):
+            validation_loader (torch.utils.data.DataLoader):
+            batch_model_feed_def (AIToolbox.torchtrain.batch_model_feed_defs.AbstractModelFeedDefinition):
+            optimizer:
+            criterion:
+            project_name (str):
+            experiment_name (str):
+            local_model_result_folder_path (str):
+            args (dict):
             result_package_class:
         """
         TrainLoop.__init__(self, model, train_loader, validation_loader, batch_model_feed_def, optimizer, criterion)
@@ -188,18 +216,10 @@ class TrainLoopModelEndSave(TrainLoop):
         self.args = args
         self.result_package_class = result_package_class
 
-        self.results_saver = FullPyTorchExperimentS3Saver(self.project_name, self.experiment_name,
-                                                          local_model_result_folder_path=self.local_model_result_folder_path)
-
-    def on_end_of_training(self):
-        train_hist_pkg = PyTorchTrainingHistory(self.train_history, 
-                                                list(range(len(self.train_history[list(self.train_history.keys())[0]]))))
-
-        y_test, y_pred = self.predict_on_validation_set()
-        result_pkg = self.result_package_class(y_test, y_pred, 
-                                               hyperparameters=self.args, training_history=train_hist_pkg)
-        
-        self.results_saver.save_experiment(self.model, result_pkg, save_true_pred_labels=True)
+        self.callbacks_handler.register_callbacks([
+            ModelTrainEndSaveCallback(self.project_name, self.experiment_name, self.local_model_result_folder_path,
+                                      self.args, self.result_package_class)
+        ])
 
 
 class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
@@ -207,20 +227,21 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
                  train_loader, validation_loader,
                  batch_model_feed_def,
                  optimizer, criterion,
-                 project_name, experiment_name, local_model_result_folder_path, args,
-                 result_package_class):
+                 project_name, experiment_name, local_model_result_folder_path,
+                 args, result_package_class):
         """
 
         Args:
             model (torch.nn.modules.Module):
             train_loader (torch.utils.data.DataLoader):
             validation_loader (torch.utils.data.DataLoader):
-            batch_model_feed_def:
+            batch_model_feed_def (AIToolbox.torchtrain.batch_model_feed_defs.AbstractModelFeedDefinition):
             optimizer:
             criterion:
             project_name (str):
             experiment_name (str):
             local_model_result_folder_path (str):
+            args (dict):
             result_package_class:
         """
         TrainLoopModelEndSave.__init__(self, model, train_loader, validation_loader, batch_model_feed_def,
@@ -231,40 +252,3 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
         self.callbacks_handler.register_callbacks([
             ModelCheckpointCallback(self.project_name, self.experiment_name, self.local_model_result_folder_path)
         ])
-
-
-class TrainLoopModelCheckpoint(TrainLoopModelCheckpointEndSave):
-    def __init__(self, model,
-                 train_loader, validation_loader,
-                 batch_model_feed_def,
-                 optimizer, criterion,
-                 project_name, experiment_name, local_model_result_folder_path, args,
-                 result_package_class):
-        """
-
-        Args:
-            model (torch.nn.modules.Module):
-            train_loader (torch.utils.data.DataLoader):
-            validation_loader (torch.utils.data.DataLoader):
-            batch_model_feed_def:
-            optimizer:
-            criterion:
-            project_name (str):
-            experiment_name (str):
-            local_model_result_folder_path (str):
-            result_package_class:
-        """
-        TrainLoopModelCheckpointEndSave.__init__(self, model, train_loader, validation_loader, batch_model_feed_def,
-                                                 optimizer, criterion,
-                                                 project_name, experiment_name, local_model_result_folder_path,
-                                                 args, result_package_class)
-
-    def on_end_of_training(self):
-        """Disable on end of training hook which is inherited
-
-        The train loop consequently only checkpoints the models after each epoch but does nothing at the end of training
-
-        Returns:
-            None
-        """
-        return None
