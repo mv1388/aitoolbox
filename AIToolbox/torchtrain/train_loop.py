@@ -4,9 +4,9 @@ import datetime
 import numpy as np
 import torch
 
-from AIToolbox.AWS.model_save import PyTorchS3ModelSaver
 from AIToolbox.experiment_save.experiment_saver import FullPyTorchExperimentS3Saver
 from AIToolbox.experiment_save.training_history import PyTorchTrainingHistory
+from AIToolbox.torchtrain.callbacks import CallbacksHandler, ModelCheckpointCallback
 
 
 class TrainLoop:
@@ -36,9 +36,11 @@ class TrainLoop:
 
         self.experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
         self.loss_avg = []
+        self.epoch = 0
 
         self.train_history = {'loss': [], 'val_loss': []} if self.validation_loader is not None else {'loss': []}
 
+        self.callbacks_handler = CallbacksHandler(self)
         self.callbacks = []
         self.early_stop = False
 
@@ -64,13 +66,16 @@ class TrainLoop:
         Returns:
 
         """
-        self.register_callbacks(callbacks)
+        self.callbacks_handler.register_callbacks(callbacks)
 
         self.model = self.model.to(self.device)
         self.model.train()
 
-        for epoch in range(num_epoch):
-            print(f'Epoch: {epoch + 1}')
+        self.callbacks_handler.execute_train_begin()
+
+        for self.epoch in range(num_epoch):
+            print(f'Epoch: {self.epoch + 1}')
+            self.callbacks_handler.execute_epoch_begin()
 
             for batch_data in tqdm(self.train_loader):
                 loss_batch = self.batch_model_feed_def.get_loss(self.model, batch_data, self.criterion, self.device)
@@ -84,19 +89,22 @@ class TrainLoop:
 
             # Automatic end of epoch code - reports the train and if available validation loss and executes callbacks
             self.auto_execute_end_of_epoch()
+            self.callbacks_handler.execute_epoch_end()
+
             # Customized end of epoch code
-            self.on_end_of_epoch(epoch)
+            self.on_end_of_epoch()
 
             # self.early_stop is changed from the early stopper callback
             if self.early_stop:
                 break
 
+        self.callbacks_handler.execute_train_end()
         # Customized end of training code
         self.on_end_of_training()
 
         return self.model
 
-    def on_end_of_epoch(self, epoch):
+    def on_end_of_epoch(self):
         pass
 
     def on_end_of_training(self):
@@ -112,9 +120,6 @@ class TrainLoop:
             val_loss_batch = self.evaluate_loss_on_validation()
             print(f'VAL LOSS: {val_loss_batch}')
             self.train_history['val_loss'].append(val_loss_batch)
-
-        # Execute registered callbacks
-        self.execute_callbacks()
 
     def evaluate_loss_on_validation(self):
         """
@@ -152,14 +157,6 @@ class TrainLoop:
         self.model.train()
 
         return y_test, y_pred
-
-    def register_callbacks(self, callbacks):
-        if callbacks is not None and len(callbacks) > 0:
-            self.callbacks = callbacks
-
-    def execute_callbacks(self):
-        for callback in self.callbacks:
-            callback.execute(self)
 
 
 class TrainLoopModelEndSave(TrainLoop):
@@ -231,24 +228,7 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
                                        project_name, experiment_name, local_model_result_folder_path,
                                        args, result_package_class)
 
-        self.model_checkpointer = PyTorchS3ModelSaver(local_model_result_folder_path=self.local_model_result_folder_path,
-                                                      checkpoint_model=True)
-
-    def on_end_of_epoch(self, epoch):
-        """
-
-        Args:
-            epoch (int):
-
-        Returns:
-
-        """
-        self.model_checkpointer.save_model(model=self.model,
-                                           project_name=self.project_name,
-                                           experiment_name=self.experiment_name,
-                                           experiment_timestamp=self.experiment_timestamp,
-                                           epoch=epoch,
-                                           protect_existing_folder=True)
+        self.callbacks_handler.register_callbacks([ModelCheckpointCallback(self.local_model_result_folder_path)])
 
 
 class TrainLoopModelCheckpoint(TrainLoopModelCheckpointEndSave):
