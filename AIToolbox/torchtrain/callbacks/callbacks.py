@@ -138,3 +138,11 @@ class ModelCheckpointCallback(AbstractCallback):
                                            experiment_timestamp=train_loop_obj.experiment_timestamp,
                                            epoch=train_loop_obj.epoch,
                                            protect_existing_folder=True)
+
+
+class ModelTrainEndSaveCallback(AbstractCallback):
+    def __init__(self, local_model_result_folder_path):
+        AbstractCallback.__init__(self, 'Model save at the end of training')
+
+    def on_train_end(self, train_loop_obj):
+        raise NotImplementedError
