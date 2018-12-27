@@ -83,7 +83,6 @@ class DummyCallback(AbstractCallback):
 
 
 # TODO: implement:
-
 class EarlyStoppingCallback(AbstractCallback):
     def __init__(self, monitor='val_loss', min_delta=0, patience=0):
         AbstractCallback.__init__(self, 'EarlyStopping')
