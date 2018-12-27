@@ -229,7 +229,9 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
                                        project_name, experiment_name, local_model_result_folder_path,
                                        args, result_package_class)
 
-        self.callbacks_handler.register_callbacks([ModelCheckpointCallback(self.local_model_result_folder_path)])
+        self.callbacks_handler.register_callbacks([
+            ModelCheckpointCallback(self.project_name, self.experiment_name, self.local_model_result_folder_path)
+        ])
 
 
 class TrainLoopModelCheckpoint(TrainLoopModelCheckpointEndSave):

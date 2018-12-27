@@ -114,8 +114,17 @@ class EarlyStoppingCallback(AbstractCallback):
 
 
 class ModelCheckpointCallback(AbstractCallback):
-    def __init__(self, local_model_result_folder_path):
+    def __init__(self, project_name, experiment_name, local_model_result_folder_path):
+        """
+
+        Args:
+            project_name:
+            experiment_name:
+            local_model_result_folder_path:
+        """
         AbstractCallback.__init__(self, 'Model checkpoint at end of epoch')
+        self.project_name = project_name
+        self.experiment_name = experiment_name
         self.local_model_result_folder_path = local_model_result_folder_path
 
         self.model_checkpointer = PyTorchS3ModelSaver(
@@ -127,14 +136,14 @@ class ModelCheckpointCallback(AbstractCallback):
         """
 
         Args:
-            train_loop_obj (AIToolbox.torchtrain.train_loop.TrainLoopModelCheckpointEndSave):
+            train_loop_obj (AIToolbox.torchtrain.train_loop.TrainLoop):
 
         Returns:
 
         """
         self.model_checkpointer.save_model(model=train_loop_obj.model,
-                                           project_name=train_loop_obj.project_name,
-                                           experiment_name=train_loop_obj.experiment_name,
+                                           project_name=self.project_name,
+                                           experiment_name=self.experiment_name,
                                            experiment_timestamp=train_loop_obj.experiment_timestamp,
                                            epoch=train_loop_obj.epoch,
                                            protect_existing_folder=True)
