@@ -84,7 +84,6 @@ class DummyCallback(AbstractCallback):
         train_loop_obj.train_history[self.callback_name].append(1000)
 
 
-# TODO: implement:
 class EarlyStoppingCallback(AbstractCallback):
     def __init__(self, monitor='val_loss', min_delta=0, patience=0):
         AbstractCallback.__init__(self, 'EarlyStopping')
@@ -102,14 +101,16 @@ class EarlyStoppingCallback(AbstractCallback):
 
         """
         history_data = train_loop_obj.train_history[self.monitor]
-        history_window = history_data if len(history_data) < self.patience else history_data[-self.patience:]
 
-        if 'loss' in self.monitor:
-            pass
+        if len(history_data) > self.patience:
+            history_window = history_data[-self.patience:]
 
-        raise NotImplementedError
-
-        # train_loop_obj.early_stop = True
+            if 'loss' in self.monitor:
+                if history_window[0] == min(history_window):
+                    train_loop_obj.early_stop = True
+            else:
+                if history_window[0] == max(history_window):
+                    train_loop_obj.early_stop = True
 
 
 class ModelCheckpointCallback(AbstractCallback):
@@ -123,6 +124,14 @@ class ModelCheckpointCallback(AbstractCallback):
         )
 
     def on_epoch_end(self, train_loop_obj):
+        """
+
+        Args:
+            train_loop_obj (AIToolbox.torchtrain.train_loop.TrainLoopModelCheckpointEndSave):
+
+        Returns:
+
+        """
         self.model_checkpointer.save_model(model=train_loop_obj.model,
                                            project_name=train_loop_obj.project_name,
                                            experiment_name=train_loop_obj.experiment_name,
