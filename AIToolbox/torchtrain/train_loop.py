@@ -6,7 +6,8 @@ import torch
 
 from AIToolbox.experiment_save.experiment_saver import FullPyTorchExperimentS3Saver
 from AIToolbox.experiment_save.training_history import PyTorchTrainingHistory
-from AIToolbox.torchtrain.callbacks import CallbacksHandler, ModelCheckpointCallback
+from AIToolbox.torchtrain.callbacks.callback_handler import CallbacksHandler
+from AIToolbox.torchtrain.callbacks.callbacks import ModelCheckpointCallback
 
 
 class TrainLoop:
