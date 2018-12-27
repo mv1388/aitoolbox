@@ -91,6 +91,9 @@ class EarlyStoppingCallback(AbstractCallback):
         self.min_delta = min_delta
         self.patience = patience
 
+        self.patience_count = self.patience
+        self.best_performance = None
+
     def on_epoch_end(self, train_loop_obj):
         """
 
@@ -101,16 +104,37 @@ class EarlyStoppingCallback(AbstractCallback):
 
         """
         history_data = train_loop_obj.train_history[self.monitor]
+        current_performance = history_data[-1]
 
-        if len(history_data) > self.patience:
-            history_window = history_data[-self.patience:]
+        # if len(history_data) > self.patience:
+        #     history_window = history_data[-self.patience:]
+        #
+        #     if 'loss' in self.monitor:
+        #         if history_window[0] == min(history_window) and history_window[0] < history_window[-1]-self.patience:
+        #             train_loop_obj.early_stop = True
+        #     else:
+        #         if history_window[0] == max(history_window) and history_window[0] > history_window[-1]+self.patience:
+        #             train_loop_obj.early_stop = True
 
+        if self.best_performance is None:
+            self.best_performance = current_performance
+
+        else:
             if 'loss' in self.monitor:
-                if history_window[0] == min(history_window) and history_window[0] <= history_window[-1]-self.patience:
-                    train_loop_obj.early_stop = True
+                if current_performance < self.best_performance - self.min_delta:
+                    self.best_performance = current_performance
+                    self.patience_count = self.patience
+                else:
+                    self.patience_count -= 1
             else:
-                if history_window[0] == max(history_window) and history_window[0] >= history_window[-1]+self.patience:
-                    train_loop_obj.early_stop = True
+                if current_performance > self.best_performance + self.min_delta:
+                    self.best_performance = current_performance
+                    self.patience_count = self.patience
+                else:
+                    self.patience_count -= 1
+
+            if self.patience_count < 0:
+                train_loop_obj.early_stop = True
 
 
 class ModelCheckpointCallback(AbstractCallback):
