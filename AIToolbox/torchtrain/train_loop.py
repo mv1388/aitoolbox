@@ -4,10 +4,9 @@ import datetime
 import numpy as np
 import torch
 
-from AIToolbox.AWS.model_save import PyTorchS3ModelSaver
 from AIToolbox.experiment_save.experiment_saver import FullPyTorchExperimentS3Saver
 from AIToolbox.experiment_save.training_history import PyTorchTrainingHistory
-from AIToolbox.torchtrain.callbacks import CallbacksHandler
+from AIToolbox.torchtrain.callbacks import CallbacksHandler, ModelCheckpointCallback
 
 
 class TrainLoop:
@@ -229,24 +228,7 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
                                        project_name, experiment_name, local_model_result_folder_path,
                                        args, result_package_class)
 
-        self.model_checkpointer = PyTorchS3ModelSaver(local_model_result_folder_path=self.local_model_result_folder_path,
-                                                      checkpoint_model=True)
-
-    def on_end_of_epoch(self):
-        """
-
-        Args:
-            epoch (int):
-
-        Returns:
-
-        """
-        self.model_checkpointer.save_model(model=self.model,
-                                           project_name=self.project_name,
-                                           experiment_name=self.experiment_name,
-                                           experiment_timestamp=self.experiment_timestamp,
-                                           epoch=self.epoch,
-                                           protect_existing_folder=True)
+        self.callbacks_handler.register_callbacks([ModelCheckpointCallback(self.local_model_result_folder_path)])
 
 
 class TrainLoopModelCheckpoint(TrainLoopModelCheckpointEndSave):
