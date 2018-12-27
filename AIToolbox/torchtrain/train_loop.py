@@ -189,7 +189,6 @@ class TrainLoopModelEndSave(TrainLoop):
         self.result_package_class = result_package_class
 
         self.results_saver = FullPyTorchExperimentS3Saver(self.project_name, self.experiment_name,
-                                                          experiment_timestamp=self.experiment_timestamp,
                                                           local_model_result_folder_path=self.local_model_result_folder_path)
 
     def on_end_of_training(self):

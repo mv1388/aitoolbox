@@ -1,5 +1,6 @@
 from AIToolbox.AWS.model_save import PyTorchS3ModelSaver
 from AIToolbox.experiment_save.experiment_saver import FullPyTorchExperimentS3Saver
+from AIToolbox.experiment_save.training_history import PyTorchTrainingHistory
 
 
 class AbstractCallback:
@@ -162,7 +163,6 @@ class ModelTrainEndSaveCallback(AbstractCallback):
         self.result_package_class = result_package_class
 
         self.results_saver = FullPyTorchExperimentS3Saver(self.project_name, self.experiment_name,
-                                                          experiment_timestamp=self.experiment_timestamp,
                                                           local_model_result_folder_path=self.local_model_result_folder_path)
 
     def on_train_end(self, train_loop_obj):
@@ -174,4 +174,15 @@ class ModelTrainEndSaveCallback(AbstractCallback):
         Returns:
 
         """
-        pass
+        train_history = train_loop_obj.train_history
+        epoch_list = list(range(len(train_loop_obj.train_history[list(train_loop_obj.train_history.keys())[0]])))
+        train_hist_pkg = PyTorchTrainingHistory(train_history, epoch_list)
+
+        y_test, y_pred = train_loop_obj.predict_on_validation_set()
+
+        result_pkg = self.result_package_class(y_test, y_pred,
+                                               hyperparameters=self.args, training_history=train_hist_pkg)
+
+        self.results_saver.save_experiment(train_loop_obj.model, result_pkg,
+                                           experiment_timestamp=train_loop_obj.experiment_timestamp,
+                                           save_true_pred_labels=True)
