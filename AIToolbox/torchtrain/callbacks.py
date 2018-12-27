@@ -1,3 +1,5 @@
+from AIToolbox.AWS.model_save import PyTorchS3ModelSaver
+
 
 class CallbacksHandler:
     def __init__(self, train_loop_obj):
@@ -108,3 +110,22 @@ class EarlyStoppingCallback(AbstractCallback):
         raise NotImplementedError
 
         # train_loop_obj.early_stop = True
+
+
+class ModelCheckpointCallback(AbstractCallback):
+    def __init__(self, local_model_result_folder_path):
+        AbstractCallback.__init__(self, 'Model checkpoint at end of epoch')
+        self.local_model_result_folder_path = local_model_result_folder_path
+
+        self.model_checkpointer = PyTorchS3ModelSaver(
+            local_model_result_folder_path=self.local_model_result_folder_path,
+            checkpoint_model=True
+        )
+
+    def on_epoch_end(self, train_loop_obj):
+        self.model_checkpointer.save_model(model=train_loop_obj.model,
+                                           project_name=train_loop_obj.project_name,
+                                           experiment_name=train_loop_obj.experiment_name,
+                                           experiment_timestamp=train_loop_obj.experiment_timestamp,
+                                           epoch=train_loop_obj.epoch,
+                                           protect_existing_folder=True)
