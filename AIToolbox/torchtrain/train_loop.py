@@ -38,7 +38,9 @@ class TrainLoop:
         self.loss_avg = []
 
         self.train_history = {'loss': [], 'val_loss': []} if self.validation_loader is not None else {'loss': []}
+
         self.callbacks = []
+        self.early_stop = False
 
     def __call__(self, num_epoch, callbacks=None):
         """
@@ -50,7 +52,7 @@ class TrainLoop:
         Returns:
 
         """
-        self.do_train(num_epoch, callbacks)
+        return self.do_train(num_epoch, callbacks)
 
     def do_train(self, num_epoch, callbacks=None):
         """
@@ -85,8 +87,14 @@ class TrainLoop:
             # Customized end of epoch code
             self.on_end_of_epoch(epoch)
 
+            # self.early_stop is changed from the early stopper callback
+            if self.early_stop:
+                break
+
         # Customized end of training code
         self.on_end_of_training()
+
+        return self.model
 
     def on_end_of_epoch(self, epoch):
         pass
