@@ -106,10 +106,10 @@ class EarlyStoppingCallback(AbstractCallback):
             history_window = history_data[-self.patience:]
 
             if 'loss' in self.monitor:
-                if history_window[0] == min(history_window):
+                if history_window[0] == min(history_window) and history_window[0] <= history_window[-1]-self.patience:
                     train_loop_obj.early_stop = True
             else:
-                if history_window[0] == max(history_window):
+                if history_window[0] == max(history_window) and history_window[0] >= history_window[-1]+self.patience:
                     train_loop_obj.early_stop = True
 
 
