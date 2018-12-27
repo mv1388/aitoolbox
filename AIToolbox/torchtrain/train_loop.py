@@ -106,9 +106,7 @@ class TrainLoop:
         return self.model
 
     def on_end_of_epoch(self):
-        # pass
-
-        print(self.train_history)
+        pass
 
     def on_end_of_training(self):
         pass
