@@ -277,5 +277,4 @@ class TrainLoopModelCheckpoint(TrainLoopModelCheckpointEndSave):
         Returns:
             None
         """
-
         return None
