@@ -53,6 +53,7 @@ class EarlyStoppingCallback(AbstractCallback):
 
         self.patience_count = self.patience
         self.best_performance = None
+        self.best_epoch = 0
 
     def on_epoch_end(self, train_loop_obj):
         """
@@ -78,23 +79,38 @@ class EarlyStoppingCallback(AbstractCallback):
 
         if self.best_performance is None:
             self.best_performance = current_performance
+            self.best_epoch = train_loop_obj.epoch
 
         else:
             if 'loss' in self.monitor:
                 if current_performance < self.best_performance - self.min_delta:
                     self.best_performance = current_performance
+                    self.best_epoch = train_loop_obj.epoch
                     self.patience_count = self.patience
                 else:
                     self.patience_count -= 1
             else:
                 if current_performance > self.best_performance + self.min_delta:
                     self.best_performance = current_performance
+                    self.best_epoch = train_loop_obj.epoch
                     self.patience_count = self.patience
                 else:
                     self.patience_count -= 1
 
             if self.patience_count < 0:
                 train_loop_obj.early_stop = True
+
+    def on_train_end(self, train_loop_obj):
+        """
+
+        Args:
+            train_loop_obj (AIToolbox.torchtrain.train_loop.TrainLoop):
+
+        Returns:
+
+        """
+        if train_loop_obj.early_stop:
+            print(f'Early stopping at epoch: {train_loop_obj.epoch}. Best recorded epoch: {self.best_epoch}.')
 
 
 class ModelCheckpointCallback(AbstractCallback):
