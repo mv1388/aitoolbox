@@ -31,7 +31,7 @@ class DummyCallback(AbstractCallback):
         Returns:
 
         """
-        if 'dummy_acc' not in train_loop_obj.train_history:
+        if self.callback_name not in train_loop_obj.train_history:
             train_loop_obj.train_history[self.callback_name] = []
 
         train_loop_obj.train_history[self.callback_name].append(1000)
