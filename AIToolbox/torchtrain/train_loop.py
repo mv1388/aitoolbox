@@ -37,23 +37,32 @@ class TrainLoop:
         self.experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
         self.loss_avg = []
 
-        # TODO: implement history tracking
-        self.train_history = {}
+        self.train_history = {'loss': [], 'val_loss': []} if self.validation_loader is not None else {'loss': []}
+        self.callbacks = []
 
-    def __call__(self, num_epoch):
-        self.do_train(num_epoch)
-
-    def do_train(self, num_epoch):
+    def __call__(self, num_epoch, callbacks=None):
         """
 
         Args:
             num_epoch (int):
+            callbacks (list):
 
         Returns:
 
         """
-        # Potentially remove: experiment_timestamp is created in the __init__ when the train loop object is created.
-        # self.experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
+        self.do_train(num_epoch, callbacks)
+
+    def do_train(self, num_epoch, callbacks=None):
+        """
+
+        Args:
+            num_epoch (int):
+            callbacks (list):
+
+        Returns:
+
+        """
+        self.register_callbacks(callbacks)
 
         self.model = self.model.to(self.device)
         self.model.train()
@@ -71,8 +80,8 @@ class TrainLoop:
                 loss_batch.backward()
                 self.optimizer.step()
 
-            # Automatic end of epoch report code - only reports the train and if available validation loss
-            self.auto_end_of_epoch_report()
+            # Automatic end of epoch code - reports the train and if available validation loss and executes callbacks
+            self.auto_execute_end_of_epoch()
             # Customized end of epoch code
             self.on_end_of_epoch(epoch)
 
@@ -85,17 +94,19 @@ class TrainLoop:
     def on_end_of_training(self):
         pass
 
-    def record_epoch_history(self):
-
-        raise NotImplementedError
-
-    def auto_end_of_epoch_report(self):
-        print(f'AVG TRAIN LOSS: {np.mean(self.loss_avg)}')
+    def auto_execute_end_of_epoch(self):
+        train_loss_avg = np.mean(self.loss_avg)
+        print(f'AVG TRAIN LOSS: {train_loss_avg}')
         self.loss_avg = []
+        self.train_history['loss'].append(train_loss_avg)
 
         if self.validation_loader is not None:
             val_loss_batch = self.evaluate_loss_on_validation()
             print(f'VAL LOSS: {val_loss_batch}')
+            self.train_history['val_loss'].append(val_loss_batch)
+
+        # Execute registered callbacks
+        self.execute_callbacks()
 
     def evaluate_loss_on_validation(self):
         """
@@ -134,6 +145,14 @@ class TrainLoop:
 
         return y_test, y_pred
 
+    def register_callbacks(self, callbacks):
+        if callbacks is not None and len(callbacks) > 0:
+            self.callbacks = callbacks
+
+    def execute_callbacks(self):
+        for callback in self.callbacks:
+            callback.execute(self)
+
 
 class TrainLoopModelEndSave(TrainLoop):
     def __init__(self, model,
@@ -168,8 +187,6 @@ class TrainLoopModelEndSave(TrainLoop):
                                                           local_model_result_folder_path=self.local_model_result_folder_path)
 
     def on_end_of_training(self):
-
-        # TODO: implement record_epoch_history() to enable the use of self.train_history
         train_hist_pkg = PyTorchTrainingHistory(self.train_history, 
                                                 list(range(len(self.train_history[list(self.train_history.keys())[0]]))))
 
