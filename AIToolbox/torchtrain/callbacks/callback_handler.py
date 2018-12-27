@@ -22,6 +22,11 @@ class CallbacksHandler:
         if callbacks is not None and len(callbacks) > 0:
             self.train_loop_obj.callbacks += callbacks
 
+    def print_registered_callback_names(self):
+        print('CALLBACKS:')
+        for callback in self.train_loop_obj.callbacks:
+            print(callback.callback_name)
+
     def execute_epoch_begin(self):
         for callback in self.train_loop_obj.callbacks:
             callback.on_epoch_begin(self.train_loop_obj)
