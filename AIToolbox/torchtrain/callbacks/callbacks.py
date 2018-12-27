@@ -1,4 +1,5 @@
 from AIToolbox.AWS.model_save import PyTorchS3ModelSaver
+from AIToolbox.experiment_save.experiment_saver import FullPyTorchExperimentS3Saver
 
 
 class AbstractCallback:
@@ -150,8 +151,27 @@ class ModelCheckpointCallback(AbstractCallback):
 
 
 class ModelTrainEndSaveCallback(AbstractCallback):
-    def __init__(self, local_model_result_folder_path):
+    def __init__(self, project_name, experiment_name, local_model_result_folder_path,
+                 args, result_package_class):
+
         AbstractCallback.__init__(self, 'Model save at the end of training')
+        self.project_name = project_name
+        self.experiment_name = experiment_name
+        self.local_model_result_folder_path = local_model_result_folder_path
+        self.args = args
+        self.result_package_class = result_package_class
+
+        self.results_saver = FullPyTorchExperimentS3Saver(self.project_name, self.experiment_name,
+                                                          experiment_timestamp=self.experiment_timestamp,
+                                                          local_model_result_folder_path=self.local_model_result_folder_path)
 
     def on_train_end(self, train_loop_obj):
-        raise NotImplementedError
+        """
+
+        Args:
+            train_loop_obj (AIToolbox.torchtrain.train_loop.TrainLoop):
+
+        Returns:
+
+        """
+        pass
