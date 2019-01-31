@@ -19,12 +19,12 @@ class AbstractCallback:
     def on_train_end(self, train_loop_obj):
         pass
 
-    # Not used yet to prevent training slowdown
-    # def on_batch_begin(self, batch):
-    #     pass
-    #
-    # def on_batch_end(self, batch):
-    #     pass
+    # TODO: Think about potential training slowdown
+    def on_batch_begin(self, train_loop_obj):
+        pass
+
+    def on_batch_end(self, train_loop_obj):
+        pass
 
 
 class DummyCallback(AbstractCallback):
@@ -186,3 +186,4 @@ class ModelTrainEndSaveCallback(AbstractCallback):
         self.results_saver.save_experiment(train_loop_obj.model, result_pkg,
                                            experiment_timestamp=train_loop_obj.experiment_timestamp,
                                            save_true_pred_labels=True)
+

@@ -42,3 +42,11 @@ class CallbacksHandler:
     def execute_train_end(self):
         for callback in self.train_loop_obj.callbacks:
             callback.on_train_end(self.train_loop_obj)
+
+    def execute_batch_begin(self):
+        for callback in self.train_loop_obj.callbacks:
+            callback.on_batch_begin(self.train_loop_obj)
+
+    def execute_batch_end(self):
+        for callback in self.train_loop_obj.callbacks:
+            callback.on_batch_end(self.train_loop_obj)

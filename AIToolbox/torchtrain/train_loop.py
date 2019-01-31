@@ -77,6 +77,8 @@ class TrainLoop:
             self.callbacks_handler.execute_epoch_begin()
 
             for batch_data in tqdm(self.train_loader):
+                self.callbacks_handler.execute_batch_begin()
+
                 loss_batch = self.batch_model_feed_def.get_loss(self.model, batch_data, self.criterion, self.device)
 
                 # print(f'Loss: {loss_batch}')
@@ -85,6 +87,8 @@ class TrainLoop:
                 self.optimizer.zero_grad()
                 loss_batch.backward()
                 self.optimizer.step()
+
+                self.callbacks_handler.execute_batch_end()
 
             # Automatic end of epoch code - reports the train and if available validation loss and executes callbacks
             self.auto_execute_end_of_epoch()
