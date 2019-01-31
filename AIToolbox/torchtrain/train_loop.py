@@ -119,9 +119,9 @@ class TrainLoop:
         self.train_history['loss'].append(train_loss_avg)
 
         if self.validation_loader is not None:
-            val_loss_batch = self.evaluate_loss_on_validation()
-            print(f'VAL LOSS: {val_loss_batch}')
-            self.train_history['val_loss'].append(val_loss_batch)
+            val_loss_avg = self.evaluate_loss_on_validation()
+            print(f'VAL LOSS: {val_loss_avg}')
+            self.train_history['val_loss'].append(val_loss_avg)
 
     def evaluate_loss_on_validation(self):
         """
