@@ -6,24 +6,29 @@ from AIToolbox.experiment_save.training_history import PyTorchTrainingHistory
 class AbstractCallback:
     def __init__(self, callback_name):
         self.callback_name = callback_name
+        self.train_loop_obj = None
 
-    def on_epoch_begin(self, train_loop_obj):
+    def register_train_loop_obj(self, train_loop_obj):
+        self.train_loop_obj = train_loop_obj
+        return self
+
+    def on_epoch_begin(self):
         pass
 
-    def on_epoch_end(self, train_loop_obj):
+    def on_epoch_end(self):
         pass
 
-    def on_train_begin(self, train_loop_obj):
+    def on_train_begin(self):
         pass
 
-    def on_train_end(self, train_loop_obj):
+    def on_train_end(self):
         pass
 
     # TODO: Think about potential training slowdown
-    def on_batch_begin(self, train_loop_obj):
+    def on_batch_begin(self):
         pass
 
-    def on_batch_end(self, train_loop_obj):
+    def on_batch_end(self):
         pass
 
 
@@ -31,19 +36,16 @@ class DummyCallback(AbstractCallback):
     def __init__(self):
         AbstractCallback.__init__(self, 'DummyCallback')
 
-    def on_epoch_end(self, train_loop_obj):
+    def on_epoch_end(self):
         """
-
-        Args:
-            train_loop_obj (AIToolbox.torchtrain.train_loop.TrainLoop):
 
         Returns:
 
         """
-        if self.callback_name not in train_loop_obj.train_history:
-            train_loop_obj.train_history[self.callback_name] = []
+        if self.callback_name not in self.train_loop_obj.train_history:
+            self.train_loop_obj.train_history[self.callback_name] = []
 
-        train_loop_obj.train_history[self.callback_name].append(1000)
+        self.train_loop_obj.train_history[self.callback_name].append(1000)
 
 
 class EarlyStoppingCallback(AbstractCallback):
@@ -57,16 +59,13 @@ class EarlyStoppingCallback(AbstractCallback):
         self.best_performance = None
         self.best_epoch = 0
 
-    def on_epoch_end(self, train_loop_obj):
+    def on_epoch_end(self):
         """
-
-        Args:
-            train_loop_obj (AIToolbox.torchtrain.train_loop.TrainLoop):
 
         Returns:
 
         """
-        history_data = train_loop_obj.train_history[self.monitor]
+        history_data = self.train_loop_obj.train_history[self.monitor]
         current_performance = history_data[-1]
 
         # if len(history_data) > self.patience:
@@ -81,38 +80,35 @@ class EarlyStoppingCallback(AbstractCallback):
 
         if self.best_performance is None:
             self.best_performance = current_performance
-            self.best_epoch = train_loop_obj.epoch
+            self.best_epoch = self.train_loop_obj.epoch
 
         else:
             if 'loss' in self.monitor:
                 if current_performance < self.best_performance - self.min_delta:
                     self.best_performance = current_performance
-                    self.best_epoch = train_loop_obj.epoch
+                    self.best_epoch = self.train_loop_obj.epoch
                     self.patience_count = self.patience
                 else:
                     self.patience_count -= 1
             else:
                 if current_performance > self.best_performance + self.min_delta:
                     self.best_performance = current_performance
-                    self.best_epoch = train_loop_obj.epoch
+                    self.best_epoch = self.train_loop_obj.epoch
                     self.patience_count = self.patience
                 else:
                     self.patience_count -= 1
 
             if self.patience_count < 0:
-                train_loop_obj.early_stop = True
+                self.train_loop_obj.early_stop = True
 
-    def on_train_end(self, train_loop_obj):
+    def on_train_end(self):
         """
-
-        Args:
-            train_loop_obj (AIToolbox.torchtrain.train_loop.TrainLoop):
 
         Returns:
 
         """
-        if train_loop_obj.early_stop:
-            print(f'Early stopping at epoch: {train_loop_obj.epoch}. Best recorded epoch: {self.best_epoch}.')
+        if self.train_loop_obj.early_stop:
+            print(f'Early stopping at epoch: {self.train_loop_obj.epoch}. Best recorded epoch: {self.best_epoch}.')
 
 
 class ModelCheckpointCallback(AbstractCallback):
@@ -134,20 +130,17 @@ class ModelCheckpointCallback(AbstractCallback):
             checkpoint_model=True
         )
 
-    def on_epoch_end(self, train_loop_obj):
+    def on_epoch_end(self):
         """
-
-        Args:
-            train_loop_obj (AIToolbox.torchtrain.train_loop.TrainLoop):
 
         Returns:
 
         """
-        self.model_checkpointer.save_model(model=train_loop_obj.model,
+        self.model_checkpointer.save_model(model=self.train_loop_obj.model,
                                            project_name=self.project_name,
                                            experiment_name=self.experiment_name,
-                                           experiment_timestamp=train_loop_obj.experiment_timestamp,
-                                           epoch=train_loop_obj.epoch,
+                                           experiment_timestamp=self.train_loop_obj.experiment_timestamp,
+                                           epoch=self.train_loop_obj.epoch,
                                            protect_existing_folder=True)
 
 
@@ -165,25 +158,22 @@ class ModelTrainEndSaveCallback(AbstractCallback):
         self.results_saver = FullPyTorchExperimentS3Saver(self.project_name, self.experiment_name,
                                                           local_model_result_folder_path=self.local_model_result_folder_path)
 
-    def on_train_end(self, train_loop_obj):
+    def on_train_end(self):
         """
-
-        Args:
-            train_loop_obj (AIToolbox.torchtrain.train_loop.TrainLoop):
 
         Returns:
 
         """
-        train_history = train_loop_obj.train_history
-        epoch_list = list(range(len(train_loop_obj.train_history[list(train_loop_obj.train_history.keys())[0]])))
+        train_history = self.train_loop_obj.train_history
+        epoch_list = list(range(len(self.train_loop_obj.train_history[list(self.train_loop_obj.train_history.keys())[0]])))
         train_hist_pkg = PyTorchTrainingHistory(train_history, epoch_list)
 
-        y_test, y_pred = train_loop_obj.predict_on_validation_set()
+        y_test, y_pred = self.train_loop_obj.predict_on_validation_set()
 
         result_pkg = self.result_package_class(y_test, y_pred,
                                                hyperparameters=self.args, training_history=train_hist_pkg)
 
-        self.results_saver.save_experiment(train_loop_obj.model, result_pkg,
-                                           experiment_timestamp=train_loop_obj.experiment_timestamp,
+        self.results_saver.save_experiment(self.train_loop_obj.model, result_pkg,
+                                           experiment_timestamp=self.train_loop_obj.experiment_timestamp,
                                            save_true_pred_labels=True)
 
