@@ -11,3 +11,12 @@ class BasicLearnRateScheduler(AbstractCallback):
     
     def on_epoch_end(self, train_loop_obj):
         pass
+
+
+class ReduceLROnPlateauScheduler(AbstractCallback):
+    def __init__(self, lr_decay):
+        AbstractCallback.__init__(self, 'Reduce learn rate if the model hits the plateau')
+        self.lr_decay = lr_decay
+
+    def on_epoch_end(self, train_loop_obj):
+        pass

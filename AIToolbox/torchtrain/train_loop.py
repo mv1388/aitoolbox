@@ -93,7 +93,6 @@ class TrainLoop:
             # Automatic end of epoch code - reports the train and if available validation loss and executes callbacks
             self.auto_execute_end_of_epoch()
             self.callbacks_handler.execute_epoch_end()
-
             # Customized end of epoch code
             self.on_end_of_epoch()
 
