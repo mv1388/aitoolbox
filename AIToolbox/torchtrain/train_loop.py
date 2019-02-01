@@ -143,6 +143,11 @@ class TrainLoop:
         return np.mean(val_loss_avg)
     
     def predict_on_validation_set(self):
+        """
+
+        Returns:
+
+        """
         y_test, y_pred = [], []
 
         self.model.eval()

@@ -9,6 +9,14 @@ class AbstractCallback:
         self.train_loop_obj = None
 
     def register_train_loop_obj(self, train_loop_obj):
+        """
+
+        Args:
+            train_loop_obj (AIToolbox.torchtrain.train_loop.TrainLoop):
+
+        Returns:
+
+        """
         self.train_loop_obj = train_loop_obj
         return self
 
@@ -49,7 +57,14 @@ class DummyCallback(AbstractCallback):
 
 
 class EarlyStoppingCallback(AbstractCallback):
-    def __init__(self, monitor='val_loss', min_delta=0, patience=0):
+    def __init__(self, monitor='val_loss', min_delta=0., patience=0):
+        """
+
+        Args:
+            monitor (str):
+            min_delta (float):
+            patience (int):
+        """
         AbstractCallback.__init__(self, 'EarlyStopping')
         self.monitor = monitor
         self.min_delta = min_delta
@@ -116,9 +131,9 @@ class ModelCheckpointCallback(AbstractCallback):
         """
 
         Args:
-            project_name:
-            experiment_name:
-            local_model_result_folder_path:
+            project_name (str):
+            experiment_name (str):
+            local_model_result_folder_path (str):
         """
         AbstractCallback.__init__(self, 'Model checkpoint at end of epoch')
         self.project_name = project_name
@@ -147,7 +162,15 @@ class ModelCheckpointCallback(AbstractCallback):
 class ModelTrainEndSaveCallback(AbstractCallback):
     def __init__(self, project_name, experiment_name, local_model_result_folder_path,
                  args, result_package_class):
+        """
 
+        Args:
+            project_name (str):
+            experiment_name (str):
+            local_model_result_folder_path (str):
+            args (dict):
+            result_package_class:
+        """
         AbstractCallback.__init__(self, 'Model save at the end of training')
         self.project_name = project_name
         self.experiment_name = experiment_name
