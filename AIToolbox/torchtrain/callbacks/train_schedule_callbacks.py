@@ -69,6 +69,7 @@ class GeneralLRScheduler(AbstractCallback):
         """
 
         Args:
+            scheduler_class:
             **kwargs:
         """
         AbstractCallback.__init__(self, 'General learn rate scheduler')
@@ -77,6 +78,14 @@ class GeneralLRScheduler(AbstractCallback):
         self.scheduler = None
 
     def register_train_loop_obj(self, train_loop_obj):
+        """
+
+        Args:
+            train_loop_obj:
+
+        Returns:
+
+        """
         self.train_loop_obj = train_loop_obj
         self.scheduler = self.scheduler_class(self.train_loop_obj.optimizer, **self.scheduler_args)
         return self
@@ -90,19 +99,8 @@ class ReduceLROnPlateauScheduler(GeneralLRScheduler):
     def __init__(self, **kwargs):
         """
 
-        def __init__(self, mode='min', factor=0.1, patience=10,
-                 verbose=False, threshold=1e-4, threshold_mode='rel', cooldown=0, min_lr=0, eps=1e-8):
-
         Args:
-            mode:
-            factor:
-            patience:
-            verbose:
-            threshold:
-            threshold_mode:
-            cooldown:
-            min_lr:
-            eps:
+            **kwargs:
         """
         GeneralLRScheduler.__init__(self, ReduceLROnPlateau, **kwargs)
         self.callback_name = 'Reduce learn rate if the model hits the plateau'
@@ -113,7 +111,7 @@ class LambdaLRScheduler(GeneralLRScheduler):
         """
 
         Args:
-            lr_lambda_list:
+            lr_lambda_list (list):
             **kwargs:
         """
         GeneralLRScheduler.__init__(self, LambdaLR, **dict(kwargs, lr_lambda=lr_lambda_list))
@@ -125,7 +123,7 @@ class StepLRScheduler(GeneralLRScheduler):
         """
 
         Args:
-            step_size:
+            step_size (int):
             **kwargs:
         """
         GeneralLRScheduler.__init__(self, StepLR, **dict(kwargs, step_size=step_size))
@@ -137,7 +135,7 @@ class MultiStepLRScheduler(GeneralLRScheduler):
         """
 
         Args:
-            milestones_list:
+            milestones_list (list):
             **kwargs:
         """
         GeneralLRScheduler.__init__(self, MultiStepLR, **dict(kwargs, milestones=milestones_list))
