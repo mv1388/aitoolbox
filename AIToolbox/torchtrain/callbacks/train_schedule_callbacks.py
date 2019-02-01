@@ -37,7 +37,7 @@ class BasicLearnRateScheduler(AbstractCallback):
 #         self.scheduler_args = kwargs
 #         self.scheduler = None
 #
-#     def register_train_loop_obj(self, train_loop_obj):
+#     def register_train_loop_object(self, train_loop_obj):
 #         self.train_loop_obj = train_loop_obj
 #         self.scheduler = ReduceLROnPlateau(self.train_loop_obj.optimizer, **self.scheduler_args)
 #         return self
@@ -58,7 +58,7 @@ class BasicLearnRateScheduler(AbstractCallback):
 #         ReduceLROnPlateauScheduler.__init__(self, **kwargs)
 #         self.scheduler_class = scheduler_class
 #
-#     def register_train_loop_obj(self, train_loop_obj):
+#     def register_train_loop_object(self, train_loop_obj):
 #         self.train_loop_obj = train_loop_obj
 #         self.scheduler = self.scheduler_class(self.train_loop_obj.optimizer, **self.scheduler_args)
 #         return self
@@ -77,7 +77,7 @@ class GeneralLRScheduler(AbstractCallback):
         self.scheduler_class = scheduler_class
         self.scheduler = None
 
-    def register_train_loop_obj(self, train_loop_obj):
+    def register_train_loop_object(self, train_loop_obj):
         """
 
         Args:

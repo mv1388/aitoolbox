@@ -8,7 +8,7 @@ class AbstractCallback:
         self.callback_name = callback_name
         self.train_loop_obj = None
 
-    def register_train_loop_obj(self, train_loop_obj):
+    def register_train_loop_object(self, train_loop_obj):
         """
 
         Args:

@@ -20,7 +20,7 @@ class CallbacksHandler:
 
         """
         if callbacks is not None and len(callbacks) > 0:
-            self.train_loop_obj.callbacks += [cb.register_train_loop_obj(self.train_loop_obj) for cb in callbacks]
+            self.train_loop_obj.callbacks += [cb.register_train_loop_object(self.train_loop_obj) for cb in callbacks]
 
     def print_registered_callback_names(self):
         print('CALLBACKS:')
