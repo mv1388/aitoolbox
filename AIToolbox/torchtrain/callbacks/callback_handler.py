@@ -3,8 +3,6 @@ class CallbacksHandler:
     def __init__(self, train_loop_obj):
         """
 
-        TODO: Not an optimal implementation... repeated for loops
-
         Args:
             train_loop_obj (AIToolbox.torchtrain.train_loop.TrainLoop):
         """
