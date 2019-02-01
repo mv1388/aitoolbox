@@ -1,4 +1,4 @@
-from torch.optim.lr_scheduler import ReduceLROnPlateau
+from torch.optim.lr_scheduler import ReduceLROnPlateau, LambdaLR, StepLR
 
 from AIToolbox.torchtrain.callbacks.callbacks import AbstractCallback
 
@@ -106,3 +106,27 @@ class ReduceLROnPlateauScheduler(GeneralLRScheduler):
         """
         GeneralLRScheduler.__init__(self, ReduceLROnPlateau, **kwargs)
         self.callback_name = 'Reduce learn rate if the model hits the plateau'
+
+
+class LambdaLRScheduler(GeneralLRScheduler):
+    def __init__(self, lr_lambda_list, **kwargs):
+        """
+
+        Args:
+            lr_lambda_list:
+            **kwargs:
+        """
+        GeneralLRScheduler.__init__(self, LambdaLR, **dict(kwargs, lr_lambda=lr_lambda_list))
+        self.callback_name = ''
+
+
+class StepLRScheduler(GeneralLRScheduler):
+    def __init__(self, step_size, **kwargs):
+        """
+
+        Args:
+            step_size:
+            **kwargs:
+        """
+        GeneralLRScheduler.__init__(self, StepLR, **dict(kwargs, step_size=step_size))
+        self.callback_name = ''
