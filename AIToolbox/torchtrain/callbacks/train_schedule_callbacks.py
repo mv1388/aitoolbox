@@ -1,4 +1,4 @@
-from torch.optim.lr_scheduler import ReduceLROnPlateau, LambdaLR, StepLR
+from torch.optim.lr_scheduler import ReduceLROnPlateau, LambdaLR, StepLR, MultiStepLR
 
 from AIToolbox.torchtrain.callbacks.callbacks import AbstractCallback
 
@@ -129,4 +129,16 @@ class StepLRScheduler(GeneralLRScheduler):
             **kwargs:
         """
         GeneralLRScheduler.__init__(self, StepLR, **dict(kwargs, step_size=step_size))
+        self.callback_name = ''
+
+
+class MultiStepLRScheduler(GeneralLRScheduler):
+    def __init__(self, milestones_list, **kwargs):
+        """
+
+        Args:
+            milestones_list:
+            **kwargs:
+        """
+        GeneralLRScheduler.__init__(self, MultiStepLR, **dict(kwargs, milestones=milestones_list))
         self.callback_name = ''
