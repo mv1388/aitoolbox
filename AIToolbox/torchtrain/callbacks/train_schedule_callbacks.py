@@ -16,10 +16,11 @@ class BasicLearnRateScheduler(AbstractCallback):
 
 
 class ReduceLROnPlateauScheduler(AbstractCallback):
-    def __init__(self, mode='min', factor=0.1, patience=10,
-                 verbose=False, threshold=1e-4, threshold_mode='rel',
-                 cooldown=0, min_lr=0, eps=1e-8):
+    def __init__(self, **kwargs):
         """
+
+        def __init__(self, mode='min', factor=0.1, patience=10,
+                 verbose=False, threshold=1e-4, threshold_mode='rel', cooldown=0, min_lr=0, eps=1e-8):
 
         Args:
             mode:
@@ -33,10 +34,13 @@ class ReduceLROnPlateauScheduler(AbstractCallback):
             eps:
         """
         AbstractCallback.__init__(self, 'Reduce learn rate if the model hits the plateau')
-        self.scheduler = ReduceLROnPlateau(self.train_loop_obj.optimizer,
-                                           mode, factor, patience,
-                                           verbose, threshold, threshold_mode,
-                                           cooldown, min_lr, eps)
+        self.scheduler_args = kwargs
+        self.scheduler = None
+
+    def register_train_loop_obj(self, train_loop_obj):
+        self.train_loop_obj = train_loop_obj
+        self.scheduler = ReduceLROnPlateau(self.train_loop_obj.optimizer, **self.scheduler_args)
+        return self
 
     def on_epoch_end(self):
         val_loss_avg = self.train_loop_obj.evaluate_loss_on_validation()
