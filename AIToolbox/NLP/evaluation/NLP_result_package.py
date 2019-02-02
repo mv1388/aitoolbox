@@ -1,6 +1,6 @@
 from AIToolbox.experiment_save.result_package import AbstractResultPackage
 from AIToolbox.experiment_save.core_metrics.classification import AccuracyMetric
-from AIToolbox.NLP.evaluation.NLP_metrics import BLEUScoreMetric, PerplexityMetric, ROGUEMetric
+from AIToolbox.NLP.evaluation.NLP_metrics import BLEUCorpusScoreMetric, PerplexityMetric, ROGUEMetric
 
 
 class QuestionAnswerResultPackage(AbstractResultPackage):
@@ -109,7 +109,7 @@ class MachineTranslationResultPackage(AbstractResultPackage):
         Returns:
 
         """
-        # bleu_result = BLEUScoreMetric(self.y_true, self.y_predicted).get_metric_dict()
+        # bleu_result = BLEUCorpusScoreMetric(self.y_true, self.y_predicted).get_metric_dict()
         # perplexity_result = PerplexityMetric(self.y_true, self.y_predicted).get_metric_dict()
 
         raise NotImplementedError

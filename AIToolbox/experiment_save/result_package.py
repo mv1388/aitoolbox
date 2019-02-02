@@ -32,6 +32,10 @@ class AbstractResultPackage(ABC):
 
         self.prepare_results_dict()
 
+    @abstractmethod
+    def prepare_results_dict(self):
+        pass
+
     def get_results(self):
         """
 
@@ -96,10 +100,6 @@ class AbstractResultPackage(ABC):
             raise ValueError(msg)
         else:
             print(msg)
-
-    @abstractmethod
-    def prepare_results_dict(self):
-        pass
 
 
 class GeneralResultPackage(AbstractResultPackage):
