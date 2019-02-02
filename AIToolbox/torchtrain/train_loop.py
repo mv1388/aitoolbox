@@ -93,7 +93,6 @@ class TrainLoop:
             # Automatic end of epoch code - reports the train and if available validation loss and executes callbacks
             self.auto_execute_end_of_epoch()
             self.callbacks_handler.execute_epoch_end()
-
             # Customized end of epoch code
             self.on_end_of_epoch()
 
@@ -120,9 +119,9 @@ class TrainLoop:
         self.train_history['loss'].append(train_loss_avg)
 
         if self.validation_loader is not None:
-            val_loss_batch = self.evaluate_loss_on_validation()
-            print(f'VAL LOSS: {val_loss_batch}')
-            self.train_history['val_loss'].append(val_loss_batch)
+            val_loss_avg = self.evaluate_loss_on_validation()
+            print(f'VAL LOSS: {val_loss_avg}')
+            self.train_history['val_loss'].append(val_loss_avg)
 
     def evaluate_loss_on_validation(self):
         """
@@ -144,6 +143,11 @@ class TrainLoop:
         return np.mean(val_loss_avg)
     
     def predict_on_validation_set(self):
+        """
+
+        Returns:
+
+        """
         y_test, y_pred = [], []
 
         self.model.eval()

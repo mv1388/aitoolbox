@@ -3,8 +3,6 @@ class CallbacksHandler:
     def __init__(self, train_loop_obj):
         """
 
-        TODO: Not an optimal implementation... repeated for loops
-
         Args:
             train_loop_obj (AIToolbox.torchtrain.train_loop.TrainLoop):
         """
@@ -20,7 +18,7 @@ class CallbacksHandler:
 
         """
         if callbacks is not None and len(callbacks) > 0:
-            self.train_loop_obj.callbacks += callbacks
+            self.train_loop_obj.callbacks += [cb.register_train_loop_object(self.train_loop_obj) for cb in callbacks]
 
     def print_registered_callback_names(self):
         print('CALLBACKS:')
