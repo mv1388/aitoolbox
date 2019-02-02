@@ -12,7 +12,6 @@ class ROGUEMetric(AbstractBaseMetric):
         """
 
         Use this package:
-
             https://pypi.org/project/pyrouge/
             https://github.com/bheinzerling/pyrouge
 
