@@ -9,8 +9,30 @@ from AIToolbox.experiment_save.core_metrics.regression import MeanSquaredErrorMe
 
 
 class AbstractResultPackage(ABC):
-    def __init__(self, y_true, y_predicted, hyperparameters=None, training_history=None,
-                 strict_content_check=False):
+    def __init__(self, strict_content_check=False, **kwargs):
+        """
+
+        Args:
+            strict_content_check (bool):
+            **kwargs (dict):
+        """
+        self.pkg_name = None
+        self.strict_content_check = strict_content_check
+
+        self.y_true = None
+        self.y_predicted = None
+        self.additional_results = None
+        self.results_dict = None
+        
+        self.hyperparameters = None
+        self.training_history = None
+        self.package_metadata = kwargs
+
+    @abstractmethod
+    def prepare_results_dict(self):
+        pass
+
+    def prepare_result_package(self, y_true, y_predicted, hyperparameters=None, training_history=None, **kwargs):
         """
 
         Args:
@@ -18,23 +40,20 @@ class AbstractResultPackage(ABC):
             y_predicted (numpy.array or list):
             hyperparameters (dict or None):
             training_history (AIToolbox.ExperimentSave.training_history.AbstractTrainingHistory):
-            strict_content_check (bool):
-        """
-        self.pkg_name = None
-        self.strict_content_check = strict_content_check
+            **kwargs (dict):
 
+        Returns:
+            None
+        """
         self.y_true = np.array(y_true)
         self.y_predicted = np.array(y_predicted)
 
         self.results_dict = None
         self.hyperparameters = hyperparameters
         self.training_history = training_history.get_train_history()
+        self.additional_results = kwargs
 
         self.prepare_results_dict()
-
-    @abstractmethod
-    def prepare_results_dict(self):
-        pass
 
     def get_results(self):
         """
@@ -103,21 +122,17 @@ class AbstractResultPackage(ABC):
 
 
 class GeneralResultPackage(AbstractResultPackage):
-    def __init__(self, y_true, y_predicted, metrics_list, hyperparameters=None, training_history=None,
-                 strict_content_check=False):
+    def __init__(self, metrics_list, strict_content_check=False, **kwargs):
         """
 
         Args:
-            y_true (numpy.array or list):
-            y_predicted (numpy.array or list):
             metrics_list (list): List of objects which are inherited from
                 AIToolbox.experiment_save.core_metrics.BaseMetric.AbstractBaseMetric
-            hyperparameters (dict):
-            training_history (AIToolbox.ExperimentSave.training_history.AbstractTrainingHistory):
             strict_content_check (bool):
+            **kwargs (dict):
         """
         self.metrics_list = metrics_list
-        AbstractResultPackage.__init__(self, y_true, y_predicted, hyperparameters, training_history, strict_content_check)
+        AbstractResultPackage.__init__(self, strict_content_check, **kwargs)
 
     def prepare_results_dict(self):
         """
@@ -147,17 +162,14 @@ class GeneralResultPackage(AbstractResultPackage):
 
 
 class BinaryClassificationResultPackage(AbstractResultPackage):
-    def __init__(self, y_true, y_predicted, hyperparameters=None, training_history=None, strict_content_check=False):
+    def __init__(self, strict_content_check=False, **kwargs):
         """
 
         Args:
-            y_true (numpy.array or list):
-            y_predicted (numpy.array or list):
-            hyperparameters (dict):
-            training_history (AIToolbox.ExperimentSave.training_history.AbstractTrainingHistory):
             strict_content_check (bool):
+            **kwargs (dict):
         """
-        AbstractResultPackage.__init__(self, y_true, y_predicted, hyperparameters, training_history, strict_content_check)
+        AbstractResultPackage.__init__(self, strict_content_check, **kwargs)
 
     def prepare_results_dict(self):
         """
@@ -174,19 +186,16 @@ class BinaryClassificationResultPackage(AbstractResultPackage):
 
 
 class ClassificationResultPackage(AbstractResultPackage):
-    def __init__(self, y_true, y_predicted, hyperparameters=None, training_history=None, strict_content_check=False):
+    def __init__(self, strict_content_check=False, **kwargs):
         """
 
         Without Precision-Recall metric which is available only for binary classification problems.
 
         Args:
-            y_true (numpy.array or list):
-            y_predicted (numpy.array or list):
-            hyperparameters (dict):
-            training_history (AIToolbox.ExperimentSave.training_history.AbstractTrainingHistory):
             strict_content_check (bool):
+            **kwargs (dict):
         """
-        AbstractResultPackage.__init__(self, y_true, y_predicted, hyperparameters, training_history, strict_content_check)
+        AbstractResultPackage.__init__(self, strict_content_check, **kwargs)
 
     def prepare_results_dict(self):
         """
@@ -205,17 +214,14 @@ class ClassificationResultPackage(AbstractResultPackage):
 
         
 class RegressionResultPackage(AbstractResultPackage):
-    def __init__(self, y_true, y_predicted, hyperparameters=None, training_history=None, strict_content_check=False):
+    def __init__(self, strict_content_check=False, **kwargs):
         """
 
         Args:
-            y_true (numpy.array or list):
-            y_predicted (numpy.array or list):
-            hyperparameters (dict):
-            training_history (AIToolbox.ExperimentSave.training_history.AbstractTrainingHistory):
             strict_content_check (bool):
+            **kwargs (dict):
         """
-        AbstractResultPackage.__init__(self, y_true, y_predicted, hyperparameters, training_history, strict_content_check)
+        AbstractResultPackage.__init__(self, strict_content_check, **kwargs)
 
     def prepare_results_dict(self):
         """
@@ -230,17 +236,16 @@ class RegressionResultPackage(AbstractResultPackage):
 
 
 class MultipleResultPackageWrapper(AbstractResultPackage):
-    def __init__(self, result_packages, hyperparameters=None, training_history=None, strict_content_check=False):
+    def __init__(self, result_packages, strict_content_check=False, **kwargs):
         """
 
         Args:
             result_packages (list):
-            hyperparameters (dict):
-            training_history (AIToolbox.ExperimentSave.training_history.AbstractTrainingHistory):
             strict_content_check (bool):
+            **kwargs (dict):
         """
         self.result_packages = result_packages
-        AbstractResultPackage.__init__(self, None, None, hyperparameters, training_history, strict_content_check)
+        AbstractResultPackage.__init__(self, strict_content_check, **kwargs)
 
     def prepare_results_dict(self):
         self.results_dict = {}

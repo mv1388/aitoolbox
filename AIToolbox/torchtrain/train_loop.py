@@ -197,7 +197,7 @@ class TrainLoopModelEndSave(TrainLoop):
                  batch_model_feed_def,
                  optimizer, criterion,
                  project_name, experiment_name, local_model_result_folder_path,
-                 args, result_package_class):
+                 args, result_package):
         """
 
         Args:
@@ -211,18 +211,18 @@ class TrainLoopModelEndSave(TrainLoop):
             experiment_name (str):
             local_model_result_folder_path (str):
             args (dict):
-            result_package_class:
+            result_package (AIToolbox.experiment_save.result_package.AbstractResultPackage):
         """
         TrainLoop.__init__(self, model, train_loader, validation_loader, batch_model_feed_def, optimizer, criterion)
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = local_model_result_folder_path
         self.args = args
-        self.result_package_class = result_package_class
+        self.result_package = result_package
 
         self.callbacks_handler.register_callbacks([
             ModelTrainEndSaveCallback(self.project_name, self.experiment_name, self.local_model_result_folder_path,
-                                      self.args, self.result_package_class)
+                                      self.args, self.result_package)
         ])
 
 
@@ -232,7 +232,7 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
                  batch_model_feed_def,
                  optimizer, criterion,
                  project_name, experiment_name, local_model_result_folder_path,
-                 args, result_package_class):
+                 args, result_package):
         """
 
         Args:
@@ -246,12 +246,12 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
             experiment_name (str):
             local_model_result_folder_path (str):
             args (dict):
-            result_package_class:
+            result_package (AIToolbox.experiment_save.result_package.AbstractResultPackage):
         """
         TrainLoopModelEndSave.__init__(self, model, train_loader, validation_loader, batch_model_feed_def,
                                        optimizer, criterion,
                                        project_name, experiment_name, local_model_result_folder_path,
-                                       args, result_package_class)
+                                       args, result_package)
 
         self.callbacks_handler.register_callbacks([
             ModelCheckpointCallback(self.project_name, self.experiment_name, self.local_model_result_folder_path)

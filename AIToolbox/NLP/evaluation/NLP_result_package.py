@@ -4,17 +4,14 @@ from AIToolbox.NLP.evaluation.NLP_metrics import BLEUCorpusScoreMetric, Perplexi
 
 
 class QuestionAnswerResultPackage(AbstractResultPackage):
-    def __init__(self, y_true, y_predicted, hyperparameters=None, training_history=None, strict_content_check=False):
+    def __init__(self, strict_content_check=False, **kwargs):
         """
 
         Args:
-            y_true (numpy.array or list):
-            y_predicted (numpy.array or list):
-            hyperparameters (dict):
-            training_history (AIToolbox.ExperimentSave.training_history.AbstractTrainingHistory):
             strict_content_check (bool):
+            **kwargs (dict):
         """
-        AbstractResultPackage.__init__(self, y_true, y_predicted, hyperparameters, training_history, strict_content_check)
+        AbstractResultPackage.__init__(self, strict_content_check, **kwargs)
 
     def prepare_results_dict(self):
         """
@@ -29,7 +26,7 @@ class QuestionAnswerSpanClassificationResultPackage(AbstractResultPackage):
     def __init__(self,
                  y_span_start_true, y_span_start_predicted,
                  y_span_end_true, y_span_end_predicted,
-                 hyperparameters=None, training_history=None, strict_content_check=False):
+                 strict_content_check=False, **kwargs):
         """
 
         Args:
@@ -37,9 +34,8 @@ class QuestionAnswerSpanClassificationResultPackage(AbstractResultPackage):
             y_span_start_predicted (numpy.array or list):
             y_span_end_true (numpy.array or list):
             y_span_end_predicted (numpy.array or list):
-            hyperparameters (dict):
-            training_history (AIToolbox.ExperimentSave.training_history.AbstractTrainingHistory):
             strict_content_check (bool):
+            **kwargs (dict):
         """
         self.y_span_start_true = y_span_start_true
         self.y_span_end_true = y_span_end_true
@@ -47,7 +43,7 @@ class QuestionAnswerSpanClassificationResultPackage(AbstractResultPackage):
         self.y_span_start_predicted = y_span_start_predicted
         self.y_span_end_predicted = y_span_end_predicted
 
-        AbstractResultPackage.__init__(self, None, None, hyperparameters, training_history, strict_content_check)
+        AbstractResultPackage.__init__(self, strict_content_check, **kwargs)
 
     def prepare_results_dict(self):
         """
@@ -67,17 +63,14 @@ class QuestionAnswerSpanClassificationResultPackage(AbstractResultPackage):
 
 
 class TextSummarizationResultPackage(AbstractResultPackage):
-    def __init__(self, y_true, y_predicted, hyperparameters=None, training_history=None, strict_content_check=False):
+    def __init__(self, strict_content_check=False, **kwargs):
         """
 
         Args:
-            y_true (numpy.array or list):
-            y_predicted (numpy.array or list):
-            hyperparameters (dict):
-            training_history (AIToolbox.ExperimentSave.training_history.AbstractTrainingHistory):
             strict_content_check (bool):
+            **kwargs (dict):
         """
-        AbstractResultPackage.__init__(self, y_true, y_predicted, hyperparameters, training_history, strict_content_check)
+        AbstractResultPackage.__init__(self, strict_content_check, **kwargs)
 
     def prepare_results_dict(self):
         """
@@ -91,17 +84,14 @@ class TextSummarizationResultPackage(AbstractResultPackage):
 
 
 class MachineTranslationResultPackage(AbstractResultPackage):
-    def __init__(self, y_true, y_predicted, hyperparameters=None, training_history=None, strict_content_check=False):
+    def __init__(self, strict_content_check=False, **kwargs):
         """
 
         Args:
-            y_true (numpy.array or list):
-            y_predicted (numpy.array or list):
-            hyperparameters (dict):
-            training_history (AIToolbox.ExperimentSave.training_history.AbstractTrainingHistory):
             strict_content_check (bool):
+            **kwargs (dict):
         """
-        AbstractResultPackage.__init__(self, y_true, y_predicted, hyperparameters, training_history, strict_content_check)
+        AbstractResultPackage.__init__(self, strict_content_check, **kwargs)
 
     def prepare_results_dict(self):
         """

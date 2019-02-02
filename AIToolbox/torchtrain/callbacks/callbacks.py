@@ -153,14 +153,22 @@ class ModelCheckpointCallback(AbstractCallback):
 
 class ModelTrainEndSaveCallback(AbstractCallback):
     def __init__(self, project_name, experiment_name, local_model_result_folder_path,
-                 args, result_package_class):
+                 args, result_package):
+        """
 
+        Args:
+            project_name (str):
+            experiment_name (str):
+            local_model_result_folder_path (str):
+            args (dict):
+            result_package (AIToolbox.experiment_save.result_package.AbstractResultPackage):
+        """
         AbstractCallback.__init__(self, 'Model save at the end of training')
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = local_model_result_folder_path
         self.args = args
-        self.result_package_class = result_package_class
+        self.result_package = result_package
 
         self.results_saver = FullPyTorchExperimentS3Saver(self.project_name, self.experiment_name,
                                                           local_model_result_folder_path=self.local_model_result_folder_path)
@@ -180,10 +188,12 @@ class ModelTrainEndSaveCallback(AbstractCallback):
 
         y_test, y_pred = train_loop_obj.predict_on_validation_set()
 
-        result_pkg = self.result_package_class(y_test, y_pred,
-                                               hyperparameters=self.args, training_history=train_hist_pkg)
+        # result_pkg = self.result_package_class(y_test, y_pred,
+        #                                        hyperparameters=self.args, training_history=train_hist_pkg)
+        self.result_package.prepare_result_package(y_test, y_pred,
+                                                   hyperparameters=self.args, training_history=train_hist_pkg)
 
-        self.results_saver.save_experiment(train_loop_obj.model, result_pkg,
+        self.results_saver.save_experiment(train_loop_obj.model, self.result_package,
                                            experiment_timestamp=train_loop_obj.experiment_timestamp,
                                            save_true_pred_labels=True)
 
