@@ -201,4 +201,3 @@ class ModelTrainEndSaveCallback(AbstractCallback):
         self.results_saver.save_experiment(self.train_loop_obj.model, self.result_package,
                                            experiment_timestamp=self.train_loop_obj.experiment_timestamp,
                                            save_true_pred_labels=True)
-
