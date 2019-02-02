@@ -1,4 +1,5 @@
 from pyrouge import Rouge155
+from rouge import Rouge
 from nltk.translate.bleu_score import sentence_bleu, corpus_bleu
 from torchnlp.metrics import bleu
 
@@ -27,12 +28,36 @@ class ROGUEMetric(AbstractBaseMetric):
         raise NotImplementedError
 
 
+class ROGUENonOfficialMetric(AbstractBaseMetric):
+    def __init__(self, y_true, y_predicted):
+        """
+
+        From this package:
+            https://github.com/pltrdy/rouge
+
+
+        Args:
+            y_true (list):
+            y_predicted (list):
+        """
+        AbstractBaseMetric.__init__(self, y_true, y_predicted)
+        self.metric_name = 'ROGUE_nonOfficial'
+
+    def calculate_metric(self):
+        rouge_calc = Rouge()
+        hypothesis = self.y_predicted
+        reference = self.y_true
+        self.metric_result = rouge_calc.get_scores(hypothesis, reference, avg=True)
+
+
 class BLEUSentenceScoreMetric(AbstractBaseMetric):
     def __init__(self, y_true, y_predicted):
         """
 
         NLTK provides the sentence_bleu() function for evaluating a candidate sentence
         against one or more reference sentences.
+
+        https://machinelearningmastery.com/calculate-bleu-score-for-text-python/
 
         The reference sentences must be provided as a list of sentences where each reference is a list of tokens.
         The candidate sentence is provided as a list of tokens. For example:
@@ -56,7 +81,10 @@ class BLEUCorpusScoreMetric(AbstractBaseMetric):
     def __init__(self, y_true, y_predicted):
         """
 
-        Function called corpus_bleu() for calculating the BLEU score for multiple sentences such as a paragraph or a document.
+        Function called corpus_bleu() for calculating the BLEU score for multiple sentences such as a paragraph or
+        a document.
+
+        https://machinelearningmastery.com/calculate-bleu-score-for-text-python/
 
         The references must be specified as a list of documents where each document is a list of references and each
         alternative reference is a list of tokens, e.g. a list of lists of lists of tokens. The candidate documents must
