@@ -40,6 +40,39 @@ class QASpanSQuADModelFeedDefinition(AbstractModelFeedDefinition):
         return loss
 
     def get_predictions(self, model, batch_data, device):
+        paragraph_batch, paragraph_lengths, question_batch, question_lengths, span = batch_data
+
+        paragraph_batch = paragraph_batch.to(device)
+        paragraph_lengths = paragraph_lengths.to(device)
+        question_batch = question_batch.to(device)
+        question_lengths = question_lengths.to(device)
+
+        output_start_span, output_end_span = model(paragraph_batch, question_batch, paragraph_lengths, question_lengths)
+
+        y_test = span
+        y_pred = [output_start_span, output_end_span]
+        return y_test, y_pred
+
+
+class MachineTranslationFeedDefinition(AbstractModelFeedDefinition):
+    def get_loss(self, model, batch_data, criterion, device):
         raise NotImplementedError
 
-        return y_test, y_pred
+    def get_predictions(self, model, batch_data, device):
+        raise NotImplementedError
+
+
+class TextClassificationFeedDefinition(AbstractModelFeedDefinition):
+    def get_loss(self, model, batch_data, criterion, device):
+        raise NotImplementedError
+
+    def get_predictions(self, model, batch_data, device):
+        raise NotImplementedError
+
+
+class ImageClassificationFeedDefinition(AbstractModelFeedDefinition):
+    def get_loss(self, model, batch_data, criterion, device):
+        raise NotImplementedError
+
+    def get_predictions(self, model, batch_data, device):
+        raise NotImplementedError
