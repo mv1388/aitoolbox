@@ -1,3 +1,4 @@
+import os
 from pyrouge import Rouge155
 from rouge import Rouge
 from nltk.translate.bleu_score import sentence_bleu, corpus_bleu
@@ -8,7 +9,7 @@ from AIToolbox.experiment_save.core_metrics.base_metric import AbstractBaseMetri
 
 
 class ROGUEMetric(AbstractBaseMetric):
-    def __init__(self, y_true, y_predicted):
+    def __init__(self, y_true, y_predicted, output_text_dir):
         """
 
         Use this package:
@@ -17,14 +18,51 @@ class ROGUEMetric(AbstractBaseMetric):
 
 
         Args:
-            y_true (numpy.array or list):
-            y_predicted (numpy.array or list):
+            y_true (numpy.array or list): gold standard summaries are ‘model’ summaries
+            y_predicted (numpy.array or list): your summaries are ‘system’ summaries
         """
+        self.output_text_dir = output_text_dir
         AbstractBaseMetric.__init__(self, y_true, y_predicted)
         self.metric_name = 'ROGUE'
 
     def calculate_metric(self):
-        raise NotImplementedError
+        self.dump_answer_text_to_disk(self.y_true, self.y_predicted, self.output_text_dir)
+
+        rouge = Rouge155()
+        # In ROUGE, your summaries are ‘system’ summaries and the gold standard summaries are ‘model’ summaries.
+        rouge.system_dir = os.path.join(self.output_text_dir, 'pred_answer')
+        rouge.model_dir = os.path.join(self.output_text_dir, 'true_answer')
+        rouge.system_filename_pattern = 'pred_answer_text.(\d+).txt'
+        rouge.model_filename_pattern = 'true_answer_text.#ID#.txt'
+
+        rouge_output = rouge.convert_and_evaluate()
+        output_dict = rouge.output_to_dict(rouge_output)
+        
+        self.metric_result = output_dict
+
+    def dump_answer_text_to_disk(self, true_text, pred_text, output_text_dir):
+        """
+
+        Args:
+            true_text:
+            pred_text:
+            output_text_dir:
+
+        Returns:
+
+        """
+        if not os.path.exists(output_text_dir):
+            os.mkdir(output_text_dir)
+            os.mkdir(os.path.join(output_text_dir, 'true_answer'))
+            os.mkdir(os.path.join(output_text_dir, 'pred_answer'))
+
+        for i, text in enumerate(true_text):
+            with open(os.path.join(output_text_dir, f'true_answer/true_answer_text.{i}.txt'), 'w') as f:
+                f.write(text)
+
+        for i, text in enumerate(pred_text):
+            with open(os.path.join(output_text_dir, f'pred_answer/pred_answer_text.{i}.txt'), 'w') as f:
+                f.write(text)
 
 
 class ROGUENonOfficialMetric(AbstractBaseMetric):

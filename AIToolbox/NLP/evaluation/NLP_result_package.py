@@ -5,15 +5,17 @@ from AIToolbox.NLP.evaluation.NLP_metrics import ROGUEMetric, ROGUENonOfficialMe
 
 
 class QuestionAnswerResultPackage(AbstractResultPackage):
-    def __init__(self, paragraph_text_tokens, strict_content_check=False, **kwargs):
+    def __init__(self, paragraph_text_tokens, output_text_dir, strict_content_check=False, **kwargs):
         """
 
         Args:
             paragraph_text_tokens (list):
+            output_text_dir (str):
             strict_content_check (bool):
             **kwargs (dict):
         """
         self.paragraph_text_tokens = paragraph_text_tokens
+        self.output_text_dir = output_text_dir
         AbstractResultPackage.__init__(self, strict_content_check, **kwargs)
 
     def prepare_results_dict(self):
@@ -37,11 +39,10 @@ class QuestionAnswerResultPackage(AbstractResultPackage):
                      for start_span, end_span, paragraph_tex in
                      zip(y_span_start_predicted, y_span_end_predicted, self.paragraph_text_tokens)]
 
-        rogue_metric = ROGUENonOfficialMetric(true_text, pred_text)
+        rogue_metric_non_official = ROGUENonOfficialMetric(true_text, pred_text)
+        rogue_metric = ROGUEMetric(true_text, pred_text, self.output_text_dir)
 
-        # TODO: implement ROGUEMetric where the official ROGUE calculation script is used
-
-        self.results_dict = rogue_metric
+        self.results_dict = {**rogue_metric_non_official, **rogue_metric}
 
 
 class QuestionAnswerSpanClassificationResultPackage(AbstractResultPackage):
