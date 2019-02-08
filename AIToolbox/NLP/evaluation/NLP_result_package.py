@@ -75,13 +75,15 @@ class QuestionAnswerSpanClassificationResultPackage(AbstractResultPackage):
 
         """
 
-        raise NotImplementedError
+        # raise NotImplementedError
 
 
         y_span_start_true = self.y_true[:, 0]
-        y_span_start_predicted = [el[0] for el in self.y_predicted]
+        # y_span_start_predicted = [el[0] for el in self.y_predicted]
+        y_span_start_predicted = self.y_predicted[:, 0]
         y_span_end_true = self.y_true[:, 1]
-        y_span_end_predicted = [el[1] for el in self.y_predicted]
+        # y_span_end_predicted = [el[1] for el in self.y_predicted]
+        y_span_end_predicted = self.y_predicted[:, 1]
 
         # span_start_accuracy = AccuracyMetric(self.y_span_start_true, self.y_span_start_predicted)
         # span_start_accuracy.metric_name += '_span_start'

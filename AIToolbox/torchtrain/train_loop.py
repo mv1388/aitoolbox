@@ -161,6 +161,9 @@ class TrainLoop:
                 y_test.append(y_test_batch)
                 y_pred.append(y_pred_batch)
 
+            y_test = torch.cat(y_test)
+            y_pred = torch.cat(y_pred)
+
         self.model.train()
 
         return y_test, y_pred

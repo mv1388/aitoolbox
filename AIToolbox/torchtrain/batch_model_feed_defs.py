@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+import torch
 
 
 """
@@ -49,8 +50,11 @@ class QASpanSQuADModelFeedDefinition(AbstractModelFeedDefinition):
 
         output_start_span, output_end_span = model(paragraph_batch, question_batch, paragraph_lengths, question_lengths)
 
+        _, output_start_span_idx = output_start_span.max(1)
+        _, output_end_span_idx = output_end_span.max(1)
+
         y_test = span
-        y_pred = [output_start_span, output_end_span]
+        y_pred = torch.stack((output_start_span_idx, output_end_span_idx), 1)
         return y_test, y_pred
 
 
