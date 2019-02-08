@@ -4,7 +4,6 @@ from rouge import Rouge
 from nltk.translate.bleu_score import sentence_bleu, corpus_bleu
 from torchnlp.metrics import bleu
 
-
 from AIToolbox.experiment_save.core_metrics.base_metric import AbstractBaseMetric
 
 
@@ -20,6 +19,7 @@ class ROGUEMetric(AbstractBaseMetric):
         Args:
             y_true (numpy.array or list): gold standard summaries are ‘model’ summaries
             y_predicted (numpy.array or list): your summaries are ‘system’ summaries
+            output_text_dir (str):
         """
         self.output_text_dir = output_text_dir
         AbstractBaseMetric.__init__(self, y_true, y_predicted)
@@ -39,14 +39,15 @@ class ROGUEMetric(AbstractBaseMetric):
         output_dict = rouge.output_to_dict(rouge_output)
         
         self.metric_result = output_dict
-
-    def dump_answer_text_to_disk(self, true_text, pred_text, output_text_dir):
+    
+    @staticmethod
+    def dump_answer_text_to_disk(true_text, pred_text, output_text_dir):
         """
 
         Args:
-            true_text:
-            pred_text:
-            output_text_dir:
+            true_text (list):
+            pred_text (list):
+            output_text_dir (str):
 
         Returns:
 

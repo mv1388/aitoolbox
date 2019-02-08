@@ -24,7 +24,7 @@ class QuestionAnswerResultPackage(AbstractResultPackage):
         Returns:
 
         """
-        # raise NotImplementedError
+        raise NotImplementedError
 
         y_span_start_true = self.y_true[:, 0]
         y_span_start_predicted = [el[0] for el in self.y_predicted]
@@ -39,10 +39,10 @@ class QuestionAnswerResultPackage(AbstractResultPackage):
                      for start_span, end_span, paragraph_tex in
                      zip(y_span_start_predicted, y_span_end_predicted, self.paragraph_text_tokens)]
 
-        rogue_metric_non_official = ROGUENonOfficialMetric(true_text, pred_text)
         rogue_metric = ROGUEMetric(true_text, pred_text, self.output_text_dir)
+        rogue_metric_non_official = ROGUENonOfficialMetric(true_text, pred_text)
 
-        self.results_dict = {**rogue_metric_non_official, **rogue_metric}
+        self.results_dict = {**rogue_metric, **rogue_metric_non_official}
 
 
 class QuestionAnswerSpanClassificationResultPackage(AbstractResultPackage):

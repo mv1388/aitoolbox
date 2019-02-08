@@ -27,24 +27,24 @@ class CallbacksHandler:
 
     def execute_epoch_begin(self):
         for callback in self.train_loop_obj.callbacks:
-            callback.on_epoch_begin(self.train_loop_obj)
+            callback.on_epoch_begin()
 
     def execute_epoch_end(self):
         for callback in self.train_loop_obj.callbacks:
-            callback.on_epoch_end(self.train_loop_obj)
+            callback.on_epoch_end()
 
     def execute_train_begin(self):
         for callback in self.train_loop_obj.callbacks:
-            callback.on_train_begin(self.train_loop_obj)
+            callback.on_train_begin()
 
     def execute_train_end(self):
         for callback in self.train_loop_obj.callbacks:
-            callback.on_train_end(self.train_loop_obj)
+            callback.on_train_end()
 
     def execute_batch_begin(self):
         for callback in self.train_loop_obj.callbacks:
-            callback.on_batch_begin(self.train_loop_obj)
+            callback.on_batch_begin()
 
     def execute_batch_end(self):
         for callback in self.train_loop_obj.callbacks:
-            callback.on_batch_end(self.train_loop_obj)
+            callback.on_batch_end()
