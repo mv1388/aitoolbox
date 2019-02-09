@@ -14,7 +14,8 @@ class QuestionAnswerResultPackage(AbstractResultPackage):
             strict_content_check (bool):
             **kwargs (dict):
         """
-        self.paragraph_text_tokens = paragraph_text_tokens
+        # self.paragraph_text_tokens = paragraph_text_tokens
+        self.paragraph_text_tokens = [[str(w) for w in paragraph] for paragraph in paragraph_text_tokens]
         self.output_text_dir = output_text_dir
         AbstractResultPackage.__init__(self, strict_content_check, **kwargs)
 
@@ -24,25 +25,30 @@ class QuestionAnswerResultPackage(AbstractResultPackage):
         Returns:
 
         """
-        raise NotImplementedError
-
         y_span_start_true = self.y_true[:, 0]
-        y_span_start_predicted = [el[0] for el in self.y_predicted]
+        y_span_start_predicted = self.y_predicted[:, 0]
         y_span_end_true = self.y_true[:, 1]
-        y_span_end_predicted = [el[1] for el in self.y_predicted]
+        y_span_end_predicted = self.y_predicted[:, 1]
 
-        true_text = [paragraph_tex[start_span:end_span + 1]
-                     for start_span, end_span, paragraph_tex in
-                     zip(y_span_start_true, y_span_end_true, self.paragraph_text_tokens)]
+        true_text = [paragraph_text[start_span:end_span + 1]
+                     for start_span, end_span, paragraph_text in
+                     zip(y_span_start_true.astype('int'), y_span_end_true.astype('int'), self.paragraph_text_tokens)]
 
-        pred_text = [paragraph_tex[start_span:end_span + 1]
-                     for start_span, end_span, paragraph_tex in
-                     zip(y_span_start_predicted, y_span_end_predicted, self.paragraph_text_tokens)]
+        # pred_text = [paragraph_text[start_span:end_span + 1]
+        #              for start_span, end_span, paragraph_text in
+        #              zip(y_span_start_predicted.astype('int'), y_span_end_predicted.astype('int'), self.paragraph_text_tokens)]
+
+        # TODO: Just for testing
+
+        pred_text = [paragraph_text[start_span:end_span + 1]
+                     for start_span, end_span, paragraph_text in
+                     zip(y_span_start_true.astype('int'), y_span_end_true.astype('int'), self.paragraph_text_tokens)]
 
         rogue_metric = ROGUEMetric(true_text, pred_text, self.output_text_dir)
-        rogue_metric_non_official = ROGUENonOfficialMetric(true_text, pred_text)
+        # rogue_metric_non_official = ROGUENonOfficialMetric(true_text, pred_text)
+        # self.results_dict = {**rogue_metric, **rogue_metric_non_official}
 
-        self.results_dict = {**rogue_metric, **rogue_metric_non_official}
+        self.results_dict = rogue_metric.get_metric_dict()
 
 
 class QuestionAnswerSpanClassificationResultPackage(AbstractResultPackage):
@@ -53,10 +59,6 @@ class QuestionAnswerSpanClassificationResultPackage(AbstractResultPackage):
             strict_content_check (bool):
             **kwargs (dict):
         """
-        # self.y_span_start_true = y_span_start_true
-        # self.y_span_end_true = y_span_end_true
-        # self.y_span_start_predicted = y_span_start_predicted
-        # self.y_span_end_predicted = y_span_end_predicted
         AbstractResultPackage.__init__(self, strict_content_check, **kwargs)
 
     def prepare_results_dict(self):
@@ -74,21 +76,10 @@ class QuestionAnswerSpanClassificationResultPackage(AbstractResultPackage):
         Returns:
 
         """
-
-        # raise NotImplementedError
-
-
         y_span_start_true = self.y_true[:, 0]
-        # y_span_start_predicted = [el[0] for el in self.y_predicted]
         y_span_start_predicted = self.y_predicted[:, 0]
         y_span_end_true = self.y_true[:, 1]
-        # y_span_end_predicted = [el[1] for el in self.y_predicted]
         y_span_end_predicted = self.y_predicted[:, 1]
-
-        # span_start_accuracy = AccuracyMetric(self.y_span_start_true, self.y_span_start_predicted)
-        # span_start_accuracy.metric_name += '_span_start'
-        # span_end_accuracy = AccuracyMetric(self.y_span_end_true, self.y_span_end_predicted)
-        # span_end_accuracy.metric_name += '_span_end'
 
         span_start_accuracy = AccuracyMetric(y_span_start_true, y_span_start_predicted)
         span_start_accuracy.metric_name += '_span_start'

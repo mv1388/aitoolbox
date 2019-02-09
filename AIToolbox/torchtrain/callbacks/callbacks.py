@@ -161,7 +161,7 @@ class ModelCheckpointCallback(AbstractCallback):
 
 class ModelTrainEndSaveCallback(AbstractCallback):
     def __init__(self, project_name, experiment_name, local_model_result_folder_path,
-                     args, result_package):
+                 args, result_package):
         """
 
         Args:
@@ -232,3 +232,9 @@ class ModelPerformancePrintCallback(AbstractCallback):
     def on_epoch_end(self):
         if self.on_each_epoch:
             self.on_train_end()
+
+            metric_name = f'val_{self.callback_name}'
+            if metric_name not in self.train_loop_obj.train_history:
+                self.train_loop_obj.train_history[metric_name] = []
+
+            self.train_loop_obj.train_history[metric_name].append(self.result_package.get_results())

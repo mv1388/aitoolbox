@@ -1,4 +1,5 @@
 import os
+import shutil
 from pyrouge import Rouge155
 from rouge import Rouge
 from nltk.translate.bleu_score import sentence_bleu, corpus_bleu
@@ -39,7 +40,7 @@ class ROGUEMetric(AbstractBaseMetric):
         output_dict = rouge.output_to_dict(rouge_output)
         
         self.metric_result = output_dict
-    
+
     @staticmethod
     def dump_answer_text_to_disk(true_text, pred_text, output_text_dir):
         """
@@ -52,18 +53,20 @@ class ROGUEMetric(AbstractBaseMetric):
         Returns:
 
         """
-        if not os.path.exists(output_text_dir):
-            os.mkdir(output_text_dir)
-            os.mkdir(os.path.join(output_text_dir, 'true_answer'))
-            os.mkdir(os.path.join(output_text_dir, 'pred_answer'))
+        if os.path.exists(output_text_dir):
+            shutil.rmtree(output_text_dir)
+
+        os.mkdir(output_text_dir)
+        os.mkdir(os.path.join(output_text_dir, 'true_answer'))
+        os.mkdir(os.path.join(output_text_dir, 'pred_answer'))
 
         for i, text in enumerate(true_text):
             with open(os.path.join(output_text_dir, f'true_answer/true_answer_text.{i}.txt'), 'w') as f:
-                f.write(text)
+                f.write(' '.join(text))
 
         for i, text in enumerate(pred_text):
             with open(os.path.join(output_text_dir, f'pred_answer/pred_answer_text.{i}.txt'), 'w') as f:
-                f.write(text)
+                f.write(' '.join(text))
 
 
 class ROGUENonOfficialMetric(AbstractBaseMetric):
