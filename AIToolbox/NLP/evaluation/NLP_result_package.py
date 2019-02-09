@@ -34,15 +34,14 @@ class QuestionAnswerResultPackage(AbstractResultPackage):
                      for start_span, end_span, paragraph_text in
                      zip(y_span_start_true.astype('int'), y_span_end_true.astype('int'), self.paragraph_text_tokens)]
 
-        # pred_text = [paragraph_text[start_span:end_span + 1]
-        #              for start_span, end_span, paragraph_text in
-        #              zip(y_span_start_predicted.astype('int'), y_span_end_predicted.astype('int'), self.paragraph_text_tokens)]
-
-        # TODO: Just for testing
-
         pred_text = [paragraph_text[start_span:end_span + 1]
                      for start_span, end_span, paragraph_text in
-                     zip(y_span_start_true.astype('int'), y_span_end_true.astype('int'), self.paragraph_text_tokens)]
+                     zip(y_span_start_predicted.astype('int'), y_span_end_predicted.astype('int'), self.paragraph_text_tokens)]
+
+        # Just for testing
+        # pred_text = [paragraph_text[start_span:end_span + 2]
+        #              for start_span, end_span, paragraph_text in
+        #              zip(y_span_start_true.astype('int'), y_span_end_true.astype('int'), self.paragraph_text_tokens)]
 
         rogue_metric = ROGUEMetric(true_text, pred_text, self.output_text_dir)
         # rogue_metric_non_official = ROGUENonOfficialMetric(true_text, pred_text)

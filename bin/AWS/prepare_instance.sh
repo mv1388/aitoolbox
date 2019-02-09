@@ -52,6 +52,9 @@ scp -i $key_path ../../dist/AIToolbox-$AIToolbox_version.tar.gz  ec2-user@$ec2_i
 scp -i $key_path download_data.sh  ec2-user@$ec2_instance_address:~/project
 scp -i $key_path run_experiment.sh  ec2-user@$ec2_instance_address:~/project
 
+scp -i $key_path ../pyrouge_set_rouge_path ec2-user@$ec2_instance_address:~/project
+scp -i $key_path -r ../ROUGE-1.5.5 ec2-user@$ec2_instance_address:~/project
+
 echo "#!/usr/bin/env bash
 
 sudo -H pip install awscli --upgrade
@@ -64,6 +67,8 @@ cd project
 source activate $py_env
 
 pip install AIToolbox-$AIToolbox_version.tar.gz
+
+./pyrouge_set_rouge_path ~/project/ROUGE-1.5.5
 
 if [ $dataset_name != '' ]; then
     ./download_data.sh ~/project/data $dataset_name $preproc_dataset
