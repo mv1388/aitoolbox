@@ -161,7 +161,7 @@ class ModelCheckpointCallback(AbstractCallback):
 
 class ModelTrainEndSaveCallback(AbstractCallback):
     def __init__(self, project_name, experiment_name, local_model_result_folder_path,
-                 args, result_package_class):
+                 args, result_package):
         """
 
         Args:
@@ -169,14 +169,14 @@ class ModelTrainEndSaveCallback(AbstractCallback):
             experiment_name (str):
             local_model_result_folder_path (str):
             args (dict):
-            result_package_class:
+            result_package (AIToolbox.experiment_save.result_package.AbstractResultPackage):
         """
         AbstractCallback.__init__(self, 'Model save at the end of training')
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = local_model_result_folder_path
         self.args = args
-        self.result_package_class = result_package_class
+        self.result_package = result_package
 
         self.results_saver = FullPyTorchExperimentS3Saver(self.project_name, self.experiment_name,
                                                           local_model_result_folder_path=self.local_model_result_folder_path)
@@ -193,10 +193,48 @@ class ModelTrainEndSaveCallback(AbstractCallback):
 
         y_test, y_pred = self.train_loop_obj.predict_on_validation_set()
 
-        result_pkg = self.result_package_class(y_test, y_pred,
-                                               hyperparameters=self.args, training_history=train_hist_pkg)
+        # result_pkg = self.result_package_class(y_test, y_pred,
+        #                                        hyperparameters=self.args, training_history=train_hist_pkg)
+        self.result_package.prepare_result_package(y_test, y_pred,
+                                                   hyperparameters=self.args, training_history=train_hist_pkg)
 
-        self.results_saver.save_experiment(self.train_loop_obj.model, result_pkg,
+        self.results_saver.save_experiment(self.train_loop_obj.model, self.result_package,
                                            experiment_timestamp=self.train_loop_obj.experiment_timestamp,
                                            save_true_pred_labels=True)
 
+
+class ModelPerformancePrintCallback(AbstractCallback):
+    def __init__(self, result_package, args, on_each_epoch=True):
+        """
+
+        Args:
+            result_package (AIToolbox.experiment_save.result_package.AbstractResultPackage):
+            args (dict):
+            on_each_epoch (bool):
+        """
+        AbstractCallback.__init__(self, 'Model checkpoint at end of epoch')
+        self.result_package = result_package
+        self.args = args
+        self.on_each_epoch = on_each_epoch
+
+    def on_train_end(self):
+        # TODO: maybe remove these 3 lines to save compute time and don't generate the train history which is not needed
+        train_history = self.train_loop_obj.train_history
+        epoch_list = list(range(len(self.train_loop_obj.train_history[list(self.train_loop_obj.train_history.keys())[0]])))
+        train_hist_pkg = PyTorchTrainingHistory(train_history, epoch_list)
+
+        y_test, y_pred = self.train_loop_obj.predict_on_validation_set()
+        self.result_package.prepare_result_package(y_test, y_pred,
+                                                   hyperparameters=self.args, training_history=train_hist_pkg)
+
+        print(self.result_package.get_results())
+
+    def on_epoch_end(self):
+        if self.on_each_epoch:
+            self.on_train_end()
+
+            # metric_name = f'val_{self.callback_name}'
+            # if metric_name not in self.train_loop_obj.train_history:
+            #     self.train_loop_obj.train_history[metric_name] = []
+            #
+            # self.train_loop_obj.train_history[metric_name].append(self.result_package.get_results())
