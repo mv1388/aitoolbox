@@ -52,6 +52,7 @@ scp -i $key_path ../../dist/AIToolbox-$AIToolbox_version.tar.gz  ec2-user@$ec2_i
 scp -i $key_path download_data.sh  ec2-user@$ec2_instance_address:~/project
 scp -i $key_path run_experiment.sh  ec2-user@$ec2_instance_address:~/project
 
+# Stuff for pyrouge package
 scp -i $key_path ../pyrouge_set_rouge_path ec2-user@$ec2_instance_address:~/project
 scp -i $key_path -r ../ROUGE-1.5.5 ec2-user@$ec2_instance_address:~/project
 

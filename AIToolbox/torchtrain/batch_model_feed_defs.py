@@ -55,7 +55,7 @@ class QASpanSQuADModelFeedDefinition(AbstractModelFeedDefinition):
 
         y_test = span
         y_pred = torch.stack((output_start_span_idx, output_end_span_idx), 1)
-        return y_test, y_pred
+        return y_test.cpu(), y_pred.cpu()
 
 
 class MachineTranslationFeedDefinition(AbstractModelFeedDefinition):

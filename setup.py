@@ -31,7 +31,7 @@ setup(name='AIToolbox',
                         'allennlp',
                         'torch',
                         'torchvision',
-                        'torchnlp',
+                        'pytorch-nlp',
                         'pyrouge',
                         'rouge'],
 

@@ -146,6 +146,7 @@ class TrainLoop:
         """
 
         Returns:
+            (torch.Tensor, torch.Tensor):
 
         """
         y_test, y_pred = [], []

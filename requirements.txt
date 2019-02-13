@@ -15,3 +15,6 @@ scikit-learn
 allennlp
 torch
 torchvision
+pytorch-nlp
+pyrouge
+rouge

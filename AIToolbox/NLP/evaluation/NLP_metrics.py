@@ -66,7 +66,7 @@ class ROGUEMetric(AbstractBaseMetric):
 
         for i, text in enumerate(pred_text):
             with open(os.path.join(output_text_dir, f'pred_answer/pred_answer_text.{i}.txt'), 'w') as f:
-                f.write(' '.join(text))
+                f.write(' '.join(text) if len(text) > 0 else ' ')
 
 
 class ROGUENonOfficialMetric(AbstractBaseMetric):
