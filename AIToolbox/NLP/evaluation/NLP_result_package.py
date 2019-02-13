@@ -1,3 +1,5 @@
+import os
+
 from AIToolbox.experiment_save.result_package import AbstractResultPackage
 from AIToolbox.experiment_save.core_metrics.classification import AccuracyMetric
 from AIToolbox.NLP.evaluation.NLP_metrics import ROGUEMetric, ROGUENonOfficialMetric, \
@@ -16,7 +18,7 @@ class QuestionAnswerResultPackage(AbstractResultPackage):
         """
         # self.paragraph_text_tokens = paragraph_text_tokens
         self.paragraph_text_tokens = [[str(w) for w in paragraph] for paragraph in paragraph_text_tokens]
-        self.output_text_dir = output_text_dir
+        self.output_text_dir = os.path.expanduser(output_text_dir)
         AbstractResultPackage.__init__(self, strict_content_check, **kwargs)
 
     def prepare_results_dict(self):
