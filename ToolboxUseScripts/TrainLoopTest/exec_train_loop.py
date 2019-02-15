@@ -30,9 +30,6 @@ class Net(nn.Module):
 
 
 class MNISTModelFeedDefinition(AbstractModelFeedDefinition):
-    # def __init__(self):
-    #     self.feed_type = ''
-
     def get_loss(self, model, batch_data, criterion, device):
         data, target = batch_data
         data, target = data.to(device), target.to(device)
