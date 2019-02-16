@@ -42,22 +42,6 @@ class AbstractCallback:
         pass
 
 
-class DummyCallback(AbstractCallback):
-    def __init__(self):
-        AbstractCallback.__init__(self, 'DummyCallback')
-
-    def on_epoch_end(self):
-        """
-
-        Returns:
-
-        """
-        if self.callback_name not in self.train_loop_obj.train_history:
-            self.train_loop_obj.train_history[self.callback_name] = []
-
-        self.train_loop_obj.train_history[self.callback_name].append(1000)
-
-
 class EarlyStoppingCallback(AbstractCallback):
     def __init__(self, monitor='val_loss', min_delta=0., patience=0):
         """
@@ -205,7 +189,7 @@ class ModelTrainEndSaveCallback(AbstractCallback):
                                            save_true_pred_labels=True)
 
 
-class ModelPerformancePrintCallback(AbstractCallback):
+class ModelPerformanceEvaluationCallback(AbstractCallback):
     def __init__(self, result_package, args,
                  on_each_epoch=True, on_train_data=False, on_val_data=True):
         """
@@ -217,7 +201,7 @@ class ModelPerformancePrintCallback(AbstractCallback):
             on_train_data (bool):
             on_val_data (bool):
         """
-        AbstractCallback.__init__(self, 'Model checkpoint at end of epoch')
+        AbstractCallback.__init__(self, 'Model performance calculator - evaluator')
         self.result_package = result_package
         self.args = args
         self.on_each_epoch = on_each_epoch
@@ -231,26 +215,11 @@ class ModelPerformancePrintCallback(AbstractCallback):
             self.train_result_package = copy.deepcopy(result_package)
 
     def on_train_end(self):
-        # TODO: maybe remove these 3 lines to save compute time and don't generate the train history which is not needed
-        train_history = self.train_loop_obj.train_history
-        epoch_list = list(range(len(self.train_loop_obj.train_history[list(self.train_loop_obj.train_history.keys())[0]])))
-        train_hist_pkg = PyTorchTrainingHistory(train_history, epoch_list)
-
-        if self.on_train_data:
-            y_test, y_pred = self.train_loop_obj.predict_on_train_set()
-            self.train_result_package.prepare_result_package(y_test, y_pred,
-                                                             hyperparameters=self.args, training_history=train_hist_pkg)
-            print(f'TRAIN: {self.train_result_package.get_results()}')
-
-        if self.on_val_data:
-            y_test, y_pred = self.train_loop_obj.predict_on_validation_set()
-            self.result_package.prepare_result_package(y_test, y_pred,
-                                                       hyperparameters=self.args, training_history=train_hist_pkg)
-            print(f'VAL: {self.result_package.get_results()}')
+        self.evaluate_model_performance()
 
     def on_epoch_end(self):
         if self.on_each_epoch:
-            self.on_train_end()
+            self.evaluate_model_performance()
 
             evaluated_metrics = self.result_package.get_results().keys() if self.on_val_data \
                 else self.train_result_package.get_results().keys()
@@ -267,3 +236,64 @@ class ModelPerformancePrintCallback(AbstractCallback):
                     if metric_name not in self.train_loop_obj.train_history:
                         self.train_loop_obj.train_history[metric_name] = []
                     self.train_loop_obj.train_history[metric_name].append(self.result_package.get_results()[m_name])
+
+    def evaluate_model_performance(self):
+        # TODO: maybe remove these 3 lines to save compute time and don't generate the train history which is not needed
+        train_history = self.train_loop_obj.train_history
+        epoch_list = list(
+            range(len(self.train_loop_obj.train_history[list(self.train_loop_obj.train_history.keys())[0]])))
+        train_hist_pkg = PyTorchTrainingHistory(train_history, epoch_list)
+
+        if self.on_train_data:
+            y_test, y_pred = self.train_loop_obj.predict_on_train_set()
+            self.train_result_package.prepare_result_package(y_test, y_pred,
+                                                             hyperparameters=self.args, training_history=train_hist_pkg)
+            print(f'TRAIN: {self.train_result_package.get_results()}')
+
+        if self.on_val_data:
+            y_test, y_pred = self.train_loop_obj.predict_on_validation_set()
+            self.result_package.prepare_result_package(y_test, y_pred,
+                                                       hyperparameters=self.args, training_history=train_hist_pkg)
+            print(f'VAL: {self.result_package.get_results()}')
+
+
+class ModelPerformancePrintReportCallback(AbstractCallback):
+    def __init__(self, metrics, on_each_epoch=True, strict_metric_reporting=False):
+        """
+
+        Args:
+            metrics (list): list of string metric names which should be presented in the printed report
+            on_each_epoch (bool):
+            strict_metric_reporting (bool): if False ignore missing metric in the TrainLoop.train_history, if True, in
+                case of missing metric throw and exception and thus interrupt the training loop
+        """
+        AbstractCallback.__init__(self, 'Model performance print reporter')
+        self.metrics = metrics
+        self.on_each_epoch = on_each_epoch
+        self.strict_metric_reporting = strict_metric_reporting
+
+        if len(metrics) == 0:
+            raise ValueError('metrics list is empty')
+
+    def on_train_end(self):
+        print('End of training performance report:')
+        self.print_performance_report()
+
+    def on_epoch_end(self):
+        if self.on_each_epoch:
+            print('End of epoch performance report:')
+            self.print_performance_report()
+
+    def print_performance_report(self):
+        for metric_name in self.metrics:
+            if metric_name not in self.train_loop_obj.train_history:
+                if self.strict_metric_reporting:
+                    raise ValueError(
+                        f'Metric {metric_name} expected for the report missing from TrainLoop.train_history. '
+                        f'Found only the following: {self.train_loop_obj.train_history.keys()}')
+                else:
+                    print(f'Metric {metric_name} expected for the report missing from TrainLoop.train_history. '
+                          f'Found only the following: {self.train_loop_obj.train_history.keys()}')
+
+            else:
+                print(f'{metric_name}: {self.train_loop_obj.train_history[metric_name][-1]}')

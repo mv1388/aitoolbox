@@ -8,7 +8,7 @@ from torchvision import datasets, transforms
 
 from AIToolbox.torchtrain.train_loop import TrainLoop
 from AIToolbox.torchtrain.batch_model_feed_defs import AbstractModelFeedDefinition
-from AIToolbox.torchtrain.callbacks.callbacks import ModelPerformancePrintCallback
+from AIToolbox.torchtrain.callbacks.callbacks import ModelPerformanceEvaluationCallback, ModelPerformancePrintReportCallback
 from AIToolbox.experiment_save.result_package import ClassificationResultPackage
 
 
@@ -98,8 +98,9 @@ model = Net()
 optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
 criterion = F.nll_loss
 
-callbacks = [ModelPerformancePrintCallback(ClassificationResultPackage(), args.__dict__, 
-                                           on_train_data=True, on_val_data=True)]
+callbacks = [ModelPerformanceEvaluationCallback(ClassificationResultPackage(), args.__dict__, 
+                                                on_train_data=True, on_val_data=True),
+             ModelPerformancePrintReportCallback(['loss', 'val_Accuracy'])]
 
 TrainLoop(model,
           train_loader, test_loader,
