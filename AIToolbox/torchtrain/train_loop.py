@@ -118,44 +118,6 @@ class TrainLoop:
             print(f'VAL LOSS: {val_loss}')
             self.train_history['val_loss'].append(val_loss)
 
-    # def evaluate_loss_on_train_set(self):
-    #     """
-    #
-    #     Returns:
-    #         float:
-    #     """
-    #     self.model.eval()
-    #     train_loss_avg = []
-    #
-    #     with torch.no_grad():
-    #         for batch_data in tqdm(self.train_loader):
-    #             train_loss_batch = self.batch_model_feed_def.get_loss(self.model, batch_data, self.criterion, self.device)
-    #
-    #             train_loss_avg.append(train_loss_batch.item())
-    #
-    #     self.model.train()
-    #
-    #     return np.mean(train_loss_avg)
-    #
-    # def evaluate_loss_on_validation_set(self):
-    #     """
-    #
-    #     Returns:
-    #         float:
-    #     """
-    #     self.model.eval()
-    #     val_loss_avg = []
-    #
-    #     with torch.no_grad():
-    #         for batch_data in tqdm(self.validation_loader):
-    #             val_loss_batch = self.batch_model_feed_def.get_loss(self.model, batch_data, self.criterion, self.device)
-    #
-    #             val_loss_avg.append(val_loss_batch.item())
-    #
-    #     self.model.train()
-    #
-    #     return np.mean(val_loss_avg)
-
     def evaluate_loss_on_train_set(self):
         """
 
@@ -193,60 +155,6 @@ class TrainLoop:
         self.model.train()
 
         return np.mean(loss_avg)
-
-    # def predict_on_train_set(self):
-    #     """
-    #
-    #     Returns:
-    #         (torch.Tensor, torch.Tensor):
-    #
-    #     """
-    #     y_test, y_pred = [], []
-    #
-    #     self.model.eval()
-    #
-    #     with torch.no_grad():
-    #         for batch_data in tqdm(self.train_loader):
-    #             y_test_batch, y_pred_batch = self.batch_model_feed_def.get_predictions(self.model, batch_data, self.device)
-    #
-    #             # TODO: check if it is the best idea to append predictions to the list and not to some torch tensor
-    #             # TODO: also if append is the best option and not the concat
-    #             y_test.append(y_test_batch)
-    #             y_pred.append(y_pred_batch)
-    #
-    #         y_test = torch.cat(y_test)
-    #         y_pred = torch.cat(y_pred)
-    #
-    #     self.model.train()
-    #
-    #     return y_test, y_pred
-    #
-    # def predict_on_validation_set(self):
-    #     """
-    #
-    #     Returns:
-    #         (torch.Tensor, torch.Tensor):
-    #
-    #     """
-    #     y_test, y_pred = [], []
-    #
-    #     self.model.eval()
-    #
-    #     with torch.no_grad():
-    #         for batch_data in tqdm(self.validation_loader):
-    #             y_test_batch, y_pred_batch = self.batch_model_feed_def.get_predictions(self.model, batch_data, self.device)
-    #
-    #             # TODO: check if it is the best idea to append predictions to the list and not to some torch tensor
-    #             # TODO: also if append is the best option and not the concat
-    #             y_test.append(y_test_batch)
-    #             y_pred.append(y_pred_batch)
-    #
-    #         y_test = torch.cat(y_test)
-    #         y_pred = torch.cat(y_pred)
-    #
-    #     self.model.train()
-    #
-    #     return y_test, y_pred
 
     def predict_on_train_set(self):
         """
