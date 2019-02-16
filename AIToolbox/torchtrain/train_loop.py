@@ -34,10 +34,11 @@ class TrainLoop:
         self.device = torch.device("cuda" if USE_CUDA else "cpu")
 
         self.experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
-        self.loss_avg = []
+        self.loss_batch_accum = []
         self.epoch = 0
 
-        self.train_history = {'loss': [], 'val_loss': []} if self.validation_loader is not None else {'loss': []}
+        self.train_history = {'loss': [], 'accumulated_loss': [], 'val_loss': []} if self.validation_loader is not None \
+            else {'loss': [], 'accumulated_loss': []}
 
         self.callbacks_handler = CallbacksHandler(self)
         self.callbacks = []
@@ -73,6 +74,7 @@ class TrainLoop:
         self.callbacks_handler.execute_train_begin()
 
         for self.epoch in range(num_epoch):
+            print('==============================================')
             print(f'Epoch: {self.epoch + 1}')
             self.callbacks_handler.execute_epoch_begin()
 
@@ -80,9 +82,7 @@ class TrainLoop:
                 self.callbacks_handler.execute_batch_begin()
 
                 loss_batch = self.batch_model_feed_def.get_loss(self.model, batch_data, self.criterion, self.device)
-
-                # print(f'Loss: {loss_batch}')
-                self.loss_avg.append(float(loss_batch))
+                self.loss_batch_accum.append(loss_batch.item())
 
                 self.optimizer.zero_grad()
                 loss_batch.backward()
@@ -113,15 +113,38 @@ class TrainLoop:
         pass
 
     def auto_execute_end_of_epoch(self):
-        train_loss_avg = np.mean(self.loss_avg)
-        print(f'AVG TRAIN LOSS: {train_loss_avg}')
-        self.loss_avg = []
-        self.train_history['loss'].append(train_loss_avg)
+        train_loss_batch_accum_avg = np.mean(self.loss_batch_accum)
+        print(f'AVG BATCH ACCUMULATED TRAIN LOSS: {train_loss_batch_accum_avg}')
+        self.train_history['accumulated_loss'].append(train_loss_batch_accum_avg)
+        self.loss_batch_accum = []
+
+        train_loss = self.evaluate_loss_on_train()
+        print(f'TRAIN LOSS: {train_loss}')
+        self.train_history['loss'].append(train_loss)
 
         if self.validation_loader is not None:
-            val_loss_avg = self.evaluate_loss_on_validation()
-            print(f'VAL LOSS: {val_loss_avg}')
-            self.train_history['val_loss'].append(val_loss_avg)
+            val_loss = self.evaluate_loss_on_validation()
+            print(f'VAL LOSS: {val_loss}')
+            self.train_history['val_loss'].append(val_loss)
+
+    def evaluate_loss_on_train(self):
+        """
+
+        Returns:
+            float:
+        """
+        self.model.eval()
+        train_loss_avg = []
+
+        with torch.no_grad():
+            for batch_data in tqdm(self.train_loader):
+                train_loss_batch = self.batch_model_feed_def.get_loss(self.model, batch_data, self.criterion, self.device)
+
+                train_loss_avg.append(train_loss_batch.item())
+
+        self.model.train()
+
+        return np.mean(train_loss_avg)
 
     def evaluate_loss_on_validation(self):
         """

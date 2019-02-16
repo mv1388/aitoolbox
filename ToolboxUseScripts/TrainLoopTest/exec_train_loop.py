@@ -8,6 +8,8 @@ from torchvision import datasets, transforms
 
 from AIToolbox.torchtrain.train_loop import TrainLoop
 from AIToolbox.torchtrain.batch_model_feed_defs import AbstractModelFeedDefinition
+from AIToolbox.torchtrain.callbacks.callbacks import ModelPerformancePrintCallback
+from AIToolbox.experiment_save.result_package import ClassificationResultPackage
 
 
 class Net(nn.Module):
@@ -44,7 +46,7 @@ class MNISTModelFeedDefinition(AbstractModelFeedDefinition):
         data = data.to(device)
 
         output = model(data)
-        y_pred = output.argmax(dim=1, keepdim=True)  # get the index of the max log-probability
+        y_pred = output.argmax(dim=1, keepdim=False)  # get the index of the max log-probability
 
         return y_test, y_pred.cpu()
 
@@ -96,8 +98,9 @@ model = Net()
 optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
 criterion = F.nll_loss
 
+callbacks = [ModelPerformancePrintCallback(ClassificationResultPackage(), args.__dict__)]
 
 TrainLoop(model,
           train_loader, test_loader,
-          MNISTModelFeedDefinition(), optimizer, criterion)(num_epoch=10)
+          MNISTModelFeedDefinition(), optimizer, criterion)(num_epoch=10, callbacks=callbacks)
 
