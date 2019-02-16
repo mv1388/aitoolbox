@@ -43,7 +43,7 @@ class BasicLearnRateScheduler(AbstractCallback):
 #         return self
 #
 #     def on_epoch_end(self):
-#         val_loss_avg = self.train_loop_obj.evaluate_loss_on_validation()
+#         val_loss_avg = self.train_loop_obj.evaluate_loss_on_validation_set()
 #         self.scheduler.step(val_loss_avg)
 
 
@@ -91,7 +91,7 @@ class GeneralLRScheduler(AbstractCallback):
         return self
 
     def on_epoch_end(self):
-        val_loss_avg = self.train_loop_obj.evaluate_loss_on_validation()
+        val_loss_avg = self.train_loop_obj.evaluate_loss_on_validation_set()
         self.scheduler.step(val_loss_avg)
 
 
