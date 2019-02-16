@@ -196,7 +196,7 @@ class ModelPerformanceEvaluationCallback(AbstractCallback):
         Args:
             result_package (AIToolbox.experiment_save.result_package.AbstractResultPackage):
             args (dict):
-            on_each_epoch (bool):
+            on_each_epoch (bool): calculate performance results just at the end of training or at the end of each epoch
             on_train_data (bool):
             on_val_data (bool):
         """
@@ -269,7 +269,7 @@ class ModelPerformancePrintReportCallback(AbstractCallback):
 
         Args:
             metrics (list): list of string metric names which should be presented in the printed report
-            on_each_epoch (bool):
+            on_each_epoch (bool): present results just at the end of training or at the end of each epoch
             strict_metric_reporting (bool): if False ignore missing metric in the TrainLoop.train_history, if True, in
                 case of missing metric throw and exception and thus interrupt the training loop
         """
