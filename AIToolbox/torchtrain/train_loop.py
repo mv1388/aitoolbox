@@ -93,24 +93,14 @@ class TrainLoop:
             # Automatic end of epoch code - reports the train and if available validation loss and executes callbacks
             self.auto_execute_end_of_epoch()
             self.callbacks_handler.execute_epoch_end()
-            # Customized end of epoch code
-            self.on_end_of_epoch()
 
             # self.early_stop is changed from the early stopper callback
             if self.early_stop:
                 break
 
         self.callbacks_handler.execute_train_end()
-        # Customized end of training code
-        self.on_end_of_training()
 
         return self.model
-
-    def on_end_of_epoch(self):
-        pass
-
-    def on_end_of_training(self):
-        pass
 
     def auto_execute_end_of_epoch(self):
         train_loss_batch_accum_avg = np.mean(self.loss_batch_accum)
@@ -159,7 +149,7 @@ class TrainLoop:
             for batch_data in tqdm(self.validation_loader):
                 val_loss_batch = self.batch_model_feed_def.get_loss(self.model, batch_data, self.criterion, self.device)
 
-                val_loss_avg.append(float(val_loss_batch))
+                val_loss_avg.append(val_loss_batch.item())
 
         self.model.train()
 
