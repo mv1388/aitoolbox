@@ -233,8 +233,10 @@ class ModelPerformancePrintCallback(AbstractCallback):
         if self.on_each_epoch:
             self.on_train_end()
 
-            # metric_name = f'val_{self.callback_name}'
-            # if metric_name not in self.train_loop_obj.train_history:
-            #     self.train_loop_obj.train_history[metric_name] = []
-            #
-            # self.train_loop_obj.train_history[metric_name].append(self.result_package.get_results())
+            for m_name in self.result_package.get_results():
+                metric_name = f'val_{m_name}'
+
+                if metric_name not in self.train_loop_obj.train_history:
+                    self.train_loop_obj.train_history[metric_name] = []
+
+                self.train_loop_obj.train_history[metric_name].append(self.result_package.get_results()[m_name])
