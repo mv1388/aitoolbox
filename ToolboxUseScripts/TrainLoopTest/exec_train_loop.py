@@ -98,7 +98,8 @@ model = Net()
 optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
 criterion = F.nll_loss
 
-callbacks = [ModelPerformancePrintCallback(ClassificationResultPackage(), args.__dict__)]
+callbacks = [ModelPerformancePrintCallback(ClassificationResultPackage(), args.__dict__, 
+                                           on_train_data=True, on_val_data=True)]
 
 TrainLoop(model,
           train_loader, test_loader,

@@ -1,3 +1,5 @@
+import copy
+
 from AIToolbox.AWS.model_save import PyTorchS3ModelSaver
 from AIToolbox.experiment_save.experiment_saver import FullPyTorchExperimentS3Saver
 from AIToolbox.experiment_save.training_history import PyTorchTrainingHistory
@@ -204,18 +206,29 @@ class ModelTrainEndSaveCallback(AbstractCallback):
 
 
 class ModelPerformancePrintCallback(AbstractCallback):
-    def __init__(self, result_package, args, on_each_epoch=True):
+    def __init__(self, result_package, args,
+                 on_each_epoch=True, on_train_data=False, on_val_data=True):
         """
 
         Args:
             result_package (AIToolbox.experiment_save.result_package.AbstractResultPackage):
             args (dict):
             on_each_epoch (bool):
+            on_train_data (bool):
+            on_val_data (bool):
         """
         AbstractCallback.__init__(self, 'Model checkpoint at end of epoch')
         self.result_package = result_package
         self.args = args
         self.on_each_epoch = on_each_epoch
+        self.on_train_data = on_train_data
+        self.on_val_data = on_val_data
+
+        if not on_train_data and not on_val_data:
+            raise ValueError('Both on_train_data and on_val_data are set to False. At least one of them has to be True')
+
+        if on_train_data:
+            self.train_result_package = copy.deepcopy(result_package)
 
     def on_train_end(self):
         # TODO: maybe remove these 3 lines to save compute time and don't generate the train history which is not needed
@@ -223,20 +236,34 @@ class ModelPerformancePrintCallback(AbstractCallback):
         epoch_list = list(range(len(self.train_loop_obj.train_history[list(self.train_loop_obj.train_history.keys())[0]])))
         train_hist_pkg = PyTorchTrainingHistory(train_history, epoch_list)
 
-        y_test, y_pred = self.train_loop_obj.predict_on_validation_set()
-        self.result_package.prepare_result_package(y_test, y_pred,
-                                                   hyperparameters=self.args, training_history=train_hist_pkg)
+        if self.on_train_data:
+            y_test, y_pred = self.train_loop_obj.predict_on_train_set()
+            self.train_result_package.prepare_result_package(y_test, y_pred,
+                                                             hyperparameters=self.args, training_history=train_hist_pkg)
+            print(f'TRAIN: {self.train_result_package.get_results()}')
 
-        print(self.result_package.get_results())
+        if self.on_val_data:
+            y_test, y_pred = self.train_loop_obj.predict_on_validation_set()
+            self.result_package.prepare_result_package(y_test, y_pred,
+                                                       hyperparameters=self.args, training_history=train_hist_pkg)
+            print(f'VAL: {self.result_package.get_results()}')
 
     def on_epoch_end(self):
         if self.on_each_epoch:
             self.on_train_end()
 
-            for m_name in self.result_package.get_results():
-                metric_name = f'val_{m_name}'
+            evaluated_metrics = self.result_package.get_results().keys() if self.on_val_data \
+                else self.train_result_package.get_results().keys()
 
-                if metric_name not in self.train_loop_obj.train_history:
-                    self.train_loop_obj.train_history[metric_name] = []
+            for m_name in evaluated_metrics:
+                if self.on_train_data:
+                    metric_name = f'train_{m_name}'
+                    if metric_name not in self.train_loop_obj.train_history:
+                        self.train_loop_obj.train_history[metric_name] = []
+                    self.train_loop_obj.train_history[metric_name].append(self.train_result_package.get_results()[m_name])
 
-                self.train_loop_obj.train_history[metric_name].append(self.result_package.get_results()[m_name])
+                if self.on_val_data:
+                    metric_name = f'val_{m_name}'
+                    if metric_name not in self.train_loop_obj.train_history:
+                        self.train_loop_obj.train_history[metric_name] = []
+                    self.train_loop_obj.train_history[metric_name].append(self.result_package.get_results()[m_name])
