@@ -34,7 +34,6 @@ class AbstractCallback:
     def on_train_end(self):
         pass
 
-    # TODO: Think about potential training slowdown
     def on_batch_begin(self):
         pass
 
@@ -260,6 +259,13 @@ class ModelPerformanceEvaluationCallback(AbstractCallback):
 class ModelPerformancePrintReportCallback(AbstractCallback):
     def __init__(self, metrics, on_each_epoch=True, strict_metric_reporting=False):
         """
+
+        Best used in combination with the callback which actually calculates some performance evaluation metrics, such
+        as ModelPerformanceEvaluationCallback. Otherwise we are limited only to automatic loss calculation reporting.
+
+        When listing callbacks for the TrainLoop it is important to list the ModelPerformanceEvaluationCallback before
+        this ModelPerformancePrintReportCallback. This ensures that the calculated results are present in the
+        TrainLoop.train_history before there is an attempt to print them.
 
         Args:
             metrics (list): list of string metric names which should be presented in the printed report
