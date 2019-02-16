@@ -109,16 +109,16 @@ class TrainLoop:
         self.train_history['accumulated_loss'].append(train_loss_batch_accum_avg)
         self.loss_batch_accum = []
 
-        train_loss = self.evaluate_loss_on_train()
+        train_loss = self.evaluate_loss_on_train_set()
         print(f'TRAIN LOSS: {train_loss}')
         self.train_history['loss'].append(train_loss)
 
         if self.validation_loader is not None:
-            val_loss = self.evaluate_loss_on_validation()
+            val_loss = self.evaluate_loss_on_validation_set()
             print(f'VAL LOSS: {val_loss}')
             self.train_history['val_loss'].append(val_loss)
 
-    # def evaluate_loss_on_train(self):
+    # def evaluate_loss_on_train_set(self):
     #     """
     #
     #     Returns:
@@ -137,7 +137,7 @@ class TrainLoop:
     #
     #     return np.mean(train_loss_avg)
     #
-    # def evaluate_loss_on_validation(self):
+    # def evaluate_loss_on_validation_set(self):
     #     """
     #
     #     Returns:
@@ -156,7 +156,7 @@ class TrainLoop:
     #
     #     return np.mean(val_loss_avg)
 
-    def evaluate_loss_on_train(self):
+    def evaluate_loss_on_train_set(self):
         """
 
         Returns:
@@ -164,7 +164,7 @@ class TrainLoop:
         """
         return self.evaluate_model_loss(self.train_loader)
 
-    def evaluate_loss_on_validation(self):
+    def evaluate_loss_on_validation_set(self):
         """
 
         Returns:
