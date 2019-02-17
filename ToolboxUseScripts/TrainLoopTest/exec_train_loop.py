@@ -6,7 +6,7 @@ import torch.nn.functional as F
 import torch.optim as optim
 from torchvision import datasets, transforms
 
-from AIToolbox.torchtrain.train_loop import TrainLoop
+from AIToolbox.torchtrain.train_loop import TrainLoop, TrainLoopModelCheckpointEndSave
 from AIToolbox.torchtrain.batch_model_feed_defs import AbstractModelFeedDefinition
 from AIToolbox.torchtrain.callbacks.callbacks import ModelPerformanceEvaluationCallback, ModelPerformancePrintReportCallback
 from AIToolbox.experiment_save.result_package import ClassificationResultPackage
@@ -100,9 +100,17 @@ criterion = F.nll_loss
 
 callbacks = [ModelPerformanceEvaluationCallback(ClassificationResultPackage(), args.__dict__, 
                                                 on_train_data=True, on_val_data=True),
-             ModelPerformancePrintReportCallback(['loss', 'val_Accuracy'])]
+             ModelPerformancePrintReportCallback(['loss', 'train_Accuracy', 'val_Accuracy'], strict_metric_reporting=True)]
 
-TrainLoop(model,
-          train_loader, test_loader,
-          MNISTModelFeedDefinition(), optimizer, criterion)(num_epoch=10, callbacks=callbacks)
 
+# TrainLoop(model,
+#           train_loader, test_loader,
+#           MNISTModelFeedDefinition(), optimizer, criterion)(num_epoch=10, callbacks=callbacks)
+
+
+TrainLoopModelCheckpointEndSave(model, train_loader, test_loader, MNISTModelFeedDefinition(), optimizer, criterion,
+                                project_name='localRunCNNTest',
+                                experiment_name='CNN_MNIST_test',
+                                local_model_result_folder_path='~/PycharmProjects/MemoryNet/model_results',
+                                args=args.__dict__,
+                                result_package=ClassificationResultPackage())(num_epoch=5, callbacks=callbacks)

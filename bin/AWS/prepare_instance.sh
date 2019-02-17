@@ -71,6 +71,17 @@ pip install AIToolbox-$AIToolbox_version.tar.gz
 
 ./pyrouge_set_rouge_path ~/project/ROUGE-1.5.5
 
+#sudo yum -y install perl-CPAN
+#sudo perl -MCPAN -e 'install LWP::UserAgent::Cached'
+sudo perl -MCPAN -e 'install DB_File'
+
+#cd ROUGE-1.5.5/data/WordNet-2.0-Exceptions
+#./buildExeptionDB.pl . exc WordNet-2.0.exc.db
+#cd ../
+#ln -s WordNet-2.0-Exceptions/WordNet-2.0.exc.db WordNet-2.0.exc.db
+#cd ../..
+
+
 if [ $dataset_name != '' ]; then
     ./download_data.sh ~/project/data $dataset_name $preproc_dataset
 fi
