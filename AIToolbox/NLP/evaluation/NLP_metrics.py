@@ -18,8 +18,9 @@ class ROGUEMetric(AbstractBaseMetric):
             https://github.com/bheinzerling/pyrouge
 
 
-            Problems:
-                https://ireneli.eu/2018/01/11/working-with-rouge-1-5-5-evaluation-metric-in-python/
+        Problems:
+            Defined regex text cleaning to deal with Illegal division by zero
+            https://ireneli.eu/2018/01/11/working-with-rouge-1-5-5-evaluation-metric-in-python/
 
 
         Args:
@@ -53,6 +54,10 @@ class ROGUEMetric(AbstractBaseMetric):
     def dump_answer_text_to_disk(true_text, pred_text, output_text_dir, output_text_cleaning_regex):
         """
 
+        Problems:
+            Defined regex text cleaning to deal with Illegal division by zero
+            https://ireneli.eu/2018/01/11/working-with-rouge-1-5-5-evaluation-metric-in-python/
+
         Args:
             true_text (list):
             pred_text (list):
@@ -73,6 +78,7 @@ class ROGUEMetric(AbstractBaseMetric):
             with open(os.path.join(output_text_dir, f'true_answer/true_answer_text.{i}.txt'), 'w') as f:
                 # text_clean = [t for t in text if not re.search(r'<.*?>', t)]
 
+                # The default is: r'<.*?>'
                 re_pattern = re.compile(output_text_cleaning_regex)
                 text_clean = [re_pattern.sub('', t) for t in text if len(re_pattern.sub('', t)) > 0]
                 f.write(' '.join(text_clean))
@@ -81,6 +87,7 @@ class ROGUEMetric(AbstractBaseMetric):
             with open(os.path.join(output_text_dir, f'pred_answer/pred_answer_text.{i}.txt'), 'w') as f:
                 # text_clean = [t for t in text if not re.search(r'<.*?>', t)]
 
+                # The default is: r'<.*?>'
                 re_pattern = re.compile(output_text_cleaning_regex)
                 text_clean = [re_pattern.sub('', t) for t in text if len(re_pattern.sub('', t)) > 0]
                 f.write(' '.join(text_clean) if len(text_clean) > 0 else ' ')
