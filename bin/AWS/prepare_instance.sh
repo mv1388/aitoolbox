@@ -2,8 +2,10 @@
 
 # Example how to run:
 
-# ./prepare_instance.sh <SSH_KEY_LOCATION> ec2-34-251-236-206.eu-west-1.compute.amazonaws.com TF 0.1 SQuAD2 orig ~/PycharmProjects/MemoryNet
+# ./prepare_instance.sh <SSH_KEY_LOCATION> ec2-34-251-236-206.eu-west-1.compute.amazonaws.com pytorch 0.1 SQuAD2 orig ~/PycharmProjects/MemoryNet
 
+
+# ./prepare_instance.sh <SSH_KEY_LOCATION> ec2-34-251-236-206.eu-west-1.compute.amazonaws.com TF 0.1 SQuAD2 orig ~/PycharmProjects/MemoryNet
 # ./prepare_instance.sh <SSH_KEY_LOCATION> ec2-34-251-236-206.eu-west-1.compute.amazonaws.com pytorch 0.1 cnn-dailymail abisee ~/PycharmProjects/MemoryNet
 
 # When you get ssh-ed to the instance finish the instance prep process by running:
@@ -58,18 +60,34 @@ scp -i $key_path -r ../ROUGE-1.5.5 ec2-user@$ec2_instance_address:~/project
 
 echo "#!/usr/bin/env bash
 
-sudo -H pip install awscli --upgrade
-#sudo yum downgrade aws-cli.noarch python27-botocore
-
 aws configure
-
 cd project
 
 source activate $py_env
 
+pip install -U boto3
+pip install awscl
+pip install -U numpy
+pip install --ignore-installed greenlet
+
 pip install AIToolbox-$AIToolbox_version.tar.gz
 
 ./pyrouge_set_rouge_path ~/project/ROUGE-1.5.5
+
+sudo yum -y install perl-CPAN
+#sudo perl -MCPAN -e 'install LWP::UserAgent::Cached'
+#sudo perl -MCPAN -e 'install Bundle::LWP'
+sudo yum install -y perl-libwww-perl
+sudo perl -MCPAN -e 'install DB_File'
+
+cd ROUGE-1.5.5/data
+rm WordNet-2.0.exc.db
+cd WordNet-2.0-Exceptions
+./buildExeptionDB.pl . exc WordNet-2.0.exc.db
+cd ../
+ln -s WordNet-2.0-Exceptions/WordNet-2.0.exc.db WordNet-2.0.exc.db
+cd ../..
+
 
 if [ $dataset_name != '' ]; then
     ./download_data.sh ~/project/data $dataset_name $preproc_dataset

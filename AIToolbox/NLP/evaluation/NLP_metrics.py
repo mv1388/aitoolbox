@@ -1,4 +1,5 @@
 import os
+import re
 import shutil
 from pyrouge import Rouge155
 from rouge import Rouge
@@ -9,7 +10,8 @@ from AIToolbox.experiment_save.core_metrics.base_metric import AbstractBaseMetri
 
 
 class ROGUEMetric(AbstractBaseMetric):
-    def __init__(self, y_true, y_predicted, output_text_dir):
+    def __init__(self, y_true, y_predicted,
+                 output_text_dir, output_text_cleaning_regex=(r'<.*?>', r'[^a-zA-Z0-9.?! ]+')):
         """
 
         Use this package:
@@ -17,17 +19,25 @@ class ROGUEMetric(AbstractBaseMetric):
             https://github.com/bheinzerling/pyrouge
 
 
+        Problems:
+            Defined regex text cleaning to deal with Illegal division by zero
+            https://ireneli.eu/2018/01/11/working-with-rouge-1-5-5-evaluation-metric-in-python/
+
+
         Args:
             y_true (numpy.array or list): gold standard summaries are ‘model’ summaries
             y_predicted (numpy.array or list): your summaries are ‘system’ summaries
             output_text_dir (str):
+            output_text_cleaning_regex (list):
         """
         self.output_text_dir = output_text_dir
+        self.output_text_cleaning_regex = output_text_cleaning_regex
         AbstractBaseMetric.__init__(self, y_true, y_predicted)
         self.metric_name = 'ROGUE'
 
     def calculate_metric(self):
-        self.dump_answer_text_to_disk(self.y_true, self.y_predicted, self.output_text_dir)
+        self.dump_answer_text_to_disk(self.y_true, self.y_predicted,
+                                      self.output_text_dir, self.output_text_cleaning_regex)
 
         rouge = Rouge155()
         # In ROUGE, your summaries are ‘system’ summaries and the gold standard summaries are ‘model’ summaries.
@@ -42,13 +52,18 @@ class ROGUEMetric(AbstractBaseMetric):
         self.metric_result = output_dict
 
     @staticmethod
-    def dump_answer_text_to_disk(true_text, pred_text, output_text_dir):
+    def dump_answer_text_to_disk(true_text, pred_text, output_text_dir, output_text_cleaning_regex):
         """
+
+        Problems:
+            Defined regex text cleaning to deal with Illegal division by zero
+            https://ireneli.eu/2018/01/11/working-with-rouge-1-5-5-evaluation-metric-in-python/
 
         Args:
             true_text (list):
             pred_text (list):
             output_text_dir (str):
+            output_text_cleaning_regex (list):
 
         Returns:
 
@@ -62,11 +77,32 @@ class ROGUEMetric(AbstractBaseMetric):
 
         for i, text in enumerate(true_text):
             with open(os.path.join(output_text_dir, f'true_answer/true_answer_text.{i}.txt'), 'w') as f:
-                f.write(' '.join(text))
+                # Default regex cleaners: (r'<.*?>', r'[^a-zA-Z0-9.?! ]+')
+                text_clean = ROGUEMetric.regex_clean_text(text, output_text_cleaning_regex)
+                f.write(' '.join(text_clean))
 
         for i, text in enumerate(pred_text):
             with open(os.path.join(output_text_dir, f'pred_answer/pred_answer_text.{i}.txt'), 'w') as f:
-                f.write(' '.join(text) if len(text) > 0 else ' ')
+                # Default regex cleaners: (r'<.*?>', r'[^a-zA-Z0-9.?! ]+')
+                text_clean = ROGUEMetric.regex_clean_text(text, output_text_cleaning_regex)
+                f.write(' '.join(text_clean) if len(text_clean) > 0 else ' ')
+
+    @staticmethod
+    def regex_clean_text(text, cleaning_regex_list):
+        """
+
+        Args:
+            text (list):
+            cleaning_regex_list (list):
+
+        Returns:
+            list:
+        """
+        # The default is: (r'<.*?>', r'[^a-zA-Z0-9.?! ]+')
+        for cleaning_regex in cleaning_regex_list:
+            re_pattern = re.compile(cleaning_regex)
+            text = [re_pattern.sub('', t) for t in text if len(re_pattern.sub('', t)) > 0]
+        return text
 
 
 class ROGUENonOfficialMetric(AbstractBaseMetric):
