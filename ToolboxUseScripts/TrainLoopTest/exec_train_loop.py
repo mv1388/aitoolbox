@@ -103,14 +103,14 @@ callbacks = [ModelPerformanceEvaluationCallback(ClassificationResultPackage(), a
              ModelPerformancePrintReportCallback(['loss', 'train_Accuracy', 'val_Accuracy'], strict_metric_reporting=True)]
 
 
-# TrainLoop(model,
-#           train_loader, test_loader,
-#           MNISTModelFeedDefinition(), optimizer, criterion)(num_epoch=10, callbacks=callbacks)
+TrainLoop(model,
+          train_loader, test_loader,
+          MNISTModelFeedDefinition(), optimizer, criterion)(num_epoch=10, callbacks=callbacks)
 
 
-TrainLoopModelCheckpointEndSave(model, train_loader, test_loader, MNISTModelFeedDefinition(), optimizer, criterion,
-                                project_name='localRunCNNTest',
-                                experiment_name='CNN_MNIST_test',
-                                local_model_result_folder_path='~/PycharmProjects/MemoryNet/model_results',
-                                args=args.__dict__,
-                                result_package=ClassificationResultPackage())(num_epoch=5, callbacks=callbacks)
+# TrainLoopModelCheckpointEndSave(model, train_loader, test_loader, MNISTModelFeedDefinition(), optimizer, criterion,
+#                                 project_name='localRunCNNTest',
+#                                 experiment_name='CNN_MNIST_test',
+#                                 local_model_result_folder_path='~/PycharmProjects/MemoryNet/model_results',
+#                                 args=args.__dict__,
+#                                 result_package=ClassificationResultPackage())(num_epoch=5, callbacks=callbacks)
