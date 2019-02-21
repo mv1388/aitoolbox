@@ -156,7 +156,7 @@ print(experiment_timestamp)
 
 _, y = make_classification(100)
 y_pred = [random.uniform(0, 1) for _ in range(100)]
-class_pkg = ClassificationResultPackage(y, y_pred, hyperparameters={'bash_script_path':'dasdassd'})
+class_pkg = ClassificationResultPackage(y, y_pred, hyperparameters={'bash_script_path': 'dasdassd'})
 
 res_saver = S3ResultsSaver(local_model_result_folder_path=local_model_result_folder_path)
 # res_saver.local_results_saver.file_format = 'pickle'

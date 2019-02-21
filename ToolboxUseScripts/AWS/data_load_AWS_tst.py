@@ -1,14 +1,14 @@
 # from AIToolbox.AWS.data_access import SQuAD2DatasetFetcher
 #
 # df = SQuAD2DatasetFetcher(bucket_name='dataset-store',
-#                           local_dataset_folder_path='~/PycharmProjects/AIToolbox/ToolboxUseScripts/AWS')
+#                           local_dataset_folder_path='')
 #
 # df.fetch_dataset()
 
 
 from AIToolbox.NLP.dataset import SQuAD2, HotpotQA, QAngaroo, CNNDailyMail
 
-path = '/Users/markovidoni/PycharmProjects/MemoryNet/test_data_dir'
+path = 'test_data_dir'
 
 SQuAD2.get_dataset_local_copy(path)
 HotpotQA.get_dataset_local_copy(path)
