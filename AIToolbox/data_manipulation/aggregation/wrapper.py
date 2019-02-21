@@ -18,12 +18,12 @@ class DataAggregator:
         Examples:
             Example for extracting only aggregate text statistics:
 
-            database_path = '/Volumes/Zunanji Disk/MSc_StackOverflow_dump'
+            database_path = ''
             database_name = 'so-dump.db'
             sql_query = '''SELECT OwnerUserId, Body FROM UserText_ONLY_accept_min2_1Column'''
 
             # NLP stats aggregator setup
-            output_data_path = '/Users/markovidoni/PycharmProjects/UniPostgrad/MSc_project/data/SO_db'
+            output_data_path = ''
             output_file_name = 'user_text_stats_TEST_TEST.p'
             stats_file_data_saver = FileDataAccessor(data_folder_path=output_data_path, data_file_name=output_file_name,
                                                      data_type='pickle-dict')

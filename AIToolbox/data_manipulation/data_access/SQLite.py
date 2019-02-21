@@ -17,12 +17,12 @@ class SQLiteDataAccessor:
                 Flush to disk when enough data has accumulated.
     """
 
-    def __init__(self, db_path='/Volumes/Zunanji Disk/MSc_StackOverflow_dump/', db_name='so-dump.db',
+    def __init__(self, db_path='', db_name='so-dump.db',
                  db_create_query=None, db_insert_query=None,
                  data_aggregator=None):
         """
         Examples:
-            dump_path = '/Users/markovidoni/PycharmProjects/UniPostgrad/MSc_project/data/STATS_db'
+            dump_path = ''
             dump_database_name = 'stats-dump.db'
             data_accessor = SQLiteDataAccessor(db_path=dump_path, db_name=dump_database_name)
 
