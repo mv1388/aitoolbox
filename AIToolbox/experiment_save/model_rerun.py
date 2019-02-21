@@ -117,3 +117,23 @@ class KerasModelReRunner(AbstractModelReRunner):
 
     def evaluate_result_package(self, result_package, return_result_package=True):
         raise NotImplementedError
+
+
+class TensorFlowModelReRunner(AbstractModelReRunner):
+    def __init__(self, model, data_loader):
+        """
+
+        Args:
+            model:
+            data_loader:
+        """
+        AbstractModelReRunner.__init__(self, model, data_loader)
+
+    def model_predict(self):
+        raise NotImplementedError
+
+    def model_get_loss(self):
+        raise NotImplementedError
+
+    def evaluate_result_package(self, result_package, return_result_package=True):
+        raise NotImplementedError
