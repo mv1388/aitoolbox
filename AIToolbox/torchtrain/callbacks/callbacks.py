@@ -2,7 +2,7 @@ import copy
 
 from AIToolbox.AWS.model_save import PyTorchS3ModelSaver
 from AIToolbox.experiment_save.experiment_saver import FullPyTorchExperimentS3Saver
-from AIToolbox.experiment_save.training_history import PyTorchTrainingHistory
+from AIToolbox.experiment_save.training_history import TrainingHistory
 
 
 class AbstractCallback:
@@ -174,7 +174,7 @@ class ModelTrainEndSaveCallback(AbstractCallback):
         """
         train_history = self.train_loop_obj.train_history
         epoch_list = list(range(len(self.train_loop_obj.train_history[list(self.train_loop_obj.train_history.keys())[0]])))
-        train_hist_pkg = PyTorchTrainingHistory(train_history, epoch_list)
+        train_hist_pkg = TrainingHistory(train_history, epoch_list)
 
         y_test, y_pred = self.train_loop_obj.predict_on_validation_set()
 
@@ -241,7 +241,7 @@ class ModelPerformanceEvaluationCallback(AbstractCallback):
         train_history = self.train_loop_obj.train_history
         epoch_list = list(
             range(len(self.train_loop_obj.train_history[list(self.train_loop_obj.train_history.keys())[0]])))
-        train_hist_pkg = PyTorchTrainingHistory(train_history, epoch_list)
+        train_hist_pkg = TrainingHistory(train_history, epoch_list)
 
         if self.on_train_data:
             y_test, y_pred = self.train_loop_obj.predict_on_train_set()
