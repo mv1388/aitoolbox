@@ -1,8 +1,28 @@
+from abc import ABC, abstractmethod
+
 from AIToolbox.torchtrain.train_loop import TrainLoop
-from AIToolbox.experiment_save.training_history import PyTorchTrainingHistory
+from AIToolbox.experiment_save.training_history import TrainingHistory
 
 
-class PyTorchModelReRunner:
+class AbstractModelReRunner(ABC):
+    def __init__(self, model, data_loader):
+        self.model = model
+        self.data_loader = data_loader
+
+    @abstractmethod
+    def model_predict(self):
+        pass
+
+    @abstractmethod
+    def model_get_loss(self):
+        pass
+
+    @abstractmethod
+    def evaluate_result_package(self, result_package, return_result_package=True):
+        pass
+
+
+class PyTorchModelReRunner(AbstractModelReRunner):
     def __init__(self, model, data_loader, batch_model_feed_def):
         """
 
@@ -11,8 +31,7 @@ class PyTorchModelReRunner:
             data_loader (torch.utils.data.DataLoader):
             batch_model_feed_def (AIToolbox.torchtrain.batch_model_feed_defs.AbstractModelFeedDefinition):
         """
-        self.model = model
-        self.data_loader = data_loader
+        AbstractModelReRunner.__init__(self, model, data_loader)
         self.batch_model_feed_def = batch_model_feed_def
 
         self.train_loop = TrainLoop(self.model, None, self.data_loader, batch_model_feed_def, None, None)
@@ -45,7 +64,7 @@ class PyTorchModelReRunner:
         """
         train_history = self.train_loop.train_history
         epoch_list = list(range(len(self.train_loop.train_history[list(self.train_loop.train_history.keys())[0]])))
-        train_hist_pkg = PyTorchTrainingHistory(train_history, epoch_list)
+        train_hist_pkg = TrainingHistory(train_history, epoch_list)
 
         y_test, y_pred = self.train_loop.predict_on_validation_set()
 
@@ -61,7 +80,7 @@ class PyTorchModelReRunner:
         """
 
         Args:
-            metric:
+            metric (AIToolbox.experiment_save.core_metrics.base_metric.AbstractBaseMetric):
 
         Returns:
 
@@ -77,4 +96,24 @@ class PyTorchModelReRunner:
         Returns:
 
         """
+        raise NotImplementedError
+
+
+class KerasModelReRunner(AbstractModelReRunner):
+    def __init__(self, model, data_loader):
+        """
+
+        Args:
+            model:
+            data_loader:
+        """
+        AbstractModelReRunner.__init__(self, model, data_loader)
+
+    def model_predict(self):
+        raise NotImplementedError
+
+    def model_get_loss(self):
+        raise NotImplementedError
+
+    def evaluate_result_package(self, result_package, return_result_package=True):
         raise NotImplementedError
