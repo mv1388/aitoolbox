@@ -2,7 +2,7 @@ from AIToolbox.torchtrain.train_loop import TrainLoop
 from AIToolbox.experiment_save.training_history import PyTorchTrainingHistory
 
 
-class ModelReRunner:
+class PyTorchModelReRunner:
     def __init__(self, model, data_loader, batch_model_feed_def):
         """
 
