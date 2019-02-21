@@ -38,7 +38,7 @@ class AbstractResultPackage(ABC):
             y_true (numpy.array or list):
             y_predicted (numpy.array or list):
             hyperparameters (dict or None):
-            training_history (AIToolbox.ExperimentSave.training_history.AbstractTrainingHistory):
+            training_history (AIToolbox.ExperimentSave.training_history.TrainingHistory):
             **kwargs (dict):
 
         Returns:
