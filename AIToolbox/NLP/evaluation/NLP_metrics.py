@@ -105,7 +105,7 @@ class ROUGEMetric(AbstractBaseMetric):
         return text
 
 
-class ROUGENonOfficialMetric(AbstractBaseMetric):
+class ROUGENonPerlMetric(AbstractBaseMetric):
     def __init__(self, y_true, y_predicted):
         """
 
@@ -114,10 +114,10 @@ class ROUGENonOfficialMetric(AbstractBaseMetric):
 
 
         Args:
-            y_true (list):
-            y_predicted (list):
+            y_true (str):
+            y_predicted (str):
         """
-        AbstractBaseMetric.__init__(self, y_true, y_predicted)
+        AbstractBaseMetric.__init__(self, y_true, y_predicted, np_array=False)
         self.metric_name = 'ROGUE_nonOfficial'
 
     def calculate_metric(self):
