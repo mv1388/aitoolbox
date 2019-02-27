@@ -2,7 +2,7 @@ import os
 
 from AIToolbox.experiment_save.result_package import AbstractResultPackage
 from AIToolbox.experiment_save.core_metrics.classification import AccuracyMetric
-from AIToolbox.NLP.evaluation.NLP_metrics import ROGUEMetric, ROGUENonOfficialMetric, \
+from AIToolbox.NLP.evaluation.NLP_metrics import ROUGEMetric, ROUGENonPerlMetric, \
     BLEUCorpusScoreMetric, PerplexityMetric
 
 
@@ -45,8 +45,8 @@ class QuestionAnswerResultPackage(AbstractResultPackage):
         #              for start_span, end_span, paragraph_text in
         #              zip(y_span_start_true.astype('int'), y_span_end_true.astype('int'), self.paragraph_text_tokens)]
 
-        rogue_metric = ROGUEMetric(true_text, pred_text, self.output_text_dir)
-        # rogue_metric_non_official = ROGUENonOfficialMetric(true_text, pred_text)
+        rogue_metric = ROUGEMetric(true_text, pred_text, self.output_text_dir)
+        # rogue_metric_non_official = ROUGENonPerlMetric(true_text, pred_text)
         # self.results_dict = {**rogue_metric, **rogue_metric_non_official}
 
         self.results_dict = rogue_metric.get_metric_dict()
@@ -109,7 +109,7 @@ class TextSummarizationResultPackage(AbstractResultPackage):
         Returns:
 
         """
-        # rogue_result = ROGUEMetric(self.y_true, self.y_predicted).get_metric_dict()
+        # rogue_result = ROUGEMetric(self.y_true, self.y_predicted).get_metric_dict()
 
         raise NotImplementedError
 

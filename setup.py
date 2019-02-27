@@ -33,7 +33,11 @@ setup(name='AIToolbox',
                         'torchvision',
                         'pytorch-nlp',
                         'pyrouge',
-                        'rouge'],
+                        'rouge',    
+                        # New ones... just for testing
+                        'sumeval', # https://github.com/chakki-works/sumeval
+                        'chakin', # https://github.com/chakki-works/chakin
+                        'chazutsu'], # https://github.com/chakki-works/chazutsu
 
       test_suite='tests',
       tests_require=['nose'],

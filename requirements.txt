@@ -18,3 +18,6 @@ torchvision
 pytorch-nlp
 pyrouge
 rouge
+sumeval
+chakin
+chazutsu
