@@ -9,7 +9,7 @@ from torchnlp.metrics import bleu
 from AIToolbox.experiment_save.core_metrics.base_metric import AbstractBaseMetric
 
 
-class ROUGEMetric(AbstractBaseMetric):
+class ROGUEMetric(AbstractBaseMetric):
     def __init__(self, y_true, y_predicted,
                  output_text_dir, output_text_cleaning_regex=(r'<.*?>', r'[^a-zA-Z0-9.?! ]+')):
         """
@@ -78,13 +78,13 @@ class ROUGEMetric(AbstractBaseMetric):
         for i, text in enumerate(true_text):
             with open(os.path.join(output_text_dir, f'true_answer/true_answer_text.{i}.txt'), 'w') as f:
                 # Default regex cleaners: (r'<.*?>', r'[^a-zA-Z0-9.?! ]+')
-                text_clean = ROUGEMetric.regex_clean_text(text, output_text_cleaning_regex)
+                text_clean = ROGUEMetric.regex_clean_text(text, output_text_cleaning_regex)
                 f.write(' '.join(text_clean))
 
         for i, text in enumerate(pred_text):
             with open(os.path.join(output_text_dir, f'pred_answer/pred_answer_text.{i}.txt'), 'w') as f:
                 # Default regex cleaners: (r'<.*?>', r'[^a-zA-Z0-9.?! ]+')
-                text_clean = ROUGEMetric.regex_clean_text(text, output_text_cleaning_regex)
+                text_clean = ROGUEMetric.regex_clean_text(text, output_text_cleaning_regex)
                 f.write(' '.join(text_clean) if len(text_clean) > 0 else ' ')
 
     @staticmethod
@@ -105,7 +105,7 @@ class ROUGEMetric(AbstractBaseMetric):
         return text
 
 
-class ROUGENonOfficialMetric(AbstractBaseMetric):
+class ROGUENonOfficialMetric(AbstractBaseMetric):
     def __init__(self, y_true, y_predicted):
         """
 
