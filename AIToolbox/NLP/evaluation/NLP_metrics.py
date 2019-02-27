@@ -18,7 +18,6 @@ class ROUGEMetric(AbstractBaseMetric):
             https://pypi.org/project/pyrouge/
             https://github.com/bheinzerling/pyrouge
 
-
         Problems:
             Defined regex text cleaning to deal with Illegal division by zero
             https://ireneli.eu/2018/01/11/working-with-rouge-1-5-5-evaluation-metric-in-python/
