@@ -7,18 +7,25 @@ from AIToolbox.NLP.evaluation.NLP_metrics import ROUGEMetric, ROUGENonPerlMetric
 
 
 class QuestionAnswerResultPackage(AbstractResultPackage):
-    def __init__(self, paragraph_text_tokens, output_text_dir, strict_content_check=False, **kwargs):
+    def __init__(self, paragraph_text_tokens, output_text_dir, target_actual_text=False, use_perl_rouge=True,
+                 strict_content_check=False, **kwargs):
         """
 
         Args:
             paragraph_text_tokens (list):
             output_text_dir (str):
+            target_actual_text (bool):
+            use_perl_rouge (bool):
             strict_content_check (bool):
             **kwargs (dict):
         """
         # self.paragraph_text_tokens = paragraph_text_tokens
-        self.paragraph_text_tokens = [[str(w) for w in paragraph] for paragraph in paragraph_text_tokens]
+        # todo: check if this is efficient
+        self.paragraph_text_tokens = [[str(w) for w in paragraph] if not target_actual_text else [paragraph]
+                                      for paragraph in paragraph_text_tokens]
         self.output_text_dir = os.path.expanduser(output_text_dir)
+        self.target_actual_text = target_actual_text
+        self.use_perl_rouge = use_perl_rouge
         AbstractResultPackage.__init__(self, strict_content_check, **kwargs)
 
     def prepare_results_dict(self):
@@ -31,11 +38,14 @@ class QuestionAnswerResultPackage(AbstractResultPackage):
         y_span_start_predicted = self.y_predicted[:, 0]
         y_span_end_true = self.y_true[:, 1]
         y_span_end_predicted = self.y_predicted[:, 1]
-
-        true_text = [paragraph_text[start_span:end_span + 1]
-                     for start_span, end_span, paragraph_text in
-                     zip(y_span_start_true.astype('int'), y_span_end_true.astype('int'), self.paragraph_text_tokens)]
-
+        
+        if self.target_actual_text:
+            true_text = self.paragraph_text_tokens
+        else:
+            true_text = [paragraph_text[start_span:end_span + 1]
+                         for start_span, end_span, paragraph_text in
+                         zip(y_span_start_true.astype('int'), y_span_end_true.astype('int'), self.paragraph_text_tokens)]
+        
         pred_text = [paragraph_text[start_span:end_span + 1]
                      for start_span, end_span, paragraph_text in
                      zip(y_span_start_predicted.astype('int'), y_span_end_predicted.astype('int'), self.paragraph_text_tokens)]
@@ -45,10 +55,13 @@ class QuestionAnswerResultPackage(AbstractResultPackage):
         #              for start_span, end_span, paragraph_text in
         #              zip(y_span_start_true.astype('int'), y_span_end_true.astype('int'), self.paragraph_text_tokens)]
 
-        rogue_metric = ROUGEMetric(true_text, pred_text, self.output_text_dir)
-        # rogue_metric_non_official = ROUGENonPerlMetric(true_text, pred_text)
-        # self.results_dict = {**rogue_metric, **rogue_metric_non_official}
+        if self.use_perl_rouge:
+            rogue_metric = ROUGEMetric(true_text, pred_text, self.output_text_dir,
+                                       target_actual_text=self.target_actual_text)
+        else:
+            rogue_metric = ROUGENonPerlMetric(true_text, pred_text, target_actual_text=self.target_actual_text)
 
+        # self.results_dict = {**rogue_metric, **rogue_metric_non_official}
         self.results_dict = rogue_metric.get_metric_dict()
 
 
