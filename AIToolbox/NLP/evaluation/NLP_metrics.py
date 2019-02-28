@@ -142,7 +142,8 @@ class ROUGENonPerlMetric(AbstractBaseMetric):
     def prepare_text(self):
         if not self.target_actual_text:
             self.y_true = [' '.join(sent) for sent in self.y_true]
-            self.y_predicted = [' '.join(sent) if len(sent) > 0 else ' ' for sent in self.y_predicted]
+        
+        self.y_predicted = [' '.join(sent) if len(sent) > 0 else ' ' for sent in self.y_predicted]
 
 
 class BLEUSentenceScoreMetric(AbstractBaseMetric):
