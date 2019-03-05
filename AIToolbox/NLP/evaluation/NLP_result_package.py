@@ -7,7 +7,7 @@ from AIToolbox.NLP.evaluation.NLP_metrics import ROUGEMetric, ROUGENonPerlMetric
 
 
 class QuestionAnswerResultPackage(AbstractResultPackage):
-    def __init__(self, paragraph_text_tokens, output_text_dir, target_actual_text=False, use_perl_rouge=True,
+    def __init__(self, paragraph_text_tokens, output_text_dir=None, target_actual_text=False, use_perl_rouge=True,
                  strict_content_check=False, **kwargs):
         """
 
@@ -19,11 +19,13 @@ class QuestionAnswerResultPackage(AbstractResultPackage):
             strict_content_check (bool):
             **kwargs (dict):
         """
-        # self.paragraph_text_tokens = paragraph_text_tokens
+        if use_perl_rouge is True and output_text_dir is None:
+            raise ValueError('When using the perl based ROUGE definition the output_text_dir path must be given.')
+
         # todo: check if this is efficient
         self.paragraph_text_tokens = [[str(w) for w in paragraph] if not target_actual_text else [paragraph]
                                       for paragraph in paragraph_text_tokens]
-        self.output_text_dir = os.path.expanduser(output_text_dir)
+        self.output_text_dir = os.path.expanduser(output_text_dir) if output_text_dir else None
         self.target_actual_text = target_actual_text
         self.use_perl_rouge = use_perl_rouge
         AbstractResultPackage.__init__(self, strict_content_check, **kwargs)

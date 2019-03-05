@@ -113,7 +113,8 @@ class ROUGEMetric(AbstractBaseMetric):
 
 class ROUGENonPerlMetric(AbstractBaseMetric):
     def __init__(self, y_true, y_predicted,
-                 output_text_cleaning_regex=(r'<.*?>', r'[^a-zA-Z0-9.?! ]+'), target_actual_text=False):
+                 output_text_cleaning_regex=(r'<.*?>', r'[^a-zA-Z0-9.?! ]+'), target_actual_text=False,
+                 output_text_dir=None):
         """
 
         From this package:
@@ -125,24 +126,40 @@ class ROUGENonPerlMetric(AbstractBaseMetric):
             y_predicted (numpy.array or list):
             output_text_cleaning_regex (list):
             target_actual_text (bool):
+            output_text_dir (str):
         """
         self.output_text_cleaning_regex = output_text_cleaning_regex
         self.target_actual_text = target_actual_text
+        self.output_text_dir = output_text_dir
         AbstractBaseMetric.__init__(self, y_true, y_predicted, np_array=False)
         self.metric_name = 'ROGUE_nonPerl'
 
     def calculate_metric(self):
+        if self.output_text_dir is not None:
+            # TODO: Test this!!!
+            ROUGEMetric.dump_answer_text_to_disk(self.y_true, self.y_predicted,
+                                                 self.output_text_dir, self.output_text_cleaning_regex,
+                                                 self.target_actual_text)
+
         self.prepare_text()
 
         rouge_calc = Rouge()
         hypothesis = self.y_predicted
         reference = self.y_true
-        self.metric_result = rouge_calc.get_scores(hypothesis, reference, avg=True)
+
+        # TODO: remove try-except... just for testing
+        try:
+            self.metric_result = rouge_calc.get_scores(hypothesis, reference, avg=True)
+        except:
+            print('hypothesis')
+            print(hypothesis)
+            print('reference')
+            print(reference)
+            exit()
 
     def prepare_text(self):
         if not self.target_actual_text:
             self.y_true = [' '.join(sent) for sent in self.y_true]
-        
         self.y_predicted = [' '.join(sent) if len(sent) > 0 else ' ' for sent in self.y_predicted]
 
 
