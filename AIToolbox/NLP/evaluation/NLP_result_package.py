@@ -7,26 +7,31 @@ from AIToolbox.NLP.evaluation.NLP_metrics import ROUGEMetric, ROUGENonPerlMetric
 
 
 class QuestionAnswerResultPackage(AbstractResultPackage):
-    def __init__(self, paragraph_text_tokens, output_text_dir=None, target_actual_text=False, use_perl_rouge=True,
+    def __init__(self, paragraph_text_tokens, output_text_dir=None, target_actual_text=None,
+                 use_perl_rouge=True,
                  strict_content_check=False, **kwargs):
         """
 
         Args:
             paragraph_text_tokens (list):
             output_text_dir (str):
-            target_actual_text (bool):
+            target_actual_text (list or None):
             use_perl_rouge (bool):
             strict_content_check (bool):
             **kwargs (dict):
         """
         if use_perl_rouge is True and output_text_dir is None:
             raise ValueError('When using the perl based ROUGE definition the output_text_dir path must be given.')
+        if target_actual_text is not None:
+            if len(paragraph_text_tokens) != len(target_actual_text):
+                raise ValueError('paragraph_text_tokens size not the same as target_actual_text.')
 
         # todo: check if this is efficient
-        self.paragraph_text_tokens = [[str(w) for w in paragraph] if not target_actual_text else [paragraph]
-                                      for paragraph in paragraph_text_tokens]
-        self.output_text_dir = os.path.expanduser(output_text_dir) if output_text_dir else None
+        self.paragraph_text_tokens = [[str(w) for w in paragraph] for paragraph in paragraph_text_tokens]
         self.target_actual_text = target_actual_text
+        self.use_target_actual_text = target_actual_text is not None
+
+        self.output_text_dir = os.path.expanduser(output_text_dir) if output_text_dir else None
         self.use_perl_rouge = use_perl_rouge
         AbstractResultPackage.__init__(self, strict_content_check, **kwargs)
 
@@ -41,8 +46,8 @@ class QuestionAnswerResultPackage(AbstractResultPackage):
         y_span_end_true = self.y_true[:, 1]
         y_span_end_predicted = self.y_predicted[:, 1]
         
-        if self.target_actual_text:
-            true_text = self.paragraph_text_tokens
+        if self.use_target_actual_text:
+            true_text = self.target_actual_text
         else:
             true_text = [paragraph_text[start_span:end_span + 1]
                          for start_span, end_span, paragraph_text in
@@ -59,9 +64,9 @@ class QuestionAnswerResultPackage(AbstractResultPackage):
 
         if self.use_perl_rouge:
             rogue_metric = ROUGEMetric(true_text, pred_text, self.output_text_dir,
-                                       target_actual_text=self.target_actual_text)
+                                       target_actual_text=self.use_target_actual_text)
         else:
-            rogue_metric = ROUGENonPerlMetric(true_text, pred_text, target_actual_text=self.target_actual_text)
+            rogue_metric = ROUGENonPerlMetric(true_text, pred_text, target_actual_text=self.use_target_actual_text)
 
         # self.results_dict = {**rogue_metric, **rogue_metric_non_official}
         self.results_dict = rogue_metric.get_metric_dict()
