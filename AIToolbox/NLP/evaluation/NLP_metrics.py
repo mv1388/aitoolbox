@@ -11,7 +11,61 @@ from AIToolbox.experiment_save.core_metrics.base_metric import AbstractBaseMetri
 
 class ROUGEMetric(AbstractBaseMetric):
     def __init__(self, y_true, y_predicted,
-                 output_text_dir, output_text_cleaning_regex=(r'<.*?>', r'[^a-zA-Z0-9.?! ]+')):
+                 target_actual_text=False, output_text_dir=None,
+                 output_text_cleaning_regex=(r'<.*?>', r'[^a-zA-Z0-9.?! ]+')):
+        """
+
+        From this package:
+            https://github.com/pltrdy/rouge
+
+
+        Args:
+            y_true (numpy.array or list):
+            y_predicted (numpy.array or list):
+            target_actual_text (bool):
+            output_text_dir (str):
+            output_text_cleaning_regex (list):
+        """
+        self.output_text_cleaning_regex = output_text_cleaning_regex
+        self.target_actual_text = target_actual_text
+        self.output_text_dir = output_text_dir
+        AbstractBaseMetric.__init__(self, y_true, y_predicted, np_array=False)
+        self.metric_name = 'ROGUE'
+
+    def calculate_metric(self):
+        if self.output_text_dir is not None:
+            # Not affecting the metric calculation. Just for record keeping it drops the texts to disk so they can be
+            # reviewed
+            ROUGEPerlMetric.dump_answer_text_to_disk(self.y_true, self.y_predicted,
+                                                     self.output_text_dir, self.output_text_cleaning_regex,
+                                                     self.target_actual_text)
+
+        self.prepare_text()
+
+        rouge_calc = Rouge()
+        hypothesis = self.y_predicted
+        reference = self.y_true
+
+        # TODO: remove try-except... just for testing
+        try:
+            self.metric_result = rouge_calc.get_scores(hypothesis, reference, avg=True)
+        except:
+            print('hypothesis')
+            print(hypothesis)
+            print('reference')
+            print(reference)
+            exit()
+
+    def prepare_text(self):
+        if not self.target_actual_text:
+            self.y_true = [' '.join(sent) for sent in self.y_true]
+        self.y_predicted = [' '.join(sent) if len(sent) > 0 else ' ' for sent in self.y_predicted]
+
+
+class ROUGEPerlMetric(AbstractBaseMetric):
+    def __init__(self, y_true, y_predicted,
+                 output_text_dir, output_text_cleaning_regex=(r'<.*?>', r'[^a-zA-Z0-9.?! ]+'),
+                 target_actual_text=False):
         """
 
         Use this package:
@@ -29,15 +83,18 @@ class ROUGEMetric(AbstractBaseMetric):
             y_predicted (numpy.array or list): your summaries are ‘system’ summaries
             output_text_dir (str):
             output_text_cleaning_regex (list):
+            target_actual_text (bool):
         """
         self.output_text_dir = output_text_dir
         self.output_text_cleaning_regex = output_text_cleaning_regex
-        AbstractBaseMetric.__init__(self, y_true, y_predicted)
-        self.metric_name = 'ROGUE'
+        self.target_actual_text = target_actual_text
+        AbstractBaseMetric.__init__(self, y_true, y_predicted, np_array=False)
+        self.metric_name = 'ROGUE_Perl'
 
     def calculate_metric(self):
         self.dump_answer_text_to_disk(self.y_true, self.y_predicted,
-                                      self.output_text_dir, self.output_text_cleaning_regex)
+                                      self.output_text_dir, self.output_text_cleaning_regex,
+                                      self.target_actual_text)
 
         rouge = Rouge155()
         # In ROUGE, your summaries are ‘system’ summaries and the gold standard summaries are ‘model’ summaries.
@@ -52,7 +109,7 @@ class ROUGEMetric(AbstractBaseMetric):
         self.metric_result = output_dict
 
     @staticmethod
-    def dump_answer_text_to_disk(true_text, pred_text, output_text_dir, output_text_cleaning_regex):
+    def dump_answer_text_to_disk(true_text, pred_text, output_text_dir, output_text_cleaning_regex, target_actual_text):
         """
 
         Problems:
@@ -64,6 +121,7 @@ class ROUGEMetric(AbstractBaseMetric):
             pred_text (list):
             output_text_dir (str):
             output_text_cleaning_regex (list):
+            target_actual_text (bool):
 
         Returns:
 
@@ -78,13 +136,16 @@ class ROUGEMetric(AbstractBaseMetric):
         for i, text in enumerate(true_text):
             with open(os.path.join(output_text_dir, f'true_answer/true_answer_text.{i}.txt'), 'w') as f:
                 # Default regex cleaners: (r'<.*?>', r'[^a-zA-Z0-9.?! ]+')
-                text_clean = ROUGEMetric.regex_clean_text(text, output_text_cleaning_regex)
+                if target_actual_text:
+                    text_clean = [text]
+                else:
+                    text_clean = ROUGEPerlMetric.regex_clean_text(text, output_text_cleaning_regex)
                 f.write(' '.join(text_clean))
 
         for i, text in enumerate(pred_text):
             with open(os.path.join(output_text_dir, f'pred_answer/pred_answer_text.{i}.txt'), 'w') as f:
                 # Default regex cleaners: (r'<.*?>', r'[^a-zA-Z0-9.?! ]+')
-                text_clean = ROUGEMetric.regex_clean_text(text, output_text_cleaning_regex)
+                text_clean = ROUGEPerlMetric.regex_clean_text(text, output_text_cleaning_regex)
                 f.write(' '.join(text_clean) if len(text_clean) > 0 else ' ')
 
     @staticmethod
@@ -98,33 +159,13 @@ class ROUGEMetric(AbstractBaseMetric):
         Returns:
             list:
         """
+        # return text
+
         # The default is: (r'<.*?>', r'[^a-zA-Z0-9.?! ]+')
         for cleaning_regex in cleaning_regex_list:
             re_pattern = re.compile(cleaning_regex)
             text = [re_pattern.sub('', t) for t in text if len(re_pattern.sub('', t)) > 0]
         return text
-
-
-class ROUGENonPerlMetric(AbstractBaseMetric):
-    def __init__(self, y_true, y_predicted):
-        """
-
-        From this package:
-            https://github.com/pltrdy/rouge
-
-
-        Args:
-            y_true (str):
-            y_predicted (str):
-        """
-        AbstractBaseMetric.__init__(self, y_true, y_predicted, np_array=False)
-        self.metric_name = 'ROGUE_nonOfficial'
-
-    def calculate_metric(self):
-        rouge_calc = Rouge()
-        hypothesis = self.y_predicted
-        reference = self.y_true
-        self.metric_result = rouge_calc.get_scores(hypothesis, reference, avg=True)
 
 
 class BLEUSentenceScoreMetric(AbstractBaseMetric):

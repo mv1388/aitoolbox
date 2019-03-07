@@ -102,7 +102,11 @@ class SQuAD2ConcatContextDatasetReader:
             candidate_answers[(span_start, span_end)] += 1
         span_start, span_end = candidate_answers.most_common(1)[0][0]
 
-        return paragraph_tokens, question_tokens, (span_start, span_end)  # , answer_texts
+        # TODO: check if I really always only want 1 answer and not multiple options.
+        #  Maybe have a parameter deciding which option
+        selected_answer_text = answer_texts[token_spans.index(candidate_answers.most_common(1)[0][0])]
+
+        return paragraph_tokens, question_tokens, (span_start, span_end), selected_answer_text
 
     def tokenize_process_paragraph(self, paragraph_text):
         tokenized_paragraph = self._tokenizer.tokenize(paragraph_text)
