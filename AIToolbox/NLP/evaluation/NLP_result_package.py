@@ -2,20 +2,20 @@ import os
 
 from AIToolbox.experiment_save.result_package import AbstractResultPackage
 from AIToolbox.experiment_save.core_metrics.classification import AccuracyMetric
-from AIToolbox.NLP.evaluation.NLP_metrics import ROUGEMetric, ROUGENonPerlMetric, \
+from AIToolbox.NLP.evaluation.NLP_metrics import ROUGEMetric, ROUGEPerlMetric, \
     BLEUCorpusScoreMetric, PerplexityMetric
 
 
 class QuestionAnswerResultPackage(AbstractResultPackage):
-    def __init__(self, paragraph_text_tokens, output_text_dir=None, target_actual_text=None,
-                 use_perl_rouge=True,
+    def __init__(self, paragraph_text_tokens, target_actual_text=None, output_text_dir=None,
+                 use_perl_rouge=False,
                  strict_content_check=False, **kwargs):
         """
 
         Args:
             paragraph_text_tokens (list):
-            output_text_dir (str):
             target_actual_text (list or None):
+            output_text_dir (str):
             use_perl_rouge (bool):
             strict_content_check (bool):
             **kwargs (dict):
@@ -62,11 +62,12 @@ class QuestionAnswerResultPackage(AbstractResultPackage):
         #              for start_span, end_span, paragraph_text in
         #              zip(y_span_start_true.astype('int'), y_span_end_true.astype('int'), self.paragraph_text_tokens)]
 
-        if self.use_perl_rouge:
-            rogue_metric = ROUGEMetric(true_text, pred_text, self.output_text_dir,
-                                       target_actual_text=self.use_target_actual_text)
+        if not self.use_perl_rouge:
+            rogue_metric = ROUGEMetric(true_text, pred_text, target_actual_text=self.use_target_actual_text,
+                                       output_text_dir=self.output_text_dir)
         else:
-            rogue_metric = ROUGENonPerlMetric(true_text, pred_text, target_actual_text=self.use_target_actual_text)
+            rogue_metric = ROUGEPerlMetric(true_text, pred_text, self.output_text_dir,
+                                           target_actual_text=self.use_target_actual_text)
 
         # self.results_dict = {**rogue_metric, **rogue_metric_non_official}
         self.results_dict = rogue_metric.get_metric_dict()
@@ -129,7 +130,7 @@ class TextSummarizationResultPackage(AbstractResultPackage):
         Returns:
 
         """
-        # rogue_result = ROUGEMetric(self.y_true, self.y_predicted).get_metric_dict()
+        # rogue_result = ROUGEPerlMetric(self.y_true, self.y_predicted).get_metric_dict()
 
         raise NotImplementedError
 
