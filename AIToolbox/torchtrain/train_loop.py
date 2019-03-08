@@ -111,12 +111,16 @@ class TrainLoop:
 
         train_loss = self.evaluate_loss_on_train_set()
         print(f'TRAIN LOSS: {train_loss}')
-        self.train_history['loss'].append(train_loss)
+        # TODO: test this
+        # self.train_history['loss'].append(train_loss)
+        self.insert_metric_result_into_history('loss', train_loss)
 
         if self.validation_loader is not None:
             val_loss = self.evaluate_loss_on_validation_set()
             print(f'VAL LOSS: {val_loss}')
-            self.train_history['val_loss'].append(val_loss)
+            # TODO: test this
+            # self.train_history['val_loss'].append(val_loss)
+            self.insert_metric_result_into_history('val_loss', val_loss)
 
     def evaluate_loss_on_train_set(self):
         """
@@ -201,6 +205,18 @@ class TrainLoop:
         self.model.train()
 
         return y_test, y_pred
+
+    def insert_metric_result_into_history(self, metric_name, metric_result):
+        """
+
+        Args:
+            metric_name (str):
+            metric_result (float or dict):
+
+        """
+        if metric_name not in self.train_history:
+            self.train_history[metric_name] = []
+        self.train_history[metric_name].append(metric_result)
 
 
 class TrainLoopModelCheckpoint(TrainLoop):
