@@ -162,12 +162,12 @@ class TrainHistoryFormatter(AbstractCallback):
 
     def on_epoch_end(self):
         if self.epoch_end:
-            if self.check_if_history_updated():
+            if self.check_if_history_updated(not self.epoch_end):
                 self.format_history()
 
     def on_train_end(self):
         if self.train_end:
-            if self.check_if_history_updated():
+            if self.check_if_history_updated(self.train_end):
                 self.format_history()
 
     def format_history(self):
@@ -175,8 +175,11 @@ class TrainHistoryFormatter(AbstractCallback):
         output_metric_name, output_metric = self.output_metric_setter(input_metric)
         self.train_loop_obj.insert_metric_result_into_history(output_metric_name, output_metric)
 
-    def check_if_history_updated(self):
-        history_elements_expected = self.train_loop_obj.epoch + 1
+    def check_if_history_updated(self, train_end_phase):
+        if train_end_phase:
+            history_elements_expected = 1
+        else:
+            history_elements_expected = self.train_loop_obj.epoch + 1
         metric_result_list = self.input_metric_getter(self.train_loop_obj.train_history)
         metric_result_len = len(metric_result_list)
 
