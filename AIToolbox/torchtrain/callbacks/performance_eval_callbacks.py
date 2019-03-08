@@ -133,8 +133,10 @@ class TrainHistoryFormatter(AbstractCallback):
         """
 
         Args:
-            input_metric_getter (lambda):
-            output_metric_setter (lambda):
+            input_metric_getter (lambda): extract full history for the desired metric, not just the last history input.
+                Return should be represented as a list.
+            output_metric_setter (lambda): take the extracted full history of a metric and convert it as desired.
+                Return new / transformed metric name and transformed metric result.
             epoch_end (bool):
             train_end (bool):
             strict_metric_extract (bool):
@@ -179,7 +181,7 @@ class TrainHistoryFormatter(AbstractCallback):
         return True
 
 
-class MetricRename(TrainHistoryFormatter):
+class MetricHistoryRename(TrainHistoryFormatter):
     def __init__(self, input_metric_path, new_metric_name, strict_metric_extract=False):
         """
 
@@ -189,10 +191,23 @@ class MetricRename(TrainHistoryFormatter):
             new_metric_name (str):
             strict_metric_extract (bool):
         """
-        self.input_metric_getter = lambda train_history: \
-            input_metric_path(train_history) if callable(input_metric_path) else train_history[input_metric_path]
 
-        self.output_metric_setter = lambda input_metric: (new_metric_name, input_metric[-1])
+        # TODO: decide which of these two options is better
 
-        TrainHistoryFormatter.__init__(self, self.input_metric_getter, self.output_metric_setter,
+        # if callable(input_metric_path):
+        #     input_metric_getter = input_metric_path
+        # else:
+        #     input_metric_getter = lambda train_history: train_history[input_metric_path]
+
+        # input_metric_getter = input_metric_path if callable(input_metric_path) \
+        #     else lambda train_history: train_history[input_metric_path]
+        # output_metric_setter = lambda input_metric: (new_metric_name, input_metric[-1])
+
+        # TrainHistoryFormatter.__init__(self, input_metric_getter, output_metric_setter,
+        #                                epoch_end=True, train_end=True, strict_metric_extract=strict_metric_extract)
+
+        TrainHistoryFormatter.__init__(self,
+                                       input_metric_getter=input_metric_path if callable(input_metric_path) else
+                                       lambda train_history: train_history[input_metric_path],
+                                       output_metric_setter=lambda input_metric: (new_metric_name, input_metric[-1]),
                                        epoch_end=True, train_end=True, strict_metric_extract=strict_metric_extract)
