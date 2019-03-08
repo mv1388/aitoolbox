@@ -136,7 +136,7 @@ class ModelPerformancePrintReportCallback(AbstractCallback):
 
 class TrainHistoryFormatter(AbstractCallback):
     def __init__(self, input_metric_getter, output_metric_setter,
-                 epoch_end=True, train_end=True, strict_metric_extract=True):
+                 epoch_end=True, train_end=False, strict_metric_extract=True):
         """
 
         Args:
@@ -148,6 +148,10 @@ class TrainHistoryFormatter(AbstractCallback):
             train_end (bool):
             strict_metric_extract (bool):
         """
+        if epoch_end == train_end:
+            raise ValueError(f'Only either epoch_end or train_end have to be set to True. '
+                             f'Have set epoch_end to {epoch_end} and train_end to {train_end}')
+
         AbstractCallback.__init__(self, 'Train history general formatter engine')
         self.input_metric_getter = input_metric_getter
         self.output_metric_setter = output_metric_setter
@@ -190,7 +194,7 @@ class TrainHistoryFormatter(AbstractCallback):
 
 class MetricHistoryRename(TrainHistoryFormatter):
     def __init__(self, input_metric_path, new_metric_name,
-                 epoch_end=True, train_end=True, strict_metric_extract=True):
+                 epoch_end=True, train_end=False, strict_metric_extract=True):
         """
 
         Args:
