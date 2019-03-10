@@ -13,7 +13,7 @@ class AbstractDatasetFetcher(ABC):
         pass
 
 
-class SmartDatasetFetcher:
+class BaseDatasetFetcher:
     def __init__(self, bucket_name='dataset-store', local_dataset_folder_path='~/project/data'):
         """
 
@@ -88,7 +88,7 @@ class SmartDatasetFetcher:
                 zip_ref.extractall(target_dir_path)
 
 
-class SQuAD2DatasetFetcher(AbstractDatasetFetcher, SmartDatasetFetcher):
+class SQuAD2DatasetFetcher(AbstractDatasetFetcher, BaseDatasetFetcher):
     def __init__(self, bucket_name='dataset-store', local_dataset_folder_path='~/project/data'):
         """
 
@@ -96,7 +96,7 @@ class SQuAD2DatasetFetcher(AbstractDatasetFetcher, SmartDatasetFetcher):
             bucket_name (str):
             local_dataset_folder_path (str):
         """
-        SmartDatasetFetcher.__init__(self, bucket_name, local_dataset_folder_path)
+        BaseDatasetFetcher.__init__(self, bucket_name, local_dataset_folder_path)
 
     def fetch_dataset(self, protect_local_folder=True):
         """
@@ -115,7 +115,7 @@ class SQuAD2DatasetFetcher(AbstractDatasetFetcher, SmartDatasetFetcher):
                             local_file_path=os.path.join(self.local_dataset_folder_path, 'SQuAD2', 'dev-v2.0.json'))
 
 
-class QAngarooDatasetFetcher(AbstractDatasetFetcher, SmartDatasetFetcher):
+class QAngarooDatasetFetcher(AbstractDatasetFetcher, BaseDatasetFetcher):
     def __init__(self, bucket_name='dataset-store', local_dataset_folder_path='~/project/data'):
         """
 
@@ -123,7 +123,7 @@ class QAngarooDatasetFetcher(AbstractDatasetFetcher, SmartDatasetFetcher):
             bucket_name (str):
             local_dataset_folder_path (str):
         """
-        SmartDatasetFetcher.__init__(self, bucket_name, local_dataset_folder_path)
+        BaseDatasetFetcher.__init__(self, bucket_name, local_dataset_folder_path)
 
     def fetch_dataset(self, protect_local_folder=True):
         """
@@ -148,7 +148,7 @@ class QAngarooDatasetFetcher(AbstractDatasetFetcher, SmartDatasetFetcher):
             self.unzip_file(wikihop_local_file_path, wikihop_local_folder_path)
 
 
-class CNNDailyMailDatasetFetcher(AbstractDatasetFetcher, SmartDatasetFetcher):
+class CNNDailyMailDatasetFetcher(AbstractDatasetFetcher, BaseDatasetFetcher):
     def __init__(self, bucket_name='dataset-store', local_dataset_folder_path='~/project/data'):
         """
 
@@ -156,7 +156,7 @@ class CNNDailyMailDatasetFetcher(AbstractDatasetFetcher, SmartDatasetFetcher):
             bucket_name (str):
             local_dataset_folder_path (str):
         """
-        SmartDatasetFetcher.__init__(self, bucket_name, local_dataset_folder_path)
+        BaseDatasetFetcher.__init__(self, bucket_name, local_dataset_folder_path)
         self.available_prepocessed_datasets = ['abisee', 'danqi']
 
     def fetch_dataset(self, protect_local_folder=True):
@@ -215,7 +215,7 @@ class CNNDailyMailDatasetFetcher(AbstractDatasetFetcher, SmartDatasetFetcher):
                 self.unzip_file(dm_local_file_path, dm_local_folder_path)
 
 
-class HotpotQADatasetFetcher(AbstractDatasetFetcher, SmartDatasetFetcher):
+class HotpotQADatasetFetcher(AbstractDatasetFetcher, BaseDatasetFetcher):
     def __init__(self, bucket_name='dataset-store', local_dataset_folder_path='~/project/data'):
         """
 
@@ -229,7 +229,7 @@ class HotpotQADatasetFetcher(AbstractDatasetFetcher, SmartDatasetFetcher):
             bucket_name (str):
             local_dataset_folder_path (str):
         """
-        SmartDatasetFetcher.__init__(self, bucket_name, local_dataset_folder_path)
+        BaseDatasetFetcher.__init__(self, bucket_name, local_dataset_folder_path)
 
     def fetch_dataset(self, protect_local_folder=True):
         """
