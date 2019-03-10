@@ -31,32 +31,12 @@ class ModelPerformanceEvaluationCallback(AbstractCallback):
 
     def on_train_end(self):
         self.evaluate_model_performance()
+        self.store_evaluated_metrics_to_history(prefix='train_end_')
 
     def on_epoch_end(self):
         if self.on_each_epoch:
             self.evaluate_model_performance()
-
-            evaluated_metrics = self.result_package.get_results().keys() if self.on_val_data \
-                else self.train_result_package.get_results().keys()
-
-            for m_name in evaluated_metrics:
-                if self.on_train_data:
-                    metric_name = f'train_{m_name}'
-                    # TODO: Test this
-                    # if metric_name not in self.train_loop_obj.train_history:
-                    #     self.train_loop_obj.train_history[metric_name] = []
-                    # self.train_loop_obj.train_history[metric_name].append(self.train_result_package.get_results()[m_name])
-                    self.train_loop_obj.insert_metric_result_into_history(metric_name,
-                                                                          self.train_result_package.get_results()[m_name])
-
-                if self.on_val_data:
-                    metric_name = f'val_{m_name}'
-                    # TODO: Test this
-                    # if metric_name not in self.train_loop_obj.train_history:
-                    #     self.train_loop_obj.train_history[metric_name] = []
-                    # self.train_loop_obj.train_history[metric_name].append(self.result_package.get_results()[m_name])
-                    self.train_loop_obj.insert_metric_result_into_history(metric_name,
-                                                                          self.result_package.get_results()[m_name])
+            self.store_evaluated_metrics_to_history()
 
     def evaluate_model_performance(self):
         # TODO: maybe remove these 3 lines to save compute time and don't generate the train history which is not needed
@@ -69,17 +49,38 @@ class ModelPerformanceEvaluationCallback(AbstractCallback):
             y_test, y_pred = self.train_loop_obj.predict_on_train_set()
             self.train_result_package.prepare_result_package(y_test, y_pred,
                                                              hyperparameters=self.args, training_history=train_hist_pkg)
-            print(f'TRAIN: {self.train_result_package.get_results()}')
+            # print(f'TRAIN: {self.train_result_package.get_results()}')
 
         if self.on_val_data:
             y_test, y_pred = self.train_loop_obj.predict_on_validation_set()
             self.result_package.prepare_result_package(y_test, y_pred,
                                                        hyperparameters=self.args, training_history=train_hist_pkg)
-            print(f'VAL: {self.result_package.get_results()}')
+            # print(f'VAL: {self.result_package.get_results()}')
+
+    def store_evaluated_metrics_to_history(self, prefix=''):
+        """
+
+        Args:
+            prefix (str):
+
+        """
+        evaluated_metrics = self.result_package.get_results().keys() if self.on_val_data \
+            else self.train_result_package.get_results().keys()
+
+        for m_name in evaluated_metrics:
+            if self.on_train_data:
+                metric_name = f'{prefix}train_{m_name}'
+                self.train_loop_obj.insert_metric_result_into_history(metric_name,
+                                                                      self.train_result_package.get_results()[m_name])
+
+            if self.on_val_data:
+                metric_name = f'{prefix}val_{m_name}'
+                self.train_loop_obj.insert_metric_result_into_history(metric_name,
+                                                                      self.result_package.get_results()[m_name])
 
 
 class ModelPerformancePrintReportCallback(AbstractCallback):
-    def __init__(self, metrics, on_each_epoch=True, strict_metric_reporting=False):
+    def __init__(self, metrics, on_each_epoch=True, strict_metric_reporting=True, list_tracked_metrics=False):
         """
 
         Best used in combination with the callback which actually calculates some performance evaluation metrics, such
@@ -94,26 +95,33 @@ class ModelPerformancePrintReportCallback(AbstractCallback):
             on_each_epoch (bool): present results just at the end of training or at the end of each epoch
             strict_metric_reporting (bool): if False ignore missing metric in the TrainLoop.train_history, if True, in
                 case of missing metric throw and exception and thus interrupt the training loop
+            list_tracked_metrics (bool):
         """
         AbstractCallback.__init__(self, 'Model performance print reporter')
         self.metrics = metrics
         self.on_each_epoch = on_each_epoch
         self.strict_metric_reporting = strict_metric_reporting
+        self.list_tracked_metrics = list_tracked_metrics
 
         if len(metrics) == 0:
             raise ValueError('metrics list is empty')
 
     def on_train_end(self):
-        print('End of training performance report:')
-        self.print_performance_report()
+        print('------------  End of training performance report  ------------')
+        self.print_performance_report(prefix='train_end_')
 
     def on_epoch_end(self):
         if self.on_each_epoch:
-            print('End of epoch performance report:')
+            print('------------  End of epoch performance report  ------------')
             self.print_performance_report()
 
-    def print_performance_report(self):
+    def print_performance_report(self, prefix=''):
+        if self.list_tracked_metrics:
+            print(self.train_loop_obj.train_history.keys())
+
         for metric_name in self.metrics:
+            metric_name = prefix + metric_name
+
             if metric_name not in self.train_loop_obj.train_history:
                 if self.strict_metric_reporting:
                     raise ValueError(
@@ -122,23 +130,28 @@ class ModelPerformancePrintReportCallback(AbstractCallback):
                 else:
                     print(f'Metric {metric_name} expected for the report missing from TrainLoop.train_history. '
                           f'Found only the following: {self.train_loop_obj.train_history.keys()}')
-
             else:
                 print(f'{metric_name}: {self.train_loop_obj.train_history[metric_name][-1]}')
 
 
 class TrainHistoryFormatter(AbstractCallback):
     def __init__(self, input_metric_getter, output_metric_setter,
-                 epoch_end=True, train_end=True, strict_metric_extract=False):
+                 epoch_end=True, train_end=False, strict_metric_extract=True):
         """
 
         Args:
-            input_metric_getter (lambda):
-            output_metric_setter (lambda):
+            input_metric_getter (lambda): extract full history for the desired metric, not just the last history input.
+                Return should be represented as a list.
+            output_metric_setter (lambda): take the extracted full history of a metric and convert it as desired.
+                Return new / transformed metric name and transformed metric result.
             epoch_end (bool):
             train_end (bool):
             strict_metric_extract (bool):
         """
+        if epoch_end == train_end:
+            raise ValueError(f'Only either epoch_end or train_end have to be set to True. '
+                             f'Have set epoch_end to {epoch_end} and train_end to {train_end}')
+
         AbstractCallback.__init__(self, 'Train history general formatter engine')
         self.input_metric_getter = input_metric_getter
         self.output_metric_setter = output_metric_setter
@@ -149,12 +162,12 @@ class TrainHistoryFormatter(AbstractCallback):
 
     def on_epoch_end(self):
         if self.epoch_end:
-            if self.check_if_history_updated():
+            if self.check_if_history_updated(not self.epoch_end):
                 self.format_history()
 
     def on_train_end(self):
         if self.train_end:
-            if self.check_if_history_updated():
+            if self.check_if_history_updated(self.train_end):
                 self.format_history()
 
     def format_history(self):
@@ -162,8 +175,11 @@ class TrainHistoryFormatter(AbstractCallback):
         output_metric_name, output_metric = self.output_metric_setter(input_metric)
         self.train_loop_obj.insert_metric_result_into_history(output_metric_name, output_metric)
 
-    def check_if_history_updated(self):
-        history_elements_expected = self.train_loop_obj.epoch + 1
+    def check_if_history_updated(self, train_end_phase):
+        if train_end_phase:
+            history_elements_expected = 1
+        else:
+            history_elements_expected = self.train_loop_obj.epoch + 1
         metric_result_list = self.input_metric_getter(self.train_loop_obj.train_history)
         metric_result_len = len(metric_result_list)
 
@@ -179,20 +195,37 @@ class TrainHistoryFormatter(AbstractCallback):
         return True
 
 
-class MetricRename(TrainHistoryFormatter):
-    def __init__(self, input_metric_path, new_metric_name, strict_metric_extract=False):
+class MetricHistoryRename(TrainHistoryFormatter):
+    def __init__(self, input_metric_path, new_metric_name,
+                 epoch_end=True, train_end=False, strict_metric_extract=True):
         """
 
         Args:
             input_metric_path (str or lambda): if using lambda, extract full history for the desired metric,
                 not just the last history input. Return should be represented as a list.
             new_metric_name (str):
+            epoch_end (bool):
+            train_end (bool):
             strict_metric_extract (bool):
         """
-        self.input_metric_getter = lambda train_history: \
-            input_metric_path(train_history) if callable(input_metric_path) else train_history[input_metric_path]
 
-        self.output_metric_setter = lambda input_metric: (new_metric_name, input_metric[-1])
+        # TODO: decide which of these two options is better
 
-        TrainHistoryFormatter.__init__(self, self.input_metric_getter, self.output_metric_setter,
-                                       epoch_end=True, train_end=True, strict_metric_extract=strict_metric_extract)
+        # if callable(input_metric_path):
+        #     input_metric_getter = input_metric_path
+        # else:
+        #     input_metric_getter = lambda train_history: train_history[input_metric_path]
+
+        # input_metric_getter = input_metric_path if callable(input_metric_path) \
+        #     else lambda train_history: train_history[input_metric_path]
+        # output_metric_setter = lambda input_metric: (new_metric_name, input_metric[-1])
+
+        # TrainHistoryFormatter.__init__(self, input_metric_getter, output_metric_setter,
+        #                                epoch_end=True, train_end=True, strict_metric_extract=strict_metric_extract)
+
+        TrainHistoryFormatter.__init__(self,
+                                       input_metric_getter=input_metric_path if callable(input_metric_path) else
+                                       lambda train_history: train_history[input_metric_path],
+                                       output_metric_setter=lambda input_metric: (new_metric_name, input_metric[-1]),
+                                       epoch_end=epoch_end, train_end=train_end,
+                                       strict_metric_extract=strict_metric_extract)
