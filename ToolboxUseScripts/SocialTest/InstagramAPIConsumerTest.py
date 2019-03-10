@@ -3,8 +3,8 @@
 # import instagram
 #
 #
-# client_id = "2917c107942e440ebabc5990d2c4d913"
-# client_secret = "5530123bb910406fb3cf80b9418d0067"
+# client_id = ""
+# client_secret = ""
 # access_token = ""
 #
 # api = instagram.InstagramAPI(client_id=client_id, client_secret=client_secret)
