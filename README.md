@@ -18,7 +18,7 @@ By using different implemented derivations of `TrainLoop`, the automatic model c
 
 Definition of the model evaluation procedure on the task we are experimenting with. Under the hood the result package executes one or more `metrics` objects which actually calculate the performance metric calculation. Result package object is thus used as a wrapper around potentially multiple performance calculations which are needed for our task.
 
-### experiment saver 
+### Experiment Saver 
 
 Saves the model architecture as well as model performance evaluation results and training history. This can be done at the end of each epoch as a model checkpointing or at the end of training.
 
