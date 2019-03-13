@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+import copy
 import numpy as np
 
 from AIToolbox.experiment_save.core_metrics.base_metric import AbstractBaseMetric
@@ -118,6 +119,70 @@ class AbstractResultPackage(ABC):
             raise ValueError(msg)
         else:
             print(msg)
+
+    def __str__(self):
+        self.warn_if_results_dict_not_defined()
+        return '\n'.join([f'{result_metric}: {self.results_dict[result_metric]}'
+                          for result_metric in self.results_dict])
+
+    def __len__(self):
+        self.warn_if_results_dict_not_defined()
+        return len(self.results_dict)
+
+    def __add__(self, other):
+        self_object_copy = copy.deepcopy(self)
+        return self_object_copy.add_bi_directional(other)
+
+    def __radd__(self, other):
+        self_object_copy = copy.deepcopy(self)
+        return self_object_copy.add_bi_directional(other)
+
+    def __iadd__(self, other):
+        return self.add_bi_directional(other)
+
+    def add_bi_directional(self, other):
+        self.warn_if_results_dict_not_defined()
+
+        if isinstance(other, AbstractResultPackage):
+            return self.merge_dicts(other.results_dict)
+        elif type(other) is dict:
+            return self.merge_dicts(other)
+        else:
+            raise ValueError(f'Addition supported on the AbstractResultPackage objects and dicts. Given {type(other)}')
+
+    def merge_dicts(self, other_results_dict):
+        def results_duplicated(self_results_dict, other_results_dict_dup):
+            for result_name in other_results_dict_dup:
+                if result_name in self_results_dict:
+                    return True
+            return False
+
+        if not results_duplicated(self.results_dict, other_results_dict):
+            self.results_dict = {**self.results_dict, **other_results_dict}
+            return self
+        else:
+            raise ValueError(f'Duplicated metric results found in the results_dict. '
+                             f'Trying to merge the following results_dict metrics: '
+                             f'{self.results_dict.keys()} and {other_results_dict.keys()}')
+
+    def __contains__(self, item):
+        self.warn_if_results_dict_not_defined()
+        if item in self.results_dict:
+            return True
+        else:
+            return False
+
+    def __getitem__(self, item):
+        self.warn_if_results_dict_not_defined()
+        if item in self.results_dict:
+            return self.results_dict[item]
+        else:
+            raise KeyError(f'Key {item} can not be found in the results_dict. '
+                           f'Currently present keys: {self.results_dict.keys()}')
+
+    def warn_if_results_dict_not_defined(self):
+        if self.results_dict is None:
+            raise ValueError(f'results_dict is not set yet. Currently it is {self.results_dict}')
 
 
 class GeneralResultPackage(AbstractResultPackage):
