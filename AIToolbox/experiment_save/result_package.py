@@ -130,17 +130,32 @@ class AbstractResultPackage(ABC):
         return len(self.results_dict)
 
     def __add__(self, other):
-        self_object_copy = copy.deepcopy(self)
-        return self_object_copy.add_bi_directional(other)
+        return self.add_merge_multi_pkg_wrap(other)
 
     def __radd__(self, other):
+        return self.add_merge_multi_pkg_wrap(other)
+
+    def add_merge_multi_pkg_wrap(self, other_object):
         self_object_copy = copy.deepcopy(self)
-        return self_object_copy.add_bi_directional(other)
+        self_object_copy.warn_if_results_dict_not_defined()
+
+        if isinstance(other_object, AbstractResultPackage):
+            multi_result_pkg = MultipleResultPackageWrapper([self_object_copy, other_object])
+
+            multi_result_pkg.prepare_result_package(self_object_copy.y_true, self_object_copy.y_predicted,
+                                                    self_object_copy.hyperparameters, self_object_copy.training_history)
+
+            return multi_result_pkg
+
+        elif type(other_object) is dict:
+            return self_object_copy.merge_dicts(other_object)
+        else:
+            raise ValueError(f'Addition supported on the AbstractResultPackage objects and dicts. Given {type(other_object)}')
 
     def __iadd__(self, other):
-        return self.add_bi_directional(other)
+        return self.add_merge_dicts(other)
 
-    def add_bi_directional(self, other):
+    def add_merge_dicts(self, other):
         self.warn_if_results_dict_not_defined()
 
         if isinstance(other, AbstractResultPackage):
