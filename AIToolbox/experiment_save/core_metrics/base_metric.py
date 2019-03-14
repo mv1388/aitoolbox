@@ -71,6 +71,14 @@ class AbstractBaseMetric(ABC):
         return self_val >= other_val
 
     def get_metric_self_other_val(self, other):
+        """
+
+        Args:
+            other (AIToolbox.experiment_save.core_metrics.base_metric.AbstractBaseMetric or float or int):
+
+        Returns:
+            float or int:
+        """
         if type(self.metric_result) is float or type(self.metric_result) is int:
             if isinstance(other, AbstractBaseMetric) and \
                     (type(other.metric_result) is float or type(other.metric_result) is int):
