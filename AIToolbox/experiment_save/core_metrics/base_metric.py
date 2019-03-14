@@ -54,21 +54,29 @@ class AbstractBaseMetric(ABC):
                             f'The type is: {type(self.metric_result)}. '
                             f'Optimally it should be either a list, dict, float or int.')
 
-    def __cmp__(self, other):
-        def compare_spec(self_val, other_val):
-            if self_val < other_val:
-                return -1
-            elif self_val == other_val:
-                return 0
-            elif self_val > other_val:
-                return 1
+    def __lt__(self, other):
+        self_val, other_val = self.get_metric_self_other_val(other)
+        return self_val < other_val
 
+    def __le__(self, other):
+        self_val, other_val = self.get_metric_self_other_val(other)
+        return self_val <= other_val
+
+    def __gt__(self, other):
+        self_val, other_val = self.get_metric_self_other_val(other)
+        return self_val > other_val
+
+    def __ge__(self, other):
+        self_val, other_val = self.get_metric_self_other_val(other)
+        return self_val >= other_val
+
+    def get_metric_self_other_val(self, other):
         if type(self.metric_result) is float or type(self.metric_result) is int:
             if isinstance(other, AbstractBaseMetric) and \
                     (type(other.metric_result) is float or type(other.metric_result) is int):
-                return compare_spec(self.metric_result, other.metric_result)
+                return self.metric_result, other.metric_result
             elif type(other) is float or type(other) is int:
-                return compare_spec(self.metric_result, other)
+                return self.metric_result, other
 
         raise ValueError('Can do comparison only on metrics where metric_result is int of float')
 
