@@ -140,16 +140,16 @@ class AbstractResultPackage(ABC):
         """
         return self.add_merge_multi_pkg_wrap(other)
 
-    # def __radd__(self, other):
-    #     """
-    #
-    #     Args:
-    #         other (AIToolbox.experiment_save.result_package.AbstractResultPackage or dict):
-    #
-    #     Returns:
-    #         AIToolbox.experiment_save.result_package.MultipleResultPackageWrapper:
-    #     """
-    #     return self.add_merge_multi_pkg_wrap(other)
+    def __radd__(self, other):
+        """
+
+        Args:
+            other (AIToolbox.experiment_save.result_package.AbstractResultPackage or dict):
+
+        Returns:
+            AIToolbox.experiment_save.result_package.MultipleResultPackageWrapper:
+        """
+        return self.add_merge_multi_pkg_wrap(other)
 
     def add_merge_multi_pkg_wrap(self, other_object):
         """
