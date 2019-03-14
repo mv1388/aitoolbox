@@ -56,7 +56,7 @@ class PyTorchModelReRunner(AbstractModelReRunner):
         """
 
         Args:
-            result_package (AIToolbox.experiment_save.result_package.abstract_result_package.AbstractResultPackage):
+            result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
             return_result_package (bool):
 
         Returns:
