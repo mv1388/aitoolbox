@@ -80,7 +80,7 @@ class PyTorchModelReRunner(AbstractModelReRunner):
         """
 
         Args:
-            metric (AIToolbox.experiment_save.core_metrics.base_metric.AbstractBaseMetric):
+            metric (AIToolbox.experiment_save.core_metrics.abstract_metric.AbstractBaseMetric):
 
         Returns:
 
