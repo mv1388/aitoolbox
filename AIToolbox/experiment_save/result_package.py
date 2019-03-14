@@ -132,25 +132,42 @@ class AbstractResultPackage(ABC):
     def __add__(self, other):
         return self.add_merge_multi_pkg_wrap(other)
 
-    def __radd__(self, other):
-        return self.add_merge_multi_pkg_wrap(other)
+    # def __radd__(self, other):
+    #     return self.add_merge_multi_pkg_wrap(other)
 
     def add_merge_multi_pkg_wrap(self, other_object):
+        # if isinstance(other_object, AbstractResultPackage):
+        #     other_object.warn_if_results_dict_not_defined()
+        #     other_object_pkg = copy.deepcopy(other_object)
+        # elif type(other_object) is dict:
+        #     other_object_copy = copy.deepcopy(other_object)
+        #     other_object_pkg = PreCalculatedResultPackage(other_object_copy)
+        # else:
+        #     raise ValueError(f'Addition supported on the AbstractResultPackage objects and dicts. Given {type(other_object)}')
+
+        other_object_pkg = self.create_other_object_pkg(other_object)
+
+        self.warn_if_results_dict_not_defined()
         self_object_copy = copy.deepcopy(self)
-        self_object_copy.warn_if_results_dict_not_defined()
 
+        multi_result_pkg = MultipleResultPackageWrapper([self_object_copy, other_object_pkg])
+        multi_result_pkg.prepare_result_package(self_object_copy.y_true, self_object_copy.y_predicted,
+                                                self_object_copy.hyperparameters, self_object_copy.training_history)
+
+        return multi_result_pkg
+
+    @staticmethod
+    def create_other_object_pkg(other_object):
         if isinstance(other_object, AbstractResultPackage):
-            multi_result_pkg = MultipleResultPackageWrapper([self_object_copy, other_object])
-
-            multi_result_pkg.prepare_result_package(self_object_copy.y_true, self_object_copy.y_predicted,
-                                                    self_object_copy.hyperparameters, self_object_copy.training_history)
-
-            return multi_result_pkg
-
+            other_object.warn_if_results_dict_not_defined()
+            other_object_pkg = copy.deepcopy(other_object)
         elif type(other_object) is dict:
-            return self_object_copy.merge_dicts(other_object)
+            other_object_copy = copy.deepcopy(other_object)
+            other_object_pkg = PreCalculatedResultPackage(other_object_copy)
         else:
             raise ValueError(f'Addition supported on the AbstractResultPackage objects and dicts. Given {type(other_object)}')
+
+        return other_object_pkg
 
     def __iadd__(self, other):
         return self.add_merge_dicts(other)
@@ -198,6 +215,22 @@ class AbstractResultPackage(ABC):
     def warn_if_results_dict_not_defined(self):
         if self.results_dict is None:
             raise ValueError(f'results_dict is not set yet. Currently it is {self.results_dict}')
+
+
+class PreCalculatedResultPackage(AbstractResultPackage):
+    def __init__(self, results_dict, strict_content_check=False, **kwargs):
+        """
+
+        Args:
+            results_dict (dict):
+            strict_content_check (bool):
+            **kwargs (dict):
+        """
+        self.results_dict = results_dict
+        AbstractResultPackage.__init__(self, strict_content_check, **kwargs)
+
+    def prepare_results_dict(self):
+        pass
 
 
 class GeneralResultPackage(AbstractResultPackage):
@@ -335,3 +368,48 @@ class MultipleResultPackageWrapper(AbstractResultPackage):
                 self.results_dict[result_pkg.pkg_name + suffix] = result_pkg.get_results()
             else:
                 self.results_dict[f'ResultPackage{i}'] = result_pkg.get_results()
+
+    def add_merge_multi_pkg_wrap(self, other_object):
+        # if isinstance(other_object, AbstractResultPackage):
+        #     other_object.warn_if_results_dict_not_defined()
+        #     other_object_pkg = copy.deepcopy(other_object)
+        # elif type(other_object) is dict:
+        #     other_object_copy = copy.deepcopy(other_object)
+        #     other_object_pkg = PreCalculatedResultPackage(other_object_copy)
+        # else:
+        #     raise ValueError(
+        #         f'Addition supported on the AbstractResultPackage objects and dicts. Given {type(other_object)}')
+
+        other_object_pkg = self.create_other_object_pkg(other_object)
+
+        self.warn_if_results_dict_not_defined()
+        self_multi_result_pkg = copy.deepcopy(self)
+
+        self_multi_result_pkg.result_packages.append(other_object_pkg)
+        self_multi_result_pkg.prepare_result_package(self_multi_result_pkg.y_true, self_multi_result_pkg.y_predicted,
+                                                     self_multi_result_pkg.hyperparameters,
+                                                     self_multi_result_pkg.training_history,
+                                                     **self_multi_result_pkg.package_metadata)
+
+        return self_multi_result_pkg
+
+    def __iadd__(self, other_object):
+        # if isinstance(other_object, AbstractResultPackage):
+        #     other_object.warn_if_results_dict_not_defined()
+        #     other_object_pkg = copy.deepcopy(other_object)
+        # elif type(other_object) is dict:
+        #     other_object_copy = copy.deepcopy(other_object)
+        #     other_object_pkg = PreCalculatedResultPackage(other_object_copy)
+        # else:
+        #     raise ValueError(
+        #         f'Addition supported on the AbstractResultPackage objects and dicts. Given {type(other_object)}')
+
+        other_object_pkg = self.create_other_object_pkg(other_object)
+
+        self.warn_if_results_dict_not_defined()
+
+        self.result_packages.append(other_object_pkg)
+        self.prepare_result_package(self.y_true, self.y_predicted,
+                                    self.hyperparameters, self.training_history, **self.package_metadata)
+
+        return self
