@@ -130,24 +130,39 @@ class AbstractResultPackage(ABC):
         return len(self.results_dict)
 
     def __add__(self, other):
+        """
+
+        Args:
+            other (AIToolbox.experiment_save.result_package.AbstractResultPackage or dict):
+
+        Returns:
+            AIToolbox.experiment_save.result_package.MultipleResultPackageWrapper:
+        """
         return self.add_merge_multi_pkg_wrap(other)
 
     # def __radd__(self, other):
+    #     """
+    #
+    #     Args:
+    #         other (AIToolbox.experiment_save.result_package.AbstractResultPackage or dict):
+    #
+    #     Returns:
+    #         AIToolbox.experiment_save.result_package.MultipleResultPackageWrapper:
+    #     """
     #     return self.add_merge_multi_pkg_wrap(other)
 
     def add_merge_multi_pkg_wrap(self, other_object):
-        # if isinstance(other_object, AbstractResultPackage):
-        #     other_object.warn_if_results_dict_not_defined()
-        #     other_object_pkg = copy.deepcopy(other_object)
-        # elif type(other_object) is dict:
-        #     other_object_copy = copy.deepcopy(other_object)
-        #     other_object_pkg = PreCalculatedResultPackage(other_object_copy)
-        # else:
-        #     raise ValueError(f'Addition supported on the AbstractResultPackage objects and dicts. Given {type(other_object)}')
+        """
 
+        Args:
+            other_object (AIToolbox.experiment_save.result_package.AbstractResultPackage or dict):
+
+        Returns:
+            AIToolbox.experiment_save.result_package.MultipleResultPackageWrapper:
+        """
+        self.warn_if_results_dict_not_defined()
         other_object_pkg = self.create_other_object_pkg(other_object)
 
-        self.warn_if_results_dict_not_defined()
         self_object_copy = copy.deepcopy(self)
 
         multi_result_pkg = MultipleResultPackageWrapper([self_object_copy, other_object_pkg])
@@ -158,6 +173,14 @@ class AbstractResultPackage(ABC):
 
     @staticmethod
     def create_other_object_pkg(other_object):
+        """
+
+        Args:
+            other_object (AIToolbox.experiment_save.result_package.AbstractResultPackage or dict):
+
+        Returns:
+            AIToolbox.experiment_save.result_package.AbstractResultPackage:
+        """
         if isinstance(other_object, AbstractResultPackage):
             other_object.warn_if_results_dict_not_defined()
             other_object_pkg = copy.deepcopy(other_object)
@@ -170,12 +193,29 @@ class AbstractResultPackage(ABC):
         return other_object_pkg
 
     def __iadd__(self, other):
+        """
+
+        Args:
+            other (AIToolbox.experiment_save.result_package.AbstractResultPackage or dict):
+
+        Returns:
+            AIToolbox.experiment_save.result_package.AbstractResultPackage:
+        """
         return self.add_merge_dicts(other)
 
     def add_merge_dicts(self, other):
+        """
+
+        Args:
+            other (AIToolbox.experiment_save.result_package.AbstractResultPackage or dict):
+
+        Returns:
+            AIToolbox.experiment_save.result_package.AbstractResultPackage:
+        """
         self.warn_if_results_dict_not_defined()
 
         if isinstance(other, AbstractResultPackage):
+            other.warn_if_results_dict_not_defined()
             return self.merge_dicts(other.results_dict)
         elif type(other) is dict:
             return self.merge_dicts(other)
@@ -183,6 +223,14 @@ class AbstractResultPackage(ABC):
             raise ValueError(f'Addition supported on the AbstractResultPackage objects and dicts. Given {type(other)}')
 
     def merge_dicts(self, other_results_dict):
+        """
+
+        Args:
+            other_results_dict (dict):
+
+        Returns:
+            AIToolbox.experiment_save.result_package.AbstractResultPackage:
+        """
         def results_duplicated(self_results_dict, other_results_dict_dup):
             for result_name in other_results_dict_dup:
                 if result_name in self_results_dict:
@@ -370,19 +418,17 @@ class MultipleResultPackageWrapper(AbstractResultPackage):
                 self.results_dict[f'ResultPackage{i}'] = result_pkg.get_results()
 
     def add_merge_multi_pkg_wrap(self, other_object):
-        # if isinstance(other_object, AbstractResultPackage):
-        #     other_object.warn_if_results_dict_not_defined()
-        #     other_object_pkg = copy.deepcopy(other_object)
-        # elif type(other_object) is dict:
-        #     other_object_copy = copy.deepcopy(other_object)
-        #     other_object_pkg = PreCalculatedResultPackage(other_object_copy)
-        # else:
-        #     raise ValueError(
-        #         f'Addition supported on the AbstractResultPackage objects and dicts. Given {type(other_object)}')
+        """
 
+        Args:
+            other_object (AIToolbox.experiment_save.result_package.AbstractResultPackage or dict):
+
+        Returns:
+            AIToolbox.experiment_save.result_package.MultipleResultPackageWrapper:
+        """
+        self.warn_if_results_dict_not_defined()
         other_object_pkg = self.create_other_object_pkg(other_object)
 
-        self.warn_if_results_dict_not_defined()
         self_multi_result_pkg = copy.deepcopy(self)
 
         self_multi_result_pkg.result_packages.append(other_object_pkg)
@@ -390,26 +436,21 @@ class MultipleResultPackageWrapper(AbstractResultPackage):
                                                      self_multi_result_pkg.hyperparameters,
                                                      self_multi_result_pkg.training_history,
                                                      **self_multi_result_pkg.package_metadata)
-
         return self_multi_result_pkg
 
-    def __iadd__(self, other_object):
-        # if isinstance(other_object, AbstractResultPackage):
-        #     other_object.warn_if_results_dict_not_defined()
-        #     other_object_pkg = copy.deepcopy(other_object)
-        # elif type(other_object) is dict:
-        #     other_object_copy = copy.deepcopy(other_object)
-        #     other_object_pkg = PreCalculatedResultPackage(other_object_copy)
-        # else:
-        #     raise ValueError(
-        #         f'Addition supported on the AbstractResultPackage objects and dicts. Given {type(other_object)}')
+    def __iadd__(self, other):
+        """
 
-        other_object_pkg = self.create_other_object_pkg(other_object)
+        Args:
+            other (AIToolbox.experiment_save.result_package.AbstractResultPackage or dict):
 
+        Returns:
+            AIToolbox.experiment_save.result_package.MultipleResultPackageWrapper:
+        """
         self.warn_if_results_dict_not_defined()
+        other_object_pkg = self.create_other_object_pkg(other)
 
         self.result_packages.append(other_object_pkg)
         self.prepare_result_package(self.y_true, self.y_predicted,
                                     self.hyperparameters, self.training_history, **self.package_metadata)
-
         return self
