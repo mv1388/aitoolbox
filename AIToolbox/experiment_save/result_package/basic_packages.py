@@ -1,123 +1,26 @@
-from abc import ABC, abstractmethod
-import numpy as np
+import copy
 
+from AIToolbox.experiment_save.result_package.abstract_result_package import AbstractResultPackage
 from AIToolbox.experiment_save.core_metrics.abstract_metric import AbstractBaseMetric
 from AIToolbox.experiment_save.core_metrics.classification import AccuracyMetric, ROCAUCMetric, \
     PrecisionRecallCurveAUCMetric, F1ScoreMetric
 from AIToolbox.experiment_save.core_metrics.regression import MeanSquaredErrorMetric, MeanAbsoluteErrorMetric
 
 
-class AbstractResultPackage(ABC):
-    def __init__(self, strict_content_check=False, **kwargs):
+class PreCalculatedResultPackage(AbstractResultPackage):
+    def __init__(self, results_dict, strict_content_check=False, **kwargs):
         """
 
         Args:
+            results_dict (dict):
             strict_content_check (bool):
             **kwargs (dict):
         """
-        self.pkg_name = None
-        self.strict_content_check = strict_content_check
+        self.results_dict = results_dict
+        AbstractResultPackage.__init__(self, strict_content_check, **kwargs)
 
-        self.y_true = None
-        self.y_predicted = None
-        self.additional_results = None
-        self.results_dict = None
-        
-        self.hyperparameters = None
-        self.training_history = None
-        self.package_metadata = kwargs
-
-    @abstractmethod
     def prepare_results_dict(self):
         pass
-
-    def prepare_result_package(self, y_true, y_predicted, hyperparameters=None, training_history=None, **kwargs):
-        """
-
-        Args:
-            y_true (numpy.array or list):
-            y_predicted (numpy.array or list):
-            hyperparameters (dict or None):
-            training_history (AIToolbox.ExperimentSave.training_history.TrainingHistory):
-            **kwargs (dict):
-
-        Returns:
-            None
-        """
-        self.y_true = np.array(y_true)
-        self.y_predicted = np.array(y_predicted)
-
-        self.results_dict = None
-        self.hyperparameters = hyperparameters
-        self.training_history = training_history.get_train_history()
-        self.additional_results = kwargs
-
-        self.prepare_results_dict()
-
-    def get_results(self):
-        """
-
-        Returns:
-            dict:
-        """
-        if self.results_dict is None:
-            self.warn_about_result_data_problem('Warning: Results dict missing')
-
-        return self.results_dict
-
-    def get_hyperparameters(self):
-        """
-
-        Returns:
-            dict:
-        """
-        self.qa_check_hyperparameters_dict()
-        return self.hyperparameters
-
-    def get_training_history(self):
-        """
-
-        Returns:
-            dict:
-        """
-        # History QA check is (automatically) done in the history object and not here in the result package
-        return self.training_history
-
-    def qa_check_hyperparameters_dict(self):
-        """
-
-        Returns:
-            None:
-        """
-        if self.hyperparameters is None:
-            self.warn_about_result_data_problem('Warning: Hyperparameters missing')
-
-        # Check if hyperparameters dict had bash script element and is not None
-        if 'bash_script_path' not in self.hyperparameters or self.hyperparameters['bash_script_path'] is None:
-            self.warn_about_result_data_problem('bash_script_path missing from hyperparameters dict. '
-                                                'Potential solution: add it to the model config file and parse '
-                                                'with argparser.')
-
-        # Check if hyperparameters dict had python experiment script element and is not None
-        if 'python_experiment_file_path' not in self.hyperparameters or \
-                self.hyperparameters['python_experiment_file_path'] is None:
-            self.warn_about_result_data_problem('python_experiment_file_path missing from hyperparameters dict. '
-                                                'Potential solution: add it to the model config file and parse '
-                                                'with argparser.')
-
-    def warn_about_result_data_problem(self, msg):
-        """
-
-        Args:
-            msg (str):
-
-        Returns:
-            None:
-        """
-        if self.strict_content_check:
-            raise ValueError(msg)
-        else:
-            print(msg)
 
 
 class GeneralResultPackage(AbstractResultPackage):
@@ -255,3 +158,47 @@ class MultipleResultPackageWrapper(AbstractResultPackage):
                 self.results_dict[result_pkg.pkg_name + suffix] = result_pkg.get_results()
             else:
                 self.results_dict[f'ResultPackage{i}'] = result_pkg.get_results()
+
+    def __str__(self):
+        return '\n'.join([f'--> {pkg.pkg_name}:\n{str(pkg)}' for pkg in self.result_packages])
+
+    def __len__(self):
+        return len(self.result_packages)
+
+    def add_merge_multi_pkg_wrap(self, other_object):
+        """
+
+        Args:
+            other_object (AIToolbox.experiment_save.result_package.abstract_result_package.AbstractResultPackage or dict):
+
+        Returns:
+            AIToolbox.experiment_save.result_package.basic_packages.MultipleResultPackageWrapper:
+        """
+        self.warn_if_results_dict_not_defined()
+        other_object_pkg = self.create_other_object_pkg(other_object)
+
+        self_multi_result_pkg = copy.deepcopy(self)
+
+        self_multi_result_pkg.result_packages.append(other_object_pkg)
+        self_multi_result_pkg.prepare_result_package(self_multi_result_pkg.y_true, self_multi_result_pkg.y_predicted,
+                                                     self_multi_result_pkg.hyperparameters,
+                                                     self_multi_result_pkg.training_history,
+                                                     **self_multi_result_pkg.package_metadata)
+        return self_multi_result_pkg
+
+    def __iadd__(self, other):
+        """
+
+        Args:
+            other (AIToolbox.experiment_save.abstract_result_package.AbstractResultPackage or dict):
+
+        Returns:
+            AIToolbox.experiment_save.result_package.basic_packages.MultipleResultPackageWrapper:
+        """
+        self.warn_if_results_dict_not_defined()
+        other_object_pkg = self.create_other_object_pkg(other)
+
+        self.result_packages.append(other_object_pkg)
+        self.prepare_result_package(self.y_true, self.y_predicted,
+                                    self.hyperparameters, self.training_history, **self.package_metadata)
+        return self

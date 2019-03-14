@@ -152,7 +152,7 @@ class ModelTrainEndSaveCallback(AbstractCallback):
             experiment_name (str):
             local_model_result_folder_path (str):
             args (dict):
-            result_package (AIToolbox.experiment_save.result_package.AbstractResultPackage):
+            result_package (AIToolbox.experiment_save.result_package.abstract_result_package.AbstractResultPackage):
         """
         AbstractCallback.__init__(self, 'Model save at the end of training')
         self.project_name = project_name
