@@ -47,7 +47,7 @@ class AbstractResultPackage(ABC):
 
         self.results_dict = None
         self.hyperparameters = hyperparameters
-        self.training_history = training_history.get_train_history()
+        self.training_history = training_history
         self.additional_results = kwargs
 
         self.prepare_results_dict()
@@ -73,13 +73,13 @@ class AbstractResultPackage(ABC):
         return self.hyperparameters
 
     def get_training_history(self):
-        """
+        """Extract training history dict from the training history object
 
         Returns:
             dict:
         """
         # History QA check is (automatically) done in the history object and not here in the result package
-        return self.training_history
+        return self.training_history.get_train_history()
 
     def qa_check_hyperparameters_dict(self):
         """
