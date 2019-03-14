@@ -25,6 +25,8 @@ class QuestionAnswerResultPackage(AbstractResultPackage):
             if len(paragraph_text_tokens) != len(target_actual_text):
                 raise ValueError('paragraph_text_tokens size not the same as target_actual_text.')
 
+        AbstractResultPackage.__init__(self, pkg_name='QuestionAnswerResult',
+                                       strict_content_check=strict_content_check, **kwargs)
         # todo: check if this is efficient
         self.paragraph_text_tokens = [[str(w) for w in paragraph] for paragraph in paragraph_text_tokens]
         self.target_actual_text = target_actual_text
@@ -32,7 +34,6 @@ class QuestionAnswerResultPackage(AbstractResultPackage):
 
         self.output_text_dir = os.path.expanduser(output_text_dir) if output_text_dir else None
         self.use_perl_rouge = use_perl_rouge
-        AbstractResultPackage.__init__(self, strict_content_check, **kwargs)
 
     def prepare_results_dict(self):
         """
@@ -80,7 +81,8 @@ class QuestionAnswerSpanClassificationResultPackage(AbstractResultPackage):
             strict_content_check (bool):
             **kwargs (dict):
         """
-        AbstractResultPackage.__init__(self, strict_content_check, **kwargs)
+        AbstractResultPackage.__init__(self, pkg_name='QuestionAnswerSpanClassificationResult',
+                                       strict_content_check=strict_content_check, **kwargs)
 
     def prepare_results_dict(self):
         """
@@ -121,7 +123,8 @@ class TextSummarizationResultPackage(AbstractResultPackage):
             strict_content_check (bool):
             **kwargs (dict):
         """
-        AbstractResultPackage.__init__(self, strict_content_check, **kwargs)
+        AbstractResultPackage.__init__(self, pkg_name='TextSummarizationResult',
+                                       strict_content_check=strict_content_check, **kwargs)
 
     def prepare_results_dict(self):
         """
@@ -142,7 +145,8 @@ class MachineTranslationResultPackage(AbstractResultPackage):
             strict_content_check (bool):
             **kwargs (dict):
         """
-        AbstractResultPackage.__init__(self, strict_content_check, **kwargs)
+        AbstractResultPackage.__init__(self, pkg_name='MachineTranslationResult',
+                                       strict_content_check=strict_content_check, **kwargs)
 
     def prepare_results_dict(self):
         """
