@@ -4,7 +4,7 @@ import numpy as np
 
 
 class AbstractBaseMetric(ABC):
-    def __init__(self, y_true, y_predicted, np_array=True):
+    def __init__(self, y_true, y_predicted, metric_name=None, np_array=True):
         """
 
         Args:
@@ -14,7 +14,7 @@ class AbstractBaseMetric(ABC):
         """
         self.y_true = np.array(y_true) if np_array else y_true
         self.y_predicted = np.array(y_predicted) if np_array else y_predicted
-        self.metric_name = None
+        self.metric_name = metric_name
         self.metric_result = None
 
         self.calculate_metric()

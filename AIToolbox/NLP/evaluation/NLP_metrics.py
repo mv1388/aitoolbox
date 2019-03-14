@@ -29,8 +29,7 @@ class ROUGEMetric(AbstractBaseMetric):
         self.output_text_cleaning_regex = output_text_cleaning_regex
         self.target_actual_text = target_actual_text
         self.output_text_dir = output_text_dir
-        AbstractBaseMetric.__init__(self, y_true, y_predicted, np_array=False)
-        self.metric_name = 'ROGUE'
+        AbstractBaseMetric.__init__(self, y_true, y_predicted, metric_name='ROGUE', np_array=False)
 
     def calculate_metric(self):
         if self.output_text_dir is not None:
@@ -88,8 +87,7 @@ class ROUGEPerlMetric(AbstractBaseMetric):
         self.output_text_dir = output_text_dir
         self.output_text_cleaning_regex = output_text_cleaning_regex
         self.target_actual_text = target_actual_text
-        AbstractBaseMetric.__init__(self, y_true, y_predicted, np_array=False)
-        self.metric_name = 'ROGUE_Perl'
+        AbstractBaseMetric.__init__(self, y_true, y_predicted, metric_name='ROGUE_Perl', np_array=False)
 
     def calculate_metric(self):
         self.dump_answer_text_to_disk(self.y_true, self.y_predicted,
@@ -188,8 +186,7 @@ class BLEUSentenceScoreMetric(AbstractBaseMetric):
             y_true (list):
             y_predicted (list):
         """
-        AbstractBaseMetric.__init__(self, y_true, y_predicted)
-        self.metric_name = 'BLEU_sentence_score'
+        AbstractBaseMetric.__init__(self, y_true, y_predicted, metric_name='BLEU_sentence_score')
 
     def calculate_metric(self):
         self.metric_result = sentence_bleu(self.y_true, self.y_predicted)
@@ -216,8 +213,7 @@ class BLEUCorpusScoreMetric(AbstractBaseMetric):
             y_true (list):
             y_predicted (list):
         """
-        AbstractBaseMetric.__init__(self, y_true, y_predicted)
-        self.metric_name = 'BLEU_corpus_score'
+        AbstractBaseMetric.__init__(self, y_true, y_predicted, metric_name='BLEU_corpus_score')
 
     def calculate_metric(self):
         self.metric_result = corpus_bleu(self.y_true, self.y_predicted)
@@ -231,8 +227,7 @@ class BLEUScoreStrTorchNLPMetric(AbstractBaseMetric):
             y_true (list):
             y_predicted (list):
         """
-        AbstractBaseMetric.__init__(self, y_true, y_predicted)
-        self.metric_name = 'BLEU_str_torchNLP_score'
+        AbstractBaseMetric.__init__(self, y_true, y_predicted, metric_name='BLEU_str_torchNLP_score')
         self.lowercase = lowercase
 
     def calculate_metric(self):
@@ -247,8 +242,7 @@ class PerplexityMetric(AbstractBaseMetric):
             y_true (numpy.array or list):
             y_predicted (numpy.array or list):
         """
-        AbstractBaseMetric.__init__(self, y_true, y_predicted)
-        self.metric_name = 'Perplexity'
+        AbstractBaseMetric.__init__(self, y_true, y_predicted, metric_name='Perplexity')
 
     def calculate_metric(self):
         raise NotImplementedError
