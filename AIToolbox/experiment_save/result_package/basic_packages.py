@@ -7,22 +7,6 @@ from AIToolbox.experiment_save.core_metrics.classification import AccuracyMetric
 from AIToolbox.experiment_save.core_metrics.regression import MeanSquaredErrorMetric, MeanAbsoluteErrorMetric
 
 
-class PreCalculatedResultPackage(AbstractResultPackage):
-    def __init__(self, results_dict, strict_content_check=False, **kwargs):
-        """
-
-        Args:
-            results_dict (dict):
-            strict_content_check (bool):
-            **kwargs (dict):
-        """
-        self.results_dict = results_dict
-        AbstractResultPackage.__init__(self, strict_content_check, **kwargs)
-
-    def prepare_results_dict(self):
-        pass
-
-
 class GeneralResultPackage(AbstractResultPackage):
     def __init__(self, metrics_list, strict_content_check=False, **kwargs):
         """
@@ -135,6 +119,22 @@ class RegressionResultPackage(AbstractResultPackage):
         mae_result = MeanAbsoluteErrorMetric(self.y_true, self.y_predicted).get_metric_dict()
 
         self.results_dict = {**mse_result, **mae_result}
+
+
+class PreCalculatedResultPackage(AbstractResultPackage):
+    def __init__(self, results_dict, strict_content_check=False, **kwargs):
+        """
+
+        Args:
+            results_dict (dict):
+            strict_content_check (bool):
+            **kwargs (dict):
+        """
+        self.results_dict = results_dict
+        AbstractResultPackage.__init__(self, strict_content_check, **kwargs)
+
+    def prepare_results_dict(self):
+        pass
 
 
 class MultipleResultPackageWrapper(AbstractResultPackage):
