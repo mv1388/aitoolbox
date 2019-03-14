@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import numpy as np
 
-from AIToolbox.experiment_save.core_metrics.base_metric import AbstractBaseMetric
+from AIToolbox.experiment_save.core_metrics.abstract_metric import AbstractBaseMetric
 from AIToolbox.experiment_save.core_metrics.classification import AccuracyMetric, ROCAUCMetric, \
     PrecisionRecallCurveAUCMetric, F1ScoreMetric
 from AIToolbox.experiment_save.core_metrics.regression import MeanSquaredErrorMetric, MeanAbsoluteErrorMetric
