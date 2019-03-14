@@ -417,6 +417,12 @@ class MultipleResultPackageWrapper(AbstractResultPackage):
             else:
                 self.results_dict[f'ResultPackage{i}'] = result_pkg.get_results()
 
+    def __str__(self):
+        return '\n'.join([f'--> {pkg.pkg_name}:\n{str(pkg)}' for pkg in self.result_packages])
+
+    def __len__(self):
+        return len(self.result_packages)
+
     def add_merge_multi_pkg_wrap(self, other_object):
         """
 
