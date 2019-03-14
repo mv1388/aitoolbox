@@ -2,8 +2,6 @@ import copy
 from abc import ABC, abstractmethod
 import numpy as np
 
-from AIToolbox.experiment_save.result_package.basic_packages import MultipleResultPackageWrapper, PreCalculatedResultPackage
-
 
 class AbstractResultPackage(ABC):
     def __init__(self, strict_content_check=False, **kwargs):
@@ -157,6 +155,8 @@ class AbstractResultPackage(ABC):
         Returns:
             AIToolbox.experiment_save.result_package.MultipleResultPackageWrapper:
         """
+        from AIToolbox.experiment_save.result_package.basic_packages import MultipleResultPackageWrapper
+
         self.warn_if_results_dict_not_defined()
         other_object_pkg = self.create_other_object_pkg(other_object)
 
@@ -182,6 +182,7 @@ class AbstractResultPackage(ABC):
             other_object.warn_if_results_dict_not_defined()
             other_object_pkg = copy.deepcopy(other_object)
         elif type(other_object) is dict:
+            from AIToolbox.experiment_save.result_package.basic_packages import PreCalculatedResultPackage
             other_object_copy = copy.deepcopy(other_object)
             other_object_pkg = PreCalculatedResultPackage(other_object_copy)
         else:
