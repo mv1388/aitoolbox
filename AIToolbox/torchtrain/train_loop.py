@@ -269,7 +269,7 @@ class TrainLoopModelEndSave(TrainLoop):
             experiment_name (str):
             local_model_result_folder_path (str):
             args (dict):
-            result_package (AIToolbox.experiment_save.result_package.abstract_result_package.AbstractResultPackage):
+            result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
         """
         TrainLoop.__init__(self, model, train_loader, validation_loader, batch_model_feed_def, optimizer, criterion)
         self.project_name = project_name
@@ -304,7 +304,7 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
             experiment_name (str):
             local_model_result_folder_path (str):
             args (dict):
-            result_package (AIToolbox.experiment_save.result_package.abstract_result_package.AbstractResultPackage):
+            result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
         """
         TrainLoopModelEndSave.__init__(self, model, train_loader, validation_loader, batch_model_feed_def,
                                        optimizer, criterion,

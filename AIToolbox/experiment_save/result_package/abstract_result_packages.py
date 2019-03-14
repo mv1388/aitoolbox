@@ -2,6 +2,8 @@ import copy
 from abc import ABC, abstractmethod
 import numpy as np
 
+from AIToolbox.experiment_save.training_history import TrainingHistory
+
 
 class AbstractResultPackage(ABC):
     def __init__(self, strict_content_check=False, **kwargs):
@@ -155,8 +157,6 @@ class AbstractResultPackage(ABC):
         Returns:
             AIToolbox.experiment_save.result_package.MultipleResultPackageWrapper:
         """
-        from AIToolbox.experiment_save.result_package.basic_packages import MultipleResultPackageWrapper
-
         self.warn_if_results_dict_not_defined()
         other_object_pkg = self.create_other_object_pkg(other_object)
 
@@ -182,7 +182,6 @@ class AbstractResultPackage(ABC):
             other_object.warn_if_results_dict_not_defined()
             other_object_pkg = copy.deepcopy(other_object)
         elif type(other_object) is dict:
-            from AIToolbox.experiment_save.result_package.basic_packages import PreCalculatedResultPackage
             other_object_copy = copy.deepcopy(other_object)
             other_object_pkg = PreCalculatedResultPackage(other_object_copy)
         else:
@@ -261,3 +260,87 @@ class AbstractResultPackage(ABC):
     def warn_if_results_dict_not_defined(self):
         if self.results_dict is None:
             raise ValueError(f'results_dict is not set yet. Currently it is {self.results_dict}')
+
+
+class PreCalculatedResultPackage(AbstractResultPackage):
+    def __init__(self, results_dict, strict_content_check=False, **kwargs):
+        """
+
+        Args:
+            results_dict (dict):
+            strict_content_check (bool):
+            **kwargs (dict):
+        """
+        AbstractResultPackage.__init__(self, strict_content_check, **kwargs)
+        self.results_dict = results_dict
+        self.training_history = TrainingHistory({}, [], strict_content_check)
+
+    def prepare_results_dict(self):
+        pass
+
+
+class MultipleResultPackageWrapper(AbstractResultPackage):
+    def __init__(self, result_packages, strict_content_check=False, **kwargs):
+        """
+
+        Args:
+            result_packages (list):
+            strict_content_check (bool):
+            **kwargs (dict):
+        """
+        AbstractResultPackage.__init__(self, strict_content_check, **kwargs)
+        self.result_packages = result_packages
+
+    def prepare_results_dict(self):
+        self.results_dict = {}
+
+        for i, result_pkg in enumerate(self.result_packages):
+            if result_pkg.pkg_name is not None:
+                suffix = '' if result_pkg.pkg_name not in self.results_dict else str(i)
+                self.results_dict[result_pkg.pkg_name + suffix] = result_pkg.get_results()
+            else:
+                self.results_dict[f'ResultPackage{i}'] = result_pkg.get_results()
+
+    def __str__(self):
+        return '\n'.join([f'--> {pkg.pkg_name}:\n{str(pkg)}' for pkg in self.result_packages])
+
+    def __len__(self):
+        return len(self.result_packages)
+
+    def add_merge_multi_pkg_wrap(self, other_object):
+        """
+
+        Args:
+            other_object (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage or dict):
+
+        Returns:
+            AIToolbox.experiment_save.result_package.abstract_result_packages.MultipleResultPackageWrapper:
+        """
+        self.warn_if_results_dict_not_defined()
+        other_object_pkg = self.create_other_object_pkg(other_object)
+
+        self_multi_result_pkg = copy.deepcopy(self)
+
+        self_multi_result_pkg.result_packages.append(other_object_pkg)
+        self_multi_result_pkg.prepare_result_package(self_multi_result_pkg.y_true, self_multi_result_pkg.y_predicted,
+                                                     self_multi_result_pkg.hyperparameters,
+                                                     self_multi_result_pkg.training_history,
+                                                     **self_multi_result_pkg.package_metadata)
+        return self_multi_result_pkg
+
+    def __iadd__(self, other):
+        """
+
+        Args:
+            other (AIToolbox.experiment_save.abstract_result_package.AbstractResultPackage or dict):
+
+        Returns:
+            AIToolbox.experiment_save.result_package.abstract_result_packages.MultipleResultPackageWrapper:
+        """
+        self.warn_if_results_dict_not_defined()
+        other_object_pkg = self.create_other_object_pkg(other)
+
+        self.result_packages.append(other_object_pkg)
+        self.prepare_result_package(self.y_true, self.y_predicted,
+                                    self.hyperparameters, self.training_history, **self.package_metadata)
+        return self
