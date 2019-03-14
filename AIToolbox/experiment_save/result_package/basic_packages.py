@@ -15,8 +15,9 @@ class GeneralResultPackage(AbstractResultPackage):
             strict_content_check (bool):
             **kwargs (dict):
         """
+        AbstractResultPackage.__init__(self, pkg_name='GeneralResultPackage', 
+                                       strict_content_check=strict_content_check, **kwargs)
         self.metrics_list = metrics_list
-        AbstractResultPackage.__init__(self, strict_content_check, **kwargs)
 
     def prepare_results_dict(self):
         """
@@ -53,7 +54,8 @@ class BinaryClassificationResultPackage(AbstractResultPackage):
             strict_content_check (bool):
             **kwargs (dict):
         """
-        AbstractResultPackage.__init__(self, strict_content_check, **kwargs)
+        AbstractResultPackage.__init__(self, pkg_name='BinaryClassificationResult', 
+                                       strict_content_check=strict_content_check, **kwargs)
 
     def prepare_results_dict(self):
         """
@@ -79,7 +81,8 @@ class ClassificationResultPackage(AbstractResultPackage):
             strict_content_check (bool):
             **kwargs (dict):
         """
-        AbstractResultPackage.__init__(self, strict_content_check, **kwargs)
+        AbstractResultPackage.__init__(self, pkg_name='ClassificationResult', 
+                                       strict_content_check=strict_content_check, **kwargs)
 
     def prepare_results_dict(self):
         """
@@ -105,7 +108,8 @@ class RegressionResultPackage(AbstractResultPackage):
             strict_content_check (bool):
             **kwargs (dict):
         """
-        AbstractResultPackage.__init__(self, strict_content_check, **kwargs)
+        AbstractResultPackage.__init__(self, pkg_name='RegressionResult', 
+                                       strict_content_check=strict_content_check, **kwargs)
 
     def prepare_results_dict(self):
         """

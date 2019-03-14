@@ -6,14 +6,15 @@ from AIToolbox.experiment_save.training_history import TrainingHistory
 
 
 class AbstractResultPackage(ABC):
-    def __init__(self, strict_content_check=False, **kwargs):
+    def __init__(self, pkg_name=None, strict_content_check=False, **kwargs):
         """
 
         Args:
+            pkg_name (str or None):
             strict_content_check (bool):
             **kwargs (dict):
         """
-        self.pkg_name = None
+        self.pkg_name = pkg_name
         self.strict_content_check = strict_content_check
 
         self.y_true = None
@@ -271,7 +272,8 @@ class PreCalculatedResultPackage(AbstractResultPackage):
             strict_content_check (bool):
             **kwargs (dict):
         """
-        AbstractResultPackage.__init__(self, strict_content_check, **kwargs)
+        AbstractResultPackage.__init__(self, pkg_name='PreCalculatedResult',
+                                       strict_content_check=strict_content_check, **kwargs)
         self.results_dict = results_dict
         self.training_history = TrainingHistory({}, [], strict_content_check)
 
@@ -288,7 +290,8 @@ class MultipleResultPackageWrapper(AbstractResultPackage):
             strict_content_check (bool):
             **kwargs (dict):
         """
-        AbstractResultPackage.__init__(self, strict_content_check, **kwargs)
+        AbstractResultPackage.__init__(self, pkg_name='MultipleResultWrapper',
+                                       strict_content_check=strict_content_check, **kwargs)
         self.result_packages = result_packages
 
     def prepare_results_dict(self):
