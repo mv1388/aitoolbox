@@ -49,6 +49,10 @@ class AbstractBaseMetric(ABC):
             return 1
         elif self.metric_result is None:
             return 0
+        else:
+            raise TypeError(f'Current metric_result does not support len evaluation. '
+                            f'The type is: {type(self.metric_result)}. '
+                            f'Optimally it should be either a list, dict, float or int.')
 
     def __cmp__(self, other):
         def compare_spec(self_val, other_val):
