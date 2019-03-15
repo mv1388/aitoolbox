@@ -8,8 +8,8 @@ from torchvision import datasets, transforms
 
 from AIToolbox.torchtrain.train_loop import TrainLoop, TrainLoopModelCheckpointEndSave
 from AIToolbox.torchtrain.batch_model_feed_defs import AbstractModelFeedDefinition
-from AIToolbox.torchtrain.callbacks.callbacks import ModelPerformanceEvaluationCallback, ModelPerformancePrintReportCallback
-from AIToolbox.experiment_save.result_package import ClassificationResultPackage
+from AIToolbox.torchtrain.callbacks.performance_eval_callbacks import ModelPerformanceEvaluationCallback, ModelPerformancePrintReportCallback
+from AIToolbox.experiment_save.result_package.basic_packages import ClassificationResultPackage
 
 
 class Net(nn.Module):

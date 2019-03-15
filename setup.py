@@ -11,7 +11,7 @@ setup(name='AIToolbox',
 
       python_requires='>=3.6.0',
 
-      packages=find_packages(exclude=['tests', 'ToolboxUseScripts', 'deprecated']),
+      packages=find_packages(exclude=['tests', 'examples', 'deprecated']),
 
       install_requires=['mysql-connector-python',
                         'pymongo',
