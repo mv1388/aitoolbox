@@ -34,6 +34,11 @@ Still work in progress...
 Different NLP data processing functions and NLP oriented task performance evaluation definitions such as Q&A, summarization, machine translation, ...
 
 
+# Examples of package usage
+
+Look into the `examples` folder for starters. Will be adding more examples of different training scenarios.
+
+
 ## Requesting Spot Instances on AWS
 
 https://chatbotslife.com/aws-setup-for-deep-learning-fda04db6df75
