@@ -150,6 +150,7 @@ class MachineTranslationResultPackage(AbstractResultPackage):
         AbstractResultPackage.__init__(self, pkg_name='MachineTranslationResult',
                                        strict_content_check=strict_content_check, **kwargs)
         self.output_attn_heatmap_dir = output_attn_heatmap_dir
+        self.attention_matrices = None
 
     def prepare_results_dict(self):
         """
@@ -165,9 +166,9 @@ class MachineTranslationResultPackage(AbstractResultPackage):
         # # Don't include TrainLoop objects inside the package - it makes it useful only for PyTorch, not other frameworks
         # if self.output_attn_heatmap_dir is not None:
         #     # Get this from **kwargs or find another way of getting attention matrices
-        #     attention_matrices = self.additional_results['additional_results']['attention_matrices']
+        #     self.attention_matrices = self.additional_results['additional_results']['attention_matrices']
         #
-        #     attn_heatmap_metric = AttentionHeatMap(attention_matrices, self.y_true, self.y_predicted,
+        #     attn_heatmap_metric = AttentionHeatMap(self.attention_matrices, self.y_true, self.y_predicted,
         #                                            self.output_attn_heatmap_dir)
         #
         #     attn_heatmap_plot_paths = attn_heatmap_metric.get_metric_dict()
