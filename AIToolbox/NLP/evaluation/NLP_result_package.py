@@ -2,7 +2,8 @@ import os
 
 from AIToolbox.experiment_save.result_package.abstract_result_packages import AbstractResultPackage
 from AIToolbox.experiment_save.core_metrics.classification import AccuracyMetric
-from AIToolbox.NLP.evaluation.NLP_metrics import ROUGEMetric, ROUGEPerlMetric
+from AIToolbox.NLP.evaluation.NLP_metrics import ROUGEMetric, ROUGEPerlMetric, BLEUCorpusScoreMetric, PerplexityMetric
+from AIToolbox.NLP.evaluation.attention_heatmap import AttentionHeatMap
 
 
 class QuestionAnswerResultPackage(AbstractResultPackage):
@@ -132,21 +133,23 @@ class TextSummarizationResultPackage(AbstractResultPackage):
         Returns:
 
         """
-        # rogue_result = ROUGEPerlMetric(self.y_true, self.y_predicted).get_metric_dict()
+        # rogue_result = ROUGEMetric(self.y_true, self.y_predicted).get_metric_dict()
 
         raise NotImplementedError
 
 
 class MachineTranslationResultPackage(AbstractResultPackage):
-    def __init__(self, strict_content_check=False, **kwargs):
+    def __init__(self, output_attn_heatmap_dir=None, strict_content_check=False, **kwargs):
         """
 
         Args:
+            output_attn_heatmap_dir (str or None):
             strict_content_check (bool):
             **kwargs (dict):
         """
         AbstractResultPackage.__init__(self, pkg_name='MachineTranslationResult',
                                        strict_content_check=strict_content_check, **kwargs)
+        self.output_attn_heatmap_dir = output_attn_heatmap_dir
 
     def prepare_results_dict(self):
         """
@@ -156,5 +159,18 @@ class MachineTranslationResultPackage(AbstractResultPackage):
         """
         # bleu_result = BLEUCorpusScoreMetric(self.y_true, self.y_predicted).get_metric_dict()
         # perplexity_result = PerplexityMetric(self.y_true, self.y_predicted).get_metric_dict()
+        #
+        # self.results_dict = {**bleu_result, **perplexity_result}
+        #
+        # # Don't include TrainLoop objects inside the package - it makes it useful only for PyTorch, not other frameworks
+        # if self.output_attn_heatmap_dir is not None:
+        #     # Get this from **kwargs or find another way of getting attention matrices
+        #     attention_matrices = self.additional_results['attention_matrices']
+        #
+        #     attn_heatmap_metric = AttentionHeatMap(attention_matrices, self.y_true, self.y_predicted,
+        #                                            self.output_attn_heatmap_dir)
+        #
+        #     attn_heatmap_plot_paths = attn_heatmap_metric.get_metric_dict()
+        #     self.results_dict = {**self.results_dict, **attn_heatmap_plot_paths}
 
         raise NotImplementedError

@@ -11,6 +11,8 @@ joblib
 tqdm
 boto3
 botocore
+matplotlib
+seaborn
 scikit-learn
 allennlp
 torch
