@@ -46,15 +46,17 @@ class ModelPerformanceEvaluationCallback(AbstractCallback):
         train_hist_pkg = TrainingHistory(train_history, epoch_list)
 
         if self.on_train_data:
-            y_test, y_pred = self.train_loop_obj.predict_on_train_set()
+            y_test, y_pred, additional_results = self.train_loop_obj.predict_on_train_set()
             self.train_result_package.prepare_result_package(y_test, y_pred,
-                                                             hyperparameters=self.args, training_history=train_hist_pkg)
+                                                             hyperparameters=self.args, training_history=train_hist_pkg,
+                                                             additional_results=additional_results)
             # print(f'TRAIN: {self.train_result_package.get_results()}')
 
         if self.on_val_data:
-            y_test, y_pred = self.train_loop_obj.predict_on_validation_set()
+            y_test, y_pred, additional_results = self.train_loop_obj.predict_on_validation_set()
             self.result_package.prepare_result_package(y_test, y_pred,
-                                                       hyperparameters=self.args, training_history=train_hist_pkg)
+                                                       hyperparameters=self.args, training_history=train_hist_pkg,
+                                                       additional_results=additional_results)
             # print(f'VAL: {self.result_package.get_results()}')
 
     def store_evaluated_metrics_to_history(self, prefix=''):
