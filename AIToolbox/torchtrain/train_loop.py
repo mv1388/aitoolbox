@@ -186,26 +186,31 @@ class TrainLoop:
         Returns:
             (torch.Tensor, torch.Tensor):
         """
-        y_test, y_pred = [], []
+        y_test, y_pred, metadata_list = [], [], []
 
         self.model.eval()
 
         with torch.no_grad():
             for batch_data in tqdm(data_loader):
-                y_test_batch, y_pred_batch = self.batch_model_feed_def.get_predictions(self.model, batch_data,
-                                                                                       self.device)
+                y_test_batch, y_pred_batch, metadata_batch = self.batch_model_feed_def.get_predictions(self.model, batch_data,
+                                                                                                       self.device)
 
                 # TODO: check if it is the best idea to append predictions to the list and not to some torch tensor
                 # TODO: also if append is the best option and not the concat
                 y_test.append(y_test_batch)
                 y_pred.append(y_pred_batch)
 
+                if metadata_batch is not None:
+                    metadata_list.append(metadata_batch)
+
             y_test = torch.cat(y_test)
             y_pred = torch.cat(y_pred)
 
+            metadata = self.combine_prediction_metadata_batches(metadata_list) if len(metadata_list) > 0 else None
+
         self.model.train()
 
-        return y_test, y_pred
+        return y_test, y_pred, metadata
 
     def insert_metric_result_into_history(self, metric_name, metric_result):
         """
@@ -218,6 +223,26 @@ class TrainLoop:
         if metric_name not in self.train_history:
             self.train_history[metric_name] = []
         self.train_history[metric_name].append(metric_result)
+
+    @staticmethod
+    def combine_prediction_metadata_batches(metadata_list):
+        """
+
+        Args:
+            metadata_list (list):
+
+        Returns:
+            dict:
+        """
+        combined_metadata = {}
+
+        for metadata_batch in metadata_list:
+            for meta_el in metadata_batch:
+                if meta_el not in combined_metadata:
+                    combined_metadata[meta_el] = []
+                combined_metadata[meta_el] += metadata_batch[meta_el]
+
+        return combined_metadata
 
 
 class TrainLoopModelCheckpoint(TrainLoop):
