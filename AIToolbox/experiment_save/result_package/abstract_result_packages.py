@@ -166,6 +166,15 @@ class AbstractResultPackage(ABC):
 
     @staticmethod
     def zip_additional_results_dump(dir_path, zip_path):
+        """
+
+        Args:
+            dir_path (str):
+            zip_path (str):
+
+        Returns:
+            str:
+        """
         shutil.make_archive(zip_path, 'zip', dir_path)
         return zip_path
 
