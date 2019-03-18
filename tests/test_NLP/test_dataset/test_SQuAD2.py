@@ -16,12 +16,12 @@ class TestDataset_SQuAD2ConcatContextDatasetReader(unittest.TestCase):
 
         self.assertEqual(vocab.num_words, 245732)
         self.assertEqual(len(data), 5928)
-        self.assertTrue(all([len(span) == 2 for _, _, span in data]))
+        self.assertTrue(all([len(span) == 2 for _, _, span, _ in data]))
 
-        self.assertEqual(max([len(paragraph_tokens) for paragraph_tokens, _, _ in data]), 706)
-        self.assertEqual(max([len(question_tokens) for _, question_tokens, _ in data]), 34)
+        self.assertEqual(max([len(paragraph_tokens) for paragraph_tokens, _, _, _ in data]), 706)
+        self.assertEqual(max([len(question_tokens) for _, question_tokens, _, _ in data]), 34)
 
-        self.assertTrue(all([len(paragraph_tokens) > span[1] for paragraph_tokens, _, span in data]))
+        self.assertTrue(all([len(paragraph_tokens) > span[1] for paragraph_tokens, _, span, _ in data]))
 
         self.assertEqual([str(el) for el in data[2][0][:20]],
                          ['The', 'Normans', '(', 'Norman', ':', 'Nourmands', ';', 'French', ':', 'Normands', ';',
