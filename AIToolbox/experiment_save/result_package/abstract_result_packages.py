@@ -25,6 +25,7 @@ class AbstractResultPackage(ABC):
         self.y_true = None
         self.y_predicted = None
         self.additional_results = None
+        self.additional_results_dump_paths = None
         self.results_dict = None
 
         self.hyperparameters = None
@@ -94,9 +95,9 @@ class AbstractResultPackage(ABC):
             list or None: list of string paths if it is not None.
                 Each element of the list should be list of: results_file_name, results_file_local_path
         """
-        add_results_paths = self.list_additional_results_dump_paths()
-        self.qa_check_additional_results_dump_paths(add_results_paths)
-        return add_results_paths
+        self.additional_results_dump_paths = self.list_additional_results_dump_paths()
+        self.qa_check_additional_results_dump_paths()
+        return self.additional_results_dump_paths
 
     def list_additional_results_dump_paths(self):
         """
@@ -129,20 +130,18 @@ class AbstractResultPackage(ABC):
                                                 'Potential solution: add it to the model config file and parse '
                                                 'with argparser.')
 
-    def qa_check_additional_results_dump_paths(self, paths):
+    def qa_check_additional_results_dump_paths(self):
         """
-
-        Args:
-            paths (list or None):
 
         Returns:
 
         """
-        if paths is not None:
-            if type(paths) is not list:
-                raise ValueError(f'Additional results dump paths are given but are not in the list format. Dump paths: {paths}')
+        if self.additional_results_dump_paths is not None:
+            if type(self.additional_results_dump_paths) is not list:
+                raise ValueError(f'Additional results dump paths are given but are not in the list format. '
+                                 f'Dump paths: {self.additional_results_dump_paths}')
 
-            for el in paths:
+            for el in self.additional_results_dump_paths:
                 if type(el) is not list:
                     raise ValueError(
                         f'Element inside additional results dump is not a list. Element is: {el}')
