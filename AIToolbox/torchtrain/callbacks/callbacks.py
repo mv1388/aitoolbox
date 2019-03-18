@@ -174,12 +174,11 @@ class ModelTrainEndSaveCallback(AbstractCallback):
         epoch_list = list(range(len(self.train_loop_obj.train_history[list(self.train_loop_obj.train_history.keys())[0]])))
         train_hist_pkg = TrainingHistory(train_history, epoch_list)
 
-        y_test, y_pred = self.train_loop_obj.predict_on_validation_set()
+        y_test, y_pred, additional_results = self.train_loop_obj.predict_on_validation_set()
 
-        # result_pkg = self.result_package_class(y_test, y_pred,
-        #                                        hyperparameters=self.args, training_history=train_hist_pkg)
         self.result_package.prepare_result_package(y_test, y_pred,
-                                                   hyperparameters=self.args, training_history=train_hist_pkg)
+                                                   hyperparameters=self.args, training_history=train_hist_pkg,
+                                                   additional_results=additional_results)
 
         self.results_saver.save_experiment(self.train_loop_obj.model, self.result_package,
                                            experiment_timestamp=self.train_loop_obj.experiment_timestamp,

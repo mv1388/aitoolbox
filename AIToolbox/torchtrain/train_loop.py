@@ -165,7 +165,7 @@ class TrainLoop:
         """
 
         Returns:
-            (torch.Tensor, torch.Tensor):
+            (torch.Tensor, torch.Tensor, dict):
         """
         return self.predict_with_model(self.train_loader)
 
@@ -173,7 +173,7 @@ class TrainLoop:
         """
 
         Returns:
-            (torch.Tensor, torch.Tensor):
+            (torch.Tensor, torch.Tensor, dict):
         """
         return self.predict_with_model(self.validation_loader)
 
@@ -184,7 +184,7 @@ class TrainLoop:
             data_loader (torch.utils.data.DataLoader):
 
         Returns:
-            (torch.Tensor, torch.Tensor):
+            (torch.Tensor, torch.Tensor, dict):
         """
         y_test, y_pred, metadata_list = [], [], []
 
