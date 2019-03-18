@@ -40,7 +40,7 @@ class PyTorchModelReRunner(AbstractModelReRunner):
         """
 
         Returns:
-            (torch.Tensor, torch.Tensor):
+            (torch.Tensor, torch.Tensor, dict):
         """
         return self.train_loop.predict_on_validation_set()
 
@@ -66,10 +66,11 @@ class PyTorchModelReRunner(AbstractModelReRunner):
         epoch_list = list(range(len(self.train_loop.train_history[list(self.train_loop.train_history.keys())[0]])))
         train_hist_pkg = TrainingHistory(train_history, epoch_list)
 
-        y_test, y_pred = self.train_loop.predict_on_validation_set()
+        y_test, y_pred, additional_results = self.train_loop.predict_on_validation_set()
 
         result_package.prepare_result_package(y_test, y_pred,
-                                              hyperparameters={}, training_history=train_hist_pkg)
+                                              hyperparameters={}, training_history=train_hist_pkg,
+                                              additional_results=additional_results)
 
         if return_result_package:
             return result_package
