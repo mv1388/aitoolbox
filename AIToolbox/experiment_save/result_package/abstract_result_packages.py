@@ -1,5 +1,6 @@
 import copy
 from abc import ABC, abstractmethod
+import shutil
 import numpy as np
 
 from AIToolbox.experiment_save.training_history import TrainingHistory
@@ -8,6 +9,10 @@ from AIToolbox.experiment_save.training_history import TrainingHistory
 class AbstractResultPackage(ABC):
     def __init__(self, pkg_name=None, strict_content_check=False, **kwargs):
         """
+
+        Functions which the user should potentially override in a specific result package:
+            - prepare_results_dict()
+            - list_additional_results_dump_paths()
 
         Args:
             pkg_name (str or None):
@@ -82,6 +87,26 @@ class AbstractResultPackage(ABC):
         # History QA check is (automatically) done in the history object and not here in the result package
         return self.training_history.get_train_history()
 
+    def get_additional_results_dump_paths(self):
+        """
+
+        Returns:
+            list or None: list of string paths if it is not None.
+                Each element of the list should be list of: results_file_name, results_file_local_path
+        """
+        add_results_paths = self.list_additional_results_dump_paths()
+        self.qa_check_additional_results_dump_paths(add_results_paths)
+        return add_results_paths
+
+    def list_additional_results_dump_paths(self):
+        """
+
+        Returns:
+            list or None: list of string paths if it is not None.
+                Each element of the list should be list of: results_file_name, results_file_local_path
+        """
+        return None
+
     def qa_check_hyperparameters_dict(self):
         """
 
@@ -104,6 +129,28 @@ class AbstractResultPackage(ABC):
                                                 'Potential solution: add it to the model config file and parse '
                                                 'with argparser.')
 
+    def qa_check_additional_results_dump_paths(self, paths):
+        """
+
+        Args:
+            paths (list or None):
+
+        Returns:
+
+        """
+        if paths is not None:
+            if type(paths) is not list:
+                raise ValueError(f'Additional results dump paths are given but are not in the list format. Dump paths: {paths}')
+
+            for el in paths:
+                if type(el) is not list:
+                    raise ValueError(
+                        f'Element inside additional results dump is not a list. Element is: {el}')
+                if len(el) != 2:
+                    raise ValueError(f'Element must be a list of len 2. Element is : {el}')
+                if type(el[0]) is not str or type(el[1]) is not str:
+                    raise ValueError(f'One of the path elements is not string. Element is : {el}')
+
     def warn_about_result_data_problem(self, msg):
         """
 
@@ -117,6 +164,11 @@ class AbstractResultPackage(ABC):
             raise ValueError(msg)
         else:
             print(msg)
+
+    @staticmethod
+    def zip_additional_results_dump(dir_path, zip_path):
+        shutil.make_archive(zip_path, 'zip', dir_path)
+        return zip_path
 
     def __str__(self):
         self.warn_if_results_dict_not_defined()
