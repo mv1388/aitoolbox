@@ -20,7 +20,7 @@ class BaseFullExperimentS3Saver(AbstractExperimentSaver):
         """
 
         Args:
-            model_saver (AIToolbox.AWS.model_save.PyTorchS3ModelSaver or AIToolbox.AWS.model_save.KerasS3ModelSaver):
+            model_saver (AIToolbox.AWS.model_save.AbstractModelSaver):
             project_name (str):
             experiment_name (str):
             bucket_name (str):
