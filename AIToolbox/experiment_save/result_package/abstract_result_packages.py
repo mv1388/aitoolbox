@@ -164,18 +164,18 @@ class AbstractResultPackage(ABC):
             print(msg)
 
     @staticmethod
-    def zip_additional_results_dump(dir_path, zip_path):
+    def zip_additional_results_dump(source_dir_path, zip_path):
         """
 
         Args:
-            dir_path (str):
-            zip_path (str):
+            source_dir_path (str):
+            zip_path (str): specify the path with the zip name but without the '.zip' at the end
 
         Returns:
             str:
         """
-        shutil.make_archive(zip_path, 'zip', dir_path)
-        return zip_path
+        shutil.make_archive(zip_path, 'zip', source_dir_path)
+        return zip_path + '.zip'
 
     def __str__(self):
         self.warn_if_results_dict_not_defined()
