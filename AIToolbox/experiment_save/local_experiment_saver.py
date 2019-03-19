@@ -2,23 +2,28 @@ import datetime
 import time
 
 from AIToolbox.experiment_save.experiment_saver import AbstractExperimentSaver
-from AIToolbox.experiment_save.local_model_save import PyTorchLocalModelSaver, KerasLocalModelSaver
+from AIToolbox.experiment_save.local_model_save import PyTorchLocalModelSaver, KerasLocalModelSaver, AbstractLocalModelSaver
 from AIToolbox.experiment_save.local_results_save import LocalResultsSaver
 
 
 class BaseFullExperimentLocalSaver(AbstractExperimentSaver):
-    def __init__(self, project_name, experiment_name, local_model_result_folder_path='~/project/model_result'):
+    def __init__(self, model_saver, project_name, experiment_name, local_model_result_folder_path='~/project/model_result'):
         """
 
         Args:
+            model_saver (AIToolbox.experiment_save.local_model_save.AbstractLocalModelSaver)
             project_name (str):
             experiment_name (str):
             local_model_result_folder_path (str):
         """
+        if not isinstance(model_saver, AbstractLocalModelSaver):
+            raise TypeError(f'model_saver must be inherited from AbstractLocalModelSaver. '
+                            f'model_saver type is: {type(model_saver)}')
+
         self.project_name = project_name
         self.experiment_name = experiment_name
 
-        self.model_saver = None
+        self.model_saver = model_saver
         self.results_saver = LocalResultsSaver(local_model_result_folder_path)
 
     def save_experiment(self, model, result_package, experiment_timestamp=None,
@@ -81,9 +86,9 @@ class FullPyTorchExperimentLocalSaver(BaseFullExperimentLocalSaver):
             experiment_name (str):
             local_model_result_folder_path (str):
         """
-        BaseFullExperimentLocalSaver.__init__(self, project_name, experiment_name,
+        BaseFullExperimentLocalSaver.__init__(self, PyTorchLocalModelSaver(local_model_result_folder_path),
+                                              project_name, experiment_name,
                                               local_model_result_folder_path=local_model_result_folder_path)
-        self.model_saver = PyTorchLocalModelSaver(local_model_result_folder_path)
 
 
 class FullKerasExperimentLocalSaver(BaseFullExperimentLocalSaver):
@@ -95,6 +100,6 @@ class FullKerasExperimentLocalSaver(BaseFullExperimentLocalSaver):
             experiment_name (str):
             local_model_result_folder_path (str):
         """
-        BaseFullExperimentLocalSaver.__init__(self, project_name, experiment_name,
+        BaseFullExperimentLocalSaver.__init__(self, KerasLocalModelSaver(local_model_result_folder_path),
+                                              project_name, experiment_name,
                                               local_model_result_folder_path=local_model_result_folder_path)
-        self.model_saver = KerasLocalModelSaver(local_model_result_folder_path)
