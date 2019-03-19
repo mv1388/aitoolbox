@@ -1,5 +1,6 @@
 from AIToolbox.AWS.model_save import PyTorchS3ModelSaver
-from AIToolbox.experiment_save.experiment_saver import FullPyTorchExperimentS3Saver
+from AIToolbox.experiment_save.local_model_save import PyTorchLocalModelSaver
+from AIToolbox.experiment_save.experiment_saver import FullPyTorchExperimentS3Saver, FullPyTorchExperimentLocalSaver
 from AIToolbox.experiment_save.training_history import TrainingHistory
 
 
@@ -110,23 +111,30 @@ class EarlyStoppingCallback(AbstractCallback):
 
 
 class ModelCheckpointCallback(AbstractCallback):
-    def __init__(self, project_name, experiment_name, local_model_result_folder_path):
+    def __init__(self, project_name, experiment_name, local_model_result_folder_path, save_to_s3=True):
         """
 
         Args:
             project_name (str):
             experiment_name (str):
             local_model_result_folder_path (str):
+            save_to_s3 (bool):
         """
         AbstractCallback.__init__(self, 'Model checkpoint at end of epoch')
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = local_model_result_folder_path
+        self.save_to_s3 = save_to_s3
 
-        self.model_checkpointer = PyTorchS3ModelSaver(
-            local_model_result_folder_path=self.local_model_result_folder_path,
-            checkpoint_model=True
-        )
+        if self.save_to_s3:
+            self.model_checkpointer = PyTorchS3ModelSaver(
+                local_model_result_folder_path=self.local_model_result_folder_path,
+                checkpoint_model=True
+            )
+        else:
+            self.model_checkpointer = PyTorchLocalModelSaver(
+                local_model_result_folder_path=self.local_model_result_folder_path, checkpoint_model=True
+            )
 
     def on_epoch_end(self):
         """
@@ -144,7 +152,7 @@ class ModelCheckpointCallback(AbstractCallback):
 
 class ModelTrainEndSaveCallback(AbstractCallback):
     def __init__(self, project_name, experiment_name, local_model_result_folder_path,
-                 args, result_package):
+                 args, result_package, save_to_s3=True):
         """
 
         Args:
@@ -153,6 +161,7 @@ class ModelTrainEndSaveCallback(AbstractCallback):
             local_model_result_folder_path (str):
             args (dict):
             result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
+            save_to_s3 (bool):
         """
         AbstractCallback.__init__(self, 'Model save at the end of training')
         self.project_name = project_name
@@ -160,9 +169,14 @@ class ModelTrainEndSaveCallback(AbstractCallback):
         self.local_model_result_folder_path = local_model_result_folder_path
         self.args = args
         self.result_package = result_package
+        self.save_to_s3 = save_to_s3
 
-        self.results_saver = FullPyTorchExperimentS3Saver(self.project_name, self.experiment_name,
-                                                          local_model_result_folder_path=self.local_model_result_folder_path)
+        if self.save_to_s3:
+            self.results_saver = FullPyTorchExperimentS3Saver(self.project_name, self.experiment_name,
+                                                              local_model_result_folder_path=self.local_model_result_folder_path)
+        else:
+            self.results_saver = FullPyTorchExperimentLocalSaver(self.project_name, self.experiment_name,
+                                                                 local_model_result_folder_path=self.local_model_result_folder_path)
 
     def on_train_end(self):
         """
