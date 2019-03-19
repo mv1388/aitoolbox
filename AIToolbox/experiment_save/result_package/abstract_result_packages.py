@@ -92,8 +92,8 @@ class AbstractResultPackage(ABC):
         """
 
         Returns:
-            list or None: list of string paths if it is not None.
-                Each element of the list should be list of: results_file_name, results_file_local_path
+            list or None: list of lists of string paths if it is not None.
+                Each element of the list should be list of: [[results_file_name, results_file_local_path], ... [,]]
         """
         self.additional_results_dump_paths = self.list_additional_results_dump_paths()
         self.qa_check_additional_results_dump_paths()
@@ -103,8 +103,8 @@ class AbstractResultPackage(ABC):
         """
 
         Returns:
-            list or None: list of string paths if it is not None.
-                Each element of the list should be list of: results_file_name, results_file_local_path
+            list or None: list of lists of string paths if it is not None.
+                Each element of the list should be list of: [[results_file_name, results_file_local_path], ... [,]]
         """
         return None
 
@@ -143,8 +143,7 @@ class AbstractResultPackage(ABC):
 
             for el in self.additional_results_dump_paths:
                 if type(el) is not list:
-                    raise ValueError(
-                        f'Element inside additional results dump is not a list. Element is: {el}')
+                    raise ValueError(f'Element inside additional results dump is not a list. Element is: {el}')
                 if len(el) != 2:
                     raise ValueError(f'Element must be a list of len 2. Element is : {el}')
                 if type(el[0]) is not str or type(el[1]) is not str:
