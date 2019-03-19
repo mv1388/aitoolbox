@@ -175,3 +175,12 @@ class MachineTranslationResultPackage(AbstractResultPackage):
         #     self.results_dict = {**self.results_dict, **attn_heatmap_plot_paths}
 
         raise NotImplementedError
+
+    # def list_additional_results_dump_paths(self):
+    #     file_name = 'attention_heatmaps.zip'
+    #     results_file_local_path = os.path.join(self.output_attn_heatmap_dir, file_name)
+    #
+    #     self.zip_additional_results_dump(os.path.join(self.output_attn_heatmap_dir, 'attention_heatmaps'),
+    #                                      results_file_local_path)
+    #
+    #     return [[file_name, results_file_local_path]]

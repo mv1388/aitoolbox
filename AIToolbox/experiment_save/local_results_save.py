@@ -107,8 +107,7 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
             protect_existing_folder (bool):
 
         Returns:
-            paths to locally saved results... so that S3 version can take them and upload to S3
-
+            list: paths to locally saved results... so that S3 version can take them and upload to S3
         """
         if experiment_timestamp is None:
             experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
@@ -119,6 +118,8 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
         results = result_package.get_results()
         hyperparameters = result_package.get_hyperparameters()
         training_history = result_package.get_training_history()
+
+        additional_results_dump_paths = result_package.get_additional_results_dump_paths()
 
         exp_results_hyperparam_dict = {'experiment_name': experiment_name,
                                        'experiment_results_local_path': experiment_results_local_path,
@@ -136,8 +137,13 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
         results_file_name, results_file_local_path = self.save_file(exp_results_hyperparam_dict,
                                                                     results_file_name_w_type,
                                                                     results_file_local_path_w_type)
-
-        return results_file_name, results_file_local_path
+        
+        experiment_results_paths = [[results_file_name, results_file_local_path]] 
+        
+        if additional_results_dump_paths is not None:
+            experiment_results_paths += additional_results_dump_paths
+        
+        return experiment_results_paths
 
     def save_experiment_results_separate_files(self, result_package, project_name, experiment_name,
                                                experiment_timestamp=None, save_true_pred_labels=False,
@@ -153,8 +159,7 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
             protect_existing_folder (bool):
 
         Returns:
-            paths to locally saved results... so that S3 version can take them and upload to S3
-
+            list: paths to locally saved results... so that S3 version can take them and upload to S3
         """
         experiment_results_local_path = self.create_experiment_local_folder_structure(project_name, experiment_name,
                                                                                       experiment_timestamp)
@@ -162,6 +167,8 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
         results = result_package.get_results()
         hyperparameters = result_package.get_hyperparameters()
         training_history = result_package.get_training_history()
+
+        additional_results_dump_paths = result_package.get_additional_results_dump_paths()
 
         experiment_results_dict = {'experiment_name': experiment_name,
                                    'experiment_results_local_path': experiment_results_local_path,
@@ -206,5 +213,8 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
                                                                       labels_file_name_w_type,
                                                                       labels_file_local_path_w_type)
             saved_results_paths.append([labels_file_name, labels_file_local_path])
+            
+        if additional_results_dump_paths is not None:
+            saved_results_paths += additional_results_dump_paths
 
         return saved_results_paths

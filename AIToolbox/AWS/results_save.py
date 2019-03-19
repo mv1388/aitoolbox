@@ -95,7 +95,6 @@ class S3ResultsSaver(AbstractResultsSaver, BaseResultsSaver):
                                                                                            experiment_timestamp,
                                                                                            save_true_pred_labels,
                                                                                            protect_existing_folder)
-            saved_local_results_details = [saved_local_results_details]
         else:
             saved_local_results_details = \
                 self.local_results_saver.save_experiment_results_separate_files(result_package,
