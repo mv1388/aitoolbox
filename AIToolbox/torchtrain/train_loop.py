@@ -250,7 +250,7 @@ class TrainLoopModelCheckpoint(TrainLoop):
                  train_loader, validation_loader,
                  batch_model_feed_def,
                  optimizer, criterion,
-                 project_name, experiment_name, local_model_result_folder_path):
+                 project_name, experiment_name, local_model_result_folder_path, save_to_s3=True):
         """
 
         Args:
@@ -263,14 +263,17 @@ class TrainLoopModelCheckpoint(TrainLoop):
             project_name (str):
             experiment_name (str):
             local_model_result_folder_path (str):
+            save_to_s3 (bool):
         """
         TrainLoop.__init__(self, model, train_loader, validation_loader, batch_model_feed_def, optimizer, criterion)
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = local_model_result_folder_path
+        self.save_to_s3 = save_to_s3
 
         self.callbacks_handler.register_callbacks([
-            ModelCheckpointCallback(self.project_name, self.experiment_name, self.local_model_result_folder_path)
+            ModelCheckpointCallback(self.project_name, self.experiment_name, self.local_model_result_folder_path,
+                                    save_to_s3=self.save_to_s3)
         ])
 
 
@@ -280,7 +283,7 @@ class TrainLoopModelEndSave(TrainLoop):
                  batch_model_feed_def,
                  optimizer, criterion,
                  project_name, experiment_name, local_model_result_folder_path,
-                 args, result_package):
+                 args, result_package, save_to_s3=True):
         """
 
         Args:
@@ -295,6 +298,7 @@ class TrainLoopModelEndSave(TrainLoop):
             local_model_result_folder_path (str):
             args (dict):
             result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
+            save_to_s3 (bool):
         """
         TrainLoop.__init__(self, model, train_loader, validation_loader, batch_model_feed_def, optimizer, criterion)
         self.project_name = project_name
@@ -302,10 +306,11 @@ class TrainLoopModelEndSave(TrainLoop):
         self.local_model_result_folder_path = local_model_result_folder_path
         self.args = args
         self.result_package = result_package
+        self.save_to_s3 = save_to_s3
 
         self.callbacks_handler.register_callbacks([
             ModelTrainEndSaveCallback(self.project_name, self.experiment_name, self.local_model_result_folder_path,
-                                      self.args, self.result_package)
+                                      self.args, self.result_package, save_to_s3=self.save_to_s3)
         ])
 
 
@@ -315,7 +320,7 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
                  batch_model_feed_def,
                  optimizer, criterion,
                  project_name, experiment_name, local_model_result_folder_path,
-                 args, result_package):
+                 args, result_package, save_to_s3=True):
         """
 
         Args:
@@ -330,12 +335,14 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
             local_model_result_folder_path (str):
             args (dict):
             result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
+            save_to_s3 (bool):
         """
         TrainLoopModelEndSave.__init__(self, model, train_loader, validation_loader, batch_model_feed_def,
                                        optimizer, criterion,
                                        project_name, experiment_name, local_model_result_folder_path,
-                                       args, result_package)
+                                       args, result_package, save_to_s3)
 
         self.callbacks_handler.register_callbacks([
-            ModelCheckpointCallback(self.project_name, self.experiment_name, self.local_model_result_folder_path)
+            ModelCheckpointCallback(self.project_name, self.experiment_name, self.local_model_result_folder_path,
+                                    save_to_s3=self.save_to_s3)
         ])
