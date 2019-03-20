@@ -34,6 +34,16 @@ class AbstractResultPackage(ABC):
 
     @abstractmethod
     def prepare_results_dict(self):
+        """ Perform result package building and save the result into self.results_dict
+
+        Mostly this consists of executing calculation of selected performance metrics and returning their result dicts.
+        If you want to use multiple performance metrics you have to combine them in the single self.results_dict
+        at the end by doing this:
+            self.results_dict = {**metric_dict_1, **metric_dict_2}
+
+        Returns:
+            None
+        """
         pass
 
     def prepare_result_package(self, y_true, y_predicted, hyperparameters=None, training_history=None, **kwargs):
@@ -100,7 +110,18 @@ class AbstractResultPackage(ABC):
         return self.additional_results_dump_paths
 
     def list_additional_results_dump_paths(self):
-        """
+        """Specify the list of meta data files you also want to save & upload to s3 during the experiment saving procedure
+
+        By default there are no additional files that are saved as the return is None. If you want to save your
+        specific additional files produced during the training procedure, then override this method specifying
+        the file paths.
+
+        If you want to save a whole folder of files, use zip_additional_results_dump() function to zip it into a single
+        file and save this zip instead.
+
+        The specified files are any additional data you would want to include into the experiment folder in addition to
+        the model save files and performance evaluation report files. For example a zip of attention heatmap pictures
+        in the machine translation projects.
 
         Returns:
             list or None: list of lists of string paths if it is not None.
@@ -172,7 +193,7 @@ class AbstractResultPackage(ABC):
             zip_path (str): specify the path with the zip name but without the '.zip' at the end
 
         Returns:
-            str:
+            str: the full path to the produced zip file (with the .zip extension appended)
         """
         shutil.make_archive(zip_path, 'zip', source_dir_path)
         return zip_path + '.zip'

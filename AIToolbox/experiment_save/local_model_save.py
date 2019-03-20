@@ -7,6 +7,20 @@ import datetime
 class AbstractLocalModelSaver(ABC):
     @abstractmethod
     def save_model(self, model, project_name, experiment_name, experiment_timestamp=None, epoch=None, protect_existing_folder=True):
+        """
+        
+        Args:
+            model (keras.engine.training.Model):
+            project_name (str):
+            experiment_name (str):
+            experiment_timestamp (str or None):
+            epoch (int or None):
+            protect_existing_folder (bool):
+
+        Returns:
+            (str, str, str, str): model_name, model_weights_name, model_local_path, model_weights_local_path
+
+        """
         pass
 
 
@@ -73,7 +87,7 @@ class KerasLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
             protect_existing_folder (bool):
 
         Returns:
-            (str, str, str, str):
+            (str, str, str, str): model_name, model_weights_name, model_local_path, model_weights_local_path
 
         """
         if experiment_timestamp is None:
@@ -135,7 +149,7 @@ class PyTorchLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
             protect_existing_folder (bool):
 
         Returns:
-            (str, str, str, str):
+            (str, str, str, str): model_name, model_weights_name, model_local_path, model_weights_local_path
 
         """
         if experiment_timestamp is None:
