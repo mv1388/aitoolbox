@@ -10,6 +10,20 @@ from AIToolbox.experiment_save.local_model_save import KerasLocalModelSaver, Ten
 class AbstractModelSaver(ABC):
     @abstractmethod
     def save_model(self, model, project_name, experiment_name, experiment_timestamp=None, epoch=None, protect_existing_folder=True):
+        """
+
+        Args:
+            model:
+            project_name (str):
+            experiment_name (str):
+            experiment_timestamp (str or None):
+            epoch (int or None):
+            protect_existing_folder (bool):
+
+        Returns:
+            (str, str): model_s3_path, experiment_timestamp
+
+        """
         pass
 
 

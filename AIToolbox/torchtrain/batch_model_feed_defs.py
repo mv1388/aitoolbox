@@ -12,10 +12,31 @@ import torch
 class AbstractModelFeedDefinition(ABC):
     @abstractmethod
     def get_loss(self, model, batch_data, criterion, device):
+        """
+
+        Args:
+            model:
+            batch_data:
+            criterion:
+            device:
+
+        Returns:
+            PyTorch loss
+        """
         pass
 
     @abstractmethod
     def get_predictions(self, model, batch_data, device):
+        """
+
+        Args:
+            model:
+            batch_data:
+            device:
+
+        Returns:
+            np.array, np.array, dict: y_test.cpu(), y_pred.cpu(), metadata
+        """
         pass
 
 
