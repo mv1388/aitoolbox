@@ -32,7 +32,7 @@ class AbstractBaseMetric(ABC):
         """
 
         Returns:
-            float:
+            float or dict:
         """
         return self.metric_result
 
