@@ -10,6 +10,14 @@ import tarfile
 class AbstractDatasetFetcher(ABC):
     @abstractmethod
     def fetch_dataset(self, protect_local_folder=True):
+        """
+        
+        Args:
+            protect_local_folder (bool): 
+
+        Returns:
+            None
+        """
         pass
 
 
@@ -61,7 +69,7 @@ class BaseDatasetFetcher:
             protect_local_folder (bool):
 
         Returns:
-            bool
+            bool:
 
         """
         if os.path.exists(os.path.join(self.local_dataset_folder_path, dataset_name)) and protect_local_folder:

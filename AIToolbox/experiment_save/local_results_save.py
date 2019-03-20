@@ -10,6 +10,20 @@ class AbstractLocalResultsSaver(ABC):
     @abstractmethod
     def save_experiment_results(self, result_package, project_name, experiment_name, experiment_timestamp=None,
                                 save_true_pred_labels=False, protect_existing_folder=True):
+        """
+        
+        Args:
+            result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
+            project_name (str):
+            experiment_name (str):
+            experiment_timestamp (str or None):
+            save_true_pred_labels (bool):
+            protect_existing_folder (bool):
+
+        Returns:
+            list: list of list with this format: [[results_file_name, results_file_local_path], ... [ , ]] 
+                Each file should be a new list specifying the file name and its full path
+        """
         pass
 
     @abstractmethod
@@ -107,7 +121,8 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
             protect_existing_folder (bool):
 
         Returns:
-            list: paths to locally saved results... so that S3 version can take them and upload to S3
+            list: list of list with this format: [[results_file_name, results_file_local_path], ... [ , ]] 
+                Each file should be a new list specifying the file name and its full path
         """
         if experiment_timestamp is None:
             experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
@@ -151,7 +166,7 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
         """
 
         Args:
-            result_package (AIToolbox.ExperimentSave.result_package.AbstractResultPackage):
+            result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
             project_name (str):
             experiment_name (str):
             experiment_timestamp (str or None):
@@ -159,7 +174,8 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
             protect_existing_folder (bool):
 
         Returns:
-            list: paths to locally saved results... so that S3 version can take them and upload to S3
+            list: list of list with this format: [[results_file_name, results_file_local_path], ... [ , ]] 
+                Each file should be a new list specifying the file name and its full path
         """
         experiment_results_local_path = self.create_experiment_local_folder_structure(project_name, experiment_name,
                                                                                       experiment_timestamp)

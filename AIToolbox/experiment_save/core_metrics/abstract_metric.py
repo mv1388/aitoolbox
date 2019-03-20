@@ -21,6 +21,11 @@ class AbstractBaseMetric(ABC):
 
     @abstractmethod
     def calculate_metric(self):
+        """ Perform metric calculation and save the result into self.metric_result 
+        
+        Returns:
+            None
+        """
         pass
 
     def get_metric(self):

@@ -11,6 +11,19 @@ class AbstractExperimentSaver(ABC):
     def save_experiment(self, model, result_package, experiment_timestamp=None,
                         save_true_pred_labels=False, separate_files=False,
                         protect_existing_folder=True):
+        """
+
+        Args:
+            model:
+            result_package (AIToolbox.ExperimentSave.result_package.AbstractResultPackage):
+            experiment_timestamp (str):
+            save_true_pred_labels (bool):
+            separate_files (bool):
+            protect_existing_folder (bool):
+
+        Returns:
+            list: string paths where the experiment files were saved
+        """
         pass
 
 
@@ -47,7 +60,7 @@ class BaseFullExperimentS3Saver(AbstractExperimentSaver):
             protect_existing_folder (bool):
 
         Returns:
-            (str, str)
+            (str, str): s3_model_path, s3_results_path
         """
         if experiment_timestamp is None:
             experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')

@@ -11,6 +11,21 @@ class AbstractResultsSaver(ABC):
     @abstractmethod
     def save_experiment_results(self, result_package, project_name, experiment_name, experiment_timestamp=None,
                                 save_true_pred_labels=False, separate_files=False, protect_existing_folder=True):
+        """
+        
+        Args:
+            result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
+            project_name (str):
+            experiment_name (str):
+            experiment_timestamp (str):
+            save_true_pred_labels (bool):
+            separate_files (bool):
+            protect_existing_folder (bool):
+
+        Returns:
+            (str, str): results_file_s3_path, experiment_timestamp
+
+        """
         pass
 
 
