@@ -41,7 +41,6 @@ class BaseLocalResultsSaver:
             file_format (str): pickle or json
         """
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
-        self.experiment_path = None
         self.file_format = file_format
 
         if self.file_format not in ['pickle', 'json']:
