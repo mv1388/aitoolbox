@@ -6,7 +6,8 @@ from AIToolbox.experiment_save.training_history import TrainingHistory
 
 class ModelPerformanceEvaluationCallback(AbstractCallback):
     def __init__(self, result_package, args,
-                 on_each_epoch=True, on_train_data=False, on_val_data=True):
+                 on_each_epoch=True, on_train_data=False, on_val_data=True,
+                 if_available_output_to_project_dir=True):
         """
 
         Args:
@@ -15,6 +16,15 @@ class ModelPerformanceEvaluationCallback(AbstractCallback):
             on_each_epoch (bool): calculate performance results just at the end of training or at the end of each epoch
             on_train_data (bool):
             on_val_data (bool):
+            if_available_output_to_project_dir (bool): if using train loop version which builds project local folder
+                structure for saving checkpoints or creation of end of training reports, by setting
+                if_available_output_to_project_dir to True the potential additional metadata result outputs from the
+                result_package will be saved in the folder inside the main project folder. In this case
+                the result_package's output folder shouldn't be full path but just the folder name and the full folder
+                path pointing inside the corresponding project folder will be automatically created.
+                If such a functionality should to be prevented and manual full additional metadata results dump folder
+                is needed potentially outside the project folder, than set this argument to False and
+                specify a full folder path.
         """
         AbstractCallback.__init__(self, 'Model performance calculator - evaluator')
         self.result_package = result_package
@@ -22,6 +32,7 @@ class ModelPerformanceEvaluationCallback(AbstractCallback):
         self.on_each_epoch = on_each_epoch
         self.on_train_data = on_train_data
         self.on_val_data = on_val_data
+        self.if_available_output_to_project_dir = if_available_output_to_project_dir
 
         if not on_train_data and not on_val_data:
             raise ValueError('Both on_train_data and on_val_data are set to False. At least one of them has to be True')
@@ -79,6 +90,15 @@ class ModelPerformanceEvaluationCallback(AbstractCallback):
                 metric_name = f'{prefix}val_{m_name}'
                 self.train_loop_obj.insert_metric_result_into_history(metric_name,
                                                                       self.result_package.get_results()[m_name])
+
+    def on_train_loop_registration(self):
+        if self.if_available_output_to_project_dir and \
+            hasattr(self.train_loop_obj, 'project_name') and hasattr(self.train_loop_obj, 'experiment_name') and \
+                hasattr(self.train_loop_obj, 'local_model_result_folder_path'):
+            self.result_package.set_experiment_dir_path_for_additional_results(self.train_loop_obj.project_name,
+                                                                               self.train_loop_obj.experiment_name,
+                                                                               self.train_loop_obj.experiment_timestamp,
+                                                                               self.train_loop_obj.local_model_result_folder_path)
 
 
 class ModelPerformancePrintReportCallback(AbstractCallback):

@@ -13,6 +13,7 @@ class AbstractResultPackage(ABC):
         Functions which the user should potentially override in a specific result package:
             - prepare_results_dict()
             - list_additional_results_dump_paths()
+            - set_experiment_dir_path_for_additional_results()
 
         Args:
             pkg_name (str or None):
@@ -128,6 +129,33 @@ class AbstractResultPackage(ABC):
                 Each element of the list should be list of: [[results_file_name, results_file_local_path], ... [,]]
         """
         return None
+
+    def set_experiment_dir_path_for_additional_results(self, project_name, experiment_name, experiment_timestamp,
+                                                       local_model_result_folder_path):
+        """Set experiment folder path after potential timestamps have already been generated.
+
+        Experiment folder setting for additional metadata results output is needed only in certain result packages,
+        for example in QuestionAnswerResultPackage where the self.output_text_dir initially has only the name of
+        the folder where the results text predictions for each example should be stored. This function when implemented
+        reforms the folder name so that it becomes a full path placing the folder inside the experiment folder (for
+        which the timestamp at the start of train loop is needed).
+
+        Another use of this function is in MachineTranslationResultPackage where the attention heatmap pictures are
+        stored as additional metadata results.
+
+        As can be seen from the fact that the train loop mechanism is mentioned, this method's functionality is
+        primarily used for PyTorch experiments.
+
+        Args:
+            project_name (str):
+            experiment_name (str):
+            experiment_timestamp (str):
+            local_model_result_folder_path (str):
+
+        Returns:
+
+        """
+        pass
 
     def qa_check_hyperparameters_dict(self):
         """

@@ -41,6 +41,7 @@ class BaseLocalResultsSaver:
             file_format (str): pickle or json
         """
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
+        self.experiment_path = None
         self.file_format = file_format
 
         if self.file_format not in ['pickle', 'json']:
@@ -58,18 +59,35 @@ class BaseLocalResultsSaver:
         Returns:
             str:
         """
-        if not os.path.exists(os.path.join(self.local_model_result_folder_path, project_name)):
-            os.mkdir(os.path.join(self.local_model_result_folder_path, project_name))
-
-        experiment_path = os.path.join(self.local_model_result_folder_path, project_name,
-                                       experiment_name + '_' + experiment_timestamp)
-
+        project_path, experiment_path, experiment_results_path = \
+            self.form_experiment_local_folders_paths(project_name, experiment_name, experiment_timestamp,
+                                                     self.local_model_result_folder_path)
+        if not os.path.exists(project_path):
+            os.mkdir(project_path)
         if not os.path.exists(experiment_path):
             os.mkdir(experiment_path)
-
-        experiment_results_path = os.path.join(experiment_path, 'results')
         os.mkdir(experiment_results_path)
         return experiment_results_path
+
+    @staticmethod
+    def form_experiment_local_folders_paths(project_name, experiment_name, experiment_timestamp,
+                                            local_model_result_folder_path):
+        """
+
+        Args:
+            project_name (str):
+            experiment_name (str):
+            experiment_timestamp (str):
+            local_model_result_folder_path (str):
+
+        Returns:
+            str, str, str: project_dir_path, experiment_dir_path, experiment_results_dir_path
+        """
+        project_dir_path = os.path.join(local_model_result_folder_path, project_name)
+        experiment_dir_path = os.path.join(project_dir_path, experiment_name + '_' + experiment_timestamp)
+        experiment_results_dir_path = os.path.join(experiment_dir_path, 'results')
+
+        return project_dir_path, experiment_dir_path, experiment_results_dir_path
 
     def save_file(self, result_dict, file_name_w_type, file_local_path_w_type):
         """

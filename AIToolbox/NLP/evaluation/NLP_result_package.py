@@ -1,5 +1,6 @@
 import os
 
+from AIToolbox.experiment_save.local_results_save import BaseLocalResultsSaver
 from AIToolbox.experiment_save.result_package.abstract_result_packages import AbstractResultPackage
 from AIToolbox.experiment_save.core_metrics.classification import AccuracyMetric
 from AIToolbox.NLP.evaluation.NLP_metrics import ROUGEMetric, ROUGEPerlMetric, BLEUCorpusScoreMetric, PerplexityMetric
@@ -72,6 +73,20 @@ class QuestionAnswerResultPackage(AbstractResultPackage):
 
         # self.results_dict = {**rogue_metric, **rogue_metric_non_official}
         self.results_dict = rogue_metric.get_metric_dict()
+
+    def set_experiment_dir_path_for_additional_results(self, project_name, experiment_name, experiment_timestamp,
+                                                       local_model_result_folder_path):
+        if self.output_text_dir is not None:
+            _, experiment_dir_path, _ = \
+                BaseLocalResultsSaver.form_experiment_local_folders_paths(project_name, experiment_name,
+                                                                          experiment_timestamp, local_model_result_folder_path)
+            self.output_text_dir = os.path.join(experiment_dir_path, self.output_text_dir)
+
+    def list_additional_results_dump_paths(self):
+        if self.output_text_dir is not None:
+            zip_path = self.zip_additional_results_dump(self.output_text_dir, self.output_text_dir)
+            zip_file_name = os.path.basename(zip_path)
+            return [[zip_file_name, zip_path]]
 
 
 class QuestionAnswerSpanClassificationResultPackage(AbstractResultPackage):
