@@ -1,3 +1,5 @@
+import os
+
 from AIToolbox.AWS.model_save import PyTorchS3ModelSaver
 from AIToolbox.experiment_save.local_model_save import PyTorchLocalModelSaver
 from AIToolbox.experiment_save.experiment_saver import FullPyTorchExperimentS3Saver
@@ -20,7 +22,16 @@ class AbstractCallback:
 
         """
         self.train_loop_obj = train_loop_obj
+        self.on_train_loop_registration()
         return self
+
+    def on_train_loop_registration(self):
+        """Execute callback initialization / preparation after the train_loop_object becomes available
+
+        Returns:
+
+        """
+        pass
 
     def on_epoch_begin(self):
         pass
@@ -198,3 +209,8 @@ class ModelTrainEndSaveCallback(AbstractCallback):
         self.results_saver.save_experiment(self.train_loop_obj.model, self.result_package,
                                            experiment_timestamp=self.train_loop_obj.experiment_timestamp,
                                            save_true_pred_labels=True)
+
+    def on_train_loop_registration(self):
+        self.result_package.set_experiment_dir_path_for_additional_results(self.project_name, self.experiment_name,
+                                                                           self.train_loop_obj.experiment_timestamp,
+                                                                           self.local_model_result_folder_path)
