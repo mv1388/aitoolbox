@@ -1,10 +1,14 @@
 import unittest
+import os
 from AIToolbox.NLP.dataset.SQuAD2.SQuAD2DataReader import *
+
+
+THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 class TestDataset_SQuAD2ConcatContextDatasetReader(unittest.TestCase):
     def test_dataset_reader(self):
-        reader = SQuAD2ConcatContextDatasetReader(file_path='/Users/markovidoni/PycharmProjects/MemoryNet/data/SQuAD2/dev-v2.0.json',
+        reader = SQuAD2ConcatContextDatasetReader(file_path=os.path.join(THIS_DIR, 'SQuAD2-dev-v2.0.json'),
                                                   is_train=True)
 
         self.assertEqual(len(reader.dataset), 35)
