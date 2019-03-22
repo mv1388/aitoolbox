@@ -15,17 +15,10 @@ class TestCallbacksHandler(unittest.TestCase):
         self.check_callback_handler_for_hooks(callback_handler_2)
 
     def check_callback_handler_for_hooks(self, callback_handler):
-        self.assertTrue(self.function_exists(callback_handler, 'register_callbacks'))
-        self.assertTrue(self.function_exists(callback_handler, 'execute_epoch_begin'))
-        self.assertTrue(self.function_exists(callback_handler, 'execute_epoch_end'))
-        self.assertTrue(self.function_exists(callback_handler, 'execute_train_begin'))
-        self.assertTrue(self.function_exists(callback_handler, 'execute_train_end'))
-        self.assertTrue(self.function_exists(callback_handler, 'execute_batch_begin'))
-        self.assertTrue(self.function_exists(callback_handler, 'execute_batch_end'))
-
-    @staticmethod
-    def function_exists(callback_handler_object, fn_name):
-        if hasattr(callback_handler_object, fn_name):
-            fn_obj = getattr(callback_handler_object, fn_name, None)
-            return callable(fn_obj)
-        return False
+        self.assertTrue(function_exists(callback_handler, 'register_callbacks'))
+        self.assertTrue(function_exists(callback_handler, 'execute_epoch_begin'))
+        self.assertTrue(function_exists(callback_handler, 'execute_epoch_end'))
+        self.assertTrue(function_exists(callback_handler, 'execute_train_begin'))
+        self.assertTrue(function_exists(callback_handler, 'execute_train_end'))
+        self.assertTrue(function_exists(callback_handler, 'execute_batch_begin'))
+        self.assertTrue(function_exists(callback_handler, 'execute_batch_end'))
