@@ -27,14 +27,14 @@ class TestTrainLoop(unittest.TestCase):
 
         self.assertEqual(len(train_loop.callbacks), 3)
         for reg_cb, true_cb in zip(train_loop.callbacks, [AbstractCallback, CallbackTracker, CallbackTrackerShort]):
-            self.assertIsInstance(reg_cb, true_cb)
+            self.assertEqual(type(reg_cb), true_cb)
         for reg_cb in train_loop.callbacks:
             self.assertEqual(reg_cb.train_loop_obj, train_loop)
 
         train_loop.callbacks_handler.register_callbacks([AbstractCallback('callback_test2')])
         self.assertEqual(len(train_loop.callbacks), 4)
         for reg_cb, true_cb in zip(train_loop.callbacks, [AbstractCallback, CallbackTracker, CallbackTrackerShort, AbstractCallback]):
-            self.assertIsInstance(reg_cb, true_cb)
+            self.assertEqual(type(reg_cb), true_cb)
 
         for reg_cb in train_loop.callbacks:
             self.assertEqual(reg_cb.train_loop_obj, train_loop)
@@ -168,7 +168,7 @@ class TestTrainLoopModelCheckpoint(unittest.TestCase):
         self.assertEqual(train_loop.train_history, {'loss': [], 'accumulated_loss': [], 'val_loss': []})
 
         self.assertEqual(len(train_loop.callbacks), 1)
-        self.assertIsInstance(train_loop.callbacks[0], ModelCheckpointCallback)
+        self.assertEqual(type(train_loop.callbacks[0]), ModelCheckpointCallback)
 
         self.assertIsInstance(train_loop.callbacks_handler, CallbacksHandler)
         self.assertEqual(train_loop.callbacks_handler.train_loop_obj, train_loop)
@@ -189,7 +189,7 @@ class TestTrainLoopModelEndSave(unittest.TestCase):
         self.assertEqual(train_loop.train_history, {'loss': [], 'accumulated_loss': [], 'val_loss': []})
 
         self.assertEqual(len(train_loop.callbacks), 1)
-        self.assertIsInstance(train_loop.callbacks[0], ModelTrainEndSaveCallback)
+        self.assertEqual(type(train_loop.callbacks[0]), ModelTrainEndSaveCallback)
         self.assertEqual(train_loop.callbacks[0].result_package, dummy_result_package)
 
         self.assertIsInstance(train_loop.callbacks_handler, CallbacksHandler)
@@ -211,10 +211,10 @@ class TestTrainLoopModelCheckpointEndSave(unittest.TestCase):
         self.assertEqual(train_loop.train_history, {'loss': [], 'accumulated_loss': [], 'val_loss': []})
 
         self.assertEqual(len(train_loop.callbacks), 2)
-        self.assertIsInstance(train_loop.callbacks[0], ModelTrainEndSaveCallback)
+        self.assertEqual(type(train_loop.callbacks[0]), ModelTrainEndSaveCallback)
         self.assertEqual(train_loop.callbacks[0].result_package, dummy_result_package)
 
-        self.assertIsInstance(train_loop.callbacks[1], ModelCheckpointCallback)
+        self.assertEqual(type(train_loop.callbacks[1]), ModelCheckpointCallback)
 
         self.assertIsInstance(train_loop.callbacks_handler, CallbacksHandler)
         self.assertEqual(train_loop.callbacks_handler.train_loop_obj, train_loop)
@@ -229,14 +229,14 @@ class TestTrainLoopModelCheckpointEndSave(unittest.TestCase):
 
         self.assertEqual(len(train_loop.callbacks), 2)
         for reg_cb, true_cb in zip(train_loop.callbacks, [ModelTrainEndSaveCallback, ModelCheckpointCallback]):
-            self.assertIsInstance(reg_cb, true_cb)
+            self.assertEqual(type(reg_cb), true_cb)
         for reg_cb in train_loop.callbacks:
             self.assertEqual(reg_cb.train_loop_obj, train_loop)
 
         train_loop.callbacks_handler.register_callbacks([AbstractCallback('callback_test2')])
         self.assertEqual(len(train_loop.callbacks), 3)
         for reg_cb, true_cb in zip(train_loop.callbacks, [ModelTrainEndSaveCallback, ModelCheckpointCallback, AbstractCallback]):
-            self.assertIsInstance(reg_cb, true_cb)
+            self.assertEqual(type(reg_cb), true_cb)
 
         for reg_cb in train_loop.callbacks:
             self.assertEqual(reg_cb.train_loop_obj, train_loop)
