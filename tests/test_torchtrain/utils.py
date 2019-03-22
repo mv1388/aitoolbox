@@ -164,3 +164,13 @@ class DummyResultPackage(AbstractResultPackage):
     def set_experiment_dir_path_for_additional_results(self, project_name, experiment_name, experiment_timestamp,
                                                        local_model_result_folder_path):
         self.experiment_path = f'{local_model_result_folder_path}/{project_name}_{experiment_name}_{experiment_timestamp}'
+
+
+class DummyResultPackageExtend(DummyResultPackage):
+    def __init__(self):
+        DummyResultPackage.__init__(self)
+        self.ctr = 0.
+    
+    def prepare_results_dict(self):
+        self.results_dict = {'dummy': 111 + self.ctr, 'extended_dummy': 1323123.44 + self.ctr}
+        self.ctr += 12
