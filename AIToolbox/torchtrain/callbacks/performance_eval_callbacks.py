@@ -8,7 +8,13 @@ class ModelPerformanceEvaluationCallback(AbstractCallback):
     def __init__(self, result_package, args,
                  on_each_epoch=True, on_train_data=False, on_val_data=True,
                  if_available_output_to_project_dir=True):
-        """
+        """Track performance metrics from result_package and store them into TrainLoop's history
+
+        This callback is different from those for model and experiment saving where performance evaluations are also
+        calculated. Here we only want to calculate performance and store it in memory into TrainLoop's history dict.
+
+        It is a more lightweight, on the go performance tracking without the need for the full project folder structure
+        construction.
 
         Args:
             result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
