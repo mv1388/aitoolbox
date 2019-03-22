@@ -2,7 +2,7 @@ import unittest
 
 from tests.test_torchtrain.utils import *
 
-from AIToolbox.torchtrain.callbacks.performance_eval_callbacks import ModelPerformanceEvaluationCallback
+from AIToolbox.torchtrain.callbacks.performance_eval_callbacks import ModelPerformanceEvaluationCallback, MetricHistoryRename
 from AIToolbox.torchtrain.train_loop import TrainLoop, TrainLoopModelCheckpoint
 
 
@@ -179,3 +179,98 @@ class TestModelPerformanceEvaluationCallback(unittest.TestCase):
         self.assertEqual(train_loop.train_history,
                          {'loss': [], 'accumulated_loss': [], 'val_loss': [], 'val_dummy': [111.0, 123.0, 135.0],
                           'val_extended_dummy': [1323123.44, 1323135.44, 1323147.44]})
+
+
+class TestMetricHistoryRename(unittest.TestCase):
+    def test_rename_metric(self):
+        dummy_feed_def = DeactivateModelFeedDefinition()
+        dummy_optimizer = DummyOptimizer()
+        dummy_train_loader = list(range(3))
+        dummy_val_loader = list(range(2))
+        model = Net()
+
+        result_pkg = DummyResultPackageExtend()
+        callback = ModelPerformanceEvaluationCallback(result_pkg, {},
+                                                      on_each_epoch=True, on_train_data=False, on_val_data=True)
+        rename_callback = MetricHistoryRename(input_metric_path='val_dummy', new_metric_name='val_renamed_dummy',
+                                              epoch_end=True, train_end=False)
+
+        train_loop = TrainLoop(model, dummy_train_loader, dummy_val_loader, dummy_feed_def, dummy_optimizer, None)
+        train_loop.callbacks_handler.register_callbacks([callback, rename_callback])
+
+        callback.evaluate_model_performance()
+        callback.store_evaluated_metrics_to_history()
+        rename_callback.on_epoch_end()
+
+        self.assertEqual(train_loop.train_history,
+                         {'loss': [], 'accumulated_loss': [], 'val_loss': [], 'val_dummy': [111.0],
+                          'val_extended_dummy': [1323123.44], 'val_renamed_dummy': [111.0]})
+
+    def test_rename_metric_multi_epoch_simulation(self):
+        dummy_feed_def = DeactivateModelFeedDefinition()
+        dummy_optimizer = DummyOptimizer()
+        dummy_train_loader = list(range(3))
+        dummy_val_loader = list(range(2))
+        model = Net()
+
+        result_pkg = DummyResultPackageExtend()
+        callback = ModelPerformanceEvaluationCallback(result_pkg, {},
+                                                      on_each_epoch=True, on_train_data=False, on_val_data=True)
+        rename_callback = MetricHistoryRename(input_metric_path='val_dummy', new_metric_name='val_renamed_dummy',
+                                              epoch_end=True, train_end=False)
+
+        train_loop = TrainLoop(model, dummy_train_loader, dummy_val_loader, dummy_feed_def, dummy_optimizer, None)
+        train_loop.callbacks_handler.register_callbacks([callback, rename_callback])
+
+        # Epoch 1
+        callback.evaluate_model_performance()
+        callback.store_evaluated_metrics_to_history()
+        rename_callback.on_epoch_end()
+        self.assertEqual(train_loop.train_history,
+                         {'loss': [], 'accumulated_loss': [], 'val_loss': [], 'val_dummy': [111.0],
+                          'val_extended_dummy': [1323123.44], 'val_renamed_dummy': [111.0]})
+        train_loop.epoch += 1
+
+        # Epoch 2
+        callback.evaluate_model_performance()
+        callback.store_evaluated_metrics_to_history()
+        rename_callback.on_epoch_end()
+        self.assertEqual(train_loop.train_history,
+                         {'loss': [], 'accumulated_loss': [], 'val_loss': [], 'val_dummy': [111.0, 123.0],
+                          'val_extended_dummy': [1323123.44, 1323135.44], 'val_renamed_dummy': [111.0, 123.0]})
+        train_loop.epoch += 1
+
+        # Epoch 3
+        callback.evaluate_model_performance()
+        callback.store_evaluated_metrics_to_history()
+        rename_callback.on_epoch_end()
+        self.assertEqual(train_loop.train_history,
+                         {'loss': [], 'accumulated_loss': [], 'val_loss': [], 'val_dummy': [111.0, 123.0, 135.0],
+                          'val_extended_dummy': [1323123.44, 1323135.44, 1323147.44], 'val_renamed_dummy': [111.0, 123.0, 135.0]})
+
+    def test_fail_check_if_history_updated(self):
+        dummy_feed_def = DeactivateModelFeedDefinition()
+        dummy_optimizer = DummyOptimizer()
+        dummy_train_loader = list(range(3))
+        dummy_val_loader = list(range(2))
+        model = Net()
+
+        result_pkg = DummyResultPackageExtend()
+        callback = ModelPerformanceEvaluationCallback(result_pkg, {},
+                                                      on_each_epoch=True, on_train_data=False, on_val_data=True)
+        rename_callback = MetricHistoryRename(input_metric_path='val_dummy', new_metric_name='val_renamed_dummy',
+                                              epoch_end=True, train_end=False, strict_metric_extract=True)
+
+        train_loop = TrainLoop(model, dummy_train_loader, dummy_val_loader, dummy_feed_def, dummy_optimizer, None)
+        train_loop.callbacks_handler.register_callbacks([callback, rename_callback])
+
+        callback.evaluate_model_performance()
+        callback.store_evaluated_metrics_to_history()
+        rename_callback.on_epoch_end()
+
+        # Don't increment epoch count in the train loop to ensure that the history updated check fails
+        callback.evaluate_model_performance()
+        callback.store_evaluated_metrics_to_history()
+
+        with self.assertRaises(ValueError):
+            rename_callback.on_epoch_end()
