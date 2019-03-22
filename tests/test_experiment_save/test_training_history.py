@@ -5,7 +5,7 @@ from tests.test_torchtrain.utils import *
 from AIToolbox.experiment_save.training_history import TrainingHistory
 
 
-class TestAbstractCallback(unittest.TestCase):
+class TestTrainingHistory(unittest.TestCase):
     def test_abstract_callback_has_hook_methods(self):
         history = {'val_loss': [2.2513437271118164, 2.1482439041137695, 2.0187528133392334, 1.7953970432281494,
                                 1.5492324829101562, 1.715561032295227, 1.631982684135437, 1.3721977472305298,
