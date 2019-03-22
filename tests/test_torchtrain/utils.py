@@ -156,6 +156,11 @@ class DummyOptimizer:
 class DummyResultPackage(AbstractResultPackage):
     def __init__(self):
         AbstractResultPackage.__init__(self, 'DummyPackage', False)
+        self.experiment_path = None
 
     def prepare_results_dict(self):
         self.results_dict = {'dummy': 111}
+        
+    def set_experiment_dir_path_for_additional_results(self, project_name, experiment_name, experiment_timestamp,
+                                                       local_model_result_folder_path):
+        self.experiment_path = f'{local_model_result_folder_path}/{project_name}_{experiment_name}_{experiment_timestamp}'
