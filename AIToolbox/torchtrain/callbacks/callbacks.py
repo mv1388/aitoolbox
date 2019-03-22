@@ -1,5 +1,3 @@
-import os
-
 from AIToolbox.AWS.model_save import PyTorchS3ModelSaver
 from AIToolbox.experiment_save.local_model_save import PyTorchLocalModelSaver
 from AIToolbox.experiment_save.experiment_saver import FullPyTorchExperimentS3Saver
