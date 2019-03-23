@@ -1,6 +1,6 @@
 import unittest
 
-from tests.test_torchtrain.utils import *
+from tests.utils import *
 
 from AIToolbox.torchtrain.callbacks.performance_eval_callbacks import ModelPerformanceEvaluationCallback, MetricHistoryRename
 from AIToolbox.torchtrain.train_loop import TrainLoop, TrainLoopModelCheckpoint

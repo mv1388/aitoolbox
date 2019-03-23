@@ -1,6 +1,6 @@
 import unittest
 
-from tests.test_torchtrain.utils import *
+from tests.utils import *
 
 
 class TestAbstractBaseMetric(unittest.TestCase):
