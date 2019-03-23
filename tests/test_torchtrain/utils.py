@@ -7,9 +7,9 @@ from AIToolbox.torchtrain.callbacks.callbacks import AbstractCallback
 from AIToolbox.experiment_save.result_package.abstract_result_packages import AbstractResultPackage
 
 
-def function_exists(callback_handler_object, fn_name):
-    if hasattr(callback_handler_object, fn_name):
-        fn_obj = getattr(callback_handler_object, fn_name, None)
+def function_exists(object_to_check, fn_name):
+    if hasattr(object_to_check, fn_name):
+        fn_obj = getattr(object_to_check, fn_name, None)
         return callable(fn_obj)
     return False
 
