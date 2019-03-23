@@ -53,7 +53,3 @@ class TestROGUENonOfficialMetric(unittest.TestCase):
 
             for k2 in dict_1[k1]:
                 self.assertAlmostEqual(dict_1[k1][k2], dict_2[k1][k2])
-
-
-if __name__ == '__main__':
-    unittest.main()
