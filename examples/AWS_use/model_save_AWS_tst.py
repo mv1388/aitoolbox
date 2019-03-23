@@ -12,6 +12,12 @@ import tensorflow as tf
 from sklearn.datasets import make_classification
 import random
 
+from AIToolbox.AWS.model_save import KerasS3ModelSaver
+from AIToolbox.AWS.results_save import S3ResultsSaver
+from AIToolbox.experiment_save.result_package.basic_packages import ClassificationResultPackage
+
+import numpy as np
+
 
 class RepeatVector4D(layers.Layer):
     def __init__(self, n, **kwargs):
@@ -136,13 +142,6 @@ def build_FastQA_RNN_concat_model_GLOVE(RNN, story_maxlen, query_maxlen, vocab_s
 
 rnn = recurrent.GRU
 model = build_FastQA_RNN_concat_model_GLOVE(rnn, 400, 20, 8000, 400, 0, 50, 0.2)
-
-
-from AIToolbox.AWS.model_save import KerasS3ModelSaver
-from AIToolbox.AWS.results_save import S3ResultsSaver
-from AIToolbox.experiment_save.result_package import ClassificationResultPackage
-
-import numpy as np
 
 
 local_model_result_folder_path = '~/PycharmProjects/MemoryNet/model_results'
