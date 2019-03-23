@@ -1,6 +1,6 @@
 import unittest
 
-from tests.test_torchtrain.utils import *
+from tests.utils import *
 
 from AIToolbox.torchtrain.callbacks.callbacks import AbstractCallback, ModelCheckpointCallback, ModelTrainEndSaveCallback, \
     EarlyStoppingCallback

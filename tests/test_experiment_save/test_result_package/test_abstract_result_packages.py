@@ -1,6 +1,6 @@
 import unittest
 
-from tests.test_torchtrain.utils import *
+from tests.utils import *
 from AIToolbox.experiment_save.training_history import TrainingHistory
 from AIToolbox.experiment_save.result_package.abstract_result_packages import MultipleResultPackageWrapper, PreCalculatedResultPackage
 

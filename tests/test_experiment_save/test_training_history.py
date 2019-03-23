@@ -1,7 +1,5 @@
 import unittest
 
-from tests.test_torchtrain.utils import *
-
 from AIToolbox.experiment_save.training_history import TrainingHistory
 
 
