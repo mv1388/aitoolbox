@@ -175,6 +175,30 @@ class TestAbstractBaseMetric(unittest.TestCase):
                                                       combo_pkg_1_2.result_packages[1].pkg_name: pkg_2_dict})
         self.assertEqual(combo_pkg_1_2.results_dict, {pkg_1.pkg_name: result_d_1, 'PreCalculatedResult': pkg_2_dict})
 
+    def test_combine_package_metric_name_clash(self):
+        result_d_1 = {'metricSAME': 33232, 'metric2': 1000}
+        pkg_1 = DummyResultPackageExtendVariable(result_d_1)
+        pkg_1.prepare_result_package([10] * 100, [11] * 100, {'dddd': 222}, self.build_train_hist())
+
+        result_d_2 = {'metricSAME': 33232, 'metric3': 1000}
+        pkg_2 = DummyResultPackageExtendVariable(result_d_2)
+        pkg_2.prepare_result_package([10] * 100, [11] * 100, {'qqq': 445}, self.build_train_hist())
+
+        combo_pkg_1_2 = pkg_1 + pkg_2
+
+        self.assertEqual(combo_pkg_1_2.results_dict, {pkg_1.pkg_name: result_d_1, f'{pkg_2.pkg_name}1': result_d_2})
+
+    def test_combine_metric_dict_name_clash(self):
+        result_d_1 = {'metricSAME': 33232, 'metric2': 1000}
+        pkg_1 = DummyResultPackageExtendVariable(result_d_1)
+        pkg_1.prepare_result_package([10] * 100, [11] * 100, {'dddd': 222}, self.build_train_hist())
+        pkg_2_dict = {'metricSAME': 33232, 'metric3': 1000}
+
+        combo_pkg_1_2 = pkg_1 + pkg_2_dict
+        self.assertEqual(combo_pkg_1_2.results_dict, {pkg_1.pkg_name: result_d_1,
+                                                      combo_pkg_1_2.result_packages[1].pkg_name: pkg_2_dict})
+        self.assertEqual(combo_pkg_1_2.results_dict, {pkg_1.pkg_name: result_d_1, 'PreCalculatedResult': pkg_2_dict})
+
     def test_fail_dict_not_defined(self):
         result_d_1 = {'metric1': 33232, 'metric2': 1000}
         pkg_1 = DummyResultPackageExtendVariable(result_d_1)
@@ -187,30 +211,16 @@ class TestAbstractBaseMetric(unittest.TestCase):
             pkg_2_dict = {'metric3': 11111}
             combo_pkg_1_2 = pkg_2_dict + pkg_1
 
-    def test_fail_metric_name_clash(self):
+    def test_fail_dict_not_defined_pkg(self):
         result_d_1 = {'metricSAME': 33232, 'metric2': 1000}
         pkg_1 = DummyResultPackageExtendVariable(result_d_1)
 
         result_d_2 = {'metricSAME': 33232, 'metric3': 1000}
         pkg_2 = DummyResultPackageExtendVariable(result_d_2)
+        pkg_2.prepare_result_package([10] * 100, [11] * 100, {'qqq': 445}, self.build_train_hist())
 
         with self.assertRaises(ValueError):
             combo_pkg_1_2 = pkg_1 + pkg_2
-
-        with self.assertRaises(ValueError):
-            combo_pkg_1_2 = pkg_2 + pkg_1
-
-    def test_fail_metric_dict_name_clash(self):
-        result_d_1 = {'metricSAME': 33232, 'metric2': 1000}
-        pkg_1 = DummyResultPackageExtendVariable(result_d_1)
-
-        pkg_2_dict = {'metricSAME': 33232, 'metric3': 1000}
-
-        with self.assertRaises(ValueError):
-            combo_pkg_1_2 = pkg_1 + pkg_2_dict
-
-        with self.assertRaises(ValueError):
-            combo_pkg_1_2 = pkg_2_dict + pkg_1
 
     def test_append_packages(self):
         train_hist_1 = self.build_train_hist()
@@ -235,4 +245,78 @@ class TestAbstractBaseMetric(unittest.TestCase):
         self.assertEqual(pkg_1.hyperparameters, {'dddd': 222})
         self.assertEqual(pkg_1.get_hyperparameters(), {'dddd': 222})
 
+    def test_append_dict_packages(self):
+        train_hist_1 = self.build_train_hist()
+        result_d_1 = {'metric1': 33232, 'metric2': 1000}
+        pkg_1 = DummyResultPackageExtendVariable(result_d_1)
+        pkg_1.prepare_result_package([10] * 100, [11] * 100, {'dddd': 222}, train_hist_1)
 
+        pkg_dict_2 = {'metric3': 1, 'metric4': 2}
+
+        pkg_1 += pkg_dict_2
+
+        self.assertEqual(type(pkg_1), DummyResultPackageExtendVariable)
+        self.assertEqual(pkg_1.results_dict, {**result_d_1, **pkg_dict_2})
+        self.assertEqual(pkg_1.results_dict, {'metric1': 33232, 'metric2': 1000, 'metric3': 1, 'metric4': 2})
+
+        self.assertEqual(pkg_1.y_true.tolist(), [10] * 100)
+        self.assertEqual(pkg_1.y_predicted.tolist(), [11] * 100)
+        self.assertEqual(pkg_1.training_history, train_hist_1)
+        self.assertEqual(pkg_1.get_training_history(), train_hist_1.get_train_history())
+        self.assertEqual(pkg_1.hyperparameters, {'dddd': 222})
+        self.assertEqual(pkg_1.get_hyperparameters(), {'dddd': 222})
+
+    def test_fail_append_packages_name_clash_val_fail(self):
+        train_hist_1 = self.build_train_hist()
+        result_d_1 = {'metricSAME': 33232, 'metric2': 1000}
+        pkg_1 = DummyResultPackageExtendVariable(result_d_1)
+        pkg_1.prepare_result_package([10] * 100, [11] * 100, {'dddd': 222}, train_hist_1)
+
+        result_d_2 = {'metricSAME': 1, 'metric4': 2}
+        pkg_2 = DummyResultPackageExtendVariable(result_d_2)
+        pkg_2.prepare_result_package([100] * 100, [110] * 100, {'qqq': 445}, self.build_train_hist())
+
+        with self.assertRaises(ValueError):
+            pkg_1 += pkg_2
+
+        with self.assertRaises(ValueError):
+            pkg_1 += [23323]
+
+        with self.assertRaises(ValueError):
+            pkg_1 += 33121
+
+    def test_fail_append_dict_packages_name_clash(self):
+        train_hist_1 = self.build_train_hist()
+        result_d_1 = {'metricSAME': 33232, 'metric2': 1000}
+        pkg_1 = DummyResultPackageExtendVariable(result_d_1)
+        pkg_1.prepare_result_package([10] * 100, [11] * 100, {'dddd': 222}, train_hist_1)
+
+        pkg_dict_2 = {'metricSAME': 1, 'metric4': 2}
+
+        with self.assertRaises(ValueError):
+            pkg_1 += pkg_dict_2
+
+    def test_package_contains(self):
+        train_hist_1 = self.build_train_hist()
+        result_d_1 = {'metric1': 33232, 'metric2': 1000}
+        pkg_1 = DummyResultPackageExtendVariable(result_d_1)
+        with self.assertRaises(ValueError):
+            res = 'metric1' in pkg_1
+
+        pkg_1.prepare_result_package([10] * 100, [11] * 100, {'dddd': 222}, train_hist_1)
+        self.assertTrue('metric1' in pkg_1)
+        self.assertTrue('metric2' in pkg_1)
+        self.assertFalse('metricMissing' in pkg_1)
+
+    def test_package_get_item(self):
+        train_hist_1 = self.build_train_hist()
+        result_d_1 = {'metric1': 33232, 'metric2': 1000}
+        pkg_1 = DummyResultPackageExtendVariable(result_d_1)
+        with self.assertRaises(ValueError):
+            res = pkg_1['metric1']
+
+        pkg_1.prepare_result_package([10] * 100, [11] * 100, {'dddd': 222}, train_hist_1)
+        self.assertEqual(pkg_1['metric1'], result_d_1['metric1'])
+        self.assertEqual(pkg_1['metric2'], result_d_1['metric2'])
+        with self.assertRaises(KeyError):
+            res = pkg_1['metricMissing']
