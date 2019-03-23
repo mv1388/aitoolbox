@@ -31,7 +31,3 @@ class TestDataset_SQuAD2ConcatContextDatasetReader(unittest.TestCase):
                          ['The', 'Normans', '(', 'Norman', ':', 'Nourmands', ';', 'French', ':', 'Normands', ';',
                           'Latin', ':', 'Normanni', ')', 'were', 'the', 'people', 'who', 'in'])
         self.assertEqual(data[2][2], (55, 59))
-
-
-if __name__ == '__main__':
-    unittest.main()
