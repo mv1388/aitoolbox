@@ -12,6 +12,13 @@ import tensorflow as tf
 from sklearn.datasets import make_classification
 import random
 
+from AIToolbox.AWS.model_save import KerasS3ModelSaver
+from AIToolbox.AWS.results_save import S3ResultsSaver
+from AIToolbox.experiment_save.result_package.basic_packages import ClassificationResultPackage
+from AIToolbox.experiment_save.training_history import TrainingHistory
+
+import numpy as np
+
 
 class RepeatVector4D(layers.Layer):
     def __init__(self, n, **kwargs):
@@ -138,13 +145,6 @@ rnn = recurrent.GRU
 model = build_FastQA_RNN_concat_model_GLOVE(rnn, 400, 20, 8000, 400, 0, 50, 0.2)
 
 
-from AIToolbox.AWS.model_save import KerasS3ModelSaver
-from AIToolbox.AWS.results_save import S3ResultsSaver
-from AIToolbox.experiment_save.result_package import ClassificationResultPackage
-
-import numpy as np
-
-
 local_model_result_folder_path = '~/PycharmProjects/MemoryNet/model_results'
 # local_model_result_folder_path = '/home/ec2-user/project/model_results'
 
@@ -155,11 +155,12 @@ print(s3_model_path)
 print(experiment_timestamp)
 
 _, y = make_classification(100)
-y_pred = [random.uniform(0, 1) for _ in range(100)]
-class_pkg = ClassificationResultPackage(y, y_pred, hyperparameters={'bash_script_path': 'dasdassd'})
+y_pred = [random.randint(0, 1) for _ in range(100)]
+class_pkg = ClassificationResultPackage()
+class_pkg.prepare_result_package(y, y_pred, hyperparameters={'bash_script_path': 'dasdassd'},
+                                 training_history=TrainingHistory({}, []))
 
 res_saver = S3ResultsSaver(local_model_result_folder_path=local_model_result_folder_path)
-# res_saver.local_results_saver.file_format = 'pickle'
 
 s3_res_path, experiment_timestamp2 = res_saver.save_experiment_results(result_package=class_pkg,
                                                                        project_name='QA_QAngaroo', experiment_name='separate_files2',
