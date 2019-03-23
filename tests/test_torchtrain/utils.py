@@ -5,6 +5,7 @@ import torch.nn.functional as F
 from AIToolbox.torchtrain.batch_model_feed_defs import AbstractModelFeedDefinition
 from AIToolbox.torchtrain.callbacks.callbacks import AbstractCallback
 from AIToolbox.experiment_save.result_package.abstract_result_packages import AbstractResultPackage
+from AIToolbox.experiment_save.core_metrics.abstract_metric import AbstractBaseMetric
 
 
 def function_exists(object_to_check, fn_name):
@@ -174,3 +175,11 @@ class DummyResultPackageExtend(DummyResultPackage):
     def prepare_results_dict(self):
         self.results_dict = {'dummy': 111 + self.ctr, 'extended_dummy': 1323123.44 + self.ctr}
         self.ctr += 12
+
+
+class DummyAbstractBaseMetric(AbstractBaseMetric):
+    def __init__(self, val):
+        AbstractBaseMetric.__init__(self, val, val+10, 'dummy_metric', np_array=False)
+
+    def calculate_metric(self):
+        self.metric_result = self.y_true
