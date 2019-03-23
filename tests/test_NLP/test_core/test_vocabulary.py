@@ -131,7 +131,3 @@ class TestVocabulary(unittest.TestCase):
             vocab.convert_idx_sent2sent([2, 4, 1, 5, 6, 1, 1, 1, 9, 10, 15, 11, 16, 8, 3]),
             ['SOS'] + new_sent_back + ['EOS']
         )
-
-
-if __name__ == '__main__':
-    unittest.main()

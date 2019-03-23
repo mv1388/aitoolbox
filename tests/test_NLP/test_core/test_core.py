@@ -47,7 +47,3 @@ class TestCore_normalize_string(unittest.TestCase):
             core.normalize_string('For this purpose, we propose a 2-hierarchical 345 attention model to capture.'),
             'for this purpose we propose a 2 hierarchical 345 attention model to capture .'
         )
-
-
-if __name__ == '__main__':
-    unittest.main()
