@@ -177,6 +177,24 @@ class DummyResultPackageExtend(DummyResultPackage):
         self.ctr += 12
 
 
+class DummyResultPackageExtendV2(DummyResultPackageExtend):
+    def __init__(self, additional_results):
+        DummyResultPackageExtend.__init__(self)
+        self.additional_results = additional_results
+
+    def list_additional_results_dump_paths(self):
+        return self.additional_results
+    
+
+class DummyResultPackageExtendVariable(DummyResultPackageExtend):
+    def __init__(self, result_d):
+        DummyResultPackageExtend.__init__(self)
+        self.result_d = result_d
+        
+    def prepare_results_dict(self):
+        self.results_dict = self.result_d
+        
+
 class DummyAbstractBaseMetric(AbstractBaseMetric):
     def __init__(self, val):
         AbstractBaseMetric.__init__(self, val, val+10, 'dummy_metric', np_array=False)
