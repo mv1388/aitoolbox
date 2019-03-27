@@ -33,6 +33,7 @@ setup(name='AIToolbox',
                         'torch',
                         'torchvision',
                         'pytorch-nlp',
+                        'keras',
                         'rouge',
                         'pyrouge',    
                         # New ones... just for testing

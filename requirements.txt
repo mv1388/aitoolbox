@@ -18,6 +18,7 @@ allennlp
 torch
 torchvision
 pytorch-nlp
+keras
 pyrouge
 rouge
 sumeval
