@@ -1,6 +1,5 @@
 import time
 import datetime
-import numpy as np
 
 from AIToolbox.kerastrain.callbacks.callbacks import AbstractCallback, ModelCheckpointCallback, ModelTrainEndSaveCallback
 
@@ -27,7 +26,7 @@ class TrainLoop:
         self.use_fit_generator = use_fit_generator
 
         self.test_loader = test_loader
-        self.x_test, self.y_test = test_loader if test_loader is not None or not callable(test_loader) else (None, None)
+        self.x_test, self.y_test = test_loader if test_loader is not None and not callable(test_loader) else (None, None)
 
         self.callbacks = []
         self.train_history = None
