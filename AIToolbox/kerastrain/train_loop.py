@@ -1,33 +1,44 @@
 import time
 import datetime
+import types
 
-from AIToolbox.kerastrain.callbacks.callbacks import AbstractCallback, ModelCheckpointCallback, ModelTrainEndSaveCallback
+from AIToolbox.kerastrain.callbacks.callback_handler import CallbacksHandler
+from AIToolbox.kerastrain.callbacks.callbacks import ModelCheckpointCallback, ModelTrainEndSaveCallback
 
 
 class TrainLoop:
     def __init__(self, model,
-                 optimizer, criterion, metrics, use_fit_generator=False,
-                 test_loader=None):
+                 train_loader, validation_loader=None, test_loader=None,
+                 optimizer=None, criterion=None, metrics=None):
         """
 
         Args:
             model (keras.engine.training.Model):
+            train_loader:
+            validation_loader:
+            test_loader:
             optimizer:
             criterion:
             metrics:
-            use_fit_generator:
-            test_loader:
         """
         self.model = model
         
         self.optimizer = optimizer
         self.criterion = criterion
         self.metrics = metrics
-        self.use_fit_generator = use_fit_generator
+
+        self.train_loader = train_loader
+        self.x_train, self.y_train = train_loader if train_loader is not None and not self.is_generator(train_loader) else (None, None)
+
+        self.validation_loader = validation_loader
+        self.x_val, self.y_val = validation_loader if validation_loader is not None and not self.is_generator(validation_loader) else (None, None)
 
         self.test_loader = test_loader
-        self.x_test, self.y_test = test_loader if test_loader is not None and not callable(test_loader) else (None, None)
+        self.x_test, self.y_test = test_loader if test_loader is not None and not self.is_generator(test_loader) else (None, None)
 
+        self.check_provided_data_loaders()
+
+        self.callbacks_handler = CallbacksHandler(self)
         self.callbacks = []
         self.train_history = None
 
@@ -59,18 +70,91 @@ class TrainLoop:
         Returns:
 
         """
-        self.register_callbacks(callbacks)
+        self.callbacks_handler.register_callbacks(callbacks)
         self.model.compile(optimizer=self.optimizer, loss=self.criterion, metrics=self.metrics)
-        
-        if not self.use_fit_generator:
-            self.train_history = self.model.fit(epochs=num_epoch, batch_size=batch_size, callbacks=self.callbacks, **kwargs)
-        else:
-            self.train_history = self.model.fit_generator(epochs=num_epoch, callbacks=self.callbacks, **kwargs)
 
-        self.execute_callbacks_on_train_end_train_loop()
+        if not self.is_generator(self.train_loader):
+            self.train_history = self.model.fit(x=self.x_train, y=self.y_train,
+                                                epochs=num_epoch, batch_size=batch_size, callbacks=self.callbacks,
+                                                validation_data=self.validation_loader,
+                                                **kwargs)
+        else:
+            self.train_history = self.model.fit_generator(generator=self.train_loader,
+                                                          epochs=num_epoch, callbacks=self.callbacks,
+                                                          validation_data=self.validation_loader,
+                                                          **kwargs)
+
+        self.callbacks_handler.execute_train_end_train_loop()
         return self.model
-        
+
+    def evaluate_loss_on_train_set(self):
+        """
+
+        Returns:
+            float:
+        """
+        return self.evaluate_model_loss(self.train_loader)
+
+    def evaluate_loss_on_validation_set(self):
+        """
+
+        Returns:
+            float:
+        """
+        return self.evaluate_model_loss(self.validation_loader)
+
+    def evaluate_loss_on_test_set(self):
+        """
+
+        Returns:
+            float:
+        """
+        return self.evaluate_model_loss(self.test_loader)
+
+    def evaluate_model_loss(self, data_loader):
+        """
+
+        Args:
+            data_loader:
+
+        Returns:
+            float:
+        """
+        if not self.is_generator(data_loader):
+            x_data = data_loader[0]
+            y_data = data_loader[1]
+            scores = self.model.evaluate(x=x_data, y=y_data)
+        else:
+            scores = self.model.evaluate_generator(data_loader)
+
+        loss = scores[0]
+        return loss
+
+    def predict_on_train_set(self):
+        """
+
+        Returns:
+            (numpy.array, numpy.array, dict):
+        """
+        return self.predict_with_model(self.train_loader)
+
     def predict_on_validation_set(self):
+        """
+
+        Returns:
+            (numpy.array, numpy.array, dict):
+        """
+        return self.predict_with_model(self.validation_loader)
+
+    def predict_on_test_set(self):
+        """
+
+        Returns:
+            (numpy.array, numpy.array, dict)
+        """
+        return self.predict_with_model(self.test_loader)
+
+    def predict_with_model(self, data_loader):
         """
 
         In fact in keras mode it predicts on test set
@@ -78,50 +162,65 @@ class TrainLoop:
         todo: some time down the line make the dataset names correct: train, val, test
 
         Returns:
-
+            (numpy.array, numpy.array, dict)
         """
-        if not self.use_fit_generator:
-            y_pred = self.model.predict(self.x_test)
-            y_test = self.y_test
+        if not self.is_generator(data_loader):
+            x_data = data_loader[0]
+            y_data = data_loader[1]
+            y_pred = self.model.predict(x_data)
         else:
-            y_pred = self.model.predict_generator(self.test_loader)
-            y_test = [y_batch for _, y_batch in self.test_loader]
+            y_data = [y_batch for _, y_batch in data_loader]
+            y_pred = self.model.predict_generator(data_loader)
 
         metadata = None
 
-        return y_test, y_pred, metadata
+        return y_data, y_pred, metadata
 
-    def register_callbacks(self, callbacks):
+    @staticmethod
+    def is_generator(data_loader):
         """
 
         Args:
-            callbacks (list):
+            data_loader:
 
         Returns:
-
+            bool:
         """
-        if callbacks is not None and len(callbacks) > 0:
-            self.callbacks += [cb.register_train_loop_object(self) if isinstance(cb, AbstractCallback) else cb 
-                               for cb in callbacks]
-            
-    def execute_callbacks_on_train_end_train_loop(self):
-        for cb in self.callbacks:
-            if isinstance(cb, AbstractCallback):
-                cb.on_train_end_train_loop()
+        return isinstance(data_loader, types.GeneratorType)
+
+    def check_provided_data_loaders(self):
+        if not self.is_generator(self.train_loader) and self.is_generator(self.validation_loader):
+            raise ValueError('train_loader is not generator, but validation_loader is. '
+                             'When train_loader is not generator, the validation_loader also can not be')
 
 
 class TrainLoopModelCheckpoint(TrainLoop):
     def __init__(self, model,
-                 optimizer, criterion, metrics,
-                 project_name, experiment_name, local_model_result_folder_path,
-                 use_fit_generator=False, test_loader=None, save_to_s3=True):
-        TrainLoop.__init__(self, model, optimizer, criterion, metrics, use_fit_generator, test_loader)
+                 train_loader, validation_loader=None, test_loader=None,
+                 optimizer=None, criterion=None, metrics=None,
+                 project_name=None, experiment_name=None, local_model_result_folder_path=None, save_to_s3=True):
+        """
+
+        Args:
+            model:
+            train_loader:
+            validation_loader:
+            test_loader:
+            optimizer:
+            criterion:
+            metrics:
+            project_name:
+            experiment_name:
+            local_model_result_folder_path:
+            save_to_s3:
+        """
+        TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion, metrics)
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = local_model_result_folder_path
         self.save_to_s3 = save_to_s3
 
-        self.register_callbacks([
+        self.callbacks_handler.register_callbacks([
             ModelCheckpointCallback(self.project_name, self.experiment_name, self.local_model_result_folder_path,
                                     save_to_s3=self.save_to_s3)
         ])
@@ -129,11 +228,28 @@ class TrainLoopModelCheckpoint(TrainLoop):
 
 class TrainLoopModelEndSave(TrainLoop):
     def __init__(self, model,
-                 optimizer, criterion, metrics,
-                 project_name, experiment_name, local_model_result_folder_path,
-                 args, result_package,
-                 use_fit_generator=False, test_loader=None, save_to_s3=True):
-        TrainLoop.__init__(self, model, optimizer, criterion, metrics, use_fit_generator, test_loader)
+                 train_loader, validation_loader=None, test_loader=None,
+                 optimizer=None, criterion=None, metrics=None,
+                 project_name=None, experiment_name=None, local_model_result_folder_path=None,
+                 args=None, result_package=None, save_to_s3=True):
+        """
+
+        Args:
+            model:
+            train_loader:
+            validation_loader:
+            test_loader:
+            optimizer:
+            criterion:
+            metrics:
+            project_name:
+            experiment_name:
+            local_model_result_folder_path:
+            args:
+            result_package:
+            save_to_s3:
+        """
+        TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion, metrics)
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = local_model_result_folder_path
@@ -141,7 +257,7 @@ class TrainLoopModelEndSave(TrainLoop):
         self.result_package = result_package
         self.save_to_s3 = save_to_s3
 
-        self.register_callbacks([
+        self.callbacks_handler.register_callbacks([
             ModelTrainEndSaveCallback(self.project_name, self.experiment_name, self.local_model_result_folder_path,
                                       self.args, self.result_package, save_to_s3=self.save_to_s3)
         ])
@@ -149,15 +265,33 @@ class TrainLoopModelEndSave(TrainLoop):
 
 class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
     def __init__(self, model,
-                 optimizer, criterion, metrics,
-                 project_name, experiment_name, local_model_result_folder_path,
-                 args, result_package,
-                 use_fit_generator=False, test_loader=None, save_to_s3=True):
-        TrainLoopModelEndSave.__init__(self, model, optimizer, criterion, metrics,
+                 train_loader, validation_loader=None, test_loader=None,
+                 optimizer=None, criterion=None, metrics=None,
+                 project_name=None, experiment_name=None, local_model_result_folder_path=None,
+                 args=None, result_package=None, save_to_s3=True):
+        """
+
+        Args:
+            model:
+            train_loader:
+            validation_loader:
+            test_loader:
+            optimizer:
+            criterion:
+            metrics:
+            project_name:
+            experiment_name:
+            local_model_result_folder_path:
+            args:
+            result_package:
+            save_to_s3:
+        """
+        TrainLoopModelEndSave.__init__(self, model, train_loader, validation_loader, test_loader,
+                                       optimizer, criterion, metrics,
                                        project_name, experiment_name, local_model_result_folder_path,
-                                       args, result_package,
-                                       use_fit_generator, test_loader, save_to_s3)
-        self.register_callbacks([
+                                       args, result_package, save_to_s3)
+
+        self.callbacks_handler.register_callbacks([
             ModelCheckpointCallback(self.project_name, self.experiment_name, self.local_model_result_folder_path,
                                     save_to_s3=self.save_to_s3)
         ])

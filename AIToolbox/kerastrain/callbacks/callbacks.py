@@ -7,7 +7,7 @@ from AIToolbox.experiment_save.local_experiment_saver import FullKerasExperiment
 from AIToolbox.experiment_save.training_history import TrainingHistory
 
 
-class AbstractCallback(Callback):
+class AbstractKerasCallback(Callback):
     def __init__(self, callback_name):
         Callback.__init__(self)
         self.callback_name = callback_name
@@ -38,7 +38,7 @@ class AbstractCallback(Callback):
         pass
 
 
-class ModelCheckpointCallback(AbstractCallback):
+class ModelCheckpointCallback(AbstractKerasCallback):
     def __init__(self, project_name, experiment_name, local_model_result_folder_path, save_to_s3=True):
         """
 
@@ -48,7 +48,7 @@ class ModelCheckpointCallback(AbstractCallback):
             local_model_result_folder_path (str):
             save_to_s3 (bool):
         """
-        AbstractCallback.__init__(self, 'Model checkpoint at end of epoch')
+        AbstractKerasCallback.__init__(self, 'Model checkpoint at end of epoch')
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = local_model_result_folder_path
@@ -73,7 +73,7 @@ class ModelCheckpointCallback(AbstractCallback):
                                            protect_existing_folder=True)
 
 
-class ModelTrainEndSaveCallback(AbstractCallback):
+class ModelTrainEndSaveCallback(AbstractKerasCallback):
     def __init__(self, project_name, experiment_name, local_model_result_folder_path,
                  args, result_package, save_to_s3=True):
         """
@@ -86,7 +86,7 @@ class ModelTrainEndSaveCallback(AbstractCallback):
             result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
             save_to_s3 (bool):
         """
-        AbstractCallback.__init__(self, 'Model save at the end of training')
+        AbstractKerasCallback.__init__(self, 'Model save at the end of training')
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = local_model_result_folder_path

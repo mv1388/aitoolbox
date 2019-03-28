@@ -59,11 +59,11 @@ optimizer = keras.optimizers.rmsprop(lr=0.0001, decay=1e-6)
 #                                                                       validation_data=(x_test, y_test),
 #                                                                       shuffle=True)
 
-TrainLoopModelCheckpointEndSave(model, optimizer, 'categorical_crossentropy', ['accuracy'],
-                                'kerasloop_final', 'checkpoint_endsave', '<PATH>',
-                                {}, ClassificationResultPackage(),
-                                test_loader=(x_test, y_test))(num_epoch=1, batch_size=batch_size,
-                                                              x=x_train,
-                                                              y=y_train,
-                                                              validation_data=(x_test, y_test),
-                                                              shuffle=True)
+TrainLoopModelCheckpointEndSave(model,
+                                train_loader=[x_train, y_train], validation_loader=[x_test, y_test], test_loader=None,
+                                optimizer=optimizer, criterion='categorical_crossentropy', metrics=['accuracy'],
+                                project_name='kerasloop_final3', experiment_name='checkpoint_endsave',
+                                local_model_result_folder_path='<PATH>',
+                                args={}, result_package=ClassificationResultPackage())\
+    (num_epoch=1, batch_size=batch_size,
+     shuffle=True)
