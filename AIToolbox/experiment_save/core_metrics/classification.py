@@ -21,21 +21,12 @@ class AccuracyMetric(AbstractBaseMetric):
         # else:
         #     self.metric_result = accuracy_score(self.y_true, self.y_predicted)
 
-        # if len(self.y_predicted.shape) > 1:
-        #     y_label_predicted = np.argmax(self.y_predicted, axis=1)
-        #     self.metric_result = accuracy_score(self.y_true, y_label_predicted)
-        # else:
-        #     self.metric_result = accuracy_score(self.y_true, self.y_predicted)
-
-        y_label_predicted = self.y_predicted
-        y_label_true = self.y_true
-
         if len(self.y_predicted.shape) > 1:
-            y_label_predicted = np.argmax(self.y_predicted, axis=1)
+            self.y_predicted = np.argmax(self.y_predicted, axis=1)
         if len(self.y_true.shape) > 1:
-            y_label_true = np.argmax(self.y_true, axis=1)
+            self.y_true = np.argmax(self.y_true, axis=1)
 
-        self.metric_result = accuracy_score(y_label_true, y_label_predicted)
+        self.metric_result = accuracy_score(self.y_true, self.y_predicted)
 
 
 class ROCAUCMetric(AbstractBaseMetric):
