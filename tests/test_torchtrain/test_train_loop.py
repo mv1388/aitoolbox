@@ -191,11 +191,11 @@ class TestTrainLoopModelCheckpoint(unittest.TestCase):
 
 class TestTrainLoopModelEndSave(unittest.TestCase):
     def test_init_values(self):
-        train_loop_non_val = TrainLoopModelEndSave(Net(), None, None, None, DeactivateModelFeedDefinition(), None, None,
+        train_loop_non_val = TrainLoopModelEndSave(Net(), None, 100, 100, DeactivateModelFeedDefinition(), None, None,
                                                    "project_name", "experiment_name", "local_model_result_folder_path",
                                                    args={}, val_result_package=DummyResultPackage(),
                                                    test_result_package=DummyResultPackage(), save_to_s3=True)
-        self.assertEqual(train_loop_non_val.train_history, {'loss': [], 'accumulated_loss': []})
+        self.assertEqual(train_loop_non_val.train_history, {'loss': [], 'accumulated_loss': [], 'val_loss': []})
 
         dummy_result_package = DummyResultPackage()
         train_loop = TrainLoopModelEndSave(Net(), None, 100, None, DeactivateModelFeedDefinition(), None, None,
@@ -213,13 +213,50 @@ class TestTrainLoopModelEndSave(unittest.TestCase):
         self.assertEqual(train_loop.callbacks_handler.train_loop_obj, train_loop)
         self.assertFalse(train_loop.early_stop)
 
+    def test_loader_package_exceptions(self):
+        with self.assertRaises(ValueError):
+            train_loop_non_val = TrainLoopModelEndSave(Net(), None, None, 100, DeactivateModelFeedDefinition(), None,
+                                                       None,
+                                                       "project_name", "experiment_name",
+                                                       "local_model_result_folder_path",
+                                                       args={},
+                                                       val_result_package=DummyResultPackage(),
+                                                       test_result_package=DummyResultPackage(),
+                                                       save_to_s3=True)
+        with self.assertRaises(ValueError):
+            train_loop_non_val = TrainLoopModelEndSave(Net(), None, 100, None, DeactivateModelFeedDefinition(), None,
+                                                       None,
+                                                       "project_name", "experiment_name",
+                                                       "local_model_result_folder_path",
+                                                       args={},
+                                                       val_result_package=DummyResultPackage(),
+                                                       test_result_package=DummyResultPackage(),
+                                                       save_to_s3=True)
+        with self.assertRaises(ValueError):
+            train_loop_non_val = TrainLoopModelEndSave(Net(), None, 100, None, DeactivateModelFeedDefinition(), None,
+                                                       None,
+                                                       "project_name", "experiment_name",
+                                                       "local_model_result_folder_path",
+                                                       args={},
+                                                       test_result_package=DummyResultPackage(),
+                                                       save_to_s3=True)
+        with self.assertRaises(ValueError):
+            train_loop_non_val = TrainLoopModelEndSave(Net(), None, None, None, DeactivateModelFeedDefinition(), None,
+                                                       None,
+                                                       "project_name", "experiment_name",
+                                                       "local_model_result_folder_path",
+                                                       args={},
+                                                       val_result_package=DummyResultPackage(),
+                                                       test_result_package=DummyResultPackage(),
+                                                       save_to_s3=True)
+
 
 class TestTrainLoopModelCheckpointEndSave(unittest.TestCase):
     def test_init_values(self):
-        train_loop_non_val = TrainLoopModelCheckpointEndSave(Net(), None, None, None, DeactivateModelFeedDefinition(), None, None,
+        train_loop_non_val = TrainLoopModelCheckpointEndSave(Net(), None, 100, None, DeactivateModelFeedDefinition(), None, None,
                                                              "project_name", "experiment_name", "local_model_result_folder_path",
                                                              args={}, val_result_package=DummyResultPackage(), save_to_s3=True)
-        self.assertEqual(train_loop_non_val.train_history, {'loss': [], 'accumulated_loss': []})
+        self.assertEqual(train_loop_non_val.train_history, {'loss': [], 'accumulated_loss': [], 'val_loss': []})
 
         dummy_result_package = DummyResultPackage()
         train_loop = TrainLoopModelCheckpointEndSave(Net(), None, 100, None, DeactivateModelFeedDefinition(), None, None,
@@ -242,7 +279,7 @@ class TestTrainLoopModelCheckpointEndSave(unittest.TestCase):
     def test_init_val_test_loader_values(self):
         dummy_result_package_val = DummyResultPackage()
         dummy_result_package_test = DummyResultPackage()
-        train_loop = TrainLoopModelCheckpointEndSave(Net(), None, 100, None, DeactivateModelFeedDefinition(), None,
+        train_loop = TrainLoopModelCheckpointEndSave(Net(), None, 100, 100, DeactivateModelFeedDefinition(), None,
                                                      None,
                                                      "project_name", "experiment_name",
                                                      "local_model_result_folder_path",
@@ -278,3 +315,40 @@ class TestTrainLoopModelCheckpointEndSave(unittest.TestCase):
         for reg_cb, cb_name in zip(train_loop.callbacks,
                                    ['Model save at the end of training',  'Model checkpoint at end of epoch', 'callback_test2']):
             self.assertEqual(reg_cb.callback_name, cb_name)
+
+    def test_loader_package_exceptions(self):
+        with self.assertRaises(ValueError):
+            train_loop_non_val = TrainLoopModelCheckpointEndSave(Net(), None, None, 100, DeactivateModelFeedDefinition(), None,
+                                                                 None,
+                                                                 "project_name", "experiment_name",
+                                                                 "local_model_result_folder_path",
+                                                                 args={},
+                                                                 val_result_package=DummyResultPackage(),
+                                                                 test_result_package=DummyResultPackage(),
+                                                                 save_to_s3=True)
+        with self.assertRaises(ValueError):
+            train_loop_non_val = TrainLoopModelCheckpointEndSave(Net(), None, 100, None, DeactivateModelFeedDefinition(), None,
+                                                                 None,
+                                                                 "project_name", "experiment_name",
+                                                                 "local_model_result_folder_path",
+                                                                 args={},
+                                                                 val_result_package=DummyResultPackage(),
+                                                                 test_result_package=DummyResultPackage(),
+                                                                 save_to_s3=True)
+        with self.assertRaises(ValueError):
+            train_loop_non_val = TrainLoopModelCheckpointEndSave(Net(), None, 100, None, DeactivateModelFeedDefinition(), None,
+                                                                 None,
+                                                                 "project_name", "experiment_name",
+                                                                 "local_model_result_folder_path",
+                                                                 args={},
+                                                                 test_result_package=DummyResultPackage(),
+                                                                 save_to_s3=True)
+        with self.assertRaises(ValueError):
+            train_loop_non_val = TrainLoopModelCheckpointEndSave(Net(), None, None, None, DeactivateModelFeedDefinition(), None,
+                                                                 None,
+                                                                 "project_name", "experiment_name",
+                                                                 "local_model_result_folder_path",
+                                                                 args={},
+                                                                 val_result_package=DummyResultPackage(),
+                                                                 test_result_package=DummyResultPackage(),
+                                                                 save_to_s3=True)
