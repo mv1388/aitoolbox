@@ -33,6 +33,10 @@ Functionality for saving model architecture and weights to S3 either during trai
 Still work in progress... 
 Different NLP data processing functions and NLP oriented task performance evaluation definitions such as Q&A, summarization, machine translation, ...
 
+## kerastrain
+
+Beta version of TrainLoop framework which is mainly developed for PyTorch but ported here to Keras
+
 
 # Examples of package usage
 
