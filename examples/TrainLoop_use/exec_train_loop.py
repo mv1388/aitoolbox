@@ -104,7 +104,7 @@ callbacks = [ModelPerformanceEvaluationCallback(ClassificationResultPackage(), a
 
 
 TrainLoop(model,
-          train_loader, test_loader,
+          train_loader, test_loader, None,
           MNISTModelFeedDefinition(), optimizer, criterion)(num_epoch=10, callbacks=callbacks)
 
 
