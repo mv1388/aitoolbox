@@ -202,7 +202,6 @@ class ModelTrainEndSaveCallback(AbstractCallback):
         train_hist_pkg = TrainingHistory(train_history, epoch_list)
 
         y_test, y_pred, additional_results = self.train_loop_obj.predict_on_validation_set()
-
         self.result_package.prepare_result_package(y_test, y_pred,
                                                    hyperparameters=self.args, training_history=train_hist_pkg,
                                                    additional_results=additional_results)

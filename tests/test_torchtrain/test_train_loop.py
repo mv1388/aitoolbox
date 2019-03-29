@@ -9,10 +9,10 @@ from AIToolbox.torchtrain.callbacks.callbacks import ModelCheckpointCallback, Mo
 
 class TestTrainLoop(unittest.TestCase):
     def test_init_values(self):
-        train_loop_non_val = TrainLoop(Net(), None, None, DeactivateModelFeedDefinition(), None, None)
+        train_loop_non_val = TrainLoop(Net(), None, None, None, DeactivateModelFeedDefinition(), None, None)
         self.assertEqual(train_loop_non_val.train_history, {'loss': [], 'accumulated_loss': []})
 
-        train_loop = TrainLoop(Net(), None, 100, DeactivateModelFeedDefinition(), None, None)
+        train_loop = TrainLoop(Net(), None, 100, None, DeactivateModelFeedDefinition(), None, None)
         self.assertEqual(train_loop.train_history, {'loss': [], 'accumulated_loss': [], 'val_loss': []})
         
         self.assertEqual(train_loop.callbacks, [])
@@ -21,7 +21,7 @@ class TestTrainLoop(unittest.TestCase):
         self.assertFalse(train_loop.early_stop)
 
     def test_callback_registration(self):
-        train_loop = TrainLoop(Net(), None, 100, DeactivateModelFeedDefinition(), None, None)
+        train_loop = TrainLoop(Net(), None, 100, None, DeactivateModelFeedDefinition(), None, None)
         train_loop.callbacks_handler.register_callbacks([AbstractCallback('callback_test1'),
                                                          CallbackTracker(), CallbackTrackerShort()])
 
@@ -47,11 +47,13 @@ class TestTrainLoop(unittest.TestCase):
         num_epochs = 2
         dummy_feed_def = DeactivateModelFeedDefinition()
         dummy_optimizer = DummyOptimizer()
-        dummy_train_loader = list(range(3))
-        dummy_val_loader = list(range(2))
+        dummy_train_loader = list(range(4))
+        dummy_val_loader = list(range(3))
+        dummy_test_loader = list(range(2))
 
         model = Net()
-        train_loop = TrainLoop(model, dummy_train_loader, dummy_val_loader, dummy_feed_def, dummy_optimizer, None)
+        train_loop = TrainLoop(model, dummy_train_loader, dummy_val_loader, dummy_test_loader,
+                               dummy_feed_def, dummy_optimizer, None)
         train_loop.callbacks_handler.register_callbacks([AbstractCallback('callback_test1'),
                                                          CallbackTracker(), CallbackTrackerShort(),
                                                          AbstractCallback('callback_test2')])
@@ -68,7 +70,8 @@ class TestTrainLoop(unittest.TestCase):
         self.assertEqual(dummy_feed_def.dummy_batch.back_ctr, num_epochs*len(dummy_train_loader))
         self.assertEqual(dummy_feed_def.dummy_batch.item_ctr,
                          num_epochs * len(dummy_train_loader) + num_epochs * len(dummy_train_loader) +
-                         num_epochs * len(dummy_val_loader))
+                         num_epochs * len(dummy_val_loader) +
+                         len(dummy_test_loader))
 
         self.assertEqual(dummy_optimizer.zero_grad_ctr, num_epochs*len(dummy_train_loader))
         self.assertEqual(dummy_optimizer.step_ctr, num_epochs * len(dummy_train_loader))
@@ -76,19 +79,20 @@ class TestTrainLoop(unittest.TestCase):
         self.assertEqual(callback_full.callback_calls,
                          ['on_train_loop_registration', 'on_train_begin', 'on_epoch_begin', 'on_batch_begin',
                           'on_batch_end', 'on_batch_begin', 'on_batch_end', 'on_batch_begin', 'on_batch_end',
-                          'on_epoch_end', 'on_epoch_begin', 'on_batch_begin', 'on_batch_end', 'on_batch_begin',
-                          'on_batch_end', 'on_batch_begin', 'on_batch_end', 'on_epoch_end', 'on_train_end'])
+                          'on_batch_begin', 'on_batch_end', 'on_epoch_end', 'on_epoch_begin', 'on_batch_begin',
+                          'on_batch_end', 'on_batch_begin', 'on_batch_end', 'on_batch_begin', 'on_batch_end',
+                          'on_batch_begin', 'on_batch_end', 'on_epoch_end', 'on_train_end'])
         self.assertEqual(callback_full.call_ctr,
                          {'on_train_loop_registration': 1, 'on_epoch_begin': 2, 'on_epoch_end': 2, 'on_train_begin': 1,
-                          'on_train_end': 1, 'on_batch_begin': 6, 'on_batch_end': 6})
+                          'on_train_end': 1, 'on_batch_begin': 8, 'on_batch_end': 8})
 
         self.assertEqual(callback_short.callback_calls,
-                         ['on_epoch_begin', 'on_batch_begin', 'on_batch_begin', 'on_batch_begin', 'on_epoch_end',
-                          'on_epoch_begin', 'on_batch_begin', 'on_batch_begin', 'on_batch_begin', 'on_epoch_end',
-                          'on_train_end'])
+                         ['on_epoch_begin', 'on_batch_begin', 'on_batch_begin', 'on_batch_begin', 'on_batch_begin',
+                          'on_epoch_end', 'on_epoch_begin', 'on_batch_begin', 'on_batch_begin', 'on_batch_begin',
+                          'on_batch_begin', 'on_epoch_end', 'on_train_end'])
         self.assertEqual(callback_short.call_ctr,
                          {'on_train_loop_registration': 0, 'on_epoch_begin': 2, 'on_epoch_end': 2, 'on_train_begin': 0,
-                          'on_train_end': 1, 'on_batch_begin': 6, 'on_batch_end': 0})
+                          'on_train_end': 1, 'on_batch_begin': 8, 'on_batch_end': 0})
 
     def test_predict_train_data(self):
         self.eval_prediction('train')
@@ -123,7 +127,7 @@ class TestTrainLoop(unittest.TestCase):
             data_loader = dummy_val_loader
         else:
             y_test, y_pred, metadata = train_loop.predict_on_test_set()
-            data_loader = dummy_val_loader
+            data_loader = dummy_test_loader
 
         r = []
         for i in range(1, len(data_loader) + 1):
@@ -143,11 +147,13 @@ class TestTrainLoop(unittest.TestCase):
         num_epochs = 2
         dummy_feed_def = DeactivateModelFeedDefinition()
         dummy_optimizer = DummyOptimizer()
-        dummy_train_loader = list(range(3))
-        dummy_val_loader = list(range(2))
+        dummy_train_loader = list(range(4))
+        dummy_val_loader = list(range(3))
+        dummy_test_loader = list(range(2))
 
         model = Net()
-        train_loop = TrainLoop(model, dummy_train_loader, dummy_val_loader, dummy_feed_def, dummy_optimizer, None)
+        train_loop = TrainLoop(model, dummy_train_loader, dummy_val_loader, dummy_test_loader,
+                               dummy_feed_def, dummy_optimizer, None)
         train_loop.callbacks_handler.register_callbacks([AbstractCallback('callback_test1'),
                                                          CallbackTracker(), CallbackTrackerShort(),
                                                          AbstractCallback('callback_test2')])
@@ -167,11 +173,11 @@ class TestTrainLoop(unittest.TestCase):
 
 class TestTrainLoopModelCheckpoint(unittest.TestCase):
     def test_init_values(self):
-        train_loop_non_val = TrainLoopModelCheckpoint(Net(), None, None, DeactivateModelFeedDefinition(), None, None,
+        train_loop_non_val = TrainLoopModelCheckpoint(Net(), None, None, None, DeactivateModelFeedDefinition(), None, None,
                                                       "project_name", "experiment_name", "local_model_result_folder_path")
         self.assertEqual(train_loop_non_val.train_history, {'loss': [], 'accumulated_loss': []})
 
-        train_loop = TrainLoopModelCheckpoint(Net(), None, 100, DeactivateModelFeedDefinition(), None, None,
+        train_loop = TrainLoopModelCheckpoint(Net(), None, 100, None, DeactivateModelFeedDefinition(), None, None,
                                               "project_name", "experiment_name", "local_model_result_folder_path")
         self.assertEqual(train_loop.train_history, {'loss': [], 'accumulated_loss': [], 'val_loss': []})
 
@@ -185,13 +191,13 @@ class TestTrainLoopModelCheckpoint(unittest.TestCase):
 
 class TestTrainLoopModelEndSave(unittest.TestCase):
     def test_init_values(self):
-        train_loop_non_val = TrainLoopModelEndSave(Net(), None, None, DeactivateModelFeedDefinition(), None, None,
+        train_loop_non_val = TrainLoopModelEndSave(Net(), None, None, None, DeactivateModelFeedDefinition(), None, None,
                                                    "project_name", "experiment_name", "local_model_result_folder_path",
                                                    args={}, result_package=DummyResultPackage(), save_to_s3=True)
         self.assertEqual(train_loop_non_val.train_history, {'loss': [], 'accumulated_loss': []})
 
         dummy_result_package = DummyResultPackage()
-        train_loop = TrainLoopModelEndSave(Net(), None, 100, DeactivateModelFeedDefinition(), None, None,
+        train_loop = TrainLoopModelEndSave(Net(), None, 100, None, DeactivateModelFeedDefinition(), None, None,
                                            "project_name", "experiment_name", "local_model_result_folder_path",
                                            args={}, result_package=dummy_result_package, save_to_s3=True)
         self.assertEqual(train_loop.train_history, {'loss': [], 'accumulated_loss': [], 'val_loss': []})
@@ -207,13 +213,13 @@ class TestTrainLoopModelEndSave(unittest.TestCase):
 
 class TestTrainLoopModelCheckpointEndSave(unittest.TestCase):
     def test_init_values(self):
-        train_loop_non_val = TrainLoopModelCheckpointEndSave(Net(), None, None, DeactivateModelFeedDefinition(), None, None,
+        train_loop_non_val = TrainLoopModelCheckpointEndSave(Net(), None, None, None, DeactivateModelFeedDefinition(), None, None,
                                                              "project_name", "experiment_name", "local_model_result_folder_path",
                                                              args={}, result_package=DummyResultPackage(), save_to_s3=True)
         self.assertEqual(train_loop_non_val.train_history, {'loss': [], 'accumulated_loss': []})
 
         dummy_result_package = DummyResultPackage()
-        train_loop = TrainLoopModelCheckpointEndSave(Net(), None, 100, DeactivateModelFeedDefinition(), None, None,
+        train_loop = TrainLoopModelCheckpointEndSave(Net(), None, 100, None, DeactivateModelFeedDefinition(), None, None,
                                                      "project_name", "experiment_name", "local_model_result_folder_path",
                                                      args={}, result_package=dummy_result_package, save_to_s3=True)
         self.assertEqual(train_loop.train_history, {'loss': [], 'accumulated_loss': [], 'val_loss': []})
@@ -230,7 +236,7 @@ class TestTrainLoopModelCheckpointEndSave(unittest.TestCase):
 
     def test_callback_registration(self):
         dummy_result_package = DummyResultPackage()
-        train_loop = TrainLoopModelCheckpointEndSave(Net(), None, 100, DeactivateModelFeedDefinition(), None, None,
+        train_loop = TrainLoopModelCheckpointEndSave(Net(), None, 100, None, DeactivateModelFeedDefinition(), None, None,
                                                      "project_name", "experiment_name",
                                                      "local_model_result_folder_path",
                                                      args={}, result_package=dummy_result_package, save_to_s3=True)
