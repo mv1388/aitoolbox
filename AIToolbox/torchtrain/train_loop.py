@@ -334,10 +334,25 @@ class TrainLoopModelEndSave(TrainLoop):
         self.test_result_package = test_result_package
         self.save_to_s3 = save_to_s3
 
+        self.check_if_result_packages_possible()
+
         self.callbacks_handler.register_callbacks([
             ModelTrainEndSaveCallback(self.project_name, self.experiment_name, self.local_model_result_folder_path,
                                       self.args, self.val_result_package, self.test_result_package, save_to_s3=self.save_to_s3)
         ])
+
+    def check_if_result_packages_possible(self):
+        if self.val_result_package is not None and self.validation_loader is None:
+            raise ValueError('Given the val_result_package but not supplied the validation_loader. '
+                             'If you want to calculate the val_result_package the validation_loader has to be provided.')
+
+        if self.test_result_package is not None and self.test_loader is None:
+            raise ValueError('Given the test_result_package but not supplied the test_loader. '
+                             'If you want to calculate the test_result_package the test_loader has to be provided.')
+
+        if self.val_result_package is None and self.test_result_package is None:
+            raise ValueError("Both val_result_package and test_result_package are None. "
+                             "At least one of these should be not None but actual result package.")
 
 
 class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
