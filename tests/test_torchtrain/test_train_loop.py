@@ -193,18 +193,21 @@ class TestTrainLoopModelEndSave(unittest.TestCase):
     def test_init_values(self):
         train_loop_non_val = TrainLoopModelEndSave(Net(), None, None, None, DeactivateModelFeedDefinition(), None, None,
                                                    "project_name", "experiment_name", "local_model_result_folder_path",
-                                                   args={}, result_package=DummyResultPackage(), save_to_s3=True)
+                                                   args={}, val_result_package=DummyResultPackage(),
+                                                   test_result_package=DummyResultPackage(), save_to_s3=True)
         self.assertEqual(train_loop_non_val.train_history, {'loss': [], 'accumulated_loss': []})
 
         dummy_result_package = DummyResultPackage()
         train_loop = TrainLoopModelEndSave(Net(), None, 100, None, DeactivateModelFeedDefinition(), None, None,
                                            "project_name", "experiment_name", "local_model_result_folder_path",
-                                           args={}, result_package=dummy_result_package, save_to_s3=True)
+                                           args={}, val_result_package=dummy_result_package, save_to_s3=True)
         self.assertEqual(train_loop.train_history, {'loss': [], 'accumulated_loss': [], 'val_loss': []})
 
         self.assertEqual(len(train_loop.callbacks), 1)
         self.assertEqual(type(train_loop.callbacks[0]), ModelTrainEndSaveCallback)
-        self.assertEqual(train_loop.callbacks[0].result_package, dummy_result_package)
+        self.assertEqual(train_loop.callbacks[0].val_result_package, dummy_result_package)
+        self.assertEqual(train_loop.callbacks[0].test_result_package, None)
+        self.assertEqual(train_loop.callbacks[0].result_package, None)
 
         self.assertIsInstance(train_loop.callbacks_handler, CallbacksHandler)
         self.assertEqual(train_loop.callbacks_handler.train_loop_obj, train_loop)
@@ -215,18 +218,20 @@ class TestTrainLoopModelCheckpointEndSave(unittest.TestCase):
     def test_init_values(self):
         train_loop_non_val = TrainLoopModelCheckpointEndSave(Net(), None, None, None, DeactivateModelFeedDefinition(), None, None,
                                                              "project_name", "experiment_name", "local_model_result_folder_path",
-                                                             args={}, result_package=DummyResultPackage(), save_to_s3=True)
+                                                             args={}, val_result_package=DummyResultPackage(), save_to_s3=True)
         self.assertEqual(train_loop_non_val.train_history, {'loss': [], 'accumulated_loss': []})
 
         dummy_result_package = DummyResultPackage()
         train_loop = TrainLoopModelCheckpointEndSave(Net(), None, 100, None, DeactivateModelFeedDefinition(), None, None,
                                                      "project_name", "experiment_name", "local_model_result_folder_path",
-                                                     args={}, result_package=dummy_result_package, save_to_s3=True)
+                                                     args={}, val_result_package=dummy_result_package, save_to_s3=True)
         self.assertEqual(train_loop.train_history, {'loss': [], 'accumulated_loss': [], 'val_loss': []})
 
         self.assertEqual(len(train_loop.callbacks), 2)
         self.assertEqual(type(train_loop.callbacks[0]), ModelTrainEndSaveCallback)
-        self.assertEqual(train_loop.callbacks[0].result_package, dummy_result_package)
+        self.assertEqual(train_loop.callbacks[0].val_result_package, dummy_result_package)
+        self.assertEqual(train_loop.callbacks[0].test_result_package, None)
+        self.assertEqual(train_loop.callbacks[0].result_package, None)
 
         self.assertEqual(type(train_loop.callbacks[1]), ModelCheckpointCallback)
 
@@ -234,12 +239,27 @@ class TestTrainLoopModelCheckpointEndSave(unittest.TestCase):
         self.assertEqual(train_loop.callbacks_handler.train_loop_obj, train_loop)
         self.assertFalse(train_loop.early_stop)
 
+    def test_init_val_test_loader_values(self):
+        dummy_result_package_val = DummyResultPackage()
+        dummy_result_package_test = DummyResultPackage()
+        train_loop = TrainLoopModelCheckpointEndSave(Net(), None, 100, None, DeactivateModelFeedDefinition(), None,
+                                                     None,
+                                                     "project_name", "experiment_name",
+                                                     "local_model_result_folder_path",
+                                                     args={},
+                                                     val_result_package=dummy_result_package_val,
+                                                     test_result_package=dummy_result_package_test,
+                                                     save_to_s3=True)
+        self.assertEqual(train_loop.callbacks[0].val_result_package, dummy_result_package_val)
+        self.assertEqual(train_loop.callbacks[0].test_result_package, dummy_result_package_test)
+        self.assertEqual(train_loop.callbacks[0].result_package, None)
+
     def test_callback_registration(self):
         dummy_result_package = DummyResultPackage()
         train_loop = TrainLoopModelCheckpointEndSave(Net(), None, 100, None, DeactivateModelFeedDefinition(), None, None,
                                                      "project_name", "experiment_name",
                                                      "local_model_result_folder_path",
-                                                     args={}, result_package=dummy_result_package, save_to_s3=True)
+                                                     args={}, val_result_package=dummy_result_package, save_to_s3=True)
 
         self.assertEqual(len(train_loop.callbacks), 2)
         for reg_cb, true_cb in zip(train_loop.callbacks, [ModelTrainEndSaveCallback, ModelCheckpointCallback]):
