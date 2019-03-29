@@ -10,7 +10,7 @@ from AIToolbox.torchtrain.callbacks.callbacks import ModelCheckpointCallback, Mo
 
 class TrainLoop:
     def __init__(self, model,
-                 train_loader, validation_loader,
+                 train_loader, validation_loader, test_loader,
                  batch_model_feed_def,
                  optimizer, criterion):
         """
@@ -19,6 +19,7 @@ class TrainLoop:
             model (torch.nn.modules.Module):
             train_loader (torch.utils.data.DataLoader):
             validation_loader (torch.utils.data.DataLoader):
+            test_loader (torch.utils.data.DataLoader):
             batch_model_feed_def (AIToolbox.torchtrain.batch_model_feed_defs.AbstractModelFeedDefinition):
             optimizer:
             criterion:
@@ -26,6 +27,7 @@ class TrainLoop:
         self.model = model
         self.train_loader = train_loader
         self.validation_loader = validation_loader
+        self.test_loader = test_loader
         self.batch_model_feed_def = batch_model_feed_def
         self.optimizer = optimizer
         self.criterion = criterion
@@ -100,6 +102,7 @@ class TrainLoop:
             if self.early_stop:
                 break
 
+        self.auto_execute_end_of_training()
         self.callbacks_handler.execute_train_end()
 
         return self.model
@@ -112,16 +115,19 @@ class TrainLoop:
 
         train_loss = self.evaluate_loss_on_train_set()
         print(f'TRAIN LOSS: {train_loss}')
-        # TODO: test this
-        # self.train_history['loss'].append(train_loss)
         self.insert_metric_result_into_history('loss', train_loss)
 
         if self.validation_loader is not None:
             val_loss = self.evaluate_loss_on_validation_set()
             print(f'VAL LOSS: {val_loss}')
-            # TODO: test this
-            # self.train_history['val_loss'].append(val_loss)
             self.insert_metric_result_into_history('val_loss', val_loss)
+
+    def auto_execute_end_of_training(self):
+        if self.test_loader is not None:
+            test_loss = self.evaluate_loss_on_test_set()
+            print(f'TEST LOSS: {test_loss}')
+            # To keep TrainingHistory from complaining due to the non-matching metric result lengths
+            # self.insert_metric_result_into_history('test_loss', test_loss)
 
     def evaluate_loss_on_train_set(self):
         """
@@ -138,6 +144,14 @@ class TrainLoop:
             float:
         """
         return self.evaluate_model_loss(self.validation_loader)
+
+    def evaluate_loss_on_test_set(self):
+        """
+
+        Returns:
+            float:
+        """
+        return self.evaluate_model_loss(self.test_loader)
 
     def evaluate_model_loss(self, data_loader):
         """
@@ -176,6 +190,14 @@ class TrainLoop:
             (torch.Tensor, torch.Tensor, dict):
         """
         return self.predict_with_model(self.validation_loader)
+
+    def predict_on_test_set(self):
+        """
+
+        Returns:
+            (torch.Tensor, torch.Tensor, dict):
+        """
+        return self.predict_with_model(self.test_loader)
 
     def predict_with_model(self, data_loader):
         """
@@ -247,7 +269,7 @@ class TrainLoop:
 
 class TrainLoopModelCheckpoint(TrainLoop):
     def __init__(self, model,
-                 train_loader, validation_loader,
+                 train_loader, validation_loader, test_loader,
                  batch_model_feed_def,
                  optimizer, criterion,
                  project_name, experiment_name, local_model_result_folder_path, save_to_s3=True):
@@ -257,6 +279,7 @@ class TrainLoopModelCheckpoint(TrainLoop):
             model (torch.nn.modules.Module):
             train_loader (torch.utils.data.DataLoader):
             validation_loader (torch.utils.data.DataLoader):
+            test_loader (torch.utils.data.DataLoader):
             batch_model_feed_def (AIToolbox.torchtrain.batch_model_feed_defs.AbstractModelFeedDefinition):
             optimizer:
             criterion:
@@ -265,7 +288,7 @@ class TrainLoopModelCheckpoint(TrainLoop):
             local_model_result_folder_path (str):
             save_to_s3 (bool):
         """
-        TrainLoop.__init__(self, model, train_loader, validation_loader, batch_model_feed_def, optimizer, criterion)
+        TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, batch_model_feed_def, optimizer, criterion)
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = local_model_result_folder_path
@@ -279,7 +302,7 @@ class TrainLoopModelCheckpoint(TrainLoop):
 
 class TrainLoopModelEndSave(TrainLoop):
     def __init__(self, model,
-                 train_loader, validation_loader,
+                 train_loader, validation_loader, test_loader,
                  batch_model_feed_def,
                  optimizer, criterion,
                  project_name, experiment_name, local_model_result_folder_path,
@@ -290,6 +313,7 @@ class TrainLoopModelEndSave(TrainLoop):
             model (torch.nn.modules.Module):
             train_loader (torch.utils.data.DataLoader):
             validation_loader (torch.utils.data.DataLoader):
+            test_loader (torch.utils.data.DataLoader):
             batch_model_feed_def (AIToolbox.torchtrain.batch_model_feed_defs.AbstractModelFeedDefinition):
             optimizer:
             criterion:
@@ -300,7 +324,7 @@ class TrainLoopModelEndSave(TrainLoop):
             result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
             save_to_s3 (bool):
         """
-        TrainLoop.__init__(self, model, train_loader, validation_loader, batch_model_feed_def, optimizer, criterion)
+        TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, batch_model_feed_def, optimizer, criterion)
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = local_model_result_folder_path
@@ -316,7 +340,7 @@ class TrainLoopModelEndSave(TrainLoop):
 
 class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
     def __init__(self, model,
-                 train_loader, validation_loader,
+                 train_loader, validation_loader, test_loader,
                  batch_model_feed_def,
                  optimizer, criterion,
                  project_name, experiment_name, local_model_result_folder_path,
@@ -327,6 +351,7 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
             model (torch.nn.modules.Module):
             train_loader (torch.utils.data.DataLoader):
             validation_loader (torch.utils.data.DataLoader):
+            test_loader (torch.utils.data.DataLoader):
             batch_model_feed_def (AIToolbox.torchtrain.batch_model_feed_defs.AbstractModelFeedDefinition):
             optimizer:
             criterion:
@@ -337,7 +362,7 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
             result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
             save_to_s3 (bool):
         """
-        TrainLoopModelEndSave.__init__(self, model, train_loader, validation_loader, batch_model_feed_def,
+        TrainLoopModelEndSave.__init__(self, model, train_loader, validation_loader, test_loader, batch_model_feed_def,
                                        optimizer, criterion,
                                        project_name, experiment_name, local_model_result_folder_path,
                                        args, result_package, save_to_s3)

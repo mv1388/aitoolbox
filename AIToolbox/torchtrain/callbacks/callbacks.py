@@ -1,3 +1,5 @@
+import copy
+
 from AIToolbox.AWS.model_save import PyTorchS3ModelSaver
 from AIToolbox.experiment_save.local_model_save import PyTorchLocalModelSaver
 from AIToolbox.experiment_save.experiment_saver import FullPyTorchExperimentS3Saver
@@ -179,6 +181,7 @@ class ModelTrainEndSaveCallback(AbstractCallback):
         self.local_model_result_folder_path = local_model_result_folder_path
         self.args = args
         self.result_package = result_package
+        self.test_result_package = None
         self.save_to_s3 = save_to_s3
 
         if self.save_to_s3:
@@ -204,6 +207,15 @@ class ModelTrainEndSaveCallback(AbstractCallback):
                                                    hyperparameters=self.args, training_history=train_hist_pkg,
                                                    additional_results=additional_results)
 
+        if self.test_result_package is not None:
+            y_test_test, y_pred_test, additional_results_test = self.train_loop_obj.predict_on_test_set()
+            self.test_result_package.prepare_result_package(y_test_test, y_pred_test,
+                                                            hyperparameters=self.args, training_history=train_hist_pkg,
+                                                            additional_results=additional_results_test)
+
+            multi_package = self.result_package + self.test_result_package
+            self.result_package = multi_package
+
         self.results_saver.save_experiment(self.train_loop_obj.model, self.result_package,
                                            experiment_timestamp=self.train_loop_obj.experiment_timestamp,
                                            save_true_pred_labels=True)
@@ -212,3 +224,6 @@ class ModelTrainEndSaveCallback(AbstractCallback):
         self.result_package.set_experiment_dir_path_for_additional_results(self.project_name, self.experiment_name,
                                                                            self.train_loop_obj.experiment_timestamp,
                                                                            self.local_model_result_folder_path)
+
+        if self.train_loop_obj.test_loader is not None:
+            self.test_result_package = copy.deepcopy(self.result_package)

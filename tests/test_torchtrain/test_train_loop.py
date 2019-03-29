@@ -91,30 +91,38 @@ class TestTrainLoop(unittest.TestCase):
                           'on_train_end': 1, 'on_batch_begin': 6, 'on_batch_end': 0})
 
     def test_predict_train_data(self):
-        self.eval_prediction(True)
+        self.eval_prediction('train')
 
     def test_predict_val_data(self):
-        self.eval_prediction(False)
+        self.eval_prediction('val')
 
-    def eval_prediction(self, eval_train):
+    def test_predict_test_data(self):
+        self.eval_prediction('test')
+
+    def eval_prediction(self, eval_mode):
         num_epochs = 2
         dummy_feed_def = DeactivateModelFeedDefinition()
         dummy_optimizer = DummyOptimizer()
-        dummy_train_loader = list(range(3))
-        dummy_val_loader = list(range(2))
+        dummy_train_loader = list(range(4))
+        dummy_val_loader = list(range(3))
+        dummy_test_loader = list(range(2))
 
         model = Net()
-        train_loop = TrainLoop(model, dummy_train_loader, dummy_val_loader, dummy_feed_def, dummy_optimizer, None)
+        train_loop = TrainLoop(model, dummy_train_loader, dummy_val_loader, dummy_test_loader,
+                               dummy_feed_def, dummy_optimizer, None)
         train_loop.callbacks_handler.register_callbacks([AbstractCallback('callback_test1'),
                                                          CallbackTracker(), CallbackTrackerShort(),
                                                          AbstractCallback('callback_test2')])
         train_loop.do_train(num_epoch=num_epochs)
 
-        if eval_train:
+        if eval_mode == 'train':
             y_test, y_pred, metadata = train_loop.predict_on_train_set()
             data_loader = dummy_train_loader
-        else:
+        elif eval_mode == 'val':
             y_test, y_pred, metadata = train_loop.predict_on_validation_set()
+            data_loader = dummy_val_loader
+        else:
+            y_test, y_pred, metadata = train_loop.predict_on_test_set()
             data_loader = dummy_val_loader
 
         r = []
