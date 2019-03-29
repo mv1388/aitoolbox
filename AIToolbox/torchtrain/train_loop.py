@@ -312,8 +312,8 @@ class TrainLoopModelEndSave(TrainLoop):
         Args:
             model (torch.nn.modules.Module):
             train_loader (torch.utils.data.DataLoader):
-            validation_loader (torch.utils.data.DataLoader):
-            test_loader (torch.utils.data.DataLoader):
+            validation_loader (torch.utils.data.DataLoader or None):
+            test_loader (torch.utils.data.DataLoader or None):
             batch_model_feed_def (AIToolbox.torchtrain.batch_model_feed_defs.AbstractModelFeedDefinition):
             optimizer:
             criterion:
@@ -321,8 +321,8 @@ class TrainLoopModelEndSave(TrainLoop):
             experiment_name (str):
             local_model_result_folder_path (str):
             args (dict):
-            val_result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
-            test_result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
+            val_result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage or None):
+            test_result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage or None):
             save_to_s3 (bool):
         """
         TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, batch_model_feed_def, optimizer, criterion)
@@ -367,8 +367,8 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
         Args:
             model (torch.nn.modules.Module):
             train_loader (torch.utils.data.DataLoader):
-            validation_loader (torch.utils.data.DataLoader):
-            test_loader (torch.utils.data.DataLoader):
+            validation_loader (torch.utils.data.DataLoader or None):
+            test_loader (torch.utils.data.DataLoader or None):
             batch_model_feed_def (AIToolbox.torchtrain.batch_model_feed_defs.AbstractModelFeedDefinition):
             optimizer:
             criterion:
@@ -376,8 +376,8 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
             experiment_name (str):
             local_model_result_folder_path (str):
             args (dict):
-            val_result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
-            test_result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
+            val_result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage or None):
+            test_result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage or None):
             save_to_s3 (bool):
         """
         TrainLoopModelEndSave.__init__(self, model, train_loader, validation_loader, test_loader, batch_model_feed_def,

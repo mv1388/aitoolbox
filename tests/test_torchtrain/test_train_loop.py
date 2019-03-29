@@ -249,6 +249,15 @@ class TestTrainLoopModelEndSave(unittest.TestCase):
                                                        val_result_package=DummyResultPackage(),
                                                        test_result_package=DummyResultPackage(),
                                                        save_to_s3=True)
+        with self.assertRaises(ValueError):
+            train_loop_non_val = TrainLoopModelEndSave(Net(), None, 100, 100, DeactivateModelFeedDefinition(), None,
+                                                       None,
+                                                       "project_name", "experiment_name",
+                                                       "local_model_result_folder_path",
+                                                       args={},
+                                                       val_result_package=None,
+                                                       test_result_package=None,
+                                                       save_to_s3=True)
 
 
 class TestTrainLoopModelCheckpointEndSave(unittest.TestCase):
@@ -351,4 +360,13 @@ class TestTrainLoopModelCheckpointEndSave(unittest.TestCase):
                                                                  args={},
                                                                  val_result_package=DummyResultPackage(),
                                                                  test_result_package=DummyResultPackage(),
+                                                                 save_to_s3=True)
+        with self.assertRaises(ValueError):
+            train_loop_non_val = TrainLoopModelCheckpointEndSave(Net(), None, 100, 100, DeactivateModelFeedDefinition(), None,
+                                                                 None,
+                                                                 "project_name", "experiment_name",
+                                                                 "local_model_result_folder_path",
+                                                                 args={},
+                                                                 val_result_package=None,
+                                                                 test_result_package=None,
                                                                  save_to_s3=True)
