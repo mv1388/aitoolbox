@@ -164,7 +164,7 @@ class ModelCheckpointCallback(AbstractCallback):
 
 class ModelTrainEndSaveCallback(AbstractCallback):
     def __init__(self, project_name, experiment_name, local_model_result_folder_path,
-                 args, result_package, save_to_s3=True):
+                 args, val_result_package=None, test_result_package=None, save_to_s3=True):
         """
 
         Args:
@@ -172,7 +172,8 @@ class ModelTrainEndSaveCallback(AbstractCallback):
             experiment_name (str):
             local_model_result_folder_path (str):
             args (dict):
-            result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
+            val_result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
+            test_result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
             save_to_s3 (bool):
         """
         AbstractCallback.__init__(self, 'Model save at the end of training')
@@ -180,9 +181,12 @@ class ModelTrainEndSaveCallback(AbstractCallback):
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = local_model_result_folder_path
         self.args = args
-        self.result_package = result_package
-        self.test_result_package = None
+        self.val_result_package = val_result_package
+        self.test_result_package = test_result_package
+        self.result_package = None
         self.save_to_s3 = save_to_s3
+
+        self.check_result_packages()
 
         if self.save_to_s3:
             self.results_saver = FullPyTorchExperimentS3Saver(self.project_name, self.experiment_name,
@@ -201,28 +205,39 @@ class ModelTrainEndSaveCallback(AbstractCallback):
         epoch_list = list(range(len(self.train_loop_obj.train_history[list(self.train_loop_obj.train_history.keys())[0]])))
         train_hist_pkg = TrainingHistory(train_history, epoch_list)
 
-        y_test, y_pred, additional_results = self.train_loop_obj.predict_on_validation_set()
-        self.result_package.prepare_result_package(y_test, y_pred,
-                                                   hyperparameters=self.args, training_history=train_hist_pkg,
-                                                   additional_results=additional_results)
+        if self.val_result_package is not None:
+            y_test, y_pred, additional_results = self.train_loop_obj.predict_on_validation_set()
+            self.val_result_package.pkg_name += '_VAL'
+            self.val_result_package.prepare_result_package(y_test, y_pred,
+                                                           hyperparameters=self.args, training_history=train_hist_pkg,
+                                                           additional_results=additional_results)
+            self.result_package = self.val_result_package
 
         if self.test_result_package is not None:
             y_test_test, y_pred_test, additional_results_test = self.train_loop_obj.predict_on_test_set()
+            self.test_result_package.pkg_name += '_TEST'
             self.test_result_package.prepare_result_package(y_test_test, y_pred_test,
                                                             hyperparameters=self.args, training_history=train_hist_pkg,
                                                             additional_results=additional_results_test)
-
-            multi_package = self.result_package + self.test_result_package
-            self.result_package = multi_package
+            self.result_package = self.test_result_package + self.result_package if self.result_package is not None \
+                else self.test_result_package
 
         self.results_saver.save_experiment(self.train_loop_obj.model, self.result_package,
                                            experiment_timestamp=self.train_loop_obj.experiment_timestamp,
                                            save_true_pred_labels=True)
 
     def on_train_loop_registration(self):
-        self.result_package.set_experiment_dir_path_for_additional_results(self.project_name, self.experiment_name,
-                                                                           self.train_loop_obj.experiment_timestamp,
-                                                                           self.local_model_result_folder_path)
+        if self.val_result_package is not None:
+            self.val_result_package.set_experiment_dir_path_for_additional_results(self.project_name, self.experiment_name,
+                                                                                   self.train_loop_obj.experiment_timestamp,
+                                                                                   self.local_model_result_folder_path)
+        if self.test_result_package is not None:
+            self.test_result_package.set_experiment_dir_path_for_additional_results(self.project_name,
+                                                                                    self.experiment_name,
+                                                                                    self.train_loop_obj.experiment_timestamp,
+                                                                                    self.local_model_result_folder_path)
 
-        if self.train_loop_obj.test_loader is not None:
-            self.test_result_package = copy.deepcopy(self.result_package)
+    def check_result_packages(self):
+        if self.val_result_package is None and self.test_result_package is None:
+            raise ValueError("Both val_result_package and test_result_package are None. "
+                             "At least one of these should be not None but actual result package.")
