@@ -34,7 +34,7 @@ class PyTorchModelReRunner(AbstractModelReRunner):
         AbstractModelReRunner.__init__(self, model, data_loader)
         self.batch_model_feed_def = batch_model_feed_def
 
-        self.train_loop = TrainLoop(self.model, None, self.data_loader, batch_model_feed_def, None, None)
+        self.train_loop = TrainLoop(self.model, None, None, self.data_loader, batch_model_feed_def, None, None)
 
     def model_predict(self):
         """
@@ -42,7 +42,7 @@ class PyTorchModelReRunner(AbstractModelReRunner):
         Returns:
             (torch.Tensor, torch.Tensor, dict):
         """
-        return self.train_loop.predict_on_validation_set()
+        return self.train_loop.predict_on_test_set()
 
     def model_get_loss(self):
         """
@@ -50,7 +50,7 @@ class PyTorchModelReRunner(AbstractModelReRunner):
         Returns:
             float:
         """
-        return self.train_loop.evaluate_loss_on_validation_set()
+        return self.train_loop.evaluate_loss_on_test_set()
 
     def evaluate_result_package(self, result_package, return_result_package=True):
         """
@@ -66,7 +66,7 @@ class PyTorchModelReRunner(AbstractModelReRunner):
         epoch_list = list(range(len(self.train_loop.train_history[list(self.train_loop.train_history.keys())[0]])))
         train_hist_pkg = TrainingHistory(train_history, epoch_list)
 
-        y_test, y_pred, additional_results = self.train_loop.predict_on_validation_set()
+        y_test, y_pred, additional_results = self.train_loop.predict_on_test_set()
 
         result_package.prepare_result_package(y_test, y_pred,
                                               hyperparameters={}, training_history=train_hist_pkg,

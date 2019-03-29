@@ -24,7 +24,7 @@ class TestAbstractCallback(unittest.TestCase):
         self.assertTrue(function_exists(callback, 'on_batch_end'))
 
     def test_on_train_loop_registration_hook(self):
-        train_loop = TrainLoop(Net(), None, None, DeactivateModelFeedDefinition(), None, None)
+        train_loop = TrainLoop(Net(), None, None, None, DeactivateModelFeedDefinition(), None, None)
         callback = CallbackTracker()
         callback.register_train_loop_object(train_loop)
 
@@ -59,7 +59,7 @@ class TestModelTrainEndSaveCallback(unittest.TestCase):
 
         callback = ModelTrainEndSaveCallback('project_name', 'experiment_name', 'local_model_result_folder_path',
                                              {}, result_pkg)
-        train_loop = TrainLoop(Net(), None, None, DeactivateModelFeedDefinition(), None, None)
+        train_loop = TrainLoop(Net(), None, None, None, DeactivateModelFeedDefinition(), None, None)
         train_loop.callbacks_handler.register_callbacks([callback])
         
         self.assertEqual(result_pkg.experiment_path,
@@ -105,7 +105,7 @@ class TestEarlyStoppingCallback(unittest.TestCase):
 
     def basic_early_stop_change_check_loss(self, val1, val2, expected_result, min_delta=0.):
         callback = EarlyStoppingCallback(monitor='dummy_loss', min_delta=min_delta)
-        train_loop = TrainLoop(Net(), None, None, DeactivateModelFeedDefinition(), None, None)
+        train_loop = TrainLoop(Net(), None, None, None, DeactivateModelFeedDefinition(), None, None)
         train_loop.callbacks_handler.register_callbacks([callback])
         self.assertFalse(train_loop.early_stop)
 
@@ -123,7 +123,7 @@ class TestEarlyStoppingCallback(unittest.TestCase):
 
     def basic_early_stop_change_check_acc(self, val1, val2, expected_result, min_delta=0.):
         callback = EarlyStoppingCallback(monitor='dummy_acc', min_delta=min_delta)
-        train_loop = TrainLoop(Net(), None, None, DeactivateModelFeedDefinition(), None, None)
+        train_loop = TrainLoop(Net(), None, None, None, DeactivateModelFeedDefinition(), None, None)
         train_loop.callbacks_handler.register_callbacks([callback])
         self.assertFalse(train_loop.early_stop)
 
@@ -185,7 +185,7 @@ class TestEarlyStoppingCallback(unittest.TestCase):
 
     def eval_patience(self, min_delta, patience, val_list, expected_result, monitor):
         callback = EarlyStoppingCallback(monitor=monitor, min_delta=min_delta, patience=patience)
-        train_loop = TrainLoop(Net(), None, None, DeactivateModelFeedDefinition(), None, None)
+        train_loop = TrainLoop(Net(), None, None, None, DeactivateModelFeedDefinition(), None, None)
         train_loop.callbacks_handler.register_callbacks([callback])
         self.assertFalse(train_loop.early_stop)
 
