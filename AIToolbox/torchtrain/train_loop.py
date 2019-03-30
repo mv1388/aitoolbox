@@ -286,7 +286,10 @@ class TrainLoopModelCheckpoint(TrainLoop):
             project_name (str):
             experiment_name (str):
             local_model_result_folder_path (str):
-            cloud_save_mode (str or None):
+            cloud_save_mode (str or None): Storage destination selector.
+                For AWS S3: 's3' / 'aws_s3' / 'aws'
+                For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
+                Everything else results just in local storage to disk
         """
         TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, batch_model_feed_def, optimizer, criterion)
         self.project_name = project_name
@@ -323,7 +326,10 @@ class TrainLoopModelEndSave(TrainLoop):
             args (dict):
             val_result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage or None):
             test_result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage or None):
-            cloud_save_mode (str or None):
+            cloud_save_mode (str or None): Storage destination selector.
+                For AWS S3: 's3' / 'aws_s3' / 'aws'
+                For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
+                Everything else results just in local storage to disk
         """
         TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, batch_model_feed_def, optimizer, criterion)
         self.project_name = project_name
@@ -379,7 +385,10 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
             args (dict):
             val_result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage or None):
             test_result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage or None):
-            cloud_save_mode (str or None):
+            cloud_save_mode (str or None): Storage destination selector.
+                For AWS S3: 's3' / 'aws_s3' / 'aws'
+                For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
+                Everything else results just in local storage to disk
         """
         TrainLoopModelEndSave.__init__(self, model, train_loader, validation_loader, test_loader, batch_model_feed_def,
                                        optimizer, criterion,
