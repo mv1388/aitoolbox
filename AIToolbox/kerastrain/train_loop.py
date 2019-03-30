@@ -198,31 +198,34 @@ class TrainLoopModelCheckpoint(TrainLoop):
     def __init__(self, model,
                  train_loader, validation_loader, test_loader,
                  optimizer, criterion, metrics,
-                 project_name, experiment_name, local_model_result_folder_path, save_to_s3=True):
+                 project_name, experiment_name, local_model_result_folder_path, cloud_save_mode='s3'):
         """
 
         Args:
-            model:
+            model (keras.engine.training.Model):
             train_loader:
             validation_loader:
             test_loader:
             optimizer:
             criterion:
             metrics:
-            project_name:
-            experiment_name:
-            local_model_result_folder_path:
-            save_to_s3:
+            project_name (str):
+            experiment_name (str):
+            local_model_result_folder_path (str):
+            cloud_save_mode (str or None): Storage destination selector.
+                For AWS S3: 's3' / 'aws_s3' / 'aws'
+                For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
+                Everything else results just in local storage to disk
         """
         TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion, metrics)
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = local_model_result_folder_path
-        self.save_to_s3 = save_to_s3
+        self.cloud_save_mode = cloud_save_mode
 
         self.callbacks_handler.register_callbacks([
             ModelCheckpointCallback(self.project_name, self.experiment_name, self.local_model_result_folder_path,
-                                    save_to_s3=self.save_to_s3)
+                                    cloud_save_mode=self.cloud_save_mode)
         ])
 
 
@@ -231,24 +234,27 @@ class TrainLoopModelEndSave(TrainLoop):
                  train_loader, validation_loader, test_loader,
                  optimizer, criterion, metrics,
                  project_name, experiment_name, local_model_result_folder_path,
-                 args, val_result_package=None, test_result_package=None, save_to_s3=True):
+                 args, val_result_package=None, test_result_package=None, cloud_save_mode='s3'):
         """
 
         Args:
-            model:
+            model (keras.engine.training.Model):
             train_loader:
             validation_loader:
             test_loader:
             optimizer:
             criterion:
             metrics:
-            project_name:
-            experiment_name:
-            local_model_result_folder_path:
-            args:
-            val_result_package:
-            test_result_package
-            save_to_s3:
+            project_name (str):
+            experiment_name (str):
+            local_model_result_folder_path (str):
+            args (dict):
+            val_result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage or None):
+            test_result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage or None):
+            cloud_save_mode (str or None): Storage destination selector.
+                For AWS S3: 's3' / 'aws_s3' / 'aws'
+                For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
+                Everything else results just in local storage to disk
         """
         TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion, metrics)
         self.project_name = project_name
@@ -257,13 +263,14 @@ class TrainLoopModelEndSave(TrainLoop):
         self.args = args
         self.val_result_package = val_result_package
         self.test_result_package = test_result_package
-        self.save_to_s3 = save_to_s3
+        self.cloud_save_mode = cloud_save_mode
         
         self.check_if_result_packages_possible()
 
         self.callbacks_handler.register_callbacks([
             ModelTrainEndSaveCallback(self.project_name, self.experiment_name, self.local_model_result_folder_path,
-                                      self.args, self.val_result_package, self.test_result_package, save_to_s3=self.save_to_s3)
+                                      self.args, self.val_result_package, self.test_result_package,
+                                      cloud_save_mode=self.cloud_save_mode)
         ])
         
     def check_if_result_packages_possible(self):
@@ -285,31 +292,34 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
                  train_loader, validation_loader, test_loader,
                  optimizer, criterion, metrics,
                  project_name, experiment_name, local_model_result_folder_path,
-                 args, val_result_package=None, test_result_package=None, save_to_s3=True):
+                 args, val_result_package=None, test_result_package=None, cloud_save_mode='s3'):
         """
 
         Args:
-            model:
+            model (keras.engine.training.Model):
             train_loader:
             validation_loader:
             test_loader:
             optimizer:
             criterion:
             metrics:
-            project_name:
-            experiment_name:
-            local_model_result_folder_path:
-            args:
-            val_result_package:
-            test_result_package:
-            save_to_s3:
+            project_name (str):
+            experiment_name (str):
+            local_model_result_folder_path (str):
+            args (dict):
+            val_result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage or None):
+            test_result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage or None):
+            cloud_save_mode (str or None): Storage destination selector.
+                For AWS S3: 's3' / 'aws_s3' / 'aws'
+                For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
+                Everything else results just in local storage to disk
         """
         TrainLoopModelEndSave.__init__(self, model, train_loader, validation_loader, test_loader,
                                        optimizer, criterion, metrics,
                                        project_name, experiment_name, local_model_result_folder_path,
-                                       args, val_result_package, test_result_package, save_to_s3)
+                                       args, val_result_package, test_result_package, cloud_save_mode)
 
         self.callbacks_handler.register_callbacks([
             ModelCheckpointCallback(self.project_name, self.experiment_name, self.local_model_result_folder_path,
-                                    save_to_s3=self.save_to_s3)
+                                    cloud_save_mode=self.cloud_save_mode)
         ])
