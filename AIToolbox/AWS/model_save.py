@@ -118,14 +118,14 @@ class KerasS3ModelSaver(AbstractModelSaver, BaseModelSaver):
 
         model_name, model_weights_name, model_local_path, model_weights_local_path = saved_local_model_details
 
-        experiment_cloud_path = self.create_experiment_cloud_storage_folder_structure(project_name, experiment_name, experiment_timestamp)
-        model_cloud_path = os.path.join(experiment_cloud_path, model_name)
-        model_weights_cloud_path = os.path.join(experiment_cloud_path, model_weights_name)
+        experiment_s3_path = self.create_experiment_cloud_storage_folder_structure(project_name, experiment_name, experiment_timestamp)
+        model_s3_path = os.path.join(experiment_s3_path, model_name)
+        model_weights_s3_path = os.path.join(experiment_s3_path, model_weights_name)
 
-        self.save_file(local_file_path=model_local_path, cloud_file_path=model_cloud_path)
-        self.save_file(local_file_path=model_weights_local_path, cloud_file_path=model_weights_cloud_path)
+        self.save_file(local_file_path=model_local_path, cloud_file_path=model_s3_path)
+        self.save_file(local_file_path=model_weights_local_path, cloud_file_path=model_weights_s3_path)
 
-        return model_cloud_path, experiment_timestamp
+        return model_s3_path, experiment_timestamp
 
 
 class TensorFlowS3ModelSaver(AbstractModelSaver, BaseModelSaver):
