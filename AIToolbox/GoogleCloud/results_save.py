@@ -33,7 +33,7 @@ class BaseResultsGoogleStorageSaver:
         blob.upload_from_filename(local_file_path)
 
 
-class GCSResultsSaver(BaseResultsGoogleStorageSaver, S3ResultsSaver):
+class GoogleStorageResultsSaver(BaseResultsGoogleStorageSaver, S3ResultsSaver):
     def __init__(self, bucket_name='model-result', local_model_result_folder_path='~/project/model_result'):
         """
 

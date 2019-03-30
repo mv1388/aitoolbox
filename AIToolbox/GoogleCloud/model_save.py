@@ -36,7 +36,7 @@ class BaseModelGoogleStorageSaver:
         blob.upload_from_filename(local_file_path)
 
 
-class KerasGCSModelSaver(BaseModelGoogleStorageSaver, KerasS3ModelSaver):
+class KerasGoogleStorageModelSaver(BaseModelGoogleStorageSaver, KerasS3ModelSaver):
     def __init__(self, bucket_name='model-result', local_model_result_folder_path='~/project/model_result',
                  checkpoint_model=False):
         """
@@ -50,7 +50,7 @@ class KerasGCSModelSaver(BaseModelGoogleStorageSaver, KerasS3ModelSaver):
         self.keras_local_saver = KerasLocalModelSaver(local_model_result_folder_path, checkpoint_model)
         
 
-class TensorFlowGCSModelSaver(BaseModelGoogleStorageSaver, TensorFlowS3ModelSaver):
+class TensorFlowGoogleStorageModelSaver(BaseModelGoogleStorageSaver, TensorFlowS3ModelSaver):
     def __init__(self, bucket_name='model-result', local_model_result_folder_path='~/project/model_result',
                  checkpoint_model=False):
         """
@@ -64,7 +64,7 @@ class TensorFlowGCSModelSaver(BaseModelGoogleStorageSaver, TensorFlowS3ModelSave
         self.tf_local_saver = TensorFlowLocalModelSaver(local_model_result_folder_path, checkpoint_model)
 
 
-class PyTorchGCSModelSaver(BaseModelGoogleStorageSaver, PyTorchS3ModelSaver):
+class PyTorchGoogleStorageModelSaver(BaseModelGoogleStorageSaver, PyTorchS3ModelSaver):
     def __init__(self, bucket_name='model-result', local_model_result_folder_path='~/project/model_result',
                  checkpoint_model=False):
         """
