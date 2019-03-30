@@ -125,7 +125,9 @@ class KerasS3ModelSaver(AbstractModelSaver, BaseModelSaver):
         self.save_file(local_file_path=model_local_path, s3_file_path=model_s3_path)
         self.save_file(local_file_path=model_weights_local_path, s3_file_path=model_weights_s3_path)
 
-        return model_s3_path, experiment_timestamp
+        full_model_s3_path = os.path.join(self.bucket_name, model_s3_path)
+
+        return full_model_s3_path, experiment_timestamp
 
 
 class TensorFlowS3ModelSaver(AbstractModelSaver, BaseModelSaver):
@@ -196,4 +198,6 @@ class PyTorchS3ModelSaver(AbstractModelSaver, BaseModelSaver):
         self.save_file(local_file_path=model_local_path, s3_file_path=model_s3_path)
         self.save_file(local_file_path=model_weights_local_path, s3_file_path=model_weights_s3_path)
 
-        return model_s3_path, experiment_timestamp
+        full_model_s3_path = os.path.join(self.bucket_name, model_s3_path)
+
+        return full_model_s3_path, experiment_timestamp
