@@ -39,9 +39,9 @@ class TestModelCheckpointCallback(unittest.TestCase):
                                                 cloud_save_mode='s3')
         self.assertEqual(type(callback_true.model_checkpointer), PyTorchS3ModelSaver)
 
-        callback_true = ModelCheckpointCallback('project_name', 'experiment_name', 'local_model_result_folder_path',
-                                                cloud_save_mode='gcs')
-        self.assertEqual(type(callback_true.model_checkpointer), PyTorchGoogleStorageModelSaver)
+        # callback_true = ModelCheckpointCallback('project_name', 'experiment_name', 'local_model_result_folder_path',
+        #                                         cloud_save_mode='gcs')
+        # self.assertEqual(type(callback_true.model_checkpointer), PyTorchGoogleStorageModelSaver)
 
         callback_false = ModelCheckpointCallback('project_name', 'experiment_name', 'local_model_result_folder_path',
                                                  cloud_save_mode=None)
@@ -54,9 +54,9 @@ class TestModelTrainEndSaveCallback(unittest.TestCase):
                                                   {}, DummyResultPackage(), cloud_save_mode='s3')
         self.assertEqual(type(callback_true.results_saver), FullPyTorchExperimentS3Saver)
 
-        callback_true = ModelTrainEndSaveCallback('project_name', 'experiment_name', 'local_model_result_folder_path',
-                                                  {}, DummyResultPackage(), cloud_save_mode='gcs')
-        self.assertEqual(type(callback_true.results_saver), FullPyTorchExperimentGoogleStorageSaver)
+        # callback_true = ModelTrainEndSaveCallback('project_name', 'experiment_name', 'local_model_result_folder_path',
+        #                                           {}, DummyResultPackage(), cloud_save_mode='gcs')
+        # self.assertEqual(type(callback_true.results_saver), FullPyTorchExperimentGoogleStorageSaver)
 
         callback_false = ModelTrainEndSaveCallback('project_name', 'experiment_name', 'local_model_result_folder_path',
                                                   {}, DummyResultPackage(), cloud_save_mode=None)
