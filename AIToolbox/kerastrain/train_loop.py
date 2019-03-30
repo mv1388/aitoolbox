@@ -8,8 +8,8 @@ from AIToolbox.kerastrain.callbacks.callbacks import ModelCheckpointCallback, Mo
 
 class TrainLoop:
     def __init__(self, model,
-                 train_loader, validation_loader=None, test_loader=None,
-                 optimizer=None, criterion=None, metrics=None):
+                 train_loader, validation_loader, test_loader,
+                 optimizer, criterion, metrics):
         """
 
         Args:
@@ -196,9 +196,9 @@ class TrainLoop:
 
 class TrainLoopModelCheckpoint(TrainLoop):
     def __init__(self, model,
-                 train_loader, validation_loader=None, test_loader=None,
-                 optimizer=None, criterion=None, metrics=None,
-                 project_name=None, experiment_name=None, local_model_result_folder_path=None, cloud_save_mode='s3'):
+                 train_loader, validation_loader, test_loader,
+                 optimizer, criterion, metrics,
+                 project_name, experiment_name, local_model_result_folder_path, cloud_save_mode='s3'):
         """
 
         Args:
@@ -228,10 +228,10 @@ class TrainLoopModelCheckpoint(TrainLoop):
 
 class TrainLoopModelEndSave(TrainLoop):
     def __init__(self, model,
-                 train_loader, validation_loader=None, test_loader=None,
-                 optimizer=None, criterion=None, metrics=None,
-                 project_name=None, experiment_name=None, local_model_result_folder_path=None,
-                 args=None, val_result_package=None, test_result_package=None, cloud_save_mode='s3'):
+                 train_loader, validation_loader, test_loader,
+                 optimizer, criterion, metrics,
+                 project_name, experiment_name, local_model_result_folder_path,
+                 args, val_result_package=None, test_result_package=None, cloud_save_mode='s3'):
         """
 
         Args:
@@ -283,10 +283,10 @@ class TrainLoopModelEndSave(TrainLoop):
 
 class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
     def __init__(self, model,
-                 train_loader, validation_loader=None, test_loader=None,
-                 optimizer=None, criterion=None, metrics=None,
-                 project_name=None, experiment_name=None, local_model_result_folder_path=None,
-                 args=None, val_result_package=None, test_result_package=None, cloud_save_mode='s3'):
+                 train_loader, validation_loader, test_loader,
+                 optimizer, criterion, metrics,
+                 project_name, experiment_name, local_model_result_folder_path,
+                 args, val_result_package=None, test_result_package=None, cloud_save_mode='s3'):
         """
 
         Args:
