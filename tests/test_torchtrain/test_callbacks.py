@@ -6,8 +6,9 @@ from AIToolbox.torchtrain.callbacks.callbacks import AbstractCallback, ModelChec
     EarlyStoppingCallback
 from AIToolbox.torchtrain.train_loop import TrainLoop
 from AIToolbox.AWS.model_save import PyTorchS3ModelSaver
+from AIToolbox.GoogleCloud.model_save import PyTorchGoogleStorageModelSaver
 from AIToolbox.experiment_save.local_model_save import PyTorchLocalModelSaver
-from AIToolbox.experiment_save.experiment_saver import FullPyTorchExperimentS3Saver
+from AIToolbox.experiment_save.experiment_saver import FullPyTorchExperimentS3Saver, FullPyTorchExperimentGoogleStorageSaver
 from AIToolbox.experiment_save.local_experiment_saver import FullPyTorchExperimentLocalSaver
 
 
@@ -35,22 +36,30 @@ class TestAbstractCallback(unittest.TestCase):
 class TestModelCheckpointCallback(unittest.TestCase):
     def test_init(self):
         callback_true = ModelCheckpointCallback('project_name', 'experiment_name', 'local_model_result_folder_path',
-                                                save_to_s3=True)
+                                                cloud_save_mode='s3')
         self.assertEqual(type(callback_true.model_checkpointer), PyTorchS3ModelSaver)
 
+        # callback_true = ModelCheckpointCallback('project_name', 'experiment_name', 'local_model_result_folder_path',
+        #                                         cloud_save_mode='gcs')
+        # self.assertEqual(type(callback_true.model_checkpointer), PyTorchGoogleStorageModelSaver)
+
         callback_false = ModelCheckpointCallback('project_name', 'experiment_name', 'local_model_result_folder_path',
-                                                 save_to_s3=False)
+                                                 cloud_save_mode=None)
         self.assertEqual(type(callback_false.model_checkpointer), PyTorchLocalModelSaver)
 
 
 class TestModelTrainEndSaveCallback(unittest.TestCase):
     def test_init(self):
         callback_true = ModelTrainEndSaveCallback('project_name', 'experiment_name', 'local_model_result_folder_path',
-                                                  {}, DummyResultPackage(), save_to_s3=True)
+                                                  {}, DummyResultPackage(), cloud_save_mode='s3')
         self.assertEqual(type(callback_true.results_saver), FullPyTorchExperimentS3Saver)
 
+        # callback_true = ModelTrainEndSaveCallback('project_name', 'experiment_name', 'local_model_result_folder_path',
+        #                                           {}, DummyResultPackage(), cloud_save_mode='gcs')
+        # self.assertEqual(type(callback_true.results_saver), FullPyTorchExperimentGoogleStorageSaver)
+
         callback_false = ModelTrainEndSaveCallback('project_name', 'experiment_name', 'local_model_result_folder_path',
-                                                  {}, DummyResultPackage(), save_to_s3=False)
+                                                  {}, DummyResultPackage(), cloud_save_mode=None)
         self.assertEqual(type(callback_false.results_saver), FullPyTorchExperimentLocalSaver)
 
     def test_train_loop_reg_set_experiment_dir_path_for_additional_results(self):

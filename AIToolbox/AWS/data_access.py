@@ -33,14 +33,13 @@ class BaseDatasetFetcher:
         self.s3 = boto3.resource('s3')
 
         self.local_dataset_folder_path = os.path.expanduser(local_dataset_folder_path)
-
         self.available_prepocessed_datasets = []
 
-    def fetch_file(self, s3_file_path, local_file_path):
+    def fetch_file(self, cloud_file_path, local_file_path):
         """
 
         Args:
-            s3_file_path (str):
+            cloud_file_path (str):
             local_file_path (str):
 
         Returns:
@@ -54,7 +53,7 @@ class BaseDatasetFetcher:
         else:
             print('Local file does not exist on the local disk. Downloading from S3')
             try:
-                self.s3.Bucket(self.bucket_name).download_file(s3_file_path, local_file_path)
+                self.s3.Bucket(self.bucket_name).download_file(cloud_file_path, local_file_path)
             except botocore.exceptions.ClientError as e:
                 if e.response['Error']['Code'] == "404":
                     print("The object does not exist on S3.")
@@ -117,9 +116,9 @@ class SQuAD2DatasetFetcher(AbstractDatasetFetcher, BaseDatasetFetcher):
 
         """
         if not self.exists_local_dataset_folder('SQuAD2', protect_local_folder):
-            self.fetch_file(s3_file_path='SQuAD2/train-v2.0.json',
+            self.fetch_file(cloud_file_path='SQuAD2/train-v2.0.json',
                             local_file_path=os.path.join(self.local_dataset_folder_path, 'SQuAD2', 'train-v2.0.json'))
-            self.fetch_file(s3_file_path='SQuAD2/dev-v2.0.json',
+            self.fetch_file(cloud_file_path='SQuAD2/dev-v2.0.json',
                             local_file_path=os.path.join(self.local_dataset_folder_path, 'SQuAD2', 'dev-v2.0.json'))
 
 
@@ -148,9 +147,9 @@ class QAngarooDatasetFetcher(AbstractDatasetFetcher, BaseDatasetFetcher):
             wikihop_local_folder_path = os.path.join(self.local_dataset_folder_path, 'qangaroo_v1')
             medhop_local_file_path = os.path.join(medhop_local_folder_path, 'medhop.zip')
             wikihop_local_file_path = os.path.join(wikihop_local_folder_path, 'wikihop.zip')
-            self.fetch_file(s3_file_path='qangaroo_v1/medhop.zip',
+            self.fetch_file(cloud_file_path='qangaroo_v1/medhop.zip',
                             local_file_path=medhop_local_file_path)
-            self.fetch_file(s3_file_path='qangaroo_v1/wikihop.zip',
+            self.fetch_file(cloud_file_path='qangaroo_v1/wikihop.zip',
                             local_file_path=wikihop_local_file_path)
             self.unzip_file(medhop_local_file_path, medhop_local_folder_path)
             self.unzip_file(wikihop_local_file_path, wikihop_local_folder_path)
@@ -179,6 +178,7 @@ class CNNDailyMailDatasetFetcher(AbstractDatasetFetcher, BaseDatasetFetcher):
         """
         raise NotImplementedError('Currently the original CNN/DailyMail dataset is not stored on S3. '
                                   'Rather use one of the preprocessed datasets.')
+        pass
 
     def fetch_preprocessed_dataset(self, preprocess_name, protect_local_folder=True):
         """
@@ -201,9 +201,9 @@ class CNNDailyMailDatasetFetcher(AbstractDatasetFetcher, BaseDatasetFetcher):
                 cnn_local_file_path = os.path.join(cnn_local_folder_path, 'cnn_stories_tokenized.zip')
                 dm_local_file_path = os.path.join(dm_local_folder_path, 'dm_stories_tokenized.zip')
 
-                self.fetch_file(s3_file_path='cnn-dailymail/preproc/abisee/cnn_stories_tokenized.zip',
+                self.fetch_file(cloud_file_path='cnn-dailymail/preproc/abisee/cnn_stories_tokenized.zip',
                                 local_file_path=cnn_local_file_path)
-                self.fetch_file(s3_file_path='cnn-dailymail/preproc/abisee/dm_stories_tokenized.zip',
+                self.fetch_file(cloud_file_path='cnn-dailymail/preproc/abisee/dm_stories_tokenized.zip',
                                 local_file_path=dm_local_file_path)
                 self.unzip_file(cnn_local_file_path, cnn_local_folder_path)
                 self.unzip_file(dm_local_file_path, dm_local_folder_path)
@@ -215,9 +215,9 @@ class CNNDailyMailDatasetFetcher(AbstractDatasetFetcher, BaseDatasetFetcher):
                 cnn_local_file_path = os.path.join(cnn_local_folder_path, 'cnn.tar.gz')
                 dm_local_file_path = os.path.join(dm_local_folder_path, 'dailymail.tar.gz')
 
-                self.fetch_file(s3_file_path='cnn-dailymail/preproc/danqi/cnn.tar.gz',
+                self.fetch_file(cloud_file_path='cnn-dailymail/preproc/danqi/cnn.tar.gz',
                                 local_file_path=cnn_local_file_path)
-                self.fetch_file(s3_file_path='cnn-dailymail/preproc/danqi/dailymail.tar.gz',
+                self.fetch_file(cloud_file_path='cnn-dailymail/preproc/danqi/dailymail.tar.gz',
                                 local_file_path=dm_local_file_path)
                 self.unzip_file(cnn_local_file_path, cnn_local_folder_path)
                 self.unzip_file(dm_local_file_path, dm_local_folder_path)
@@ -252,6 +252,6 @@ class HotpotQADatasetFetcher(AbstractDatasetFetcher, BaseDatasetFetcher):
         if not self.exists_local_dataset_folder('HotpotQA', protect_local_folder):
             hotpotqa_local_folder_path = os.path.join(self.local_dataset_folder_path, 'HotpotQA')
             hotpotqa_local_file_path = os.path.join(hotpotqa_local_folder_path, 'HotpotQA.zip')
-            self.fetch_file(s3_file_path='HotpotQA/HotpotQA.zip',
+            self.fetch_file(cloud_file_path='HotpotQA/HotpotQA.zip',
                             local_file_path=hotpotqa_local_file_path)
             self.unzip_file(hotpotqa_local_file_path, hotpotqa_local_folder_path)

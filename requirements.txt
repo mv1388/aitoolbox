@@ -10,6 +10,7 @@ tweepy
 joblib
 tqdm
 boto3
+google-cloud-storage
 botocore
 matplotlib
 seaborn
