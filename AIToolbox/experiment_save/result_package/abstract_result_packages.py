@@ -409,9 +409,11 @@ class MultipleResultPackageWrapper(AbstractResultPackage):
         for i, result_pkg in enumerate(self.result_packages):
             if result_pkg.pkg_name is not None:
                 suffix = '' if result_pkg.pkg_name not in self.results_dict else str(i)
-                self.results_dict[result_pkg.pkg_name + suffix] = result_pkg.get_results()
+                package_name = result_pkg.pkg_name + suffix
             else:
-                self.results_dict[f'ResultPackage{i}'] = result_pkg.get_results()
+                package_name = f'ResultPackage{i}'
+
+            self.results_dict[package_name] = result_pkg.get_results()
 
     def __str__(self):
         return '\n'.join([f'--> {pkg.pkg_name}:\n{str(pkg)}' for pkg in self.result_packages])
