@@ -271,8 +271,8 @@ class AbstractResultPackage(ABC):
 
         self_object_copy = copy.deepcopy(self)
 
-        multi_result_pkg = MultipleResultPackageWrapper([self_object_copy, other_object_pkg])
-        multi_result_pkg.prepare_result_package(self_object_copy.y_true, self_object_copy.y_predicted,
+        multi_result_pkg = MultipleResultPackageWrapper()
+        multi_result_pkg.prepare_result_package([self_object_copy, other_object_pkg],
                                                 self_object_copy.hyperparameters, self_object_copy.training_history)
 
         return multi_result_pkg
@@ -391,25 +391,48 @@ class PreCalculatedResultPackage(AbstractResultPackage):
 
 
 class MultipleResultPackageWrapper(AbstractResultPackage):
-    def __init__(self, result_packages, strict_content_check=False, **kwargs):
+    def __init__(self, strict_content_check=False, **kwargs):
         """
 
         Args:
-            result_packages (list):
             strict_content_check (bool):
             **kwargs (dict):
         """
         AbstractResultPackage.__init__(self, pkg_name='MultipleResultWrapper',
                                        strict_content_check=strict_content_check, **kwargs)
+        self.result_packages = None
+
+    def prepare_result_package(self, result_packages, hyperparameters=None, training_history=None, **kwargs):
+        """
+
+        Args:
+            result_packages (list):
+            hyperparameters:
+            training_history:
+            **kwargs:
+
+        Returns:
+
+        """
+        self.results_dict = None
         self.result_packages = result_packages
+        self.hyperparameters = hyperparameters
+        self.training_history = training_history
+        self.additional_results = kwargs
+
+        self.prepare_results_dict()
 
     def prepare_results_dict(self):
         self.results_dict = {}
+        self.y_true = {}
+        self.y_predicted = {}
+        self.additional_results = {self.pkg_name: self.additional_results}
 
         for i, result_pkg in enumerate(self.result_packages):
             if result_pkg.pkg_name is not None:
                 suffix = '' if result_pkg.pkg_name not in self.results_dict else str(i)
                 self.results_dict[result_pkg.pkg_name + suffix] = result_pkg.get_results()
+
             else:
                 self.results_dict[f'ResultPackage{i}'] = result_pkg.get_results()
 
