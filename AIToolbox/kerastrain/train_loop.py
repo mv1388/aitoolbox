@@ -263,7 +263,8 @@ class TrainLoopModelEndSave(TrainLoop):
 
         self.callbacks_handler.register_callbacks([
             ModelTrainEndSaveCallback(self.project_name, self.experiment_name, self.local_model_result_folder_path,
-                                      self.args, self.val_result_package, self.test_result_package, cloud_save_mode=self.cloud_save_mode)
+                                      self.args, self.val_result_package, self.test_result_package,
+                                      cloud_save_mode=self.cloud_save_mode)
         ])
         
     def check_if_result_packages_possible(self):
