@@ -125,4 +125,9 @@ class S3ResultsSaver(AbstractResultsSaver, BaseResultsSaver):
             results_file_s3_path = os.path.join(experiment_s3_path, results_file_name)
             self.save_file(local_file_path=results_file_local_path, cloud_file_path=results_file_s3_path)
 
-        return results_file_s3_path, experiment_timestamp
+        # saved_local_results_details[0][0] used to extract the main results file path which should be the first element
+        # of the list with the support files' paths following
+        main_results_s3_file_path = os.path.join(self.bucket_name, experiment_s3_path,
+                                                 saved_local_results_details[0][0])
+
+        return main_results_s3_file_path, experiment_timestamp
