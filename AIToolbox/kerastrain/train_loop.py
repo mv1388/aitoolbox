@@ -202,17 +202,17 @@ class TrainLoopModelCheckpoint(TrainLoop):
         """
 
         Args:
-            model:
+            model (keras.engine.training.Model):
             train_loader:
             validation_loader:
             test_loader:
             optimizer:
             criterion:
             metrics:
-            project_name:
-            experiment_name:
-            local_model_result_folder_path:
-            cloud_save_mode:
+            project_name (str):
+            experiment_name (str):
+            local_model_result_folder_path (str):
+            cloud_save_mode (str or None):
         """
         TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion, metrics)
         self.project_name = project_name
@@ -235,20 +235,20 @@ class TrainLoopModelEndSave(TrainLoop):
         """
 
         Args:
-            model:
+            model (keras.engine.training.Model):
             train_loader:
             validation_loader:
             test_loader:
             optimizer:
             criterion:
             metrics:
-            project_name:
-            experiment_name:
-            local_model_result_folder_path:
-            args:
-            val_result_package:
-            test_result_package
-            cloud_save_mode:
+            project_name (str):
+            experiment_name (str):
+            local_model_result_folder_path (str):
+            args (dict):
+            val_result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage or None):
+            test_result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage or None):
+            cloud_save_mode (str or None):
         """
         TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion, metrics)
         self.project_name = project_name
@@ -290,20 +290,20 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
         """
 
         Args:
-            model:
+            model (keras.engine.training.Model):
             train_loader:
             validation_loader:
             test_loader:
             optimizer:
             criterion:
             metrics:
-            project_name:
-            experiment_name:
-            local_model_result_folder_path:
-            args:
-            val_result_package:
-            test_result_package:
-            cloud_save_mode:
+            project_name (str):
+            experiment_name (str):
+            local_model_result_folder_path (str):
+            args (dict):
+            val_result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage or None):
+            test_result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage or None):
+            cloud_save_mode (str or None):
         """
         TrainLoopModelEndSave.__init__(self, model, train_loader, validation_loader, test_loader,
                                        optimizer, criterion, metrics,
