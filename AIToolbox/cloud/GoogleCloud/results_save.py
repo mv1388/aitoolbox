@@ -1,7 +1,7 @@
 import os
 from google.cloud import storage
 
-from AIToolbox.AWS.results_save import S3ResultsSaver
+from AIToolbox.cloud.AWS.results_save import S3ResultsSaver
 from AIToolbox.experiment_save.local_results_save import LocalResultsSaver
 
 

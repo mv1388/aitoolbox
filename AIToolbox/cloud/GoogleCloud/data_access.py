@@ -1,7 +1,7 @@
 import os
 from google.cloud import storage
 
-from AIToolbox.AWS.data_access import SQuAD2DatasetFetcher as SQuAD2S3DatasetFetcher, \
+from AIToolbox.cloud.AWS.data_access import SQuAD2DatasetFetcher as SQuAD2S3DatasetFetcher, \
     QAngarooDatasetFetcher as QAngarooS3DatasetFetcher, CNNDailyMailDatasetFetcher as CNNDailyMailS3DatasetFetcher, \
     HotpotQADatasetFetcher as HotpotQAS3DatasetFetcher
 
