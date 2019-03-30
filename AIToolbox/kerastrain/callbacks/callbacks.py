@@ -1,8 +1,9 @@
 from keras.callbacks import Callback
 
 from AIToolbox.AWS.model_save import KerasS3ModelSaver
+from AIToolbox.GoogleCloud.model_save import KerasGoogleStorageModelSaver
 from AIToolbox.experiment_save.local_model_save import KerasLocalModelSaver
-from AIToolbox.experiment_save.experiment_saver import FullKerasExperimentS3Saver
+from AIToolbox.experiment_save.experiment_saver import FullKerasExperimentS3Saver, FullKerasExperimentGoogleStorageSaver
 from AIToolbox.experiment_save.local_experiment_saver import FullKerasExperimentLocalSaver
 from AIToolbox.experiment_save.training_history import TrainingHistory
 
@@ -39,23 +40,28 @@ class AbstractKerasCallback(Callback):
 
 
 class ModelCheckpointCallback(AbstractKerasCallback):
-    def __init__(self, project_name, experiment_name, local_model_result_folder_path, save_to_s3=True):
+    def __init__(self, project_name, experiment_name, local_model_result_folder_path, cloud_save_mode='s3'):
         """
 
         Args:
             project_name (str):
             experiment_name (str):
             local_model_result_folder_path (str):
-            save_to_s3 (bool):
+            cloud_save_mode (str or None):
         """
         AbstractKerasCallback.__init__(self, 'Model checkpoint at end of epoch')
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = local_model_result_folder_path
-        self.save_to_s3 = save_to_s3
+        self.cloud_save_mode = cloud_save_mode
 
-        if self.save_to_s3:
+        if self.cloud_save_mode == 's3' or self.cloud_save_mode == 'aws_s3' or self.cloud_save_mode == 'aws':
             self.model_checkpointer = KerasS3ModelSaver(
+                local_model_result_folder_path=self.local_model_result_folder_path,
+                checkpoint_model=True
+            )
+        elif self.cloud_save_mode == 'gcs' or self.cloud_save_mode == 'google_storage' or self.cloud_save_mode == 'google storage':
+            self.model_checkpointer = KerasGoogleStorageModelSaver(
                 local_model_result_folder_path=self.local_model_result_folder_path,
                 checkpoint_model=True
             )
@@ -75,7 +81,7 @@ class ModelCheckpointCallback(AbstractKerasCallback):
 
 class ModelTrainEndSaveCallback(AbstractKerasCallback):
     def __init__(self, project_name, experiment_name, local_model_result_folder_path,
-                 args, result_package, save_to_s3=True):
+                 args, result_package, cloud_save_mode='s3'):
         """
 
         Args:
@@ -84,7 +90,7 @@ class ModelTrainEndSaveCallback(AbstractKerasCallback):
             local_model_result_folder_path (str):
             args (dict):
             result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
-            save_to_s3 (bool):
+            cloud_save_mode (str or None):
         """
         AbstractKerasCallback.__init__(self, 'Model save at the end of training')
         self.project_name = project_name
@@ -92,11 +98,15 @@ class ModelTrainEndSaveCallback(AbstractKerasCallback):
         self.local_model_result_folder_path = local_model_result_folder_path
         self.args = args
         self.result_package = result_package
-        self.save_to_s3 = save_to_s3
+        self.cloud_save_mode = cloud_save_mode
 
-        if self.save_to_s3:
+        if self.cloud_save_mode == 's3' or self.cloud_save_mode == 'aws_s3' or self.cloud_save_mode == 'aws':
             self.results_saver = FullKerasExperimentS3Saver(self.project_name, self.experiment_name,
                                                             local_model_result_folder_path=self.local_model_result_folder_path)
+            
+        elif self.cloud_save_mode == 'gcs' or self.cloud_save_mode == 'google_storage' or self.cloud_save_mode == 'google storage':
+            self.results_saver = FullKerasExperimentGoogleStorageSaver(self.project_name, self.experiment_name,
+                                                                       local_model_result_folder_path=self.local_model_result_folder_path)
         else:
             self.results_saver = FullKerasExperimentLocalSaver(self.project_name, self.experiment_name,
                                                                local_model_result_folder_path=self.local_model_result_folder_path)

@@ -272,7 +272,7 @@ class TrainLoopModelCheckpoint(TrainLoop):
                  train_loader, validation_loader, test_loader,
                  batch_model_feed_def,
                  optimizer, criterion,
-                 project_name, experiment_name, local_model_result_folder_path, save_to_s3=True):
+                 project_name, experiment_name, local_model_result_folder_path, cloud_save_mode='s3'):
         """
 
         Args:
@@ -286,17 +286,17 @@ class TrainLoopModelCheckpoint(TrainLoop):
             project_name (str):
             experiment_name (str):
             local_model_result_folder_path (str):
-            save_to_s3 (bool):
+            cloud_save_mode (str or None):
         """
         TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, batch_model_feed_def, optimizer, criterion)
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = local_model_result_folder_path
-        self.save_to_s3 = save_to_s3
+        self.cloud_save_mode = cloud_save_mode
 
         self.callbacks_handler.register_callbacks([
             ModelCheckpointCallback(self.project_name, self.experiment_name, self.local_model_result_folder_path,
-                                    save_to_s3=self.save_to_s3)
+                                    cloud_save_mode=self.cloud_save_mode)
         ])
 
 
@@ -306,7 +306,7 @@ class TrainLoopModelEndSave(TrainLoop):
                  batch_model_feed_def,
                  optimizer, criterion,
                  project_name, experiment_name, local_model_result_folder_path,
-                 args, val_result_package=None, test_result_package=None, save_to_s3=True):
+                 args, val_result_package=None, test_result_package=None, cloud_save_mode='s3'):
         """
 
         Args:
@@ -323,7 +323,7 @@ class TrainLoopModelEndSave(TrainLoop):
             args (dict):
             val_result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage or None):
             test_result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage or None):
-            save_to_s3 (bool):
+            cloud_save_mode (str or None):
         """
         TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, batch_model_feed_def, optimizer, criterion)
         self.project_name = project_name
@@ -332,13 +332,14 @@ class TrainLoopModelEndSave(TrainLoop):
         self.args = args
         self.val_result_package = val_result_package
         self.test_result_package = test_result_package
-        self.save_to_s3 = save_to_s3
+        self.cloud_save_mode = cloud_save_mode
 
         self.check_if_result_packages_possible()
 
         self.callbacks_handler.register_callbacks([
             ModelTrainEndSaveCallback(self.project_name, self.experiment_name, self.local_model_result_folder_path,
-                                      self.args, self.val_result_package, self.test_result_package, save_to_s3=self.save_to_s3)
+                                      self.args, self.val_result_package, self.test_result_package, 
+                                      cloud_save_mode=self.cloud_save_mode)
         ])
 
     def check_if_result_packages_possible(self):
@@ -361,7 +362,7 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
                  batch_model_feed_def,
                  optimizer, criterion,
                  project_name, experiment_name, local_model_result_folder_path,
-                 args, val_result_package=None, test_result_package=None, save_to_s3=True):
+                 args, val_result_package=None, test_result_package=None, cloud_save_mode='s3'):
         """
 
         Args:
@@ -378,14 +379,14 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
             args (dict):
             val_result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage or None):
             test_result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage or None):
-            save_to_s3 (bool):
+            cloud_save_mode (str or None):
         """
         TrainLoopModelEndSave.__init__(self, model, train_loader, validation_loader, test_loader, batch_model_feed_def,
                                        optimizer, criterion,
                                        project_name, experiment_name, local_model_result_folder_path,
-                                       args, val_result_package, test_result_package, save_to_s3)
+                                       args, val_result_package, test_result_package, cloud_save_mode)
 
         self.callbacks_handler.register_callbacks([
             ModelCheckpointCallback(self.project_name, self.experiment_name, self.local_model_result_folder_path,
-                                    save_to_s3=self.save_to_s3)
+                                    cloud_save_mode=self.cloud_save_mode)
         ])

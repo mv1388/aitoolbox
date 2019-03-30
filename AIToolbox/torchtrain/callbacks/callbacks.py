@@ -1,6 +1,7 @@
 from AIToolbox.AWS.model_save import PyTorchS3ModelSaver
+from AIToolbox.GoogleCloud.model_save import PyTorchGoogleStorageModelSaver
 from AIToolbox.experiment_save.local_model_save import PyTorchLocalModelSaver
-from AIToolbox.experiment_save.experiment_saver import FullPyTorchExperimentS3Saver
+from AIToolbox.experiment_save.experiment_saver import FullPyTorchExperimentS3Saver, FullPyTorchExperimentGoogleStorageSaver
 from AIToolbox.experiment_save.local_experiment_saver import FullPyTorchExperimentLocalSaver
 from AIToolbox.experiment_save.training_history import TrainingHistory
 
@@ -121,23 +122,28 @@ class EarlyStoppingCallback(AbstractCallback):
 
 
 class ModelCheckpointCallback(AbstractCallback):
-    def __init__(self, project_name, experiment_name, local_model_result_folder_path, save_to_s3=True):
+    def __init__(self, project_name, experiment_name, local_model_result_folder_path, cloud_save_mode='s3'):
         """
 
         Args:
             project_name (str):
             experiment_name (str):
             local_model_result_folder_path (str):
-            save_to_s3 (bool):
+            cloud_save_mode (str or None):
         """
         AbstractCallback.__init__(self, 'Model checkpoint at end of epoch')
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = local_model_result_folder_path
-        self.save_to_s3 = save_to_s3
+        self.cloud_save_mode = cloud_save_mode
 
-        if self.save_to_s3:
+        if self.cloud_save_mode == 's3' or self.cloud_save_mode == 'aws_s3' or self.cloud_save_mode == 'aws':
             self.model_checkpointer = PyTorchS3ModelSaver(
+                local_model_result_folder_path=self.local_model_result_folder_path,
+                checkpoint_model=True
+            )
+        elif self.cloud_save_mode == 'gcs' or self.cloud_save_mode == 'google_storage' or self.cloud_save_mode == 'google storage':
+            self.model_checkpointer = PyTorchGoogleStorageModelSaver(
                 local_model_result_folder_path=self.local_model_result_folder_path,
                 checkpoint_model=True
             )
@@ -162,7 +168,7 @@ class ModelCheckpointCallback(AbstractCallback):
 
 class ModelTrainEndSaveCallback(AbstractCallback):
     def __init__(self, project_name, experiment_name, local_model_result_folder_path,
-                 args, val_result_package=None, test_result_package=None, save_to_s3=True):
+                 args, val_result_package=None, test_result_package=None, cloud_save_mode='s3'):
         """
 
         Args:
@@ -172,7 +178,7 @@ class ModelTrainEndSaveCallback(AbstractCallback):
             args (dict):
             val_result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
             test_result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
-            save_to_s3 (bool):
+            cloud_save_mode (str or None):
         """
         AbstractCallback.__init__(self, 'Model save at the end of training')
         self.project_name = project_name
@@ -182,13 +188,17 @@ class ModelTrainEndSaveCallback(AbstractCallback):
         self.val_result_package = val_result_package
         self.test_result_package = test_result_package
         self.result_package = None
-        self.save_to_s3 = save_to_s3
+        self.cloud_save_mode = cloud_save_mode
 
         self.check_result_packages()
 
-        if self.save_to_s3:
+        if self.cloud_save_mode == 's3' or self.cloud_save_mode == 'aws_s3' or self.cloud_save_mode == 'aws':
             self.results_saver = FullPyTorchExperimentS3Saver(self.project_name, self.experiment_name,
                                                               local_model_result_folder_path=self.local_model_result_folder_path)
+
+        elif self.cloud_save_mode == 'gcs' or self.cloud_save_mode == 'google_storage' or self.cloud_save_mode == 'google storage':
+            self.results_saver = FullPyTorchExperimentGoogleStorageSaver(self.project_name, self.experiment_name,
+                                                                         local_model_result_folder_path=self.local_model_result_folder_path)
         else:
             self.results_saver = FullPyTorchExperimentLocalSaver(self.project_name, self.experiment_name,
                                                                  local_model_result_folder_path=self.local_model_result_folder_path)

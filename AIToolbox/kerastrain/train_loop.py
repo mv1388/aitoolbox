@@ -198,7 +198,7 @@ class TrainLoopModelCheckpoint(TrainLoop):
     def __init__(self, model,
                  train_loader, validation_loader=None, test_loader=None,
                  optimizer=None, criterion=None, metrics=None,
-                 project_name=None, experiment_name=None, local_model_result_folder_path=None, save_to_s3=True):
+                 project_name=None, experiment_name=None, local_model_result_folder_path=None, cloud_save_mode='s3'):
         """
 
         Args:
@@ -212,17 +212,17 @@ class TrainLoopModelCheckpoint(TrainLoop):
             project_name:
             experiment_name:
             local_model_result_folder_path:
-            save_to_s3:
+            cloud_save_mode:
         """
         TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion, metrics)
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = local_model_result_folder_path
-        self.save_to_s3 = save_to_s3
+        self.cloud_save_mode = cloud_save_mode
 
         self.callbacks_handler.register_callbacks([
             ModelCheckpointCallback(self.project_name, self.experiment_name, self.local_model_result_folder_path,
-                                    save_to_s3=self.save_to_s3)
+                                    cloud_save_mode=self.cloud_save_mode)
         ])
 
 
@@ -231,7 +231,7 @@ class TrainLoopModelEndSave(TrainLoop):
                  train_loader, validation_loader=None, test_loader=None,
                  optimizer=None, criterion=None, metrics=None,
                  project_name=None, experiment_name=None, local_model_result_folder_path=None,
-                 args=None, result_package=None, save_to_s3=True):
+                 args=None, result_package=None, cloud_save_mode='s3'):
         """
 
         Args:
@@ -247,7 +247,7 @@ class TrainLoopModelEndSave(TrainLoop):
             local_model_result_folder_path:
             args:
             result_package:
-            save_to_s3:
+            cloud_save_mode:
         """
         TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion, metrics)
         self.project_name = project_name
@@ -255,11 +255,11 @@ class TrainLoopModelEndSave(TrainLoop):
         self.local_model_result_folder_path = local_model_result_folder_path
         self.args = args
         self.result_package = result_package
-        self.save_to_s3 = save_to_s3
+        self.cloud_save_mode = cloud_save_mode
 
         self.callbacks_handler.register_callbacks([
             ModelTrainEndSaveCallback(self.project_name, self.experiment_name, self.local_model_result_folder_path,
-                                      self.args, self.result_package, save_to_s3=self.save_to_s3)
+                                      self.args, self.result_package, cloud_save_mode=self.cloud_save_mode)
         ])
 
 
@@ -268,7 +268,7 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
                  train_loader, validation_loader=None, test_loader=None,
                  optimizer=None, criterion=None, metrics=None,
                  project_name=None, experiment_name=None, local_model_result_folder_path=None,
-                 args=None, result_package=None, save_to_s3=True):
+                 args=None, result_package=None, cloud_save_mode='s3'):
         """
 
         Args:
@@ -284,14 +284,14 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
             local_model_result_folder_path:
             args:
             result_package:
-            save_to_s3:
+            cloud_save_mode:
         """
         TrainLoopModelEndSave.__init__(self, model, train_loader, validation_loader, test_loader,
                                        optimizer, criterion, metrics,
                                        project_name, experiment_name, local_model_result_folder_path,
-                                       args, result_package, save_to_s3)
+                                       args, result_package, cloud_save_mode)
 
         self.callbacks_handler.register_callbacks([
             ModelCheckpointCallback(self.project_name, self.experiment_name, self.local_model_result_folder_path,
-                                    save_to_s3=self.save_to_s3)
+                                    cloud_save_mode=self.cloud_save_mode)
         ])
