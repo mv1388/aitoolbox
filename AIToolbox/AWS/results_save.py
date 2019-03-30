@@ -119,10 +119,10 @@ class S3ResultsSaver(AbstractResultsSaver, BaseResultsSaver):
                                                                                 save_true_pred_labels,
                                                                                 protect_existing_folder)
 
-        experiment_cloud_path = self.create_experiment_cloud_storage_folder_structure(project_name, experiment_name, experiment_timestamp)
+        experiment_s3_path = self.create_experiment_cloud_storage_folder_structure(project_name, experiment_name, experiment_timestamp)
 
         for results_file_name, results_file_local_path in saved_local_results_details:
-            results_file_cloud_path = os.path.join(experiment_cloud_path, results_file_name)
-            self.save_file(local_file_path=results_file_local_path, cloud_file_path=results_file_cloud_path)
+            results_file_s3_path = os.path.join(experiment_s3_path, results_file_name)
+            self.save_file(local_file_path=results_file_local_path, cloud_file_path=results_file_s3_path)
 
-        return results_file_cloud_path, experiment_timestamp
+        return results_file_s3_path, experiment_timestamp
