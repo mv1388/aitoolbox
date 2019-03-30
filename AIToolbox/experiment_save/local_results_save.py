@@ -23,12 +23,30 @@ class AbstractLocalResultsSaver(ABC):
         Returns:
             list: list of list with this format: [[results_file_name, results_file_local_path], ... [ , ]] 
                 Each file should be a new list specifying the file name and its full path
+                
+                The first file path should be pointing to the main experiment results file.
         """
         pass
 
     @abstractmethod
     def save_experiment_results_separate_files(self, result_package, project_name, experiment_name, experiment_timestamp,
                                                save_true_pred_labels=False, protect_existing_folder=True):
+        """
+        
+        Args:
+            result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
+            project_name (str):
+            experiment_name (str):
+            experiment_timestamp (str or None):
+            save_true_pred_labels (bool):
+            protect_existing_folder (bool):
+
+        Returns:
+            list: list of list with this format: [[results_file_name, results_file_local_path], ... [ , ]] 
+                Each file should be a new list specifying the file name and its full path
+                
+                The first file path should be pointing to the main experiment results file.
+        """
         pass
 
 
@@ -139,7 +157,9 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
 
         Returns:
             list: list of list with this format: [[results_file_name, results_file_local_path], ... [ , ]] 
-                Each file should be a new list specifying the file name and its full path
+                Each file should be a new list specifying the file name and its full path.
+                
+                The first file path should be pointing to the main experiment results file.
         """
         if experiment_timestamp is None:
             experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
@@ -192,7 +212,9 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
 
         Returns:
             list: list of list with this format: [[results_file_name, results_file_local_path], ... [ , ]] 
-                Each file should be a new list specifying the file name and its full path
+                Each file should be a new list specifying the file name and its full path.
+                
+                The first file path should be pointing to the main experiment results file.
         """
         experiment_results_local_path = self.create_experiment_local_folder_structure(project_name, experiment_name,
                                                                                       experiment_timestamp)
