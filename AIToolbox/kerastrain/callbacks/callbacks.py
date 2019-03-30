@@ -138,9 +138,15 @@ class ModelTrainEndSaveCallback(AbstractKerasCallback):
                                            save_true_pred_labels=True)
 
     def on_train_loop_registration(self):
-        self.result_package.set_experiment_dir_path_for_additional_results(self.project_name, self.experiment_name,
-                                                                           self.train_loop_obj.experiment_timestamp,
-                                                                           self.local_model_result_folder_path)
+        if self.val_result_package is not None:
+            self.val_result_package.set_experiment_dir_path_for_additional_results(self.project_name, self.experiment_name,
+                                                                                   self.train_loop_obj.experiment_timestamp,
+                                                                                   self.local_model_result_folder_path)
+        if self.test_result_package is not None:
+            self.test_result_package.set_experiment_dir_path_for_additional_results(self.project_name,
+                                                                                    self.experiment_name,
+                                                                                    self.train_loop_obj.experiment_timestamp,
+                                                                                    self.local_model_result_folder_path)
 
     def check_result_packages(self):
         if self.val_result_package is None and self.test_result_package is None:
