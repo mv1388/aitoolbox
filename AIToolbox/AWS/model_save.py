@@ -44,20 +44,20 @@ class BaseModelSaver:
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
         self.checkpoint_model = checkpoint_model
 
-    def save_file(self, local_file_path, s3_file_path):
+    def save_file(self, local_file_path, cloud_file_path):
         """
 
         Args:
             local_file_path (str):
-            s3_file_path (str):
+            cloud_file_path (str):
 
         Returns:
             None
         """
         self.s3_client.upload_file(os.path.expanduser(local_file_path),
-                                   self.bucket_name, s3_file_path)
+                                   self.bucket_name, cloud_file_path)
 
-    def create_experiment_S3_folder_structure(self, project_name, experiment_name, experiment_timestamp):
+    def create_experiment_cloud_storage_folder_structure(self, project_name, experiment_name, experiment_timestamp):
         """
 
         Args:
@@ -68,10 +68,10 @@ class BaseModelSaver:
         Returns:
             str:
         """
-        experiment_s3_path = os.path.join(project_name,
-                                          experiment_name + '_' + experiment_timestamp,
-                                          'model' if not self.checkpoint_model else 'checkpoint_model')
-        return experiment_s3_path
+        experiment_cloud_path = os.path.join(project_name,
+                                             experiment_name + '_' + experiment_timestamp,
+                                             'model' if not self.checkpoint_model else 'checkpoint_model')
+        return experiment_cloud_path
 
 
 class KerasS3ModelSaver(AbstractModelSaver, BaseModelSaver):
@@ -118,14 +118,14 @@ class KerasS3ModelSaver(AbstractModelSaver, BaseModelSaver):
 
         model_name, model_weights_name, model_local_path, model_weights_local_path = saved_local_model_details
 
-        experiment_s3_path = self.create_experiment_S3_folder_structure(project_name, experiment_name, experiment_timestamp)
-        model_s3_path = os.path.join(experiment_s3_path, model_name)
-        model_weights_s3_path = os.path.join(experiment_s3_path, model_weights_name)
+        experiment_cloud_path = self.create_experiment_cloud_storage_folder_structure(project_name, experiment_name, experiment_timestamp)
+        model_cloud_path = os.path.join(experiment_cloud_path, model_name)
+        model_weights_cloud_path = os.path.join(experiment_cloud_path, model_weights_name)
 
-        self.save_file(local_file_path=model_local_path, s3_file_path=model_s3_path)
-        self.save_file(local_file_path=model_weights_local_path, s3_file_path=model_weights_s3_path)
+        self.save_file(local_file_path=model_local_path, cloud_file_path=model_cloud_path)
+        self.save_file(local_file_path=model_weights_local_path, cloud_file_path=model_weights_cloud_path)
 
-        return model_s3_path, experiment_timestamp
+        return model_cloud_path, experiment_timestamp
 
 
 class TensorFlowS3ModelSaver(AbstractModelSaver, BaseModelSaver):
@@ -143,6 +143,7 @@ class TensorFlowS3ModelSaver(AbstractModelSaver, BaseModelSaver):
 
     def save_model(self, model, project_name, experiment_name, experiment_timestamp=None, epoch=None, protect_existing_folder=True):
         raise NotImplementedError
+        pass
 
 
 class PyTorchS3ModelSaver(AbstractModelSaver, BaseModelSaver):
@@ -189,11 +190,11 @@ class PyTorchS3ModelSaver(AbstractModelSaver, BaseModelSaver):
 
         model_name, model_weights_name, model_local_path, model_weights_local_path = saved_local_model_details
 
-        experiment_s3_path = self.create_experiment_S3_folder_structure(project_name, experiment_name, experiment_timestamp)
+        experiment_s3_path = self.create_experiment_cloud_storage_folder_structure(project_name, experiment_name, experiment_timestamp)
         model_s3_path = os.path.join(experiment_s3_path, model_name)
         model_weights_s3_path = os.path.join(experiment_s3_path, model_weights_name)
 
-        self.save_file(local_file_path=model_local_path, s3_file_path=model_s3_path)
-        self.save_file(local_file_path=model_weights_local_path, s3_file_path=model_weights_s3_path)
+        self.save_file(local_file_path=model_local_path, cloud_file_path=model_s3_path)
+        self.save_file(local_file_path=model_weights_local_path, cloud_file_path=model_weights_s3_path)
 
         return model_s3_path, experiment_timestamp
