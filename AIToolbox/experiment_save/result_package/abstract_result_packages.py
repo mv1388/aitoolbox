@@ -239,7 +239,7 @@ class AbstractResultPackage(ABC):
         """
 
         Args:
-            other (AIToolbox.experiment_save.abstract_result_package.AbstractResultPackage or dict):
+            other (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage or dict):
 
         Returns:
             AIToolbox.experiment_save.result_package.MultipleResultPackageWrapper:
@@ -250,7 +250,7 @@ class AbstractResultPackage(ABC):
         """
 
         Args:
-            other (AIToolbox.experiment_save.abstract_result_package.AbstractResultPackage or dict):
+            other (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage or dict):
 
         Returns:
             AIToolbox.experiment_save.result_package.MultipleResultPackageWrapper:
@@ -261,18 +261,18 @@ class AbstractResultPackage(ABC):
         """
 
         Args:
-            other_object (AIToolbox.experiment_save.abstract_result_package.AbstractResultPackage or dict):
+            other_object (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage or dict):
 
         Returns:
-            AIToolbox.experiment_save.result_package.MultipleResultPackageWrapper:
+            AIToolbox.experiment_save.result_package.abstract_result_packages.MultipleResultPackageWrapper:
         """
         self.warn_if_results_dict_not_defined()
         other_object_pkg = self.create_other_object_pkg(other_object)
 
         self_object_copy = copy.deepcopy(self)
 
-        multi_result_pkg = MultipleResultPackageWrapper([self_object_copy, other_object_pkg])
-        multi_result_pkg.prepare_result_package(self_object_copy.y_true, self_object_copy.y_predicted,
+        multi_result_pkg = MultipleResultPackageWrapper()
+        multi_result_pkg.prepare_result_package([self_object_copy, other_object_pkg],
                                                 self_object_copy.hyperparameters, self_object_copy.training_history)
 
         return multi_result_pkg
@@ -282,10 +282,10 @@ class AbstractResultPackage(ABC):
         """
 
         Args:
-            other_object (AIToolbox.experiment_save.abstract_result_package.AbstractResultPackage or dict):
+            other_object (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage or dict):
 
         Returns:
-            AIToolbox.experiment_save.result_package.AbstractResultPackage:
+            AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage | AIToolbox.experiment_save.result_package.abstract_result_packages.MultipleResultPackageWrapper:
         """
         if isinstance(other_object, AbstractResultPackage):
             other_object.warn_if_results_dict_not_defined()
@@ -294,7 +294,8 @@ class AbstractResultPackage(ABC):
             other_object_copy = copy.deepcopy(other_object)
             other_object_pkg = PreCalculatedResultPackage(other_object_copy)
         else:
-            raise ValueError(f'Addition supported on the AbstractResultPackage objects and dicts. Given {type(other_object)}')
+            raise ValueError(f'Addition supported on the AbstractResultPackage objects and dicts. '
+                             f'Given {type(other_object)}')
 
         return other_object_pkg
 
@@ -302,10 +303,10 @@ class AbstractResultPackage(ABC):
         """
 
         Args:
-            other (AIToolbox.experiment_save.abstract_result_package.AbstractResultPackage or dict):
+            other (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage or dict):
 
         Returns:
-            AIToolbox.experiment_save.result_package.AbstractResultPackage:
+            AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage:
         """
         return self.add_merge_dicts(other)
 
@@ -313,10 +314,10 @@ class AbstractResultPackage(ABC):
         """
 
         Args:
-            other (AIToolbox.experiment_save.abstract_result_package.AbstractResultPackage or dict):
+            other (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage or dict):
 
         Returns:
-            AIToolbox.experiment_save.result_package.AbstractResultPackage:
+            AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage:
         """
         self.warn_if_results_dict_not_defined()
 
@@ -335,7 +336,7 @@ class AbstractResultPackage(ABC):
             other_results_dict (dict):
 
         Returns:
-            AIToolbox.experiment_save.abstract_result_package.AbstractResultPackage:
+            AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage:
         """
         def results_duplicated(self_results_dict, other_results_dict_dup):
             for result_name in other_results_dict_dup:
@@ -391,20 +392,46 @@ class PreCalculatedResultPackage(AbstractResultPackage):
 
 
 class MultipleResultPackageWrapper(AbstractResultPackage):
-    def __init__(self, result_packages, strict_content_check=False, **kwargs):
+    def __init__(self, strict_content_check=False, **kwargs):
         """
 
         Args:
-            result_packages (list):
             strict_content_check (bool):
             **kwargs (dict):
         """
         AbstractResultPackage.__init__(self, pkg_name='MultipleResultWrapper',
                                        strict_content_check=strict_content_check, **kwargs)
+        self.result_packages = None
+
+    def prepare_result_package(self, result_packages, hyperparameters=None, training_history=None, **kwargs):
+        """
+
+        Args:
+            result_packages (list): list of result packages where each of them is object inherited from
+                AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage.
+                If you want to add raw results in dict form, this dict first needs to be wrapped into
+                AIToolbox.experiment_save.result_package.abstract_result_packages.PreCalculatedResultPackage to satisfy
+                the result package object requirement.
+            hyperparameters (dict or None):
+            training_history (AIToolbox.ExperimentSave.training_history.TrainingHistory):
+            **kwargs:
+
+        Returns:
+
+        """
+        self.results_dict = None
         self.result_packages = result_packages
+        self.hyperparameters = hyperparameters
+        self.training_history = training_history
+        self.additional_results = kwargs
+
+        self.prepare_results_dict()
 
     def prepare_results_dict(self):
         self.results_dict = {}
+        self.y_true = {}
+        self.y_predicted = {}
+        self.additional_results = {self.pkg_name: self.additional_results} if self.additional_results != {} else {}
 
         for i, result_pkg in enumerate(self.result_packages):
             if result_pkg.pkg_name is not None:
@@ -414,6 +441,32 @@ class MultipleResultPackageWrapper(AbstractResultPackage):
                 package_name = f'ResultPackage{i}'
 
             self.results_dict[package_name] = result_pkg.get_results()
+            self.y_true[package_name] = result_pkg.y_true
+            self.y_predicted[package_name] = result_pkg.y_predicted
+            self.additional_results[package_name] = result_pkg.additional_results
+
+    def get_additional_results_dump_paths(self):
+        """
+
+        Returns:
+            list or None: list of lists of string paths if it is not None.
+                Each element of the list should be list of: [[results_file_name, results_file_local_path], ... [,]]
+        """
+        self.additional_results_dump_paths = self.list_additional_results_dump_paths()
+
+        sub_packages_paths = []
+        for pkg in self.result_packages:
+            pkg_additional_paths = pkg.get_additional_results_dump_paths()
+            if pkg_additional_paths is not None:
+                sub_packages_paths += pkg_additional_paths
+
+        if self.additional_results_dump_paths is None and len(sub_packages_paths) > 0:
+            self.additional_results_dump_paths = sub_packages_paths
+        elif self.additional_results_dump_paths is not None and len(sub_packages_paths) > 0:
+            self.additional_results_dump_paths += sub_packages_paths
+
+        self.qa_check_additional_results_dump_paths()
+        return self.additional_results_dump_paths
 
     def __str__(self):
         return '\n'.join([f'--> {pkg.pkg_name}:\n{str(pkg)}' for pkg in self.result_packages])
@@ -432,11 +485,12 @@ class MultipleResultPackageWrapper(AbstractResultPackage):
         """
         self.warn_if_results_dict_not_defined()
         other_object_pkg = self.create_other_object_pkg(other_object)
-
         self_multi_result_pkg = copy.deepcopy(self)
 
-        self_multi_result_pkg.result_packages.append(other_object_pkg)
-        self_multi_result_pkg.prepare_result_package(self_multi_result_pkg.y_true, self_multi_result_pkg.y_predicted,
+        other_object_pkg_list = [other_object_pkg] if type(other_object_pkg) is not MultipleResultPackageWrapper \
+            else other_object_pkg.result_packages
+
+        self_multi_result_pkg.prepare_result_package(self_multi_result_pkg.result_packages + other_object_pkg_list,
                                                      self_multi_result_pkg.hyperparameters,
                                                      self_multi_result_pkg.training_history,
                                                      **self_multi_result_pkg.package_metadata)
@@ -446,7 +500,7 @@ class MultipleResultPackageWrapper(AbstractResultPackage):
         """
 
         Args:
-            other (AIToolbox.experiment_save.abstract_result_package.AbstractResultPackage or dict):
+            other (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage or dict):
 
         Returns:
             AIToolbox.experiment_save.result_package.abstract_result_packages.MultipleResultPackageWrapper:
@@ -454,7 +508,9 @@ class MultipleResultPackageWrapper(AbstractResultPackage):
         self.warn_if_results_dict_not_defined()
         other_object_pkg = self.create_other_object_pkg(other)
 
-        self.result_packages.append(other_object_pkg)
-        self.prepare_result_package(self.y_true, self.y_predicted,
+        other_object_pkg_list = [other_object_pkg] if type(other_object_pkg) is not MultipleResultPackageWrapper \
+            else other_object_pkg.result_packages
+
+        self.prepare_result_package(self.result_packages + other_object_pkg_list,
                                     self.hyperparameters, self.training_history, **self.package_metadata)
         return self

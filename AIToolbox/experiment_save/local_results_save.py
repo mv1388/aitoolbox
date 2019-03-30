@@ -160,7 +160,7 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
                                        'training_history': training_history}
 
         if save_true_pred_labels:
-            exp_results_hyperparam_dict = {'y_true': result_package.y_true.tolist(), 'y_predicted': result_package.y_predicted.tolist(),
+            exp_results_hyperparam_dict = {'y_true': result_package.y_true, 'y_predicted': result_package.y_predicted,
                                            **exp_results_hyperparam_dict}
 
         results_file_name_w_type = f'results_hyperParams_hist_{experiment_name}_{experiment_timestamp}'
@@ -238,7 +238,7 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
                                [train_hist_file_name, train_hist_file_local_path]]
 
         if save_true_pred_labels:
-            experiment_true_pred_labels_dict = {'y_true': result_package.y_true.tolist(), 'y_predicted': result_package.y_predicted.tolist()}
+            experiment_true_pred_labels_dict = {'y_true': result_package.y_true, 'y_predicted': result_package.y_predicted}
 
             labels_file_name_w_type = f'true_pred_labels_{experiment_name}_{experiment_timestamp}'
             labels_file_local_path_w_type = os.path.join(experiment_results_local_path, labels_file_name_w_type)
