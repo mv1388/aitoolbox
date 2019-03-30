@@ -116,16 +116,6 @@ class ModelTrainEndSaveCallback(AbstractKerasCallback):
         epoch_list = self.train_loop_obj.train_history.epoch
         train_hist_pkg = TrainingHistory(train_history, epoch_list)
 
-        # y_test, y_pred, additional_results = self.train_loop_obj.predict_on_validation_set()
-        #
-        # self.result_package.prepare_result_package(y_test, y_pred,
-        #                                            hyperparameters=self.args, training_history=train_hist_pkg,
-        #                                            additional_results=additional_results)
-        #
-        # self.results_saver.save_experiment(self.train_loop_obj.model, self.result_package,
-        #                                    experiment_timestamp=self.train_loop_obj.experiment_timestamp,
-        #                                    save_true_pred_labels=True)
-
         if self.val_result_package is not None:
             y_test, y_pred, additional_results = self.train_loop_obj.predict_on_validation_set()
             self.val_result_package.pkg_name += '_VAL'
