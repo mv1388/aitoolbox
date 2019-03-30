@@ -426,7 +426,7 @@ class MultipleResultPackageWrapper(AbstractResultPackage):
         self.results_dict = {}
         self.y_true = {}
         self.y_predicted = {}
-        self.additional_results = {self.pkg_name: self.additional_results}
+        self.additional_results = {self.pkg_name: self.additional_results} if self.additional_results != {} else {}
 
         for i, result_pkg in enumerate(self.result_packages):
             if result_pkg.pkg_name is not None:
@@ -436,6 +436,32 @@ class MultipleResultPackageWrapper(AbstractResultPackage):
                 package_name = f'ResultPackage{i}'
 
             self.results_dict[package_name] = result_pkg.get_results()
+            self.y_true[package_name] = result_pkg.y_true
+            self.y_predicted[package_name] = result_pkg.y_predicted
+            self.additional_results[package_name] = result_pkg.additional_results
+
+    def get_additional_results_dump_paths(self):
+        """
+
+        Returns:
+            list or None: list of lists of string paths if it is not None.
+                Each element of the list should be list of: [[results_file_name, results_file_local_path], ... [,]]
+        """
+        self.additional_results_dump_paths = self.list_additional_results_dump_paths()
+
+        sub_packages_paths = []
+        for pkg in self.result_packages:
+            pkg_additional_paths = pkg.get_additional_results_dump_paths()
+            if pkg_additional_paths is not None:
+                sub_packages_paths += pkg_additional_paths
+
+        if self.additional_results_dump_paths is None and len(sub_packages_paths) > 0:
+            self.additional_results_dump_paths = sub_packages_paths
+        elif self.additional_results_dump_paths is not None and len(sub_packages_paths) > 0:
+            self.additional_results_dump_paths += sub_packages_paths
+
+        self.qa_check_additional_results_dump_paths()
+        return self.additional_results_dump_paths
 
     def __str__(self):
         return '\n'.join([f'--> {pkg.pkg_name}:\n{str(pkg)}' for pkg in self.result_packages])
@@ -454,11 +480,12 @@ class MultipleResultPackageWrapper(AbstractResultPackage):
         """
         self.warn_if_results_dict_not_defined()
         other_object_pkg = self.create_other_object_pkg(other_object)
-
         self_multi_result_pkg = copy.deepcopy(self)
 
-        self_multi_result_pkg.result_packages.append(other_object_pkg)
-        self_multi_result_pkg.prepare_result_package(self_multi_result_pkg.y_true, self_multi_result_pkg.y_predicted,
+        other_object_pkg_list = [other_object_pkg] if type(other_object_pkg) is not MultipleResultPackageWrapper \
+            else other_object_pkg.result_packages
+
+        self_multi_result_pkg.prepare_result_package(self_multi_result_pkg.result_packages + other_object_pkg_list,
                                                      self_multi_result_pkg.hyperparameters,
                                                      self_multi_result_pkg.training_history,
                                                      **self_multi_result_pkg.package_metadata)
@@ -476,7 +503,9 @@ class MultipleResultPackageWrapper(AbstractResultPackage):
         self.warn_if_results_dict_not_defined()
         other_object_pkg = self.create_other_object_pkg(other)
 
-        self.result_packages.append(other_object_pkg)
-        self.prepare_result_package(self.y_true, self.y_predicted,
+        other_object_pkg_list = [other_object_pkg] if type(other_object_pkg) is not MultipleResultPackageWrapper \
+            else other_object_pkg.result_packages
+
+        self.prepare_result_package(self.result_packages + other_object_pkg_list,
                                     self.hyperparameters, self.training_history, **self.package_metadata)
         return self

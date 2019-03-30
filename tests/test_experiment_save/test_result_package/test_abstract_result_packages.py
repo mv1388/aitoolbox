@@ -143,8 +143,8 @@ class TestAbstractBaseMetric(unittest.TestCase):
         self.assertEqual(combo_pkg_1_2.results_dict, {pkg_1.pkg_name: result_d_1, f'{pkg_2.pkg_name}1': result_d_2})
 
         self.assertEqual(combo_pkg_1_2.training_history.get_train_history(), train_hist_1.get_train_history())
-        self.assertEqual(combo_pkg_1_2.y_true.tolist(), [10] * 100)
-        self.assertEqual(combo_pkg_1_2.y_predicted.tolist(), [11] * 100)
+        self.assertEqual(combo_pkg_1_2.y_true['DummyPackage1'].tolist(), [10] * 100)
+        self.assertEqual(combo_pkg_1_2.y_predicted['DummyPackage1'].tolist(), [11] * 100)
         self.assertEqual(combo_pkg_1_2.hyperparameters, {'dddd': 222})
 
     def test_combine_package_w_dict(self):
@@ -351,8 +351,8 @@ class TestMultipleResultPackageWrapper(unittest.TestCase):
         pkg_2 = DummyResultPackageExtendVariable(result_d_2)
         pkg_2.prepare_result_package([10] * 100, [11] * 100, {'qqq': 445}, self.build_train_hist())
 
-        multi_result = MultipleResultPackageWrapper([pkg_1, pkg_2])
-        multi_result.prepare_results_dict()
+        multi_result = MultipleResultPackageWrapper()
+        multi_result.prepare_result_package([pkg_1, pkg_2])
 
         self.assertEqual(str(multi_result),
                          f"--> {pkg_1.pkg_name}:\nmetric1: {result_d_1['metric1']}\nmetric2: {result_d_1['metric2']}\n"
@@ -381,8 +381,8 @@ class TestMultipleResultPackageWrapper(unittest.TestCase):
         pkg_4.pkg_name = 'NEWPackageName'
         pkg_4.prepare_result_package([10] * 100, [11] * 100, {'dddd': 222}, train_hist_4)
 
-        multi_result = MultipleResultPackageWrapper([pkg_1, pkg_2])
-        multi_result.prepare_results_dict()
+        multi_result = MultipleResultPackageWrapper()
+        multi_result.prepare_result_package([pkg_1, pkg_2])
 
         concat_package = multi_result + pkg_3
         self.assertEqual(concat_package.get_results(), {pkg_1.pkg_name: result_d_1, f'{pkg_2.pkg_name}1': result_d_2,
@@ -422,8 +422,8 @@ class TestMultipleResultPackageWrapper(unittest.TestCase):
         pkg_4.pkg_name = 'NEWPackageName'
         pkg_4.prepare_result_package([10] * 100, [11] * 100, {'dddd': 222}, train_hist_4)
 
-        multi_result = MultipleResultPackageWrapper([pkg_1, pkg_2])
-        multi_result.prepare_results_dict()
+        multi_result = MultipleResultPackageWrapper()
+        multi_result.prepare_result_package([pkg_1, pkg_2])
 
         multi_result += pkg_3
 
@@ -445,8 +445,8 @@ class TestMultipleResultPackageWrapper(unittest.TestCase):
 
         pkg_dict_3 = {'metric1NEW': 33232, 'metric2NEW': 1000}
 
-        multi_result = MultipleResultPackageWrapper([pkg_1, pkg_2])
-        multi_result.prepare_results_dict()
+        multi_result = MultipleResultPackageWrapper()
+        multi_result.prepare_result_package([pkg_1, pkg_2])
 
         concat_package = multi_result + pkg_dict_3
         self.assertEqual(concat_package.get_results(), {pkg_1.pkg_name: result_d_1, f'{pkg_2.pkg_name}1': result_d_2,
@@ -469,8 +469,8 @@ class TestMultipleResultPackageWrapper(unittest.TestCase):
 
         pkg_dict_3 = {'metric1NEW': 33232, 'metric2NEW': 1000}
 
-        multi_result = MultipleResultPackageWrapper([pkg_1, pkg_2])
-        multi_result.prepare_results_dict()
+        multi_result = MultipleResultPackageWrapper()
+        multi_result.prepare_result_package([pkg_1, pkg_2])
 
         multi_result += pkg_dict_3
         self.assertEqual(multi_result.get_results(), {pkg_1.pkg_name: result_d_1, f'{pkg_2.pkg_name}1': result_d_2,
