@@ -98,7 +98,7 @@ class FullKerasExperimentS3Saver(BaseFullExperimentS3Saver):
                                               local_model_result_folder_path=local_model_result_folder_path)
 
         BaseFullExperimentS3Saver.__init__(self, keras_model_saver, project_name, experiment_name,
-                                           bucket_name='model-result',
+                                           bucket_name=bucket_name,
                                            local_model_result_folder_path=local_model_result_folder_path)
 
 
@@ -117,7 +117,7 @@ class FullPyTorchExperimentS3Saver(BaseFullExperimentS3Saver):
                                                   local_model_result_folder_path=local_model_result_folder_path)
 
         BaseFullExperimentS3Saver.__init__(self, pytorch_model_saver, project_name, experiment_name,
-                                           bucket_name='model-result',
+                                           bucket_name=bucket_name,
                                            local_model_result_folder_path=local_model_result_folder_path)
 
 
@@ -156,7 +156,7 @@ class FullKerasExperimentGoogleStorageSaver(BaseFullExperimentGoogleStorageSaver
                                                          local_model_result_folder_path=local_model_result_folder_path)
 
         BaseFullExperimentGoogleStorageSaver.__init__(self, keras_model_saver, project_name, experiment_name,
-                                                      bucket_name='model-result',
+                                                      bucket_name=bucket_name,
                                                       local_model_result_folder_path=local_model_result_folder_path)
 
 
@@ -175,5 +175,5 @@ class FullPyTorchExperimentGoogleStorageSaver(BaseFullExperimentGoogleStorageSav
                                                              local_model_result_folder_path=local_model_result_folder_path)
 
         BaseFullExperimentGoogleStorageSaver.__init__(self, pytorch_model_saver, project_name, experiment_name,
-                                                      bucket_name='model-result',
+                                                      bucket_name=bucket_name,
                                                       local_model_result_folder_path=local_model_result_folder_path)
