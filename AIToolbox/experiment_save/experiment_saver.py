@@ -2,9 +2,10 @@ from abc import ABC, abstractmethod
 import time
 import datetime
 
-from AIToolbox.AWS.model_save import KerasS3ModelSaver, PyTorchS3ModelSaver
+from AIToolbox.AWS.model_save import KerasS3ModelSaver, TensorFlowS3ModelSaver, PyTorchS3ModelSaver
 from AIToolbox.AWS.results_save import S3ResultsSaver
-from AIToolbox.GoogleCloud.model_save import KerasGoogleStorageModelSaver, PyTorchGoogleStorageModelSaver
+from AIToolbox.GoogleCloud.model_save import KerasGoogleStorageModelSaver, TensorFlowGoogleStorageModelSaver, \
+    PyTorchGoogleStorageModelSaver
 from AIToolbox.GoogleCloud.results_save import GoogleStorageResultsSaver
 
 
@@ -115,6 +116,27 @@ class FullKerasExperimentS3Saver(BaseFullExperimentS3Saver):
         BaseFullExperimentS3Saver.__init__(self, keras_model_saver, project_name, experiment_name,
                                            bucket_name=bucket_name,
                                            local_model_result_folder_path=local_model_result_folder_path)
+        
+        
+class FullTensorFlowExperimentS3Saver(BaseFullExperimentS3Saver):
+    def __init__(self, project_name, experiment_name,
+                 bucket_name='model-result', local_model_result_folder_path='~/project/model_result'):
+        """
+
+        Args:
+            project_name (str):
+            experiment_name (str):
+            bucket_name (str):
+            local_model_result_folder_path (str):
+        """
+        tf_model_saver = TensorFlowS3ModelSaver(bucket_name=bucket_name,
+                                                local_model_result_folder_path=local_model_result_folder_path)
+
+        BaseFullExperimentS3Saver.__init__(self, tf_model_saver, project_name, experiment_name,
+                                           bucket_name=bucket_name,
+                                           local_model_result_folder_path=local_model_result_folder_path)
+        
+        raise NotImplementedError
 
 
 class FullPyTorchExperimentS3Saver(BaseFullExperimentS3Saver):
@@ -171,6 +193,27 @@ class FullKerasExperimentGoogleStorageSaver(BaseFullExperimentGoogleStorageSaver
         BaseFullExperimentGoogleStorageSaver.__init__(self, keras_model_saver, project_name, experiment_name,
                                                       bucket_name=bucket_name,
                                                       local_model_result_folder_path=local_model_result_folder_path)
+
+
+class FullTensorFlowExperimentGoogleStorageSaver(BaseFullExperimentGoogleStorageSaver):
+    def __init__(self, project_name, experiment_name,
+                 bucket_name='model-result', local_model_result_folder_path='~/project/model_result'):
+        """
+
+        Args:
+            project_name (str):
+            experiment_name (str):
+            bucket_name (str):
+            local_model_result_folder_path (str):
+        """
+        tf_model_saver = TensorFlowGoogleStorageModelSaver(bucket_name=bucket_name,
+                                                           local_model_result_folder_path=local_model_result_folder_path)
+
+        BaseFullExperimentGoogleStorageSaver.__init__(self, tf_model_saver, project_name, experiment_name,
+                                                      bucket_name=bucket_name,
+                                                      local_model_result_folder_path=local_model_result_folder_path)
+        
+        raise NotImplementedError
 
 
 class FullPyTorchExperimentGoogleStorageSaver(BaseFullExperimentGoogleStorageSaver):
