@@ -122,6 +122,8 @@ class TensorFlowLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
         """
         BaseLocalModelSaver.__init__(self, local_model_result_folder_path, checkpoint_model)
 
+        raise NotImplementedError
+
     def save_model(self, model, project_name, experiment_name, experiment_timestamp=None, epoch=None, protect_existing_folder=True):
         raise NotImplementedError
 
