@@ -143,6 +143,8 @@ class TensorFlowS3ModelSaver(AbstractModelSaver, BaseModelSaver):
         BaseModelSaver.__init__(self, bucket_name, local_model_result_folder_path, checkpoint_model)
         self.tf_local_saver = TensorFlowLocalModelSaver(local_model_result_folder_path, checkpoint_model)
 
+        raise NotImplementedError
+
     def save_model(self, model, project_name, experiment_name, experiment_timestamp=None, epoch=None, protect_existing_folder=True):
         raise NotImplementedError
         pass
