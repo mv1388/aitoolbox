@@ -46,24 +46,26 @@ class TrainLoop:
         self.callbacks = []
         self.early_stop = False
 
-    def __call__(self, num_epoch, callbacks=None):
+    def __call__(self, num_epoch, callbacks=None, grad_clip=None):
         """
 
         Args:
             num_epoch (int):
             callbacks (list):
+            grad_clip (int or float):
 
         Returns:
 
         """
-        return self.do_train(num_epoch, callbacks)
+        return self.do_train(num_epoch, callbacks, grad_clip)
 
-    def do_train(self, num_epoch, callbacks=None):
+    def do_train(self, num_epoch, callbacks=None, grad_clip=None):
         """
 
         Args:
             num_epoch (int):
             callbacks (list):
+            grad_clip (int or float):
 
         Returns:
 
@@ -90,6 +92,8 @@ class TrainLoop:
 
                 self.optimizer.zero_grad()
                 loss_batch.backward()
+                if grad_clip is not None:
+                    torch.nn.utils.clip_grad_norm_(self.model.parameters(), grad_clip)
                 self.optimizer.step()
 
                 self.callbacks_handler.execute_batch_end()
@@ -167,7 +171,7 @@ class TrainLoop:
 
         with torch.no_grad():
             for batch_data in tqdm(data_loader):
-                loss_batch = self.batch_model_feed_def.get_loss(self.model, batch_data, self.criterion, self.device)
+                loss_batch = self.batch_model_feed_def.get_loss_eval(self.model, batch_data, self.criterion, self.device)
 
                 loss_avg.append(loss_batch.item())
 
