@@ -1,5 +1,5 @@
 import unittest
-from AIToolbox.NLP.evaluation.NLP_metrics import *
+from AIToolbox.NLP.experiment_evaluation.NLP_metrics import *
 
 
 class TestROGUENonOfficialMetric(unittest.TestCase):
