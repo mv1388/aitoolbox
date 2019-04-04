@@ -1,10 +1,9 @@
 import os
 
-from AIToolbox.experiment_save.local_results_save import BaseLocalResultsSaver
+from AIToolbox.experiment_save.local_save.local_results_save import BaseLocalResultsSaver
 from AIToolbox.experiment_save.result_package.abstract_result_packages import AbstractResultPackage
 from AIToolbox.experiment_save.core_metrics.classification import AccuracyMetric
-from AIToolbox.NLP.evaluation.NLP_metrics import ROUGEMetric, ROUGEPerlMetric, BLEUCorpusScoreMetric, PerplexityMetric
-from AIToolbox.NLP.evaluation.attention_heatmap import AttentionHeatMap
+from AIToolbox.NLP.evaluation.NLP_metrics import ROUGEMetric, ROUGEPerlMetric
 
 
 class QuestionAnswerResultPackage(AbstractResultPackage):

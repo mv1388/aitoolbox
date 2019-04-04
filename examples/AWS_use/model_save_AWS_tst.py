@@ -1,23 +1,17 @@
 from keras import backend as K
 # from keras.engine.topology import Layer, InputSpec
-from keras.activations import softmax
-from keras.layers.embeddings import Embedding
 from keras import layers
-from keras.layers import recurrent, Bidirectional, Lambda, Multiply, Add
+from keras.layers import recurrent, Lambda, Multiply, Add
 from keras.models import Model
 from keras.regularizers import L1L2
-
-import tensorflow as tf
 
 from sklearn.datasets import make_classification
 import random
 
-from AIToolbox.AWS.model_save import KerasS3ModelSaver
-from AIToolbox.AWS.results_save import S3ResultsSaver
+from AIToolbox.cloud.AWS.model_save import KerasS3ModelSaver
+from AIToolbox.cloud.AWS.results_save import S3ResultsSaver
 from AIToolbox.experiment_save.result_package.basic_packages import ClassificationResultPackage
 from AIToolbox.experiment_save.training_history import TrainingHistory
-
-import numpy as np
 
 
 class RepeatVector4D(layers.Layer):

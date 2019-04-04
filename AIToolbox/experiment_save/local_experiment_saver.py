@@ -2,8 +2,8 @@ import datetime
 import time
 
 from AIToolbox.experiment_save.experiment_saver import AbstractExperimentSaver
-from AIToolbox.experiment_save.local_model_save import PyTorchLocalModelSaver, KerasLocalModelSaver, AbstractLocalModelSaver
-from AIToolbox.experiment_save.local_results_save import LocalResultsSaver
+from AIToolbox.experiment_save.local_save.local_model_save import PyTorchLocalModelSaver, KerasLocalModelSaver, AbstractLocalModelSaver
+from AIToolbox.experiment_save.local_save.local_results_save import LocalResultsSaver
 
 
 class BaseFullExperimentLocalSaver(AbstractExperimentSaver):
@@ -11,7 +11,7 @@ class BaseFullExperimentLocalSaver(AbstractExperimentSaver):
         """
 
         Args:
-            model_saver (AIToolbox.experiment_save.local_model_save.AbstractLocalModelSaver)
+            model_saver (AIToolbox.experiment_save.local_save.local_model_save.AbstractLocalModelSaver)
             project_name (str):
             experiment_name (str):
             local_model_result_folder_path (str):
@@ -33,7 +33,7 @@ class BaseFullExperimentLocalSaver(AbstractExperimentSaver):
 
         Args:
             model (torch.nn.modules.Module):
-            result_package (AIToolbox.ExperimentSave.result_package.AbstractResultPackage):
+            result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
             experiment_timestamp (str):
             save_true_pred_labels (bool):
             separate_files (bool):

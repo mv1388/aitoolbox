@@ -1,8 +1,8 @@
 from keras.callbacks import Callback
 
-from AIToolbox.AWS.model_save import KerasS3ModelSaver
-from AIToolbox.GoogleCloud.model_save import KerasGoogleStorageModelSaver
-from AIToolbox.experiment_save.local_model_save import KerasLocalModelSaver
+from AIToolbox.cloud.AWS.model_save import KerasS3ModelSaver
+from AIToolbox.cloud.GoogleCloud.model_save import KerasGoogleStorageModelSaver
+from AIToolbox.experiment_save.local_save.local_model_save import KerasLocalModelSaver
 from AIToolbox.experiment_save.experiment_saver import FullKerasExperimentS3Saver, FullKerasExperimentGoogleStorageSaver
 from AIToolbox.experiment_save.local_experiment_saver import FullKerasExperimentLocalSaver
 from AIToolbox.experiment_save.training_history import TrainingHistory

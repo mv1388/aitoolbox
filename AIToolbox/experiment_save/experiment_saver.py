@@ -2,11 +2,11 @@ from abc import ABC, abstractmethod
 import time
 import datetime
 
-from AIToolbox.AWS.model_save import KerasS3ModelSaver, TensorFlowS3ModelSaver, PyTorchS3ModelSaver
-from AIToolbox.AWS.results_save import S3ResultsSaver
-from AIToolbox.GoogleCloud.model_save import KerasGoogleStorageModelSaver, TensorFlowGoogleStorageModelSaver, \
+from AIToolbox.cloud.AWS.model_save import KerasS3ModelSaver, TensorFlowS3ModelSaver, PyTorchS3ModelSaver
+from AIToolbox.cloud.AWS.results_save import S3ResultsSaver
+from AIToolbox.cloud.GoogleCloud.model_save import KerasGoogleStorageModelSaver, TensorFlowGoogleStorageModelSaver, \
     PyTorchGoogleStorageModelSaver
-from AIToolbox.GoogleCloud.results_save import GoogleStorageResultsSaver
+from AIToolbox.cloud.GoogleCloud.results_save import GoogleStorageResultsSaver
 
 
 class AbstractExperimentSaver(ABC):
@@ -35,8 +35,8 @@ class BaseFullExperimentSaver(AbstractExperimentSaver):
         """
 
         Args:
-            model_saver (AIToolbox.AWS.model_save.AbstractModelSaver):
-            results_saver (AIToolbox.AWS.results_save.AbstractResultsSaver):
+            model_saver (AIToolbox.cloud.AWS.model_save.AbstractModelSaver):
+            results_saver (AIToolbox.cloud.AWS.results_save.AbstractResultsSaver):
             project_name (str):
             experiment_name (str):
         """
@@ -164,7 +164,7 @@ class BaseFullExperimentGoogleStorageSaver(BaseFullExperimentSaver):
         """
 
         Args:
-            model_saver (AIToolbox.AWS.model_save.AbstractModelSaver):
+            model_saver (AIToolbox.cloud.AWS.model_save.AbstractModelSaver):
             project_name (str):
             experiment_name (str):
             bucket_name (str):
