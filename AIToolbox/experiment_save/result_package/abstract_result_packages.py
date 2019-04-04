@@ -285,7 +285,7 @@ class AbstractResultPackage(ABC):
             other_object (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage or dict):
 
         Returns:
-            AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage | AIToolbox.experiment_save.result_package.abstract_result_packages.MultipleResultPackageWrapper:
+            AbstractResultPackage | MultipleResultPackageWrapper:
         """
         if isinstance(other_object, AbstractResultPackage):
             other_object.warn_if_results_dict_not_defined()
