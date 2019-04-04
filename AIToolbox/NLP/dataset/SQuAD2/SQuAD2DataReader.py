@@ -6,7 +6,7 @@ from tqdm import tqdm
 from allennlp.data.tokenizers import WordTokenizer
 from allennlp.data.dataset_readers.reading_comprehension import util
 
-from AIToolbox.AWS.data_access import SQuAD2DatasetFetcher
+from AIToolbox.cloud.AWS.data_access import SQuAD2DatasetFetcher
 from AIToolbox.NLP.core.vocabulary import Vocabulary
 
 """

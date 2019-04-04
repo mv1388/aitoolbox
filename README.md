@@ -23,9 +23,15 @@ Definition of the model evaluation procedure on the task we are experimenting wi
 Saves the model architecture as well as model performance evaluation results and training history. This can be done at the end of each epoch as a model checkpointing or at the end of training.
 
 
-## AWS 
+## cloud
+
+### AWS 
 
 Functionality for saving model architecture and weights to S3 either during training or at the training end. At the same time the code here can be also used to store model performance reports to S3 in the similar fashion as in the case of model saving.
+
+### Google Cloud
+
+Same functionality as for AWS S3 but for Google Cloud Storage. Implemented, however, not yet tested in practice. 
 
 
 ## NLP

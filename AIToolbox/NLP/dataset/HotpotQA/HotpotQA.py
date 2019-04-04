@@ -1,4 +1,4 @@
-from AIToolbox.AWS.data_access import HotpotQADatasetFetcher
+from AIToolbox.cloud.AWS.data_access import HotpotQADatasetFetcher
 
 
 """

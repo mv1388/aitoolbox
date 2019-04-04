@@ -3,7 +3,7 @@ import pickle
 import os
 from tqdm import tqdm
 
-from AIToolbox.AWS.data_access import SQuAD2DatasetFetcher
+from AIToolbox.cloud.AWS.data_access import SQuAD2DatasetFetcher
 from AIToolbox.NLP.core.vocabulary import Vocabulary
 from AIToolbox.NLP.core.core import *
 
