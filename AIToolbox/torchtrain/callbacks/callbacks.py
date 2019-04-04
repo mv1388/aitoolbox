@@ -1,6 +1,6 @@
 from AIToolbox.cloud.AWS.model_save import PyTorchS3ModelSaver
 from AIToolbox.cloud.GoogleCloud.model_save import PyTorchGoogleStorageModelSaver
-from AIToolbox.experiment_save.local_model_save import PyTorchLocalModelSaver
+from AIToolbox.experiment_save.local_save.local_model_save import PyTorchLocalModelSaver
 from AIToolbox.experiment_save.experiment_saver import FullPyTorchExperimentS3Saver, FullPyTorchExperimentGoogleStorageSaver
 from AIToolbox.experiment_save.local_experiment_saver import FullPyTorchExperimentLocalSaver
 from AIToolbox.experiment_save.training_history import TrainingHistory
