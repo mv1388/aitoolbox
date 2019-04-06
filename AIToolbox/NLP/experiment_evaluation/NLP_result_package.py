@@ -17,7 +17,7 @@ class QuestionAnswerResultPackage(AbstractResultPackage):
         Args:
             paragraph_text_tokens (list):
             target_actual_text (list or None):
-            output_text_dir (str):
+            output_text_dir (str or None):
             use_perl_rouge (bool):
             strict_content_check (bool):
             **kwargs (dict):
@@ -161,7 +161,7 @@ class MachineTranslationResultPackage(AbstractResultPackage):
 
         Args:
             target_vocab (AIToolbox.NLP.core.vocabulary.Vocabulary):
-            source_vocab (AIToolbox.NLP.core.vocabulary.Vocabulary):
+            source_vocab (AIToolbox.NLP.core.vocabulary.Vocabulary or None):
             source_sents (list or None):
             output_text_dir (str or None):
             output_attn_heatmap_dir (str or None):
