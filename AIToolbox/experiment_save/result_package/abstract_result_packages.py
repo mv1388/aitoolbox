@@ -18,7 +18,7 @@ class AbstractResultPackage(ABC):
         Args:
             pkg_name (str or None):
             strict_content_check (bool):
-            np_array (str or bool): how the inputs should be handled. Should the package try to automatically guess or
+            np_array (bool or str): how the inputs should be handled. Should the package try to automatically guess or
                 you want to manually decide whether to leave the inputs as they are or convert them to np.array.
                 Possible options: True, False, 'auto'
                 Be slightly careful with 'auto' as it sometimes doesn't work so it is preferable to explicitly use True/False
