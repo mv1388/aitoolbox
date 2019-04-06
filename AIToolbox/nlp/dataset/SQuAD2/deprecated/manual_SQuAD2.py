@@ -4,8 +4,8 @@ import os
 from tqdm import tqdm
 
 from AIToolbox.cloud.AWS.data_access import SQuAD2DatasetFetcher
-from AIToolbox.nlp.core.vocabulary import Vocabulary
-from AIToolbox.nlp.core.core import *
+from AIToolbox.NLP.core.vocabulary import Vocabulary
+from AIToolbox.NLP.core.core import *
 
 
 def get_dataset_local_copy(local_dataset_folder_path, protect_local_folder=True):
