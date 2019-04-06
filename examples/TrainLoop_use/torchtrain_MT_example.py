@@ -16,8 +16,8 @@ import time
 from AIToolbox.torchtrain.train_loop import TrainLoop, TrainLoopModelCheckpointEndSave
 from AIToolbox.torchtrain.batch_model_feed_defs import AbstractModelFeedDefinition
 from AIToolbox.torchtrain.callbacks.callbacks import AbstractCallback
-from AIToolbox.NLP.experiment_evaluation.NLP_result_package import MachineTranslationResultPackage
-from AIToolbox.NLP.core.vocabulary import Vocabulary
+from AIToolbox.nlp.experiment_evaluation.NLP_result_package import MachineTranslationResultPackage
+from AIToolbox.nlp.core.vocabulary import Vocabulary
 
 
 """

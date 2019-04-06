@@ -5,16 +5,16 @@ from torch import optim
 import torch
 from torch import nn
 
-from AIToolbox.NLP.dataset.SQuAD2.SQuAD2DataReader import SQuAD2ConcatContextDatasetReader
-from AIToolbox.NLP.dataset.torch_dataset import BasicDataset as SQuAD2Dataset
-from AIToolbox.NLP.dataset.torch_collate_fns import qa_concat_ctx_span_collate_fn
+from AIToolbox.nlp.dataset.SQuAD2.SQuAD2DataReader import SQuAD2ConcatContextDatasetReader
+from AIToolbox.nlp.dataset.torch_dataset import BasicDataset as SQuAD2Dataset
+from AIToolbox.nlp.dataset.torch_collate_fns import qa_concat_ctx_span_collate_fn
 
 from AIToolbox.torchtrain.train_loop import TrainLoop, TrainLoopModelEndSave, TrainLoopModelCheckpointEndSave
 from AIToolbox.torchtrain.batch_model_feed_defs import QASpanSQuADModelFeedDefinition
 
 from AIToolbox.torchtrain.callbacks.performance_eval_callbacks import ModelPerformanceEvaluationCallback, ModelPerformancePrintReportCallback
 from AIToolbox.torchtrain.callbacks.train_schedule_callbacks import ReduceLROnPlateauScheduler
-from AIToolbox.NLP.experiment_evaluation.NLP_result_package import QuestionAnswerSpanClassificationResultPackage, QuestionAnswerResultPackage
+from AIToolbox.nlp.experiment_evaluation.NLP_result_package import QuestionAnswerSpanClassificationResultPackage, QuestionAnswerResultPackage
 
 from memo_net.model_def.basic_qa_net import *
 

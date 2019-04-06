@@ -3,9 +3,9 @@ import os
 from AIToolbox.experiment_save.local_save.local_results_save import BaseLocalResultsSaver
 from AIToolbox.experiment_save.result_package.abstract_result_packages import AbstractResultPackage
 from AIToolbox.experiment_save.core_metrics.classification import AccuracyMetric
-from AIToolbox.NLP.experiment_evaluation.NLP_metrics import ROUGEMetric, ROUGEPerlMetric, \
+from AIToolbox.nlp.experiment_evaluation.NLP_metrics import ROUGEMetric, ROUGEPerlMetric, \
     BLEUSentenceScoreMetric, BLEUCorpusScoreMetric, BLEUScoreStrTorchNLPMetric, PerplexityMetric
-from AIToolbox.NLP.experiment_evaluation.attention_heatmap import AttentionHeatMap
+from AIToolbox.nlp.experiment_evaluation.attention_heatmap import AttentionHeatMap
 
 
 class QuestionAnswerResultPackage(AbstractResultPackage):
@@ -160,8 +160,8 @@ class MachineTranslationResultPackage(AbstractResultPackage):
         """
 
         Args:
-            target_vocab (AIToolbox.NLP.core.vocabulary.Vocabulary):
-            source_vocab (AIToolbox.NLP.core.vocabulary.Vocabulary or None):
+            target_vocab (AIToolbox.nlp.core.vocabulary.Vocabulary):
+            source_vocab (AIToolbox.nlp.core.vocabulary.Vocabulary or None):
             source_sents (list or None):
             output_text_dir (str or None):
             output_attn_heatmap_dir (str or None):
