@@ -285,7 +285,7 @@ class BLEUCorpusScoreMetric(AbstractBaseMetric):
     def calculate_metric(self):
         BLEUSentenceScoreMetric.check_transl_sent_num_match([self.y_true, self.y_predicted])
 
-        self.metric_result = corpus_bleu(self.y_true, self.y_predicted)
+        self.metric_result = corpus_bleu([[sent] for sent in self.y_true], self.y_predicted)
 
         if self.output_text_dir is not None:
             BLEUSentenceScoreMetric.dump_translation_text_to_disk(self.source_sents,
