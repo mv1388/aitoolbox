@@ -155,22 +155,31 @@ class TextSummarizationResultPackage(AbstractResultPackage):
 
 
 class MachineTranslationResultPackage(AbstractResultPackage):
-    def __init__(self, vocab, source_sents=None, output_text_dir=None, output_attn_heatmap_dir=None,
+    def __init__(self, target_vocab, source_vocab=None, source_sents=None, output_text_dir=None, output_attn_heatmap_dir=None,
                  strict_content_check=False, **kwargs):
         """
 
         Args:
-            vocab (AIToolbox.NLP.core.vocabulary.Vocabulary):
+            target_vocab (AIToolbox.NLP.core.vocabulary.Vocabulary):
+            source_vocab (AIToolbox.NLP.core.vocabulary.Vocabulary):
             source_sents (list or None):
             output_text_dir (str or None):
             output_attn_heatmap_dir (str or None):
             strict_content_check (bool):
             **kwargs (dict):
         """
+        if output_text_dir is not None and (source_vocab is None or source_sents is None):
+            raise ValueError(f'output_text_dir is not none which initiates the text results dump on disk. '
+                             f'However, the the source_vocab or source_sents are not provided. '
+                             f'To save text on disk these have to be supplied.\nCurrently:\n'
+                             f'output_text_dir: {output_text_dir}\n'
+                             f'source_vocab: {source_vocab}\n'
+                             f'source_sents: {source_sents}\n')
+
         AbstractResultPackage.__init__(self, pkg_name='MachineTranslationResult',
                                        strict_content_check=strict_content_check, np_array=False, **kwargs)
-
-        self.vocab = vocab
+        self.target_vocab = target_vocab
+        self.source_vocab = source_vocab
         self.source_sents = source_sents
         self.output_text_dir = output_text_dir
         self.output_attn_heatmap_dir = output_attn_heatmap_dir
@@ -185,8 +194,8 @@ class MachineTranslationResultPackage(AbstractResultPackage):
         Returns:
 
         """
-        self.y_true_text = [self.vocab.convert_idx_sent2sent(sent, rm_default_tokens=True) for sent in self.y_true]
-        self.y_predicted_text = [self.vocab.convert_idx_sent2sent(sent, rm_default_tokens=True) for sent in self.y_predicted]
+        self.y_true_text = [self.target_vocab.convert_idx_sent2sent(sent, rm_default_tokens=True) for sent in self.y_true]
+        self.y_predicted_text = [self.target_vocab.convert_idx_sent2sent(sent, rm_default_tokens=True) for sent in self.y_predicted]
 
         bleu_avg_sent = BLEUSentenceScoreMetric(self.y_true_text, self.y_predicted_text,
                                                 self.source_sents, self.output_text_dir).get_metric_dict()
@@ -202,7 +211,7 @@ class MachineTranslationResultPackage(AbstractResultPackage):
             self.attention_matrices = self.additional_results['additional_results']['attention_matrices']
 
             source_sent_idx_tokens = self.additional_results['additional_results']['source_sent_text']
-            source_sent_text = [self.vocab.convert_idx_sent2sent(sent, rm_default_tokens=False) for sent in source_sent_idx_tokens]
+            source_sent_text = [self.source_vocab.convert_idx_sent2sent(sent, rm_default_tokens=False) for sent in source_sent_idx_tokens]
 
             attn_heatmap_metric = AttentionHeatMap(self.attention_matrices, source_sent_text, self.y_predicted_text,
                                                    self.output_attn_heatmap_dir)

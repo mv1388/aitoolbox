@@ -20,7 +20,8 @@ class AbstractResultPackage(ABC):
             strict_content_check (bool):
             np_array (str or bool): how the inputs should be handled. Should the package try to automatically guess or
                 you want to manually decide whether to leave the inputs as they are or convert them to np.array.
-                Possible options: 'auto', True, False
+                Possible options: True, False, 'auto'
+                Be slightly careful with 'auto' as it sometimes doesn't work so it is preferable to explicitly use True/False
             **kwargs (dict):
         """
         self.pkg_name = pkg_name
@@ -64,12 +65,13 @@ class AbstractResultPackage(ABC):
         Returns:
             None
         """
-        if self.np_array == 'auto':
-            self.y_true = self.auto_y_input_array_convert(y_true)
-            self.y_predicted = self.auto_y_input_array_convert(y_predicted)
-        elif self.np_array is True:
+        if self.np_array is True:
             self.y_true = np.array(y_true)
             self.y_predicted = np.array(y_predicted)
+        elif self.np_array == 'auto':
+            # This option sometimes doesnt't work and the explicit True/False specification is needed by the user
+            self.y_true = self.auto_y_input_array_convert(y_true)
+            self.y_predicted = self.auto_y_input_array_convert(y_predicted)
         else:
             self.y_true = y_true
             self.y_predicted = y_predicted
@@ -83,6 +85,20 @@ class AbstractResultPackage(ABC):
 
     @staticmethod
     def auto_y_input_array_convert(y_array):
+        """Try to automatically decide if array should be left as it is or convert to np.array
+
+        Not working in all the situations so relying on it at all times is not recommended.
+        Especially for costly experiments rely rather on your own judgement and explicitly define
+        if np.array conversion is needed.
+
+        TODO: make it smarter so 'auto' option can be used more often
+
+        Args:
+            y_array (list):
+
+        Returns:
+            list or numpy.array:
+        """
         previous_len = len(y_array[0])
         np_array_ok = True
 
@@ -498,6 +514,11 @@ class MultipleResultPackageWrapper(AbstractResultPackage):
         return '\n'.join([f'--> {pkg.pkg_name}:\n{str(pkg)}' for pkg in self.result_packages])
 
     def __len__(self):
+        """
+
+        Returns:
+            int: number of result packages inside this multi package wrapper
+        """
         return len(self.result_packages)
 
     def add_merge_multi_pkg_wrap(self, other_object):

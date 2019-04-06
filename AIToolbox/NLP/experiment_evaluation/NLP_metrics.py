@@ -158,8 +158,6 @@ class ROUGEPerlMetric(AbstractBaseMetric):
         Returns:
             list:
         """
-        # return text
-
         # The default is: (r'<.*?>', r'[^a-zA-Z0-9.?! ]+')
         for cleaning_regex in cleaning_regex_list:
             re_pattern = re.compile(cleaning_regex)
@@ -210,12 +208,25 @@ class BLEUSentenceScoreMetric(AbstractBaseMetric):
     @staticmethod
     def dump_translation_text_to_disk(source_sents, pred_translations, true_translations, sentence_bleu_results,
                                       output_text_dir):
+        """
+
+        Args:
+            source_sents (list):
+            pred_translations (list):
+            true_translations (list):
+            sentence_bleu_results (list):
+            output_text_dir (str):
+
+        Returns:
+
+        """
         if os.path.exists(output_text_dir):
             shutil.rmtree(output_text_dir)
 
         os.mkdir(output_text_dir)
 
-        for i, (source, pred_transl, true_transl, bleu_result) in enumerate(zip(source_sents, pred_translations, true_translations, sentence_bleu_results)):
+        for i, (source, pred_transl, true_transl, bleu_result) in enumerate(zip(source_sents, pred_translations,
+                                                                                true_translations, sentence_bleu_results)):
             with open(os.path.join(output_text_dir, f'transl_{i}.txt'), 'w') as f:
                 f.write(f'{source}\n')
                 f.write(f'{pred_transl}\n')
