@@ -7,7 +7,7 @@ from AIToolbox.experiment_save.training_history import TrainingHistory
 
 
 class AbstractResultPackage(ABC):
-    def __init__(self, pkg_name=None, strict_content_check=False, np_array='auto', **kwargs):
+    def __init__(self, pkg_name=None, strict_content_check=False, np_array=True, **kwargs):
         """
 
         Functions which the user should potentially override in a specific result package:
