@@ -397,12 +397,16 @@ class MachineTranslationFeedDefinition(AbstractModelFeedDefinition):
         return translation_true_l, translation_l, metadata_dict
 
 
-vocab = Vocabulary('vocab')
-vocab.index2word = TRG.vocab.itos
-vocab.default_tokens = [TRG.vocab.stoi['<pad>'], TRG.vocab.stoi['<eos>']]
+vocab_trg = Vocabulary('vocab')
+vocab_trg.index2word = TRG.vocab.itos
+vocab_trg.default_tokens = [TRG.vocab.stoi['<pad>'], TRG.vocab.stoi['<eos>']]
+
+vocab_src = Vocabulary('vocab')
+vocab_src.index2word = SRC.vocab.itos
+vocab_src.default_tokens = [SRC.vocab.stoi['<pad>'], SRC.vocab.stoi['<eos>']]
 
 
-finish_result_pkg_test = MachineTranslationResultPackage(vocab,
+finish_result_pkg_test = MachineTranslationResultPackage(vocab_trg, vocab_src,
                                                          source_sents=['sourceSent'] * len(test_data),
                                                          output_text_dir='final_text_test',
                                                          output_attn_heatmap_dir='final_attn_test')

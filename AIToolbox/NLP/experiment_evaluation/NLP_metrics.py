@@ -233,9 +233,9 @@ class BLEUSentenceScoreMetric(AbstractBaseMetric):
         for i, (source, pred_transl, true_transl, bleu_result) in enumerate(zip(source_sents, pred_translations,
                                                                                 true_translations, sentence_bleu_results)):
             with open(os.path.join(output_text_dir, f'transl_{i}.txt'), 'w') as f:
-                f.write(f'{source}\n')
-                f.write(f'{pred_transl}\n')
-                f.write(f'{true_transl}\n')
+                f.write(f'Source:\t{source}\n')
+                f.write(f'Predicted:\t{pred_transl}\n')
+                f.write(f'True:\t{true_transl}\n')
                 f.write(f'BLEU: {bleu_result}\n')
 
     @staticmethod
