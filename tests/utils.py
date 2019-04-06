@@ -113,6 +113,9 @@ class DeactivateModelFeedDefinition(AbstractModelFeedDefinition):
         """    
         return self.dummy_batch
 
+    def get_loss_eval(self, model, batch_data, criterion, device):
+        return self.get_loss(model, batch_data, criterion, device)
+
     def get_predictions(self, model, batch_data, device):
         """
 

@@ -1,14 +1,5 @@
 from nltk.tokenize import word_tokenize
 
-# Default word tokens
-PAD_token = 0  # Used for padding short sentences
-OOV_token = 1  # Out of vocab token
-SOS_token = 2  # Start-of-sentence token
-EOS_token = 3  # End-of-sentence token
-
-SOD_token = 4
-EOD_token = 5
-
 
 class Vocabulary:
     def __init__(self, name, document_level=False):
@@ -18,17 +9,30 @@ class Vocabulary:
             name (str):
             document_level (bool):
         """
+        # Default word tokens
+        self.PAD_token = 0  # Used for padding short sentences
+        self.OOV_token = 1  # Out of vocab token
+        self.SOS_token = 2  # Start-of-sentence token
+        self.EOS_token = 3  # End-of-sentence token
+
+        self.SOD_token = 4
+        self.EOD_token = 5
+
         self.name = name
         self.document_level = document_level
         self.trimmed = False
         self.word2index = {}
         self.word2count = {}
         if not self.document_level:
-            self.index2word = {PAD_token: "PAD", OOV_token: "OOV", SOS_token: "SOS", EOS_token: "EOS"}
+            self.index2word = {self.PAD_token: "PAD", self.OOV_token: "OOV", self.SOS_token: "SOS", self.EOS_token: "EOS"}
             self.num_words = 4  # Count SOS, EOS, PAD
+            self.default_tokens = [self.PAD_token, self.OOV_token, self.SOS_token, self.EOS_token]
         else:
-            self.index2word = {PAD_token: "PAD", OOV_token: "OOV", SOS_token: "SOS", EOS_token: "EOS", SOD_token: "SOD", EOD_token: "EOD"}
+            self.index2word = {self.PAD_token: "PAD", self.OOV_token: "OOV", self.SOS_token: "SOS",
+                               self.EOS_token: "EOS", self.SOD_token: "SOD", self.EOD_token: "EOD"}
             self.num_words = 6
+            self.default_tokens = [self.PAD_token, self.OOV_token, self.SOS_token, self.EOS_token,
+                                   self.SOD_token, self.EOD_token]
 
     def add_sentence(self, sentence_tokens):
         """
@@ -86,10 +90,11 @@ class Vocabulary:
         self.word2index = {}
         self.word2count = {}
         if not self.document_level:
-            self.index2word = {PAD_token: "PAD", OOV_token: "OOV", SOS_token: "SOS", EOS_token: "EOS"}
+            self.index2word = {self.PAD_token: "PAD", self.OOV_token: "OOV", self.SOS_token: "SOS", self.EOS_token: "EOS"}
             self.num_words = 4  # Count SOS, EOS, PAD
         else:
-            self.index2word = {PAD_token: "PAD", OOV_token: "OOV", SOS_token: "SOS", EOS_token: "EOS", SOD_token: "SOD", EOD_token: "EOD"}
+            self.index2word = {self.PAD_token: "PAD", self.OOV_token: "OOV", self.SOS_token: "SOS", self.EOS_token: "EOS",
+                               self.SOD_token: "SOD", self.EOD_token: "EOD"}
             self.num_words = 6
 
         for word in keep_words:
@@ -107,13 +112,16 @@ class Vocabulary:
         if len(self.word2index) == 0:
             raise ValueError('word2index is empty')
 
-        return [SOS_token] + [self.word2index[word] if word in self.word2index else OOV_token for word in sent_tokens] + [EOS_token]
+        return [self.SOS_token] + \
+               [self.word2index[word] if word in self.word2index else self.OOV_token for word in sent_tokens] + \
+               [self.EOS_token]
 
-    def convert_idx_sent2sent(self, idx_sent):
+    def convert_idx_sent2sent(self, idx_sent, rm_default_tokens=False):
         """
 
         Args:
             idx_sent:
+            rm_default_tokens (bool):
 
         Returns:
 
@@ -121,4 +129,7 @@ class Vocabulary:
         if len(self.index2word) == 0:
             raise ValueError('word2index is empty')
 
-        return [self.index2word[idx_word] for idx_word in idx_sent]
+        if rm_default_tokens:
+            return [self.index2word[idx_word] for idx_word in idx_sent if idx_word not in self.default_tokens]
+        else:
+            return [self.index2word[idx_word] for idx_word in idx_sent]

@@ -7,7 +7,7 @@ from AIToolbox.experiment_save.training_history import TrainingHistory
 
 
 class AbstractResultPackage(ABC):
-    def __init__(self, pkg_name=None, strict_content_check=False, **kwargs):
+    def __init__(self, pkg_name=None, strict_content_check=False, np_array=True, **kwargs):
         """
 
         Functions which the user should potentially override in a specific result package:
@@ -18,10 +18,15 @@ class AbstractResultPackage(ABC):
         Args:
             pkg_name (str or None):
             strict_content_check (bool):
+            np_array (bool or str): how the inputs should be handled. Should the package try to automatically guess or
+                you want to manually decide whether to leave the inputs as they are or convert them to np.array.
+                Possible options: True, False, 'auto'
+                Be slightly careful with 'auto' as it sometimes doesn't work so it is preferable to explicitly use True/False
             **kwargs (dict):
         """
         self.pkg_name = pkg_name
         self.strict_content_check = strict_content_check
+        self.np_array = np_array
 
         self.y_true = None
         self.y_predicted = None
@@ -60,8 +65,16 @@ class AbstractResultPackage(ABC):
         Returns:
             None
         """
-        self.y_true = np.array(y_true)
-        self.y_predicted = np.array(y_predicted)
+        if self.np_array is True:
+            self.y_true = np.array(y_true)
+            self.y_predicted = np.array(y_predicted)
+        elif self.np_array == 'auto':
+            # This option sometimes doesnt't work and the explicit True/False specification is needed by the user
+            self.y_true = self.auto_y_input_array_convert(y_true)
+            self.y_predicted = self.auto_y_input_array_convert(y_predicted)
+        else:
+            self.y_true = y_true
+            self.y_predicted = y_predicted
 
         self.results_dict = None
         self.hyperparameters = hyperparameters
@@ -69,6 +82,35 @@ class AbstractResultPackage(ABC):
         self.additional_results = kwargs
 
         self.prepare_results_dict()
+
+    @staticmethod
+    def auto_y_input_array_convert(y_array):
+        """Try to automatically decide if array should be left as it is or convert to np.array
+
+        Not working in all the situations so relying on it at all times is not recommended.
+        Especially for costly experiments rely rather on your own judgement and explicitly define
+        if np.array conversion is needed.
+
+        TODO: make it smarter so 'auto' option can be used more often
+
+        Args:
+            y_array (list):
+
+        Returns:
+            list or numpy.array:
+        """
+        previous_len = len(y_array[0])
+        np_array_ok = True
+
+        for el in y_array:
+            if len(el) != previous_len:
+                np_array_ok = False
+                break
+
+        if np_array_ok:
+            return np.array(y_array)
+        else:
+            return y_array
 
     def get_results(self):
         """
@@ -285,7 +327,7 @@ class AbstractResultPackage(ABC):
             other_object (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage or dict):
 
         Returns:
-            AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage | AIToolbox.experiment_save.result_package.abstract_result_packages.MultipleResultPackageWrapper:
+            AbstractResultPackage | MultipleResultPackageWrapper:
         """
         if isinstance(other_object, AbstractResultPackage):
             other_object.warn_if_results_dict_not_defined()
@@ -472,6 +514,11 @@ class MultipleResultPackageWrapper(AbstractResultPackage):
         return '\n'.join([f'--> {pkg.pkg_name}:\n{str(pkg)}' for pkg in self.result_packages])
 
     def __len__(self):
+        """
+
+        Returns:
+            int: number of result packages inside this multi package wrapper
+        """
         return len(self.result_packages)
 
     def add_merge_multi_pkg_wrap(self, other_object):

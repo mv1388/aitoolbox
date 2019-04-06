@@ -14,7 +14,7 @@ from AIToolbox.torchtrain.batch_model_feed_defs import QASpanSQuADModelFeedDefin
 
 from AIToolbox.torchtrain.callbacks.performance_eval_callbacks import ModelPerformanceEvaluationCallback, ModelPerformancePrintReportCallback
 from AIToolbox.torchtrain.callbacks.train_schedule_callbacks import ReduceLROnPlateauScheduler
-from AIToolbox.NLP.evaluation.NLP_result_package import QuestionAnswerSpanClassificationResultPackage, QuestionAnswerResultPackage
+from AIToolbox.NLP.experiment_evaluation.NLP_result_package import QuestionAnswerSpanClassificationResultPackage, QuestionAnswerResultPackage
 
 from memo_net.model_def.basic_qa_net import *
 
