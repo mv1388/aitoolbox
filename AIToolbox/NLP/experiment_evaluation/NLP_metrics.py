@@ -196,6 +196,8 @@ class BLEUSentenceScoreMetric(AbstractBaseMetric):
         AbstractBaseMetric.__init__(self, y_true, y_predicted, metric_name='BLEU_sentence_score', np_array=False)
 
     def calculate_metric(self):
+        self.check_transl_sent_num_match([self.y_true, self.y_predicted])
+
         sentence_bleu_results = [sentence_bleu([true_t], pred_t) for true_t, pred_t in zip(self.y_true, self.y_predicted)]
         self.metric_result = np.mean(sentence_bleu_results)
 
@@ -220,6 +222,9 @@ class BLEUSentenceScoreMetric(AbstractBaseMetric):
         Returns:
 
         """
+        BLEUSentenceScoreMetric.check_transl_sent_num_match([pred_translations, true_translations,
+                                                             source_sents, sentence_bleu_results])
+
         if os.path.exists(output_text_dir):
             shutil.rmtree(output_text_dir)
 
@@ -232,6 +237,22 @@ class BLEUSentenceScoreMetric(AbstractBaseMetric):
                 f.write(f'{pred_transl}\n')
                 f.write(f'{true_transl}\n')
                 f.write(f'BLEU: {bleu_result}\n')
+
+    @staticmethod
+    def check_transl_sent_num_match(sent_types):
+        """
+
+        Args:
+            sent_types (list): list of lists
+            
+        Raises:
+            ValueError
+        """
+        num_sents = len(sent_types[0])
+        for sent_t in sent_types:
+            if len(sent_t) != num_sents:
+                raise ValueError(f"The length of list elements across different text types does not match "
+                                 f"The featured lengths are: {', '.join([str(len(el)) for el in sent_types])}")
 
 
 class BLEUCorpusScoreMetric(AbstractBaseMetric):
@@ -262,7 +283,9 @@ class BLEUCorpusScoreMetric(AbstractBaseMetric):
         AbstractBaseMetric.__init__(self, y_true, y_predicted, metric_name='BLEU_corpus_score', np_array=False)
 
     def calculate_metric(self):
-        self.metric_result = corpus_bleu(self.y_true, self.y_predicted)
+        BLEUSentenceScoreMetric.check_transl_sent_num_match([self.y_true, self.y_predicted])
+
+        self.metric_result = corpus_bleu([[sent] for sent in self.y_true], self.y_predicted)
 
         if self.output_text_dir is not None:
             BLEUSentenceScoreMetric.dump_translation_text_to_disk(self.source_sents,
@@ -301,6 +324,8 @@ class BLEUScoreStrTorchNLPMetric(AbstractBaseMetric):
         AbstractBaseMetric.__init__(self, y_true, y_predicted, metric_name='BLEU_str_torchNLP_score', np_array=False)
 
     def calculate_metric(self):
+        BLEUSentenceScoreMetric.check_transl_sent_num_match([self.y_true, self.y_predicted])
+
         sentence_bleu_results = [bleu.get_moses_multi_bleu([' '.join(true_t)], [' '.join(pred_t)], lowercase=self.lowercase) 
                                  for true_t, pred_t in zip(self.y_true, self.y_predicted)]
         self.metric_result = float(np.mean(sentence_bleu_results))
