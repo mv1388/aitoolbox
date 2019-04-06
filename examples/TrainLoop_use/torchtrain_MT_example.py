@@ -46,8 +46,9 @@ def tokenize_en(text):
 SRC = Field(tokenize=tokenize_de, init_token='<sos>', eos_token='<eos>', lower=True, include_lengths=True)
 TRG = Field(tokenize=tokenize_en, init_token='<sos>', eos_token='<eos>', lower=True)
 
-train_data, valid_data, test_data = Multi30k.splits(exts=('.de', '.en'), fields=(SRC, TRG),
-                                                    train='mini_train', validation='mini_val', test='mini_test2016')
+train_data, valid_data, test_data = Multi30k.splits(exts=('.de', '.en'), fields=(SRC, TRG))
+# train_data, valid_data, test_data = Multi30k.splits(exts=('.de', '.en'), fields=(SRC, TRG),
+#                                                     train='mini_train', validation='mini_val', test='mini_test2016')
 
 SRC.build_vocab(train_data, min_freq=2)
 TRG.build_vocab(train_data, min_freq=2)
@@ -394,7 +395,7 @@ vocab.default_tokens = [TRG.vocab.stoi['<pad>'], TRG.vocab.stoi['<eos>']]
 
 
 finish_result_pkg_test = MachineTranslationResultPackage(vocab,
-                                                         source_sents=['sourceSent'] * 1000,
+                                                         source_sents=['sourceSent'] * len(test_data),
                                                          output_text_dir='final_text_test',
                                                          output_attn_heatmap_dir='final_attn_test')
 
