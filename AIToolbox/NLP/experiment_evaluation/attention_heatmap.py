@@ -36,6 +36,8 @@ class AttentionHeatMap(AbstractBaseMetric):
             plot_file_path = os.path.join(dir_path, f'attn_plot_{i}.png')
             output_plot_paths.append(plot_file_path)
 
+            attn_matrix = attn_matrix[:len(target_sent)]
+
             self.plot_sentence_attention(attn_matrix, source_sent, target_sent, plot_file_path)
 
         self.metric_result = output_plot_paths

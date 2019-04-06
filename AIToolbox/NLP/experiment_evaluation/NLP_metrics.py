@@ -1,6 +1,7 @@
 import os
 import re
 import shutil
+import numpy as np
 from pyrouge import Rouge155
 from rouge import Rouge
 from nltk.translate.bleu_score import sentence_bleu, corpus_bleu
@@ -167,7 +168,7 @@ class ROUGEPerlMetric(AbstractBaseMetric):
 
 
 class BLEUSentenceScoreMetric(AbstractBaseMetric):
-    def __init__(self, y_true, y_predicted):
+    def __init__(self, y_true, y_predicted, source_sents=None, output_text_dir=None):
         """
 
         NLTK provides the sentence_bleu() function for evaluating a candidate sentence
@@ -185,15 +186,45 @@ class BLEUSentenceScoreMetric(AbstractBaseMetric):
         Args:
             y_true (list):
             y_predicted (list):
+            source_sents (list or None):
+            output_text_dir (str or None):
         """
-        AbstractBaseMetric.__init__(self, y_true, y_predicted, metric_name='BLEU_sentence_score')
+        if output_text_dir is not None and source_sents is None:
+            raise ValueError('output_text_dir is not None and source_sents is None; '
+                             'if output_text_dir you must give the source_sents')
+
+        self.output_text_dir = output_text_dir
+        self.source_sents = source_sents
+        AbstractBaseMetric.__init__(self, y_true, y_predicted, metric_name='BLEU_sentence_score', np_array=False)
 
     def calculate_metric(self):
-        self.metric_result = sentence_bleu(self.y_true, self.y_predicted)
+        sentence_bleu_results = [sentence_bleu([true_t], pred_t) for true_t, pred_t in zip(self.y_true, self.y_predicted)]
+        self.metric_result = np.mean(sentence_bleu_results)
+
+        if self.output_text_dir is not None:
+            self.dump_translation_text_to_disk(self.source_sents,
+                                               [' '.join(sent) for sent in self.y_predicted],
+                                               [' '.join(sent) for sent in self.y_true],
+                                               sentence_bleu_results, self.output_text_dir)
+
+    @staticmethod
+    def dump_translation_text_to_disk(source_sents, pred_translations, true_translations, sentence_bleu_results,
+                                      output_text_dir):
+        if os.path.exists(output_text_dir):
+            shutil.rmtree(output_text_dir)
+
+        os.mkdir(output_text_dir)
+
+        for i, (source, pred_transl, true_transl, bleu_result) in enumerate(zip(source_sents, pred_translations, true_translations, sentence_bleu_results)):
+            with open(os.path.join(output_text_dir, f'transl_{i}.txt'), 'w') as f:
+                f.write(f'{source}\n')
+                f.write(f'{pred_transl}\n')
+                f.write(f'{true_transl}\n')
+                f.write(f'BLEU: {bleu_result}\n')
 
 
 class BLEUCorpusScoreMetric(AbstractBaseMetric):
-    def __init__(self, y_true, y_predicted):
+    def __init__(self, y_true, y_predicted, source_sents=None, output_text_dir=None):
         """
 
         Function called corpus_bleu() for calculating the BLEU score for multiple sentences such as a paragraph or
@@ -212,26 +243,62 @@ class BLEUCorpusScoreMetric(AbstractBaseMetric):
         Args:
             y_true (list):
             y_predicted (list):
+            source_sents (list or None):
+            output_text_dir (str or None):
         """
-        AbstractBaseMetric.__init__(self, y_true, y_predicted, metric_name='BLEU_corpus_score')
+        self.output_text_dir = output_text_dir
+        self.source_sents = source_sents
+        AbstractBaseMetric.__init__(self, y_true, y_predicted, metric_name='BLEU_corpus_score', np_array=False)
 
     def calculate_metric(self):
         self.metric_result = corpus_bleu(self.y_true, self.y_predicted)
 
+        if self.output_text_dir is not None:
+            BLEUSentenceScoreMetric.dump_translation_text_to_disk(self.source_sents,
+                                                                  [' '.join(sent) for sent in self.y_predicted],
+                                                                  [' '.join(sent) for sent in self.y_true],
+                                                                  ['na'] * len(self.y_predicted), self.output_text_dir)
+
 
 class BLEUScoreStrTorchNLPMetric(AbstractBaseMetric):
-    def __init__(self, y_true, y_predicted, lowercase=False):
+    def __init__(self, y_true, y_predicted, lowercase=False, source_sents=None, output_text_dir=None):
         """
+
+        Example:
+            hypotheses = [
+              "The brown fox jumps over the dog 笑",
+              "The brown fox jumps over the dog 2 笑"
+              ]
+            references = [
+              "The quick brown fox jumps over the lazy dog 笑",
+              "The quick brown fox jumps over the lazy dog 笑"
+              ]
+
+            get_moses_multi_bleu(hypotheses, references, lowercase=True)
+            46.51
 
         Args:
             y_true (list):
             y_predicted (list):
+            lowercase (bool):
+            source_sents (list or None):
+            output_text_dir (str or None):
         """
-        AbstractBaseMetric.__init__(self, y_true, y_predicted, metric_name='BLEU_str_torchNLP_score')
+        self.output_text_dir = output_text_dir
+        self.source_sents = source_sents
         self.lowercase = lowercase
+        AbstractBaseMetric.__init__(self, y_true, y_predicted, metric_name='BLEU_str_torchNLP_score', np_array=False)
 
     def calculate_metric(self):
-        self.metric_result = bleu.get_moses_multi_bleu(self.y_predicted, self.y_true, lowercase=self.lowercase)
+        sentence_bleu_results = [bleu.get_moses_multi_bleu([' '.join(true_t)], [' '.join(pred_t)], lowercase=self.lowercase) 
+                                 for true_t, pred_t in zip(self.y_true, self.y_predicted)]
+        self.metric_result = float(np.mean(sentence_bleu_results))
+        
+        if self.output_text_dir is not None:
+            BLEUSentenceScoreMetric.dump_translation_text_to_disk(self.source_sents,
+                                                                  [' '.join(sent) for sent in self.y_predicted],
+                                                                  [' '.join(sent) for sent in self.y_true],
+                                                                  sentence_bleu_results, self.output_text_dir)
 
 
 class PerplexityMetric(AbstractBaseMetric):
@@ -242,7 +309,9 @@ class PerplexityMetric(AbstractBaseMetric):
             y_true (numpy.array or list):
             y_predicted (numpy.array or list):
         """
-        AbstractBaseMetric.__init__(self, y_true, y_predicted, metric_name='Perplexity')
+        raise NotImplementedError
+
+        AbstractBaseMetric.__init__(self, y_true, y_predicted, metric_name='Perplexity', np_array=False)
 
     def calculate_metric(self):
         raise NotImplementedError
