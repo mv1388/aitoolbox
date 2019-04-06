@@ -4,12 +4,19 @@ from AIToolbox.NLP.core.vocabulary import *
 
 class TestVocabulary(unittest.TestCase):
     def test_hard_coded_values(self):
-        self.assertEqual(PAD_token, 0)
-        self.assertEqual(OOV_token, 1)
-        self.assertEqual(SOS_token, 2)
-        self.assertEqual(EOS_token, 3)
-        self.assertEqual(SOD_token, 4)
-        self.assertEqual(EOD_token, 5)
+        vocab_doc = Vocabulary('testVocabulary', document_level=False)
+        self.assertEqual(vocab_doc.PAD_token, 0)
+        self.assertEqual(vocab_doc.OOV_token, 1)
+        self.assertEqual(vocab_doc.SOS_token, 2)
+        self.assertEqual(vocab_doc.EOS_token, 3)
+
+        vocab_doc = Vocabulary('testVocabulary', document_level=True)
+        self.assertEqual(vocab_doc.PAD_token, 0)
+        self.assertEqual(vocab_doc.OOV_token, 1)
+        self.assertEqual(vocab_doc.SOS_token, 2)
+        self.assertEqual(vocab_doc.EOS_token, 3)
+        self.assertEqual(vocab_doc.SOD_token, 4)
+        self.assertEqual(vocab_doc.EOD_token, 5)
 
     def test_vocabulary_init(self):
         vocab = Vocabulary('testVocabulary', document_level=False)
@@ -19,7 +26,8 @@ class TestVocabulary(unittest.TestCase):
         self.assertEqual(vocab.num_words, 4)
 
         self.assertEqual(vocab.index2word, {0: "PAD", 1: "OOV", 2: "SOS", 3: "EOS"})
-        self.assertEqual(vocab.index2word, {PAD_token: "PAD", OOV_token: "OOV", SOS_token: "SOS", EOS_token: "EOS"})
+        self.assertEqual(vocab.index2word, {vocab.PAD_token: "PAD", vocab.OOV_token: "OOV",
+                                            vocab.SOS_token: "SOS", vocab.EOS_token: "EOS"})
 
     def test_vocabulary_init_doc_level(self):
         vocab = Vocabulary('testVocabulary', document_level=True)
@@ -29,8 +37,9 @@ class TestVocabulary(unittest.TestCase):
         self.assertEqual(vocab.num_words, 6)
 
         self.assertEqual(vocab.index2word, {0: "PAD", 1: "OOV", 2: "SOS", 3: "EOS", 4: "SOD", 5: "EOD"})
-        self.assertEqual(vocab.index2word, {PAD_token: "PAD", OOV_token: "OOV", SOS_token: "SOS", EOS_token: "EOS",
-                                            SOD_token: "SOD", EOD_token: "EOD"})
+        self.assertEqual(vocab.index2word, {vocab.PAD_token: "PAD", vocab.OOV_token: "OOV",
+                                            vocab.SOS_token: "SOS", vocab.EOS_token: "EOS",
+                                            vocab.SOD_token: "SOD", vocab.EOD_token: "EOD"})
 
     def test_add_sentence(self):
         vocab = Vocabulary('testVocabulary', document_level=False)

@@ -3,7 +3,9 @@ import os
 from AIToolbox.experiment_save.local_save.local_results_save import BaseLocalResultsSaver
 from AIToolbox.experiment_save.result_package.abstract_result_packages import AbstractResultPackage
 from AIToolbox.experiment_save.core_metrics.classification import AccuracyMetric
-from AIToolbox.NLP.experiment_evaluation.NLP_metrics import ROUGEMetric, ROUGEPerlMetric
+from AIToolbox.NLP.experiment_evaluation.NLP_metrics import ROUGEMetric, ROUGEPerlMetric, \
+    BLEUSentenceScoreMetric, BLEUCorpusScoreMetric, BLEUScoreStrTorchNLPMetric, PerplexityMetric
+from AIToolbox.NLP.experiment_evaluation.attention_heatmap import AttentionHeatMap
 
 
 class QuestionAnswerResultPackage(AbstractResultPackage):
@@ -15,7 +17,7 @@ class QuestionAnswerResultPackage(AbstractResultPackage):
         Args:
             paragraph_text_tokens (list):
             target_actual_text (list or None):
-            output_text_dir (str):
+            output_text_dir (str or None):
             use_perl_rouge (bool):
             strict_content_check (bool):
             **kwargs (dict):
@@ -153,18 +155,38 @@ class TextSummarizationResultPackage(AbstractResultPackage):
 
 
 class MachineTranslationResultPackage(AbstractResultPackage):
-    def __init__(self, output_attn_heatmap_dir=None, strict_content_check=False, **kwargs):
+    def __init__(self, target_vocab, source_vocab=None, source_sents=None, output_text_dir=None, output_attn_heatmap_dir=None,
+                 strict_content_check=False, **kwargs):
         """
 
         Args:
+            target_vocab (AIToolbox.NLP.core.vocabulary.Vocabulary):
+            source_vocab (AIToolbox.NLP.core.vocabulary.Vocabulary or None):
+            source_sents (list or None):
+            output_text_dir (str or None):
             output_attn_heatmap_dir (str or None):
             strict_content_check (bool):
             **kwargs (dict):
         """
+        if output_text_dir is not None and (source_vocab is None or source_sents is None):
+            raise ValueError(f'output_text_dir is not none which initiates the text results dump on disk. '
+                             f'However, the the source_vocab or source_sents are not provided. '
+                             f'To save text on disk these have to be supplied.\nCurrently:\n'
+                             f'output_text_dir: {output_text_dir}\n'
+                             f'source_vocab: {source_vocab}\n'
+                             f'source_sents: {source_sents}\n')
+
         AbstractResultPackage.__init__(self, pkg_name='MachineTranslationResult',
-                                       strict_content_check=strict_content_check, **kwargs)
+                                       strict_content_check=strict_content_check, np_array=False, **kwargs)
+        self.target_vocab = target_vocab
+        self.source_vocab = source_vocab
+        self.source_sents = source_sents
+        self.output_text_dir = output_text_dir
         self.output_attn_heatmap_dir = output_attn_heatmap_dir
         self.attention_matrices = None
+
+        self.y_true_text = None
+        self.y_predicted_text = None
 
     def prepare_results_dict(self):
         """
@@ -172,29 +194,57 @@ class MachineTranslationResultPackage(AbstractResultPackage):
         Returns:
 
         """
-        # bleu_result = BLEUCorpusScoreMetric(self.y_true, self.y_predicted).get_metric_dict()
-        # perplexity_result = PerplexityMetric(self.y_true, self.y_predicted).get_metric_dict()
-        #
-        # self.results_dict = {**bleu_result, **perplexity_result}
-        #
-        # # Don't include TrainLoop objects inside the package - it makes it useful only for PyTorch, not other frameworks
-        # if self.output_attn_heatmap_dir is not None:
-        #     # Get this from **kwargs or find another way of getting attention matrices
-        #     self.attention_matrices = self.additional_results['additional_results']['attention_matrices']
-        #
-        #     attn_heatmap_metric = AttentionHeatMap(self.attention_matrices, self.y_true, self.y_predicted,
-        #                                            self.output_attn_heatmap_dir)
-        #
-        #     attn_heatmap_plot_paths = attn_heatmap_metric.get_metric_dict()
-        #     self.results_dict = {**self.results_dict, **attn_heatmap_plot_paths}
+        self.y_true_text = [self.target_vocab.convert_idx_sent2sent(sent, rm_default_tokens=True) for sent in self.y_true]
+        self.y_predicted_text = [self.target_vocab.convert_idx_sent2sent(sent, rm_default_tokens=True) for sent in self.y_predicted]
 
-        raise NotImplementedError
+        bleu_avg_sent = BLEUSentenceScoreMetric(self.y_true_text, self.y_predicted_text,
+                                                self.source_sents, self.output_text_dir).get_metric_dict()
+        bleu_corpus_result = BLEUCorpusScoreMetric(self.y_true_text, self.y_predicted_text).get_metric_dict()
+        # bleu_perl_result = BLEUScoreStrTorchNLPMetric(self.y_true_text, self.y_predicted_text).get_metric_dict()
+        # perplexity_result = PerplexityMetric(self.y_true_text, self.y_predicted_text).get_metric_dict()
 
-    # def list_additional_results_dump_paths(self):
-    #     file_name = 'attention_heatmaps.zip'
-    #     results_file_local_path = os.path.join(self.output_attn_heatmap_dir, file_name)
-    #
-    #     self.zip_additional_results_dump(os.path.join(self.output_attn_heatmap_dir, 'attention_heatmaps'),
-    #                                      results_file_local_path)
-    #
-    #     return [[file_name, results_file_local_path]]
+        self.results_dict = {**bleu_corpus_result, **bleu_avg_sent}
+
+        # Don't include TrainLoop objects inside the package - it makes it useful only for PyTorch, not other frameworks
+        if self.output_attn_heatmap_dir is not None:
+            # Get this from **kwargs or find another way of getting attention matrices
+            self.attention_matrices = self.additional_results['additional_results']['attention_matrices']
+
+            source_sent_idx_tokens = self.additional_results['additional_results']['source_sent_text']
+            source_sent_text = [self.source_vocab.convert_idx_sent2sent(sent, rm_default_tokens=False) for sent in source_sent_idx_tokens]
+
+            attn_heatmap_metric = AttentionHeatMap(self.attention_matrices, source_sent_text, self.y_predicted_text,
+                                                   self.output_attn_heatmap_dir)
+
+            attn_heatmap_plot_paths = attn_heatmap_metric.get_metric_dict()
+            self.results_dict = {**self.results_dict, **attn_heatmap_plot_paths}
+
+    def set_experiment_dir_path_for_additional_results(self, project_name, experiment_name, experiment_timestamp,
+                                                       local_model_result_folder_path):
+        if self.output_text_dir is not None:
+            _, experiment_dir_path, _ = \
+                BaseLocalResultsSaver.form_experiment_local_folders_paths(project_name, experiment_name,
+                                                                          experiment_timestamp, local_model_result_folder_path)
+            self.output_text_dir = os.path.join(experiment_dir_path, self.output_text_dir)
+
+        if self.output_attn_heatmap_dir is not None:
+            _, experiment_dir_path, _ = \
+                BaseLocalResultsSaver.form_experiment_local_folders_paths(project_name, experiment_name,
+                                                                          experiment_timestamp, local_model_result_folder_path)
+            self.output_attn_heatmap_dir = os.path.join(experiment_dir_path, self.output_attn_heatmap_dir)
+
+    def list_additional_results_dump_paths(self):
+        additional_results_paths = []
+
+        if self.output_text_dir is not None:
+            zip_path = self.zip_additional_results_dump(self.output_text_dir, self.output_text_dir)
+            zip_file_name = os.path.basename(zip_path)
+            additional_results_paths.append([zip_file_name, zip_path])
+
+        if self.output_attn_heatmap_dir is not None:
+            zip_path = self.zip_additional_results_dump(self.output_attn_heatmap_dir, self.output_attn_heatmap_dir)
+            zip_file_name = os.path.basename(zip_path)
+            additional_results_paths.append([zip_file_name, zip_path])
+
+        if len(additional_results_paths) > 0:
+            return additional_results_paths

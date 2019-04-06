@@ -223,14 +223,24 @@ class TrainLoop:
 
                 # TODO: check if it is the best idea to append predictions to the list and not to some torch tensor
                 # TODO: also if append is the best option and not the concat
-                y_test.append(y_test_batch)
-                y_pred.append(y_pred_batch)
+                if type(y_test_batch) is list:
+                    y_test += y_test_batch
+                else:
+                    y_test.append(y_test_batch)
+
+                if type(y_pred_batch) is list:
+                    y_pred += y_pred_batch
+                else:
+                    y_pred.append(y_pred_batch)
 
                 if metadata_batch is not None:
                     metadata_list.append(metadata_batch)
 
-            y_test = torch.cat(y_test)
-            y_pred = torch.cat(y_pred)
+            if type(y_test_batch) is not list:
+                y_test = torch.cat(y_test)
+
+            if type(y_pred_batch) is not list:
+                y_pred = torch.cat(y_pred)
 
             metadata = self.combine_prediction_metadata_batches(metadata_list) if len(metadata_list) > 0 else None
 
