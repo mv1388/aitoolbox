@@ -7,7 +7,7 @@ from AIToolbox.experiment_save.training_history import TrainingHistory
 
 
 class AbstractResultPackage(ABC):
-    def __init__(self, pkg_name=None, strict_content_check=False, **kwargs):
+    def __init__(self, pkg_name=None, strict_content_check=False, np_array='auto', **kwargs):
         """
 
         Functions which the user should potentially override in a specific result package:
@@ -18,10 +18,14 @@ class AbstractResultPackage(ABC):
         Args:
             pkg_name (str or None):
             strict_content_check (bool):
+            np_array (str or bool): how the inputs should be handled. Should the package try to automatically guess or
+                you want to manually decide whether to leave the inputs as they are or convert them to np.array.
+                Possible options: 'auto', True, False
             **kwargs (dict):
         """
         self.pkg_name = pkg_name
         self.strict_content_check = strict_content_check
+        self.np_array = np_array
 
         self.y_true = None
         self.y_predicted = None
@@ -60,8 +64,15 @@ class AbstractResultPackage(ABC):
         Returns:
             None
         """
-        self.y_true = np.array(y_true)
-        self.y_predicted = np.array(y_predicted)
+        if self.np_array == 'auto':
+            self.y_true = self.auto_y_input_array_convert(y_true)
+            self.y_predicted = self.auto_y_input_array_convert(y_predicted)
+        elif self.np_array is True:
+            self.y_true = np.array(y_true)
+            self.y_predicted = np.array(y_predicted)
+        else:
+            self.y_true = y_true
+            self.y_predicted = y_predicted
 
         self.results_dict = None
         self.hyperparameters = hyperparameters
@@ -69,6 +80,21 @@ class AbstractResultPackage(ABC):
         self.additional_results = kwargs
 
         self.prepare_results_dict()
+
+    @staticmethod
+    def auto_y_input_array_convert(y_array):
+        previous_len = len(y_array[0])
+        np_array_ok = True
+
+        for el in y_array:
+            if len(el) != previous_len:
+                np_array_ok = False
+                break
+
+        if np_array_ok:
+            return np.array(y_array)
+        else:
+            return y_array
 
     def get_results(self):
         """
