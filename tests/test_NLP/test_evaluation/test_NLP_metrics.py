@@ -191,8 +191,69 @@ class TestBLEUCorpusScoreMetric(unittest.TestCase):
                                            ['bla bla bla bla'.split(), '1122 mm44 fadfdas'.split()])
 
 
-# class TestBLEUScoreStrTorchNLPMetric(unittest.TestCase):
-#     def test_single_sentence_calculate_metric(self):
-#         bleu_1 = BLEUScoreStrTorchNLPMetric(['bla bla bla bla'.split()], ['bla bla bla bla'.split()])
-#         self.assertEqual(bleu_1.get_metric(), 1.)
-#         self.assertEqual(bleu_1.get_metric_dict(), {'BLEU_corpus_score': 1.})
+class TestBLEUScoreStrTorchNLPMetric(unittest.TestCase):
+    def test_single_sentence_calculate_metric(self):
+        bleu_1 = BLEUScoreStrTorchNLPMetric(['bla bla bla bla'.split()], ['bla bla bla bla'.split()])
+        self.assertEqual(bleu_1.get_metric(), 100.)
+        self.assertEqual(bleu_1.get_metric_dict(), {'BLEU_str_torchNLP_score': 100.})
+
+        bleu_2 = BLEUScoreStrTorchNLPMetric(['Today the sun does shines'.split()], ['Today the sun does shine'.split()])
+        self.assertAlmostEqual(bleu_2.get_metric(), 66.87000274658203)
+        self.assertEqual(bleu_2.get_metric_dict(), {'BLEU_str_torchNLP_score': bleu_2.get_metric()})
+        self.assertEqual(bleu_2.get_metric_dict(), {bleu_2.metric_name: bleu_2.metric_result})
+        self.assertEqual(bleu_2.get_metric_dict(), {bleu_2.metric_name: bleu_2.get_metric()})
+
+        bleu_3 = BLEUScoreStrTorchNLPMetric(['Today the sun does not shine'.split()], ['Today the sun does shine'.split()])
+        self.assertAlmostEqual(bleu_3.get_metric(), 53.72999954223633)
+
+        bleu_4 = BLEUScoreStrTorchNLPMetric(['Today the sun does not shine'.split()], ['Today it is cloudy'.split()])
+        self.assertAlmostEqual(bleu_4.get_metric(), 0.)
+
+        bleu_5 = BLEUScoreStrTorchNLPMetric(['Today the sun does not shine'.split()],
+                                            ['Today it is cloudy and the sun does not shine'.split()])
+        self.assertAlmostEqual(bleu_5.get_metric(), 40.83000183105469)
+
+        bleu_6 = BLEUScoreStrTorchNLPMetric(['Today the sun does not shine'.split()],
+                                            ["Today it is cloudy and the sun doesn't shine".split()])
+        self.assertAlmostEqual(bleu_6.get_metric(), 0.)
+        self.assertEqual(bleu_6.get_metric_dict(), {'BLEU_str_torchNLP_score': bleu_6.get_metric()})
+        self.assertEqual(bleu_6.get_metric_dict(), {bleu_6.metric_name: bleu_6.metric_result})
+        self.assertEqual(bleu_6.get_metric_dict(), {bleu_6.metric_name: bleu_6.get_metric()})
+
+    def test_sss(self):
+        bleu_1 = BLEUScoreStrTorchNLPMetric(['bla bla bla bla'.split(), 'mjaw how how mjav mjaw'.split()],
+                                         ['bla bla bla bla'.split(), 'mjaw how how mjav mjaw'.split()])
+        self.assertAlmostEqual(bleu_1.get_metric(), 100.)
+        self.assertEqual(bleu_1.get_metric_dict(), {'BLEU_str_torchNLP_score': 100.})
+        self.assertEqual(bleu_1.get_metric_dict(), {'BLEU_str_torchNLP_score': bleu_1.get_metric()})
+        self.assertEqual(bleu_1.get_metric_dict(), {bleu_1.metric_name: bleu_1.metric_result})
+        self.assertEqual(bleu_1.get_metric_dict(), {bleu_1.metric_name: bleu_1.get_metric()})
+
+        bleu_2 = BLEUScoreStrTorchNLPMetric(['bla bla bla bla'.split(), 'mjaw how bla mjav mjaw'.split()],
+                                            ['bla mjav bla bla'.split(), 'mjaw how how mjav mjaw'.split()])
+        self.assertAlmostEqual(bleu_2.get_metric(), 0.)
+
+        bleu_3 = BLEUScoreStrTorchNLPMetric(['bla bla bla bla'.split(), 'mjaw how how mjav mjaw'.split()],
+                                            ['bla mjav bla bla bla'.split(), 'mjaw how how mjav mjaw'.split()])
+        self.assertAlmostEqual(bleu_3.get_metric(), 50.0)
+
+        bleu_4 = BLEUScoreStrTorchNLPMetric(['bla bla bla bla'.split(), 'mjaw how how how how mjav mjaw'.split()],
+                                            ['bla mjav bla bla bla'.split(), 'mjaw how how mjav mjaw'.split()])
+        self.assertAlmostEqual(bleu_4.get_metric(), 25.850000381469727)
+
+        bleu_5 = BLEUScoreStrTorchNLPMetric(['bla bla bla bla'.split(), 'mjaw how how how how bla mjav mjaw'.split()],
+                                       ['bla mjav bla bla bla'.split(), 'mjaw how how mjav mjaw'.split()])
+        self.assertAlmostEqual(bleu_5.get_metric(), 0.)
+
+    def test_catch_not_equal_num_of_examples(self):
+        with self.assertRaises(ValueError):
+            bleu_1 = BLEUScoreStrTorchNLPMetric(['bla bla bla bla'.split(), 'mjaw how how mjav mjaw'.split()],
+                                                ['bla bla bla bla'.split()])
+
+        with self.assertRaises(ValueError):
+            bleu_2 = BLEUScoreStrTorchNLPMetric(['bla bla bla bla'.split(), 'mjaw how how mjav mjaw'.split(), 'dsad qwqw'.split()],
+                                                ['bla bla bla bla'.split()])
+
+        with self.assertRaises(ValueError):
+            bleu_3 = BLEUScoreStrTorchNLPMetric(['bla bla bla bla'.split(), 'mjaw how how mjav mjaw'.split(), 'dsad qwqw'.split()],
+                                                ['bla bla bla bla'.split(), '1122 mm44 fadfdas'.split()])
