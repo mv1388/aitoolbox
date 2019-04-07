@@ -12,7 +12,11 @@ import torch
 class AbstractModelFeedDefinition(ABC):
     @abstractmethod
     def get_loss(self, model, batch_data, criterion, device):
-        """
+        """Get loss during training stage
+
+        Called from do_train() in TrainLoop
+
+        Executed during training stage where model weights are updated based on the loss returned from this function.
 
         Args:
             model:
@@ -27,11 +31,29 @@ class AbstractModelFeedDefinition(ABC):
 
     @abstractmethod
     def get_loss_eval(self, model, batch_data, criterion, device):
+        """Get loss during evaluation stage
+
+        Called from evaluate_model_loss() in TrainLoop.
+
+        The difference compared with get_loss() is that here the backprop weight update is not done.
+        This function is executed in the evaluation stage not training.
+
+        For simple examples this function can just call the get_loss() and return its result.
+
+        Args:
+            model:
+            batch_data:
+            criterion:
+            device:
+
+        Returns:
+
+        """
         pass
 
     @abstractmethod
     def get_predictions(self, model, batch_data, device):
-        """
+        """Get predictions during evaluation stage
 
         Args:
             model:
@@ -93,6 +115,9 @@ class MachineTranslationFeedDefinition(AbstractModelFeedDefinition):
     def get_loss(self, model, batch_data, criterion, device):
         raise NotImplementedError
 
+    def get_loss_eval(self, model, batch_data, criterion, device):
+        raise NotImplementedError
+
     def get_predictions(self, model, batch_data, device):
         raise NotImplementedError
 
@@ -101,12 +126,18 @@ class TextClassificationFeedDefinition(AbstractModelFeedDefinition):
     def get_loss(self, model, batch_data, criterion, device):
         raise NotImplementedError
 
+    def get_loss_eval(self, model, batch_data, criterion, device):
+        raise NotImplementedError
+
     def get_predictions(self, model, batch_data, device):
         raise NotImplementedError
 
 
 class ImageClassificationFeedDefinition(AbstractModelFeedDefinition):
     def get_loss(self, model, batch_data, criterion, device):
+        raise NotImplementedError
+
+    def get_loss_eval(self, model, batch_data, criterion, device):
         raise NotImplementedError
 
     def get_predictions(self, model, batch_data, device):
