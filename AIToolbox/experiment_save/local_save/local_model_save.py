@@ -181,8 +181,10 @@ class LocalSubOptimalModelRemover:
         """
 
         Args:
-            metric_name (str):
-            num_best_kept (int):
+            metric_name (str): one of the metric names that will be calculated and will appear in the train_history dict
+                in the TrainLoop
+            num_best_kept (int): number of best performing models which are kept when removing suboptimal model
+                checkpoints
         """
         self.metric_name = metric_name
         self.decrease_metric = 'loss' in metric_name
@@ -205,7 +207,11 @@ class LocalSubOptimalModelRemover:
         """
         if not self.is_default_metric:
             if self.non_default_metric_buffer is not None:
-                self.model_save_history.append((self.non_default_metric_buffer, history[self.metric_name][-1]))
+                if self.metric_name in history:
+                    self.model_save_history.append((self.non_default_metric_buffer, history[self.metric_name][-1]))
+                else:
+                    print(f'Provided metric {self.metric_name} not found on the list of evaluated metrics: {history.keys()}')
+                    
             self.non_default_metric_buffer = new_model_dump_paths
         else:
             self.model_save_history.append((new_model_dump_paths, history[self.metric_name][-1]))

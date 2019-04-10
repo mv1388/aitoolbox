@@ -308,7 +308,8 @@ class TrainLoopModelCheckpoint(TrainLoop):
             rm_subopt_local_models (bool or str): if True, the deciding metric is set to 'loss'. Give string metric name
                 to set it as a deciding metric for suboptimal model removal. If metric name consists of substring 'loss'
                 the metric minimization is done otherwise metric maximization is done
-            num_best_checkpoints_kept (int):
+            num_best_checkpoints_kept (int): number of best performing models which are kept when removing suboptimal
+                model checkpoints
         """
         TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, batch_model_feed_def, optimizer, criterion)
         self.project_name = project_name
@@ -414,7 +415,8 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
             rm_subopt_local_models (bool or str): if True, the deciding metric is set to 'loss'. Give string metric name
                 to set it as a deciding metric for suboptimal model removal. If metric name consists of substring 'loss'
                 the metric minimization is done otherwise metric maximization is done
-            num_best_checkpoints_kept (int):
+            num_best_checkpoints_kept (int): number of best performing models which are kept when removing suboptimal
+                model checkpoints
         """
         TrainLoopModelEndSave.__init__(self, model, train_loader, validation_loader, test_loader, batch_model_feed_def,
                                        optimizer, criterion,
