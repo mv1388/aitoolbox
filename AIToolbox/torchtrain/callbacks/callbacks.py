@@ -137,7 +137,8 @@ class ModelCheckpointCallback(AbstractCallback):
             rm_subopt_local_models (bool or str): if True, the deciding metric is set to 'loss'. Give string metric name
                 to set it as a deciding metric for suboptimal model removal. If metric name consists of substring 'loss'
                 the metric minimization is done otherwise metric maximization is done
-            num_best_checkpoints_kept (int):
+            num_best_checkpoints_kept (int): number of best performing models which are kept when removing suboptimal
+                model checkpoints
         """
         AbstractCallback.__init__(self, 'Model checkpoint at end of epoch')
         self.project_name = project_name
@@ -147,7 +148,8 @@ class ModelCheckpointCallback(AbstractCallback):
         self.rm_subopt_local_models = rm_subopt_local_models
 
         if self.rm_subopt_local_models is not False:
-            self.subopt_model_remover = LocalSubOptimalModelRemover('loss' if self.rm_subopt_local_models is True else self.rm_subopt_local_models,
+            metric_name = 'loss' if self.rm_subopt_local_models is True else self.rm_subopt_local_models
+            self.subopt_model_remover = LocalSubOptimalModelRemover(metric_name,
                                                                     num_best_checkpoints_kept)
 
         if self.cloud_save_mode == 's3' or self.cloud_save_mode == 'aws_s3' or self.cloud_save_mode == 'aws':
