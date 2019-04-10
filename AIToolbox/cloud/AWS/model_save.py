@@ -99,7 +99,7 @@ class KerasS3ModelSaver(AbstractModelSaver, BaseModelSaver):
             protect_existing_folder (bool):
 
         Returns:
-            (str, str):
+            (str, str, str, str):
 
         Examples:
             local_model_result_folder_path = '~/project/model_results'
@@ -127,7 +127,7 @@ class KerasS3ModelSaver(AbstractModelSaver, BaseModelSaver):
 
         full_model_s3_path = os.path.join(self.bucket_name, model_s3_path)
 
-        return full_model_s3_path, experiment_timestamp
+        return full_model_s3_path, experiment_timestamp, model_local_path, model_weights_local_path
 
 
 class TensorFlowS3ModelSaver(AbstractModelSaver, BaseModelSaver):
@@ -175,7 +175,7 @@ class PyTorchS3ModelSaver(AbstractModelSaver, BaseModelSaver):
             protect_existing_folder (bool):
 
         Returns:
-            (str, str):
+            (str, str, str, str):
 
         Examples:
             local_model_result_folder_path = '~/project/model_results'
@@ -203,4 +203,4 @@ class PyTorchS3ModelSaver(AbstractModelSaver, BaseModelSaver):
 
         full_model_s3_path = os.path.join(self.bucket_name, model_s3_path)
 
-        return full_model_s3_path, experiment_timestamp
+        return full_model_s3_path, experiment_timestamp, model_local_path, model_weights_local_path
