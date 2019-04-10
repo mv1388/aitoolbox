@@ -1,6 +1,6 @@
 from AIToolbox.cloud.AWS.model_save import PyTorchS3ModelSaver
 from AIToolbox.cloud.GoogleCloud.model_save import PyTorchGoogleStorageModelSaver
-from AIToolbox.experiment_save.local_save.local_model_save import PyTorchLocalModelSaver
+from AIToolbox.experiment_save.local_save.local_model_save import PyTorchLocalModelSaver, LocalSubOptimalModelRemover
 from AIToolbox.experiment_save.experiment_saver import FullPyTorchExperimentS3Saver, FullPyTorchExperimentGoogleStorageSaver
 from AIToolbox.experiment_save.local_experiment_saver import FullPyTorchExperimentLocalSaver
 from AIToolbox.experiment_save.training_history import TrainingHistory
@@ -122,7 +122,8 @@ class EarlyStoppingCallback(AbstractCallback):
 
 
 class ModelCheckpointCallback(AbstractCallback):
-    def __init__(self, project_name, experiment_name, local_model_result_folder_path, cloud_save_mode='s3'):
+    def __init__(self, project_name, experiment_name, local_model_result_folder_path, cloud_save_mode='s3',
+                 rm_subopt_local_models=False, num_best_checkpoints_kept=2):
         """
 
         Args:
@@ -133,12 +134,21 @@ class ModelCheckpointCallback(AbstractCallback):
                 For AWS S3: 's3' / 'aws_s3' / 'aws'
                 For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
                 Everything else results just in local storage to disk
+            rm_subopt_local_models (bool or str): if True, the deciding metric is set to 'loss'. Give string metric name
+                to set it as a deciding metric for suboptimal model removal. If metric name consists of substring 'loss'
+                the metric minimization is done otherwise metric maximization is done
+            num_best_checkpoints_kept (int):
         """
         AbstractCallback.__init__(self, 'Model checkpoint at end of epoch')
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = local_model_result_folder_path
         self.cloud_save_mode = cloud_save_mode
+        self.rm_subopt_local_models = rm_subopt_local_models
+
+        if self.rm_subopt_local_models is not False:
+            self.subopt_model_remover = LocalSubOptimalModelRemover('loss' if self.rm_subopt_local_models is True else self.rm_subopt_local_models,
+                                                                    num_best_checkpoints_kept)
 
         if self.cloud_save_mode == 's3' or self.cloud_save_mode == 'aws_s3' or self.cloud_save_mode == 'aws':
             self.model_checkpointer = PyTorchS3ModelSaver(
@@ -161,12 +171,17 @@ class ModelCheckpointCallback(AbstractCallback):
         Returns:
 
         """
-        self.model_checkpointer.save_model(model=self.train_loop_obj.model,
-                                           project_name=self.project_name,
-                                           experiment_name=self.experiment_name,
-                                           experiment_timestamp=self.train_loop_obj.experiment_timestamp,
-                                           epoch=self.train_loop_obj.epoch,
-                                           protect_existing_folder=True)
+        model_paths = self.model_checkpointer.save_model(model=self.train_loop_obj.model,
+                                                         project_name=self.project_name,
+                                                         experiment_name=self.experiment_name,
+                                                         experiment_timestamp=self.train_loop_obj.experiment_timestamp,
+                                                         epoch=self.train_loop_obj.epoch,
+                                                         protect_existing_folder=True)
+
+        if self.rm_subopt_local_models is not False:
+            _, _, model_local_path, model_weights_local_path = model_paths
+            self.subopt_model_remover.decide_if_remove_suboptimal_model(self.train_loop_obj.train_history,
+                                                                        [model_local_path, model_weights_local_path])
 
 
 class ModelTrainEndSaveCallback(AbstractCallback):

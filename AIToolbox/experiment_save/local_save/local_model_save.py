@@ -174,3 +174,55 @@ class PyTorchLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
         torch.save(model.state_dict(), model_weights_local_path)
 
         return model_name, model_weights_name, model_local_path, model_weights_local_path
+
+
+class LocalSubOptimalModelRemover:
+    def __init__(self, metric_name, num_best_kept=2):
+        """
+
+        Args:
+            metric_name (str):
+            num_best_kept (int):
+        """
+        self.metric_name = metric_name
+        self.decrease_metric = 'loss' in metric_name
+
+        self.num_best_kept = num_best_kept
+
+        self.default_metrics_list = ['loss', 'accumulated_loss', 'val_loss']
+        self.is_default_metric = metric_name in self.default_metrics_list
+        self.non_default_metric_buffer = None
+
+        self.model_save_history = []
+        
+    def decide_if_remove_suboptimal_model(self, history, new_model_dump_paths):
+        """
+
+        Args:
+            history (dict):
+            new_model_dump_paths (list):
+
+        """
+        if not self.is_default_metric:
+            if self.non_default_metric_buffer is not None:
+                self.model_save_history.append((self.non_default_metric_buffer, history[self.metric_name][-1]))
+            self.non_default_metric_buffer = new_model_dump_paths
+        else:
+            self.model_save_history.append((new_model_dump_paths, history[self.metric_name][-1]))
+
+        if len(self.model_save_history) >= self.num_best_kept:
+            self.model_save_history = sorted(self.model_save_history, key=lambda x: x[1], reverse=not self.decrease_metric)
+
+            model_paths_to_rm, _ = self.model_save_history.pop()
+            self.rm_suboptimal_model(model_paths_to_rm)
+
+    @staticmethod
+    def rm_suboptimal_model(rm_model_paths):
+        """
+
+        Args:
+            rm_model_paths (list): list of string paths
+
+        """
+        for rm_path in rm_model_paths:
+            os.remove(rm_path)
