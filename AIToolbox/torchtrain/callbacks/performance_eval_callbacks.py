@@ -31,6 +31,7 @@ class ModelPerformanceEvaluationCallback(AbstractCallback):
                 If such a functionality should to be prevented and manual full additional metadata results dump folder
                 is needed potentially outside the project folder, than set this argument to False and
                 specify a full folder path.
+
         """
         AbstractCallback.__init__(self, 'Model performance calculator - evaluator')
         self.result_package = result_package
@@ -124,6 +125,7 @@ class ModelPerformancePrintReportCallback(AbstractCallback):
             strict_metric_reporting (bool): if False ignore missing metric in the TrainLoop.train_history, if True, in
                 case of missing metric throw and exception and thus interrupt the training loop
             list_tracked_metrics (bool):
+
         """
         AbstractCallback.__init__(self, 'Model performance print reporter')
         self.metrics = metrics
@@ -175,6 +177,7 @@ class TrainHistoryFormatter(AbstractCallback):
             epoch_end (bool):
             train_end (bool):
             strict_metric_extract (bool):
+
         """
         if epoch_end == train_end:
             raise ValueError(f'Only either epoch_end or train_end have to be set to True. '
@@ -235,6 +238,7 @@ class MetricHistoryRename(TrainHistoryFormatter):
             epoch_end (bool):
             train_end (bool):
             strict_metric_extract (bool):
+
         """
 
         # TODO: decide which of these two options is better

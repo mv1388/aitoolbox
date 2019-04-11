@@ -26,6 +26,7 @@ class ROUGEMetric(AbstractBaseMetric):
             target_actual_text (bool):
             output_text_dir (str):
             output_text_cleaning_regex (list):
+
         """
         self.output_text_cleaning_regex = output_text_cleaning_regex
         self.target_actual_text = target_actual_text
@@ -84,6 +85,7 @@ class ROUGEPerlMetric(AbstractBaseMetric):
             output_text_dir (str):
             output_text_cleaning_regex (list):
             target_actual_text (bool):
+
         """
         self.output_text_dir = output_text_dir
         self.output_text_cleaning_regex = output_text_cleaning_regex
@@ -157,6 +159,7 @@ class ROUGEPerlMetric(AbstractBaseMetric):
 
         Returns:
             list:
+
         """
         # The default is: (r'<.*?>', r'[^a-zA-Z0-9.?! ]+')
         for cleaning_regex in cleaning_regex_list:
@@ -186,6 +189,7 @@ class BLEUSentenceScoreMetric(AbstractBaseMetric):
             y_predicted (list):
             source_sents (list or None):
             output_text_dir (str or None):
+
         """
         if output_text_dir is not None and source_sents is None:
             raise ValueError('output_text_dir is not None and source_sents is None; '
@@ -247,6 +251,7 @@ class BLEUSentenceScoreMetric(AbstractBaseMetric):
             
         Raises:
             ValueError
+
         """
         num_sents = len(sent_types[0])
         for sent_t in sent_types:
@@ -277,6 +282,7 @@ class BLEUCorpusScoreMetric(AbstractBaseMetric):
             y_predicted (list):
             source_sents (list or None):
             output_text_dir (str or None):
+
         """
         self.output_text_dir = output_text_dir
         self.source_sents = source_sents
@@ -317,6 +323,7 @@ class BLEUScoreStrTorchNLPMetric(AbstractBaseMetric):
             lowercase (bool):
             source_sents (list or None):
             output_text_dir (str or None):
+
         """
         self.output_text_dir = output_text_dir
         self.source_sents = source_sents
@@ -344,6 +351,7 @@ class PerplexityMetric(AbstractBaseMetric):
         Args:
             y_true (numpy.array or list):
             y_predicted (numpy.array or list):
+
         """
         raise NotImplementedError
 

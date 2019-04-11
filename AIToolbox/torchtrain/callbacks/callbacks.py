@@ -59,6 +59,7 @@ class EarlyStoppingCallback(AbstractCallback):
             monitor (str):
             min_delta (float):
             patience (int):
+
         """
         AbstractCallback.__init__(self, 'EarlyStopping')
         self.monitor = monitor
@@ -139,6 +140,7 @@ class ModelCheckpointCallback(AbstractCallback):
                 the metric minimization is done otherwise metric maximization is done
             num_best_checkpoints_kept (int): number of best performing models which are kept when removing suboptimal
                 model checkpoints
+
         """
         AbstractCallback.__init__(self, 'Model checkpoint at end of epoch')
         self.project_name = project_name
@@ -202,6 +204,7 @@ class ModelTrainEndSaveCallback(AbstractCallback):
                 For AWS S3: 's3' / 'aws_s3' / 'aws'
                 For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
                 Everything else results just in local storage to disk
+
         """
         AbstractCallback.__init__(self, 'Model save at the end of training')
         self.project_name = project_name

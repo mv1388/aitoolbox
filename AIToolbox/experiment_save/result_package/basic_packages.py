@@ -14,6 +14,7 @@ class GeneralResultPackage(AbstractResultPackage):
                 AIToolbox.experiment_save.core_metrics.BaseMetric.AbstractBaseMetric
             strict_content_check (bool):
             **kwargs (dict):
+
         """
         AbstractResultPackage.__init__(self, pkg_name='GeneralResultPackage', 
                                        strict_content_check=strict_content_check, **kwargs)
@@ -24,6 +25,7 @@ class GeneralResultPackage(AbstractResultPackage):
 
         Returns:
             dict:
+
         """
         self.qa_check_hyperparameters_dict()
         results_dict = {}
@@ -39,6 +41,7 @@ class GeneralResultPackage(AbstractResultPackage):
 
         Returns:
             None
+
         """
         if len(self.metrics_list) == 0:
             self.warn_about_result_data_problem('Metrics list is empty')
@@ -55,6 +58,7 @@ class BinaryClassificationResultPackage(AbstractResultPackage):
         Args:
             strict_content_check (bool):
             **kwargs (dict):
+
         """
         AbstractResultPackage.__init__(self, pkg_name='BinaryClassificationResult', 
                                        strict_content_check=strict_content_check, **kwargs)
@@ -64,6 +68,7 @@ class BinaryClassificationResultPackage(AbstractResultPackage):
 
         Returns:
             dict:
+
         """
         accuracy_result = AccuracyMetric(self.y_true, self.y_predicted).get_metric_dict()
         roc_auc_result = ROCAUCMetric(self.y_true, self.y_predicted).get_metric_dict()
@@ -82,6 +87,7 @@ class ClassificationResultPackage(AbstractResultPackage):
         Args:
             strict_content_check (bool):
             **kwargs (dict):
+
         """
         AbstractResultPackage.__init__(self, pkg_name='ClassificationResult', 
                                        strict_content_check=strict_content_check, **kwargs)
@@ -91,6 +97,7 @@ class ClassificationResultPackage(AbstractResultPackage):
 
         Returns:
             dict:
+
         """
         accuracy_result = AccuracyMetric(self.y_true, self.y_predicted).get_metric_dict()
 
@@ -109,6 +116,7 @@ class RegressionResultPackage(AbstractResultPackage):
         Args:
             strict_content_check (bool):
             **kwargs (dict):
+
         """
         AbstractResultPackage.__init__(self, pkg_name='RegressionResult', 
                                        strict_content_check=strict_content_check, **kwargs)
@@ -118,6 +126,7 @@ class RegressionResultPackage(AbstractResultPackage):
 
         Returns:
             dict:
+
         """
         mse_result = MeanSquaredErrorMetric(self.y_true, self.y_predicted).get_metric_dict()
         mae_result = MeanAbsoluteErrorMetric(self.y_true, self.y_predicted).get_metric_dict()
