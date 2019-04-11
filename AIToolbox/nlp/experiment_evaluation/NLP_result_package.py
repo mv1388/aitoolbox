@@ -10,7 +10,7 @@ from AIToolbox.nlp.experiment_evaluation.attention_heatmap import AttentionHeatM
 
 class QuestionAnswerResultPackage(AbstractResultPackage):
     def __init__(self, paragraph_text_tokens, target_actual_text=None, output_text_dir=None,
-                 use_perl_rouge=False,
+                 use_perl_rouge=False, flatten_result_dict=False,
                  strict_content_check=False, **kwargs):
         """
 
@@ -19,6 +19,7 @@ class QuestionAnswerResultPackage(AbstractResultPackage):
             target_actual_text (list or None):
             output_text_dir (str or None):
             use_perl_rouge (bool):
+            flatten_result_dict (bool):
             strict_content_check (bool):
             **kwargs (dict):
         """
@@ -37,6 +38,7 @@ class QuestionAnswerResultPackage(AbstractResultPackage):
 
         self.output_text_dir = os.path.expanduser(output_text_dir) if output_text_dir else None
         self.use_perl_rouge = use_perl_rouge
+        self.flatten_result_dict = flatten_result_dict
 
     def prepare_results_dict(self):
         """
@@ -74,6 +76,9 @@ class QuestionAnswerResultPackage(AbstractResultPackage):
 
         # self.results_dict = {**rogue_metric, **rogue_metric_non_official}
         self.results_dict = rogue_metric.get_metric_dict()
+
+        if self.flatten_result_dict:
+            self.results_dict = self.flatten_dict(self.results_dict)
 
     def set_experiment_dir_path_for_additional_results(self, project_name, experiment_name, experiment_timestamp,
                                                        local_model_result_folder_path):

@@ -1,6 +1,7 @@
 import copy
 from abc import ABC, abstractmethod
 import shutil
+import collections
 import numpy as np
 
 from AIToolbox.experiment_save.training_history import TrainingHistory
@@ -267,6 +268,27 @@ class AbstractResultPackage(ABC):
         """
         shutil.make_archive(zip_path, 'zip', source_dir_path)
         return zip_path + '.zip'
+
+    @staticmethod
+    def flatten_dict(d, parent_key='', sep='_'):
+        """Flatten the nested dict of dicts of ...
+
+        Args:
+            d (dict): input dict
+            parent_key (str):
+            sep (str): separator when flattening the category
+
+        Returns:
+            dict: flattened dict
+        """
+        items = []
+        for k, v in d.items():
+            new_key = parent_key + sep + k if parent_key else k
+            if isinstance(v, collections.MutableMapping):
+                items.extend(AbstractResultPackage.flatten_dict(v, new_key, sep=sep).items())
+            else:
+                items.append((new_key, v))
+        return dict(items)
 
     def __str__(self):
         self.warn_if_results_dict_not_defined()
