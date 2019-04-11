@@ -71,6 +71,8 @@ class TestLocalSubOptimalModelRemover(unittest.TestCase):
                          [(['history_path_3.1', 'history_path_3.2'], 25.0),
                           (['history_path_4.1', 'history_path_4.2'], 30.0)])
 
+        self.assertEqual(remover_loss.paths_to_remove, paths_1 + paths_2)
+
     def test_decide_if_remove_suboptimal_model_custom_loss(self):
         remover_loss = DummyLocalSubOptimalModelRemover('my_loss', num_best_kept=2)
 
@@ -102,6 +104,8 @@ class TestLocalSubOptimalModelRemover(unittest.TestCase):
                           (['history_path_2.1', 'history_path_2.2'], 75.0)])
         self.assertEqual(remover_loss.non_default_metric_buffer, paths_4)
 
+        self.assertEqual(remover_loss.paths_to_remove, paths_1)
+
     def test_decide_if_remove_suboptimal_model_custom_non_loss(self):
         remover_loss = DummyLocalSubOptimalModelRemover('my_acc', num_best_kept=2)
 
@@ -132,6 +136,8 @@ class TestLocalSubOptimalModelRemover(unittest.TestCase):
                          [(['history_path_3.1', 'history_path_3.2'], 150.0),
                           (['history_path_1.1', 'history_path_1.2'], 100.0)])
         self.assertEqual(remover_loss.non_default_metric_buffer, paths_4)
+
+        self.assertEqual(remover_loss.paths_to_remove, paths_2)
 
     def test_num_best_kept_acc(self):
         for num_kept in range(2, 100):
