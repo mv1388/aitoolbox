@@ -8,6 +8,7 @@ class Vocabulary:
         Args:
             name (str):
             document_level (bool):
+
         """
         # Default word tokens
         self.PAD_token = 0  # Used for padding short sentences

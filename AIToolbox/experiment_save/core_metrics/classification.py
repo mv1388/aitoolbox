@@ -11,6 +11,7 @@ class AccuracyMetric(AbstractBaseMetric):
         Args:
             y_true (numpy.array or list):
             y_predicted (numpy.array or list):
+
         """
         AbstractBaseMetric.__init__(self, y_true, y_predicted, metric_name='Accuracy')
 
@@ -36,6 +37,7 @@ class ROCAUCMetric(AbstractBaseMetric):
         Args:
             y_true (numpy.array or list):
             y_predicted (numpy.array or list):
+
         """
         AbstractBaseMetric.__init__(self, y_true, y_predicted, metric_name='ROC_AUC')
 
@@ -50,6 +52,7 @@ class PrecisionRecallCurveAUCMetric(AbstractBaseMetric):
         Args:
             y_true (numpy.array or list):
             y_predicted (numpy.array or list):
+
         """
         AbstractBaseMetric.__init__(self, y_true, y_predicted, metric_name='PrecisionRecall_AUC')
 
@@ -65,6 +68,7 @@ class F1ScoreMetric(AbstractBaseMetric):
         Args:
             y_true (numpy.array or list):
             y_predicted (numpy.array or list):
+
         """
         self.y_predicted_label_thresh = y_predicted_label_thresh
         AbstractBaseMetric.__init__(self, y_true, y_predicted, metric_name='F1_score')
@@ -81,6 +85,7 @@ class PrecisionMetric(AbstractBaseMetric):
         Args:
             y_true (numpy.array or list):
             y_predicted (numpy.array or list):
+
         """
         self.y_predicted_label_thresh = y_predicted_label_thresh
         AbstractBaseMetric.__init__(self, y_true, y_predicted, metric_name='Precision')
@@ -97,6 +102,7 @@ class RecallMetric(AbstractBaseMetric):
         Args:
             y_true (numpy.array or list):
             y_predicted (numpy.array or list):
+
         """
         self.y_predicted_label_thresh = y_predicted_label_thresh
         AbstractBaseMetric.__init__(self, y_true, y_predicted, metric_name='Recall')

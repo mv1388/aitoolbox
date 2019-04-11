@@ -36,6 +36,7 @@ class BaseResultsSaver:
         Args:
             bucket_name (str):
             local_results_folder_path (str):
+
         """
         self.bucket_name = bucket_name
         self.s3_client = boto3.client('s3')
@@ -52,6 +53,7 @@ class BaseResultsSaver:
 
         Returns:
             None
+
         """
         self.s3_client.upload_file(os.path.expanduser(local_file_path),
                                    self.bucket_name, cloud_file_path)
@@ -66,6 +68,7 @@ class BaseResultsSaver:
 
         Returns:
             str:
+
         """
         experiment_cloud_path = os.path.join(project_name,
                                              experiment_name + '_' + experiment_timestamp,
@@ -80,6 +83,7 @@ class S3ResultsSaver(AbstractResultsSaver, BaseResultsSaver):
         Args:
             bucket_name (str):
             local_model_result_folder_path (str):
+
         """
         BaseResultsSaver.__init__(self, bucket_name, local_model_result_folder_path)
         self.local_results_saver = LocalResultsSaver(local_model_result_folder_path)
@@ -99,6 +103,7 @@ class S3ResultsSaver(AbstractResultsSaver, BaseResultsSaver):
 
         Returns:
             (str, str):
+
         """
         if experiment_timestamp is None:
             experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')

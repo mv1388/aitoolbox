@@ -32,6 +32,7 @@ class BaseLocalModelSaver:
         Args:
             local_model_result_folder_path (str):
             checkpoint_model (bool):
+
         """
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
         self.checkpoint_model = checkpoint_model
@@ -46,6 +47,7 @@ class BaseLocalModelSaver:
 
         Returns:
             str:
+
         """
         project_path = os.path.join(self.local_model_result_folder_path, project_name)
         if not os.path.exists(project_path):
@@ -72,6 +74,7 @@ class KerasLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
         Args:
             local_model_result_folder_path (str):
             checkpoint_model (bool):
+
         """
         BaseLocalModelSaver.__init__(self, local_model_result_folder_path, checkpoint_model)
 
@@ -119,6 +122,7 @@ class TensorFlowLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
         Args:
             local_model_result_folder_path (str):
             checkpoint_model (bool):
+
         """
         BaseLocalModelSaver.__init__(self, local_model_result_folder_path, checkpoint_model)
 
@@ -136,6 +140,7 @@ class PyTorchLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
         Args:
             local_model_result_folder_path (str):
             checkpoint_model (bool):
+
         """
         BaseLocalModelSaver.__init__(self, local_model_result_folder_path, checkpoint_model)
 
@@ -185,6 +190,7 @@ class LocalSubOptimalModelRemover:
                 in the TrainLoop
             num_best_kept (int): number of best performing models which are kept when removing suboptimal model
                 checkpoints
+
         """
         self.metric_name = metric_name
         self.decrease_metric = 'loss' in metric_name
@@ -203,6 +209,9 @@ class LocalSubOptimalModelRemover:
         Args:
             history (dict):
             new_model_dump_paths (list):
+            
+        Returns:
+            None
 
         """
         if not self.is_default_metric:
@@ -228,6 +237,9 @@ class LocalSubOptimalModelRemover:
 
         Args:
             rm_model_paths (list): list of string paths
+            
+        Returns:
+            None
 
         """
         for rm_path in rm_model_paths:

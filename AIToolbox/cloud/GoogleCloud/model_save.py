@@ -14,6 +14,7 @@ class BaseModelGoogleStorageSaver:
             bucket_name (str):
             local_model_result_folder_path (str):
             checkpoint_model (bool):
+
         """
         self.bucket_name = bucket_name
         self.gcs_client = storage.Client()
@@ -31,6 +32,7 @@ class BaseModelGoogleStorageSaver:
 
         Returns:
             None
+
         """
         blob = self.gcs_bucket.blob(cloud_file_path)
         blob.upload_from_filename(local_file_path)
@@ -45,6 +47,7 @@ class KerasGoogleStorageModelSaver(BaseModelGoogleStorageSaver, KerasS3ModelSave
             bucket_name (str):
             local_model_result_folder_path (str):
             checkpoint_model (bool):
+
         """
         BaseModelGoogleStorageSaver.__init__(self, bucket_name, local_model_result_folder_path, checkpoint_model)
         self.keras_local_saver = KerasLocalModelSaver(local_model_result_folder_path, checkpoint_model)
@@ -59,6 +62,7 @@ class TensorFlowGoogleStorageModelSaver(BaseModelGoogleStorageSaver, TensorFlowS
             bucket_name (str):
             local_model_result_folder_path (str):
             checkpoint_model (bool):
+
         """
         BaseModelGoogleStorageSaver.__init__(self, bucket_name, local_model_result_folder_path, checkpoint_model)
         self.tf_local_saver = TensorFlowLocalModelSaver(local_model_result_folder_path, checkpoint_model)
@@ -75,6 +79,7 @@ class PyTorchGoogleStorageModelSaver(BaseModelGoogleStorageSaver, PyTorchS3Model
             bucket_name (str):
             local_model_result_folder_path (str):
             checkpoint_model (bool):
+
         """
         BaseModelGoogleStorageSaver.__init__(self, bucket_name, local_model_result_folder_path, checkpoint_model)
         self.pytorch_local_saver = PyTorchLocalModelSaver(local_model_result_folder_path, checkpoint_model)

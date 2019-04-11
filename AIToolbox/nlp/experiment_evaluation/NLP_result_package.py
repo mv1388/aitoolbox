@@ -22,6 +22,7 @@ class QuestionAnswerResultPackage(AbstractResultPackage):
             flatten_result_dict (bool):
             strict_content_check (bool):
             **kwargs (dict):
+
         """
         if use_perl_rouge is True and output_text_dir is None:
             raise ValueError('When using the perl based ROUGE definition the output_text_dir path must be given.')
@@ -45,6 +46,7 @@ class QuestionAnswerResultPackage(AbstractResultPackage):
 
         Returns:
             dict:
+
         """
         y_span_start_true = self.y_true[:, 0]
         y_span_start_predicted = self.y_predicted[:, 0]
@@ -62,11 +64,6 @@ class QuestionAnswerResultPackage(AbstractResultPackage):
                      for start_span, end_span, paragraph_text in
                      zip(y_span_start_predicted.astype('int'), y_span_end_predicted.astype('int'), self.paragraph_text_tokens)]
 
-        # Just for testing
-        # pred_text = [paragraph_text[start_span:end_span + 2]
-        #              for start_span, end_span, paragraph_text in
-        #              zip(y_span_start_true.astype('int'), y_span_end_true.astype('int'), self.paragraph_text_tokens)]
-
         if not self.use_perl_rouge:
             rogue_metric = ROUGEMetric(true_text, pred_text, target_actual_text=self.use_target_actual_text,
                                        output_text_dir=self.output_text_dir)
@@ -74,7 +71,6 @@ class QuestionAnswerResultPackage(AbstractResultPackage):
             rogue_metric = ROUGEPerlMetric(true_text, pred_text, self.output_text_dir,
                                            target_actual_text=self.use_target_actual_text)
 
-        # results_dict = {**rogue_metric, **rogue_metric_non_official}
         results_dict = rogue_metric.get_metric_dict()
 
         if self.flatten_result_dict:
@@ -104,6 +100,7 @@ class QuestionAnswerSpanClassificationResultPackage(AbstractResultPackage):
         Args:
             strict_content_check (bool):
             **kwargs (dict):
+
         """
         AbstractResultPackage.__init__(self, pkg_name='QuestionAnswerSpanClassificationResult',
                                        strict_content_check=strict_content_check, **kwargs)
@@ -122,6 +119,7 @@ class QuestionAnswerSpanClassificationResultPackage(AbstractResultPackage):
 
         Returns:
             dict:
+
         """
         y_span_start_true = self.y_true[:, 0]
         y_span_start_predicted = self.y_predicted[:, 0]
@@ -146,6 +144,7 @@ class TextSummarizationResultPackage(AbstractResultPackage):
         Args:
             strict_content_check (bool):
             **kwargs (dict):
+
         """
         AbstractResultPackage.__init__(self, pkg_name='TextSummarizationResult',
                                        strict_content_check=strict_content_check, **kwargs)
@@ -155,6 +154,7 @@ class TextSummarizationResultPackage(AbstractResultPackage):
 
         Returns:
             dict:
+
         """
         # rogue_result = ROUGEMetric(self.y_true, self.y_predicted).get_metric_dict()
 
@@ -174,6 +174,7 @@ class MachineTranslationResultPackage(AbstractResultPackage):
             output_attn_heatmap_dir (str or None):
             strict_content_check (bool):
             **kwargs (dict):
+
         """
         if output_text_dir is not None and (source_vocab is None or source_sents is None):
             raise ValueError(f'output_text_dir is not none which initiates the text results dump on disk. '
@@ -199,7 +200,9 @@ class MachineTranslationResultPackage(AbstractResultPackage):
         """
 
         Returns:
-            dict:
+            dict: result dict which is combination of different BLEU metric calculations and possibly
+                saved attention heatmap plot files and perplexity
+
         """
         self.y_true_text = [self.target_vocab.convert_idx_sent2sent(sent, rm_default_tokens=True) for sent in self.y_true]
         self.y_predicted_text = [self.target_vocab.convert_idx_sent2sent(sent, rm_default_tokens=True) for sent in self.y_predicted]
@@ -218,7 +221,8 @@ class MachineTranslationResultPackage(AbstractResultPackage):
             self.attention_matrices = self.additional_results['additional_results']['attention_matrices']
 
             source_sent_idx_tokens = self.additional_results['additional_results']['source_sent_text']
-            source_sent_text = [self.source_vocab.convert_idx_sent2sent(sent, rm_default_tokens=False) for sent in source_sent_idx_tokens]
+            source_sent_text = [self.source_vocab.convert_idx_sent2sent(sent, rm_default_tokens=False)
+                                for sent in source_sent_idx_tokens]
 
             attn_heatmap_metric = AttentionHeatMap(self.attention_matrices, source_sent_text, self.y_predicted_text,
                                                    self.output_attn_heatmap_dir)

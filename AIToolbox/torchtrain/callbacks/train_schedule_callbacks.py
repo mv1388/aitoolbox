@@ -10,6 +10,7 @@ class GeneralLRScheduler(AbstractCallback):
         Args:
             scheduler_class:
             **kwargs:
+
         """
         AbstractCallback.__init__(self, 'General learn rate scheduler')
         self.scheduler_args = kwargs
@@ -40,6 +41,7 @@ class ReduceLROnPlateauScheduler(GeneralLRScheduler):
 
         Args:
             **kwargs:
+
         """
         GeneralLRScheduler.__init__(self, ReduceLROnPlateau, **kwargs)
         self.callback_name = 'Reduce learn rate if the model hits the plateau'
@@ -55,6 +57,7 @@ class ReduceLROnPlateauMetricScheduler(GeneralLRScheduler):
         Args:
             metric_name (str):
             **kwargs:
+
         """
         GeneralLRScheduler.__init__(self, ReduceLROnPlateau, **kwargs)
         self.metric_name = metric_name
@@ -77,6 +80,7 @@ class LambdaLRScheduler(GeneralLRScheduler):
         Args:
             lr_lambda_list (list):
             **kwargs:
+
         """
         GeneralLRScheduler.__init__(self, LambdaLR, **dict(kwargs, lr_lambda=lr_lambda_list))
         self.callback_name = ''
@@ -89,6 +93,7 @@ class StepLRScheduler(GeneralLRScheduler):
         Args:
             step_size (int):
             **kwargs:
+
         """
         GeneralLRScheduler.__init__(self, StepLR, **dict(kwargs, step_size=step_size))
         self.callback_name = ''
@@ -101,6 +106,7 @@ class MultiStepLRScheduler(GeneralLRScheduler):
         Args:
             milestones_list (list):
             **kwargs:
+
         """
         GeneralLRScheduler.__init__(self, MultiStepLR, **dict(kwargs, milestones=milestones_list))
         self.callback_name = ''

@@ -5,6 +5,7 @@ class CallbacksHandler:
 
         Args:
             train_loop_obj (AIToolbox.torchtrain.train_loop.TrainLoop):
+
         """
         self.train_loop_obj = train_loop_obj
 
