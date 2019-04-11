@@ -32,6 +32,7 @@ class BaseLocalModelSaver:
         Args:
             local_model_result_folder_path (str):
             checkpoint_model (bool):
+
         """
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
         self.checkpoint_model = checkpoint_model
@@ -46,6 +47,7 @@ class BaseLocalModelSaver:
 
         Returns:
             str:
+
         """
         project_path = os.path.join(self.local_model_result_folder_path, project_name)
         if not os.path.exists(project_path):
@@ -72,6 +74,7 @@ class KerasLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
         Args:
             local_model_result_folder_path (str):
             checkpoint_model (bool):
+
         """
         BaseLocalModelSaver.__init__(self, local_model_result_folder_path, checkpoint_model)
 
@@ -119,6 +122,7 @@ class TensorFlowLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
         Args:
             local_model_result_folder_path (str):
             checkpoint_model (bool):
+
         """
         BaseLocalModelSaver.__init__(self, local_model_result_folder_path, checkpoint_model)
 
@@ -136,6 +140,7 @@ class PyTorchLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
         Args:
             local_model_result_folder_path (str):
             checkpoint_model (bool):
+
         """
         BaseLocalModelSaver.__init__(self, local_model_result_folder_path, checkpoint_model)
 
@@ -174,3 +179,68 @@ class PyTorchLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
         torch.save(model.state_dict(), model_weights_local_path)
 
         return model_name, model_weights_name, model_local_path, model_weights_local_path
+
+
+class LocalSubOptimalModelRemover:
+    def __init__(self, metric_name, num_best_kept=2):
+        """
+
+        Args:
+            metric_name (str): one of the metric names that will be calculated and will appear in the train_history dict
+                in the TrainLoop
+            num_best_kept (int): number of best performing models which are kept when removing suboptimal model
+                checkpoints
+
+        """
+        self.metric_name = metric_name
+        self.decrease_metric = 'loss' in metric_name
+
+        self.num_best_kept = num_best_kept
+
+        self.default_metrics_list = ['loss', 'accumulated_loss', 'val_loss']
+        self.is_default_metric = metric_name in self.default_metrics_list
+        self.non_default_metric_buffer = None
+
+        self.model_save_history = []
+        
+    def decide_if_remove_suboptimal_model(self, history, new_model_dump_paths):
+        """
+
+        Args:
+            history (dict):
+            new_model_dump_paths (list):
+            
+        Returns:
+            None
+
+        """
+        if not self.is_default_metric:
+            if self.non_default_metric_buffer is not None:
+                if self.metric_name in history:
+                    self.model_save_history.append((self.non_default_metric_buffer, history[self.metric_name][-1]))
+                else:
+                    print(f'Provided metric {self.metric_name} not found on the list of evaluated metrics: {history.keys()}')
+                    
+            self.non_default_metric_buffer = new_model_dump_paths
+        else:
+            self.model_save_history.append((new_model_dump_paths, history[self.metric_name][-1]))
+
+        if len(self.model_save_history) >= self.num_best_kept:
+            self.model_save_history = sorted(self.model_save_history, key=lambda x: x[1], reverse=not self.decrease_metric)
+
+            model_paths_to_rm, _ = self.model_save_history.pop()
+            self.rm_suboptimal_model(model_paths_to_rm)
+
+    @staticmethod
+    def rm_suboptimal_model(rm_model_paths):
+        """
+
+        Args:
+            rm_model_paths (list): list of string paths
+            
+        Returns:
+            None
+
+        """
+        for rm_path in rm_model_paths:
+            os.remove(rm_path)

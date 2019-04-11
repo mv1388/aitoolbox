@@ -13,10 +13,11 @@ class AbstractDatasetFetcher(ABC):
         """
         
         Args:
-            protect_local_folder (bool): 
+            protect_local_folder (bool):
 
         Returns:
             None
+
         """
         pass
 
@@ -28,6 +29,7 @@ class BaseDatasetFetcher:
         Args:
             bucket_name (str):
             local_dataset_folder_path (str):
+
         """
         self.bucket_name = bucket_name
         self.s3 = boto3.resource('s3')
@@ -87,6 +89,13 @@ class BaseDatasetFetcher:
 
     @staticmethod
     def unzip_file(file_path, target_dir_path):
+        """
+
+        Args:
+            file_path (str):
+            target_dir_path (str):
+
+        """
         if file_path[-4:] == '.zip':
             with zipfile.ZipFile(file_path, 'r') as zip_ref:
                 zip_ref.extractall(target_dir_path)
@@ -102,6 +111,7 @@ class SQuAD2DatasetFetcher(AbstractDatasetFetcher, BaseDatasetFetcher):
         Args:
             bucket_name (str):
             local_dataset_folder_path (str):
+
         """
         BaseDatasetFetcher.__init__(self, bucket_name, local_dataset_folder_path)
 
@@ -129,6 +139,7 @@ class QAngarooDatasetFetcher(AbstractDatasetFetcher, BaseDatasetFetcher):
         Args:
             bucket_name (str):
             local_dataset_folder_path (str):
+
         """
         BaseDatasetFetcher.__init__(self, bucket_name, local_dataset_folder_path)
 
@@ -162,6 +173,7 @@ class CNNDailyMailDatasetFetcher(AbstractDatasetFetcher, BaseDatasetFetcher):
         Args:
             bucket_name (str):
             local_dataset_folder_path (str):
+
         """
         BaseDatasetFetcher.__init__(self, bucket_name, local_dataset_folder_path)
         self.available_prepocessed_datasets = ['abisee', 'danqi']
@@ -236,6 +248,7 @@ class HotpotQADatasetFetcher(AbstractDatasetFetcher, BaseDatasetFetcher):
         Args:
             bucket_name (str):
             local_dataset_folder_path (str):
+
         """
         BaseDatasetFetcher.__init__(self, bucket_name, local_dataset_folder_path)
 

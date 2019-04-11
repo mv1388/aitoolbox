@@ -7,7 +7,7 @@ from allennlp.data.tokenizers import WordTokenizer
 from allennlp.data.dataset_readers.reading_comprehension import util
 
 from AIToolbox.cloud.AWS.data_access import SQuAD2DatasetFetcher
-from AIToolbox.NLP.core.vocabulary import Vocabulary
+from AIToolbox.nlp.core.vocabulary import Vocabulary
 
 """
 
@@ -38,6 +38,15 @@ def get_dataset_local_copy(local_dataset_folder_path, protect_local_folder=True)
 
 class SQuAD2ConcatContextDatasetReader:
     def __init__(self, file_path, tokenizer=None, is_train=True, dev_mode_size=None):
+        """
+
+        Args:
+            file_path (str):
+            tokenizer:
+            is_train (bool):
+            dev_mode_size:
+
+        """
         self.file_path = os.path.expanduser(file_path)
         self.is_train = is_train
         self.dataset = None
@@ -57,6 +66,7 @@ class SQuAD2ConcatContextDatasetReader:
         """Read SQuAD data. Tested and it works
 
         Returns:
+            list, AIToolbox.nlp.core.vocabulary.Vocabulary:
 
         """
         data = []
@@ -86,6 +96,17 @@ class SQuAD2ConcatContextDatasetReader:
         return data, self.vocab
 
     def process_example(self, paragraph_tokens, question_tokens, char_spans, answer_texts):
+        """
+
+        Args:
+            paragraph_tokens:
+            question_tokens:
+            char_spans:
+            answer_texts:
+
+        Returns:
+
+        """
         token_spans = []
         passage_offsets = [(token.idx, token.idx + len(token.text)) for token in paragraph_tokens]
 
@@ -109,6 +130,14 @@ class SQuAD2ConcatContextDatasetReader:
         return paragraph_tokens, question_tokens, (span_start, span_end), selected_answer_text
 
     def tokenize_process_paragraph(self, paragraph_text):
+        """
+
+        Args:
+            paragraph_text:
+
+        Returns:
+
+        """
         tokenized_paragraph = self._tokenizer.tokenize(paragraph_text)
 
         if self.is_train:
@@ -117,6 +146,14 @@ class SQuAD2ConcatContextDatasetReader:
         return tokenized_paragraph
 
     def tokenize_process_question(self, question_text):
+        """
+
+        Args:
+            question_text:
+
+        Returns:
+
+        """
         tokenized_question = self._tokenizer.tokenize(question_text)
 
         if self.is_train:
@@ -137,12 +174,33 @@ class GeneratorSQuAD2ConcatContextDatasetReader(SQuAD2ConcatContextDatasetReader
     """
 
     def __init__(self, file_path, tokenizer=None, is_train=True, dev_mode_size=None):
+        """
+
+        Args:
+            file_path:
+            tokenizer:
+            is_train:
+            dev_mode_size:
+
+        """
         SQuAD2ConcatContextDatasetReader.__init__(self, file_path, tokenizer, is_train, dev_mode_size)
 
     def read(self):
+        """
+
+        Returns:
+            list:
+
+        """
         return list(self.read_generator()), self.vocab
 
     def read_generator(self):
+        """
+
+        Yields:
+            list:
+
+        """
         for article in tqdm(self.dataset, total=len(self.dataset)):
             for paragraph_json in article['paragraphs']:
 

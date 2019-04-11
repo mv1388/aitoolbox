@@ -23,6 +23,7 @@ class TrainLoop:
             batch_model_feed_def (AIToolbox.torchtrain.batch_model_feed_defs.AbstractModelFeedDefinition):
             optimizer:
             criterion:
+
         """
         self.model = model
         self.train_loader = train_loader
@@ -55,6 +56,7 @@ class TrainLoop:
             grad_clip (int or float):
 
         Returns:
+            torch.nn.modules.Module:
 
         """
         return self.do_train(num_epoch, callbacks, grad_clip)
@@ -68,6 +70,7 @@ class TrainLoop:
             grad_clip (int or float):
 
         Returns:
+            torch.nn.modules.Module:
 
         """
         self.callbacks_handler.register_callbacks(callbacks)
@@ -138,6 +141,7 @@ class TrainLoop:
 
         Returns:
             float:
+
         """
         return self.evaluate_model_loss(self.train_loader)
 
@@ -146,6 +150,7 @@ class TrainLoop:
 
         Returns:
             float:
+
         """
         return self.evaluate_model_loss(self.validation_loader)
 
@@ -154,6 +159,7 @@ class TrainLoop:
 
         Returns:
             float:
+
         """
         return self.evaluate_model_loss(self.test_loader)
 
@@ -165,6 +171,7 @@ class TrainLoop:
 
         Returns:
             float:
+
         """
         self.model.eval()
         loss_avg = []
@@ -184,6 +191,7 @@ class TrainLoop:
 
         Returns:
             (torch.Tensor, torch.Tensor, dict):
+
         """
         return self.predict_with_model(self.train_loader)
 
@@ -192,6 +200,7 @@ class TrainLoop:
 
         Returns:
             (torch.Tensor, torch.Tensor, dict):
+
         """
         return self.predict_with_model(self.validation_loader)
 
@@ -200,6 +209,7 @@ class TrainLoop:
 
         Returns:
             (torch.Tensor, torch.Tensor, dict):
+
         """
         return self.predict_with_model(self.test_loader)
 
@@ -211,6 +221,7 @@ class TrainLoop:
 
         Returns:
             (torch.Tensor, torch.Tensor, dict):
+
         """
         y_test, y_pred, metadata_list = [], [], []
 
@@ -269,6 +280,7 @@ class TrainLoop:
 
         Returns:
             dict:
+
         """
         combined_metadata = {}
 
@@ -286,7 +298,8 @@ class TrainLoopModelCheckpoint(TrainLoop):
                  train_loader, validation_loader, test_loader,
                  batch_model_feed_def,
                  optimizer, criterion,
-                 project_name, experiment_name, local_model_result_folder_path, cloud_save_mode='s3'):
+                 project_name, experiment_name, local_model_result_folder_path, cloud_save_mode='s3',
+                 rm_subopt_local_models=False, num_best_checkpoints_kept=2):
         """
 
         Args:
@@ -304,16 +317,25 @@ class TrainLoopModelCheckpoint(TrainLoop):
                 For AWS S3: 's3' / 'aws_s3' / 'aws'
                 For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
                 Everything else results just in local storage to disk
+            rm_subopt_local_models (bool or str): if True, the deciding metric is set to 'loss'. Give string metric name
+                to set it as a deciding metric for suboptimal model removal. If metric name consists of substring 'loss'
+                the metric minimization is done otherwise metric maximization is done
+            num_best_checkpoints_kept (int): number of best performing models which are kept when removing suboptimal
+                model checkpoints
+
         """
         TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, batch_model_feed_def, optimizer, criterion)
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = local_model_result_folder_path
         self.cloud_save_mode = cloud_save_mode
+        self.rm_subopt_local_models = rm_subopt_local_models
 
         self.callbacks_handler.register_callbacks([
             ModelCheckpointCallback(self.project_name, self.experiment_name, self.local_model_result_folder_path,
-                                    cloud_save_mode=self.cloud_save_mode)
+                                    cloud_save_mode=self.cloud_save_mode,
+                                    rm_subopt_local_models=self.rm_subopt_local_models,
+                                    num_best_checkpoints_kept=num_best_checkpoints_kept)
         ])
 
 
@@ -344,6 +366,7 @@ class TrainLoopModelEndSave(TrainLoop):
                 For AWS S3: 's3' / 'aws_s3' / 'aws'
                 For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
                 Everything else results just in local storage to disk
+
         """
         TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, batch_model_feed_def, optimizer, criterion)
         self.project_name = project_name
@@ -382,7 +405,8 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
                  batch_model_feed_def,
                  optimizer, criterion,
                  project_name, experiment_name, local_model_result_folder_path,
-                 args, val_result_package=None, test_result_package=None, cloud_save_mode='s3'):
+                 args, val_result_package=None, test_result_package=None, cloud_save_mode='s3',
+                 rm_subopt_local_models=False, num_best_checkpoints_kept=2):
         """
 
         Args:
@@ -403,13 +427,22 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
                 For AWS S3: 's3' / 'aws_s3' / 'aws'
                 For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
                 Everything else results just in local storage to disk
+            rm_subopt_local_models (bool or str): if True, the deciding metric is set to 'loss'. Give string metric name
+                to set it as a deciding metric for suboptimal model removal. If metric name consists of substring 'loss'
+                the metric minimization is done otherwise metric maximization is done
+            num_best_checkpoints_kept (int): number of best performing models which are kept when removing suboptimal
+                model checkpoints
+
         """
         TrainLoopModelEndSave.__init__(self, model, train_loader, validation_loader, test_loader, batch_model_feed_def,
                                        optimizer, criterion,
                                        project_name, experiment_name, local_model_result_folder_path,
                                        args, val_result_package, test_result_package, cloud_save_mode)
+        self.rm_subopt_local_models = rm_subopt_local_models
 
         self.callbacks_handler.register_callbacks([
             ModelCheckpointCallback(self.project_name, self.experiment_name, self.local_model_result_folder_path,
-                                    cloud_save_mode=self.cloud_save_mode)
+                                    cloud_save_mode=self.cloud_save_mode,
+                                    rm_subopt_local_models=self.rm_subopt_local_models,
+                                    num_best_checkpoints_kept=num_best_checkpoints_kept)
         ])

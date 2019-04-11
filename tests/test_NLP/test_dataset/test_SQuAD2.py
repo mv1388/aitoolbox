@@ -1,6 +1,6 @@
 import unittest
 import os
-from AIToolbox.NLP.dataset.SQuAD2.SQuAD2DataReader import *
+from AIToolbox.nlp.dataset.SQuAD2.SQuAD2DataReader import *
 
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -18,7 +18,7 @@ class TestDataset_SQuAD2ConcatContextDatasetReader(unittest.TestCase):
 
         data, vocab = reader.read()
 
-        self.assertEqual(vocab.num_words, 245732)
+        self.assertEqual(vocab.num_words, 245740)
         self.assertEqual(len(data), 5928)
         self.assertTrue(all([len(span) == 2 for _, _, span, _ in data]))
 

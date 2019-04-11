@@ -17,6 +17,7 @@ class AttentionHeatMap(AbstractBaseMetric):
             source_sentences (list):
             target_sentences (list):
             plot_save_dir (str):
+
         """
         if len(attention_matrices) != len(source_sentences) != len(target_sentences):
             raise ValueError(f'Lengths of attention_matrices, source_sentences and target_sentences are not the same. '
@@ -29,6 +30,12 @@ class AttentionHeatMap(AbstractBaseMetric):
         AbstractBaseMetric.__init__(self, None, None, metric_name='Attention_HeatMap', np_array=False)
 
     def calculate_metric(self):
+        """
+
+        Returns:
+            None
+
+        """
         dir_path = self.prepare_folder_for_saving(self.plot_save_dir)
         output_plot_paths = []
 
@@ -98,6 +105,7 @@ class AttentionHeatMap(AbstractBaseMetric):
 
         Returns:
             str:
+
         """
         if os.path.exists(output_plot_dir):
             shutil.rmtree(output_plot_dir)

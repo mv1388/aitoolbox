@@ -13,6 +13,7 @@ class BaseDatasetGoogleStorageFetcher:
         Args:
             bucket_name (str):
             local_dataset_folder_path (str):
+
         """
         self.bucket_name = bucket_name
         self.gcs_client = storage.Client()
@@ -49,6 +50,7 @@ class SQuAD2DatasetFetcher(BaseDatasetGoogleStorageFetcher, SQuAD2S3DatasetFetch
         Args:
             bucket_name (str):
             local_dataset_folder_path (str):
+
         """
         raise NotImplementedError('This is only api, but the GoogleStorage backend dataset folder structure is not yet prepared')
 
@@ -62,6 +64,7 @@ class QAngarooDatasetFetcher(BaseDatasetGoogleStorageFetcher, QAngarooS3DatasetF
         Args:
             bucket_name (str):
             local_dataset_folder_path (str):
+
         """
         raise NotImplementedError('This is only api, but the GoogleStorage backend dataset folder structure is not yet prepared')
 
@@ -75,6 +78,7 @@ class CNNDailyMailDatasetFetcher(BaseDatasetGoogleStorageFetcher, CNNDailyMailS3
         Args:
             bucket_name (str):
             local_dataset_folder_path (str):
+
         """
         raise NotImplementedError('This is only api, but the GoogleStorage backend dataset folder structure is not yet prepared')
 
@@ -88,6 +92,7 @@ class HotpotQADatasetFetcher(BaseDatasetGoogleStorageFetcher, HotpotQAS3DatasetF
         Args:
             bucket_name (str):
             local_dataset_folder_path (str):
+
         """
         raise NotImplementedError('This is only api, but the GoogleStorage backend dataset folder structure is not yet prepared')
 

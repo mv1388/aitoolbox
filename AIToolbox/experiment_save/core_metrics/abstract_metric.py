@@ -11,6 +11,7 @@ class AbstractBaseMetric(ABC):
             y_true (numpy.array or list or str):
             y_predicted (numpy.array or list or str):
             np_array (bool):
+
         """
         self.y_true = np.array(y_true) if np_array else y_true
         self.y_predicted = np.array(y_predicted) if np_array else y_predicted
@@ -25,6 +26,7 @@ class AbstractBaseMetric(ABC):
         
         Returns:
             None
+
         """
         pass
 
@@ -33,6 +35,7 @@ class AbstractBaseMetric(ABC):
 
         Returns:
             float or dict:
+
         """
         return self.metric_result
 
@@ -41,6 +44,7 @@ class AbstractBaseMetric(ABC):
 
         Returns:
             dict:
+
         """
         return {self.metric_name: self.metric_result}
 
@@ -83,6 +87,7 @@ class AbstractBaseMetric(ABC):
 
         Returns:
             float or int:
+
         """
         if type(self.metric_result) is float or type(self.metric_result) is int:
             if isinstance(other, AbstractBaseMetric) and \

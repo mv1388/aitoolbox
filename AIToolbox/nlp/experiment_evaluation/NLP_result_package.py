@@ -3,14 +3,14 @@ import os
 from AIToolbox.experiment_save.local_save.local_results_save import BaseLocalResultsSaver
 from AIToolbox.experiment_save.result_package.abstract_result_packages import AbstractResultPackage
 from AIToolbox.experiment_save.core_metrics.classification import AccuracyMetric
-from AIToolbox.NLP.experiment_evaluation.NLP_metrics import ROUGEMetric, ROUGEPerlMetric, \
+from AIToolbox.nlp.experiment_evaluation.NLP_metrics import ROUGEMetric, ROUGEPerlMetric, \
     BLEUSentenceScoreMetric, BLEUCorpusScoreMetric, BLEUScoreStrTorchNLPMetric, PerplexityMetric
-from AIToolbox.NLP.experiment_evaluation.attention_heatmap import AttentionHeatMap
+from AIToolbox.nlp.experiment_evaluation.attention_heatmap import AttentionHeatMap
 
 
 class QuestionAnswerResultPackage(AbstractResultPackage):
     def __init__(self, paragraph_text_tokens, target_actual_text=None, output_text_dir=None,
-                 use_perl_rouge=False,
+                 use_perl_rouge=False, flatten_result_dict=False,
                  strict_content_check=False, **kwargs):
         """
 
@@ -19,8 +19,10 @@ class QuestionAnswerResultPackage(AbstractResultPackage):
             target_actual_text (list or None):
             output_text_dir (str or None):
             use_perl_rouge (bool):
+            flatten_result_dict (bool):
             strict_content_check (bool):
             **kwargs (dict):
+
         """
         if use_perl_rouge is True and output_text_dir is None:
             raise ValueError('When using the perl based ROUGE definition the output_text_dir path must be given.')
@@ -37,11 +39,13 @@ class QuestionAnswerResultPackage(AbstractResultPackage):
 
         self.output_text_dir = os.path.expanduser(output_text_dir) if output_text_dir else None
         self.use_perl_rouge = use_perl_rouge
+        self.flatten_result_dict = flatten_result_dict
 
     def prepare_results_dict(self):
         """
 
         Returns:
+            dict:
 
         """
         y_span_start_true = self.y_true[:, 0]
@@ -60,11 +64,6 @@ class QuestionAnswerResultPackage(AbstractResultPackage):
                      for start_span, end_span, paragraph_text in
                      zip(y_span_start_predicted.astype('int'), y_span_end_predicted.astype('int'), self.paragraph_text_tokens)]
 
-        # Just for testing
-        # pred_text = [paragraph_text[start_span:end_span + 2]
-        #              for start_span, end_span, paragraph_text in
-        #              zip(y_span_start_true.astype('int'), y_span_end_true.astype('int'), self.paragraph_text_tokens)]
-
         if not self.use_perl_rouge:
             rogue_metric = ROUGEMetric(true_text, pred_text, target_actual_text=self.use_target_actual_text,
                                        output_text_dir=self.output_text_dir)
@@ -72,8 +71,12 @@ class QuestionAnswerResultPackage(AbstractResultPackage):
             rogue_metric = ROUGEPerlMetric(true_text, pred_text, self.output_text_dir,
                                            target_actual_text=self.use_target_actual_text)
 
-        # self.results_dict = {**rogue_metric, **rogue_metric_non_official}
-        self.results_dict = rogue_metric.get_metric_dict()
+        results_dict = rogue_metric.get_metric_dict()
+
+        if self.flatten_result_dict:
+            results_dict = self.flatten_dict(results_dict)
+
+        return results_dict
 
     def set_experiment_dir_path_for_additional_results(self, project_name, experiment_name, experiment_timestamp,
                                                        local_model_result_folder_path):
@@ -97,6 +100,7 @@ class QuestionAnswerSpanClassificationResultPackage(AbstractResultPackage):
         Args:
             strict_content_check (bool):
             **kwargs (dict):
+
         """
         AbstractResultPackage.__init__(self, pkg_name='QuestionAnswerSpanClassificationResult',
                                        strict_content_check=strict_content_check, **kwargs)
@@ -114,6 +118,7 @@ class QuestionAnswerSpanClassificationResultPackage(AbstractResultPackage):
         **kwargs (dict):
 
         Returns:
+            dict:
 
         """
         y_span_start_true = self.y_true[:, 0]
@@ -129,7 +134,7 @@ class QuestionAnswerSpanClassificationResultPackage(AbstractResultPackage):
         span_start_accuracy_result = span_start_accuracy.get_metric_dict()
         span_end_accuracy_result = span_end_accuracy.get_metric_dict()
 
-        self.results_dict = {**span_start_accuracy_result, **span_end_accuracy_result}
+        return {**span_start_accuracy_result, **span_end_accuracy_result}
 
 
 class TextSummarizationResultPackage(AbstractResultPackage):
@@ -139,6 +144,7 @@ class TextSummarizationResultPackage(AbstractResultPackage):
         Args:
             strict_content_check (bool):
             **kwargs (dict):
+
         """
         AbstractResultPackage.__init__(self, pkg_name='TextSummarizationResult',
                                        strict_content_check=strict_content_check, **kwargs)
@@ -147,6 +153,7 @@ class TextSummarizationResultPackage(AbstractResultPackage):
         """
 
         Returns:
+            dict:
 
         """
         # rogue_result = ROUGEMetric(self.y_true, self.y_predicted).get_metric_dict()
@@ -160,13 +167,14 @@ class MachineTranslationResultPackage(AbstractResultPackage):
         """
 
         Args:
-            target_vocab (AIToolbox.NLP.core.vocabulary.Vocabulary):
-            source_vocab (AIToolbox.NLP.core.vocabulary.Vocabulary or None):
+            target_vocab (AIToolbox.nlp.core.vocabulary.Vocabulary):
+            source_vocab (AIToolbox.nlp.core.vocabulary.Vocabulary or None):
             source_sents (list or None):
             output_text_dir (str or None):
             output_attn_heatmap_dir (str or None):
             strict_content_check (bool):
             **kwargs (dict):
+
         """
         if output_text_dir is not None and (source_vocab is None or source_sents is None):
             raise ValueError(f'output_text_dir is not none which initiates the text results dump on disk. '
@@ -192,6 +200,8 @@ class MachineTranslationResultPackage(AbstractResultPackage):
         """
 
         Returns:
+            dict: result dict which is combination of different BLEU metric calculations and possibly
+                saved attention heatmap plot files and perplexity
 
         """
         self.y_true_text = [self.target_vocab.convert_idx_sent2sent(sent, rm_default_tokens=True) for sent in self.y_true]
@@ -203,7 +213,7 @@ class MachineTranslationResultPackage(AbstractResultPackage):
         # bleu_perl_result = BLEUScoreStrTorchNLPMetric(self.y_true_text, self.y_predicted_text).get_metric_dict()
         # perplexity_result = PerplexityMetric(self.y_true_text, self.y_predicted_text).get_metric_dict()
 
-        self.results_dict = {**bleu_corpus_result, **bleu_avg_sent}
+        results_dict = {**bleu_corpus_result, **bleu_avg_sent}
 
         # Don't include TrainLoop objects inside the package - it makes it useful only for PyTorch, not other frameworks
         if self.output_attn_heatmap_dir is not None:
@@ -211,13 +221,16 @@ class MachineTranslationResultPackage(AbstractResultPackage):
             self.attention_matrices = self.additional_results['additional_results']['attention_matrices']
 
             source_sent_idx_tokens = self.additional_results['additional_results']['source_sent_text']
-            source_sent_text = [self.source_vocab.convert_idx_sent2sent(sent, rm_default_tokens=False) for sent in source_sent_idx_tokens]
+            source_sent_text = [self.source_vocab.convert_idx_sent2sent(sent, rm_default_tokens=False)
+                                for sent in source_sent_idx_tokens]
 
             attn_heatmap_metric = AttentionHeatMap(self.attention_matrices, source_sent_text, self.y_predicted_text,
                                                    self.output_attn_heatmap_dir)
 
             attn_heatmap_plot_paths = attn_heatmap_metric.get_metric_dict()
-            self.results_dict = {**self.results_dict, **attn_heatmap_plot_paths}
+            results_dict = {**results_dict, **attn_heatmap_plot_paths}
+
+        return results_dict
 
     def set_experiment_dir_path_for_additional_results(self, project_name, experiment_name, experiment_timestamp,
                                                        local_model_result_folder_path):

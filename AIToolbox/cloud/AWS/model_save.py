@@ -36,6 +36,7 @@ class BaseModelSaver:
             bucket_name (str):
             local_model_result_folder_path (str):
             checkpoint_model (bool):
+
         """
         self.bucket_name = bucket_name
         self.s3_client = boto3.client('s3')
@@ -53,6 +54,7 @@ class BaseModelSaver:
 
         Returns:
             None
+
         """
         self.s3_client.upload_file(os.path.expanduser(local_file_path),
                                    self.bucket_name, cloud_file_path)
@@ -67,6 +69,7 @@ class BaseModelSaver:
 
         Returns:
             str:
+
         """
         experiment_cloud_path = os.path.join(project_name,
                                              experiment_name + '_' + experiment_timestamp,
@@ -83,6 +86,7 @@ class KerasS3ModelSaver(AbstractModelSaver, BaseModelSaver):
             bucket_name (str):
             local_model_result_folder_path (str):
             checkpoint_model (bool):
+
         """
         BaseModelSaver.__init__(self, bucket_name, local_model_result_folder_path, checkpoint_model)
         self.keras_local_saver = KerasLocalModelSaver(local_model_result_folder_path, checkpoint_model)
@@ -99,7 +103,7 @@ class KerasS3ModelSaver(AbstractModelSaver, BaseModelSaver):
             protect_existing_folder (bool):
 
         Returns:
-            (str, str):
+            (str, str, str, str):
 
         Examples:
             local_model_result_folder_path = '~/project/model_results'
@@ -127,7 +131,7 @@ class KerasS3ModelSaver(AbstractModelSaver, BaseModelSaver):
 
         full_model_s3_path = os.path.join(self.bucket_name, model_s3_path)
 
-        return full_model_s3_path, experiment_timestamp
+        return full_model_s3_path, experiment_timestamp, model_local_path, model_weights_local_path
 
 
 class TensorFlowS3ModelSaver(AbstractModelSaver, BaseModelSaver):
@@ -139,6 +143,7 @@ class TensorFlowS3ModelSaver(AbstractModelSaver, BaseModelSaver):
             bucket_name (str):
             local_model_result_folder_path (str):
             checkpoint_model (bool):
+
         """
         BaseModelSaver.__init__(self, bucket_name, local_model_result_folder_path, checkpoint_model)
         self.tf_local_saver = TensorFlowLocalModelSaver(local_model_result_folder_path, checkpoint_model)
@@ -159,6 +164,7 @@ class PyTorchS3ModelSaver(AbstractModelSaver, BaseModelSaver):
             bucket_name (str):
             local_model_result_folder_path (str):
             checkpoint_model (bool):
+
         """
         BaseModelSaver.__init__(self, bucket_name, local_model_result_folder_path, checkpoint_model)
         self.pytorch_local_saver = PyTorchLocalModelSaver(local_model_result_folder_path, checkpoint_model)
@@ -175,7 +181,7 @@ class PyTorchS3ModelSaver(AbstractModelSaver, BaseModelSaver):
             protect_existing_folder (bool):
 
         Returns:
-            (str, str):
+            (str, str, str, str):
 
         Examples:
             local_model_result_folder_path = '~/project/model_results'
@@ -203,4 +209,4 @@ class PyTorchS3ModelSaver(AbstractModelSaver, BaseModelSaver):
 
         full_model_s3_path = os.path.join(self.bucket_name, model_s3_path)
 
-        return full_model_s3_path, experiment_timestamp
+        return full_model_s3_path, experiment_timestamp, model_local_path, model_weights_local_path
