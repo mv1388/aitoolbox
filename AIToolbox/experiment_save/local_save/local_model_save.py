@@ -225,7 +225,7 @@ class LocalSubOptimalModelRemover:
         else:
             self.model_save_history.append((new_model_dump_paths, history[self.metric_name][-1]))
 
-        if len(self.model_save_history) >= self.num_best_kept:
+        if len(self.model_save_history) > self.num_best_kept:
             self.model_save_history = sorted(self.model_save_history, key=lambda x: x[1], reverse=not self.decrease_metric)
 
             model_paths_to_rm, _ = self.model_save_history.pop()
