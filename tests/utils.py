@@ -163,7 +163,7 @@ class DummyResultPackage(AbstractResultPackage):
         self.experiment_path = None
 
     def prepare_results_dict(self):
-        self.results_dict = {'dummy': 111}
+        return {'dummy': 111}
         
     def set_experiment_dir_path_for_additional_results(self, project_name, experiment_name, experiment_timestamp,
                                                        local_model_result_folder_path):
@@ -176,8 +176,9 @@ class DummyResultPackageExtend(DummyResultPackage):
         self.ctr = 0.
     
     def prepare_results_dict(self):
-        self.results_dict = {'dummy': 111 + self.ctr, 'extended_dummy': 1323123.44 + self.ctr}
+        results_dict = {'dummy': 111 + self.ctr, 'extended_dummy': 1323123.44 + self.ctr}
         self.ctr += 12
+        return results_dict
 
 
 class DummyResultPackageExtendV2(DummyResultPackageExtend):
@@ -195,7 +196,7 @@ class DummyResultPackageExtendVariable(DummyResultPackageExtend):
         self.result_d = result_d
         
     def prepare_results_dict(self):
-        self.results_dict = self.result_d
+        return self.result_d
         
 
 class DummyAbstractBaseMetric(AbstractBaseMetric):
