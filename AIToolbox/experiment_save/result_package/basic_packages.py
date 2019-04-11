@@ -23,14 +23,16 @@ class GeneralResultPackage(AbstractResultPackage):
         """
 
         Returns:
-            None:
+            dict:
         """
         self.qa_check_hyperparameters_dict()
-        self.results_dict = {}
+        results_dict = {}
 
         for metric in self.metrics_list:
             metric_result_dict = metric(self.y_true, self.y_predicted).get_metric_dict()
-            self.results_dict = {**self.results_dict, **metric_result_dict}
+            results_dict = {**results_dict, **metric_result_dict}
+            
+        return results_dict
 
     def qa_check_metrics_list(self):
         """
@@ -61,14 +63,14 @@ class BinaryClassificationResultPackage(AbstractResultPackage):
         """
 
         Returns:
-            None:
+            dict:
         """
         accuracy_result = AccuracyMetric(self.y_true, self.y_predicted).get_metric_dict()
         roc_auc_result = ROCAUCMetric(self.y_true, self.y_predicted).get_metric_dict()
         pr_auc_result = PrecisionRecallCurveAUCMetric(self.y_true, self.y_predicted).get_metric_dict()
         f1_score_result = F1ScoreMetric(self.y_true, self.y_predicted).get_metric_dict()
 
-        self.results_dict = {**accuracy_result, **roc_auc_result, **pr_auc_result, **f1_score_result}
+        return {**accuracy_result, **roc_auc_result, **pr_auc_result, **f1_score_result}
 
 
 class ClassificationResultPackage(AbstractResultPackage):
@@ -88,7 +90,7 @@ class ClassificationResultPackage(AbstractResultPackage):
         """
 
         Returns:
-            None:
+            dict:
         """
         accuracy_result = AccuracyMetric(self.y_true, self.y_predicted).get_metric_dict()
 
@@ -97,7 +99,7 @@ class ClassificationResultPackage(AbstractResultPackage):
         # f1_score_result = F1ScoreMetric(self.y_true, self.y_predicted).get_metric_dict()
         # self.results_dict = {**accuracy_result, **roc_auc_result}
 
-        self.results_dict = accuracy_result
+        return accuracy_result
 
         
 class RegressionResultPackage(AbstractResultPackage):
@@ -115,9 +117,9 @@ class RegressionResultPackage(AbstractResultPackage):
         """
 
         Returns:
-            None:
+            dict:
         """
         mse_result = MeanSquaredErrorMetric(self.y_true, self.y_predicted).get_metric_dict()
         mae_result = MeanAbsoluteErrorMetric(self.y_true, self.y_predicted).get_metric_dict()
 
-        self.results_dict = {**mse_result, **mae_result}
+        return {**mse_result, **mae_result}

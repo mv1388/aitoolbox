@@ -41,7 +41,7 @@ class AbstractResultPackage(ABC):
 
     @abstractmethod
     def prepare_results_dict(self):
-        """ Perform result package building and save the result into self.results_dict
+        """Perform result package building
 
         Mostly this consists of executing calculation of selected performance metrics and returning their result dicts.
         If you want to use multiple performance metrics you have to combine them in the single self.results_dict
@@ -49,7 +49,7 @@ class AbstractResultPackage(ABC):
             self.results_dict = {**metric_dict_1, **metric_dict_2}
 
         Returns:
-            None
+            dict: calculated result dict
         """
         pass
 
@@ -82,7 +82,7 @@ class AbstractResultPackage(ABC):
         self.training_history = training_history
         self.additional_results = kwargs
 
-        self.prepare_results_dict()
+        self.results_dict = self.prepare_results_dict()
 
     @staticmethod
     def auto_y_input_array_convert(y_array):

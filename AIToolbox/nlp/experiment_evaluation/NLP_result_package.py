@@ -44,7 +44,7 @@ class QuestionAnswerResultPackage(AbstractResultPackage):
         """
 
         Returns:
-
+            dict:
         """
         y_span_start_true = self.y_true[:, 0]
         y_span_start_predicted = self.y_predicted[:, 0]
@@ -74,11 +74,13 @@ class QuestionAnswerResultPackage(AbstractResultPackage):
             rogue_metric = ROUGEPerlMetric(true_text, pred_text, self.output_text_dir,
                                            target_actual_text=self.use_target_actual_text)
 
-        # self.results_dict = {**rogue_metric, **rogue_metric_non_official}
-        self.results_dict = rogue_metric.get_metric_dict()
+        # results_dict = {**rogue_metric, **rogue_metric_non_official}
+        results_dict = rogue_metric.get_metric_dict()
 
         if self.flatten_result_dict:
-            self.results_dict = self.flatten_dict(self.results_dict)
+            results_dict = self.flatten_dict(results_dict)
+
+        return results_dict
 
     def set_experiment_dir_path_for_additional_results(self, project_name, experiment_name, experiment_timestamp,
                                                        local_model_result_folder_path):
@@ -119,7 +121,7 @@ class QuestionAnswerSpanClassificationResultPackage(AbstractResultPackage):
         **kwargs (dict):
 
         Returns:
-
+            dict:
         """
         y_span_start_true = self.y_true[:, 0]
         y_span_start_predicted = self.y_predicted[:, 0]
@@ -134,7 +136,7 @@ class QuestionAnswerSpanClassificationResultPackage(AbstractResultPackage):
         span_start_accuracy_result = span_start_accuracy.get_metric_dict()
         span_end_accuracy_result = span_end_accuracy.get_metric_dict()
 
-        self.results_dict = {**span_start_accuracy_result, **span_end_accuracy_result}
+        return {**span_start_accuracy_result, **span_end_accuracy_result}
 
 
 class TextSummarizationResultPackage(AbstractResultPackage):
@@ -152,7 +154,7 @@ class TextSummarizationResultPackage(AbstractResultPackage):
         """
 
         Returns:
-
+            dict:
         """
         # rogue_result = ROUGEMetric(self.y_true, self.y_predicted).get_metric_dict()
 
@@ -197,7 +199,7 @@ class MachineTranslationResultPackage(AbstractResultPackage):
         """
 
         Returns:
-
+            dict:
         """
         self.y_true_text = [self.target_vocab.convert_idx_sent2sent(sent, rm_default_tokens=True) for sent in self.y_true]
         self.y_predicted_text = [self.target_vocab.convert_idx_sent2sent(sent, rm_default_tokens=True) for sent in self.y_predicted]
@@ -208,7 +210,7 @@ class MachineTranslationResultPackage(AbstractResultPackage):
         # bleu_perl_result = BLEUScoreStrTorchNLPMetric(self.y_true_text, self.y_predicted_text).get_metric_dict()
         # perplexity_result = PerplexityMetric(self.y_true_text, self.y_predicted_text).get_metric_dict()
 
-        self.results_dict = {**bleu_corpus_result, **bleu_avg_sent}
+        results_dict = {**bleu_corpus_result, **bleu_avg_sent}
 
         # Don't include TrainLoop objects inside the package - it makes it useful only for PyTorch, not other frameworks
         if self.output_attn_heatmap_dir is not None:
@@ -222,7 +224,9 @@ class MachineTranslationResultPackage(AbstractResultPackage):
                                                    self.output_attn_heatmap_dir)
 
             attn_heatmap_plot_paths = attn_heatmap_metric.get_metric_dict()
-            self.results_dict = {**self.results_dict, **attn_heatmap_plot_paths}
+            results_dict = {**results_dict, **attn_heatmap_plot_paths}
+
+        return results_dict
 
     def set_experiment_dir_path_for_additional_results(self, project_name, experiment_name, experiment_timestamp,
                                                        local_model_result_folder_path):
