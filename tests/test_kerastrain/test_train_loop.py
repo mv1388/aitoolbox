@@ -68,17 +68,6 @@ class KerasCallbackTrackerShort(AbstractKerasCallback):
         self.call_ctr['on_batch_begin'] += 1
 
 
-class DummyKerasModel:
-    def __init__(self):
-        pass
-
-    def fit(self, **kwargs):
-        return {}
-
-    def compile(self, **kwargs):
-        pass
-
-
 class TestTrainLoop(unittest.TestCase):
     def test_init_values(self):
         train_loop = TrainLoop(keras_dummy_model(), None, None, None,
