@@ -21,7 +21,7 @@ class AbstractModelSaver(ABC):
             protect_existing_folder (bool):
 
         Returns:
-            (str, str): model_s3_path, experiment_timestamp
+            (str, str, str, str): model_s3_path, experiment_timestamp, model_local_path, model_weights_local_path
 
         """
         pass
