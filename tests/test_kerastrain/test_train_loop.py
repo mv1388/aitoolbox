@@ -1,5 +1,6 @@
 import unittest
 import keras
+import numpy
 
 from tests.utils import *
 
@@ -102,3 +103,43 @@ class TestTrainLoop(unittest.TestCase):
         for reg_cb, cb_name in zip(train_loop.callbacks,
                                    ['callback_test1', 'CallbackTracker1', 'CallbackTracker2', 'callback_test2']):
             self.assertEqual(reg_cb.callback_name, cb_name)
+
+    def test_callback_on_execution(self):
+        num_epochs = 2
+
+        model = keras_dummy_model()
+        dataset = numpy.loadtxt("pima-indians-diabetes.data.csv", delimiter=",")
+        # split into input (X) and output (Y) variables
+        X = dataset[:, 0:8]
+        Y = dataset[:, 8]
+
+        train_loop = TrainLoop(model, [X, Y], None, None,
+                               optimizer='adam',
+                               criterion='binary_crossentropy', metrics=['accuracy'])
+        train_loop.callbacks_handler.register_callbacks([AbstractKerasCallback('callback_test1'),
+                                                         KerasCallbackTracker(), KerasCallbackTrackerShort(),
+                                                         AbstractKerasCallback('callback_test2')])
+
+        callback_full = train_loop.callbacks[1]
+        callback_short = train_loop.callbacks[2]
+
+        model_return = train_loop.do_train(num_epoch=num_epochs, batch_size=300)
+
+        self.assertEqual(model, model_return)
+
+        self.assertEqual(callback_full.callback_calls,
+                         ['on_train_loop_registration', 'on_train_begin', 'on_epoch_begin', 'on_batch_begin',
+                          'on_batch_end', 'on_batch_begin', 'on_batch_end', 'on_batch_begin', 'on_batch_end',
+                          'on_epoch_end', 'on_epoch_begin', 'on_batch_begin', 'on_batch_end', 'on_batch_begin',
+                          'on_batch_end', 'on_batch_begin', 'on_batch_end', 'on_epoch_end', 'on_train_end'])
+        self.assertEqual(callback_full.call_ctr,
+                         {'on_train_loop_registration': 1, 'on_epoch_begin': 2, 'on_epoch_end': 2, 'on_train_begin': 1,
+                          'on_train_end': 1, 'on_batch_begin': 6, 'on_batch_end': 6})
+
+        self.assertEqual(callback_short.callback_calls,
+                         ['on_epoch_begin', 'on_batch_begin', 'on_batch_begin', 'on_batch_begin', 'on_epoch_end',
+                          'on_epoch_begin', 'on_batch_begin', 'on_batch_begin', 'on_batch_begin', 'on_epoch_end',
+                          'on_train_end'])
+        self.assertEqual(callback_short.call_ctr,
+                         {'on_train_loop_registration': 0, 'on_epoch_begin': 2, 'on_epoch_end': 2, 'on_train_begin': 0,
+                          'on_train_end': 1, 'on_batch_begin': 6, 'on_batch_end': 0})

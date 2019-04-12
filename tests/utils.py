@@ -43,9 +43,6 @@ def keras_dummy_model():
     model.add(Dense(8, activation='relu'))
     model.add(Dense(1, activation='sigmoid'))
 
-    model.compile(optimizer='rmsprop',
-                  loss='categorical_crossentropy',
-                  metrics=['accuracy'])
     return model
     
     
