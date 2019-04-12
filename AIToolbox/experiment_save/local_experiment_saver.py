@@ -57,24 +57,23 @@ class BaseFullExperimentLocalSaver(AbstractExperimentSaver):
         saved_paths = [model_local_path, model_weights_local_path]
 
         if not separate_files:
-            _, results_file_local_path = \
+            saved_local_results_details = \
                 self.results_saver.save_experiment_results(result_package=result_package,
                                                            project_name=self.project_name,
                                                            experiment_name=self.experiment_name,
                                                            experiment_timestamp=experiment_timestamp,
                                                            save_true_pred_labels=save_true_pred_labels,
                                                            protect_existing_folder=protect_existing_folder)
-            saved_paths.append(results_file_local_path)
-
         else:
-            saved_results_paths = \
+            saved_local_results_details = \
                 self.results_saver.save_experiment_results_separate_files(result_package=result_package,
                                                                           project_name=self.project_name,
                                                                           experiment_name=self.experiment_name,
                                                                           experiment_timestamp=experiment_timestamp,
                                                                           save_true_pred_labels=save_true_pred_labels,
                                                                           protect_existing_folder=protect_existing_folder)
-            saved_paths += [path for _, path in saved_results_paths]
+
+        saved_paths += [path for _, path in saved_local_results_details]
 
         return saved_paths
 
