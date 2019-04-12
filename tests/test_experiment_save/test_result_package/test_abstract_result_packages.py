@@ -2,10 +2,11 @@ import unittest
 
 from tests.utils import *
 from AIToolbox.experiment_save.training_history import TrainingHistory
-from AIToolbox.experiment_save.result_package.abstract_result_packages import MultipleResultPackageWrapper, PreCalculatedResultPackage
+from AIToolbox.experiment_save.result_package.abstract_result_packages import AbstractResultPackage, \
+    MultipleResultPackageWrapper, PreCalculatedResultPackage
 
 
-class TestAbstractBaseMetric(unittest.TestCase):
+class TestAbstractResultPackage(unittest.TestCase):
     def test_basic(self):
         history = {'val_loss': [2.2513437271118164, 2.1482439041137695, 2.0187528133392334, 1.7953970432281494,
                                 1.5492324829101562, 1.715561032295227, 1.631982684135437, 1.3721977472305298,
@@ -526,3 +527,15 @@ class TestMultipleResultPackageWrapper(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             pkg_1 += [32313]
+
+    def test_flatten_dict(self):
+        input_dict = {'bla': 12, 'www': 455, 'pppp': 4004}
+        self.assertEqual(AbstractResultPackage.flatten_dict(input_dict), input_dict)
+
+        input_dict_1_level = {'bla': {'uuu': 334, 'www': 1010}, 'rogue': {'ppp': 123}}
+        self.assertEqual(AbstractResultPackage.flatten_dict(input_dict_1_level),
+                         {'bla_uuu': 334, 'bla_www': 1010, 'rogue_ppp': 123})
+
+        input_dict_2_level = {'bla': {'rogue_1': {'m': 10, 'p': 11}, 'rogue_2': {'m': 20, 'p': 22}}}
+        self.assertEqual(AbstractResultPackage.flatten_dict(input_dict_2_level),
+                         {'bla_rogue_1_m': 10, 'bla_rogue_1_p': 11, 'bla_rogue_2_m': 20, 'bla_rogue_2_p': 22})

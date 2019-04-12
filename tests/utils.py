@@ -34,6 +34,21 @@ class Net(nn.Module):
         return F.log_softmax(x, dim=1)
     
     
+def keras_dummy_model():
+    from keras.models import Sequential
+    from keras.layers import Dense
+
+    model = Sequential()
+    model.add(Dense(12, input_dim=8, activation='relu'))
+    model.add(Dense(8, activation='relu'))
+    model.add(Dense(1, activation='sigmoid'))
+
+    model.compile(optimizer='rmsprop',
+                  loss='categorical_crossentropy',
+                  metrics=['accuracy'])
+    return model
+    
+    
 class CallbackTracker(AbstractCallback):
     def __init__(self):
         AbstractCallback.__init__(self, 'CallbackTracker1')
