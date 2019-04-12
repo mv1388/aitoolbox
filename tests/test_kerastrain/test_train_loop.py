@@ -113,7 +113,7 @@ class TestTrainLoop(unittest.TestCase):
         model = keras_dummy_model()
         
         # Based on the example from: https://machinelearningmastery.com/tutorial-first-neural-network-python-keras/
-        dataset = numpy.loadtxt(os.path.join(THIS_DIR, "pima-indians-diabetes.data.csv"), delimiter=",")
+        dataset = numpy.loadtxt(os.path.join(THIS_DIR, "data.csv"), delimiter=",")
         # split into input (X) and output (Y) variables
         X = dataset[:, 0:8]
         Y = dataset[:, 8]
@@ -154,7 +154,7 @@ class TestTrainLoop(unittest.TestCase):
         model = keras_dummy_model()
 
         # Based on the example from: https://machinelearningmastery.com/tutorial-first-neural-network-python-keras/
-        dataset = numpy.loadtxt(os.path.join(THIS_DIR, "pima-indians-diabetes.data.csv"), delimiter=",")
+        dataset = numpy.loadtxt(os.path.join(THIS_DIR, "data.csv"), delimiter=",")
         # split into input (X) and output (Y) variables
         X = dataset[:, 0:8]
         Y = dataset[:, 8]
