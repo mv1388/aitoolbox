@@ -244,7 +244,7 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
 
         experiment_train_hist_dict = {'experiment_name': experiment_name,
                                       'experiment_results_local_path': experiment_results_local_path,
-                                      'hyperparameters': training_history}
+                                      'training_history': training_history}
 
         results_file_name_w_type = f'results_{experiment_name}_{experiment_timestamp}'
         results_file_local_path_w_type = os.path.join(experiment_results_local_path, results_file_name_w_type)
