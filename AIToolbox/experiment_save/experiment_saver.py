@@ -68,11 +68,11 @@ class BaseFullExperimentSaver(AbstractExperimentSaver):
         if experiment_timestamp is None:
             experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
 
-        cloud_model_path, _ = self.model_saver.save_model(model=model,
-                                                          project_name=self.project_name,
-                                                          experiment_name=self.experiment_name,
-                                                          experiment_timestamp=experiment_timestamp,
-                                                          protect_existing_folder=protect_existing_folder)
+        cloud_model_path, _, _, _ = self.model_saver.save_model(model=model,
+                                                                project_name=self.project_name,
+                                                                experiment_name=self.experiment_name,
+                                                                experiment_timestamp=experiment_timestamp,
+                                                                protect_existing_folder=protect_existing_folder)
 
         cloud_results_path, _ = self.results_saver.save_experiment_results(result_package=result_package,
                                                                            project_name=self.project_name,
