@@ -148,3 +148,32 @@ class TestTrainLoop(unittest.TestCase):
         self.assertEqual(callback_short.call_ctr,
                          {'on_train_loop_registration': 0, 'on_epoch_begin': 2, 'on_epoch_end': 2, 'on_train_begin': 0,
                           'on_train_end': 1, 'on_batch_begin': 6, 'on_batch_end': 0})
+
+    def test_basic_history_tracking(self):
+        num_epochs = 2
+        model = keras_dummy_model()
+
+        # Based on the example from: https://machinelearningmastery.com/tutorial-first-neural-network-python-keras/
+        dataset = numpy.loadtxt(os.path.join(THIS_DIR, "pima-indians-diabetes.data.csv"), delimiter=",")
+        # split into input (X) and output (Y) variables
+        X = dataset[:, 0:8]
+        Y = dataset[:, 8]
+
+        train_loop = TrainLoop(model, [X, Y], None, None,
+                               optimizer='adam',
+                               criterion='binary_crossentropy', metrics=['accuracy'])
+        train_loop.callbacks_handler.register_callbacks([AbstractKerasCallback('callback_test1'),
+                                                         KerasCallbackTracker(), KerasCallbackTrackerShort(),
+                                                         AbstractKerasCallback('callback_test2')])
+
+        train_loop.do_train(num_epoch=num_epochs, batch_size=300)
+        train_history = train_loop.train_history
+
+        self.assertEqual(train_history.epoch, [0, 1])
+        self.assertEqual(len(train_history.history), 2)
+        self.assertEqual(sorted(train_history.history.keys()), sorted(['loss', 'acc']))
+        self.assertEqual(len(train_history.history['loss']), 2)
+        self.assertEqual(len(train_history.history['acc']), 2)
+        self.assertEqual(train_history.params,
+                         {'batch_size': 300, 'epochs': 2, 'steps': None, 'samples': 768, 'verbose': 1,
+                          'do_validation': False, 'metrics': ['loss', 'acc']})
