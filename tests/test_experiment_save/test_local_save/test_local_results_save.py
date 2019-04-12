@@ -7,8 +7,6 @@ import shutil
 import pickle
 import json
 
-from tests.utils import *
-
 from AIToolbox.experiment_save.local_save.local_results_save import *
 from AIToolbox.experiment_save.result_package.abstract_result_packages import AbstractResultPackage
 
