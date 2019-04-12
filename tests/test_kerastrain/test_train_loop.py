@@ -1,12 +1,16 @@
 import unittest
 import keras
 import numpy
+import os
 
 from tests.utils import *
 
 from AIToolbox.kerastrain.train_loop import TrainLoop, TrainLoopModelCheckpoint, TrainLoopModelEndSave, TrainLoopModelCheckpointEndSave
 from AIToolbox.kerastrain.callbacks.callback_handler import CallbacksHandler
 from AIToolbox.kerastrain.callbacks.callbacks import AbstractKerasCallback, ModelCheckpointCallback, ModelTrainEndSaveCallback
+
+
+THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 class KerasCallbackTracker(AbstractKerasCallback):
@@ -108,7 +112,7 @@ class TestTrainLoop(unittest.TestCase):
         num_epochs = 2
 
         model = keras_dummy_model()
-        dataset = numpy.loadtxt("pima-indians-diabetes.data.csv", delimiter=",")
+        dataset = numpy.loadtxt(os.path.join(THIS_DIR, "pima-indians-diabetes.data.csv"), delimiter=",")
         # split into input (X) and output (Y) variables
         X = dataset[:, 0:8]
         Y = dataset[:, 8]
