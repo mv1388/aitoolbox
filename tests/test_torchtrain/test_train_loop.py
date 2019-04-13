@@ -43,6 +43,38 @@ class TestTrainLoop(unittest.TestCase):
                                    ['callback_test1', 'CallbackTracker1', 'CallbackTracker2', 'callback_test2']):
             self.assertEqual(reg_cb.callback_name, cb_name)
 
+    def test_callback_registration_reordering(self):
+        cb_1 = AbstractCallback('callback_test1')
+        cb_1.execution_order = 10
+        cb_2 = CallbackTracker()
+        cb_2.execution_order = 0
+        cb_3 = CallbackTrackerShort()
+        cb_3.execution_order = 7
+
+        train_loop = TrainLoop(Net(), None, 100, None, DeactivateModelFeedDefinition(), None, None)
+        train_loop.callbacks_handler.register_callbacks([cb_1, cb_2, cb_3])
+
+        self.assertEqual(len(train_loop.callbacks), 3)
+        for reg_cb, true_cb in zip(train_loop.callbacks, [CallbackTracker, CallbackTrackerShort, AbstractCallback]):
+            self.assertEqual(type(reg_cb), true_cb)
+
+        for reg_ord, true_ord in zip([cb.execution_order for cb in train_loop.callbacks], [0, 7, 10]):
+            self.assertEqual(reg_ord, true_ord)
+
+        cb_4 = AbstractCallback('callback_test2')
+        cb_4.execution_order = 2
+        cb_5 = AbstractCallback('callback_test3')
+        cb_5.execution_order = 100
+        train_loop.callbacks_handler.register_callbacks([cb_4, cb_5])
+
+        self.assertEqual(len(train_loop.callbacks), 5)
+        for reg_cb, true_cb in zip(train_loop.callbacks, [CallbackTracker, AbstractCallback, CallbackTrackerShort,
+                                                          AbstractCallback, AbstractCallback]):
+            self.assertEqual(type(reg_cb), true_cb)
+
+        for reg_ord, true_ord in zip([cb.execution_order for cb in train_loop.callbacks], [0, 2, 7, 10, 100]):
+            self.assertEqual(reg_ord, true_ord)
+
     def test_callback_on_execution(self):
         num_epochs = 2
         dummy_feed_def = DeactivateModelFeedDefinition()
@@ -274,12 +306,12 @@ class TestTrainLoopModelCheckpointEndSave(unittest.TestCase):
         self.assertEqual(train_loop.train_history, {'loss': [], 'accumulated_loss': [], 'val_loss': []})
 
         self.assertEqual(len(train_loop.callbacks), 2)
-        self.assertEqual(type(train_loop.callbacks[0]), ModelTrainEndSaveCallback)
-        self.assertEqual(train_loop.callbacks[0].val_result_package, dummy_result_package)
-        self.assertEqual(train_loop.callbacks[0].test_result_package, None)
-        self.assertEqual(train_loop.callbacks[0].result_package, None)
+        self.assertEqual(type(train_loop.callbacks[1]), ModelTrainEndSaveCallback)
+        self.assertEqual(train_loop.callbacks[1].val_result_package, dummy_result_package)
+        self.assertEqual(train_loop.callbacks[1].test_result_package, None)
+        self.assertEqual(train_loop.callbacks[1].result_package, None)
 
-        self.assertEqual(type(train_loop.callbacks[1]), ModelCheckpointCallback)
+        self.assertEqual(type(train_loop.callbacks[0]), ModelCheckpointCallback)
 
         self.assertIsInstance(train_loop.callbacks_handler, CallbacksHandler)
         self.assertEqual(train_loop.callbacks_handler.train_loop_obj, train_loop)
@@ -296,9 +328,9 @@ class TestTrainLoopModelCheckpointEndSave(unittest.TestCase):
                                                      val_result_package=dummy_result_package_val,
                                                      test_result_package=dummy_result_package_test,
                                                      cloud_save_mode='s3')
-        self.assertEqual(train_loop.callbacks[0].val_result_package, dummy_result_package_val)
-        self.assertEqual(train_loop.callbacks[0].test_result_package, dummy_result_package_test)
-        self.assertEqual(train_loop.callbacks[0].result_package, None)
+        self.assertEqual(train_loop.callbacks[1].val_result_package, dummy_result_package_val)
+        self.assertEqual(train_loop.callbacks[1].test_result_package, dummy_result_package_test)
+        self.assertEqual(train_loop.callbacks[1].result_package, None)
 
     def test_callback_registration(self):
         dummy_result_package = DummyResultPackage()
@@ -308,21 +340,21 @@ class TestTrainLoopModelCheckpointEndSave(unittest.TestCase):
                                                      args={}, val_result_package=dummy_result_package, cloud_save_mode='s3')
 
         self.assertEqual(len(train_loop.callbacks), 2)
-        for reg_cb, true_cb in zip(train_loop.callbacks, [ModelTrainEndSaveCallback, ModelCheckpointCallback]):
+        for reg_cb, true_cb in zip(train_loop.callbacks, [ModelCheckpointCallback, ModelTrainEndSaveCallback]):
             self.assertEqual(type(reg_cb), true_cb)
         for reg_cb in train_loop.callbacks:
             self.assertEqual(reg_cb.train_loop_obj, train_loop)
 
         train_loop.callbacks_handler.register_callbacks([AbstractCallback('callback_test2')])
         self.assertEqual(len(train_loop.callbacks), 3)
-        for reg_cb, true_cb in zip(train_loop.callbacks, [ModelTrainEndSaveCallback, ModelCheckpointCallback, AbstractCallback]):
+        for reg_cb, true_cb in zip(train_loop.callbacks, [ModelCheckpointCallback, AbstractCallback, ModelTrainEndSaveCallback]):
             self.assertEqual(type(reg_cb), true_cb)
 
         for reg_cb in train_loop.callbacks:
             self.assertEqual(reg_cb.train_loop_obj, train_loop)
 
         for reg_cb, cb_name in zip(train_loop.callbacks,
-                                   ['Model save at the end of training',  'Model checkpoint at end of epoch', 'callback_test2']):
+                                   ['Model checkpoint at end of epoch', 'callback_test2', 'Model save at the end of training']):
             self.assertEqual(reg_cb.callback_name, cb_name)
 
     def test_loader_package_exceptions(self):
