@@ -7,8 +7,15 @@ from AIToolbox.experiment_save.training_history import TrainingHistory
 
 
 class AbstractCallback:
-    def __init__(self, callback_name):
+    def __init__(self, callback_name, execution_order=0):
+        """
+
+        Args:
+            callback_name (str):
+            execution_order (int):
+        """
         self.callback_name = callback_name
+        self.execution_order = execution_order
         self.train_loop_obj = None
 
     def register_train_loop_object(self, train_loop_obj):
@@ -61,7 +68,9 @@ class EarlyStoppingCallback(AbstractCallback):
             patience (int):
 
         """
-        AbstractCallback.__init__(self, 'EarlyStopping')
+        # execution_order=99 makes sure that any performance calculation callbacks are executed before and the most
+        # recent results can already be found in the train_history
+        AbstractCallback.__init__(self, 'EarlyStopping', execution_order=99)
         self.monitor = monitor
         self.min_delta = min_delta
         self.patience = patience
@@ -206,7 +215,9 @@ class ModelTrainEndSaveCallback(AbstractCallback):
                 Everything else results just in local storage to disk
 
         """
-        AbstractCallback.__init__(self, 'Model save at the end of training')
+        # execution_order=100 to make sure that this callback is the very last one to be executed when all the
+        # evaluations are already stored in the train_history
+        AbstractCallback.__init__(self, 'Model save at the end of training', execution_order=100)
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = local_model_result_folder_path

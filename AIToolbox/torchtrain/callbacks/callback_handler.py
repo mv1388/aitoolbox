@@ -21,6 +21,9 @@ class CallbacksHandler:
         if callbacks is not None and len(callbacks) > 0:
             self.train_loop_obj.callbacks += [cb.register_train_loop_object(self.train_loop_obj) for cb in callbacks]
 
+        if not all(0 == cb.execution_order for cb in self.train_loop_obj.callbacks):
+            self.train_loop_obj.callbacks = sorted(self.train_loop_obj.callbacks, key=lambda cb: cb.execution_order)
+
     def print_registered_callback_names(self):
         print('CALLBACKS:')
         for callback in self.train_loop_obj.callbacks:
