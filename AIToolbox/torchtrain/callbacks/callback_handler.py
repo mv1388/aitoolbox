@@ -52,3 +52,53 @@ class CallbacksHandler:
     def execute_batch_end(self):
         for callback in self.train_loop_obj.callbacks:
             callback.on_batch_end()
+
+    def __str__(self):
+        return 'CALLBACKS:\n' + '\n'.join([callback.callback_name for callback in self.train_loop_obj.callbacks]) 
+
+    def __len__(self):
+        return len(self.train_loop_obj.callbacks)
+
+    def __add__(self, other):
+        """
+
+        Args:
+            other (list): callbacks list
+
+        Returns:
+            None
+
+        """
+        self.register_callbacks(other)
+
+    def __iadd__(self, other):
+        """
+
+        Args:
+            other (list): callbacks list
+
+        Returns:
+            None
+
+        """
+        self.register_callbacks(other)
+
+    def __contains__(self, item):
+        """
+
+        Args:
+            item:
+
+        Returns:
+            bool:
+
+        """
+        if type(item) == str:
+            for cb in self.train_loop_obj.callbacks:
+                if cb.callback_name == item:
+                    return True
+        else:
+            for cb in self.train_loop_obj.callbacks:
+                if type(cb) == item:
+                    return True
+        return False
