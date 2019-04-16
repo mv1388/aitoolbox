@@ -53,6 +53,9 @@ class CallbacksHandler:
         for callback in self.train_loop_obj.callbacks:
             callback.on_batch_end()
 
+    def __str__(self):
+        return 'CALLBACKS:\n' + '\n'.join([callback.callback_name for callback in self.train_loop_obj.callbacks]) 
+
     def __len__(self):
         return len(self.train_loop_obj.callbacks)
 
