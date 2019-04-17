@@ -7,6 +7,9 @@ import torch
 from AIToolbox.torchtrain.callbacks.callback_handler import CallbacksHandler
 from AIToolbox.torchtrain.callbacks.callbacks import ModelCheckpointCallback, ModelTrainEndSaveCallback
 
+from AIToolbox.logger.logger import Logger
+logger = Logger()
+
 
 class TrainLoop:
     def __init__(self, model,
@@ -33,8 +36,8 @@ class TrainLoop:
         self.optimizer = optimizer
         self.criterion = criterion
 
-        USE_CUDA = torch.cuda.is_available()
-        self.device = torch.device("cuda" if USE_CUDA else "cpu")
+        self._USE_CUDA = torch.cuda.is_available()
+        self.device = torch.device("cuda" if self._USE_CUDA else "cpu")
 
         self.experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
         self.loss_batch_accum = []
@@ -73,7 +76,12 @@ class TrainLoop:
             torch.nn.modules.Module:
 
         """
+        logger.info(f'Train start time: {self.experiment_timestamp}')
+        logger.info(f'Device: {"cuda" if self._USE_CUDA else "cpu"}', for_summary=False)
+        logger.info(f'Init Train History: {self.train_history}')
+
         self.callbacks_handler.register_callbacks(callbacks)
+        logger.info(self.callbacks_handler)
 
         self.model = self.model.to(self.device)
         self.model.train()
@@ -331,12 +339,20 @@ class TrainLoopModelCheckpoint(TrainLoop):
         self.cloud_save_mode = cloud_save_mode
         self.rm_subopt_local_models = rm_subopt_local_models
 
+        self.set_logger_output_dir()
+
         self.callbacks_handler.register_callbacks([
             ModelCheckpointCallback(self.project_name, self.experiment_name, self.local_model_result_folder_path,
                                     cloud_save_mode=self.cloud_save_mode,
                                     rm_subopt_local_models=self.rm_subopt_local_models,
                                     num_best_checkpoints_kept=num_best_checkpoints_kept)
         ])
+
+    def set_logger_output_dir(self):
+        logs_folder_path = logger.create_experiment_logs_local_folder_structure(self.local_model_result_folder_path,
+                                                                                self.project_name, self.experiment_name,
+                                                                                self.experiment_timestamp)
+        logger.setup_logger(logs_folder_path)
 
 
 class TrainLoopModelEndSave(TrainLoop):
@@ -378,6 +394,7 @@ class TrainLoopModelEndSave(TrainLoop):
         self.cloud_save_mode = cloud_save_mode
 
         self.check_if_result_packages_possible()
+        self.set_logger_output_dir()
 
         self.callbacks_handler.register_callbacks([
             ModelTrainEndSaveCallback(self.project_name, self.experiment_name, self.local_model_result_folder_path,
@@ -397,6 +414,12 @@ class TrainLoopModelEndSave(TrainLoop):
         if self.val_result_package is None and self.test_result_package is None:
             raise ValueError("Both val_result_package and test_result_package are None. "
                              "At least one of these should be not None but actual result package.")
+
+    def set_logger_output_dir(self):
+        logs_folder_path = logger.create_experiment_logs_local_folder_structure(self.local_model_result_folder_path,
+                                                                                self.project_name, self.experiment_name,
+                                                                                self.experiment_timestamp)
+        logger.setup_logger(logs_folder_path)
 
 
 class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
