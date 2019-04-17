@@ -44,6 +44,48 @@ class Logger:
             self.summary_logger.info(msg)
         self.full_logger.info(msg)
 
+    def debug(self, msg, for_summary=True):
+        """
+
+        Args:
+            msg:
+            for_summary:
+
+        Returns:
+
+        """
+        if for_summary:
+            self.summary_logger.debug(msg)
+        self.full_logger.debug(msg)
+
+    def warning(self, msg, for_summary=True):
+        """
+
+        Args:
+            msg:
+            for_summary:
+
+        Returns:
+
+        """
+        if for_summary:
+            self.summary_logger.warning(msg)
+        self.full_logger.warning(msg)
+
+    def error(self, msg, for_summary=True):
+        """
+
+        Args:
+            msg:
+            for_summary:
+
+        Returns:
+
+        """
+        if for_summary:
+            self.summary_logger.error(msg)
+        self.full_logger.error(msg)
+
     def setup_logger(self, logs_folder_path, summary_logger_name=None, full_logger_name=None):
         """
 
