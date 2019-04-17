@@ -78,6 +78,7 @@ class TrainLoop:
         """
         logger.info(f'Train start time: {self.experiment_timestamp}')
         logger.info(f'Device: {"cuda" if self._USE_CUDA else "cpu"}', for_summary=False)
+        logger.info(f'TrainLoop type: {type(self)}', for_summary=False)
         logger.info(f'Init Train History: {self.train_history}')
 
         self.callbacks_handler.register_callbacks(callbacks)
@@ -91,8 +92,8 @@ class TrainLoop:
         for self.epoch in range(num_epoch):
             print('\n\n========================================================================')
             print('========================================================================')
-            # print(self.train_history)
-            print(f'Epoch: {self.epoch + 1}')
+            logger.info(f'Epoch: {self.epoch + 1}')
+            logger.info(f'Train History: {self.train_history}', for_summary=False)
             self.callbacks_handler.execute_epoch_begin()
 
             for batch_data in tqdm(self.train_loader):
@@ -119,28 +120,29 @@ class TrainLoop:
 
         self.auto_execute_end_of_training()
         self.callbacks_handler.execute_train_end()
+        logger.info(f'Final Train History: {self.train_history}', for_summary=False)
 
         return self.model
 
     def auto_execute_end_of_epoch(self):
         train_loss_batch_accum_avg = np.mean(self.loss_batch_accum)
-        print(f'AVG BATCH ACCUMULATED TRAIN LOSS: {train_loss_batch_accum_avg}')
+        logger.info(f'AVG BATCH ACCUMULATED TRAIN LOSS: {train_loss_batch_accum_avg}')
         self.train_history['accumulated_loss'].append(train_loss_batch_accum_avg)
         self.loss_batch_accum = []
 
         train_loss = self.evaluate_loss_on_train_set()
-        print(f'TRAIN LOSS: {train_loss}')
+        logger.info(f'TRAIN LOSS: {train_loss}')
         self.insert_metric_result_into_history('loss', train_loss)
 
         if self.validation_loader is not None:
             val_loss = self.evaluate_loss_on_validation_set()
-            print(f'VAL LOSS: {val_loss}')
+            logger.info(f'VAL LOSS: {val_loss}')
             self.insert_metric_result_into_history('val_loss', val_loss)
 
     def auto_execute_end_of_training(self):
         if self.test_loader is not None:
             test_loss = self.evaluate_loss_on_test_set()
-            print(f'TEST LOSS: {test_loss}')
+            logger.info(f'TEST LOSS: {test_loss}')
             # To keep TrainingHistory from complaining due to the non-matching metric result lengths
             # self.insert_metric_result_into_history('test_loss', test_loss)
 
@@ -151,6 +153,7 @@ class TrainLoop:
             float:
 
         """
+        logger.info('evaluate_loss_on_train_set', for_summary=False)
         return self.evaluate_model_loss(self.train_loader)
 
     def evaluate_loss_on_validation_set(self):
@@ -160,6 +163,7 @@ class TrainLoop:
             float:
 
         """
+        logger.info('evaluate_loss_on_validation_set', for_summary=False)
         return self.evaluate_model_loss(self.validation_loader)
 
     def evaluate_loss_on_test_set(self):
@@ -169,6 +173,7 @@ class TrainLoop:
             float:
 
         """
+        logger.info('evaluate_loss_on_test_set', for_summary=False)
         return self.evaluate_model_loss(self.test_loader)
 
     def evaluate_model_loss(self, data_loader):
@@ -201,6 +206,7 @@ class TrainLoop:
             (torch.Tensor, torch.Tensor, dict):
 
         """
+        logger.info('predict_on_train_set', for_summary=False)
         return self.predict_with_model(self.train_loader)
 
     def predict_on_validation_set(self):
@@ -210,6 +216,7 @@ class TrainLoop:
             (torch.Tensor, torch.Tensor, dict):
 
         """
+        logger.info('predict_on_validation_set', for_summary=False)
         return self.predict_with_model(self.validation_loader)
 
     def predict_on_test_set(self):
@@ -219,6 +226,7 @@ class TrainLoop:
             (torch.Tensor, torch.Tensor, dict):
 
         """
+        logger.info('predict_on_test_set', for_summary=False)
         return self.predict_with_model(self.test_loader)
 
     def predict_with_model(self, data_loader):
@@ -395,6 +403,7 @@ class TrainLoopModelEndSave(TrainLoop):
 
         self.check_if_result_packages_possible()
         self.set_logger_output_dir()
+        logger.info(f'Args: {self.args}', for_summary=False)
 
         self.callbacks_handler.register_callbacks([
             ModelTrainEndSaveCallback(self.project_name, self.experiment_name, self.local_model_result_folder_path,
