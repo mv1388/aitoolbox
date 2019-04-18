@@ -13,7 +13,6 @@ def unicode_to_ascii(text_string):
 
     Returns:
         str:
-
     """
     return ''.join(
         c for c in unicodedata.normalize('NFD', text_string)
@@ -30,7 +29,6 @@ def normalize_string(text_string, unicode_to_ascii_convert=True):
 
     Returns:
         str:
-
     """
     text_string = text_string.lower().strip()
     if unicode_to_ascii_convert:
@@ -48,7 +46,7 @@ def str2bool(w):
         w:
 
     Returns:
-
+        bool:
     """
     if w.lower() in ('yes', 'true', 't', 'y', '1'):
         return True
@@ -67,7 +65,6 @@ def find_sub_list(sub_list, main_list):
 
     Returns:
         (int, int): start and end index in the list l. Returns None if sublist is not found in the main list.
-
     """
     if len(sub_list) > len(main_list):
         raise ValueError('len(sub_list) > len(main_list); should be len(sub_list) <= len(main_list)')

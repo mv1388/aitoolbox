@@ -29,7 +29,6 @@ def get_dataset_local_copy(local_dataset_folder_path, protect_local_folder=True)
 
     Returns:
         None
-
     """
     dataset_fetcher = SQuAD2DatasetFetcher(bucket_name='dataset-store',
                                            local_dataset_folder_path=local_dataset_folder_path)
@@ -45,7 +44,6 @@ class SQuAD2ConcatContextDatasetReader:
             tokenizer:
             is_train (bool):
             dev_mode_size:
-
         """
         self.file_path = os.path.expanduser(file_path)
         self.is_train = is_train
@@ -67,7 +65,6 @@ class SQuAD2ConcatContextDatasetReader:
 
         Returns:
             list, AIToolbox.nlp.core.vocabulary.Vocabulary:
-
         """
         data = []
 
@@ -181,7 +178,6 @@ class GeneratorSQuAD2ConcatContextDatasetReader(SQuAD2ConcatContextDatasetReader
             tokenizer:
             is_train:
             dev_mode_size:
-
         """
         SQuAD2ConcatContextDatasetReader.__init__(self, file_path, tokenizer, is_train, dev_mode_size)
 
@@ -190,7 +186,6 @@ class GeneratorSQuAD2ConcatContextDatasetReader(SQuAD2ConcatContextDatasetReader
 
         Returns:
             list:
-
         """
         return list(self.read_generator()), self.vocab
 
@@ -199,7 +194,6 @@ class GeneratorSQuAD2ConcatContextDatasetReader(SQuAD2ConcatContextDatasetReader
 
         Yields:
             list:
-
         """
         for article in tqdm(self.dataset, total=len(self.dataset)):
             for paragraph_json in article['paragraphs']:

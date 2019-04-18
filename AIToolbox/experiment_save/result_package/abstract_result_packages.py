@@ -24,7 +24,6 @@ class AbstractResultPackage(ABC):
                 Possible options: True, False, 'auto'
                 Be slightly careful with 'auto' as it sometimes doesn't work so it is preferable to explicitly use True/False
             **kwargs (dict):
-
         """
         self.pkg_name = pkg_name
         self.strict_content_check = strict_content_check
@@ -51,7 +50,6 @@ class AbstractResultPackage(ABC):
 
         Returns:
             dict: calculated result dict
-
         """
         pass
 
@@ -67,7 +65,6 @@ class AbstractResultPackage(ABC):
 
         Returns:
             None
-
         """
         if self.np_array is True:
             self.y_true = np.array(y_true)
@@ -102,7 +99,6 @@ class AbstractResultPackage(ABC):
 
         Returns:
             list or numpy.array:
-
         """
         previous_len = len(y_array[0])
         np_array_ok = True
@@ -122,7 +118,6 @@ class AbstractResultPackage(ABC):
 
         Returns:
             dict:
-
         """
         if self.results_dict is None:
             self.warn_about_result_data_problem('Warning: Results dict missing')
@@ -134,7 +129,6 @@ class AbstractResultPackage(ABC):
 
         Returns:
             dict:
-
         """
         self.qa_check_hyperparameters_dict()
         return self.hyperparameters
@@ -144,7 +138,6 @@ class AbstractResultPackage(ABC):
 
         Returns:
             dict:
-
         """
         # History QA check is (automatically) done in the history object and not here in the result package
         return self.training_history.get_train_history()
@@ -155,7 +148,6 @@ class AbstractResultPackage(ABC):
         Returns:
             list or None: list of lists of string paths if it is not None.
                 Each element of the list should be list of: [[results_file_name, results_file_local_path], ... [,]]
-
         """
         self.additional_results_dump_paths = self.list_additional_results_dump_paths()
         self.qa_check_additional_results_dump_paths()
@@ -178,7 +170,6 @@ class AbstractResultPackage(ABC):
         Returns:
             list or None: list of lists of string paths if it is not None.
                 Each element of the list should be list of: [[results_file_name, results_file_local_path], ... [,]]
-
         """
         return None
 
@@ -214,7 +205,6 @@ class AbstractResultPackage(ABC):
 
         Returns:
             None
-
         """
         if self.hyperparameters is None:
             self.warn_about_result_data_problem('Warning: Hyperparameters missing')
@@ -237,7 +227,6 @@ class AbstractResultPackage(ABC):
 
         Returns:
             None
-
         """
         if self.additional_results_dump_paths is not None:
             if type(self.additional_results_dump_paths) is not list:
@@ -260,7 +249,6 @@ class AbstractResultPackage(ABC):
 
         Returns:
             None
-
         """
         if self.strict_content_check:
             raise ValueError(msg)
@@ -277,7 +265,6 @@ class AbstractResultPackage(ABC):
 
         Returns:
             str: the full path to the produced zip file (with the .zip extension appended)
-
         """
         shutil.make_archive(zip_path, 'zip', source_dir_path)
         return zip_path + '.zip'
@@ -293,7 +280,6 @@ class AbstractResultPackage(ABC):
 
         Returns:
             dict: flattened dict
-
         """
         items = []
         for k, v in d.items():
@@ -321,7 +307,6 @@ class AbstractResultPackage(ABC):
 
         Returns:
             AIToolbox.experiment_save.result_package.MultipleResultPackageWrapper:
-
         """
         return self.add_merge_multi_pkg_wrap(other)
 
@@ -333,7 +318,6 @@ class AbstractResultPackage(ABC):
 
         Returns:
             AIToolbox.experiment_save.result_package.MultipleResultPackageWrapper:
-
         """
         return self.add_merge_multi_pkg_wrap(other)
 
@@ -345,7 +329,6 @@ class AbstractResultPackage(ABC):
 
         Returns:
             AIToolbox.experiment_save.result_package.abstract_result_packages.MultipleResultPackageWrapper:
-
         """
         self.warn_if_results_dict_not_defined()
         other_object_pkg = self.create_other_object_pkg(other_object)
@@ -367,7 +350,6 @@ class AbstractResultPackage(ABC):
 
         Returns:
             AbstractResultPackage | MultipleResultPackageWrapper:
-
         """
         if isinstance(other_object, AbstractResultPackage):
             other_object.warn_if_results_dict_not_defined()
@@ -389,7 +371,6 @@ class AbstractResultPackage(ABC):
 
         Returns:
             AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage:
-
         """
         return self.add_merge_dicts(other)
 
@@ -401,7 +382,6 @@ class AbstractResultPackage(ABC):
 
         Returns:
             AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage:
-
         """
         self.warn_if_results_dict_not_defined()
 
@@ -421,7 +401,6 @@ class AbstractResultPackage(ABC):
 
         Returns:
             AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage:
-
         """
         def results_duplicated(self_results_dict, other_results_dict_dup):
             for result_name in other_results_dict_dup:
@@ -465,7 +444,6 @@ class PreCalculatedResultPackage(AbstractResultPackage):
             results_dict (dict):
             strict_content_check (bool):
             **kwargs (dict):
-
         """
         AbstractResultPackage.__init__(self, pkg_name='PreCalculatedResult',
                                        strict_content_check=strict_content_check, **kwargs)
@@ -484,7 +462,6 @@ class MultipleResultPackageWrapper(AbstractResultPackage):
         Args:
             strict_content_check (bool):
             **kwargs (dict):
-
         """
         AbstractResultPackage.__init__(self, pkg_name='MultipleResultWrapper',
                                        strict_content_check=strict_content_check, **kwargs)
@@ -505,7 +482,6 @@ class MultipleResultPackageWrapper(AbstractResultPackage):
 
         Returns:
             None
-
         """
         self.results_dict = None
         self.result_packages = result_packages
@@ -520,7 +496,6 @@ class MultipleResultPackageWrapper(AbstractResultPackage):
 
         Returns:
             dict:
-
         """
         results_dict = {}
         self.y_true = {}
@@ -547,7 +522,6 @@ class MultipleResultPackageWrapper(AbstractResultPackage):
         Returns:
             list or None: list of lists of string paths if it is not None.
                 Each element of the list should be list of: [[results_file_name, results_file_local_path], ... [,]]
-
         """
         self.additional_results_dump_paths = self.list_additional_results_dump_paths()
 
@@ -573,7 +547,6 @@ class MultipleResultPackageWrapper(AbstractResultPackage):
 
         Returns:
             int: number of result packages inside this multi package wrapper
-
         """
         return len(self.result_packages)
 
@@ -585,7 +558,6 @@ class MultipleResultPackageWrapper(AbstractResultPackage):
 
         Returns:
             AIToolbox.experiment_save.result_package.abstract_result_packages.MultipleResultPackageWrapper:
-
         """
         self.warn_if_results_dict_not_defined()
         other_object_pkg = self.create_other_object_pkg(other_object)
@@ -608,7 +580,6 @@ class MultipleResultPackageWrapper(AbstractResultPackage):
 
         Returns:
             AIToolbox.experiment_save.result_package.abstract_result_packages.MultipleResultPackageWrapper:
-
         """
         self.warn_if_results_dict_not_defined()
         other_object_pkg = self.create_other_object_pkg(other)

@@ -66,7 +66,6 @@ class EarlyStoppingCallback(AbstractCallback):
             monitor (str):
             min_delta (float):
             patience (int):
-
         """
         # execution_order=99 makes sure that any performance calculation callbacks are executed before and the most
         # recent results can already be found in the train_history
@@ -149,7 +148,6 @@ class ModelCheckpointCallback(AbstractCallback):
                 the metric minimization is done otherwise metric maximization is done
             num_best_checkpoints_kept (int): number of best performing models which are kept when removing suboptimal
                 model checkpoints
-
         """
         AbstractCallback.__init__(self, 'Model checkpoint at end of epoch')
         self.project_name = project_name
@@ -213,7 +211,6 @@ class ModelTrainEndSaveCallback(AbstractCallback):
                 For AWS S3: 's3' / 'aws_s3' / 'aws'
                 For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
                 Everything else results just in local storage to disk
-
         """
         # execution_order=100 to make sure that this callback is the very last one to be executed when all the
         # evaluations are already stored in the train_history

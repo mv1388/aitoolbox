@@ -7,7 +7,6 @@ class CallbacksHandler:
 
         Args:
             train_loop_obj (AIToolbox.kerastrain.train_loop.TrainLoop):
-
         """
         self.train_loop_obj = train_loop_obj
 
@@ -18,7 +17,7 @@ class CallbacksHandler:
             callbacks (list):
 
         Returns:
-
+            None
         """
         if callbacks is not None and len(callbacks) > 0:
             self.train_loop_obj.callbacks += \
@@ -30,7 +29,6 @@ class CallbacksHandler:
         
         Returns:
             None
-
         """
         print('CALLBACKS:')
         for callback in self.train_loop_obj.callbacks:

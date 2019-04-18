@@ -30,7 +30,6 @@ class PyTorchModelReRunner(AbstractModelReRunner):
             model (torch.nn.modules.Module):
             data_loader (torch.utils.data.DataLoader):
             batch_model_feed_def (AIToolbox.torchtrain.batch_model_feed_defs.AbstractModelFeedDefinition):
-
         """
         AbstractModelReRunner.__init__(self, model, data_loader)
         self.batch_model_feed_def = batch_model_feed_def
@@ -42,7 +41,6 @@ class PyTorchModelReRunner(AbstractModelReRunner):
 
         Returns:
             (torch.Tensor, torch.Tensor, dict):
-
         """
         return self.train_loop.predict_on_test_set()
 
@@ -51,7 +49,6 @@ class PyTorchModelReRunner(AbstractModelReRunner):
 
         Returns:
             float:
-
         """
         return self.train_loop.evaluate_loss_on_test_set()
 
@@ -110,7 +107,6 @@ class KerasModelReRunner(AbstractModelReRunner):
         Args:
             model:
             data_loader:
-
         """
         AbstractModelReRunner.__init__(self, model, data_loader)
 
@@ -131,7 +127,6 @@ class TensorFlowModelReRunner(AbstractModelReRunner):
         Args:
             model:
             data_loader:
-
         """
         AbstractModelReRunner.__init__(self, model, data_loader)
 

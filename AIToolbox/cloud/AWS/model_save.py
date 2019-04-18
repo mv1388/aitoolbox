@@ -22,7 +22,6 @@ class AbstractModelSaver(ABC):
 
         Returns:
             (str, str, str, str): model_s3_path, experiment_timestamp, model_local_path, model_weights_local_path
-
         """
         pass
 
@@ -36,7 +35,6 @@ class BaseModelSaver:
             bucket_name (str):
             local_model_result_folder_path (str):
             checkpoint_model (bool):
-
         """
         self.bucket_name = bucket_name
         self.s3_client = boto3.client('s3')
@@ -54,7 +52,6 @@ class BaseModelSaver:
 
         Returns:
             None
-
         """
         self.s3_client.upload_file(os.path.expanduser(local_file_path),
                                    self.bucket_name, cloud_file_path)
@@ -69,7 +66,6 @@ class BaseModelSaver:
 
         Returns:
             str:
-
         """
         experiment_cloud_path = os.path.join(project_name,
                                              experiment_name + '_' + experiment_timestamp,
@@ -86,7 +82,6 @@ class KerasS3ModelSaver(AbstractModelSaver, BaseModelSaver):
             bucket_name (str):
             local_model_result_folder_path (str):
             checkpoint_model (bool):
-
         """
         BaseModelSaver.__init__(self, bucket_name, local_model_result_folder_path, checkpoint_model)
         self.keras_local_saver = KerasLocalModelSaver(local_model_result_folder_path, checkpoint_model)
@@ -112,7 +107,6 @@ class KerasS3ModelSaver(AbstractModelSaver, BaseModelSaver):
             m_saver.save_model(model=model,
                                project_name='QA_QAngaroo', experiment_name='FastQA_RNN_concat_model_GLOVE',
                                protect_existing_folder=False)
-
         """
         if experiment_timestamp is None:
             experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
@@ -143,7 +137,6 @@ class TensorFlowS3ModelSaver(AbstractModelSaver, BaseModelSaver):
             bucket_name (str):
             local_model_result_folder_path (str):
             checkpoint_model (bool):
-
         """
         BaseModelSaver.__init__(self, bucket_name, local_model_result_folder_path, checkpoint_model)
         self.tf_local_saver = TensorFlowLocalModelSaver(local_model_result_folder_path, checkpoint_model)
@@ -164,7 +157,6 @@ class PyTorchS3ModelSaver(AbstractModelSaver, BaseModelSaver):
             bucket_name (str):
             local_model_result_folder_path (str):
             checkpoint_model (bool):
-
         """
         BaseModelSaver.__init__(self, bucket_name, local_model_result_folder_path, checkpoint_model)
         self.pytorch_local_saver = PyTorchLocalModelSaver(local_model_result_folder_path, checkpoint_model)
@@ -190,7 +182,6 @@ class PyTorchS3ModelSaver(AbstractModelSaver, BaseModelSaver):
             m_saver.save_model(model=model,
                                project_name='QA_QAngaroo', experiment_name='FastQA_RNN_concat_model_GLOVE',
                                protect_existing_folder=False)
-
         """
         if experiment_timestamp is None:
             experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')

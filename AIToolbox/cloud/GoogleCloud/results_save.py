@@ -12,7 +12,6 @@ class BaseResultsGoogleStorageSaver:
         Args:
             bucket_name (str):
             local_results_folder_path (str):
-
         """
         self.bucket_name = bucket_name
         self.gcs_client = storage.Client()
@@ -29,7 +28,6 @@ class BaseResultsGoogleStorageSaver:
 
         Returns:
             None
-
         """
         blob = self.gcs_bucket.blob(cloud_file_path)
         blob.upload_from_filename(local_file_path)
@@ -42,7 +40,6 @@ class GoogleStorageResultsSaver(BaseResultsGoogleStorageSaver, S3ResultsSaver):
         Args:
             bucket_name (str):
             local_model_result_folder_path (str):
-
         """
         BaseResultsGoogleStorageSaver.__init__(self, bucket_name, local_model_result_folder_path)
         self.local_results_saver = LocalResultsSaver(local_model_result_folder_path)

@@ -20,7 +20,6 @@ class TrainLoop:
             optimizer:
             criterion:
             metrics:
-
         """
         self.model = model
         
@@ -56,7 +55,6 @@ class TrainLoop:
 
         Returns:
             keras.engine.training.Model:
-
         """
         return self.do_train(num_epoch, batch_size, callbacks, **kwargs)
 
@@ -71,7 +69,6 @@ class TrainLoop:
 
         Returns:
             keras.engine.training.Model:
-
         """
         self.callbacks_handler.register_callbacks(callbacks)
         self.model.compile(optimizer=self.optimizer, loss=self.criterion, metrics=self.metrics)
@@ -95,7 +92,6 @@ class TrainLoop:
 
         Returns:
             float:
-
         """
         return self.evaluate_model_loss(self.train_loader)
 
@@ -104,7 +100,6 @@ class TrainLoop:
 
         Returns:
             float:
-
         """
         return self.evaluate_model_loss(self.validation_loader)
 
@@ -113,7 +108,6 @@ class TrainLoop:
 
         Returns:
             float:
-
         """
         return self.evaluate_model_loss(self.test_loader)
 
@@ -125,7 +119,6 @@ class TrainLoop:
 
         Returns:
             float:
-
         """
         if not self.is_generator(data_loader):
             x_data = data_loader[0]
@@ -142,7 +135,6 @@ class TrainLoop:
 
         Returns:
             (numpy.array, numpy.array, dict):
-
         """
         return self.predict_with_model(self.train_loader)
 
@@ -151,7 +143,6 @@ class TrainLoop:
 
         Returns:
             (numpy.array, numpy.array, dict):
-
         """
         return self.predict_with_model(self.validation_loader)
 
@@ -160,7 +151,6 @@ class TrainLoop:
 
         Returns:
             (numpy.array, numpy.array, dict):
-
         """
         return self.predict_with_model(self.test_loader)
 
@@ -173,7 +163,6 @@ class TrainLoop:
 
         Returns:
             (numpy.array, numpy.array, dict):
-
         """
         if not self.is_generator(data_loader):
             x_data = data_loader[0]
@@ -196,7 +185,6 @@ class TrainLoop:
 
         Returns:
             bool:
-
         """
         return isinstance(data_loader, types.GeneratorType)
 
@@ -208,7 +196,6 @@ class TrainLoop:
         
         Returns:
             None
-
         """
         if not self.is_generator(self.train_loader) and self.is_generator(self.validation_loader):
             raise ValueError('train_loader is not generator, but validation_loader is. '
@@ -237,7 +224,6 @@ class TrainLoopModelCheckpoint(TrainLoop):
                 For AWS S3: 's3' / 'aws_s3' / 'aws'
                 For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
                 Everything else results just in local storage to disk
-
         """
         TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion, metrics)
         self.project_name = project_name
@@ -277,7 +263,6 @@ class TrainLoopModelEndSave(TrainLoop):
                 For AWS S3: 's3' / 'aws_s3' / 'aws'
                 For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
                 Everything else results just in local storage to disk
-
         """
         TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion, metrics)
         self.project_name = project_name
@@ -304,7 +289,6 @@ class TrainLoopModelEndSave(TrainLoop):
         
         Returns:
             None
-
         """
         if self.val_result_package is not None and self.validation_loader is None:
             raise ValueError('Given the val_result_package but not supplied the validation_loader. '
@@ -345,7 +329,6 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
                 For AWS S3: 's3' / 'aws_s3' / 'aws'
                 For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
                 Everything else results just in local storage to disk
-
         """
         TrainLoopModelEndSave.__init__(self, model, train_loader, validation_loader, test_loader,
                                        optimizer, criterion, metrics,

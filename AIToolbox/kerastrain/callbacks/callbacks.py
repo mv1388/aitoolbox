@@ -57,7 +57,6 @@ class ModelCheckpointCallback(AbstractKerasCallback):
                 the metric minimization is done otherwise metric maximization is done
             num_best_checkpoints_kept (int): number of best performing models which are kept when removing suboptimal
                 model checkpoints
-
         """
         AbstractKerasCallback.__init__(self, 'Model checkpoint at end of epoch')
         self.project_name = project_name
@@ -116,7 +115,6 @@ class ModelTrainEndSaveCallback(AbstractKerasCallback):
                 For AWS S3: 's3' / 'aws_s3' / 'aws'
                 For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
                 Everything else results just in local storage to disk
-
         """
         AbstractKerasCallback.__init__(self, 'Model save at the end of training')
         self.project_name = project_name
