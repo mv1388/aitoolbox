@@ -5,6 +5,9 @@ from AIToolbox.experiment_save.experiment_saver import FullPyTorchExperimentS3Sa
 from AIToolbox.experiment_save.local_experiment_saver import FullPyTorchExperimentLocalSaver
 from AIToolbox.experiment_save.training_history import TrainingHistory
 
+from AIToolbox.logger.logger import Logger
+logger = Logger()
+
 
 class AbstractCallback:
     def __init__(self, callback_name, execution_order=0):
@@ -29,6 +32,7 @@ class AbstractCallback:
         """
         self.train_loop_obj = train_loop_obj
         self.on_train_loop_registration()
+        logger.info(f'{type(self)} callback train loop object registration')
         return self
 
     def on_train_loop_registration(self):

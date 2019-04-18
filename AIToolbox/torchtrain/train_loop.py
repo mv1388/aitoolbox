@@ -93,7 +93,6 @@ class TrainLoop:
             print('\n\n========================================================================')
             print('========================================================================')
             logger.info(f'Epoch: {self.epoch + 1}')
-            logger.info(f'Train History: {self.train_history}', for_summary=False)
             self.callbacks_handler.execute_epoch_begin()
 
             for batch_data in tqdm(self.train_loader):
@@ -286,6 +285,7 @@ class TrainLoop:
         if metric_name not in self.train_history:
             self.train_history[metric_name] = []
         self.train_history[metric_name].append(metric_result)
+        logger.info(f'Train History: {self.train_history}', for_summary=False)
 
     @staticmethod
     def combine_prediction_metadata_batches(metadata_list):
