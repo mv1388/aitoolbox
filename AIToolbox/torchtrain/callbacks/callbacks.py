@@ -176,6 +176,7 @@ class ModelCheckpointCallback(AbstractCallback):
             metric_name = 'loss' if self.rm_subopt_local_models is True else self.rm_subopt_local_models
             self.subopt_model_remover = LocalSubOptimalModelRemover(metric_name,
                                                                     num_best_checkpoints_kept)
+            logger.info(f'Using {type(LocalSubOptimalModelRemover)} inside {type(self)}', for_summary=False)
 
         if self.cloud_save_mode == 's3' or self.cloud_save_mode == 'aws_s3' or self.cloud_save_mode == 'aws':
             self.model_checkpointer = PyTorchS3ModelSaver(
@@ -192,6 +193,8 @@ class ModelCheckpointCallback(AbstractCallback):
                 local_model_result_folder_path=self.local_model_result_folder_path, checkpoint_model=True
             )
 
+        logger.info(f'Selected model_checkpointer: {type(self.model_checkpointer)}', for_summary=False)
+
     def on_epoch_end(self):
         """
 
@@ -204,6 +207,8 @@ class ModelCheckpointCallback(AbstractCallback):
                                                          experiment_timestamp=self.train_loop_obj.experiment_timestamp,
                                                          epoch=self.train_loop_obj.epoch,
                                                          protect_existing_folder=True)
+
+        logger.info(f'Checkpointer model_paths: {model_paths}', for_summary=False)
 
         if self.rm_subopt_local_models is not False:
             _, _, model_local_path, model_weights_local_path = model_paths
@@ -253,6 +258,8 @@ class ModelTrainEndSaveCallback(AbstractCallback):
         else:
             self.results_saver = FullPyTorchExperimentLocalSaver(self.project_name, self.experiment_name,
                                                                  local_model_result_folder_path=self.local_model_result_folder_path)
+
+        logger.info(f'Selected results_saver: {type(self.results_saver)}', for_summary=False)
 
     def on_train_end(self):
         """
