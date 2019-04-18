@@ -112,18 +112,28 @@ class EarlyStoppingCallback(AbstractCallback):
                     self.best_performance = current_performance
                     self.best_epoch = self.train_loop_obj.epoch
                     self.patience_count = self.patience
+                    logger.info(f'{type(self)}: improved result - patience reset to {self.patience_count}',
+                                for_summary=False)
                 else:
                     self.patience_count -= 1
+                    logger.info(f'{type(self)} - result not improved - patience decreased to {self.patience_count}',
+                                for_summary=False)
             else:
                 if current_performance > self.best_performance + self.min_delta:
                     self.best_performance = current_performance
                     self.best_epoch = self.train_loop_obj.epoch
                     self.patience_count = self.patience
+                    logger.info(f'{type(self)}: improved result - patience reset to {self.patience_count}',
+                                for_summary=False)
                 else:
                     self.patience_count -= 1
+                    logger.info(f'{type(self)} - result not improved - patience decreased to {self.patience_count}',
+                                for_summary=False)
 
             if self.patience_count < 0:
                 self.train_loop_obj.early_stop = True
+                logger.info(f'{type(self)}: early stopping enabled in epoch {self.train_loop_obj.epoch}',
+                            for_summary=False)
 
     def on_train_end(self):
         """
@@ -132,7 +142,7 @@ class EarlyStoppingCallback(AbstractCallback):
 
         """
         if self.train_loop_obj.early_stop:
-            print(f'Early stopping at epoch: {self.train_loop_obj.epoch}. Best recorded epoch: {self.best_epoch}.')
+            logger.info(f'Early stopping at epoch: {self.train_loop_obj.epoch}. Best recorded epoch: {self.best_epoch}.')
 
 
 class ModelCheckpointCallback(AbstractCallback):
