@@ -5,7 +5,6 @@ class CallbacksHandler:
 
         Args:
             train_loop_obj (AIToolbox.torchtrain.train_loop.TrainLoop):
-
         """
         self.train_loop_obj = train_loop_obj
 
@@ -16,7 +15,7 @@ class CallbacksHandler:
             callbacks (list):
 
         Returns:
-
+            None
         """
         if callbacks is not None and len(callbacks) > 0:
             self.train_loop_obj.callbacks += [cb.register_train_loop_object(self.train_loop_obj) for cb in callbacks]
@@ -67,7 +66,6 @@ class CallbacksHandler:
 
         Returns:
             None
-
         """
         self.register_callbacks(other)
 
@@ -79,7 +77,6 @@ class CallbacksHandler:
 
         Returns:
             None
-
         """
         self.register_callbacks(other)
 
@@ -91,7 +88,6 @@ class CallbacksHandler:
 
         Returns:
             bool:
-
         """
         if type(item) == str:
             for cb in self.train_loop_obj.callbacks:

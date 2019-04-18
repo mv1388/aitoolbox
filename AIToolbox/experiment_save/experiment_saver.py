@@ -26,7 +26,6 @@ class AbstractExperimentSaver(ABC):
 
         Returns:
             list: string paths where the experiment files were saved
-
         """
         pass
 
@@ -40,7 +39,6 @@ class BaseFullExperimentSaver(AbstractExperimentSaver):
             results_saver (AIToolbox.cloud.AWS.results_save.AbstractResultsSaver):
             project_name (str):
             experiment_name (str):
-
         """
         self.model_saver = model_saver
         self.results_saver = results_saver
@@ -63,7 +61,6 @@ class BaseFullExperimentSaver(AbstractExperimentSaver):
 
         Returns:
             (str, str): cloud_model_path, cloud_results_path
-
         """
         if experiment_timestamp is None:
             experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
@@ -95,7 +92,6 @@ class BaseFullExperimentS3Saver(BaseFullExperimentSaver):
             experiment_name (str):
             bucket_name (str):
             local_model_result_folder_path (str):
-
         """
         results_saver = S3ResultsSaver(bucket_name=bucket_name,
                                        local_model_result_folder_path=local_model_result_folder_path)
@@ -113,7 +109,6 @@ class FullKerasExperimentS3Saver(BaseFullExperimentS3Saver):
             experiment_name (str):
             bucket_name (str):
             local_model_result_folder_path (str):
-
         """
         keras_model_saver = KerasS3ModelSaver(bucket_name=bucket_name,
                                               local_model_result_folder_path=local_model_result_folder_path)
@@ -133,7 +128,6 @@ class FullTensorFlowExperimentS3Saver(BaseFullExperimentS3Saver):
             experiment_name (str):
             bucket_name (str):
             local_model_result_folder_path (str):
-
         """
         tf_model_saver = TensorFlowS3ModelSaver(bucket_name=bucket_name,
                                                 local_model_result_folder_path=local_model_result_folder_path)
@@ -155,7 +149,6 @@ class FullPyTorchExperimentS3Saver(BaseFullExperimentS3Saver):
             experiment_name (str):
             bucket_name (str):
             local_model_result_folder_path (str):
-
         """
         pytorch_model_saver = PyTorchS3ModelSaver(bucket_name=bucket_name,
                                                   local_model_result_folder_path=local_model_result_folder_path)
@@ -176,7 +169,6 @@ class BaseFullExperimentGoogleStorageSaver(BaseFullExperimentSaver):
             experiment_name (str):
             bucket_name (str):
             local_model_result_folder_path (str):
-
         """
         results_saver = GoogleStorageResultsSaver(bucket_name=bucket_name,
                                                   local_model_result_folder_path=local_model_result_folder_path)
@@ -194,7 +186,6 @@ class FullKerasExperimentGoogleStorageSaver(BaseFullExperimentGoogleStorageSaver
             experiment_name (str):
             bucket_name (str):
             local_model_result_folder_path (str):
-
         """
         keras_model_saver = KerasGoogleStorageModelSaver(bucket_name=bucket_name,
                                                          local_model_result_folder_path=local_model_result_folder_path)
@@ -214,7 +205,6 @@ class FullTensorFlowExperimentGoogleStorageSaver(BaseFullExperimentGoogleStorage
             experiment_name (str):
             bucket_name (str):
             local_model_result_folder_path (str):
-
         """
         tf_model_saver = TensorFlowGoogleStorageModelSaver(bucket_name=bucket_name,
                                                            local_model_result_folder_path=local_model_result_folder_path)
@@ -236,7 +226,6 @@ class FullPyTorchExperimentGoogleStorageSaver(BaseFullExperimentGoogleStorageSav
             experiment_name (str):
             bucket_name (str):
             local_model_result_folder_path (str):
-
         """
         pytorch_model_saver = PyTorchGoogleStorageModelSaver(bucket_name=bucket_name,
                                                              local_model_result_folder_path=local_model_result_folder_path)

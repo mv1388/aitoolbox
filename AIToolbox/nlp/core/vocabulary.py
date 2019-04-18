@@ -8,7 +8,6 @@ class Vocabulary:
         Args:
             name (str):
             document_level (bool):
-
         """
         # Default word tokens
         self.PAD_token = 0  # Used for padding short sentences
@@ -42,7 +41,7 @@ class Vocabulary:
             sentence_tokens (list):
 
         Returns:
-
+            None
         """
         for word in sentence_tokens:
             self.add_word(word)
@@ -54,7 +53,7 @@ class Vocabulary:
             word (str):
 
         Returns:
-
+            None
         """
         if word not in self.word2index:
             self.word2index[word] = self.num_words
@@ -71,7 +70,7 @@ class Vocabulary:
             min_count (int):
 
         Returns:
-
+            None
         """
         if self.trimmed:
             return
@@ -108,7 +107,7 @@ class Vocabulary:
             sent_tokens:
 
         Returns:
-
+            list:
         """
         if len(self.word2index) == 0:
             raise ValueError('word2index is empty')
@@ -125,7 +124,7 @@ class Vocabulary:
             rm_default_tokens (bool):
 
         Returns:
-
+            list:
         """
         if len(self.index2word) == 0:
             raise ValueError('word2index is empty')

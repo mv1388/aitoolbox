@@ -25,7 +25,6 @@ class AbstractLocalResultsSaver(ABC):
                 Each file should be a new list specifying the file name and its full path
                 
                 The first file path should be pointing to the main experiment results file.
-
         """
         pass
 
@@ -47,7 +46,6 @@ class AbstractLocalResultsSaver(ABC):
                 Each file should be a new list specifying the file name and its full path
                 
                 The first file path should be pointing to the main experiment results file.
-
         """
         pass
 
@@ -59,7 +57,6 @@ class BaseLocalResultsSaver:
         Args:
             local_model_result_folder_path (str):
             file_format (str): pickle or json
-
         """
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
         self.file_format = file_format
@@ -78,7 +75,6 @@ class BaseLocalResultsSaver:
 
         Returns:
             str:
-
         """
         project_path, experiment_path, experiment_results_path = \
             self.form_experiment_local_folders_paths(project_name, experiment_name, experiment_timestamp,
@@ -103,7 +99,6 @@ class BaseLocalResultsSaver:
 
         Returns:
             str, str, str: project_dir_path, experiment_dir_path, experiment_results_dir_path
-
         """
         project_dir_path = os.path.join(local_model_result_folder_path, project_name)
         experiment_dir_path = os.path.join(project_dir_path, experiment_name + '_' + experiment_timestamp)
@@ -121,7 +116,6 @@ class BaseLocalResultsSaver:
 
         Returns:
             str, str:
-
         """
         if self.file_format == 'pickle':
             file_name = file_name_w_type + '.p'
@@ -146,7 +140,6 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
         Args:
             local_model_result_folder_path (str):
             file_format (str)
-
         """
         BaseLocalResultsSaver.__init__(self, local_model_result_folder_path, file_format)
 
@@ -167,7 +160,6 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
                 Each file should be a new list specifying the file name and its full path.
                 
                 The first file path should be pointing to the main experiment results file.
-
         """
         if experiment_timestamp is None:
             experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
@@ -223,7 +215,6 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
                 Each file should be a new list specifying the file name and its full path.
                 
                 The first file path should be pointing to the main experiment results file.
-
         """
         experiment_results_local_path = self.create_experiment_local_folder_structure(project_name, experiment_name,
                                                                                       experiment_timestamp)

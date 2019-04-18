@@ -26,7 +26,6 @@ class AbstractModelFeedDefinition(ABC):
 
         Returns:
             PyTorch loss
-
         """
         pass
 
@@ -63,7 +62,6 @@ class AbstractModelFeedDefinition(ABC):
 
         Returns:
             np.array, np.array, dict: y_test.cpu(), y_pred.cpu(), metadata
-
         """
         pass
 

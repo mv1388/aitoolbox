@@ -17,7 +17,6 @@ class AbstractDatasetFetcher(ABC):
 
         Returns:
             None
-
         """
         pass
 
@@ -29,7 +28,6 @@ class BaseDatasetFetcher:
         Args:
             bucket_name (str):
             local_dataset_folder_path (str):
-
         """
         self.bucket_name = bucket_name
         self.s3 = boto3.resource('s3')
@@ -46,7 +44,6 @@ class BaseDatasetFetcher:
 
         Returns:
             None
-
         """
         local_file_path = os.path.expanduser(local_file_path)
 
@@ -71,7 +68,6 @@ class BaseDatasetFetcher:
 
         Returns:
             bool:
-
         """
         if os.path.exists(os.path.join(self.local_dataset_folder_path, dataset_name)) and protect_local_folder:
             print('Local folder exists and protect_local_folder in True: leaving local folder as it is.')
@@ -94,7 +90,6 @@ class BaseDatasetFetcher:
         Args:
             file_path (str):
             target_dir_path (str):
-
         """
         if file_path[-4:] == '.zip':
             with zipfile.ZipFile(file_path, 'r') as zip_ref:
@@ -111,7 +106,6 @@ class SQuAD2DatasetFetcher(AbstractDatasetFetcher, BaseDatasetFetcher):
         Args:
             bucket_name (str):
             local_dataset_folder_path (str):
-
         """
         BaseDatasetFetcher.__init__(self, bucket_name, local_dataset_folder_path)
 
@@ -123,7 +117,6 @@ class SQuAD2DatasetFetcher(AbstractDatasetFetcher, BaseDatasetFetcher):
 
         Returns:
             None
-
         """
         if not self.exists_local_dataset_folder('SQuAD2', protect_local_folder):
             self.fetch_file(cloud_file_path='SQuAD2/train-v2.0.json',
@@ -139,7 +132,6 @@ class QAngarooDatasetFetcher(AbstractDatasetFetcher, BaseDatasetFetcher):
         Args:
             bucket_name (str):
             local_dataset_folder_path (str):
-
         """
         BaseDatasetFetcher.__init__(self, bucket_name, local_dataset_folder_path)
 
@@ -151,7 +143,6 @@ class QAngarooDatasetFetcher(AbstractDatasetFetcher, BaseDatasetFetcher):
 
         Returns:
             None
-
         """
         if not self.exists_local_dataset_folder('qangaroo_v1', protect_local_folder):
             medhop_local_folder_path = os.path.join(self.local_dataset_folder_path, 'qangaroo_v1')
@@ -173,7 +164,6 @@ class CNNDailyMailDatasetFetcher(AbstractDatasetFetcher, BaseDatasetFetcher):
         Args:
             bucket_name (str):
             local_dataset_folder_path (str):
-
         """
         BaseDatasetFetcher.__init__(self, bucket_name, local_dataset_folder_path)
         self.available_prepocessed_datasets = ['abisee', 'danqi']
@@ -186,7 +176,6 @@ class CNNDailyMailDatasetFetcher(AbstractDatasetFetcher, BaseDatasetFetcher):
 
         Returns:
             None
-
         """
         raise NotImplementedError('Currently the original CNN/DailyMail dataset is not stored on S3. '
                                   'Rather use one of the preprocessed datasets.')
@@ -201,7 +190,6 @@ class CNNDailyMailDatasetFetcher(AbstractDatasetFetcher, BaseDatasetFetcher):
 
         Returns:
             None
-
         """
         if not self.preproc_dataset_available(preprocess_name):
             raise ValueError('Preprocessing name not available. Select: abisee / danqi')
@@ -248,7 +236,6 @@ class HotpotQADatasetFetcher(AbstractDatasetFetcher, BaseDatasetFetcher):
         Args:
             bucket_name (str):
             local_dataset_folder_path (str):
-
         """
         BaseDatasetFetcher.__init__(self, bucket_name, local_dataset_folder_path)
 
@@ -260,7 +247,6 @@ class HotpotQADatasetFetcher(AbstractDatasetFetcher, BaseDatasetFetcher):
 
         Returns:
             None
-
         """
         if not self.exists_local_dataset_folder('HotpotQA', protect_local_folder):
             hotpotqa_local_folder_path = os.path.join(self.local_dataset_folder_path, 'HotpotQA')

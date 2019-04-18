@@ -19,7 +19,6 @@ class AbstractLocalModelSaver(ABC):
 
         Returns:
             (str, str, str, str): model_name, model_weights_name, model_local_path, model_weights_local_path
-
         """
         pass
 
@@ -32,7 +31,6 @@ class BaseLocalModelSaver:
         Args:
             local_model_result_folder_path (str):
             checkpoint_model (bool):
-
         """
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
         self.checkpoint_model = checkpoint_model
@@ -47,7 +45,6 @@ class BaseLocalModelSaver:
 
         Returns:
             str:
-
         """
         project_path = os.path.join(self.local_model_result_folder_path, project_name)
         if not os.path.exists(project_path):
@@ -74,7 +71,6 @@ class KerasLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
         Args:
             local_model_result_folder_path (str):
             checkpoint_model (bool):
-
         """
         BaseLocalModelSaver.__init__(self, local_model_result_folder_path, checkpoint_model)
 
@@ -91,7 +87,6 @@ class KerasLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
 
         Returns:
             (str, str, str, str): model_name, model_weights_name, model_local_path, model_weights_local_path
-
         """
         if experiment_timestamp is None:
             experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
@@ -122,7 +117,6 @@ class TensorFlowLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
         Args:
             local_model_result_folder_path (str):
             checkpoint_model (bool):
-
         """
         BaseLocalModelSaver.__init__(self, local_model_result_folder_path, checkpoint_model)
 
@@ -140,7 +134,6 @@ class PyTorchLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
         Args:
             local_model_result_folder_path (str):
             checkpoint_model (bool):
-
         """
         BaseLocalModelSaver.__init__(self, local_model_result_folder_path, checkpoint_model)
 
@@ -157,7 +150,6 @@ class PyTorchLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
 
         Returns:
             (str, str, str, str): model_name, model_weights_name, model_local_path, model_weights_local_path
-
         """
         if experiment_timestamp is None:
             experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
@@ -190,7 +182,6 @@ class LocalSubOptimalModelRemover:
                 in the TrainLoop
             num_best_kept (int): number of best performing models which are kept when removing suboptimal model
                 checkpoints
-
         """
         self.metric_name = metric_name
         self.decrease_metric = 'loss' in metric_name
@@ -212,7 +203,6 @@ class LocalSubOptimalModelRemover:
             
         Returns:
             None
-
         """
         if not self.is_default_metric:
             if self.non_default_metric_buffer is not None:
@@ -240,7 +230,6 @@ class LocalSubOptimalModelRemover:
             
         Returns:
             None
-
         """
         for rm_path in rm_model_paths:
             os.remove(rm_path)

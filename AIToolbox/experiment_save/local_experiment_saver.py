@@ -15,7 +15,6 @@ class BaseFullExperimentLocalSaver(AbstractExperimentSaver):
             project_name (str):
             experiment_name (str):
             local_model_result_folder_path (str):
-
         """
         if not isinstance(model_saver, AbstractLocalModelSaver):
             raise TypeError(f'model_saver must be inherited from AbstractLocalModelSaver. '
@@ -42,7 +41,6 @@ class BaseFullExperimentLocalSaver(AbstractExperimentSaver):
 
         Returns:
             list:
-
         """
         if experiment_timestamp is None:
             experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
@@ -86,7 +84,6 @@ class FullPyTorchExperimentLocalSaver(BaseFullExperimentLocalSaver):
             project_name (str):
             experiment_name (str):
             local_model_result_folder_path (str):
-
         """
         BaseFullExperimentLocalSaver.__init__(self, PyTorchLocalModelSaver(local_model_result_folder_path),
                                               project_name, experiment_name,
@@ -101,7 +98,6 @@ class FullKerasExperimentLocalSaver(BaseFullExperimentLocalSaver):
             project_name (str):
             experiment_name (str):
             local_model_result_folder_path (str):
-
         """
         BaseFullExperimentLocalSaver.__init__(self, KerasLocalModelSaver(local_model_result_folder_path),
                                               project_name, experiment_name,
