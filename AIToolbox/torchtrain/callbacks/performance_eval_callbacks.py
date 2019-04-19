@@ -1,7 +1,6 @@
 import copy
 
 from AIToolbox.torchtrain.callbacks.callbacks import AbstractCallback
-from AIToolbox.experiment_save.training_history import TrainingHistory
 
 
 class ModelPerformanceEvaluationCallback(AbstractCallback):
@@ -56,23 +55,19 @@ class ModelPerformanceEvaluationCallback(AbstractCallback):
             self.store_evaluated_metrics_to_history()
 
     def evaluate_model_performance(self):
-        # TODO: maybe remove these 3 lines to save compute time and don't generate the train history which is not needed
-        train_history = self.train_loop_obj.train_history
-        epoch_list = list(
-            range(len(self.train_loop_obj.train_history[list(self.train_loop_obj.train_history.keys())[0]])))
-        train_hist_pkg = TrainingHistory(train_history, epoch_list)
-
         if self.on_train_data:
             y_test, y_pred, additional_results = self.train_loop_obj.predict_on_train_set()
             self.train_result_package.prepare_result_package(y_test, y_pred,
-                                                             hyperparameters=self.args, training_history=train_hist_pkg,
+                                                             hyperparameters=self.args,
+                                                             training_history=self.train_loop_obj.train_history,
                                                              additional_results=additional_results)
             # print(f'TRAIN: {self.train_result_package.get_results()}')
 
         if self.on_val_data:
             y_test, y_pred, additional_results = self.train_loop_obj.predict_on_validation_set()
             self.result_package.prepare_result_package(y_test, y_pred,
-                                                       hyperparameters=self.args, training_history=train_hist_pkg,
+                                                       hyperparameters=self.args,
+                                                       training_history=self.train_loop_obj.train_history,
                                                        additional_results=additional_results)
             # print(f'VAL: {self.result_package.get_results()}')
 

@@ -147,7 +147,7 @@ class ModelTrainEndSaveCallback(AbstractKerasCallback):
         """
         train_history = self.train_loop_obj.train_history.history
         epoch_list = self.train_loop_obj.train_history.epoch
-        train_hist_pkg = TrainingHistory(train_history, epoch_list)
+        train_hist_pkg = TrainingHistory().wrap_pre_prepared_history(train_history, epoch_list)
 
         if self.val_result_package is not None:
             y_test, y_pred, additional_results = self.train_loop_obj.predict_on_validation_set()
