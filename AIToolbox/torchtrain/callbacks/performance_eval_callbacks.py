@@ -55,13 +55,17 @@ class ModelPerformanceEvaluationCallback(AbstractCallback):
             self.store_evaluated_metrics_to_history()
 
     def evaluate_model_performance(self):
+        """Calculate performance based on the provided result packages
+
+        Returns:
+            None
+        """
         if self.on_train_data:
             y_test, y_pred, additional_results = self.train_loop_obj.predict_on_train_set()
             self.train_result_package.prepare_result_package(y_test, y_pred,
                                                              hyperparameters=self.args,
                                                              training_history=self.train_loop_obj.train_history,
                                                              additional_results=additional_results)
-            # print(f'TRAIN: {self.train_result_package.get_results()}')
 
         if self.on_val_data:
             y_test, y_pred, additional_results = self.train_loop_obj.predict_on_validation_set()
@@ -69,13 +73,18 @@ class ModelPerformanceEvaluationCallback(AbstractCallback):
                                                        hyperparameters=self.args,
                                                        training_history=self.train_loop_obj.train_history,
                                                        additional_results=additional_results)
-            # print(f'VAL: {self.result_package.get_results()}')
 
     def store_evaluated_metrics_to_history(self, prefix=''):
-        """
+        """Save the calculated performance results into the training history
+
+        The performance results are saved into the training history after they are calculated by the before called
+        evaluate_model_performance() function.
 
         Args:
-            prefix (str):
+            prefix (str): additional prefix for metric names that will get saved into the training history
+
+        Returns:
+            None
         """
         evaluated_metrics = self.result_package.get_results().keys() if self.on_val_data \
             else self.train_result_package.get_results().keys()
@@ -103,7 +112,7 @@ class ModelPerformanceEvaluationCallback(AbstractCallback):
 
 class ModelPerformancePrintReportCallback(AbstractCallback):
     def __init__(self, metrics, on_each_epoch=True, strict_metric_reporting=True, list_tracked_metrics=False):
-        """
+        """Print the model performance to the console
 
         Best used in combination with the callback which actually calculates some performance evaluation metrics, such
         as ModelPerformanceEvaluationCallback. Otherwise we are limited only to automatic loss calculation reporting.
@@ -138,6 +147,14 @@ class ModelPerformancePrintReportCallback(AbstractCallback):
             self.print_performance_report()
 
     def print_performance_report(self, prefix=''):
+        """Print the model performance
+
+        Args:
+            prefix (str): additional prefix for metric names that will get saved into the training history
+
+        Returns:
+            None
+        """
         if self.list_tracked_metrics:
             print(self.train_loop_obj.train_history.keys())
 
@@ -159,15 +176,15 @@ class ModelPerformancePrintReportCallback(AbstractCallback):
 class TrainHistoryFormatter(AbstractCallback):
     def __init__(self, input_metric_getter, output_metric_setter,
                  epoch_end=True, train_end=False, strict_metric_extract=True):
-        """
+        """Format stored training history results
 
         Args:
             input_metric_getter (lambda): extract full history for the desired metric, not just the last history input.
                 Return should be represented as a list.
             output_metric_setter (lambda): take the extracted full history of a metric and convert it as desired.
                 Return new / transformed metric name and transformed metric result.
-            epoch_end (bool):
-            train_end (bool):
+            epoch_end (bool): should the formatting be executed at the end of the epoch
+            train_end (bool): should the formatting be executed at the end of the training process
             strict_metric_extract (bool):
         """
         if epoch_end == train_end:
@@ -220,14 +237,14 @@ class TrainHistoryFormatter(AbstractCallback):
 class MetricHistoryRename(TrainHistoryFormatter):
     def __init__(self, input_metric_path, new_metric_name,
                  epoch_end=True, train_end=False, strict_metric_extract=True):
-        """
+        """Speciffic interface for TrainHistoryFormatter which renames the metric in the training history
 
         Args:
             input_metric_path (str or lambda): if using lambda, extract full history for the desired metric,
                 not just the last history input. Return should be represented as a list.
-            new_metric_name (str):
-            epoch_end (bool):
-            train_end (bool):
+            new_metric_name (str): the new metric name
+            epoch_end (bool): should the formatting be executed at the end of the epoch
+            train_end (bool): should the formatting be executed at the end of the training process
             strict_metric_extract (bool):
         """
 
