@@ -4,6 +4,7 @@ import datetime
 import numpy as np
 import torch
 
+from AIToolbox.experiment_save.training_history import TrainingHistory
 from AIToolbox.torchtrain.callbacks.callback_handler import CallbacksHandler
 from AIToolbox.torchtrain.callbacks.callbacks import ModelCheckpointCallback, ModelTrainEndSaveCallback
 
@@ -39,8 +40,7 @@ class TrainLoop:
         self.loss_batch_accum = []
         self.epoch = 0
 
-        self.train_history = {'loss': [], 'accumulated_loss': [], 'val_loss': []} if self.validation_loader is not None \
-            else {'loss': [], 'accumulated_loss': []}
+        self.train_history = TrainingHistory(has_validation=self.validation_loader is not None)
 
         self.callbacks_handler = CallbacksHandler(self)
         self.callbacks = []
@@ -112,9 +112,9 @@ class TrainLoop:
         return self.model
 
     def auto_execute_end_of_epoch(self):
-        train_loss_batch_accum_avg = np.mean(self.loss_batch_accum)
+        train_loss_batch_accum_avg = np.mean(self.loss_batch_accum).item()
         print(f'AVG BATCH ACCUMULATED TRAIN LOSS: {train_loss_batch_accum_avg}')
-        self.train_history['accumulated_loss'].append(train_loss_batch_accum_avg)
+        self.insert_metric_result_into_history('accumulated_loss', train_loss_batch_accum_avg)
         self.loss_batch_accum = []
 
         train_loss = self.evaluate_loss_on_train_set()
@@ -255,9 +255,7 @@ class TrainLoop:
             metric_name (str):
             metric_result (float or dict):
         """
-        if metric_name not in self.train_history:
-            self.train_history[metric_name] = []
-        self.train_history[metric_name].append(metric_result)
+        self.train_history.insert_single_result_into_history(metric_name, metric_result)
 
     @staticmethod
     def combine_prediction_metadata_batches(metadata_list):

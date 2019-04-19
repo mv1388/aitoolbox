@@ -198,7 +198,7 @@ class LocalSubOptimalModelRemover:
         """
 
         Args:
-            history (dict):
+            history (AIToolbox.experiment_save.training_history.TrainingHistory):
             new_model_dump_paths (list):
             
         Returns:

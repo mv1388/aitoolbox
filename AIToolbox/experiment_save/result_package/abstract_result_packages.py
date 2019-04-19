@@ -448,7 +448,7 @@ class PreCalculatedResultPackage(AbstractResultPackage):
         AbstractResultPackage.__init__(self, pkg_name='PreCalculatedResult',
                                        strict_content_check=strict_content_check, **kwargs)
         self.results_dict = results_dict
-        self.training_history = TrainingHistory({}, [], strict_content_check)
+        self.training_history = TrainingHistory()
         self.hyperparameters = {}
 
     def prepare_results_dict(self):

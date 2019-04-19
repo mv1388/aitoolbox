@@ -10,10 +10,10 @@ from AIToolbox.torchtrain.callbacks.callbacks import ModelCheckpointCallback, Mo
 class TestTrainLoop(unittest.TestCase):
     def test_init_values(self):
         train_loop_non_val = TrainLoop(Net(), None, None, None, DeactivateModelFeedDefinition(), None, None)
-        self.assertEqual(train_loop_non_val.train_history, {'loss': [], 'accumulated_loss': []})
+        self.assertEqual(train_loop_non_val.train_history.train_history, {'loss': [], 'accumulated_loss': []})
 
         train_loop = TrainLoop(Net(), None, 100, None, DeactivateModelFeedDefinition(), None, None)
-        self.assertEqual(train_loop.train_history, {'loss': [], 'accumulated_loss': [], 'val_loss': []})
+        self.assertEqual(train_loop.train_history.train_history, {'loss': [], 'accumulated_loss': [], 'val_loss': []})
         
         self.assertEqual(train_loop.callbacks, [])
         self.assertIsInstance(train_loop.callbacks_handler, CallbacksHandler)
@@ -191,14 +191,14 @@ class TestTrainLoop(unittest.TestCase):
                                                          AbstractCallback('callback_test2')])
         train_loop.do_train(num_epoch=num_epochs)
 
-        self.assertEqual(train_loop.train_history, {'loss': [1.0, 1.0], 'accumulated_loss': [1.0, 1.0], 'val_loss': [1.0, 1.0]})
+        self.assertEqual(train_loop.train_history.train_history, {'loss': [1.0, 1.0], 'accumulated_loss': [1.0, 1.0], 'val_loss': [1.0, 1.0]})
 
         train_loop.insert_metric_result_into_history('test_metric_1', 10.11)
         train_loop.insert_metric_result_into_history('test_metric_2', 40.11)
         train_loop.insert_metric_result_into_history('test_metric_1', 100.11)
         train_loop.insert_metric_result_into_history('test_metric_2', 400.11)
 
-        self.assertEqual(train_loop.train_history,
+        self.assertEqual(train_loop.train_history.train_history,
                          {'loss': [1.0, 1.0], 'accumulated_loss': [1.0, 1.0], 'val_loss': [1.0, 1.0],
                           'test_metric_1': [10.11, 100.11], 'test_metric_2': [40.11, 400.11]})
 
@@ -207,11 +207,11 @@ class TestTrainLoopModelCheckpoint(unittest.TestCase):
     def test_init_values(self):
         train_loop_non_val = TrainLoopModelCheckpoint(Net(), None, None, None, DeactivateModelFeedDefinition(), None, None,
                                                       "project_name", "experiment_name", "local_model_result_folder_path")
-        self.assertEqual(train_loop_non_val.train_history, {'loss': [], 'accumulated_loss': []})
+        self.assertEqual(train_loop_non_val.train_history.train_history, {'loss': [], 'accumulated_loss': []})
 
         train_loop = TrainLoopModelCheckpoint(Net(), None, 100, None, DeactivateModelFeedDefinition(), None, None,
                                               "project_name", "experiment_name", "local_model_result_folder_path")
-        self.assertEqual(train_loop.train_history, {'loss': [], 'accumulated_loss': [], 'val_loss': []})
+        self.assertEqual(train_loop.train_history.train_history, {'loss': [], 'accumulated_loss': [], 'val_loss': []})
 
         self.assertEqual(len(train_loop.callbacks), 1)
         self.assertEqual(type(train_loop.callbacks[0]), ModelCheckpointCallback)
@@ -227,13 +227,13 @@ class TestTrainLoopModelEndSave(unittest.TestCase):
                                                    "project_name", "experiment_name", "local_model_result_folder_path",
                                                    args={}, val_result_package=DummyResultPackage(),
                                                    test_result_package=DummyResultPackage(), cloud_save_mode='s3')
-        self.assertEqual(train_loop_non_val.train_history, {'loss': [], 'accumulated_loss': [], 'val_loss': []})
+        self.assertEqual(train_loop_non_val.train_history.train_history, {'loss': [], 'accumulated_loss': [], 'val_loss': []})
 
         dummy_result_package = DummyResultPackage()
         train_loop = TrainLoopModelEndSave(Net(), None, 100, None, DeactivateModelFeedDefinition(), None, None,
                                            "project_name", "experiment_name", "local_model_result_folder_path",
                                            args={}, val_result_package=dummy_result_package, cloud_save_mode='s3')
-        self.assertEqual(train_loop.train_history, {'loss': [], 'accumulated_loss': [], 'val_loss': []})
+        self.assertEqual(train_loop.train_history.train_history, {'loss': [], 'accumulated_loss': [], 'val_loss': []})
 
         self.assertEqual(len(train_loop.callbacks), 1)
         self.assertEqual(type(train_loop.callbacks[0]), ModelTrainEndSaveCallback)
@@ -297,13 +297,13 @@ class TestTrainLoopModelCheckpointEndSave(unittest.TestCase):
         train_loop_non_val = TrainLoopModelCheckpointEndSave(Net(), None, 100, None, DeactivateModelFeedDefinition(), None, None,
                                                              "project_name", "experiment_name", "local_model_result_folder_path",
                                                              args={}, val_result_package=DummyResultPackage(), cloud_save_mode='s3')
-        self.assertEqual(train_loop_non_val.train_history, {'loss': [], 'accumulated_loss': [], 'val_loss': []})
+        self.assertEqual(train_loop_non_val.train_history.train_history, {'loss': [], 'accumulated_loss': [], 'val_loss': []})
 
         dummy_result_package = DummyResultPackage()
         train_loop = TrainLoopModelCheckpointEndSave(Net(), None, 100, None, DeactivateModelFeedDefinition(), None, None,
                                                      "project_name", "experiment_name", "local_model_result_folder_path",
                                                      args={}, val_result_package=dummy_result_package, cloud_save_mode='s3')
-        self.assertEqual(train_loop.train_history, {'loss': [], 'accumulated_loss': [], 'val_loss': []})
+        self.assertEqual(train_loop.train_history.train_history, {'loss': [], 'accumulated_loss': [], 'val_loss': []})
 
         self.assertEqual(len(train_loop.callbacks), 2)
         self.assertEqual(type(train_loop.callbacks[1]), ModelTrainEndSaveCallback)

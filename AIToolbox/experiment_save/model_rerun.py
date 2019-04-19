@@ -62,14 +62,10 @@ class PyTorchModelReRunner(AbstractModelReRunner):
         Returns:
 
         """
-        train_history = self.train_loop.train_history
-        epoch_list = list(range(len(self.train_loop.train_history[list(self.train_loop.train_history.keys())[0]])))
-        train_hist_pkg = TrainingHistory(train_history, epoch_list)
-
         y_test, y_pred, additional_results = self.train_loop.predict_on_test_set()
 
         result_package.prepare_result_package(y_test, y_pred,
-                                              hyperparameters={}, training_history=train_hist_pkg,
+                                              hyperparameters={}, training_history=self.train_loop.train_history,
                                               additional_results=additional_results)
 
         if return_result_package:

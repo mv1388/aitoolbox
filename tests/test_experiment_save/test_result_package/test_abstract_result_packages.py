@@ -21,7 +21,7 @@ class TestAbstractResultPackage(unittest.TestCase):
                            0.5799999833106995, 0.6200000047683716, 0.4300000071525574, 0.5099999904632568,
                            0.6700000166893005, 0.7599999904632568]}
         epoch = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-        train_hist = TrainingHistory(history, epoch)
+        train_hist = TrainingHistory().wrap_pre_prepared_history(history, epoch)
         result_pkg = DummyResultPackageExtend()
         result_pkg.prepare_result_package([10] * 100, [11] * 100, {}, train_hist)
 
@@ -113,7 +113,7 @@ class TestAbstractResultPackage(unittest.TestCase):
                            0.5799999833106995, 0.6200000047683716, 0.4300000071525574, 0.5099999904632568,
                            0.6700000166893005, 0.7599999904632568]}
         epoch = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-        train_hist = TrainingHistory(history, epoch)
+        train_hist = TrainingHistory().wrap_pre_prepared_history(history, epoch)
         return train_hist
 
     def test_combine_packages(self):
@@ -170,7 +170,7 @@ class TestAbstractResultPackage(unittest.TestCase):
         self.assertEqual(combo_pkg_1_2.result_packages[1].results_dict, pkg_2_dict)
         self.assertEqual(combo_pkg_1_2.result_packages[1].get_results(), pkg_2_dict)
         self.assertEqual(combo_pkg_1_2.result_packages[1].get_hyperparameters(), {})
-        self.assertEqual(combo_pkg_1_2.result_packages[1].get_training_history(), TrainingHistory({}, [], False).get_train_history())
+        self.assertEqual(combo_pkg_1_2.result_packages[1].get_training_history(), TrainingHistory().get_train_history())
 
         self.assertEqual(combo_pkg_1_2.results_dict, {pkg_1.pkg_name: result_d_1,
                                                       combo_pkg_1_2.result_packages[1].pkg_name: pkg_2_dict})
@@ -339,7 +339,7 @@ class TestMultipleResultPackageWrapper(unittest.TestCase):
                            0.5799999833106995, 0.6200000047683716, 0.4300000071525574, 0.5099999904632568,
                            0.6700000166893005, 0.7599999904632568]}
         epoch = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-        train_hist = TrainingHistory(history, epoch)
+        train_hist = TrainingHistory().wrap_pre_prepared_history(history, epoch)
         return train_hist
 
     def test_basic(self):

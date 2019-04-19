@@ -243,15 +243,12 @@ class ModelTrainEndSaveCallback(AbstractCallback):
         Returns:
 
         """
-        train_history = self.train_loop_obj.train_history
-        epoch_list = list(range(len(self.train_loop_obj.train_history[list(self.train_loop_obj.train_history.keys())[0]])))
-        train_hist_pkg = TrainingHistory(train_history, epoch_list)
-
         if self.val_result_package is not None:
             y_test, y_pred, additional_results = self.train_loop_obj.predict_on_validation_set()
             self.val_result_package.pkg_name += '_VAL'
             self.val_result_package.prepare_result_package(y_test, y_pred,
-                                                           hyperparameters=self.args, training_history=train_hist_pkg,
+                                                           hyperparameters=self.args,
+                                                           training_history=self.train_loop_obj.train_history,
                                                            additional_results=additional_results)
             self.result_package = self.val_result_package
 
@@ -259,7 +256,8 @@ class ModelTrainEndSaveCallback(AbstractCallback):
             y_test_test, y_pred_test, additional_results_test = self.train_loop_obj.predict_on_test_set()
             self.test_result_package.pkg_name += '_TEST'
             self.test_result_package.prepare_result_package(y_test_test, y_pred_test,
-                                                            hyperparameters=self.args, training_history=train_hist_pkg,
+                                                            hyperparameters=self.args,
+                                                            training_history=self.train_loop_obj.train_history,
                                                             additional_results=additional_results_test)
             self.result_package = self.test_result_package + self.result_package if self.result_package is not None \
                 else self.test_result_package
