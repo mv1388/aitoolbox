@@ -17,13 +17,15 @@ class TrainLoop:
         """
 
         Args:
-            model (torch.nn.modules.Module):
-            train_loader (torch.utils.data.DataLoader):
-            validation_loader (torch.utils.data.DataLoader):
-            test_loader (torch.utils.data.DataLoader):
-            batch_model_feed_def (AIToolbox.torchtrain.batch_model_feed_defs.AbstractModelFeedDefinition):
-            optimizer:
-            criterion:
+            model (torch.nn.modules.Module): neural network model
+            train_loader (torch.utils.data.DataLoader): data loader for train data set
+            validation_loader (torch.utils.data.DataLoader): data loader for validation data set
+            test_loader (torch.utils.data.DataLoader): data loader for test data set
+            batch_model_feed_def (AIToolbox.torchtrain.batch_model_feed_defs.AbstractModelFeedDefinition): data prep
+                definition for batched data. This definition prepares the data for each batch that gets than fed into
+                the neural network.
+            optimizer (torch.optim.optimizer.Optimizer): optimizer algorithm.
+            criterion (torch.nn.modules.loss._Loss): criterion criterion during the training procedure.
         """
         self.model = model
         self.train_loader = train_loader
@@ -47,28 +49,28 @@ class TrainLoop:
         self.early_stop = False
 
     def __call__(self, num_epoch, callbacks=None, grad_clip=None):
-        """
+        """Train the model using the train loop
 
         Args:
-            num_epoch (int):
-            callbacks (list):
-            grad_clip (int or float):
+            num_epoch (int): how many epochs the network will be trained
+            callbacks (list): callbacks that are executed during the training run
+            grad_clip (int or float): optional gradient clipping
 
         Returns:
-            torch.nn.modules.Module:
+            torch.nn.modules.Module: trained model
         """
         return self.do_train(num_epoch, callbacks, grad_clip)
 
     def do_train(self, num_epoch, callbacks=None, grad_clip=None):
-        """
+        """Train the model using the train loop
 
         Args:
-            num_epoch (int):
-            callbacks (list):
-            grad_clip (int or float):
+            num_epoch (int): how many epochs the network will be trained
+            callbacks (list): callbacks that are executed during the training run
+            grad_clip (int or float): optional gradient clipping
 
         Returns:
-            torch.nn.modules.Module:
+            torch.nn.modules.Module: trained model
         """
         self.callbacks_handler.register_callbacks(callbacks)
 
@@ -112,6 +114,13 @@ class TrainLoop:
         return self.model
 
     def auto_execute_end_of_epoch(self):
+        """Basic performance evaluation executed by default at the end of each epoch
+
+        Mainly evaluation of the loss functions which are always present as part of the training loop.
+
+        Returns:
+            None
+        """
         train_loss_batch_accum_avg = np.mean(self.loss_batch_accum).item()
         print(f'AVG BATCH ACCUMULATED TRAIN LOSS: {train_loss_batch_accum_avg}')
         self.insert_metric_result_into_history('accumulated_loss', train_loss_batch_accum_avg)
@@ -127,6 +136,11 @@ class TrainLoop:
             self.insert_metric_result_into_history('val_loss', val_loss)
 
     def auto_execute_end_of_training(self):
+        """Basic performance evaluation executed by default at the end of the training process
+
+        Returns:
+            None
+        """
         if self.test_loader is not None:
             test_loss = self.evaluate_loss_on_test_set()
             print(f'TEST LOSS: {test_loss}')
@@ -134,37 +148,37 @@ class TrainLoop:
             # self.insert_metric_result_into_history('test_loss', test_loss)
 
     def evaluate_loss_on_train_set(self):
-        """
+        """Run train dataset through the network without updating the weights and return the loss
 
         Returns:
-            float:
+            float: loss
         """
         return self.evaluate_model_loss(self.train_loader)
 
     def evaluate_loss_on_validation_set(self):
-        """
+        """Run validation dataset through the network without updating the weights and return the loss
 
         Returns:
-            float:
+            float: loss
         """
         return self.evaluate_model_loss(self.validation_loader)
 
     def evaluate_loss_on_test_set(self):
-        """
+        """Run test dataset through the network without updating the weights and return the loss
 
         Returns:
-            float:
+            float: loss
         """
         return self.evaluate_model_loss(self.test_loader)
 
     def evaluate_model_loss(self, data_loader):
-        """
+        """Run given dataset through the network without updating the weights and return the loss
 
         Args:
             data_loader (torch.utils.data.DataLoader):
 
         Returns:
-            float:
+            float: loss
         """
         self.model.eval()
         loss_avg = []
@@ -180,37 +194,37 @@ class TrainLoop:
         return np.mean(loss_avg)
 
     def predict_on_train_set(self):
-        """
+        """Run train dataset through the network and return true target values, target predictions and metadata
 
         Returns:
-            (torch.Tensor, torch.Tensor, dict):
+            (torch.Tensor, torch.Tensor, dict): y_true, y_pred, metadata
         """
         return self.predict_with_model(self.train_loader)
 
     def predict_on_validation_set(self):
-        """
+        """Run validation dataset through the network and return true target values, target predictions and metadata
 
         Returns:
-            (torch.Tensor, torch.Tensor, dict):
+            (torch.Tensor, torch.Tensor, dict): y_true, y_pred, metadata
         """
         return self.predict_with_model(self.validation_loader)
 
     def predict_on_test_set(self):
-        """
+        """Run test dataset through the network and return true target values, target predictions and metadata
 
         Returns:
-            (torch.Tensor, torch.Tensor, dict):
+            (torch.Tensor, torch.Tensor, dict): y_true, y_pred, metadata
         """
         return self.predict_with_model(self.test_loader)
 
     def predict_with_model(self, data_loader):
-        """
+        """Run given dataset through the network and return true target values, target predictions and metadata
 
         Args:
             data_loader (torch.utils.data.DataLoader):
 
         Returns:
-            (torch.Tensor, torch.Tensor, dict):
+            (torch.Tensor, torch.Tensor, dict): y_true, y_pred, metadata
         """
         y_test, y_pred, metadata_list = [], [], []
 
@@ -249,23 +263,26 @@ class TrainLoop:
         return y_test, y_pred, metadata
 
     def insert_metric_result_into_history(self, metric_name, metric_result):
-        """
+        """Insert a metric result into the train history
+
+        This is the main and preferred API function for metric insertion as part of the train loop.
 
         Args:
-            metric_name (str):
-            metric_result (float or dict):
+            metric_name (str): name of the metric to be inserted
+            metric_result (float or dict): new result for the corresponding metric
         """
         self.train_history.insert_single_result_into_history(metric_name, metric_result)
 
     @staticmethod
     def combine_prediction_metadata_batches(metadata_list):
-        """
+        """Combines a list of dicts with the same keys and lists as values into a single dict with concatenated lists
+            for each corresponding key
 
         Args:
-            metadata_list (list):
+            metadata_list (list): list of dicts with matching keys and lists for values
 
         Returns:
-            dict:
+            dict: combined single dict
         """
         combined_metadata = {}
 
@@ -285,7 +302,7 @@ class TrainLoopModelCheckpoint(TrainLoop):
                  optimizer, criterion,
                  project_name, experiment_name, local_model_result_folder_path, cloud_save_mode='s3',
                  rm_subopt_local_models=False, num_best_checkpoints_kept=2):
-        """
+        """TrainLoop with the automatic model check-pointing at the end of each epoch
 
         Args:
             model (torch.nn.modules.Module):
@@ -293,11 +310,11 @@ class TrainLoopModelCheckpoint(TrainLoop):
             validation_loader (torch.utils.data.DataLoader):
             test_loader (torch.utils.data.DataLoader):
             batch_model_feed_def (AIToolbox.torchtrain.batch_model_feed_defs.AbstractModelFeedDefinition):
-            optimizer:
-            criterion:
-            project_name (str):
-            experiment_name (str):
-            local_model_result_folder_path (str):
+            optimizer (torch.optim.optimizer.Optimizer): optimizer algorithm.
+            criterion (torch.nn.modules.loss._Loss): criterion criterion during the training procedure.
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            local_model_result_folder_path (str): root local path where project folder will be created
             cloud_save_mode (str or None): Storage destination selector.
                 For AWS S3: 's3' / 'aws_s3' / 'aws'
                 For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
@@ -330,7 +347,7 @@ class TrainLoopModelEndSave(TrainLoop):
                  optimizer, criterion,
                  project_name, experiment_name, local_model_result_folder_path,
                  args, val_result_package=None, test_result_package=None, cloud_save_mode='s3'):
-        """
+        """TrainLoop with the model performance evaluation and final model saving at the end of the training process
 
         Args:
             model (torch.nn.modules.Module):
@@ -338,12 +355,12 @@ class TrainLoopModelEndSave(TrainLoop):
             validation_loader (torch.utils.data.DataLoader or None):
             test_loader (torch.utils.data.DataLoader or None):
             batch_model_feed_def (AIToolbox.torchtrain.batch_model_feed_defs.AbstractModelFeedDefinition):
-            optimizer:
-            criterion:
-            project_name (str):
-            experiment_name (str):
-            local_model_result_folder_path (str):
-            args (dict):
+            optimizer (torch.optim.optimizer.Optimizer): optimizer algorithm.
+            criterion (torch.nn.modules.loss._Loss): criterion criterion during the training procedure.
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            local_model_result_folder_path (str): root local path where project folder will be created
+            args (dict): used hyper-parameters
             val_result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage or None):
             test_result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage or None):
             cloud_save_mode (str or None): Storage destination selector.
@@ -390,7 +407,8 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
                  project_name, experiment_name, local_model_result_folder_path,
                  args, val_result_package=None, test_result_package=None, cloud_save_mode='s3',
                  rm_subopt_local_models=False, num_best_checkpoints_kept=2):
-        """
+        """TrainLoop both saving model check-pointing at the end of each epoch and model performance reporting
+            and model saving at the end of the training process
 
         Args:
             model (torch.nn.modules.Module):
@@ -398,12 +416,12 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
             validation_loader (torch.utils.data.DataLoader or None):
             test_loader (torch.utils.data.DataLoader or None):
             batch_model_feed_def (AIToolbox.torchtrain.batch_model_feed_defs.AbstractModelFeedDefinition):
-            optimizer:
-            criterion:
-            project_name (str):
-            experiment_name (str):
-            local_model_result_folder_path (str):
-            args (dict):
+            optimizer (torch.optim.optimizer.Optimizer): optimizer algorithm.
+            criterion (torch.nn.modules.loss._Loss): criterion criterion during the training procedure.
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            local_model_result_folder_path (str): root local path where project folder will be created
+            args (dict): used hyper-parameters
             val_result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage or None):
             test_result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage or None):
             cloud_save_mode (str or None): Storage destination selector.

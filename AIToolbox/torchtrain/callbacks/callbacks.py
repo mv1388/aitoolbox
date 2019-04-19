@@ -3,29 +3,36 @@ from AIToolbox.cloud.GoogleCloud.model_save import PyTorchGoogleStorageModelSave
 from AIToolbox.experiment_save.local_save.local_model_save import PyTorchLocalModelSaver, LocalSubOptimalModelRemover
 from AIToolbox.experiment_save.experiment_saver import FullPyTorchExperimentS3Saver, FullPyTorchExperimentGoogleStorageSaver
 from AIToolbox.experiment_save.local_experiment_saver import FullPyTorchExperimentLocalSaver
-from AIToolbox.experiment_save.training_history import TrainingHistory
 
 
 class AbstractCallback:
     def __init__(self, callback_name, execution_order=0):
-        """
+        """Abstract callback class that all actual callback classes have to inherit from
+
+        In the inherited callback classes the callback methods should be overwritten and used to implement desired
+        callback functionality at specific points of the train loop.
 
         Args:
-            callback_name (str):
-            execution_order (int):
+            callback_name (str): name of the callback
+            execution_order (int): order of the callback execution. If all the used callbacks have the orders set to 0,
+                than the callbacks are executed in the order they were registered.
         """
         self.callback_name = callback_name
         self.execution_order = execution_order
         self.train_loop_obj = None
 
     def register_train_loop_object(self, train_loop_obj):
-        """
+        """Introduce the reference to the encapsulating trainloop so that the callback has access to the
+            low level functionality of the trainloop
+
+        The registration is normally handled by the callback handler found inside the train loops. The handler is
+        responsible for all the callback orchestration of the callbacks inside the trainloops.
 
         Args:
-            train_loop_obj (AIToolbox.torchtrain.train_loop.TrainLoop):
+            train_loop_obj (AIToolbox.torchtrain.train_loop.TrainLoop): reference to the encapsulating trainloop
 
         Returns:
-
+            AbstractCallback: return the reference to the callback after it is registered
         """
         self.train_loop_obj = train_loop_obj
         self.on_train_loop_registration()
@@ -60,12 +67,12 @@ class AbstractCallback:
 
 class EarlyStoppingCallback(AbstractCallback):
     def __init__(self, monitor='val_loss', min_delta=0., patience=0):
-        """
+        """Early stopping of the training if the performance stops improving
 
         Args:
-            monitor (str):
-            min_delta (float):
-            patience (int):
+            monitor (str): performance measure that is tracked to decide if performance is  improving during training
+            min_delta (float): by how much the performance has to improve to still keep training the model
+            patience (int): how many epochs the early stopper waits after the performance stopped improving
         """
         # execution_order=99 makes sure that any performance calculation callbacks are executed before and the most
         # recent results can already be found in the train_history
@@ -79,23 +86,8 @@ class EarlyStoppingCallback(AbstractCallback):
         self.best_epoch = 0
 
     def on_epoch_end(self):
-        """
-
-        Returns:
-
-        """
         history_data = self.train_loop_obj.train_history[self.monitor]
         current_performance = history_data[-1]
-
-        # if len(history_data) > self.patience:
-        #     history_window = history_data[-self.patience:]
-        #
-        #     if 'loss' in self.monitor:
-        #         if history_window[0] == min(history_window) and history_window[0] < history_window[-1]-self.patience:
-        #             train_loop_obj.early_stop = True
-        #     else:
-        #         if history_window[0] == max(history_window) and history_window[0] > history_window[-1]+self.patience:
-        #             train_loop_obj.early_stop = True
 
         if self.best_performance is None:
             self.best_performance = current_performance
@@ -121,11 +113,6 @@ class EarlyStoppingCallback(AbstractCallback):
                 self.train_loop_obj.early_stop = True
 
     def on_train_end(self):
-        """
-
-        Returns:
-
-        """
         if self.train_loop_obj.early_stop:
             print(f'Early stopping at epoch: {self.train_loop_obj.epoch}. Best recorded epoch: {self.best_epoch}.')
 
@@ -133,12 +120,12 @@ class EarlyStoppingCallback(AbstractCallback):
 class ModelCheckpointCallback(AbstractCallback):
     def __init__(self, project_name, experiment_name, local_model_result_folder_path, cloud_save_mode='s3',
                  rm_subopt_local_models=False, num_best_checkpoints_kept=2):
-        """
+        """Check-point save the model during training to disk or also to S3 / GCS cloud storage
 
         Args:
-            project_name (str):
-            experiment_name (str):
-            local_model_result_folder_path (str):
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            local_model_result_folder_path (str): root local path where project folder will be created
             cloud_save_mode (str or None): Storage destination selector.
                 For AWS S3: 's3' / 'aws_s3' / 'aws'
                 For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
@@ -177,11 +164,6 @@ class ModelCheckpointCallback(AbstractCallback):
             )
 
     def on_epoch_end(self):
-        """
-
-        Returns:
-
-        """
         model_paths = self.model_checkpointer.save_model(model=self.train_loop_obj.model,
                                                          project_name=self.project_name,
                                                          experiment_name=self.experiment_name,
@@ -198,13 +180,14 @@ class ModelCheckpointCallback(AbstractCallback):
 class ModelTrainEndSaveCallback(AbstractCallback):
     def __init__(self, project_name, experiment_name, local_model_result_folder_path,
                  args, val_result_package=None, test_result_package=None, cloud_save_mode='s3'):
-        """
+        """At the end of training execute model performance evaluation, build result package repot and save it
+            together with the final model to local disk and possibly to S3 / GCS cloud storage
 
         Args:
-            project_name (str):
-            experiment_name (str):
-            local_model_result_folder_path (str):
-            args (dict):
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            local_model_result_folder_path (str): root local path where project folder will be created
+            args (dict): used hyper-parameters
             val_result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
             test_result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
             cloud_save_mode (str or None): Storage destination selector.
@@ -238,11 +221,6 @@ class ModelTrainEndSaveCallback(AbstractCallback):
                                                                  local_model_result_folder_path=self.local_model_result_folder_path)
 
     def on_train_end(self):
-        """
-
-        Returns:
-
-        """
         if self.val_result_package is not None:
             y_test, y_pred, additional_results = self.train_loop_obj.predict_on_validation_set()
             self.val_result_package.pkg_name += '_VAL'

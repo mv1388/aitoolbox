@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 
 from AIToolbox.torchtrain.train_loop import TrainLoop
-from AIToolbox.experiment_save.training_history import TrainingHistory
 
 
 class AbstractModelReRunner(ABC):
