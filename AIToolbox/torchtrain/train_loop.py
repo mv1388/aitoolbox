@@ -24,7 +24,7 @@ class TrainLoop:
             batch_model_feed_def (AIToolbox.torchtrain.batch_model_feed_defs.AbstractModelFeedDefinition): data prep
                 definition for batched data. This definition prepares the data for each batch that gets than fed into
                 the neural network.
-            optimizer (torch.optim.optimizer.Optimizer): optimizer algorithm
+            optimizer (torch.optim.optimizer.Optimizer): optimizer algorithm.
             criterion (torch.nn.modules.loss._Loss): criterion criterion during the training procedure.
         """
         self.model = model
@@ -310,11 +310,11 @@ class TrainLoopModelCheckpoint(TrainLoop):
             validation_loader (torch.utils.data.DataLoader):
             test_loader (torch.utils.data.DataLoader):
             batch_model_feed_def (AIToolbox.torchtrain.batch_model_feed_defs.AbstractModelFeedDefinition):
-            optimizer:
-            criterion:
-            project_name (str):
-            experiment_name (str):
-            local_model_result_folder_path (str):
+            optimizer (torch.optim.optimizer.Optimizer): optimizer algorithm.
+            criterion (torch.nn.modules.loss._Loss): criterion criterion during the training procedure.
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            local_model_result_folder_path (str): root local path where project folder will be created
             cloud_save_mode (str or None): Storage destination selector.
                 For AWS S3: 's3' / 'aws_s3' / 'aws'
                 For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
@@ -355,12 +355,12 @@ class TrainLoopModelEndSave(TrainLoop):
             validation_loader (torch.utils.data.DataLoader or None):
             test_loader (torch.utils.data.DataLoader or None):
             batch_model_feed_def (AIToolbox.torchtrain.batch_model_feed_defs.AbstractModelFeedDefinition):
-            optimizer:
-            criterion:
-            project_name (str):
-            experiment_name (str):
-            local_model_result_folder_path (str):
-            args (dict):
+            optimizer (torch.optim.optimizer.Optimizer): optimizer algorithm.
+            criterion (torch.nn.modules.loss._Loss): criterion criterion during the training procedure.
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            local_model_result_folder_path (str): root local path where project folder will be created
+            args (dict): used hyper-parameters
             val_result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage or None):
             test_result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage or None):
             cloud_save_mode (str or None): Storage destination selector.
@@ -416,12 +416,12 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
             validation_loader (torch.utils.data.DataLoader or None):
             test_loader (torch.utils.data.DataLoader or None):
             batch_model_feed_def (AIToolbox.torchtrain.batch_model_feed_defs.AbstractModelFeedDefinition):
-            optimizer:
-            criterion:
-            project_name (str):
-            experiment_name (str):
-            local_model_result_folder_path (str):
-            args (dict):
+            optimizer (torch.optim.optimizer.Optimizer): optimizer algorithm.
+            criterion (torch.nn.modules.loss._Loss): criterion criterion during the training procedure.
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            local_model_result_folder_path (str): root local path where project folder will be created
+            args (dict): used hyper-parameters
             val_result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage or None):
             test_result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage or None):
             cloud_save_mode (str or None): Storage destination selector.
