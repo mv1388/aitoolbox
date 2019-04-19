@@ -23,12 +23,13 @@ class AbstractModelReRunner(ABC):
 
 class PyTorchModelReRunner(AbstractModelReRunner):
     def __init__(self, model, data_loader, batch_model_feed_def):
-        """
+        """Use trained PyTorch model to predict on the (new) dataset
 
         Args:
-            model (torch.nn.modules.Module):
-            data_loader (torch.utils.data.DataLoader):
-            batch_model_feed_def (AIToolbox.torchtrain.batch_model_feed_defs.AbstractModelFeedDefinition):
+            model (torch.nn.modules.Module): model used for prediction
+            data_loader (torch.utils.data.DataLoader): specify the dataset for which the predictions are wanted
+            batch_model_feed_def (AIToolbox.torchtrain.batch_model_feed_defs.AbstractModelFeedDefinition): batch data
+                feed definition
         """
         AbstractModelReRunner.__init__(self, model, data_loader)
         self.batch_model_feed_def = batch_model_feed_def
@@ -36,30 +37,31 @@ class PyTorchModelReRunner(AbstractModelReRunner):
         self.train_loop = TrainLoop(self.model, None, None, self.data_loader, batch_model_feed_def, None, None)
 
     def model_predict(self):
-        """
+        """Run the dataset through the network and return true target values, target predictions and metadata
 
         Returns:
-            (torch.Tensor, torch.Tensor, dict):
+            (torch.Tensor, torch.Tensor, dict): y_true, y_pred, metadata
         """
         return self.train_loop.predict_on_test_set()
 
     def model_get_loss(self):
-        """
+        """Run the dataset through the network without updating the weights and return the loss
 
         Returns:
-            float:
+            float: loss
         """
         return self.train_loop.evaluate_loss_on_test_set()
 
     def evaluate_result_package(self, result_package, return_result_package=True):
-        """
+        """Evaluate the model performance based on the provided result package
 
         Args:
             result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
-            return_result_package (bool):
+                result package defining the performance evaluation logic
+            return_result_package (bool): should return a full result package or extract just the result dict
 
         Returns:
-
+            AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage | dict:
         """
         y_test, y_pred, additional_results = self.train_loop.predict_on_test_set()
 

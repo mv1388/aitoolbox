@@ -1,7 +1,8 @@
 
 class TrainingHistory:
     def __init__(self, has_validation=True, auto_epoch='loss', strict_content_check=False):
-        """
+        """Training history abstraction for storing all the produced model performance evaluations during the training
+            process
         
         Args:
             has_validation: if train history should by default include 'val_loss'. This is needed when train loops
@@ -22,7 +23,7 @@ class TrainingHistory:
             else {'loss': [], 'accumulated_loss': []}
         
     def insert_single_result_into_history(self, metric_name, metric_result, epoch=None):
-        """
+        """Insert a new model performance metric evaluation result into the training history
 
         Args:
             metric_name (str): name of the metric to be stored.
