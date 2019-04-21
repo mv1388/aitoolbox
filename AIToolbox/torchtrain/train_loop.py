@@ -286,11 +286,13 @@ class TrainLoopModelCheckpoint(TrainLoop):
         """TrainLoop with the automatic model check-pointing at the end of each epoch
 
         Args:
-            model (torch.nn.modules.Module):
-            train_loader (torch.utils.data.DataLoader):
-            validation_loader (torch.utils.data.DataLoader):
-            test_loader (torch.utils.data.DataLoader):
-            batch_model_feed_def (AIToolbox.torchtrain.batch_model_feed_defs.AbstractModelFeedDefinition):
+            model (torch.nn.modules.Module): neural network model
+            train_loader (torch.utils.data.DataLoader): data loader for train data set
+            validation_loader (torch.utils.data.DataLoader): data loader for validation data set
+            test_loader (torch.utils.data.DataLoader): data loader for test data set
+            batch_model_feed_def (AIToolbox.torchtrain.batch_model_feed_defs.AbstractModelFeedDefinition): data prep
+                definition for batched data. This definition prepares the data for each batch that gets than fed into
+                the neural network.
             optimizer (torch.optim.optimizer.Optimizer): optimizer algorithm.
             criterion (torch.nn.modules.loss._Loss): criterion criterion during the training procedure.
             project_name (str): root name of the project
@@ -331,11 +333,13 @@ class TrainLoopModelEndSave(TrainLoop):
         """TrainLoop with the model performance evaluation and final model saving at the end of the training process
 
         Args:
-            model (torch.nn.modules.Module):
-            train_loader (torch.utils.data.DataLoader):
-            validation_loader (torch.utils.data.DataLoader or None):
-            test_loader (torch.utils.data.DataLoader or None):
-            batch_model_feed_def (AIToolbox.torchtrain.batch_model_feed_defs.AbstractModelFeedDefinition):
+            model (torch.nn.modules.Module): neural network model
+            train_loader (torch.utils.data.DataLoader): data loader for train data set
+            validation_loader (torch.utils.data.DataLoader): data loader for validation data set
+            test_loader (torch.utils.data.DataLoader): data loader for test data set
+            batch_model_feed_def (AIToolbox.torchtrain.batch_model_feed_defs.AbstractModelFeedDefinition): data prep
+                definition for batched data. This definition prepares the data for each batch that gets than fed into
+                the neural network.
             optimizer (torch.optim.optimizer.Optimizer): optimizer algorithm.
             criterion (torch.nn.modules.loss._Loss): criterion criterion during the training procedure.
             project_name (str): root name of the project
@@ -394,11 +398,13 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
             and model saving at the end of the training process
 
         Args:
-            model (torch.nn.modules.Module):
-            train_loader (torch.utils.data.DataLoader):
-            validation_loader (torch.utils.data.DataLoader or None):
-            test_loader (torch.utils.data.DataLoader or None):
-            batch_model_feed_def (AIToolbox.torchtrain.batch_model_feed_defs.AbstractModelFeedDefinition):
+            model (torch.nn.modules.Module): neural network model
+            train_loader (torch.utils.data.DataLoader): data loader for train data set
+            validation_loader (torch.utils.data.DataLoader): data loader for validation data set
+            test_loader (torch.utils.data.DataLoader): data loader for test data set
+            batch_model_feed_def (AIToolbox.torchtrain.batch_model_feed_defs.AbstractModelFeedDefinition): data prep
+                definition for batched data. This definition prepares the data for each batch that gets than fed into
+                the neural network.
             optimizer (torch.optim.optimizer.Optimizer): optimizer algorithm.
             criterion (torch.nn.modules.loss._Loss): criterion criterion during the training procedure.
             project_name (str): root name of the project
