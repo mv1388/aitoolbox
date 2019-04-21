@@ -1,3 +1,5 @@
+import AIToolbox.utils.dict_util as dict_util
+
 
 class TrainingHistory:
     def __init__(self, has_validation=True, auto_epoch='loss', strict_content_check=False):
@@ -61,8 +63,11 @@ class TrainingHistory:
 
         return self.train_history_record
 
-    def get_train_history_dict(self):
+    def get_train_history_dict(self, flatten_dict=False):
         """
+
+        Args:
+            flatten_dict (bool):
 
         Returns:
             dict:
@@ -70,7 +75,7 @@ class TrainingHistory:
         if self.train_history == self.empty_train_history:
             self.warn_about_result_data_problem('Train History dict is empty')
 
-        return self.train_history
+        return dict_util.flatten_combine_dict(self.train_history) if flatten_dict else self.train_history
 
     def get_epoch_list(self):
         """

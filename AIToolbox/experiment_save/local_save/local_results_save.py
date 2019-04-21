@@ -5,6 +5,8 @@ import datetime
 import pickle
 import json
 
+from AIToolbox.experiment_save.result_reporting.report_generator import TrainingHistoryPlotter
+
 
 class AbstractLocalResultsSaver(ABC):
     @abstractmethod
@@ -76,14 +78,33 @@ class BaseLocalResultsSaver:
         Returns:
             str:
         """
+        return self.create_experiment_local_folders(project_name, experiment_name, experiment_timestamp,
+                                                    self.local_model_result_folder_path)
+
+    @staticmethod
+    def create_experiment_local_folders(project_name, experiment_name, experiment_timestamp,
+                                        local_model_result_folder_path):
+        """
+
+        Args:
+            project_name (str):
+            experiment_name (str):
+            experiment_timestamp (str):
+            local_model_result_folder_path (str):
+
+        Returns:
+            str:
+        """
         project_path, experiment_path, experiment_results_path = \
-            self.form_experiment_local_folders_paths(project_name, experiment_name, experiment_timestamp,
-                                                     self.local_model_result_folder_path)
+            BaseLocalResultsSaver.form_experiment_local_folders_paths(project_name, experiment_name,
+                                                                      experiment_timestamp,
+                                                                      local_model_result_folder_path)
         if not os.path.exists(project_path):
             os.mkdir(project_path)
         if not os.path.exists(experiment_path):
             os.mkdir(experiment_path)
-        os.mkdir(experiment_results_path)
+        if not os.path.exists(experiment_results_path):
+            os.mkdir(experiment_results_path)
         return experiment_results_path
 
     @staticmethod
@@ -156,7 +177,7 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
             protect_existing_folder (bool):
 
         Returns:
-            list: list of list with this format: [[results_file_name, results_file_local_path], ... [ , ]] 
+            list: list of list with this format: [[results_file_path_inside_results_dir, results_file_local_path], ... [ , ]]
                 Each file should be a new list specifying the file name and its full path.
                 
                 The first file path should be pointing to the main experiment results file.
@@ -172,6 +193,8 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
         training_history = result_package.get_training_history()
 
         additional_results_dump_paths = result_package.get_additional_results_dump_paths()
+        plots_paths = TrainingHistoryPlotter(result_package, experiment_results_local_path,
+                                             plots_folder_name='plots').generate_report()
 
         exp_results_hyperparam_dict = {'experiment_name': experiment_name,
                                        'experiment_results_local_path': experiment_results_local_path,
@@ -194,6 +217,9 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
         
         if additional_results_dump_paths is not None:
             experiment_results_paths += additional_results_dump_paths
+
+        if plots_paths is not None:
+            experiment_results_paths += plots_paths
         
         return experiment_results_paths
 
@@ -211,7 +237,7 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
             protect_existing_folder (bool):
 
         Returns:
-            list: list of list with this format: [[results_file_name, results_file_local_path], ... [ , ]] 
+            list: list of list with this format: [[results_file_path_inside_results_dir, results_file_local_path], ... [ , ]]
                 Each file should be a new list specifying the file name and its full path.
                 
                 The first file path should be pointing to the main experiment results file.
@@ -224,6 +250,8 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
         training_history = result_package.get_training_history()
 
         additional_results_dump_paths = result_package.get_additional_results_dump_paths()
+        plots_paths = TrainingHistoryPlotter(result_package, experiment_results_local_path,
+                                             plots_folder_name='plots').generate_report()
 
         experiment_results_dict = {'experiment_name': experiment_name,
                                    'experiment_results_local_path': experiment_results_local_path,
@@ -271,5 +299,8 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
             
         if additional_results_dump_paths is not None:
             saved_results_paths += additional_results_dump_paths
+
+        if plots_paths is not None:
+            saved_results_paths += plots_paths
 
         return saved_results_paths
