@@ -1,5 +1,6 @@
 import os
 
+import AIToolbox.utils.dict_util as dict_util
 from AIToolbox.experiment_save.local_save.local_results_save import BaseLocalResultsSaver
 from AIToolbox.experiment_save.result_package.abstract_result_packages import AbstractResultPackage
 from AIToolbox.experiment_save.core_metrics.classification import AccuracyMetric
@@ -74,7 +75,7 @@ class QuestionAnswerResultPackage(AbstractResultPackage):
         results_dict = rogue_metric.get_metric_dict()
 
         if self.flatten_result_dict:
-            results_dict = self.flatten_dict(results_dict)
+            results_dict = dict_util.flatten_dict(results_dict)
 
         return results_dict
 

@@ -4,6 +4,7 @@ import datetime
 import numpy as np
 import torch
 
+import AIToolbox.utils.dict_util as dict_util
 from AIToolbox.experiment_save.training_history import TrainingHistory
 from AIToolbox.torchtrain.callbacks.callback_handler import CallbacksHandler
 from AIToolbox.torchtrain.callbacks.callbacks import ModelCheckpointCallback, ModelTrainEndSaveCallback
@@ -144,8 +145,9 @@ class TrainLoop:
         if self.test_loader is not None:
             test_loss = self.evaluate_loss_on_test_set()
             print(f'TEST LOSS: {test_loss}')
-            # To keep TrainingHistory from complaining due to the non-matching metric result lengths
-            # self.insert_metric_result_into_history('test_loss', test_loss)
+            # To keep TrainingHistory from complaining due to the non-matching metric result lengths the checking
+            # has been turned off
+            self.insert_metric_result_into_history('train_end_test_loss', test_loss)
 
     def evaluate_loss_on_train_set(self):
         """Run train dataset through the network without updating the weights and return the loss
@@ -256,7 +258,7 @@ class TrainLoop:
             if type(y_pred_batch) is not list:
                 y_pred = torch.cat(y_pred)
 
-            metadata = self.combine_prediction_metadata_batches(metadata_list) if len(metadata_list) > 0 else None
+            metadata = dict_util.combine_prediction_metadata_batches(metadata_list) if len(metadata_list) > 0 else None
 
         self.model.train()
 
@@ -272,27 +274,6 @@ class TrainLoop:
             metric_result (float or dict): new result for the corresponding metric
         """
         self.train_history.insert_single_result_into_history(metric_name, metric_result)
-
-    @staticmethod
-    def combine_prediction_metadata_batches(metadata_list):
-        """Combines a list of dicts with the same keys and lists as values into a single dict with concatenated lists
-            for each corresponding key
-
-        Args:
-            metadata_list (list): list of dicts with matching keys and lists for values
-
-        Returns:
-            dict: combined single dict
-        """
-        combined_metadata = {}
-
-        for metadata_batch in metadata_list:
-            for meta_el in metadata_batch:
-                if meta_el not in combined_metadata:
-                    combined_metadata[meta_el] = []
-                combined_metadata[meta_el] += metadata_batch[meta_el]
-
-        return combined_metadata
 
 
 class TrainLoopModelCheckpoint(TrainLoop):

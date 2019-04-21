@@ -9,9 +9,18 @@ import json
 
 from AIToolbox.experiment_save.local_save.local_results_save import *
 from AIToolbox.experiment_save.result_package.abstract_result_packages import AbstractResultPackage
+from AIToolbox.experiment_save.training_history import TrainingHistory
 
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
+
+
+class DummyTrainingHistory(TrainingHistory):
+    def __init__(self):
+        TrainingHistory.__init__(self)
+
+    def _build_epoch_list(self):
+        return []
 
 
 class DummyFullResultPackage(AbstractResultPackage):
@@ -19,7 +28,7 @@ class DummyFullResultPackage(AbstractResultPackage):
         AbstractResultPackage.__init__(self, 'dummyFullPkg')
         self.result_dict = result_dict
         self.hyper_params = hyper_params
-        self.train_hist = train_hist
+        self.training_history = DummyTrainingHistory().wrap_pre_prepared_history(train_hist, [])
         self.y_true = [10.0] * 100
         self.y_predicted = [123.4] * 100
 
@@ -31,9 +40,6 @@ class DummyFullResultPackage(AbstractResultPackage):
 
     def get_hyperparameters(self):
         return self.hyper_params
-
-    def get_training_history(self):
-        return self.train_hist
 
 
 class TestBaseLocalResultsSaver(unittest.TestCase):
@@ -204,7 +210,7 @@ class TestLocalResultsSaverSingleFile(unittest.TestCase):
         self.assertEqual(read_result_dict['experiment_results_local_path'], results_path)
         self.assertEqual(read_result_dict['results'], result_pkg.result_dict)
         self.assertEqual(read_result_dict['hyperparameters'], result_pkg.hyper_params)
-        self.assertEqual(read_result_dict['training_history'], result_pkg.train_hist)
+        self.assertEqual(read_result_dict['training_history'], result_pkg.get_training_history())
 
         if save_true_pred_labels:
             self.assertEqual(read_result_dict['y_true'], result_pkg.y_true)
@@ -300,7 +306,7 @@ class TestLocalResultsSaverSeparateFiles(unittest.TestCase):
 
         self.assertEqual(read_train_hist_dict['experiment_name'], exp_dir_name)
         self.assertEqual(read_train_hist_dict['experiment_results_local_path'], results_path)
-        self.assertEqual(read_train_hist_dict['training_history'], result_pkg.train_hist)
+        self.assertEqual(read_train_hist_dict['training_history'], result_pkg.get_training_history())
 
         if save_true_pred_labels:
             read_labels_dict = read_result_file(labels_file_path)
