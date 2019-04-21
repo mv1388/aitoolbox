@@ -120,8 +120,8 @@ class S3ResultsSaver(AbstractResultsSaver, BaseResultsSaver):
 
         experiment_s3_path = self.create_experiment_cloud_storage_folder_structure(project_name, experiment_name, experiment_timestamp)
 
-        for results_file_name, results_file_local_path in saved_local_results_details:
-            results_file_s3_path = os.path.join(experiment_s3_path, results_file_name)
+        for results_file_path_in_s3_results_dir, results_file_local_path in saved_local_results_details:
+            results_file_s3_path = os.path.join(experiment_s3_path, results_file_path_in_s3_results_dir)
             self.save_file(local_file_path=results_file_local_path, cloud_file_path=results_file_s3_path)
 
         # saved_local_results_details[0][0] used to extract the main results file path which should be the first element

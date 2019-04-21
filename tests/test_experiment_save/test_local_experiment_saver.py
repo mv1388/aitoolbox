@@ -6,8 +6,10 @@ from tests.utils import *
 
 from AIToolbox.experiment_save.local_experiment_saver import *
 from AIToolbox.experiment_save.experiment_saver import AbstractExperimentSaver
+from AIToolbox.experiment_save.result_package.abstract_result_packages import AbstractResultPackage
 from AIToolbox.experiment_save.local_save.local_model_save import PyTorchLocalModelSaver, KerasLocalModelSaver
 from AIToolbox.experiment_save.local_save.local_results_save import LocalResultsSaver
+from AIToolbox.experiment_save.training_history import TrainingHistory
 
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -18,7 +20,7 @@ class DummyFullResultPackage(AbstractResultPackage):
         AbstractResultPackage.__init__(self, 'dummyFullPkg')
         self.result_dict = result_dict
         self.hyper_params = hyper_params
-        self.train_hist = train_hist
+        self.training_history = TrainingHistory().wrap_pre_prepared_history(train_hist, [])
         self.y_true = [10.0] * 100
         self.y_predicted = [123.4] * 100
 
@@ -32,7 +34,7 @@ class DummyFullResultPackage(AbstractResultPackage):
         return self.hyper_params
 
     def get_training_history(self):
-        return self.train_hist
+        return self.get_training_history_object()
 
 
 class TestFullPyTorchExperimentLocalSaver(unittest.TestCase):

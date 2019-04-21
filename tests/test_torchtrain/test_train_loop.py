@@ -191,7 +191,8 @@ class TestTrainLoop(unittest.TestCase):
                                                          AbstractCallback('callback_test2')])
         train_loop.do_train(num_epoch=num_epochs)
 
-        self.assertEqual(train_loop.train_history.train_history, {'loss': [1.0, 1.0], 'accumulated_loss': [1.0, 1.0], 'val_loss': [1.0, 1.0]})
+        self.assertEqual(train_loop.train_history.train_history, {'loss': [1.0, 1.0], 'accumulated_loss': [1.0, 1.0],
+                                                                  'val_loss': [1.0, 1.0], 'train_end_test_loss': [1.0]})
 
         train_loop.insert_metric_result_into_history('test_metric_1', 10.11)
         train_loop.insert_metric_result_into_history('test_metric_2', 40.11)
@@ -200,6 +201,7 @@ class TestTrainLoop(unittest.TestCase):
 
         self.assertEqual(train_loop.train_history.train_history,
                          {'loss': [1.0, 1.0], 'accumulated_loss': [1.0, 1.0], 'val_loss': [1.0, 1.0],
+                          'train_end_test_loss': [1.0],
                           'test_metric_1': [10.11, 100.11], 'test_metric_2': [40.11, 400.11]})
 
 
