@@ -20,9 +20,17 @@ class AbstractModelReRunner(ABC):
     def evaluate_result_package(self, result_package, return_result_package=True):
         pass
 
+    @abstractmethod
+    def execute_batch_end_callbacks(self):
+        pass
+
+    @abstractmethod
+    def execute_epoch_end_callbacks(self):
+        pass
+
 
 class PyTorchModelReRunner(AbstractModelReRunner):
-    def __init__(self, model, data_loader, batch_model_feed_def):
+    def __init__(self, model, data_loader, batch_model_feed_def, callbacks=None):
         """
 
         Args:
@@ -34,6 +42,7 @@ class PyTorchModelReRunner(AbstractModelReRunner):
         self.batch_model_feed_def = batch_model_feed_def
 
         self.train_loop = TrainLoop(self.model, None, None, self.data_loader, batch_model_feed_def, None, None)
+        self.train_loop.callbacks_handler.register_callbacks(callbacks)
 
     def model_predict(self):
         """
@@ -71,6 +80,12 @@ class PyTorchModelReRunner(AbstractModelReRunner):
             return result_package
         else:
             return result_package.get_results()
+
+    def execute_batch_end_callbacks(self):
+        self.train_loop.callbacks_handler.execute_batch_end()
+
+    def execute_epoch_end_callbacks(self):
+        self.train_loop.callbacks_handler.execute_epoch_end()
 
     def evaluate_metric(self, metric):
         """
@@ -114,6 +129,12 @@ class KerasModelReRunner(AbstractModelReRunner):
     def evaluate_result_package(self, result_package, return_result_package=True):
         raise NotImplementedError
 
+    def execute_batch_end_callbacks(self):
+        raise NotImplementedError
+
+    def execute_epoch_end_callbacks(self):
+        raise NotImplementedError
+
 
 class TensorFlowModelReRunner(AbstractModelReRunner):
     def __init__(self, model, data_loader):
@@ -132,4 +153,10 @@ class TensorFlowModelReRunner(AbstractModelReRunner):
         raise NotImplementedError
 
     def evaluate_result_package(self, result_package, return_result_package=True):
+        raise NotImplementedError
+
+    def execute_batch_end_callbacks(self):
+        raise NotImplementedError
+
+    def execute_epoch_end_callbacks(self):
         raise NotImplementedError
