@@ -82,9 +82,23 @@ class PyTorchModelReRunner(AbstractModelReRunner):
             return result_package.get_results()
 
     def execute_batch_end_callbacks(self):
+        """
+
+        Returns:
+            None
+        """
+        if len(self.train_loop.callbacks) == 0:
+            print('execute_batch_end_callbacks has no effect as there are no registered callbacks')
         self.train_loop.callbacks_handler.execute_batch_end()
 
     def execute_epoch_end_callbacks(self):
+        """
+
+        Returns:
+            None
+        """
+        if len(self.train_loop.callbacks) == 0:
+            print('execute_epoch_end_callbacks has no effect as there are no registered callbacks')
         self.train_loop.callbacks_handler.execute_epoch_end()
 
     def evaluate_metric(self, metric):
