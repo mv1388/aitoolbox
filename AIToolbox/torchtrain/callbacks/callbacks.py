@@ -1,3 +1,5 @@
+import numpy as np
+
 from AIToolbox.cloud.AWS.model_save import PyTorchS3ModelSaver
 from AIToolbox.cloud.GoogleCloud.model_save import PyTorchGoogleStorageModelSaver
 from AIToolbox.experiment_save.local_save.local_model_save import PyTorchLocalModelSaver, LocalSubOptimalModelRemover
@@ -92,7 +94,6 @@ class EarlyStoppingCallback(AbstractCallback):
         if self.best_performance is None:
             self.best_performance = current_performance
             self.best_epoch = self.train_loop_obj.epoch
-
         else:
             if 'loss' in self.monitor:
                 if current_performance < self.best_performance - self.min_delta:
@@ -111,10 +112,26 @@ class EarlyStoppingCallback(AbstractCallback):
 
             if self.patience_count < 0:
                 self.train_loop_obj.early_stop = True
+                print(f'Early stopping at epoch: {self.train_loop_obj.epoch}. Best recorded epoch: {self.best_epoch}.')
 
-    def on_train_end(self):
-        if self.train_loop_obj.early_stop:
-            print(f'Early stopping at epoch: {self.train_loop_obj.epoch}. Best recorded epoch: {self.best_epoch}.')
+
+class TerminateOnNaNCallback(AbstractCallback):
+    def __init__(self, monitor='loss'):
+        """
+
+        Args:
+            monitor (str):
+        """
+        AbstractCallback.__init__(self, 'TerminateOnNaN', execution_order=98)
+        self.monitor = monitor
+
+    def on_batch_end(self):
+        last_measure = self.train_loop_obj.train_history[self.monitor][-1]
+
+        if last_measure is not None:
+            if np.isnan(last_measure) or np.isinf(last_measure):
+                self.train_loop_obj.early_stop = True
+                print(f'Terminating on {self.monitor} = {last_measure} at epoch: {self.train_loop_obj.epoch}.')
 
 
 class ModelCheckpointCallback(AbstractCallback):
