@@ -39,7 +39,7 @@ class AbstractKerasCallback(Callback):
         pass
 
 
-class ModelCheckpointCallback(AbstractKerasCallback):
+class ModelCheckpoint(AbstractKerasCallback):
     def __init__(self, project_name, experiment_name, local_model_result_folder_path, cloud_save_mode='s3',
                  rm_subopt_local_models=False, num_best_checkpoints_kept=2):
         """
@@ -99,7 +99,7 @@ class ModelCheckpointCallback(AbstractKerasCallback):
                                                                         [model_local_path, model_weights_local_path])
 
 
-class ModelTrainEndSaveCallback(AbstractKerasCallback):
+class ModelTrainEndSave(AbstractKerasCallback):
     def __init__(self, project_name, experiment_name, local_model_result_folder_path,
                  args, val_result_package, test_result_package, cloud_save_mode='s3'):
         """

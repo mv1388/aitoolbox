@@ -12,7 +12,7 @@ from AIToolbox.nlp.dataset.torch_collate_fns import qa_concat_ctx_span_collate_f
 from AIToolbox.torchtrain.train_loop import TrainLoop, TrainLoopModelEndSave, TrainLoopModelCheckpointEndSave
 from AIToolbox.torchtrain.batch_model_feed_defs import QASpanSQuADModelFeedDefinition
 
-from AIToolbox.torchtrain.callbacks.performance_eval_callbacks import ModelPerformanceEvaluationCallback, ModelPerformancePrintReportCallback
+from AIToolbox.torchtrain.callbacks.performance_eval_callbacks import ModelPerformanceEvaluation, ModelPerformancePrintReport
 from AIToolbox.torchtrain.callbacks.train_schedule_callbacks import ReduceLROnPlateauScheduler
 from AIToolbox.nlp.experiment_evaluation.NLP_result_package import QuestionAnswerSpanClassificationResultPackage, QuestionAnswerResultPackage
 
@@ -74,11 +74,11 @@ qa_result_pkg_cp = QuestionAnswerResultPackage([paragraph_tokens for paragraph_t
                                                output_text_dir='tempData_checkpoint_callback'
                                                )
 
-callbacks = [ModelPerformanceEvaluationCallback(qa_result_pkg_cp, used_args,
-                                                on_each_epoch=True,
-                                                on_train_data=False, on_val_data=True),
-             ModelPerformancePrintReportCallback(['val_ROGUE'],
-                                                 on_each_epoch=True, list_tracked_metrics=True),
+callbacks = [ModelPerformanceEvaluation(qa_result_pkg_cp, used_args,
+                                        on_each_epoch=True,
+                                        on_train_data=False, on_val_data=True),
+             ModelPerformancePrintReport(['val_ROGUE'],
+                                         on_each_epoch=True, list_tracked_metrics=True),
              ReduceLROnPlateauScheduler(threshold=0.1, patience=2, verbose=True)
              ]
 

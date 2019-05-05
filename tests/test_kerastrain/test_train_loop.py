@@ -7,7 +7,7 @@ from tests.utils import *
 
 from AIToolbox.kerastrain.train_loop import TrainLoop, TrainLoopModelCheckpoint, TrainLoopModelEndSave, TrainLoopModelCheckpointEndSave
 from AIToolbox.kerastrain.callbacks.callback_handler import CallbacksHandler
-from AIToolbox.kerastrain.callbacks.callbacks import AbstractKerasCallback, ModelCheckpointCallback, ModelTrainEndSaveCallback
+from AIToolbox.kerastrain.callbacks.callbacks import AbstractKerasCallback, ModelCheckpoint, ModelTrainEndSave
 
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
