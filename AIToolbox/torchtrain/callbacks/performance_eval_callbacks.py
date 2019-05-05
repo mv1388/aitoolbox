@@ -357,7 +357,7 @@ class TrainHistoryFormatter(AbstractCallback):
 class MetricHistoryRename(TrainHistoryFormatter):
     def __init__(self, input_metric_path, new_metric_name,
                  epoch_end=True, train_end=False, strict_metric_extract=True):
-        """Speciffic interface for TrainHistoryFormatter which renames the metric in the training history
+        """Specific interface for TrainHistoryFormatter which renames the metric in the training history
 
         Args:
             input_metric_path (str or lambda): if using lambda, extract full history for the desired metric,
