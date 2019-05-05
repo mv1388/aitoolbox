@@ -9,7 +9,7 @@ from AIToolbox.experiment_save.result_package.abstract_result_packages import Pr
 from AIToolbox.experiment_save.result_reporting.report_generator import TrainingHistoryPlotter
 
 
-class ModelPerformanceEvaluationCallback(AbstractCallback):
+class ModelPerformanceEvaluation(AbstractCallback):
     def __init__(self, result_package, args,
                  on_each_epoch=True, on_train_data=False, on_val_data=True,
                  if_available_output_to_project_dir=True):
@@ -116,15 +116,15 @@ class ModelPerformanceEvaluationCallback(AbstractCallback):
                                                                                self.train_loop_obj.local_model_result_folder_path)
 
 
-class ModelPerformancePrintReportCallback(AbstractCallback):
+class ModelPerformancePrintReport(AbstractCallback):
     def __init__(self, metrics, on_each_epoch=True, strict_metric_reporting=True, list_tracked_metrics=False):
         """Print the model performance to the console
 
         Best used in combination with the callback which actually calculates some performance evaluation metrics, such
-        as ModelPerformanceEvaluationCallback. Otherwise we are limited only to automatic loss calculation reporting.
+        as ModelPerformanceEvaluation. Otherwise we are limited only to automatic loss calculation reporting.
 
-        When listing callbacks for the TrainLoop it is important to list the ModelPerformanceEvaluationCallback before
-        this ModelPerformancePrintReportCallback. This ensures that the calculated results are present in the
+        When listing callbacks for the TrainLoop it is important to list the ModelPerformanceEvaluation before
+        this ModelPerformancePrintReport. This ensures that the calculated results are present in the
         TrainLoop.train_history before there is an attempt to print them.
 
         Args:
@@ -179,7 +179,7 @@ class ModelPerformancePrintReportCallback(AbstractCallback):
                 print(f'{metric_name}: {self.train_loop_obj.train_history[metric_name][-1]}')
 
 
-class ModelTrainHistoryPlotCallback(AbstractCallback):
+class ModelTrainHistoryPlot(AbstractCallback):
     def __init__(self, epoch_end=True, train_end=False,
                  project_name=None, experiment_name=None, local_model_result_folder_path=None, cloud_save_mode='s3'):
         """

@@ -67,7 +67,7 @@ class AbstractCallback:
         pass
 
 
-class EarlyStoppingCallback(AbstractCallback):
+class EarlyStopping(AbstractCallback):
     def __init__(self, monitor='val_loss', min_delta=0., patience=0):
         """Early stopping of the training if the performance stops improving
 
@@ -115,7 +115,7 @@ class EarlyStoppingCallback(AbstractCallback):
                 print(f'Early stopping at epoch: {self.train_loop_obj.epoch}. Best recorded epoch: {self.best_epoch}.')
 
 
-class TerminateOnNaNCallback(AbstractCallback):
+class TerminateOnNaN(AbstractCallback):
     def __init__(self, monitor='loss'):
         """
 
@@ -134,7 +134,7 @@ class TerminateOnNaNCallback(AbstractCallback):
                 print(f'Terminating on {self.monitor} = {last_measure} at epoch: {self.train_loop_obj.epoch}.')
 
 
-class ModelCheckpointCallback(AbstractCallback):
+class ModelCheckpoint(AbstractCallback):
     def __init__(self, project_name, experiment_name, local_model_result_folder_path, cloud_save_mode='s3',
                  rm_subopt_local_models=False, num_best_checkpoints_kept=2):
         """Check-point save the model during training to disk or also to S3 / GCS cloud storage
@@ -194,7 +194,7 @@ class ModelCheckpointCallback(AbstractCallback):
                                                                         [model_local_path, model_weights_local_path])
 
 
-class ModelTrainEndSaveCallback(AbstractCallback):
+class ModelTrainEndSave(AbstractCallback):
     def __init__(self, project_name, experiment_name, local_model_result_folder_path,
                  args, val_result_package=None, test_result_package=None, cloud_save_mode='s3'):
         """At the end of training execute model performance evaluation, build result package repot and save it

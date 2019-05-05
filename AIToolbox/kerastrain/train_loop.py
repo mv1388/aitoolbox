@@ -3,7 +3,7 @@ import datetime
 import types
 
 from AIToolbox.kerastrain.callbacks.callback_handler import CallbacksHandler
-from AIToolbox.kerastrain.callbacks.callbacks import ModelCheckpointCallback, ModelTrainEndSaveCallback
+from AIToolbox.kerastrain.callbacks.callbacks import ModelCheckpoint, ModelTrainEndSave
 
 
 class TrainLoop:
@@ -232,8 +232,8 @@ class TrainLoopModelCheckpoint(TrainLoop):
         self.cloud_save_mode = cloud_save_mode
 
         self.callbacks_handler.register_callbacks([
-            ModelCheckpointCallback(self.project_name, self.experiment_name, self.local_model_result_folder_path,
-                                    cloud_save_mode=self.cloud_save_mode)
+            ModelCheckpoint(self.project_name, self.experiment_name, self.local_model_result_folder_path,
+                            cloud_save_mode=self.cloud_save_mode)
         ])
 
 
@@ -276,9 +276,9 @@ class TrainLoopModelEndSave(TrainLoop):
         self.check_if_result_packages_possible()
 
         self.callbacks_handler.register_callbacks([
-            ModelTrainEndSaveCallback(self.project_name, self.experiment_name, self.local_model_result_folder_path,
-                                      self.args, self.val_result_package, self.test_result_package,
-                                      cloud_save_mode=self.cloud_save_mode)
+            ModelTrainEndSave(self.project_name, self.experiment_name, self.local_model_result_folder_path,
+                              self.args, self.val_result_package, self.test_result_package,
+                              cloud_save_mode=self.cloud_save_mode)
         ])
         
     def check_if_result_packages_possible(self):
@@ -336,6 +336,6 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
                                        args, val_result_package, test_result_package, cloud_save_mode)
 
         self.callbacks_handler.register_callbacks([
-            ModelCheckpointCallback(self.project_name, self.experiment_name, self.local_model_result_folder_path,
-                                    cloud_save_mode=self.cloud_save_mode)
+            ModelCheckpoint(self.project_name, self.experiment_name, self.local_model_result_folder_path,
+                            cloud_save_mode=self.cloud_save_mode)
         ])

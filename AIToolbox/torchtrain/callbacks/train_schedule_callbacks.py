@@ -49,7 +49,7 @@ class ReduceLROnPlateauMetricScheduler(GeneralLRScheduler):
     def __init__(self, metric_name, **kwargs):
         """
 
-        Needs to be used in combination with ModelPerformanceEvaluationCallback to calculate the metric and fill it in
+        Needs to be used in combination with ModelPerformanceEvaluation to calculate the metric and fill it in
         the TrainLoop history.
 
         Args:
