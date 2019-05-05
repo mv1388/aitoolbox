@@ -2,8 +2,8 @@ import unittest
 
 from tests.utils import *
 
-from AIToolbox.torchtrain.callbacks.callbacks import AbstractCallback, ModelCheckpointCallback, ModelTrainEndSaveCallback, \
-    EarlyStoppingCallback
+from AIToolbox.torchtrain.callbacks.callbacks import AbstractCallback, ModelCheckpoint, ModelTrainEndSave, \
+    EarlyStopping
 from AIToolbox.torchtrain.train_loop import TrainLoop
 from AIToolbox.cloud.AWS.model_save import PyTorchS3ModelSaver
 from AIToolbox.experiment_save.local_save.local_model_save import PyTorchLocalModelSaver
@@ -34,39 +34,39 @@ class TestAbstractCallback(unittest.TestCase):
 
 class TestModelCheckpointCallback(unittest.TestCase):
     def test_init(self):
-        callback_true = ModelCheckpointCallback('project_name', 'experiment_name', 'local_model_result_folder_path',
-                                                cloud_save_mode='s3')
+        callback_true = ModelCheckpoint('project_name', 'experiment_name', 'local_model_result_folder_path',
+                                        cloud_save_mode='s3')
         self.assertEqual(type(callback_true.model_checkpointer), PyTorchS3ModelSaver)
 
-        # callback_true = ModelCheckpointCallback('project_name', 'experiment_name', 'local_model_result_folder_path',
+        # callback_true = ModelCheckpoint('project_name', 'experiment_name', 'local_model_result_folder_path',
         #                                         cloud_save_mode='gcs')
         # self.assertEqual(type(callback_true.model_checkpointer), PyTorchGoogleStorageModelSaver)
 
-        callback_false = ModelCheckpointCallback('project_name', 'experiment_name', 'local_model_result_folder_path',
-                                                 cloud_save_mode=None)
+        callback_false = ModelCheckpoint('project_name', 'experiment_name', 'local_model_result_folder_path',
+                                         cloud_save_mode=None)
         self.assertEqual(type(callback_false.model_checkpointer), PyTorchLocalModelSaver)
 
 
 class TestModelTrainEndSaveCallback(unittest.TestCase):
     def test_init(self):
-        callback_true = ModelTrainEndSaveCallback('project_name', 'experiment_name', 'local_model_result_folder_path',
-                                                  {}, DummyResultPackage(), cloud_save_mode='s3')
+        callback_true = ModelTrainEndSave('project_name', 'experiment_name', 'local_model_result_folder_path',
+                                          {}, DummyResultPackage(), cloud_save_mode='s3')
         self.assertEqual(type(callback_true.results_saver), FullPyTorchExperimentS3Saver)
 
-        # callback_true = ModelTrainEndSaveCallback('project_name', 'experiment_name', 'local_model_result_folder_path',
+        # callback_true = ModelTrainEndSave('project_name', 'experiment_name', 'local_model_result_folder_path',
         #                                           {}, DummyResultPackage(), cloud_save_mode='gcs')
         # self.assertEqual(type(callback_true.results_saver), FullPyTorchExperimentGoogleStorageSaver)
 
-        callback_false = ModelTrainEndSaveCallback('project_name', 'experiment_name', 'local_model_result_folder_path',
-                                                  {}, DummyResultPackage(), cloud_save_mode=None)
+        callback_false = ModelTrainEndSave('project_name', 'experiment_name', 'local_model_result_folder_path',
+                                           {}, DummyResultPackage(), cloud_save_mode=None)
         self.assertEqual(type(callback_false.results_saver), FullPyTorchExperimentLocalSaver)
 
     def test_train_loop_reg_set_experiment_dir_path_for_additional_results(self):
         result_pkg = DummyResultPackage()
         self.assertIsNone(result_pkg.experiment_path)
 
-        callback = ModelTrainEndSaveCallback('project_name', 'experiment_name', 'local_model_result_folder_path',
-                                             {}, result_pkg)
+        callback = ModelTrainEndSave('project_name', 'experiment_name', 'local_model_result_folder_path',
+                                     {}, result_pkg)
         train_loop = TrainLoop(Net(), None, None, None, DeactivateModelFeedDefinition(), None, None)
         train_loop.callbacks_handler.register_callbacks([callback])
         
@@ -112,7 +112,7 @@ class TestEarlyStoppingCallback(unittest.TestCase):
         self.basic_early_stop_change_check_acc(10., 9.5, [False, True], min_delta=2.)
 
     def basic_early_stop_change_check_loss(self, val1, val2, expected_result, min_delta=0.):
-        callback = EarlyStoppingCallback(monitor='dummy_loss', min_delta=min_delta)
+        callback = EarlyStopping(monitor='dummy_loss', min_delta=min_delta)
         train_loop = TrainLoop(Net(), None, None, None, DeactivateModelFeedDefinition(), None, None)
         train_loop.callbacks_handler.register_callbacks([callback])
         self.assertFalse(train_loop.early_stop)
@@ -130,7 +130,7 @@ class TestEarlyStoppingCallback(unittest.TestCase):
         self.assertEqual(result, expected_result)
 
     def basic_early_stop_change_check_acc(self, val1, val2, expected_result, min_delta=0.):
-        callback = EarlyStoppingCallback(monitor='dummy_acc', min_delta=min_delta)
+        callback = EarlyStopping(monitor='dummy_acc', min_delta=min_delta)
         train_loop = TrainLoop(Net(), None, None, None, DeactivateModelFeedDefinition(), None, None)
         train_loop.callbacks_handler.register_callbacks([callback])
         self.assertFalse(train_loop.early_stop)
@@ -192,7 +192,7 @@ class TestEarlyStoppingCallback(unittest.TestCase):
                            val_list=[9., 9., 10.0, 10.1], expected_result=[False, False, False, False], monitor='dummy_acc')
 
     def eval_patience(self, min_delta, patience, val_list, expected_result, monitor):
-        callback = EarlyStoppingCallback(monitor=monitor, min_delta=min_delta, patience=patience)
+        callback = EarlyStopping(monitor=monitor, min_delta=min_delta, patience=patience)
         train_loop = TrainLoop(Net(), None, None, None, DeactivateModelFeedDefinition(), None, None)
         train_loop.callbacks_handler.register_callbacks([callback])
         self.assertFalse(train_loop.early_stop)

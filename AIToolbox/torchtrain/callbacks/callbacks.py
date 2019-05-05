@@ -1,3 +1,5 @@
+import numpy as np
+
 from AIToolbox.cloud.AWS.model_save import PyTorchS3ModelSaver
 from AIToolbox.cloud.GoogleCloud.model_save import PyTorchGoogleStorageModelSaver
 from AIToolbox.experiment_save.local_save.local_model_save import PyTorchLocalModelSaver, LocalSubOptimalModelRemover
@@ -65,7 +67,7 @@ class AbstractCallback:
         pass
 
 
-class EarlyStoppingCallback(AbstractCallback):
+class EarlyStopping(AbstractCallback):
     def __init__(self, monitor='val_loss', min_delta=0., patience=0):
         """Early stopping of the training if the performance stops improving
 
@@ -92,7 +94,6 @@ class EarlyStoppingCallback(AbstractCallback):
         if self.best_performance is None:
             self.best_performance = current_performance
             self.best_epoch = self.train_loop_obj.epoch
-
         else:
             if 'loss' in self.monitor:
                 if current_performance < self.best_performance - self.min_delta:
@@ -111,13 +112,29 @@ class EarlyStoppingCallback(AbstractCallback):
 
             if self.patience_count < 0:
                 self.train_loop_obj.early_stop = True
-
-    def on_train_end(self):
-        if self.train_loop_obj.early_stop:
-            print(f'Early stopping at epoch: {self.train_loop_obj.epoch}. Best recorded epoch: {self.best_epoch}.')
+                print(f'Early stopping at epoch: {self.train_loop_obj.epoch}. Best recorded epoch: {self.best_epoch}.')
 
 
-class ModelCheckpointCallback(AbstractCallback):
+class TerminateOnNaN(AbstractCallback):
+    def __init__(self, monitor='loss'):
+        """
+
+        Args:
+            monitor (str):
+        """
+        AbstractCallback.__init__(self, 'TerminateOnNaN', execution_order=98)
+        self.monitor = monitor
+
+    def on_batch_end(self):
+        last_measure = self.train_loop_obj.train_history[self.monitor][-1]
+
+        if last_measure is not None:
+            if np.isnan(last_measure) or np.isinf(last_measure):
+                self.train_loop_obj.early_stop = True
+                print(f'Terminating on {self.monitor} = {last_measure} at epoch: {self.train_loop_obj.epoch}.')
+
+
+class ModelCheckpoint(AbstractCallback):
     def __init__(self, project_name, experiment_name, local_model_result_folder_path, cloud_save_mode='s3',
                  rm_subopt_local_models=False, num_best_checkpoints_kept=2):
         """Check-point save the model during training to disk or also to S3 / GCS cloud storage
@@ -177,7 +194,7 @@ class ModelCheckpointCallback(AbstractCallback):
                                                                         [model_local_path, model_weights_local_path])
 
 
-class ModelTrainEndSaveCallback(AbstractCallback):
+class ModelTrainEndSave(AbstractCallback):
     def __init__(self, project_name, experiment_name, local_model_result_folder_path,
                  args, val_result_package=None, test_result_package=None, cloud_save_mode='s3'):
         """At the end of training execute model performance evaluation, build result package repot and save it

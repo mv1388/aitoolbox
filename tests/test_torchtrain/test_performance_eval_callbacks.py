@@ -2,7 +2,7 @@ import unittest
 
 from tests.utils import *
 
-from AIToolbox.torchtrain.callbacks.performance_eval_callbacks import ModelPerformanceEvaluationCallback, MetricHistoryRename
+from AIToolbox.torchtrain.callbacks.performance_eval_callbacks import ModelPerformanceEvaluation, MetricHistoryRename
 from AIToolbox.torchtrain.train_loop import TrainLoop, TrainLoopModelCheckpoint
 
 
@@ -17,9 +17,9 @@ class TestModelPerformanceEvaluationCallback(unittest.TestCase):
 
         # test: if_available_output_to_project_dir=True
         result_pkg = DummyResultPackage()
-        callback = ModelPerformanceEvaluationCallback(result_pkg, {},
-                                                      on_each_epoch=True, on_train_data=False, on_val_data=True,
-                                                      if_available_output_to_project_dir=True)
+        callback = ModelPerformanceEvaluation(result_pkg, {},
+                                              on_each_epoch=True, on_train_data=False, on_val_data=True,
+                                              if_available_output_to_project_dir=True)
         train_loop = TrainLoopModelCheckpoint(model, dummy_train_loader, dummy_val_loader, dummy_test_loader, dummy_feed_def, dummy_optimizer, None,
                                               "project_name", "experiment_name", "local_model_result_folder_path")
         train_loop.callbacks_handler.register_callbacks([callback])
@@ -29,9 +29,9 @@ class TestModelPerformanceEvaluationCallback(unittest.TestCase):
 
         # test: if_available_output_to_project_dir=False
         result_pkg = DummyResultPackage()
-        callback = ModelPerformanceEvaluationCallback(result_pkg, {},
-                                                      on_each_epoch=True, on_train_data=False, on_val_data=True,
-                                                      if_available_output_to_project_dir=False)
+        callback = ModelPerformanceEvaluation(result_pkg, {},
+                                              on_each_epoch=True, on_train_data=False, on_val_data=True,
+                                              if_available_output_to_project_dir=False)
         train_loop = TrainLoopModelCheckpoint(model, dummy_train_loader, dummy_val_loader, dummy_test_loader, dummy_feed_def,
                                               dummy_optimizer, None,
                                               "project_name", "experiment_name", "local_model_result_folder_path")
@@ -41,12 +41,12 @@ class TestModelPerformanceEvaluationCallback(unittest.TestCase):
 
     def test_create_train_result_package(self):
         result_pkg = DummyResultPackage()
-        callback_true = ModelPerformanceEvaluationCallback(result_pkg, {},
-                                                           on_each_epoch=True, on_train_data=True, on_val_data=True)
+        callback_true = ModelPerformanceEvaluation(result_pkg, {},
+                                                   on_each_epoch=True, on_train_data=True, on_val_data=True)
         self.assertTrue(hasattr(callback_true, 'train_result_package'))
 
-        callback_true = ModelPerformanceEvaluationCallback(result_pkg, {},
-                                                           on_each_epoch=True, on_train_data=False, on_val_data=True)
+        callback_true = ModelPerformanceEvaluation(result_pkg, {},
+                                                   on_each_epoch=True, on_train_data=False, on_val_data=True)
         self.assertFalse(hasattr(callback_true, 'train_result_package'))
 
     def test_result_package_prepare(self):
@@ -58,8 +58,8 @@ class TestModelPerformanceEvaluationCallback(unittest.TestCase):
         model = Net()
 
         result_pkg = DummyResultPackage()
-        callback = ModelPerformanceEvaluationCallback(result_pkg, {},
-                                                      on_each_epoch=True, on_train_data=False, on_val_data=True)
+        callback = ModelPerformanceEvaluation(result_pkg, {},
+                                              on_each_epoch=True, on_train_data=False, on_val_data=True)
         train_loop = TrainLoop(model, dummy_train_loader, dummy_val_loader, dummy_test_loader, dummy_feed_def, dummy_optimizer, None)
         train_loop.callbacks_handler.register_callbacks([callback])
         train_loop.insert_metric_result_into_history('dummy_loss', 10.)
@@ -96,8 +96,8 @@ class TestModelPerformanceEvaluationCallback(unittest.TestCase):
         model = Net()
 
         result_pkg = DummyResultPackage()
-        callback = ModelPerformanceEvaluationCallback(result_pkg, {},
-                                                      on_each_epoch=True, on_train_data=False, on_val_data=True)
+        callback = ModelPerformanceEvaluation(result_pkg, {},
+                                              on_each_epoch=True, on_train_data=False, on_val_data=True)
         train_loop = TrainLoop(model, dummy_train_loader, dummy_val_loader, dummy_test_loader, dummy_feed_def, dummy_optimizer, None)
         train_loop.callbacks_handler.register_callbacks([callback])
 
@@ -116,8 +116,8 @@ class TestModelPerformanceEvaluationCallback(unittest.TestCase):
         model = Net()
 
         result_pkg = DummyResultPackage()
-        callback = ModelPerformanceEvaluationCallback(result_pkg, {},
-                                                      on_each_epoch=True, on_train_data=False, on_val_data=True)
+        callback = ModelPerformanceEvaluation(result_pkg, {},
+                                              on_each_epoch=True, on_train_data=False, on_val_data=True)
         train_loop = TrainLoop(model, dummy_train_loader, dummy_val_loader, dummy_test_loader, dummy_feed_def, dummy_optimizer, None)
         train_loop.callbacks_handler.register_callbacks([callback])
         train_loop.insert_metric_result_into_history('dummy_loss', 10.)
@@ -139,8 +139,8 @@ class TestModelPerformanceEvaluationCallback(unittest.TestCase):
         model = Net()
 
         result_pkg = DummyResultPackageExtend()
-        callback = ModelPerformanceEvaluationCallback(result_pkg, {},
-                                                      on_each_epoch=True, on_train_data=False, on_val_data=True)
+        callback = ModelPerformanceEvaluation(result_pkg, {},
+                                              on_each_epoch=True, on_train_data=False, on_val_data=True)
         train_loop = TrainLoop(model, dummy_train_loader, dummy_val_loader, dummy_test_loader, dummy_feed_def, dummy_optimizer, None)
         train_loop.callbacks_handler.register_callbacks([callback])
 
@@ -160,8 +160,8 @@ class TestModelPerformanceEvaluationCallback(unittest.TestCase):
         model = Net()
 
         result_pkg = DummyResultPackageExtend()
-        callback = ModelPerformanceEvaluationCallback(result_pkg, {},
-                                                      on_each_epoch=True, on_train_data=False, on_val_data=True)
+        callback = ModelPerformanceEvaluation(result_pkg, {},
+                                              on_each_epoch=True, on_train_data=False, on_val_data=True)
         train_loop = TrainLoop(model, dummy_train_loader, dummy_val_loader, dummy_test_loader, dummy_feed_def, dummy_optimizer, None)
         train_loop.callbacks_handler.register_callbacks([callback])
 
@@ -197,8 +197,8 @@ class TestMetricHistoryRename(unittest.TestCase):
         model = Net()
 
         result_pkg = DummyResultPackageExtend()
-        callback = ModelPerformanceEvaluationCallback(result_pkg, {},
-                                                      on_each_epoch=True, on_train_data=False, on_val_data=True)
+        callback = ModelPerformanceEvaluation(result_pkg, {},
+                                              on_each_epoch=True, on_train_data=False, on_val_data=True)
         rename_callback = MetricHistoryRename(input_metric_path='val_dummy', new_metric_name='val_renamed_dummy',
                                               epoch_end=True, train_end=False)
 
@@ -222,8 +222,8 @@ class TestMetricHistoryRename(unittest.TestCase):
         model = Net()
 
         result_pkg = DummyResultPackageExtend()
-        callback = ModelPerformanceEvaluationCallback(result_pkg, {},
-                                                      on_each_epoch=True, on_train_data=False, on_val_data=True)
+        callback = ModelPerformanceEvaluation(result_pkg, {},
+                                              on_each_epoch=True, on_train_data=False, on_val_data=True)
         rename_callback = MetricHistoryRename(input_metric_path='val_dummy', new_metric_name='val_renamed_dummy',
                                               epoch_end=True, train_end=False)
 
@@ -265,8 +265,8 @@ class TestMetricHistoryRename(unittest.TestCase):
         model = Net()
 
         result_pkg = DummyResultPackageExtend()
-        callback = ModelPerformanceEvaluationCallback(result_pkg, {},
-                                                      on_each_epoch=True, on_train_data=False, on_val_data=True)
+        callback = ModelPerformanceEvaluation(result_pkg, {},
+                                              on_each_epoch=True, on_train_data=False, on_val_data=True)
         rename_callback = MetricHistoryRename(input_metric_path='val_dummy', new_metric_name='val_renamed_dummy',
                                               epoch_end=True, train_end=False, strict_metric_extract=True)
 

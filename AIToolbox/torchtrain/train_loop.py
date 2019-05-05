@@ -7,7 +7,7 @@ import torch
 import AIToolbox.utils.dict_util as dict_util
 from AIToolbox.experiment_save.training_history import TrainingHistory
 from AIToolbox.torchtrain.callbacks.callback_handler import CallbacksHandler
-from AIToolbox.torchtrain.callbacks.callbacks import ModelCheckpointCallback, ModelTrainEndSaveCallback
+from AIToolbox.torchtrain.callbacks.callbacks import ModelCheckpoint, ModelTrainEndSave
 
 
 class TrainLoop:
@@ -316,10 +316,10 @@ class TrainLoopModelCheckpoint(TrainLoop):
         self.rm_subopt_local_models = rm_subopt_local_models
 
         self.callbacks_handler.register_callbacks([
-            ModelCheckpointCallback(self.project_name, self.experiment_name, self.local_model_result_folder_path,
-                                    cloud_save_mode=self.cloud_save_mode,
-                                    rm_subopt_local_models=self.rm_subopt_local_models,
-                                    num_best_checkpoints_kept=num_best_checkpoints_kept)
+            ModelCheckpoint(self.project_name, self.experiment_name, self.local_model_result_folder_path,
+                            cloud_save_mode=self.cloud_save_mode,
+                            rm_subopt_local_models=self.rm_subopt_local_models,
+                            num_best_checkpoints_kept=num_best_checkpoints_kept)
         ])
 
 
@@ -367,9 +367,9 @@ class TrainLoopModelEndSave(TrainLoop):
         self.check_if_result_packages_possible()
 
         self.callbacks_handler.register_callbacks([
-            ModelTrainEndSaveCallback(self.project_name, self.experiment_name, self.local_model_result_folder_path,
-                                      self.args, self.val_result_package, self.test_result_package, 
-                                      cloud_save_mode=self.cloud_save_mode)
+            ModelTrainEndSave(self.project_name, self.experiment_name, self.local_model_result_folder_path,
+                              self.args, self.val_result_package, self.test_result_package,
+                              cloud_save_mode=self.cloud_save_mode)
         ])
 
     def check_if_result_packages_possible(self):
@@ -432,8 +432,8 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
         self.rm_subopt_local_models = rm_subopt_local_models
 
         self.callbacks_handler.register_callbacks([
-            ModelCheckpointCallback(self.project_name, self.experiment_name, self.local_model_result_folder_path,
-                                    cloud_save_mode=self.cloud_save_mode,
-                                    rm_subopt_local_models=self.rm_subopt_local_models,
-                                    num_best_checkpoints_kept=num_best_checkpoints_kept)
+            ModelCheckpoint(self.project_name, self.experiment_name, self.local_model_result_folder_path,
+                            cloud_save_mode=self.cloud_save_mode,
+                            rm_subopt_local_models=self.rm_subopt_local_models,
+                            num_best_checkpoints_kept=num_best_checkpoints_kept)
         ])
