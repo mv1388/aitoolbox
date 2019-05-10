@@ -1,3 +1,5 @@
+from AIToolbox.torchtrain.callbacks.callbacks import AbstractCallback
+
 
 class CallbacksHandler:
     def __init__(self, train_loop_obj):
@@ -24,6 +26,7 @@ class CallbacksHandler:
             None
         """
         if callbacks is not None and len(callbacks) > 0:
+            self.enforce_callback_type(callbacks)
             self.train_loop_obj.callbacks += [cb.register_train_loop_object(self.train_loop_obj) for cb in callbacks]
 
         if not all(0 == cb.execution_order for cb in self.train_loop_obj.callbacks):
@@ -57,7 +60,13 @@ class CallbacksHandler:
     def execute_batch_end(self):
         for callback in self.train_loop_obj.callbacks:
             callback.on_batch_end()
-
+    
+    @staticmethod
+    def enforce_callback_type(callbacks):
+        for cb in callbacks:
+            if not isinstance(cb, AbstractCallback):
+                raise TypeError(f'Callback {cb} is not inherited from the AbstractCallback')
+    
     def __str__(self):
         return 'CALLBACKS:\n' + '\n'.join([f'\t{callback.callback_name}' for callback in self.train_loop_obj.callbacks])
 

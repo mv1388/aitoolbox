@@ -9,6 +9,7 @@ from tests.utils import *
 
 from AIToolbox.experiment_save.local_save.local_model_save import *
 from AIToolbox.torchtrain.train_loop import TrainLoop
+from AIToolbox.torchtrain.batch_model_feed_defs import ImageClassificationFeedDefinition
 
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -31,8 +32,8 @@ class TestLocalSubOptimalModelRemover(unittest.TestCase):
         remover_acc = DummyLocalSubOptimalModelRemover('acc')
         self.assertFalse(remover_acc.decrease_metric)
 
-        tl_train_metric_defaults = TrainLoop(None, [], None, None, None, None, None).train_history.keys()
-        tl_val_metric_defaults = TrainLoop(None, [], [], None, None, None, None).train_history.keys()
+        tl_train_metric_defaults = TrainLoop(None, [], None, None, ImageClassificationFeedDefinition(), None, None).train_history.keys()
+        tl_val_metric_defaults = TrainLoop(None, [], [], None, ImageClassificationFeedDefinition(), None, None).train_history.keys()
 
         self.is_in_default_metric_list(tl_train_metric_defaults)
         self.is_in_default_metric_list(tl_val_metric_defaults)

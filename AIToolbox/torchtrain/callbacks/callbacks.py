@@ -5,6 +5,7 @@ from AIToolbox.cloud.GoogleCloud.model_save import PyTorchGoogleStorageModelSave
 from AIToolbox.experiment_save.local_save.local_model_save import PyTorchLocalModelSaver, LocalSubOptimalModelRemover
 from AIToolbox.experiment_save.experiment_saver import FullPyTorchExperimentS3Saver, FullPyTorchExperimentGoogleStorageSaver
 from AIToolbox.experiment_save.local_experiment_saver import FullPyTorchExperimentLocalSaver
+from AIToolbox.experiment_save.result_package.abstract_result_packages import AbstractResultPackage
 
 
 class AbstractCallback:
@@ -276,3 +277,9 @@ class ModelTrainEndSave(AbstractCallback):
         if self.val_result_package is None and self.test_result_package is None:
             raise ValueError("Both val_result_package and test_result_package are None. "
                              "At least one of these should be not None but actual result package.")
+
+        if self.val_result_package is not None and not isinstance(self.val_result_package, AbstractResultPackage):
+            raise TypeError(f'val_result_package {self.val_result_package} is not inherited from AbstractResultPackage')
+
+        if self.test_result_package is not None and not isinstance(self.test_result_package, AbstractResultPackage):
+            raise TypeError(f'test_result_package {self.test_result_package} is not inherited from AbstractResultPackage')
