@@ -8,6 +8,8 @@ import AIToolbox.utils.dict_util as dict_util
 from AIToolbox.experiment_save.training_history import TrainingHistory
 from AIToolbox.torchtrain.callbacks.callback_handler import CallbacksHandler
 from AIToolbox.torchtrain.callbacks.callbacks import ModelCheckpoint, ModelTrainEndSave
+from AIToolbox.torchtrain.batch_model_feed_defs import AbstractModelFeedDefinition
+from AIToolbox.experiment_save.result_package.abstract_result_packages import AbstractResultPackage
 
 
 class TrainLoop:
@@ -48,6 +50,9 @@ class TrainLoop:
         self.callbacks_handler = CallbacksHandler(self)
         self.callbacks = []
         self.early_stop = False
+
+        if not isinstance(self.batch_model_feed_def, AbstractModelFeedDefinition):
+            raise TypeError('Provided batch_model_feed_def is not inherited from AbstractModelFeedDefinition')
 
     def __call__(self, num_epoch, callbacks=None, grad_clip=None):
         """Train the model using the train loop
@@ -376,8 +381,14 @@ class TrainLoopModelEndSave(TrainLoop):
                              'If you want to calculate the test_result_package the test_loader has to be provided.')
 
         if self.val_result_package is None and self.test_result_package is None:
-            raise ValueError("Both val_result_package and test_result_package are None. "
-                             "At least one of these should be not None but actual result package.")
+            raise ValueError('Both val_result_package and test_result_package are None. '
+                             'At least one of these should be not None but actual result package.')
+
+        if self.val_result_package is not None and not isinstance(self.val_result_package, AbstractResultPackage):
+            raise TypeError(f'val_result_package {self.val_result_package} is not inherited from AbstractResultPackage')
+
+        if self.test_result_package is not None and not isinstance(self.test_result_package, AbstractResultPackage):
+            raise TypeError(f'test_result_package {self.test_result_package} is not inherited from AbstractResultPackage')
 
 
 class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
