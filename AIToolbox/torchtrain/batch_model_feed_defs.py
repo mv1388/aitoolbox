@@ -154,4 +154,3 @@ class ImageClassificationFeedDefinition(AbstractModelFeedDefinition):
         y_pred = output.argmax(dim=1, keepdim=False)  # get the index of the max log-probability
 
         return y_test, y_pred.cpu()
-
