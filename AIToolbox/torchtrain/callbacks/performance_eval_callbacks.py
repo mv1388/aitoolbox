@@ -204,7 +204,9 @@ class ModelTrainHistoryPlot(AbstractCallback):
         self.train_end = train_end
         self.project_name = project_name
         self.experiment_name = experiment_name
-        self.local_model_result_folder_path = local_model_result_folder_path
+        self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path) \
+            if local_model_result_folder_path is not None \
+            else None
         self.cloud_save_mode = cloud_save_mode
 
         self.cloud_results_saver = None
