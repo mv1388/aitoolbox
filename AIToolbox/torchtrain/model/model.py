@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 import torch.nn as nn
 
 
-class TorchTrainFullModel(nn.Module, ABC):
+class TTFullModel(nn.Module, ABC):
     @abstractmethod
     def get_loss(self, batch_data, criterion, device):
         """Get loss during training stage
@@ -55,7 +55,7 @@ class TorchTrainFullModel(nn.Module, ABC):
         pass
 
 
-class TorchTrainForwardModel(TorchTrainFullModel):
+class TTForwardModel(TTFullModel):
     def get_loss(self, batch_data, criterion, device):
         pass
     
@@ -64,3 +64,16 @@ class TorchTrainForwardModel(TorchTrainFullModel):
     
     def get_predictions(self, batch_data, device):
         pass
+
+
+# class TTModelWrap(TTFullModel):
+#     def __init__(self, pytorch_model, batch_model_feed_def):
+#         """
+#
+#         Args:
+#             pytorch_model (torch.nn.modules.Module): neural network model
+#             batch_model_feed_def (AIToolbox.torchtrain.batch_model_feed_defs.AbstractModelFeedDefinition): data prep
+#                 definition for batched data. This definition prepares the data for each batch that gets than fed into
+#                 the neural network.
+#         """
+#         super().__init__()

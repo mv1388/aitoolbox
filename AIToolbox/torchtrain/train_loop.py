@@ -6,7 +6,7 @@ import numpy as np
 import torch
 
 import AIToolbox.utils.dict_util as dict_util
-from AIToolbox.torchtrain.model.model import TorchTrainFullModel
+from AIToolbox.torchtrain.model.model import TTFullModel
 from AIToolbox.experiment_save.training_history import TrainingHistory
 from AIToolbox.torchtrain.callbacks.callback_handler import CallbacksHandler
 from AIToolbox.torchtrain.callbacks.callbacks import ModelCheckpoint, ModelTrainEndSave
@@ -20,7 +20,7 @@ class TrainLoop:
         """
 
         Args:
-            model (AIToolbox.torchtrain.model.model.TorchTrainFullModel): neural network model
+            model (AIToolbox.torchtrain.model.model.TTFullModel): neural network model
             train_loader (torch.utils.data.DataLoader): data loader for train data set
             validation_loader (torch.utils.data.DataLoader): data loader for validation data set
             test_loader (torch.utils.data.DataLoader): data loader for test data set
@@ -47,8 +47,8 @@ class TrainLoop:
         self.callbacks = []
         self.early_stop = False
 
-        if not isinstance(self.model, TorchTrainFullModel):
-            raise TypeError('Provided model is not inherited from TorchTrainFullModel')
+        if not isinstance(self.model, TTFullModel):
+            raise TypeError('Provided model is not inherited from TTFullModel')
 
     def __call__(self, num_epoch, callbacks=None, grad_clip=None):
         """Train the model using the train loop

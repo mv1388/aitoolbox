@@ -2,10 +2,10 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from AIToolbox.torchtrain.model.model import TorchTrainFullModel
+from AIToolbox.torchtrain.model.model import TTFullModel
 
 
-class UnifiedQABasicRNN(TorchTrainFullModel):
+class UnifiedQABasicRNN(TTFullModel):
     def __init__(self, hidden_size, output_size, embedding_dim, vocab_size, ctx_n_layers=1, qus_n_layers=1, dropout=0.):
         super().__init__()
         self.ctx_n_layers = ctx_n_layers
@@ -92,9 +92,6 @@ class UnifiedQABasicRNN(TorchTrainFullModel):
         loss = loss1 + loss2
 
         return loss
-
-    def get_loss_eval(self, batch_data, criterion, device):
-        return self.get_loss(batch_data, criterion, device)
 
     def get_predictions(self, batch_data, device):
         paragraph_batch, paragraph_lengths, question_batch, question_lengths, span = batch_data
