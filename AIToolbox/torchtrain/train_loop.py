@@ -1,4 +1,5 @@
 from tqdm import tqdm
+import os
 import time
 import datetime
 import numpy as np
@@ -314,7 +315,7 @@ class TrainLoopModelCheckpoint(TrainLoop):
         TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, batch_model_feed_def, optimizer, criterion)
         self.project_name = project_name
         self.experiment_name = experiment_name
-        self.local_model_result_folder_path = local_model_result_folder_path
+        self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
         self.cloud_save_mode = cloud_save_mode
         self.rm_subopt_local_models = rm_subopt_local_models
 
@@ -357,7 +358,7 @@ class TrainLoopModelEndSave(TrainLoop):
         TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, batch_model_feed_def, optimizer, criterion)
         self.project_name = project_name
         self.experiment_name = experiment_name
-        self.local_model_result_folder_path = local_model_result_folder_path
+        self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
         self.args = args
         self.val_result_package = val_result_package
         self.test_result_package = test_result_package
@@ -428,7 +429,7 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
         """
         TrainLoopModelEndSave.__init__(self, model, train_loader, validation_loader, test_loader, batch_model_feed_def,
                                        optimizer, criterion,
-                                       project_name, experiment_name, local_model_result_folder_path,
+                                       project_name, experiment_name, os.path.expanduser(local_model_result_folder_path),
                                        args, val_result_package, test_result_package, cloud_save_mode)
         self.rm_subopt_local_models = rm_subopt_local_models
 
