@@ -10,7 +10,6 @@ from AIToolbox.torchtrain.model.model import TorchTrainFullModel
 from AIToolbox.experiment_save.training_history import TrainingHistory
 from AIToolbox.torchtrain.callbacks.callback_handler import CallbacksHandler
 from AIToolbox.torchtrain.callbacks.callbacks import ModelCheckpoint, ModelTrainEndSave
-from AIToolbox.torchtrain.batch_model_feed_defs import AbstractModelFeedDefinition
 from AIToolbox.experiment_save.result_package.abstract_result_packages import AbstractResultPackage
 
 
