@@ -21,7 +21,6 @@ class TorchTrainFullModel(nn.Module, ABC):
         """
         pass
 
-    @abstractmethod
     def get_loss_eval(self, batch_data, criterion, device):
         """Get loss during evaluation stage
 
@@ -40,7 +39,7 @@ class TorchTrainFullModel(nn.Module, ABC):
         Returns:
 
         """
-        pass
+        return self.get_loss(batch_data, criterion, device)
 
     @abstractmethod
     def get_predictions(self, batch_data, device):
@@ -61,7 +60,7 @@ class TorchTrainForwardModel(TorchTrainFullModel):
         pass
     
     def get_loss_eval(self, batch_data, criterion, device):
-        pass
+        return self.get_loss(batch_data, criterion, device)
     
     def get_predictions(self, batch_data, device):
         pass
