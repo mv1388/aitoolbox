@@ -70,6 +70,9 @@ pip install awscl
 pip install -U numpy
 pip install --ignore-installed greenlet
 
+conda install -c conda-forge jsonnet
+conda install -c anaconda seaborn=0.9.0
+
 pip install AIToolbox-$AIToolbox_version.tar.gz
 
 #./pyrouge_set_rouge_path ~/project/ROUGE-1.5.5
