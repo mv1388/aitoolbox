@@ -1,3 +1,4 @@
+import os
 import time
 import datetime
 import types
@@ -267,7 +268,7 @@ class TrainLoopModelEndSave(TrainLoop):
         TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion, metrics)
         self.project_name = project_name
         self.experiment_name = experiment_name
-        self.local_model_result_folder_path = local_model_result_folder_path
+        self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
         self.args = args
         self.val_result_package = val_result_package
         self.test_result_package = test_result_package

@@ -1,3 +1,4 @@
+import os
 from keras.callbacks import Callback
 
 from AIToolbox.cloud.AWS.model_save import KerasS3ModelSaver
@@ -61,7 +62,7 @@ class ModelCheckpoint(AbstractKerasCallback):
         AbstractKerasCallback.__init__(self, 'Model checkpoint at end of epoch')
         self.project_name = project_name
         self.experiment_name = experiment_name
-        self.local_model_result_folder_path = local_model_result_folder_path
+        self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
         self.cloud_save_mode = cloud_save_mode
         self.rm_subopt_local_models = rm_subopt_local_models
         
@@ -119,7 +120,7 @@ class ModelTrainEndSave(AbstractKerasCallback):
         AbstractKerasCallback.__init__(self, 'Model save at the end of training')
         self.project_name = project_name
         self.experiment_name = experiment_name
-        self.local_model_result_folder_path = local_model_result_folder_path
+        self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
         self.args = args
         self.val_result_package = val_result_package
         self.test_result_package = test_result_package
