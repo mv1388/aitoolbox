@@ -66,6 +66,7 @@ class TTForwardModel(TTFullModel):
         pass
 
 
+
 # class TTModelWrap(TTFullModel):
 #     def __init__(self, pytorch_model, batch_model_feed_def):
 #         """
