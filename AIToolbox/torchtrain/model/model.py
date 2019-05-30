@@ -77,3 +77,4 @@ class TTForwardModel(TTFullModel):
 #                 the neural network.
 #         """
 #         super().__init__()
+
