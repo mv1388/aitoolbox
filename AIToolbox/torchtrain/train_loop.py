@@ -57,7 +57,7 @@ class TrainLoop:
         if not isinstance(self.model, TTFullModel) and not isinstance(self.model, Module):
             raise TypeError('Provided model is not inherited from TTFullModel or base PyTorch Module')
         if not isinstance(self.model, TTFullModel) and \
-                isinstance(self.model, Module) and isinstance(self.batch_model_feed_def, AbstractModelFeedDefinition):
+                isinstance(self.model, Module) and not isinstance(self.batch_model_feed_def, AbstractModelFeedDefinition):
             raise TypeError('Provided the base PyTorch model but did not give the batch_model_feed_def')
 
     def __call__(self, num_epoch, callbacks=None, grad_clip=None):
