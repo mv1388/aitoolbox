@@ -22,7 +22,7 @@ class TrainLoop:
         """
 
         Args:
-            model (AIToolbox.torchtrain.model.model.TTFullModel or AIToolbox.torchtrain.model.model.ModelWrap): neural
+            model (AIToolbox.torchtrain.model.TTFullModel or AIToolbox.torchtrain.model.model.ModelWrap): neural
                 network model
             train_loader (torch.utils.data.DataLoader): data loader for train data set
             validation_loader (torch.utils.data.DataLoader): data loader for validation data set
@@ -312,7 +312,7 @@ class TrainLoopModelCheckpoint(TrainLoop):
         """TrainLoop with the automatic model check-pointing at the end of each epoch
 
         Args:
-            model (AIToolbox.torchtrain.model.model.TTFullModel or AIToolbox.torchtrain.model.model.ModelWrap): neural
+            model (AIToolbox.torchtrain.model.TTFullModel or AIToolbox.torchtrain.model.model.ModelWrap): neural
                 network model
             train_loader (torch.utils.data.DataLoader):
             validation_loader (torch.utils.data.DataLoader):
@@ -356,7 +356,7 @@ class TrainLoopModelEndSave(TrainLoop):
         """TrainLoop with the model performance evaluation and final model saving at the end of the training process
 
         Args:
-            model (AIToolbox.torchtrain.model.model.TTFullModel or AIToolbox.torchtrain.model.model.ModelWrap): neural
+            model (AIToolbox.torchtrain.model.TTFullModel or AIToolbox.torchtrain.model.model.ModelWrap): neural
                 network model
             train_loader (torch.utils.data.DataLoader):
             validation_loader (torch.utils.data.DataLoader or None):
@@ -422,7 +422,7 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
             and model saving at the end of the training process
 
         Args:
-            model (AIToolbox.torchtrain.model.model.TTFullModel or AIToolbox.torchtrain.model.model.ModelWrap): neural
+            model (AIToolbox.torchtrain.model.TTFullModel or AIToolbox.torchtrain.model.model.ModelWrap): neural
                 network model
             train_loader (torch.utils.data.DataLoader):
             validation_loader (torch.utils.data.DataLoader or None):
