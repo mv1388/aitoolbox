@@ -1,6 +1,6 @@
 import os
 
-import AIToolbox.utils.dict_util as dict_util
+from AIToolbox.utils import dict_util
 from AIToolbox.experiment_save.local_save.local_results_save import BaseLocalResultsSaver
 from AIToolbox.experiment_save.result_package.abstract_result_packages import AbstractResultPackage
 from AIToolbox.experiment_save.core_metrics.classification import AccuracyMetric
