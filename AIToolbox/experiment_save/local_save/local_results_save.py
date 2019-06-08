@@ -121,7 +121,7 @@ class BaseLocalResultsSaver:
         Returns:
             str, str, str: project_dir_path, experiment_dir_path, experiment_results_dir_path
         """
-        project_dir_path = os.path.join(local_model_result_folder_path, project_name)
+        project_dir_path = os.path.join(os.path.expanduser(local_model_result_folder_path), project_name)
         experiment_dir_path = os.path.join(project_dir_path, experiment_name + '_' + experiment_timestamp)
         experiment_results_dir_path = os.path.join(experiment_dir_path, 'results')
 

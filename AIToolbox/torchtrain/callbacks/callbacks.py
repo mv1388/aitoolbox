@@ -1,3 +1,4 @@
+import os
 import numpy as np
 
 from AIToolbox.cloud.AWS.model_save import PyTorchS3ModelSaver
@@ -5,6 +6,7 @@ from AIToolbox.cloud.GoogleCloud.model_save import PyTorchGoogleStorageModelSave
 from AIToolbox.experiment_save.local_save.local_model_save import PyTorchLocalModelSaver, LocalSubOptimalModelRemover
 from AIToolbox.experiment_save.experiment_saver import FullPyTorchExperimentS3Saver, FullPyTorchExperimentGoogleStorageSaver
 from AIToolbox.experiment_save.local_experiment_saver import FullPyTorchExperimentLocalSaver
+from AIToolbox.experiment_save.result_package.abstract_result_packages import AbstractResultPackage
 
 
 class AbstractCallback:
@@ -156,7 +158,7 @@ class ModelCheckpoint(AbstractCallback):
         AbstractCallback.__init__(self, 'Model checkpoint at end of epoch')
         self.project_name = project_name
         self.experiment_name = experiment_name
-        self.local_model_result_folder_path = local_model_result_folder_path
+        self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
         self.cloud_save_mode = cloud_save_mode
         self.rm_subopt_local_models = rm_subopt_local_models
 
@@ -217,7 +219,7 @@ class ModelTrainEndSave(AbstractCallback):
         AbstractCallback.__init__(self, 'Model save at the end of training', execution_order=100)
         self.project_name = project_name
         self.experiment_name = experiment_name
-        self.local_model_result_folder_path = local_model_result_folder_path
+        self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
         self.args = args
         self.val_result_package = val_result_package
         self.test_result_package = test_result_package
@@ -276,3 +278,9 @@ class ModelTrainEndSave(AbstractCallback):
         if self.val_result_package is None and self.test_result_package is None:
             raise ValueError("Both val_result_package and test_result_package are None. "
                              "At least one of these should be not None but actual result package.")
+
+        if self.val_result_package is not None and not isinstance(self.val_result_package, AbstractResultPackage):
+            raise TypeError(f'val_result_package {self.val_result_package} is not inherited from AbstractResultPackage')
+
+        if self.test_result_package is not None and not isinstance(self.test_result_package, AbstractResultPackage):
+            raise TypeError(f'test_result_package {self.test_result_package} is not inherited from AbstractResultPackage')

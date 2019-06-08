@@ -30,19 +30,17 @@ class AbstractModelReRunner(ABC):
 
 
 class PyTorchModelReRunner(AbstractModelReRunner):
-    def __init__(self, model, data_loader, batch_model_feed_def, callbacks=None):
-        """Use trained PyTorch model to predict on the (new) dataset
+    def __init__(self, model, data_loader, callbacks=None):
+        """
 
         Args:
-            model (torch.nn.modules.Module): model used for prediction
-            data_loader (torch.utils.data.DataLoader): specify the dataset for which the predictions are wanted
-            batch_model_feed_def (AIToolbox.torchtrain.batch_model_feed_defs.AbstractModelFeedDefinition): batch data
-                feed definition
+            model (AIToolbox.torchtrain.model.model.TTFullModel or AIToolbox.torchtrain.model.model.ModelWrap): neural
+                network model
+            data_loader (torch.utils.data.DataLoader):
         """
         AbstractModelReRunner.__init__(self, model, data_loader)
-        self.batch_model_feed_def = batch_model_feed_def
 
-        self.train_loop = TrainLoop(self.model, None, None, self.data_loader, batch_model_feed_def, None, None)
+        self.train_loop = TrainLoop(self.model, None, None, self.data_loader, None, None)
         self.train_loop.callbacks_handler.register_callbacks(callbacks)
 
     def model_predict(self):

@@ -60,6 +60,8 @@ scp -i $key_path -r ../ROUGE-1.5.5 ec2-user@$ec2_instance_address:~/project
 
 echo "#!/usr/bin/env bash
 
+echo Ireland AWS zone: eu-west-1
+
 aws configure
 cd project
 
@@ -69,6 +71,9 @@ pip install -U boto3
 pip install awscl
 pip install -U numpy
 pip install --ignore-installed greenlet
+
+conda install -c conda-forge jsonnet
+conda install -c anaconda seaborn=0.9.0
 
 pip install AIToolbox-$AIToolbox_version.tar.gz
 
