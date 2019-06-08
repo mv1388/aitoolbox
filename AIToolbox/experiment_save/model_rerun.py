@@ -41,7 +41,8 @@ class PyTorchModelReRunner(AbstractModelReRunner):
         """
         AbstractModelReRunner.__init__(self, model, data_loader)
 
-        self.train_loop = TrainLoop(self.model, None, None, self.data_loader, batch_model_feed_def, None, None)
+        self.train_loop = TrainLoop(self.model, None, None, self.data_loader, None, None,
+                                    batch_model_feed_def=batch_model_feed_def)
         self.train_loop.callbacks_handler.register_callbacks(callbacks)
 
     def model_predict(self):
