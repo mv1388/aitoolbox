@@ -7,7 +7,7 @@ import torch
 from torch.nn.modules import Module
 
 from AIToolbox.utils import dict_util
-from AIToolbox.torchtrain.model.model import TTFullModel, ModelWrap
+from AIToolbox.torchtrain.model import TTFullModel, ModelWrap
 from AIToolbox.torchtrain.batch_model_feed_defs import AbstractModelFeedDefinition
 from AIToolbox.experiment_save.training_history import TrainingHistory
 from AIToolbox.torchtrain.callbacks.callback_handler import CallbacksHandler
