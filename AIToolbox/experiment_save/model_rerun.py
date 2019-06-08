@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from torch.nn.modules import Module
 
 from AIToolbox.torchtrain.train_loop import TrainLoop
 
