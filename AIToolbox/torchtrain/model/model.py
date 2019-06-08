@@ -1,5 +1,8 @@
 from abc import ABC, abstractmethod
 import torch.nn as nn
+from torch.nn.modules import Module
+
+from AIToolbox.torchtrain.batch_model_feed_defs import AbstractModelFeedDefinition
 
 
 class TTFullModel(nn.Module, ABC):
@@ -64,3 +67,23 @@ class TTForwardModel(TTFullModel):
     
     def get_predictions(self, batch_data, device):
         pass
+
+
+class ModelWrap:
+    def __init__(self, model, batch_model_feed_def):
+        """
+
+        Args:
+            model (Module): neural network model
+            batch_model_feed_def (AIToolbox.torchtrain.batch_model_feed_defs.AbstractModelFeedDefinition or None): data
+                prep definition for batched data. This definition prepares the data for each batch that gets than fed
+                into the neural network.
+        """
+        if not isinstance(model, Module):
+            raise TypeError('Provided model is not inherited base PyTorch Module')
+        if not isinstance(batch_model_feed_def, AbstractModelFeedDefinition):
+            raise TypeError('Provided the base PyTorch model but did not give '
+                            'the batch_model_feed_def inherited from AbstractModelFeedDefinition')
+
+        self.model = model
+        self.batch_model_feed_def = batch_model_feed_def

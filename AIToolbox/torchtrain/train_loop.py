@@ -7,7 +7,7 @@ import torch
 from torch.nn.modules import Module
 
 import AIToolbox.utils.dict_util as dict_util
-from AIToolbox.torchtrain.model.model import TTFullModel
+from AIToolbox.torchtrain.model.model import TTFullModel, ModelWrap
 from AIToolbox.torchtrain.batch_model_feed_defs import AbstractModelFeedDefinition
 from AIToolbox.experiment_save.training_history import TrainingHistory
 from AIToolbox.torchtrain.callbacks.callback_handler import CallbacksHandler
@@ -18,28 +18,33 @@ from AIToolbox.experiment_save.result_package.abstract_result_packages import Ab
 class TrainLoop:
     def __init__(self, model,
                  train_loader, validation_loader, test_loader,
-                 optimizer, criterion,
-                 batch_model_feed_def=None):
+                 optimizer, criterion):
         """
 
         Args:
-            model (AIToolbox.torchtrain.model.model.TTFullModel or Module): neural network model
+            model (AIToolbox.torchtrain.model.model.TTFullModel or AIToolbox.torchtrain.model.model.ModelWrap): neural
+                network model
             train_loader (torch.utils.data.DataLoader): data loader for train data set
             validation_loader (torch.utils.data.DataLoader): data loader for validation data set
             test_loader (torch.utils.data.DataLoader): data loader for test data set
             optimizer (torch.optim.optimizer.Optimizer): optimizer algorithm.
             criterion (torch.nn.modules.loss._Loss): criterion criterion during the training procedure.
-            batch_model_feed_def (AIToolbox.torchtrain.batch_model_feed_defs.AbstractModelFeedDefinition or None): data
-                prep definition for batched data. This definition prepares the data for each batch that gets than fed
-                into the neural network.
         """
-        self.model = model
+        if isinstance(model, TTFullModel):
+            self.model = model
+            self.batch_model_feed_def = None
+        elif type(model) == ModelWrap:
+            self.model = model.model
+            self.batch_model_feed_def = model.batch_model_feed_def
+        else:
+            raise TypeError(f"Provided model is not either inherited from TTFullModel or ModelWrap. "
+                            f"Provided type is: {type(model)}.")
+
         self.train_loader = train_loader
         self.validation_loader = validation_loader
         self.test_loader = test_loader
         self.optimizer = optimizer
         self.criterion = criterion
-        self.batch_model_feed_def = batch_model_feed_def
 
         USE_CUDA = torch.cuda.is_available()
         self.device = torch.device("cuda" if USE_CUDA else "cpu")
@@ -303,12 +308,12 @@ class TrainLoopModelCheckpoint(TrainLoop):
                  train_loader, validation_loader, test_loader,
                  optimizer, criterion,
                  project_name, experiment_name, local_model_result_folder_path, cloud_save_mode='s3',
-                 rm_subopt_local_models=False, num_best_checkpoints_kept=2,
-                 batch_model_feed_def=None):
+                 rm_subopt_local_models=False, num_best_checkpoints_kept=2):
         """TrainLoop with the automatic model check-pointing at the end of each epoch
 
         Args:
-            model (AIToolbox.torchtrain.model.model.TTFullModel or Module):
+            model (AIToolbox.torchtrain.model.model.TTFullModel or AIToolbox.torchtrain.model.model.ModelWrap): neural
+                network model
             train_loader (torch.utils.data.DataLoader):
             validation_loader (torch.utils.data.DataLoader):
             test_loader (torch.utils.data.DataLoader):
@@ -326,12 +331,8 @@ class TrainLoopModelCheckpoint(TrainLoop):
                 the metric minimization is done otherwise metric maximization is done
             num_best_checkpoints_kept (int): number of best performing models which are kept when removing suboptimal
                 model checkpoints
-            batch_model_feed_def (AIToolbox.torchtrain.batch_model_feed_defs.AbstractModelFeedDefinition or None): data
-                prep definition for batched data. This definition prepares the data for each batch that gets than fed
-                into the neural network.
         """
-        TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion,
-                           batch_model_feed_def)
+        TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion)
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
@@ -351,12 +352,12 @@ class TrainLoopModelEndSave(TrainLoop):
                  train_loader, validation_loader, test_loader,
                  optimizer, criterion,
                  project_name, experiment_name, local_model_result_folder_path,
-                 args, val_result_package=None, test_result_package=None, cloud_save_mode='s3',
-                 batch_model_feed_def=None):
+                 args, val_result_package=None, test_result_package=None, cloud_save_mode='s3'):
         """TrainLoop with the model performance evaluation and final model saving at the end of the training process
 
         Args:
-            model (AIToolbox.torchtrain.model.model.TTFullModel or Module):
+            model (AIToolbox.torchtrain.model.model.TTFullModel or AIToolbox.torchtrain.model.model.ModelWrap): neural
+                network model
             train_loader (torch.utils.data.DataLoader):
             validation_loader (torch.utils.data.DataLoader or None):
             test_loader (torch.utils.data.DataLoader or None):
@@ -372,12 +373,8 @@ class TrainLoopModelEndSave(TrainLoop):
                 For AWS S3: 's3' / 'aws_s3' / 'aws'
                 For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
                 Everything else results just in local storage to disk
-            batch_model_feed_def (AIToolbox.torchtrain.batch_model_feed_defs.AbstractModelFeedDefinition or None): data
-                prep definition for batched data. This definition prepares the data for each batch that gets than fed
-                into the neural network.
         """
-        TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion,
-                           batch_model_feed_def)
+        TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion)
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
@@ -420,13 +417,13 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
                  optimizer, criterion,
                  project_name, experiment_name, local_model_result_folder_path,
                  args, val_result_package=None, test_result_package=None, cloud_save_mode='s3',
-                 rm_subopt_local_models=False, num_best_checkpoints_kept=2,
-                 batch_model_feed_def=None):
+                 rm_subopt_local_models=False, num_best_checkpoints_kept=2):
         """TrainLoop both saving model check-pointing at the end of each epoch and model performance reporting
             and model saving at the end of the training process
 
         Args:
-            model (AIToolbox.torchtrain.model.model.TTFullModel or Module):
+            model (AIToolbox.torchtrain.model.model.TTFullModel or AIToolbox.torchtrain.model.model.ModelWrap): neural
+                network model
             train_loader (torch.utils.data.DataLoader):
             validation_loader (torch.utils.data.DataLoader or None):
             test_loader (torch.utils.data.DataLoader or None):
@@ -447,14 +444,11 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
                 the metric minimization is done otherwise metric maximization is done
             num_best_checkpoints_kept (int): number of best performing models which are kept when removing suboptimal
                 model checkpoints
-            batch_model_feed_def (AIToolbox.torchtrain.batch_model_feed_defs.AbstractModelFeedDefinition or None): data
-                prep definition for batched data. This definition prepares the data for each batch that gets than fed
-                into the neural network.
         """
         TrainLoopModelEndSave.__init__(self, model, train_loader, validation_loader, test_loader,
                                        optimizer, criterion,
                                        project_name, experiment_name, os.path.expanduser(local_model_result_folder_path),
-                                       args, val_result_package, test_result_package, cloud_save_mode, batch_model_feed_def)
+                                       args, val_result_package, test_result_package, cloud_save_mode)
         self.rm_subopt_local_models = rm_subopt_local_models
 
         self.callbacks_handler.register_callbacks([

@@ -3,6 +3,7 @@ import unittest
 from tests.utils import *
 
 from AIToolbox.torchtrain.train_loop import TrainLoop, TrainLoopModelCheckpoint, TrainLoopModelEndSave, TrainLoopModelCheckpointEndSave
+from AIToolbox.torchtrain.model.model import ModelWrap
 from AIToolbox.torchtrain.callbacks.callback_handler import CallbacksHandler
 from AIToolbox.torchtrain.callbacks.callbacks import ModelCheckpoint, ModelTrainEndSave
 
@@ -127,15 +128,17 @@ class TestTrainLoop(unittest.TestCase):
 
     def test_callback_on_execution_separate_batch_feed(self):
         num_epochs = 2
-        dummy_feed_def = DeactivateModelFeedDefinition()
         dummy_optimizer = DummyOptimizer()
         dummy_train_loader = list(range(4))
         dummy_val_loader = list(range(3))
         dummy_test_loader = list(range(2))
 
         model = Net()
-        train_loop = TrainLoop(model, dummy_train_loader, dummy_val_loader, dummy_test_loader,
-                               dummy_optimizer, None, batch_model_feed_def=dummy_feed_def)
+        dummy_feed_def = DeactivateModelFeedDefinition()
+        model_wrap = ModelWrap(model=model, batch_model_feed_def=dummy_feed_def)
+
+        train_loop = TrainLoop(model_wrap, dummy_train_loader, dummy_val_loader, dummy_test_loader,
+                               dummy_optimizer, None)
         train_loop.callbacks_handler.register_callbacks([AbstractCallback('callback_test1'),
                                                          CallbackTracker(), CallbackTrackerShort(),
                                                          AbstractCallback('callback_test2')])
@@ -229,15 +232,17 @@ class TestTrainLoop(unittest.TestCase):
 
     def eval_prediction_separate_batch_feed(self, eval_mode):
         num_epochs = 2
-        dummy_feed_def = DeactivateModelFeedDefinition()
         dummy_optimizer = DummyOptimizer()
         dummy_train_loader = list(range(4))
         dummy_val_loader = list(range(3))
         dummy_test_loader = list(range(2))
 
         model = Net()
-        train_loop = TrainLoop(model, dummy_train_loader, dummy_val_loader, dummy_test_loader,
-                               dummy_optimizer, None, batch_model_feed_def=dummy_feed_def)
+        dummy_feed_def = DeactivateModelFeedDefinition()
+        model_wrap = ModelWrap(model=model, batch_model_feed_def=dummy_feed_def)
+
+        train_loop = TrainLoop(model_wrap, dummy_train_loader, dummy_val_loader, dummy_test_loader,
+                               dummy_optimizer, None)
         train_loop.callbacks_handler.register_callbacks([AbstractCallback('callback_test1'),
                                                          CallbackTracker(), CallbackTrackerShort(),
                                                          AbstractCallback('callback_test2')])
