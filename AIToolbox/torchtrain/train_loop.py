@@ -4,38 +4,45 @@ import time
 import datetime
 import numpy as np
 import torch
+from torch.nn.modules import Module
 
 import AIToolbox.utils.dict_util as dict_util
+from AIToolbox.torchtrain.model.model import TTFullModel, ModelWrap
+from AIToolbox.torchtrain.batch_model_feed_defs import AbstractModelFeedDefinition
 from AIToolbox.experiment_save.training_history import TrainingHistory
 from AIToolbox.torchtrain.callbacks.callback_handler import CallbacksHandler
 from AIToolbox.torchtrain.callbacks.callbacks import ModelCheckpoint, ModelTrainEndSave
-from AIToolbox.torchtrain.batch_model_feed_defs import AbstractModelFeedDefinition
 from AIToolbox.experiment_save.result_package.abstract_result_packages import AbstractResultPackage
 
 
 class TrainLoop:
     def __init__(self, model,
                  train_loader, validation_loader, test_loader,
-                 batch_model_feed_def,
                  optimizer, criterion):
         """
 
         Args:
-            model (torch.nn.modules.Module): neural network model
+            model (AIToolbox.torchtrain.model.model.TTFullModel or AIToolbox.torchtrain.model.model.ModelWrap): neural
+                network model
             train_loader (torch.utils.data.DataLoader): data loader for train data set
             validation_loader (torch.utils.data.DataLoader): data loader for validation data set
             test_loader (torch.utils.data.DataLoader): data loader for test data set
-            batch_model_feed_def (AIToolbox.torchtrain.batch_model_feed_defs.AbstractModelFeedDefinition): data prep
-                definition for batched data. This definition prepares the data for each batch that gets than fed into
-                the neural network.
             optimizer (torch.optim.optimizer.Optimizer): optimizer algorithm.
             criterion (torch.nn.modules.loss._Loss): criterion criterion during the training procedure.
         """
-        self.model = model
+        if isinstance(model, TTFullModel):
+            self.model = model
+            self.batch_model_feed_def = None
+        elif type(model) == ModelWrap:
+            self.model = model.model
+            self.batch_model_feed_def = model.batch_model_feed_def
+        else:
+            raise TypeError(f"Provided model is not either inherited from TTFullModel or ModelWrap. "
+                            f"Provided type is: {type(model)}.")
+
         self.train_loader = train_loader
         self.validation_loader = validation_loader
         self.test_loader = test_loader
-        self.batch_model_feed_def = batch_model_feed_def
         self.optimizer = optimizer
         self.criterion = criterion
 
@@ -52,8 +59,11 @@ class TrainLoop:
         self.callbacks = []
         self.early_stop = False
 
-        if not isinstance(self.batch_model_feed_def, AbstractModelFeedDefinition):
-            raise TypeError('Provided batch_model_feed_def is not inherited from AbstractModelFeedDefinition')
+        if not isinstance(self.model, TTFullModel) and not isinstance(self.model, Module):
+            raise TypeError('Provided model is not inherited from TTFullModel or base PyTorch Module')
+        if not isinstance(self.model, TTFullModel) and \
+                isinstance(self.model, Module) and not isinstance(self.batch_model_feed_def, AbstractModelFeedDefinition):
+            raise TypeError('Provided the base PyTorch model but did not give the batch_model_feed_def')
 
     def __call__(self, num_epoch, callbacks=None, grad_clip=None):
         """Train the model using the train loop
@@ -96,7 +106,11 @@ class TrainLoop:
             for batch_data in tqdm(self.train_loader):
                 self.callbacks_handler.execute_batch_begin()
 
-                loss_batch = self.batch_model_feed_def.get_loss(self.model, batch_data, self.criterion, self.device)
+                if isinstance(self.model, TTFullModel):
+                    loss_batch = self.model.get_loss(batch_data, self.criterion, self.device)
+                else:
+                    loss_batch = self.batch_model_feed_def.get_loss(self.model, batch_data, self.criterion, self.device)
+
                 self.loss_batch_accum.append(loss_batch.item())
 
                 self.optimizer.zero_grad()
@@ -193,7 +207,11 @@ class TrainLoop:
 
         with torch.no_grad():
             for batch_data in tqdm(data_loader):
-                loss_batch = self.batch_model_feed_def.get_loss_eval(self.model, batch_data, self.criterion, self.device)
+                if isinstance(self.model, TTFullModel):
+                    loss_batch = self.model.get_loss_eval(batch_data, self.criterion, self.device)
+                else:
+                    loss_batch = self.batch_model_feed_def.get_loss_eval(self.model, batch_data, self.criterion,
+                                                                         self.device)
 
                 loss_avg.append(loss_batch.item())
 
@@ -240,8 +258,11 @@ class TrainLoop:
 
         with torch.no_grad():
             for batch_data in tqdm(data_loader):
-                y_test_batch, y_pred_batch, metadata_batch = self.batch_model_feed_def.get_predictions(self.model, batch_data,
-                                                                                                       self.device)
+                if isinstance(self.model, TTFullModel):
+                    y_test_batch, y_pred_batch, metadata_batch = self.model.get_predictions(batch_data, self.device)
+                else:
+                    y_test_batch, y_pred_batch, metadata_batch = \
+                        self.batch_model_feed_def.get_predictions(self.model, batch_data, self.device)
 
                 # TODO: check if it is the best idea to append predictions to the list and not to some torch tensor
                 # TODO: also if append is the best option and not the concat
@@ -285,18 +306,17 @@ class TrainLoop:
 class TrainLoopModelCheckpoint(TrainLoop):
     def __init__(self, model,
                  train_loader, validation_loader, test_loader,
-                 batch_model_feed_def,
                  optimizer, criterion,
                  project_name, experiment_name, local_model_result_folder_path, cloud_save_mode='s3',
                  rm_subopt_local_models=False, num_best_checkpoints_kept=2):
         """TrainLoop with the automatic model check-pointing at the end of each epoch
 
         Args:
-            model (torch.nn.modules.Module):
+            model (AIToolbox.torchtrain.model.model.TTFullModel or AIToolbox.torchtrain.model.model.ModelWrap): neural
+                network model
             train_loader (torch.utils.data.DataLoader):
             validation_loader (torch.utils.data.DataLoader):
             test_loader (torch.utils.data.DataLoader):
-            batch_model_feed_def (AIToolbox.torchtrain.batch_model_feed_defs.AbstractModelFeedDefinition):
             optimizer (torch.optim.optimizer.Optimizer): optimizer algorithm.
             criterion (torch.nn.modules.loss._Loss): criterion criterion during the training procedure.
             project_name (str): root name of the project
@@ -312,7 +332,7 @@ class TrainLoopModelCheckpoint(TrainLoop):
             num_best_checkpoints_kept (int): number of best performing models which are kept when removing suboptimal
                 model checkpoints
         """
-        TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, batch_model_feed_def, optimizer, criterion)
+        TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion)
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
@@ -330,18 +350,17 @@ class TrainLoopModelCheckpoint(TrainLoop):
 class TrainLoopModelEndSave(TrainLoop):
     def __init__(self, model,
                  train_loader, validation_loader, test_loader,
-                 batch_model_feed_def,
                  optimizer, criterion,
                  project_name, experiment_name, local_model_result_folder_path,
                  args, val_result_package=None, test_result_package=None, cloud_save_mode='s3'):
         """TrainLoop with the model performance evaluation and final model saving at the end of the training process
 
         Args:
-            model (torch.nn.modules.Module):
+            model (AIToolbox.torchtrain.model.model.TTFullModel or AIToolbox.torchtrain.model.model.ModelWrap): neural
+                network model
             train_loader (torch.utils.data.DataLoader):
             validation_loader (torch.utils.data.DataLoader or None):
             test_loader (torch.utils.data.DataLoader or None):
-            batch_model_feed_def (AIToolbox.torchtrain.batch_model_feed_defs.AbstractModelFeedDefinition):
             optimizer (torch.optim.optimizer.Optimizer): optimizer algorithm.
             criterion (torch.nn.modules.loss._Loss): criterion criterion during the training procedure.
             project_name (str): root name of the project
@@ -355,7 +374,7 @@ class TrainLoopModelEndSave(TrainLoop):
                 For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
                 Everything else results just in local storage to disk
         """
-        TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, batch_model_feed_def, optimizer, criterion)
+        TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion)
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
@@ -395,7 +414,6 @@ class TrainLoopModelEndSave(TrainLoop):
 class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
     def __init__(self, model,
                  train_loader, validation_loader, test_loader,
-                 batch_model_feed_def,
                  optimizer, criterion,
                  project_name, experiment_name, local_model_result_folder_path,
                  args, val_result_package=None, test_result_package=None, cloud_save_mode='s3',
@@ -404,11 +422,11 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
             and model saving at the end of the training process
 
         Args:
-            model (torch.nn.modules.Module):
+            model (AIToolbox.torchtrain.model.model.TTFullModel or AIToolbox.torchtrain.model.model.ModelWrap): neural
+                network model
             train_loader (torch.utils.data.DataLoader):
             validation_loader (torch.utils.data.DataLoader or None):
             test_loader (torch.utils.data.DataLoader or None):
-            batch_model_feed_def (AIToolbox.torchtrain.batch_model_feed_defs.AbstractModelFeedDefinition):
             optimizer (torch.optim.optimizer.Optimizer): optimizer algorithm.
             criterion (torch.nn.modules.loss._Loss): criterion criterion during the training procedure.
             project_name (str): root name of the project
@@ -427,7 +445,7 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
             num_best_checkpoints_kept (int): number of best performing models which are kept when removing suboptimal
                 model checkpoints
         """
-        TrainLoopModelEndSave.__init__(self, model, train_loader, validation_loader, test_loader, batch_model_feed_def,
+        TrainLoopModelEndSave.__init__(self, model, train_loader, validation_loader, test_loader,
                                        optimizer, criterion,
                                        project_name, experiment_name, os.path.expanduser(local_model_result_folder_path),
                                        args, val_result_package, test_result_package, cloud_save_mode)
