@@ -2,7 +2,7 @@ import unittest
 
 from tests.utils import *
 
-from AIToolbox.torchtrain.model.model import ModelWrap
+from AIToolbox.torchtrain.model import ModelWrap
 from AIToolbox.experiment_save.model_rerun import PyTorchModelReRunner
 
 

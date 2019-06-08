@@ -6,7 +6,7 @@ from AIToolbox.torchtrain.batch_model_feed_defs import AbstractModelFeedDefiniti
 from AIToolbox.torchtrain.callbacks.callbacks import AbstractCallback
 from AIToolbox.experiment_save.result_package.abstract_result_packages import AbstractResultPackage
 from AIToolbox.experiment_save.core_metrics.abstract_metric import AbstractBaseMetric
-from AIToolbox.torchtrain.model.model import TTFullModel, TTForwardModel
+from AIToolbox.torchtrain.model import TTFullModel
 
 
 def function_exists(object_to_check, fn_name):

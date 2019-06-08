@@ -6,8 +6,8 @@ import numpy as np
 import torch
 from torch.nn.modules import Module
 
-import AIToolbox.utils.dict_util as dict_util
-from AIToolbox.torchtrain.model.model import TTFullModel, ModelWrap
+from AIToolbox.utils import dict_util
+from AIToolbox.torchtrain.model import TTFullModel, ModelWrap
 from AIToolbox.torchtrain.batch_model_feed_defs import AbstractModelFeedDefinition
 from AIToolbox.experiment_save.training_history import TrainingHistory
 from AIToolbox.torchtrain.callbacks.callback_handler import CallbacksHandler
@@ -22,7 +22,7 @@ class TrainLoop:
         """
 
         Args:
-            model (AIToolbox.torchtrain.model.model.TTFullModel or AIToolbox.torchtrain.model.model.ModelWrap): neural
+            model (AIToolbox.torchtrain.model.TTFullModel or AIToolbox.torchtrain.model.model.ModelWrap): neural
                 network model
             train_loader (torch.utils.data.DataLoader): data loader for train data set
             validation_loader (torch.utils.data.DataLoader): data loader for validation data set
@@ -312,7 +312,7 @@ class TrainLoopModelCheckpoint(TrainLoop):
         """TrainLoop with the automatic model check-pointing at the end of each epoch
 
         Args:
-            model (AIToolbox.torchtrain.model.model.TTFullModel or AIToolbox.torchtrain.model.model.ModelWrap): neural
+            model (AIToolbox.torchtrain.model.TTFullModel or AIToolbox.torchtrain.model.model.ModelWrap): neural
                 network model
             train_loader (torch.utils.data.DataLoader): data loader for train data set
             validation_loader (torch.utils.data.DataLoader): data loader for validation data set
@@ -356,7 +356,7 @@ class TrainLoopModelEndSave(TrainLoop):
         """TrainLoop with the model performance evaluation and final model saving at the end of the training process
 
         Args:
-            model (AIToolbox.torchtrain.model.model.TTFullModel or AIToolbox.torchtrain.model.model.ModelWrap): neural
+            model (AIToolbox.torchtrain.model.TTFullModel or AIToolbox.torchtrain.model.model.ModelWrap): neural
                 network model
             train_loader (torch.utils.data.DataLoader): data loader for train data set
             validation_loader (torch.utils.data.DataLoader or None): data loader for validation data set
@@ -422,7 +422,7 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
             and model saving at the end of the training process
 
         Args:
-            model (AIToolbox.torchtrain.model.model.TTFullModel or AIToolbox.torchtrain.model.model.ModelWrap): neural
+            model (AIToolbox.torchtrain.model.TTFullModel or AIToolbox.torchtrain.model.model.ModelWrap): neural
                 network model
             train_loader (torch.utils.data.DataLoader): data loader for train data set
             validation_loader (torch.utils.data.DataLoader or None): data loader for validation data set
