@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from AIToolbox.torchtrain.model.model import TTFullModel
+from AIToolbox.torchtrain.model import TTFullModel
 
 
 class UnifiedQABasicRNN(TTFullModel):
