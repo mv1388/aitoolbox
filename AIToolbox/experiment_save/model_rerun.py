@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from torch.nn.modules import Module
 
 from AIToolbox.torchtrain.train_loop import TrainLoop
 
@@ -30,16 +31,17 @@ class AbstractModelReRunner(ABC):
 
 
 class PyTorchModelReRunner(AbstractModelReRunner):
-    def __init__(self, model, data_loader, callbacks=None):
+    def __init__(self, model, data_loader, batch_model_feed_def=None, callbacks=None):
         """
 
         Args:
-            model (AIToolbox.torchtrain.model.model.TTFullModel):
+            model (AIToolbox.torchtrain.model.model.TTFullModel or Module):
             data_loader (torch.utils.data.DataLoader):
+            batch_model_feed_def (AIToolbox.torchtrain.batch_model_feed_defs.AbstractModelFeedDefinition):
         """
         AbstractModelReRunner.__init__(self, model, data_loader)
 
-        self.train_loop = TrainLoop(self.model, None, None, self.data_loader, None, None)
+        self.train_loop = TrainLoop(self.model, None, None, self.data_loader, batch_model_feed_def, None, None)
         self.train_loop.callbacks_handler.register_callbacks(callbacks)
 
     def model_predict(self):
