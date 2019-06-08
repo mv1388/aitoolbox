@@ -1,6 +1,6 @@
 import unittest
 
-import AIToolbox.utils.dict_util as dict_util
+from AIToolbox.utils import dict_util
 
 
 class TestFlattenDict(unittest.TestCase):

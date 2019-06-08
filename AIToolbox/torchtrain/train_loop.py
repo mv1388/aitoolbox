@@ -6,7 +6,7 @@ import numpy as np
 import torch
 from torch.nn.modules import Module
 
-import AIToolbox.utils.dict_util as dict_util
+from AIToolbox.utils import dict_util
 from AIToolbox.torchtrain.model.model import TTFullModel, ModelWrap
 from AIToolbox.torchtrain.batch_model_feed_defs import AbstractModelFeedDefinition
 from AIToolbox.experiment_save.training_history import TrainingHistory
