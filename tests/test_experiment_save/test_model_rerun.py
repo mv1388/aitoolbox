@@ -7,20 +7,18 @@ from AIToolbox.experiment_save.model_rerun import PyTorchModelReRunner
 
 class TestAbstractModelReRunner(unittest.TestCase):
     def test_if_has_abstractmethod(self):
-        model = Net()
+        model = NetUnifiedBatchFeed()
         dummy_val_loader = list(range(2))
-        batch_loader = DeactivateModelFeedDefinition()
-        re_runner = PyTorchModelReRunner(model, dummy_val_loader, batch_loader)
+        re_runner = PyTorchModelReRunner(model, dummy_val_loader)
 
         self.assertTrue(function_exists(re_runner, 'model_predict'))
         self.assertTrue(function_exists(re_runner, 'model_get_loss'))
         self.assertTrue(function_exists(re_runner, 'evaluate_result_package'))
 
     def test_predict(self):
-        model = Net()
+        model = NetUnifiedBatchFeed()
         dummy_val_loader = list(range(2))
-        batch_loader = DeactivateModelFeedDefinition()
-        re_runner = PyTorchModelReRunner(model, dummy_val_loader, batch_loader)
+        re_runner = PyTorchModelReRunner(model, dummy_val_loader)
 
         y_test, y_pred, metadata = re_runner.model_predict()
 
@@ -39,22 +37,20 @@ class TestAbstractModelReRunner(unittest.TestCase):
         self.assertEqual(metadata, d)
 
     def test_get_loss(self):
-        model = Net()
+        model = NetUnifiedBatchFeed()
         dummy_val_loader = list(range(2))
-        batch_loader = DeactivateModelFeedDefinition()
-        re_runner = PyTorchModelReRunner(model, dummy_val_loader, batch_loader)
+        re_runner = PyTorchModelReRunner(model, dummy_val_loader)
 
         loss = re_runner.model_get_loss()
 
         self.assertEqual(loss, 1.0)
-        self.assertEqual(batch_loader.dummy_batch.item_ctr, 2)
-        self.assertEqual(batch_loader.dummy_batch.back_ctr, 0)
+        self.assertEqual(model.dummy_batch.item_ctr, 2)
+        self.assertEqual(model.dummy_batch.back_ctr, 0)
         
     def test_evaluate_result_package(self):
-        model = Net()
+        model = NetUnifiedBatchFeed()
         dummy_val_loader = list(range(2))
-        batch_loader = DeactivateModelFeedDefinition()
-        re_runner = PyTorchModelReRunner(model, dummy_val_loader, batch_loader)
+        re_runner = PyTorchModelReRunner(model, dummy_val_loader)
 
         result_pkg = DummyResultPackageExtend()
         result_pkg_return = re_runner.evaluate_result_package(result_package=result_pkg, return_result_package=True)
@@ -83,10 +79,9 @@ class TestAbstractModelReRunner(unittest.TestCase):
         self.assertEqual(metadata, d)
 
     def test_evaluate_result_package_get_results(self):
-        model = Net()
+        model = NetUnifiedBatchFeed()
         dummy_val_loader = list(range(2))
-        batch_loader = DeactivateModelFeedDefinition()
-        re_runner = PyTorchModelReRunner(model, dummy_val_loader, batch_loader)
+        re_runner = PyTorchModelReRunner(model, dummy_val_loader)
 
         result_pkg = DummyResultPackageExtend()
         result_dict = re_runner.evaluate_result_package(result_package=result_pkg, return_result_package=False)

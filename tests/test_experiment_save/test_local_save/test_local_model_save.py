@@ -32,8 +32,8 @@ class TestLocalSubOptimalModelRemover(unittest.TestCase):
         remover_acc = DummyLocalSubOptimalModelRemover('acc')
         self.assertFalse(remover_acc.decrease_metric)
 
-        tl_train_metric_defaults = TrainLoop(None, [], None, None, ImageClassificationFeedDefinition(), None, None).train_history.keys()
-        tl_val_metric_defaults = TrainLoop(None, [], [], None, ImageClassificationFeedDefinition(), None, None).train_history.keys()
+        tl_train_metric_defaults = TrainLoop(NetUnifiedBatchFeed(), [], None, None, None, None).train_history.keys()
+        tl_val_metric_defaults = TrainLoop(NetUnifiedBatchFeed(), [], [], None, None, None).train_history.keys()
 
         self.is_in_default_metric_list(tl_train_metric_defaults)
         self.is_in_default_metric_list(tl_val_metric_defaults)

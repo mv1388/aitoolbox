@@ -6,6 +6,7 @@ from AIToolbox.torchtrain.batch_model_feed_defs import AbstractModelFeedDefiniti
 from AIToolbox.torchtrain.callbacks.callbacks import AbstractCallback
 from AIToolbox.experiment_save.result_package.abstract_result_packages import AbstractResultPackage
 from AIToolbox.experiment_save.core_metrics.abstract_metric import AbstractBaseMetric
+from AIToolbox.torchtrain.model.model import TTFullModel, TTForwardModel
 
 
 def function_exists(object_to_check, fn_name):
@@ -32,6 +33,39 @@ class Net(nn.Module):
         x = F.relu(self.fc1(x))
         x = self.fc2(x)
         return F.log_softmax(x, dim=1)
+
+
+class NetUnifiedBatchFeed(TTFullModel):
+    def __init__(self):
+        super(TTFullModel, self).__init__()
+        self.conv1 = nn.Conv2d(1, 20, 5, 1)
+        self.conv2 = nn.Conv2d(20, 50, 5, 1)
+        self.fc1 = nn.Linear(4*4*50, 500)
+        self.fc2 = nn.Linear(500, 10)
+
+        self.dummy_batch = DummyBatch()
+        self.prediction_count = 0
+
+    def forward(self, x):
+        x = F.relu(self.conv1(x))
+        x = F.max_pool2d(x, 2, 2)
+        x = F.relu(self.conv2(x))
+        x = F.max_pool2d(x, 2, 2)
+        x = x.view(-1, 4*4*50)
+        x = F.relu(self.fc1(x))
+        x = self.fc2(x)
+        return F.log_softmax(x, dim=1)
+
+    def get_loss(self, batch_data, criterion, device):
+        return self.dummy_batch
+
+    def get_loss_eval(self, batch_data, criterion, device):
+        return self.get_loss(batch_data, criterion, device)
+
+    def get_predictions(self, batch_data, device):
+        self.prediction_count += 1
+        return torch.FloatTensor([self.prediction_count] * 64).cpu(), \
+               torch.FloatTensor([self.prediction_count + 100] * 64).cpu(), {'bla': [self.prediction_count + 200] * 64}
     
     
 def keras_dummy_model():

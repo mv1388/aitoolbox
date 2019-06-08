@@ -30,18 +30,16 @@ class AbstractModelReRunner(ABC):
 
 
 class PyTorchModelReRunner(AbstractModelReRunner):
-    def __init__(self, model, data_loader, batch_model_feed_def, callbacks=None):
+    def __init__(self, model, data_loader, callbacks=None):
         """
 
         Args:
-            model (torch.nn.modules.Module):
+            model (AIToolbox.torchtrain.model.model.TTFullModel):
             data_loader (torch.utils.data.DataLoader):
-            batch_model_feed_def (AIToolbox.torchtrain.batch_model_feed_defs.AbstractModelFeedDefinition):
         """
         AbstractModelReRunner.__init__(self, model, data_loader)
-        self.batch_model_feed_def = batch_model_feed_def
 
-        self.train_loop = TrainLoop(self.model, None, None, self.data_loader, batch_model_feed_def, None, None)
+        self.train_loop = TrainLoop(self.model, None, None, self.data_loader, None, None)
         self.train_loop.callbacks_handler.register_callbacks(callbacks)
 
     def model_predict(self):
