@@ -8,6 +8,7 @@ from torch.nn.modules import Module
 
 from AIToolbox.utils import dict_util
 from AIToolbox.torchtrain.model import TTFullModel, ModelWrap
+from AIToolbox.torchtrain.multi_loss import MultiOptimizer
 from AIToolbox.torchtrain.batch_model_feed_defs import AbstractModelFeedDefinition
 from AIToolbox.experiment_save.training_history import TrainingHistory
 from AIToolbox.torchtrain.callbacks.callback_handler import CallbacksHandler
@@ -27,7 +28,7 @@ class TrainLoop:
             train_loader (torch.utils.data.DataLoader): data loader for train data set
             validation_loader (torch.utils.data.DataLoader): data loader for validation data set
             test_loader (torch.utils.data.DataLoader): data loader for test data set
-            optimizer (torch.optim.optimizer.Optimizer): optimizer algorithm.
+            optimizer (torch.optim.optimizer.Optimizer or MultiOptimizer): optimizer algorithm.
             criterion (torch.nn.modules.loss._Loss): criterion criterion during the training procedure.
         """
         if isinstance(model, TTFullModel):
@@ -142,7 +143,11 @@ class TrainLoop:
         Returns:
             None
         """
-        train_loss_batch_accum_avg = np.mean(self.loss_batch_accum).item()
+        if type(self.optimizer) == MultiOptimizer:
+            train_loss_batch_accum_avg = np.mean(self.loss_batch_accum, axis=0).tolist()
+        else:
+            train_loss_batch_accum_avg = np.mean(self.loss_batch_accum).item()
+
         print(f'AVG BATCH ACCUMULATED TRAIN LOSS: {train_loss_batch_accum_avg}')
         self.insert_metric_result_into_history('accumulated_loss', train_loss_batch_accum_avg)
         self.loss_batch_accum = []
@@ -217,7 +222,7 @@ class TrainLoop:
 
         self.model.train()
 
-        return np.mean(loss_avg)
+        return np.mean(loss_avg, axis=0)
 
     def predict_on_train_set(self):
         """Run train dataset through the network and return true target values, target predictions and metadata
@@ -317,7 +322,7 @@ class TrainLoopModelCheckpoint(TrainLoop):
             train_loader (torch.utils.data.DataLoader):
             validation_loader (torch.utils.data.DataLoader):
             test_loader (torch.utils.data.DataLoader):
-            optimizer (torch.optim.optimizer.Optimizer): optimizer algorithm.
+            optimizer (torch.optim.optimizer.Optimizer or MultiOptimizer): optimizer algorithm.
             criterion (torch.nn.modules.loss._Loss): criterion criterion during the training procedure.
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
@@ -361,7 +366,7 @@ class TrainLoopModelEndSave(TrainLoop):
             train_loader (torch.utils.data.DataLoader):
             validation_loader (torch.utils.data.DataLoader or None):
             test_loader (torch.utils.data.DataLoader or None):
-            optimizer (torch.optim.optimizer.Optimizer): optimizer algorithm.
+            optimizer (torch.optim.optimizer.Optimizer or MultiOptimizer): optimizer algorithm.
             criterion (torch.nn.modules.loss._Loss): criterion criterion during the training procedure.
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
@@ -427,7 +432,7 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
             train_loader (torch.utils.data.DataLoader):
             validation_loader (torch.utils.data.DataLoader or None):
             test_loader (torch.utils.data.DataLoader or None):
-            optimizer (torch.optim.optimizer.Optimizer): optimizer algorithm.
+            optimizer (torch.optim.optimizer.Optimizer or MultiOptimizer): optimizer algorithm.
             criterion (torch.nn.modules.loss._Loss): criterion criterion during the training procedure.
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
