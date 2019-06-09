@@ -34,7 +34,7 @@ class PyTorchModelReRunner(AbstractModelReRunner):
         """
 
         Args:
-            model (AIToolbox.torchtrain.model.model.TTFullModel or AIToolbox.torchtrain.model.model.ModelWrap): neural
+            model (AIToolbox.torchtrain.model.TTFullModel or AIToolbox.torchtrain.model.ModelWrap): neural
                 network model
             data_loader (torch.utils.data.DataLoader):
         """

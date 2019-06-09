@@ -141,7 +141,7 @@ class PyTorchLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
         """
 
         Args:
-            model (torch.nn.modules.Module):
+            model (torch.nn.modules.Module or AIToolbox.torchtrain.model.TTFullModel):
             project_name (str):
             experiment_name (str):
             experiment_timestamp (str or None):

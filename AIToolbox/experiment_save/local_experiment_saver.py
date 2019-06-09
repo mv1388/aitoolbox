@@ -32,7 +32,7 @@ class BaseFullExperimentLocalSaver(AbstractExperimentSaver):
         """
 
         Args:
-            model (torch.nn.modules.Module):
+            model (torch.nn.modules.Module or AIToolbox.torchtrain.model.TTFullModel):
             result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
             experiment_timestamp (str):
             save_true_pred_labels (bool):
