@@ -6,6 +6,9 @@ from AIToolbox.torchtrain.batch_model_feed_defs import AbstractModelFeedDefiniti
 
 
 class TTFullModel(nn.Module, ABC):
+    """
+    TT in TTFullModel --> TorchTrain Full Model
+    """
     @abstractmethod
     def get_loss(self, batch_data, criterion, device):
         """Get loss during training stage
