@@ -10,6 +10,7 @@ from AIToolbox.nlp.dataset.torch_dataset import BasicDataset as SQuAD2Dataset
 from AIToolbox.nlp.dataset.torch_collate_fns import qa_concat_ctx_span_collate_fn
 
 from AIToolbox.torchtrain.train_loop import TrainLoop, TrainLoopModelEndSave, TrainLoopModelCheckpointEndSave
+from AIToolbox.torchtrain.model import ModelWrap
 from AIToolbox.torchtrain.batch_model_feed_defs import QASpanSQuADModelFeedDefinition
 
 from AIToolbox.torchtrain.callbacks.performance_eval_callbacks import ModelPerformanceEvaluation, ModelPerformancePrintReport
@@ -95,7 +96,7 @@ qa_res_test_pkg_fin = QuestionAnswerResultPackage([paragraph_tokens for paragrap
                                                   output_text_dir='tempData_final_test'
                                                   )
 
-TrainLoopModelCheckpointEndSave(model, train_loader, dev_loader, test_loader, QASpanSQuADModelFeedDefinition(), optimizer, criterion,
+TrainLoopModelCheckpointEndSave(ModelWrap(model, QASpanSQuADModelFeedDefinition()), train_loader, dev_loader, test_loader, optimizer, criterion,
                                 project_name='fifnal_combo_test',
                                 experiment_name='MemoryNetPytorchTest',
                                 local_model_result_folder_path='<PATH>',

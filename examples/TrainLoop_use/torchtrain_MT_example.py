@@ -14,6 +14,7 @@ import os
 import time
 
 from AIToolbox.torchtrain.train_loop import TrainLoop, TrainLoopModelCheckpointEndSave
+from AIToolbox.torchtrain.model import ModelWrap
 from AIToolbox.torchtrain.batch_model_feed_defs import AbstractModelFeedDefinition
 from AIToolbox.torchtrain.callbacks.callbacks import AbstractCallback
 from AIToolbox.nlp.experiment_evaluation.NLP_result_package import MachineTranslationResultPackage
@@ -411,9 +412,9 @@ finish_result_pkg_test = MachineTranslationResultPackage(vocab_trg, vocab_src,
                                                          output_text_dir='final_text_test',
                                                          output_attn_heatmap_dir='final_attn_test')
 
-TrainLoopModelCheckpointEndSave(model,
+TrainLoopModelCheckpointEndSave(ModelWrap(model, MachineTranslationFeedDefinition()),
                                 train_iterator, valid_iterator, test_iterator,
-                                MachineTranslationFeedDefinition(), optimizer, criterion,
+                                optimizer, criterion,
                                 project_name='MT_project_test',
                                 experiment_name='Seq2SeqPytorchTest',
                                 local_model_result_folder_path='<PATH>',
