@@ -15,7 +15,7 @@ mkdir $project_root_path/$project_name/AWS_run_scripts
 mkdir $project_root_path/$project_name/AWS_run_scripts/AWS_core_scripts
 mkdir $project_root_path/$project_name/tst_code
 
-touch $project_root_path/$project_name/.gitignore
+cp template_gitignore $project_root_path/$project_name/.gitignore
 
 cp template_aws_project_upload.sh $project_root_path/$project_name/AWS_run_scripts/AWS_core_scripts/aws_project_upload.sh
 chmod u+x $project_root_path/$project_name/AWS_run_scripts/AWS_core_scripts/aws_project_upload.sh
