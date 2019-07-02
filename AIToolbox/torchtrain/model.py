@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 import torch.nn as nn
 from torch.nn.modules import Module
 
-from AIToolbox.torchtrain.batch_model_feed_defs import AbstractModelFeedDefinition
+from AIToolbox.torchtrain.data.batch_model_feed_defs import AbstractModelFeedDefinition
 
 
 class TTFullModel(nn.Module, ABC):

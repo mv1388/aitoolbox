@@ -1,16 +1,11 @@
 import unittest
 import random
-import os
-import datetime
-import time
 import shutil
 
 from tests.utils import *
 
 from AIToolbox.experiment_save.local_save.local_model_save import *
 from AIToolbox.torchtrain.train_loop import TrainLoop
-from AIToolbox.torchtrain.batch_model_feed_defs import ImageClassificationFeedDefinition
-
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
