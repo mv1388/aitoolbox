@@ -21,6 +21,7 @@ torchvision
 pytorch-nlp
 pyrouge
 rouge
+tensorboardX
 sumeval
 chakin
 chazutsu

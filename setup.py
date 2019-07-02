@@ -35,7 +35,8 @@ setup(name='AIToolbox',
                         'torchvision',
                         'pytorch-nlp',
                         'rouge',
-                        'pyrouge',    
+                        'pyrouge',
+                        'tensorboardX',
                         # New ones... just for testing
                         'sumeval', # https://github.com/chakki-works/sumeval
                         'chakin', # https://github.com/chakki-works/chakin
