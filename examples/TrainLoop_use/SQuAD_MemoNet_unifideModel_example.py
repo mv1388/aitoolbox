@@ -16,10 +16,6 @@ from AIToolbox.nlp.experiment_evaluation.NLP_result_package import QuestionAnswe
 from AIToolbox.nlp.models.torch.unified_qa_model import UnifiedQABasicRNN
 
 
-# from AIToolbox.logger.logger import Logger
-# logger = Logger()
-# logger.setup_logger('/Users/markovidoni/PycharmProjects/MemoryNet/model_results')
-
 USE_CUDA = torch.cuda.is_available()
 device = torch.device("cuda" if USE_CUDA else "cpu")
 
