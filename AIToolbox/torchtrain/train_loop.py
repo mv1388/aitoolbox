@@ -97,7 +97,7 @@ class TrainLoop:
 
         self.callbacks_handler.execute_train_begin()
 
-        for self.epoch in range(num_epoch):
+        for self.epoch in range(self.epoch, num_epoch):
             print('\n\n========================================================================')
             print('========================================================================')
             # print(self.train_history)
