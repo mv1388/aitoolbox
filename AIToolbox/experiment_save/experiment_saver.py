@@ -52,8 +52,8 @@ class BaseFullExperimentSaver(AbstractExperimentSaver):
         """
 
         Args:
-            model (keras.engine.training.Model or torch.nn.modules.Module):
-            result_package (AIToolbox.ExperimentSave.result_package.AbstractResultPackage):
+            model (dict or keras.engine.training.Model):
+            result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
             experiment_timestamp (str):
             save_true_pred_labels (bool):
             separate_files (bool):
@@ -65,11 +65,11 @@ class BaseFullExperimentSaver(AbstractExperimentSaver):
         if experiment_timestamp is None:
             experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
 
-        cloud_model_path, _, _, _ = self.model_saver.save_model(model=model,
-                                                                project_name=self.project_name,
-                                                                experiment_name=self.experiment_name,
-                                                                experiment_timestamp=experiment_timestamp,
-                                                                protect_existing_folder=protect_existing_folder)
+        cloud_model_path, _, _ = self.model_saver.save_model(model=model,
+                                                             project_name=self.project_name,
+                                                             experiment_name=self.experiment_name,
+                                                             experiment_timestamp=experiment_timestamp,
+                                                             protect_existing_folder=protect_existing_folder)
 
         cloud_results_path, _ = self.results_saver.save_experiment_results(result_package=result_package,
                                                                            project_name=self.project_name,
@@ -87,7 +87,7 @@ class BaseFullExperimentS3Saver(BaseFullExperimentSaver):
         """
 
         Args:
-            model_saver (AIToolbox.AWS.model_save.AbstractModelSaver):
+            model_saver (AIToolbox.cloud.AWS.model_save.AbstractModelSaver):
             project_name (str):
             experiment_name (str):
             bucket_name (str):

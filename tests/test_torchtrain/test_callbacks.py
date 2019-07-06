@@ -34,7 +34,7 @@ class TestAbstractCallback(unittest.TestCase):
 
 class TestModelCheckpointCallback(unittest.TestCase):
     def test_init(self):
-        callback_true = ModelCheckpoint('project_name', 'experiment_name', 'local_model_result_folder_path',
+        callback_true = ModelCheckpoint('project_name', 'experiment_name', 'local_model_result_folder_path', args={},
                                         cloud_save_mode='s3')
         self.assertEqual(type(callback_true.model_checkpointer), PyTorchS3ModelSaver)
 
@@ -42,7 +42,7 @@ class TestModelCheckpointCallback(unittest.TestCase):
         #                                         cloud_save_mode='gcs')
         # self.assertEqual(type(callback_true.model_checkpointer), PyTorchGoogleStorageModelSaver)
 
-        callback_false = ModelCheckpoint('project_name', 'experiment_name', 'local_model_result_folder_path',
+        callback_false = ModelCheckpoint('project_name', 'experiment_name', 'local_model_result_folder_path', args={},
                                          cloud_save_mode=None)
         self.assertEqual(type(callback_false.model_checkpointer), PyTorchLocalModelSaver)
 
@@ -67,7 +67,7 @@ class TestModelTrainEndSaveCallback(unittest.TestCase):
 
         callback = ModelTrainEndSave('project_name', 'experiment_name', 'local_model_result_folder_path',
                                      {}, result_pkg)
-        train_loop = TrainLoop(NetUnifiedBatchFeed(), None, None, None, None, None)
+        train_loop = TrainLoop(NetUnifiedBatchFeed(), None, None, None, DummyOptimizer(), None)
         train_loop.callbacks_handler.register_callbacks([callback])
         
         self.assertEqual(result_pkg.experiment_path,

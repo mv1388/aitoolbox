@@ -7,6 +7,7 @@ from AIToolbox.experiment_save.local_save.local_model_save import PyTorchLocalMo
 from AIToolbox.experiment_save.experiment_saver import FullPyTorchExperimentS3Saver, FullPyTorchExperimentGoogleStorageSaver
 from AIToolbox.experiment_save.local_experiment_saver import FullPyTorchExperimentLocalSaver
 from AIToolbox.experiment_save.result_package.abstract_result_packages import AbstractResultPackage
+from AIToolbox.utils import util
 
 
 class AbstractCallback:
@@ -187,7 +188,12 @@ class ModelCheckpoint(AbstractCallback):
             )
 
     def on_epoch_end(self):
-        model_paths = self.model_checkpointer.save_model(model=self.train_loop_obj.model,
+        model_checkpoint = {'model_state_dict': self.train_loop_obj.model.state_dict(),
+                            'optimizer_state_dict': self.train_loop_obj.optimizer.state_dict(),
+                            'epoch': self.train_loop_obj.epoch,
+                            'args': self.args}
+
+        model_paths = self.model_checkpointer.save_model(model=model_checkpoint,
                                                          project_name=self.project_name,
                                                          experiment_name=self.experiment_name,
                                                          experiment_timestamp=self.train_loop_obj.experiment_timestamp,
@@ -195,9 +201,14 @@ class ModelCheckpoint(AbstractCallback):
                                                          protect_existing_folder=True)
 
         if self.rm_subopt_local_models is not False:
-            _, _, model_local_path, model_weights_local_path = model_paths
+            *_, model_local_path = model_paths
             self.subopt_model_remover.decide_if_remove_suboptimal_model(self.train_loop_obj.train_history,
-                                                                        [model_local_path, model_weights_local_path])
+                                                                        [model_local_path])
+
+    def on_train_loop_registration(self):
+        if not util.function_exists(self.train_loop_obj.optimizer, 'state_dict'):
+            raise AttributeError('Provided optimizer does not have the required state_dict() method which is needed'
+                                 'for the saving of the model and the optimizer.')
 
 
 class ModelTrainEndSave(AbstractCallback):
@@ -247,6 +258,11 @@ class ModelTrainEndSave(AbstractCallback):
                                                                  local_model_result_folder_path=self.local_model_result_folder_path)
 
     def on_train_end(self):
+        model_final_state = {'model_state_dict': self.train_loop_obj.model.state_dict(),
+                             'optimizer_state_dict': self.train_loop_obj.optimizer.state_dict(),
+                             'epoch': self.train_loop_obj.epoch,
+                             'args': self.args}
+
         if self.val_result_package is not None:
             y_test, y_pred, additional_results = self.train_loop_obj.predict_on_validation_set()
             self.val_result_package.pkg_name += '_VAL'
@@ -266,7 +282,7 @@ class ModelTrainEndSave(AbstractCallback):
             self.result_package = self.test_result_package + self.result_package if self.result_package is not None \
                 else self.test_result_package
 
-        self.results_saver.save_experiment(self.train_loop_obj.model, self.result_package,
+        self.results_saver.save_experiment(model_final_state, self.result_package,
                                            experiment_timestamp=self.train_loop_obj.experiment_timestamp,
                                            save_true_pred_labels=True)
 
@@ -280,6 +296,9 @@ class ModelTrainEndSave(AbstractCallback):
                                                                                     self.experiment_name,
                                                                                     self.train_loop_obj.experiment_timestamp,
                                                                                     self.local_model_result_folder_path)
+        if not util.function_exists(self.train_loop_obj.optimizer, 'state_dict'):
+            raise AttributeError('Provided optimizer does not have the required state_dict() method which is needed'
+                                 'for the saving of the model and the optimizer.')
 
     def check_result_packages(self):
         if self.val_result_package is None and self.test_result_package is None:

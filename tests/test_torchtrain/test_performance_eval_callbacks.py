@@ -20,7 +20,7 @@ class TestModelPerformanceEvaluationCallback(unittest.TestCase):
                                               on_each_epoch=True, on_train_data=False, on_val_data=True,
                                               if_available_output_to_project_dir=True)
         train_loop = TrainLoopModelCheckpoint(model, dummy_train_loader, dummy_val_loader, dummy_test_loader, dummy_optimizer, None,
-                                              "project_name", "experiment_name", "local_model_result_folder_path")
+                                              "project_name", "experiment_name", "local_model_result_folder_path", {})
         train_loop.callbacks_handler.register_callbacks([callback])
 
         self.assertEqual(result_pkg.experiment_path,
@@ -33,7 +33,7 @@ class TestModelPerformanceEvaluationCallback(unittest.TestCase):
                                               if_available_output_to_project_dir=False)
         train_loop = TrainLoopModelCheckpoint(model, dummy_train_loader, dummy_val_loader, dummy_test_loader,
                                               dummy_optimizer, None,
-                                              "project_name", "experiment_name", "local_model_result_folder_path")
+                                              "project_name", "experiment_name", "local_model_result_folder_path", {})
         train_loop.callbacks_handler.register_callbacks([callback])
 
         self.assertIsNone(result_pkg.experiment_path)

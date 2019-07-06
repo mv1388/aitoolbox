@@ -191,6 +191,18 @@ class DummyBatch:
         return 1.
 
 
+class MiniDummyOptimizer:
+    def __init__(self):
+        self.zero_grad_ctr = 0
+        self.step_ctr = 0
+
+    def zero_grad(self):
+        self.zero_grad_ctr += 1
+
+    def step(self):
+        self.step_ctr += 1
+
+
 class DummyOptimizer:
     def __init__(self):
         self.zero_grad_ctr = 0
@@ -201,6 +213,9 @@ class DummyOptimizer:
     
     def step(self):
         self.step_ctr += 1
+
+    def state_dict(self):
+        print('In state_dict')
 
 
 class DummyResultPackage(AbstractResultPackage):
