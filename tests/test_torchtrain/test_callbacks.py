@@ -46,6 +46,14 @@ class TestModelCheckpointCallback(unittest.TestCase):
                                          cloud_save_mode=None)
         self.assertEqual(type(callback_false.model_checkpointer), PyTorchLocalModelSaver)
 
+    def test_optimizer_missing_state_dict_exception(self):
+        callback = ModelCheckpoint('project_name', 'experiment_name', 'local_model_result_folder_path', args={},
+                                   cloud_save_mode=None)
+        train_loop = TrainLoop(NetUnifiedBatchFeed(), None, None, None, MiniDummyOptimizer(), None)
+
+        with self.assertRaises(AttributeError):
+            train_loop.callbacks_handler.register_callbacks([callback])
+
 
 class TestModelTrainEndSaveCallback(unittest.TestCase):
     def test_init(self):
