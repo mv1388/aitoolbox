@@ -138,6 +138,7 @@ class TerminateOnNaN(AbstractCallback):
 
 class ModelCheckpoint(AbstractCallback):
     def __init__(self, project_name, experiment_name, local_model_result_folder_path,
+                 args,
                  cloud_save_mode='s3', bucket_name='model-result',
                  rm_subopt_local_models=False, num_best_checkpoints_kept=2):
         """Check-point save the model during training to disk or also to S3 / GCS cloud storage
@@ -146,6 +147,7 @@ class ModelCheckpoint(AbstractCallback):
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             local_model_result_folder_path (str): root local path where project folder will be created
+            args (dict): used hyper-parameters
             cloud_save_mode (str or None): Storage destination selector.
                 For AWS S3: 's3' / 'aws_s3' / 'aws'
                 For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
@@ -161,6 +163,7 @@ class ModelCheckpoint(AbstractCallback):
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
+        self.args = args
         self.rm_subopt_local_models = rm_subopt_local_models
 
         if self.rm_subopt_local_models is not False:
