@@ -18,7 +18,7 @@ class AbstractLocalModelSaver(ABC):
             protect_existing_folder (bool):
 
         Returns:
-            (str, str, str, str): model_name, model_weights_name, model_local_path, model_weights_local_path
+            (str, str): model_name, model_local_path
         """
         pass
 
@@ -86,7 +86,7 @@ class KerasLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
             protect_existing_folder (bool):
 
         Returns:
-            (str, str, str, str): model_name, model_weights_name, model_local_path, model_weights_local_path
+            (str, str): model_name, model_local_path
         """
         if experiment_timestamp is None:
             experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
@@ -95,18 +95,14 @@ class KerasLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
 
         if epoch is None:
             model_name = f'model_{experiment_name}_{experiment_timestamp}.h5'
-            model_weights_name = f'modelWeights_{experiment_name}_{experiment_timestamp}.h5'
         else:
             model_name = f'model_{experiment_name}_{experiment_timestamp}_E{epoch}.h5'
-            model_weights_name = f'modelWeights_{experiment_name}_{experiment_timestamp}_E{epoch}.h5'
 
         model_local_path = os.path.join(experiment_model_local_path, model_name)
-        model_weights_local_path = os.path.join(experiment_model_local_path, model_weights_name)
 
         model.save(model_local_path)
-        model.save_weights(model_weights_local_path)
 
-        return model_name, model_weights_name, model_local_path, model_weights_local_path
+        return model_name, model_local_path
 
 
 class TensorFlowLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
@@ -141,7 +137,7 @@ class PyTorchLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
         """
 
         Args:
-            model (torch.nn.modules.Module or AIToolbox.torchtrain.model.TTFullModel):
+            model (dict):
             project_name (str):
             experiment_name (str):
             experiment_timestamp (str or None):
@@ -149,8 +145,10 @@ class PyTorchLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
             protect_existing_folder (bool):
 
         Returns:
-            (str, str, str, str): model_name, model_weights_name, model_local_path, model_weights_local_path
+            (str, str): model_name, model_local_path
         """
+        self.check_model_dict_contents(model)
+
         if experiment_timestamp is None:
             experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
 
@@ -158,19 +156,31 @@ class PyTorchLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
 
         if epoch is None:
             model_name = f'model_{experiment_name}_{experiment_timestamp}.pth'
-            model_weights_name = f'modelWeights_{experiment_name}_{experiment_timestamp}.pth'
         else:
             model_name = f'model_{experiment_name}_{experiment_timestamp}_E{epoch}.pth'
-            model_weights_name = f'modelWeights_{experiment_name}_{experiment_timestamp}_E{epoch}.pth'
 
         model_local_path = os.path.join(experiment_model_local_path, model_name)
-        model_weights_local_path = os.path.join(experiment_model_local_path, model_weights_name)
 
         import torch
         torch.save(model, model_local_path)
-        torch.save(model.state_dict(), model_weights_local_path)
 
-        return model_name, model_weights_name, model_local_path, model_weights_local_path
+        return model_name, model_local_path
+
+    @staticmethod
+    def check_model_dict_contents(model):
+        """Check if PyTorch model save dict contains all the necessary elements for the training state reconstruction
+
+        Args:
+            model (dict):
+
+        Returns:
+            None:
+        """
+        # TODO: maybe add some check about the actual values/content of the dict as well
+        for required_element in ['model_state_dict', 'optimizer_state_dict', 'epoch', 'args']:
+            if required_element not in model:
+                raise ValueError(f'Required element of the model dict {required_element} is missing. Given model'
+                                 f'dict has the following elements: {model.keys()}')
 
 
 class LocalSubOptimalModelRemover:
@@ -219,6 +229,8 @@ class LocalSubOptimalModelRemover:
             self.model_save_history = sorted(self.model_save_history, key=lambda x: x[1], reverse=not self.decrease_metric)
 
             model_paths_to_rm, _ = self.model_save_history.pop()
+
+            print(f'Removing suboptimal models. Paths to be removed: {model_paths_to_rm}')
             self.rm_suboptimal_model(model_paths_to_rm)
 
     @staticmethod

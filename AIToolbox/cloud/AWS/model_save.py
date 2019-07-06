@@ -21,7 +21,7 @@ class AbstractModelSaver(ABC):
             protect_existing_folder (bool):
 
         Returns:
-            (str, str, str, str): model_s3_path, experiment_timestamp, model_local_path, model_weights_local_path
+            (str, str, str): model_s3_path, experiment_timestamp, model_local_path
         """
         pass
 
@@ -98,7 +98,7 @@ class KerasS3ModelSaver(AbstractModelSaver, BaseModelSaver):
             protect_existing_folder (bool):
 
         Returns:
-            (str, str, str, str):
+            (str, str, str): model_s3_path, experiment_timestamp, model_local_path
 
         Examples:
             local_model_result_folder_path = '~/project/model_results'
@@ -111,21 +111,18 @@ class KerasS3ModelSaver(AbstractModelSaver, BaseModelSaver):
         if experiment_timestamp is None:
             experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
 
-        saved_local_model_details = self.keras_local_saver.save_model(model, project_name, experiment_name,
-                                                                      experiment_timestamp, epoch, protect_existing_folder)
-
-        model_name, model_weights_name, model_local_path, model_weights_local_path = saved_local_model_details
+        model_name, model_local_path = self.keras_local_saver.save_model(model, project_name, experiment_name,
+                                                                         experiment_timestamp, epoch,
+                                                                         protect_existing_folder)
 
         experiment_s3_path = self.create_experiment_cloud_storage_folder_structure(project_name, experiment_name, experiment_timestamp)
         model_s3_path = os.path.join(experiment_s3_path, model_name)
-        model_weights_s3_path = os.path.join(experiment_s3_path, model_weights_name)
 
         self.save_file(local_file_path=model_local_path, cloud_file_path=model_s3_path)
-        self.save_file(local_file_path=model_weights_local_path, cloud_file_path=model_weights_s3_path)
 
         full_model_s3_path = os.path.join(self.bucket_name, model_s3_path)
 
-        return full_model_s3_path, experiment_timestamp, model_local_path, model_weights_local_path
+        return full_model_s3_path, experiment_timestamp, model_local_path
 
 
 class TensorFlowS3ModelSaver(AbstractModelSaver, BaseModelSaver):
@@ -165,7 +162,7 @@ class PyTorchS3ModelSaver(AbstractModelSaver, BaseModelSaver):
         """
 
         Args:
-            model (torch.nn.modules.Module):
+            model (dict):
             project_name (str):
             experiment_name (str):
             experiment_timestamp (str or None):
@@ -173,7 +170,7 @@ class PyTorchS3ModelSaver(AbstractModelSaver, BaseModelSaver):
             protect_existing_folder (bool):
 
         Returns:
-            (str, str, str, str):
+            (str, str, str): model_s3_path, experiment_timestamp, model_local_path
 
         Examples:
             local_model_result_folder_path = '~/project/model_results'
@@ -183,21 +180,20 @@ class PyTorchS3ModelSaver(AbstractModelSaver, BaseModelSaver):
                                project_name='QA_QAngaroo', experiment_name='FastQA_RNN_concat_model_GLOVE',
                                protect_existing_folder=False)
         """
+        PyTorchLocalModelSaver.check_model_dict_contents(model)
+
         if experiment_timestamp is None:
             experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
 
-        saved_local_model_details = self.pytorch_local_saver.save_model(model, project_name, experiment_name,
-                                                                        experiment_timestamp, epoch, protect_existing_folder)
-
-        model_name, model_weights_name, model_local_path, model_weights_local_path = saved_local_model_details
+        model_name, model_local_path = self.pytorch_local_saver.save_model(model, project_name, experiment_name,
+                                                                           experiment_timestamp, epoch,
+                                                                           protect_existing_folder)
 
         experiment_s3_path = self.create_experiment_cloud_storage_folder_structure(project_name, experiment_name, experiment_timestamp)
         model_s3_path = os.path.join(experiment_s3_path, model_name)
-        model_weights_s3_path = os.path.join(experiment_s3_path, model_weights_name)
 
         self.save_file(local_file_path=model_local_path, cloud_file_path=model_s3_path)
-        self.save_file(local_file_path=model_weights_local_path, cloud_file_path=model_weights_s3_path)
 
         full_model_s3_path = os.path.join(self.bucket_name, model_s3_path)
 
-        return full_model_s3_path, experiment_timestamp, model_local_path, model_weights_local_path
+        return full_model_s3_path, experiment_timestamp, model_local_path

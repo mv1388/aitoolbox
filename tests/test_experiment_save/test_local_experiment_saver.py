@@ -69,22 +69,22 @@ class TestFullPyTorchExperimentLocalSaver(unittest.TestCase):
         result_pkg = DummyFullResultPackage({'metric1': 33434, 'acc1': 223.43, 'loss': 4455.6},
                                             {'epoch': 20, 'lr': 0.334}, {})
 
+        model_checkpoint = {'model_state_dict': model.state_dict(), 'optimizer_state_dict': None,
+                            'epoch': 10, 'args': {}}
         saver = FullPyTorchExperimentLocalSaver(project_name=project_dir_name, experiment_name=exp_dir_name,
                                                 local_model_result_folder_path=THIS_DIR)
-        saved_paths = saver.save_experiment(model, result_pkg, current_time,
+        saved_paths = saver.save_experiment(model_checkpoint, result_pkg, current_time,
                                             save_true_pred_labels=save_true_pred_labels, separate_files=separate_files)
 
         model_file_path_true = os.path.join(model_path, f'model_{exp_dir_name}_{current_time}.pth')
-        model_weights_file_path_true = os.path.join(model_path, f'modelWeights_{exp_dir_name}_{current_time}.pth')
 
         self.assertTrue(os.path.exists(model_file_path_true))
-        self.assertTrue(os.path.exists(model_weights_file_path_true))
 
         if not separate_files:
-            saved_paths_true = [model_file_path_true, model_weights_file_path_true,
+            saved_paths_true = [model_file_path_true,
                                 os.path.join(results_path, f'results_hyperParams_hist_{exp_dir_name}_{current_time}.p')]
         else:
-            saved_paths_true = [model_file_path_true, model_weights_file_path_true,
+            saved_paths_true = [model_file_path_true,
                                 os.path.join(results_path, f'results_{exp_dir_name}_{current_time}.p'),
                                 os.path.join(results_path, f'hyperparams_{exp_dir_name}_{current_time}.p'),
                                 os.path.join(results_path, f'train_history_{exp_dir_name}_{current_time}.p')]
@@ -136,16 +136,14 @@ class TestFullKerasExperimentLocalSaver(unittest.TestCase):
                                             save_true_pred_labels=save_true_pred_labels, separate_files=separate_files)
 
         model_file_path_true = os.path.join(model_path, f'model_{exp_dir_name}_{current_time}.h5')
-        model_weights_file_path_true = os.path.join(model_path, f'modelWeights_{exp_dir_name}_{current_time}.h5')
 
         self.assertTrue(os.path.exists(model_file_path_true))
-        self.assertTrue(os.path.exists(model_weights_file_path_true))
 
         if not separate_files:
-            saved_paths_true = [model_file_path_true, model_weights_file_path_true,
+            saved_paths_true = [model_file_path_true,
                                 os.path.join(results_path, f'results_hyperParams_hist_{exp_dir_name}_{current_time}.p')]
         else:
-            saved_paths_true = [model_file_path_true, model_weights_file_path_true,
+            saved_paths_true = [model_file_path_true,
                                 os.path.join(results_path, f'results_{exp_dir_name}_{current_time}.p'),
                                 os.path.join(results_path, f'hyperparams_{exp_dir_name}_{current_time}.p'),
                                 os.path.join(results_path, f'train_history_{exp_dir_name}_{current_time}.p')]
