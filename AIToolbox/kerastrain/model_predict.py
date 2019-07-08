@@ -1,8 +1,9 @@
-from AIToolbox.torchtrain.model_predict import AbstractModelPredictor
+from AIToolbox.torchtrain.model_predict import AbstractModelPredictor, PyTorchModelPredictor
+from AIToolbox.kerastrain.train_loop import TrainLoop
 
 
-class KerasModelPredictor(AbstractModelPredictor):
-    def __init__(self, model, data_loader):
+class KerasModelPredictor(PyTorchModelPredictor):
+    def __init__(self, model, data_loader, optimizer, criterion, metrics):
         """
 
         Args:
@@ -11,17 +12,10 @@ class KerasModelPredictor(AbstractModelPredictor):
         """
         AbstractModelPredictor.__init__(self, model, data_loader)
 
-    def model_predict(self):
-        raise NotImplementedError
+        self.train_loop = TrainLoop(self.model, None, None, self.data_loader, optimizer, criterion, metrics)
 
-    def model_get_loss(self):
-        raise NotImplementedError
+    def model_get_loss(self, loss_criterion=None):
+        if loss_criterion is not None and loss_criterion != self.train_loop.criterion:
+            self.train_loop.model.compile(self.train_loop.optimizer, loss_criterion, self.train_loop.metrics)
 
-    def evaluate_result_package(self, result_package, return_result_package=True):
-        raise NotImplementedError
-
-    def execute_batch_end_callbacks(self):
-        raise NotImplementedError
-
-    def execute_epoch_end_callbacks(self):
-        raise NotImplementedError
+        return self.train_loop.evaluate_loss_on_test_set()

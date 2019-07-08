@@ -1,7 +1,8 @@
 from AIToolbox.torchtrain.model_predict import AbstractModelPredictor
+from AIToolbox.kerastrain.model_predict import KerasModelPredictor
 
 
-class TensorFlowModelPredictor(AbstractModelPredictor):
+class TensorFlowModelPredictor(KerasModelPredictor):
     def __init__(self, model, data_loader):
         """
 
@@ -11,17 +12,4 @@ class TensorFlowModelPredictor(AbstractModelPredictor):
         """
         AbstractModelPredictor.__init__(self, model, data_loader)
 
-    def model_predict(self):
-        raise NotImplementedError
-
-    def model_get_loss(self):
-        raise NotImplementedError
-
-    def evaluate_result_package(self, result_package, return_result_package=True):
-        raise NotImplementedError
-
-    def execute_batch_end_callbacks(self):
-        raise NotImplementedError
-
-    def execute_epoch_end_callbacks(self):
         raise NotImplementedError
