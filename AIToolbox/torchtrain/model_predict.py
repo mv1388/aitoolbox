@@ -89,6 +89,14 @@ class PyTorchModelPredictor(AbstractModelPredictor):
         Returns:
 
         """
+        LocalResultsSaver.create_experiment_local_folders(project_name, experiment_name,
+                                                          self.train_loop.experiment_timestamp,
+                                                          local_model_result_folder_path)
+        result_package.set_experiment_dir_path_for_additional_results(project_name=project_name,
+                                                                      experiment_name=experiment_name,
+                                                                      experiment_timestamp=self.train_loop.experiment_timestamp,
+                                                                      local_model_result_folder_path=local_model_result_folder_path)
+
         evaluated_result_package = self.evaluate_result_package(result_package, return_result_package=True)
 
         if cloud_save_mode == 's3' or cloud_save_mode == 'aws_s3' or cloud_save_mode == 'aws':
