@@ -110,9 +110,25 @@ class AbstractBaseMetric(ABC):
         raise KeyError(f'Key {item} not found')
 
     def __add__(self, other):
+        """
+
+        Args:
+            other (AbstractBaseMetric or dict):
+
+        Returns:
+            dict:
+        """
         return self.concat_metric(other)
 
     def __radd__(self, other):
+        """
+
+        Args:
+            other (AbstractBaseMetric or dict):
+
+        Returns:
+            dict:
+        """
         return self.concat_metric(other)
 
     def concat_metric(self, other):
