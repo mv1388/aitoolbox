@@ -108,3 +108,19 @@ class AbstractBaseMetric(ABC):
             if item in self.metric_result:
                 return self.metric_result[item]
         raise KeyError(f'Key {item} not found')
+
+    def __add__(self, other):
+        return self.concat_metric(other)
+
+    def __radd__(self, other):
+        return self.concat_metric(other)
+
+    def concat_metric(self, other):
+        if isinstance(other, AbstractBaseMetric):
+            other_metric_dict = other.get_metric_dict()
+        elif type(other) == dict:
+            other_metric_dict = other
+        else:
+            raise TypeError(f'Provided other not the accepted type. Provided type is: {type(other)}')
+
+        return {**self.get_metric_dict(), **other_metric_dict}
