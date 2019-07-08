@@ -116,6 +116,14 @@ class AbstractBaseMetric(ABC):
         return self.concat_metric(other)
 
     def concat_metric(self, other):
+        """
+
+        Args:
+            other (AbstractBaseMetric or dict):
+
+        Returns:
+            dict:
+        """
         if isinstance(other, AbstractBaseMetric):
             other_metric_dict = other.get_metric_dict()
         elif type(other) == dict:
