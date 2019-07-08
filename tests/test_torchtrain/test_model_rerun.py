@@ -3,14 +3,14 @@ import unittest
 from tests.utils import *
 
 from AIToolbox.torchtrain.model import ModelWrap
-from AIToolbox.experiment_save.model_rerun import PyTorchModelReRunner
+from AIToolbox.torchtrain.model_predict import PyTorchModelPredictor
 
 
-class TestAbstractModelReRunner(unittest.TestCase):
+class TestAbstractModelPredictor(unittest.TestCase):
     def test_if_has_abstractmethod(self):
         model = NetUnifiedBatchFeed()
         dummy_val_loader = list(range(2))
-        re_runner = PyTorchModelReRunner(model, dummy_val_loader)
+        re_runner = PyTorchModelPredictor(model, dummy_val_loader)
 
         self.assertTrue(function_exists(re_runner, 'model_predict'))
         self.assertTrue(function_exists(re_runner, 'model_get_loss'))
@@ -19,7 +19,7 @@ class TestAbstractModelReRunner(unittest.TestCase):
     def test_predict(self):
         model = NetUnifiedBatchFeed()
         dummy_val_loader = list(range(2))
-        re_runner = PyTorchModelReRunner(model, dummy_val_loader)
+        re_runner = PyTorchModelPredictor(model, dummy_val_loader)
 
         y_test, y_pred, metadata = re_runner.model_predict()
 
@@ -43,7 +43,7 @@ class TestAbstractModelReRunner(unittest.TestCase):
         model_wrap = ModelWrap(model=model, batch_model_feed_def=batch_loader)
 
         dummy_val_loader = list(range(2))
-        re_runner = PyTorchModelReRunner(model_wrap, dummy_val_loader)
+        re_runner = PyTorchModelPredictor(model_wrap, dummy_val_loader)
 
         y_test, y_pred, metadata = re_runner.model_predict()
 
@@ -64,7 +64,7 @@ class TestAbstractModelReRunner(unittest.TestCase):
     def test_get_loss(self):
         model = NetUnifiedBatchFeed()
         dummy_val_loader = list(range(2))
-        re_runner = PyTorchModelReRunner(model, dummy_val_loader)
+        re_runner = PyTorchModelPredictor(model, dummy_val_loader)
 
         loss = re_runner.model_get_loss()
 
@@ -78,7 +78,7 @@ class TestAbstractModelReRunner(unittest.TestCase):
         model_wrap = ModelWrap(model=model, batch_model_feed_def=batch_loader)
 
         dummy_val_loader = list(range(2))
-        re_runner = PyTorchModelReRunner(model_wrap, dummy_val_loader)
+        re_runner = PyTorchModelPredictor(model_wrap, dummy_val_loader)
 
         loss = re_runner.model_get_loss()
 
@@ -89,7 +89,7 @@ class TestAbstractModelReRunner(unittest.TestCase):
     def test_evaluate_result_package(self):
         model = NetUnifiedBatchFeed()
         dummy_val_loader = list(range(2))
-        re_runner = PyTorchModelReRunner(model, dummy_val_loader)
+        re_runner = PyTorchModelPredictor(model, dummy_val_loader)
 
         result_pkg = DummyResultPackageExtend()
         result_pkg_return = re_runner.evaluate_result_package(result_package=result_pkg, return_result_package=True)
@@ -123,7 +123,7 @@ class TestAbstractModelReRunner(unittest.TestCase):
         model_wrap = ModelWrap(model=model, batch_model_feed_def=dummy_feed_def)
 
         dummy_val_loader = list(range(2))
-        re_runner = PyTorchModelReRunner(model_wrap, dummy_val_loader)
+        re_runner = PyTorchModelPredictor(model_wrap, dummy_val_loader)
 
         result_pkg = DummyResultPackageExtend()
         result_pkg_return = re_runner.evaluate_result_package(result_package=result_pkg, return_result_package=True)
@@ -154,7 +154,7 @@ class TestAbstractModelReRunner(unittest.TestCase):
     def test_evaluate_result_package_get_results(self):
         model = NetUnifiedBatchFeed()
         dummy_val_loader = list(range(2))
-        re_runner = PyTorchModelReRunner(model, dummy_val_loader)
+        re_runner = PyTorchModelPredictor(model, dummy_val_loader)
 
         result_pkg = DummyResultPackageExtend()
         result_dict = re_runner.evaluate_result_package(result_package=result_pkg, return_result_package=False)
