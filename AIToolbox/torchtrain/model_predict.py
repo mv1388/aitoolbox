@@ -1,6 +1,9 @@
 from abc import ABC, abstractmethod
 
 from AIToolbox.torchtrain.train_loop import TrainLoop
+from AIToolbox.cloud.AWS.results_save import S3ResultsSaver
+from AIToolbox.cloud.GoogleCloud.results_save import GoogleStorageResultsSaver
+from AIToolbox.experiment_save.local_save.local_results_save import LocalResultsSaver
 
 
 class AbstractModelPredictor(ABC):
@@ -14,6 +17,12 @@ class AbstractModelPredictor(ABC):
 
     @abstractmethod
     def model_get_loss(self, loss_criterion):
+        pass
+
+    @abstractmethod
+    def evaluate_model(self, result_package,
+                       project_name, experiment_name, local_model_result_folder_path,
+                       **kwargs):
         pass
 
     @abstractmethod
@@ -62,6 +71,45 @@ class PyTorchModelPredictor(AbstractModelPredictor):
         """
         self.train_loop.criterion = loss_criterion
         return self.train_loop.evaluate_loss_on_test_set()
+
+    def evaluate_model(self, result_package,
+                       project_name, experiment_name, local_model_result_folder_path,
+                       cloud_save_mode='s3', bucket_name='model-result', save_true_pred_labels=False):
+        """
+
+        Args:
+            result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
+            project_name (str):
+            experiment_name (str):
+            local_model_result_folder_path (str):
+            cloud_save_mode (str):
+            bucket_name (str):
+            save_true_pred_labels (bool):
+
+        Returns:
+
+        """
+        LocalResultsSaver.create_experiment_local_folders(project_name, experiment_name,
+                                                          self.train_loop.experiment_timestamp,
+                                                          local_model_result_folder_path)
+        result_package.set_experiment_dir_path_for_additional_results(project_name=project_name,
+                                                                      experiment_name=experiment_name,
+                                                                      experiment_timestamp=self.train_loop.experiment_timestamp,
+                                                                      local_model_result_folder_path=local_model_result_folder_path)
+
+        evaluated_result_package = self.evaluate_result_package(result_package, return_result_package=True)
+
+        if cloud_save_mode == 's3' or cloud_save_mode == 'aws_s3' or cloud_save_mode == 'aws':
+            results_saver = S3ResultsSaver(bucket_name, local_model_result_folder_path)
+        elif cloud_save_mode == 'gcs' or cloud_save_mode == 'google_storage' or cloud_save_mode == 'google storage':
+            results_saver = GoogleStorageResultsSaver(bucket_name, local_model_result_folder_path)
+        else:
+            results_saver = LocalResultsSaver(local_model_result_folder_path)
+
+        results_saver.save_experiment_results(evaluated_result_package,
+                                              project_name=project_name, experiment_name=experiment_name,
+                                              experiment_timestamp=self.train_loop.experiment_timestamp,
+                                              save_true_pred_labels=save_true_pred_labels)
 
     def evaluate_result_package(self, result_package, return_result_package=True):
         """
