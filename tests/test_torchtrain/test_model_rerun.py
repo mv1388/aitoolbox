@@ -1,4 +1,5 @@
 import unittest
+import torch.nn as nn
 
 from tests.utils import *
 
@@ -66,7 +67,7 @@ class TestAbstractModelPredictor(unittest.TestCase):
         dummy_val_loader = list(range(2))
         re_runner = PyTorchModelPredictor(model, dummy_val_loader)
 
-        loss = re_runner.model_get_loss()
+        loss = re_runner.model_get_loss(nn.CrossEntropyLoss())
 
         self.assertEqual(loss, 1.0)
         self.assertEqual(model.dummy_batch.item_ctr, 2)
@@ -80,7 +81,7 @@ class TestAbstractModelPredictor(unittest.TestCase):
         dummy_val_loader = list(range(2))
         re_runner = PyTorchModelPredictor(model_wrap, dummy_val_loader)
 
-        loss = re_runner.model_get_loss()
+        loss = re_runner.model_get_loss(nn.CrossEntropyLoss())
 
         self.assertEqual(loss, 1.0)
         self.assertEqual(batch_loader.dummy_batch.item_ctr, 2)
