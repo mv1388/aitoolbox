@@ -287,6 +287,37 @@ class TestTrainingHistory(unittest.TestCase):
         k_th = [(k, v) for k, v in th.items()]
         self.assertEqual(k_true, k_th)
 
+    def test__add_methods(self):
+        th = self._build_dummy_history()
+
+        th_added_1 = th + {'ADDITIONAL_metric': 122.3, 'addi': 344}
+        self.assertEqual(
+            th_added_1.train_history,
+            {'loss': [123.4, 1223.4, 13323.4, 13323.4], 'accumulated_loss': [], 'val_loss': [],
+             'NEW_METRIC': [13323.4, 133323.4], 'ADDITIONAL_metric': [122.3], 'addi': [344]}
+        )
+
+        th_added_2 = {'ADDITIONAL_metric': 13322.3, 'addi': 1001010} + th
+        self.assertEqual(
+            th_added_2.train_history,
+            {'loss': [123.4, 1223.4, 13323.4, 13323.4], 'accumulated_loss': [], 'val_loss': [],
+             'NEW_METRIC': [13323.4, 133323.4], 'ADDITIONAL_metric': [13322.3], 'addi': [1001010]}
+        )
+
+        th_added_pre_post = th_added_2 + {'ADDITIONAL_metric': 11.3, 'addi': 1}
+        self.assertEqual(
+            th_added_pre_post.train_history,
+            {'loss': [123.4, 1223.4, 13323.4, 13323.4], 'accumulated_loss': [], 'val_loss': [],
+             'NEW_METRIC': [13323.4, 133323.4], 'ADDITIONAL_metric': [13322.3, 11.3], 'addi': [1001010, 1]}
+        )
+
+        th += {'ADDITIONAL_metric': 122.3, 'addi': 344}
+        self.assertEqual(
+            th.train_history,
+            {'loss': [123.4, 1223.4, 13323.4, 13323.4], 'accumulated_loss': [], 'val_loss': [],
+             'NEW_METRIC': [13323.4, 133323.4], 'ADDITIONAL_metric': [122.3], 'addi': [344]}
+        )
+
     @staticmethod
     def _build_dummy_history():
         th = TrainingHistory(auto_epoch='NEW_METRIC')

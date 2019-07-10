@@ -1,3 +1,4 @@
+import copy
 from AIToolbox.utils import dict_util
 
 
@@ -164,3 +165,32 @@ class TrainingHistory:
 
     def items(self):
         return self.train_history.items()
+
+    def __add__(self, other):
+        self_copy = copy.deepcopy(self)
+        self_copy.add_history_dict(other)
+        return self_copy
+
+    def __radd__(self, other):
+        self_copy = copy.deepcopy(self)
+        self_copy.add_history_dict(other)
+        return self_copy
+
+    def __iadd__(self, other):
+        self.add_history_dict(other)
+        return self
+
+    def add_history_dict(self, other):
+        """
+
+        Args:
+            other (dict):
+
+        Returns:
+            None
+        """
+        if type(other) is not dict:
+            raise TypeError(f'Other should be dict. Provided: {type(other)}')
+
+        for k, v in other.items():
+            self.insert_single_result_into_history(k, v)
