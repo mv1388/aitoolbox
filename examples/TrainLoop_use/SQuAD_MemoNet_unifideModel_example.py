@@ -20,7 +20,7 @@ USE_CUDA = torch.cuda.is_available()
 device = torch.device("cuda" if USE_CUDA else "cpu")
 
 
-project_folder_prefix = '~/PycharmProjects/MemoryNet'
+project_folder_prefix = '~/PycharmProjects/RNN_QANet'
 # project_folder_prefix = '~/project'
 
 

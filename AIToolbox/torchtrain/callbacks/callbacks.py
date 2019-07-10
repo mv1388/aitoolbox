@@ -1,5 +1,6 @@
 import os
 import numpy as np
+from typing import Optional
 
 from AIToolbox.cloud.AWS.model_save import PyTorchS3ModelSaver
 from AIToolbox.cloud.GoogleCloud.model_save import PyTorchGoogleStorageModelSaver
@@ -22,9 +23,11 @@ class AbstractCallback:
             execution_order (int): order of the callback execution. If all the used callbacks have the orders set to 0,
                 than the callbacks are executed in the order they were registered.
         """
+        from AIToolbox.torchtrain.train_loop import TrainLoop
+
         self.callback_name = callback_name
         self.execution_order = execution_order
-        self.train_loop_obj = None
+        self.train_loop_obj: Optional[TrainLoop] = None
 
     def register_train_loop_object(self, train_loop_obj):
         """Introduce the reference to the encapsulating trainloop so that the callback has access to the

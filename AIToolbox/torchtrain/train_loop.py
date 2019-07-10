@@ -13,6 +13,7 @@ from AIToolbox.torchtrain.data.batch_model_feed_defs import AbstractModelFeedDef
 from AIToolbox.torchtrain.callbacks.callback_handler import CallbacksHandler
 from AIToolbox.torchtrain.callbacks.callbacks import ModelCheckpoint, ModelTrainEndSave
 from AIToolbox.experiment_save.training_history import TrainingHistory
+from AIToolbox.torchtrain.model_prediction_store import ModelPredictionStore
 from AIToolbox.experiment_save.result_package.abstract_result_packages import AbstractResultPackage
 
 
@@ -55,6 +56,7 @@ class TrainLoop:
         self.epoch = 0
 
         self.train_history = TrainingHistory(has_validation=self.validation_loader is not None)
+        self.prediction_store = ModelPredictionStore(auto_purge=True)
 
         self.callbacks_handler = CallbacksHandler(self)
         self.callbacks = []
@@ -224,29 +226,56 @@ class TrainLoop:
 
         return np.mean(loss_avg, axis=0)
 
-    def predict_on_train_set(self):
+    def predict_on_train_set(self, force_prediction=False):
         """Run train dataset through the network and return true target values, target predictions and metadata
 
+        Args:
+            force_prediction (bool):
+
         Returns:
             (torch.Tensor, torch.Tensor, dict): y_true, y_pred, metadata
         """
-        return self.predict_with_model(self.train_loader)
+        if not self.prediction_store.has_train_predictions(self.epoch) or force_prediction:
+            predictions = self.predict_with_model(self.train_loader)
+            self.prediction_store.insert_train_predictions(predictions, self.epoch)
+        else:
+            predictions = self.prediction_store.get_train_predictions(self.epoch)
 
-    def predict_on_validation_set(self):
+        return predictions
+
+    def predict_on_validation_set(self, force_prediction=False):
         """Run validation dataset through the network and return true target values, target predictions and metadata
 
+        Args:
+            force_prediction (bool):
+
         Returns:
             (torch.Tensor, torch.Tensor, dict): y_true, y_pred, metadata
         """
-        return self.predict_with_model(self.validation_loader)
+        if not self.prediction_store.has_val_predictions(self.epoch) or force_prediction:
+            predictions = self.predict_with_model(self.validation_loader)
+            self.prediction_store.insert_val_predictions(predictions, self.epoch)
+        else:
+            predictions = self.prediction_store.get_val_predictions(self.epoch)
 
-    def predict_on_test_set(self):
+        return predictions
+
+    def predict_on_test_set(self, force_prediction=False):
         """Run test dataset through the network and return true target values, target predictions and metadata
 
+        Args:
+            force_prediction (bool):
+
         Returns:
             (torch.Tensor, torch.Tensor, dict): y_true, y_pred, metadata
         """
-        return self.predict_with_model(self.test_loader)
+        if not self.prediction_store.has_test_predictions(self.epoch) or force_prediction:
+            predictions = self.predict_with_model(self.test_loader)
+            self.prediction_store.insert_test_predictions(predictions, self.epoch)
+        else:
+            predictions = self.prediction_store.get_test_predictions(self.epoch)
+
+        return predictions
 
     def predict_with_model(self, data_loader):
         """Run given dataset through the network and return true target values, target predictions and metadata
