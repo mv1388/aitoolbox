@@ -1,3 +1,4 @@
+import copy
 from AIToolbox.utils import dict_util
 
 
@@ -166,12 +167,14 @@ class TrainingHistory:
         return self.train_history.items()
 
     def __add__(self, other):
-        self.add_history_dict(other)
-        return self
+        self_copy = copy.deepcopy(self)
+        self_copy.add_history_dict(other)
+        return self_copy
 
     def __radd__(self, other):
-        self.add_history_dict(other)
-        return self
+        self_copy = copy.deepcopy(self)
+        self_copy.add_history_dict(other)
+        return self_copy
 
     def __iadd__(self, other):
         self.add_history_dict(other)
