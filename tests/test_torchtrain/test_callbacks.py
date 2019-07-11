@@ -2,8 +2,8 @@ import unittest
 
 from tests.utils import *
 
-from AIToolbox.torchtrain.callbacks.callbacks import AbstractCallback, ModelCheckpoint, ModelTrainEndSave, \
-    EarlyStopping
+from AIToolbox.torchtrain.callbacks.callbacks import AbstractCallback, EarlyStopping
+from AIToolbox.torchtrain.callbacks.model_save_callbacks import ModelCheckpoint, ModelTrainEndSave
 from AIToolbox.torchtrain.train_loop import TrainLoop
 from AIToolbox.cloud.AWS.model_save import PyTorchS3ModelSaver
 from AIToolbox.experiment_save.local_save.local_model_save import PyTorchLocalModelSaver
