@@ -17,14 +17,12 @@ class TestWrapPrePreparedTrainingHistory(unittest.TestCase):
                    'acc': [0.07999999821186066, 0.33000001311302185, 0.3100000023841858, 0.5299999713897705,
                            0.5799999833106995, 0.6200000047683716, 0.4300000071525574, 0.5099999904632568,
                            0.6700000166893005, 0.7599999904632568]}
-        epoch = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-        train_hist = TrainingHistory().wrap_pre_prepared_history(history, epoch)
+        train_hist = TrainingHistory().wrap_pre_prepared_history(history)
 
-        self.assertEqual(train_hist.train_history_record, None)
         self.assertEqual(train_hist.get_train_history(),
-                         {'history': history, 'epoch': epoch})
-        self.assertEqual(train_hist.train_history_record,
-                         {'history': history, 'epoch': epoch})
+                         history)
+        self.assertEqual(train_hist.train_history,
+                         history)
         
     def test_trigger_exception_history_records(self):
         history = {'val_loss': [2.2513437271118164, 2.1482439041137695, 2.0187528133392334, 1.7953970432281494,
@@ -38,8 +36,7 @@ class TestWrapPrePreparedTrainingHistory(unittest.TestCase):
                    'acc': [0.07999999821186066, 0.33000001311302185, 0.3100000023841858, 0.5299999713897705,
                            0.5799999833106995, 0.6200000047683716, 0.4300000071525574, 0.5099999904632568,
                            0.6700000166893005, 0.7599999904632568]}
-        epoch = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-        train_hist = TrainingHistory(strict_content_check=True).wrap_pre_prepared_history(history, epoch)
+        train_hist = TrainingHistory(strict_content_check=True).wrap_pre_prepared_history(history)
 
         with self.assertRaises(ValueError):
             train_hist.qa_check_history_records()
@@ -57,9 +54,6 @@ class TestTrainingHistory(unittest.TestCase):
 
         th = TrainingHistory()
         self.assertEqual(th.train_history, {'loss': [], 'accumulated_loss': [], 'val_loss': []})
-        self.assertEqual(th.epoch, [])
-        self.assertIsNone(th.train_history_record)
-        self.assertEqual(th.auto_epoch, 'loss')
         self.assertFalse(th.strict_content_check)
         self.assertEqual(th.train_history, th.empty_train_history)
 
@@ -69,89 +63,35 @@ class TestTrainingHistory(unittest.TestCase):
         th.insert_single_result_into_history('loss', 123.4)
         self.assertEqual(th.train_history, {'loss': [123.4], 'accumulated_loss': [], 'val_loss': []})
         self.assertEqual(th.get_train_history_dict(), {'loss': [123.4], 'accumulated_loss': [], 'val_loss': []})
-        self.assertEqual(th.epoch, [])
 
         th.insert_single_result_into_history('loss', 0.443)
         self.assertEqual(th.train_history, {'loss': [123.4, 0.443], 'accumulated_loss': [], 'val_loss': []})
         self.assertEqual(th.get_train_history_dict(), {'loss': [123.4, 0.443], 'accumulated_loss': [], 'val_loss': []})
-        self.assertEqual(th.epoch, [])
 
         th.insert_single_result_into_history('NEW_METRIC', 0.443)
         self.assertEqual(th.train_history,
                          {'loss': [123.4, 0.443], 'accumulated_loss': [], 'val_loss': [], 'NEW_METRIC': [0.443]})
         self.assertEqual(th.get_train_history_dict(),
                          {'loss': [123.4, 0.443], 'accumulated_loss': [], 'val_loss': [], 'NEW_METRIC': [0.443]})
-        self.assertEqual(th.epoch, [])
 
         th.insert_single_result_into_history('NEW_METRIC', 101.2)
         self.assertEqual(th.train_history,
                          {'loss': [123.4, 0.443], 'accumulated_loss': [], 'val_loss': [], 'NEW_METRIC': [0.443, 101.2]})
         self.assertEqual(th.get_train_history_dict(),
                          {'loss': [123.4, 0.443], 'accumulated_loss': [], 'val_loss': [], 'NEW_METRIC': [0.443, 101.2]})
-        self.assertEqual(th.epoch, [])
 
     def test_test_insert_single_result_into_history_epoch_spec(self):
         th = TrainingHistory()
 
-        th.insert_single_result_into_history('loss', 123.4, epoch=1)
-        self.assertEqual(th.epoch, [1])
-
-        th.insert_single_result_into_history('loss', 1223.4, epoch=2)
-        self.assertEqual(th.epoch, [1, 2])
-
-        th.insert_single_result_into_history('loss', 1224443.4, epoch=2)
-        self.assertEqual(th.epoch, [1, 2])
-        self.assertEqual(th.train_history, {'loss': [123.4, 1223.4, 1224443.4], 'accumulated_loss': [], 'val_loss': []})
-        
-        th.insert_single_result_into_history('accumulated_loss', 1224443.4, epoch=2)
-        self.assertEqual(th.epoch, [1, 2])
-
-        # When Epoch is given, main metric discrimination is not looked at anymore
-        th.insert_single_result_into_history('accumulated_loss', 1224443.4, epoch=3)
-        self.assertEqual(th.epoch, [1, 2, 3])
-
-    def test__build_epoch_list(self):
-        th = TrainingHistory()
         th.insert_single_result_into_history('loss', 123.4)
         th.insert_single_result_into_history('loss', 1223.4)
-        th.insert_single_result_into_history('loss', 13323.4)
-
-        self.assertEqual(th._build_epoch_list(), [0, 1, 2])
-        th.insert_single_result_into_history('NEW_METRIC', 13323.4)
-        self.assertEqual(th._build_epoch_list(), [0, 1, 2])
-
-        th_def_epoch = TrainingHistory(auto_epoch='NEW_METRIC')
-        th_def_epoch.insert_single_result_into_history('loss', 123.4)
-        th_def_epoch.insert_single_result_into_history('loss', 1223.4)
-        th_def_epoch.insert_single_result_into_history('loss', 13323.4)
-        th_def_epoch.insert_single_result_into_history('NEW_METRIC', 13323.4)
-        th_def_epoch.insert_single_result_into_history('NEW_METRIC', 133323.4)
-        th_def_epoch.insert_single_result_into_history('loss', 13323.4)
-        self.assertEqual(th_def_epoch._build_epoch_list(), [0, 1])
-
-    def test__build_epoch_list_epoch_spec(self):
-        th = TrainingHistory()
-        th.insert_single_result_into_history('loss', 123.4, epoch=1)
-        th.insert_single_result_into_history('loss', 1223.4, epoch=1)
-        th.insert_single_result_into_history('loss', 13323.4, epoch=2)
-        th.insert_single_result_into_history('loss', 13323.4, epoch=5)
-        th.insert_single_result_into_history('loss', 13323.4, epoch=4)
-        self.assertEqual(th._build_epoch_list(), [1, 2, 5])
-
-        # When Epoch is given, main metric discrimination is not looked at anymore
-        th = TrainingHistory()
-        th.insert_single_result_into_history('loss', 123.4, epoch=1)
-        th.insert_single_result_into_history('loss', 1223.4, epoch=1)
-        th.insert_single_result_into_history('loss', 13323.4, epoch=2)
-        th.insert_single_result_into_history('loss', 13323.4, epoch=5)
-        th.insert_single_result_into_history('loss', 13323.4, epoch=4)
-        # IMPORTANT catch:
-        th.insert_single_result_into_history('NEW_METRIC', 13323.4, epoch=10)
-        self.assertEqual(th._build_epoch_list(), [1, 2, 5, 10])
-        th.insert_single_result_into_history('accumulated_loss', 13323.4, epoch=11)
-        self.assertEqual(th._build_epoch_list(), [1, 2, 5, 10, 11])
-        th.insert_single_result_into_history('loss', 13323.4, epoch=12)
-        self.assertEqual(th._build_epoch_list(), [1, 2, 5, 10, 11, 12])
+        th.insert_single_result_into_history('loss', 1224443.4)
+        self.assertEqual(th.train_history, {'loss': [123.4, 1223.4, 1224443.4], 'accumulated_loss': [], 'val_loss': []})
+        
+        th.insert_single_result_into_history('accumulated_loss', 1224443.4)
+        th.insert_single_result_into_history('accumulated_loss', 1224443.4)
+        self.assertEqual(th.train_history, {'loss': [123.4, 1223.4, 1224443.4],
+                                            'accumulated_loss': [1224443.4, 1224443.4], 'val_loss': []})
 
     def test_get_train_history(self):
         th = TrainingHistory()
@@ -164,53 +104,28 @@ class TestTrainingHistory(unittest.TestCase):
                          {'loss': [123.4, 0.443], 'accumulated_loss': [], 'val_loss': [], 'NEW_METRIC': [0.443, 101.2]})
 
         self.assertEqual(th.get_train_history(),
-                         {'history': {'loss': [123.4, 0.443], 'accumulated_loss': [], 'val_loss': [], 'NEW_METRIC': [0.443, 101.2]},
-                          'epoch': [0, 1]})
+                         {'loss': [123.4, 0.443], 'accumulated_loss': [], 'val_loss': [], 'NEW_METRIC': [0.443, 101.2]})
 
     def test_get_train_history_epoch_spec(self):
         th = TrainingHistory()
 
-        th.insert_single_result_into_history('loss', 123.4, epoch=1)
-        th.insert_single_result_into_history('loss', 0.443, epoch=2)
-        th.insert_single_result_into_history('NEW_METRIC', 0.443, epoch=1)
-        th.insert_single_result_into_history('NEW_METRIC', 101.2, epoch=2)
+        th.insert_single_result_into_history('loss', 123.4)
+        th.insert_single_result_into_history('loss', 0.443)
+        th.insert_single_result_into_history('NEW_METRIC', 0.443)
+        th.insert_single_result_into_history('NEW_METRIC', 101.2)
         self.assertEqual(th.train_history,
                          {'loss': [123.4, 0.443], 'accumulated_loss': [], 'val_loss': [], 'NEW_METRIC': [0.443, 101.2]})
 
         self.assertEqual(th.get_train_history(),
-                         {'history': {'loss': [123.4, 0.443], 'accumulated_loss': [], 'val_loss': [], 'NEW_METRIC': [0.443, 101.2]},
-                          'epoch': [1, 2]})
+                         {'loss': [123.4, 0.443], 'accumulated_loss': [], 'val_loss': [], 'NEW_METRIC': [0.443, 101.2]})
 
     def test_get_train_history_dict(self):
         th = TrainingHistory()
-        th.insert_single_result_into_history('loss', 123.4, epoch=1)
-        th.insert_single_result_into_history('loss', 0.443, epoch=2)
-        th.insert_single_result_into_history('NEW_METRIC', 0.443, epoch=1)
-        th.insert_single_result_into_history('NEW_METRIC', 101.2, epoch=2)
-        self.assertEqual(th.train_history, th.get_train_history_dict())
-
-    def test_get_epoch_list(self):
-        th = TrainingHistory()
         th.insert_single_result_into_history('loss', 123.4)
-        th.insert_single_result_into_history('loss', 1223.4)
-        th.insert_single_result_into_history('loss', 13323.4)
-
-        self.assertEqual(th._build_epoch_list(), [0, 1, 2])
-        self.assertEqual(th.get_epoch_list(), [0, 1, 2])
-        self.assertEqual(th.get_epoch_list(), th._build_epoch_list())
-        th.insert_single_result_into_history('NEW_METRIC', 13323.4)
-        self.assertEqual(th.get_epoch_list(), [0, 1, 2])
-        self.assertEqual(th.get_epoch_list(), th._build_epoch_list())
-
-        th_def_epoch = TrainingHistory(auto_epoch='NEW_METRIC')
-        th_def_epoch.insert_single_result_into_history('loss', 123.4)
-        th_def_epoch.insert_single_result_into_history('loss', 1223.4)
-        th_def_epoch.insert_single_result_into_history('loss', 13323.4)
-        th_def_epoch.insert_single_result_into_history('NEW_METRIC', 13323.4)
-        th_def_epoch.insert_single_result_into_history('NEW_METRIC', 133323.4)
-        th_def_epoch.insert_single_result_into_history('loss', 13323.4)
-        self.assertEqual(th_def_epoch.get_epoch_list(), [0, 1])
-        self.assertEqual(th_def_epoch.get_epoch_list(), th_def_epoch._build_epoch_list())
+        th.insert_single_result_into_history('loss', 0.443)
+        th.insert_single_result_into_history('NEW_METRIC', 0.443)
+        th.insert_single_result_into_history('NEW_METRIC', 101.2)
+        self.assertEqual(th.train_history, th.get_train_history_dict())
 
     def test_str(self):
         th = self._build_dummy_history()
@@ -320,7 +235,7 @@ class TestTrainingHistory(unittest.TestCase):
 
     @staticmethod
     def _build_dummy_history():
-        th = TrainingHistory(auto_epoch='NEW_METRIC')
+        th = TrainingHistory()
         th.insert_single_result_into_history('loss', 123.4)
         th.insert_single_result_into_history('loss', 1223.4)
         th.insert_single_result_into_history('loss', 13323.4)

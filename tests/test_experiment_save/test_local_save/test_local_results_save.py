@@ -28,7 +28,7 @@ class DummyFullResultPackage(AbstractResultPackage):
         AbstractResultPackage.__init__(self, 'dummyFullPkg')
         self.result_dict = result_dict
         self.hyper_params = hyper_params
-        self.training_history = DummyTrainingHistory().wrap_pre_prepared_history(train_hist, [])
+        self.training_history = DummyTrainingHistory().wrap_pre_prepared_history(train_hist)
         self.y_true = [10.0] * 100
         self.y_predicted = [123.4] * 100
 
