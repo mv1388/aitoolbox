@@ -140,6 +140,27 @@ class TerminateOnNaN(AbstractCallback):
                 print(f'Terminating on {self.monitor} = {last_measure} at epoch: {self.train_loop_obj.epoch}.')
 
 
+class AllPredictionsSame(AbstractCallback):
+    def __init__(self, value=0., stop_training=False, verbose=True):
+        AbstractCallback.__init__(self, 'All predictions have the same value')
+        self.value = value
+        self.stop_training = stop_training
+        self.verbose = verbose
+
+    def on_epoch_end(self):
+        _, predictions, _ = self.train_loop_obj.predict_on_validation_set()
+
+        all_values_same = all(el == self.value for el in predictions)
+
+        if all_values_same:
+            if self.verbose:
+                print(f'All the predicted values are of the same value: {self.value}')
+
+            if self.stop_training:
+                print('Executing early stopping')
+                self.train_loop_obj.early_stop = True
+
+
 class ModelCheckpoint(AbstractCallback):
     def __init__(self, project_name, experiment_name, local_model_result_folder_path,
                  args,
