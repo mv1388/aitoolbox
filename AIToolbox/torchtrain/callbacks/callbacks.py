@@ -131,7 +131,7 @@ class TerminateOnNaN(AbstractCallback):
         AbstractCallback.__init__(self, 'TerminateOnNaN', execution_order=98)
         self.monitor = monitor
 
-    def on_batch_end(self):
+    def on_epoch_end(self):
         last_measure = self.train_loop_obj.train_history[self.monitor][-1]
 
         if last_measure is not None:
