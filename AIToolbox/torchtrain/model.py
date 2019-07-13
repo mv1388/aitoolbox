@@ -76,6 +76,9 @@ class ModelWrap:
     def __init__(self, model, batch_model_feed_def):
         """
 
+        NOTE: especially useful in the case when you want to train on multi-GPU where TTFullModel abstract functions
+            can't be used.
+
         Args:
             model (Module): neural network model
             batch_model_feed_def (AIToolbox.torchtrain.batch_model_feed_defs.AbstractModelFeedDefinition or None): data

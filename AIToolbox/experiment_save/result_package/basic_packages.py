@@ -29,8 +29,8 @@ class GeneralResultPackage(AbstractResultPackage):
         results_dict = {}
 
         for metric in self.metrics_list:
-            metric_result_dict = metric(self.y_true, self.y_predicted).get_metric_dict()
-            results_dict = {**results_dict, **metric_result_dict}
+            metric_result = metric(self.y_true, self.y_predicted)
+            results_dict = results_dict + metric_result
             
         return results_dict
 
@@ -65,12 +65,12 @@ class BinaryClassificationResultPackage(AbstractResultPackage):
         Returns:
             dict:
         """
-        accuracy_result = AccuracyMetric(self.y_true, self.y_predicted).get_metric_dict()
-        roc_auc_result = ROCAUCMetric(self.y_true, self.y_predicted).get_metric_dict()
-        pr_auc_result = PrecisionRecallCurveAUCMetric(self.y_true, self.y_predicted).get_metric_dict()
-        f1_score_result = F1ScoreMetric(self.y_true, self.y_predicted).get_metric_dict()
+        accuracy_result = AccuracyMetric(self.y_true, self.y_predicted)
+        roc_auc_result = ROCAUCMetric(self.y_true, self.y_predicted)
+        pr_auc_result = PrecisionRecallCurveAUCMetric(self.y_true, self.y_predicted)
+        f1_score_result = F1ScoreMetric(self.y_true, self.y_predicted)
 
-        return {**accuracy_result, **roc_auc_result, **pr_auc_result, **f1_score_result}
+        return accuracy_result + roc_auc_result + pr_auc_result + f1_score_result
 
 
 class ClassificationResultPackage(AbstractResultPackage):
@@ -95,9 +95,8 @@ class ClassificationResultPackage(AbstractResultPackage):
         accuracy_result = AccuracyMetric(self.y_true, self.y_predicted).get_metric_dict()
 
         # Causing problems in default mode. With proper selection of parameters it could work for multiclass
-        # roc_auc_result = ROCAUCMetric(self.y_true, self.y_predicted).get_metric_dict()
-        # f1_score_result = F1ScoreMetric(self.y_true, self.y_predicted).get_metric_dict()
-        # self.results_dict = {**accuracy_result, **roc_auc_result}
+        # roc_auc_result = ROCAUCMetric(self.y_true, self.y_predicted)
+        # f1_score_result = F1ScoreMetric(self.y_true, self.y_predicted)
 
         return accuracy_result
 
@@ -119,7 +118,7 @@ class RegressionResultPackage(AbstractResultPackage):
         Returns:
             dict:
         """
-        mse_result = MeanSquaredErrorMetric(self.y_true, self.y_predicted).get_metric_dict()
-        mae_result = MeanAbsoluteErrorMetric(self.y_true, self.y_predicted).get_metric_dict()
+        mse_result = MeanSquaredErrorMetric(self.y_true, self.y_predicted)
+        mae_result = MeanAbsoluteErrorMetric(self.y_true, self.y_predicted)
 
-        return {**mse_result, **mae_result}
+        return mse_result + mae_result

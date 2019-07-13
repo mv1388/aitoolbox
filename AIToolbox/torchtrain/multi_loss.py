@@ -32,3 +32,6 @@ class MultiOptimizer:
     def step(self):
         for optimizer in self.optimizer_list:
             optimizer.step()
+
+    def state_dict(self):
+        return [optimizer.state_dict() for optimizer in self.optimizer_list]

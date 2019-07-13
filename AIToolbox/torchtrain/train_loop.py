@@ -11,8 +11,9 @@ from AIToolbox.torchtrain.model import TTFullModel, ModelWrap
 from AIToolbox.torchtrain.multi_loss import MultiOptimizer
 from AIToolbox.torchtrain.data.batch_model_feed_defs import AbstractModelFeedDefinition
 from AIToolbox.torchtrain.callbacks.callback_handler import CallbacksHandler
-from AIToolbox.torchtrain.callbacks.callbacks import ModelCheckpoint, ModelTrainEndSave
+from AIToolbox.torchtrain.callbacks.model_save_callbacks import ModelCheckpoint, ModelTrainEndSave
 from AIToolbox.experiment_save.training_history import TrainingHistory
+from AIToolbox.torchtrain.model_prediction_store import ModelPredictionStore
 from AIToolbox.experiment_save.result_package.abstract_result_packages import AbstractResultPackage
 
 
@@ -55,6 +56,7 @@ class TrainLoop:
         self.epoch = 0
 
         self.train_history = TrainingHistory(has_validation=self.validation_loader is not None)
+        self.prediction_store = ModelPredictionStore(auto_purge=True)
 
         self.callbacks_handler = CallbacksHandler(self)
         self.callbacks = []
@@ -97,7 +99,7 @@ class TrainLoop:
 
         self.callbacks_handler.execute_train_begin()
 
-        for self.epoch in range(num_epoch):
+        for self.epoch in range(self.epoch, num_epoch):
             print('\n\n========================================================================')
             print('========================================================================')
             # print(self.train_history)
@@ -224,29 +226,56 @@ class TrainLoop:
 
         return np.mean(loss_avg, axis=0)
 
-    def predict_on_train_set(self):
+    def predict_on_train_set(self, force_prediction=False):
         """Run train dataset through the network and return true target values, target predictions and metadata
 
+        Args:
+            force_prediction (bool):
+
         Returns:
             (torch.Tensor, torch.Tensor, dict): y_true, y_pred, metadata
         """
-        return self.predict_with_model(self.train_loader)
+        if not self.prediction_store.has_train_predictions(self.epoch) or force_prediction:
+            predictions = self.predict_with_model(self.train_loader)
+            self.prediction_store.insert_train_predictions(predictions, self.epoch)
+        else:
+            predictions = self.prediction_store.get_train_predictions(self.epoch)
 
-    def predict_on_validation_set(self):
+        return predictions
+
+    def predict_on_validation_set(self, force_prediction=False):
         """Run validation dataset through the network and return true target values, target predictions and metadata
 
+        Args:
+            force_prediction (bool):
+
         Returns:
             (torch.Tensor, torch.Tensor, dict): y_true, y_pred, metadata
         """
-        return self.predict_with_model(self.validation_loader)
+        if not self.prediction_store.has_val_predictions(self.epoch) or force_prediction:
+            predictions = self.predict_with_model(self.validation_loader)
+            self.prediction_store.insert_val_predictions(predictions, self.epoch)
+        else:
+            predictions = self.prediction_store.get_val_predictions(self.epoch)
 
-    def predict_on_test_set(self):
+        return predictions
+
+    def predict_on_test_set(self, force_prediction=False):
         """Run test dataset through the network and return true target values, target predictions and metadata
 
+        Args:
+            force_prediction (bool):
+
         Returns:
             (torch.Tensor, torch.Tensor, dict): y_true, y_pred, metadata
         """
-        return self.predict_with_model(self.test_loader)
+        if not self.prediction_store.has_test_predictions(self.epoch) or force_prediction:
+            predictions = self.predict_with_model(self.test_loader)
+            self.prediction_store.insert_test_predictions(predictions, self.epoch)
+        else:
+            predictions = self.prediction_store.get_test_predictions(self.epoch)
+
+        return predictions
 
     def predict_with_model(self, data_loader):
         """Run given dataset through the network and return true target values, target predictions and metadata
@@ -313,6 +342,7 @@ class TrainLoopModelCheckpoint(TrainLoop):
                  train_loader, validation_loader, test_loader,
                  optimizer, criterion,
                  project_name, experiment_name, local_model_result_folder_path,
+                 args,
                  cloud_save_mode='s3', bucket_name='model-result',
                  rm_subopt_local_models=False, num_best_checkpoints_kept=2):
         """TrainLoop with the automatic model check-pointing at the end of each epoch
@@ -328,6 +358,7 @@ class TrainLoopModelCheckpoint(TrainLoop):
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             local_model_result_folder_path (str): root local path where project folder will be created
+            args (dict): used hyper-parameters
             cloud_save_mode (str or None): Storage destination selector.
                 For AWS S3: 's3' / 'aws_s3' / 'aws'
                 For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
@@ -343,11 +374,12 @@ class TrainLoopModelCheckpoint(TrainLoop):
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
+        self.args = args
         self.cloud_save_mode = cloud_save_mode
         self.rm_subopt_local_models = rm_subopt_local_models
 
         self.callbacks_handler.register_callbacks([
-            ModelCheckpoint(self.project_name, self.experiment_name, self.local_model_result_folder_path,
+            ModelCheckpoint(self.project_name, self.experiment_name, self.local_model_result_folder_path, self.args,
                             cloud_save_mode=self.cloud_save_mode, bucket_name=bucket_name,
                             rm_subopt_local_models=self.rm_subopt_local_models,
                             num_best_checkpoints_kept=num_best_checkpoints_kept)
@@ -463,7 +495,7 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
         self.rm_subopt_local_models = rm_subopt_local_models
 
         self.callbacks_handler.register_callbacks([
-            ModelCheckpoint(self.project_name, self.experiment_name, self.local_model_result_folder_path,
+            ModelCheckpoint(self.project_name, self.experiment_name, self.local_model_result_folder_path, self.args,
                             cloud_save_mode=self.cloud_save_mode, bucket_name=bucket_name,
                             rm_subopt_local_models=self.rm_subopt_local_models,
                             num_best_checkpoints_kept=num_best_checkpoints_kept)

@@ -5,7 +5,7 @@ from tests.utils import *
 from AIToolbox.torchtrain.train_loop import TrainLoop, TrainLoopModelCheckpoint, TrainLoopModelEndSave, TrainLoopModelCheckpointEndSave
 from AIToolbox.torchtrain.model import ModelWrap
 from AIToolbox.torchtrain.callbacks.callback_handler import CallbacksHandler
-from AIToolbox.torchtrain.callbacks.callbacks import ModelCheckpoint, ModelTrainEndSave
+from AIToolbox.torchtrain.callbacks.model_save_callbacks import ModelCheckpoint, ModelTrainEndSave
 
 
 class TestTrainLoop(unittest.TestCase):
@@ -303,12 +303,12 @@ class TestTrainLoop(unittest.TestCase):
 
 class TestTrainLoopModelCheckpoint(unittest.TestCase):
     def test_init_values(self):
-        train_loop_non_val = TrainLoopModelCheckpoint(NetUnifiedBatchFeed(), None, None, None, None, None,
-                                                      "project_name", "experiment_name", "local_model_result_folder_path")
+        train_loop_non_val = TrainLoopModelCheckpoint(NetUnifiedBatchFeed(), None, None, None, DummyOptimizer(), None,
+                                                      "project_name", "experiment_name", "local_model_result_folder_path", {})
         self.assertEqual(train_loop_non_val.train_history.train_history, {'loss': [], 'accumulated_loss': []})
 
-        train_loop = TrainLoopModelCheckpoint(NetUnifiedBatchFeed(), None, 100, None, None, None,
-                                              "project_name", "experiment_name", "local_model_result_folder_path")
+        train_loop = TrainLoopModelCheckpoint(NetUnifiedBatchFeed(), None, 100, None, DummyOptimizer(), None,
+                                              "project_name", "experiment_name", "local_model_result_folder_path", {})
         self.assertEqual(train_loop.train_history.train_history, {'loss': [], 'accumulated_loss': [], 'val_loss': []})
 
         self.assertEqual(len(train_loop.callbacks), 1)
@@ -318,17 +318,23 @@ class TestTrainLoopModelCheckpoint(unittest.TestCase):
         self.assertEqual(train_loop.callbacks_handler.train_loop_obj, train_loop)
         self.assertFalse(train_loop.early_stop)
 
+    def test_optimizer_missing_state_dict_exception(self):
+        with self.assertRaises(AttributeError):
+            TrainLoopModelCheckpoint(NetUnifiedBatchFeed(), None, None, None, MiniDummyOptimizer(), None,
+                                     "project_name", "experiment_name",
+                                     "local_model_result_folder_path", {})
+
 
 class TestTrainLoopModelEndSave(unittest.TestCase):
     def test_init_values(self):
-        train_loop_non_val = TrainLoopModelEndSave(NetUnifiedBatchFeed(), None, 100, 100, None, None,
+        train_loop_non_val = TrainLoopModelEndSave(NetUnifiedBatchFeed(), None, 100, 100, DummyOptimizer(), None,
                                                    "project_name", "experiment_name", "local_model_result_folder_path",
                                                    args={}, val_result_package=DummyResultPackage(),
                                                    test_result_package=DummyResultPackage(), cloud_save_mode='s3')
         self.assertEqual(train_loop_non_val.train_history.train_history, {'loss': [], 'accumulated_loss': [], 'val_loss': []})
 
         dummy_result_package = DummyResultPackage()
-        train_loop = TrainLoopModelEndSave(NetUnifiedBatchFeed(), None, 100, None, None, None,
+        train_loop = TrainLoopModelEndSave(NetUnifiedBatchFeed(), None, 100, None, DummyOptimizer(), None,
                                            "project_name", "experiment_name", "local_model_result_folder_path",
                                            args={}, val_result_package=dummy_result_package, cloud_save_mode='s3')
         self.assertEqual(train_loop.train_history.train_history, {'loss': [], 'accumulated_loss': [], 'val_loss': []})
@@ -392,13 +398,13 @@ class TestTrainLoopModelEndSave(unittest.TestCase):
 
 class TestTrainLoopModelCheckpointEndSave(unittest.TestCase):
     def test_init_values(self):
-        train_loop_non_val = TrainLoopModelCheckpointEndSave(NetUnifiedBatchFeed(), None, 100, None, None, None,
+        train_loop_non_val = TrainLoopModelCheckpointEndSave(NetUnifiedBatchFeed(), None, 100, None, DummyOptimizer(), None,
                                                              "project_name", "experiment_name", "local_model_result_folder_path",
                                                              args={}, val_result_package=DummyResultPackage(), cloud_save_mode='s3')
         self.assertEqual(train_loop_non_val.train_history.train_history, {'loss': [], 'accumulated_loss': [], 'val_loss': []})
 
         dummy_result_package = DummyResultPackage()
-        train_loop = TrainLoopModelCheckpointEndSave(NetUnifiedBatchFeed(), None, 100, None, None, None,
+        train_loop = TrainLoopModelCheckpointEndSave(NetUnifiedBatchFeed(), None, 100, None, DummyOptimizer(), None,
                                                      "project_name", "experiment_name", "local_model_result_folder_path",
                                                      args={}, val_result_package=dummy_result_package, cloud_save_mode='s3')
         self.assertEqual(train_loop.train_history.train_history, {'loss': [], 'accumulated_loss': [], 'val_loss': []})
@@ -418,7 +424,7 @@ class TestTrainLoopModelCheckpointEndSave(unittest.TestCase):
     def test_init_val_test_loader_values(self):
         dummy_result_package_val = DummyResultPackage()
         dummy_result_package_test = DummyResultPackage()
-        train_loop = TrainLoopModelCheckpointEndSave(NetUnifiedBatchFeed(), None, 100, 100, None,
+        train_loop = TrainLoopModelCheckpointEndSave(NetUnifiedBatchFeed(), None, 100, 100, DummyOptimizer(),
                                                      None,
                                                      "project_name", "experiment_name",
                                                      "local_model_result_folder_path",
@@ -432,7 +438,7 @@ class TestTrainLoopModelCheckpointEndSave(unittest.TestCase):
 
     def test_callback_registration(self):
         dummy_result_package = DummyResultPackage()
-        train_loop = TrainLoopModelCheckpointEndSave(NetUnifiedBatchFeed(), None, 100, None, None, None,
+        train_loop = TrainLoopModelCheckpointEndSave(NetUnifiedBatchFeed(), None, 100, None, DummyOptimizer(), None,
                                                      "project_name", "experiment_name",
                                                      "local_model_result_folder_path",
                                                      args={}, val_result_package=dummy_result_package, cloud_save_mode='s3')
@@ -455,48 +461,57 @@ class TestTrainLoopModelCheckpointEndSave(unittest.TestCase):
                                    ['Model checkpoint at end of epoch', 'callback_test2', 'Model save at the end of training']):
             self.assertEqual(reg_cb.callback_name, cb_name)
 
+    def test_optimizer_missing_state_dict_exception(self):
+        dummy_result_package = DummyResultPackage()
+
+        with self.assertRaises(AttributeError):
+            TrainLoopModelCheckpointEndSave(NetUnifiedBatchFeed(), None, 100, None, MiniDummyOptimizer(), None,
+                                            "project_name", "experiment_name",
+                                            "local_model_result_folder_path",
+                                            args={}, val_result_package=dummy_result_package, cloud_save_mode='s3')
+
     def test_loader_package_exceptions(self):
         with self.assertRaises(ValueError):
-            train_loop_non_val = TrainLoopModelCheckpointEndSave(NetUnifiedBatchFeed(), None, None, 100, None,
-                                                                 None,
-                                                                 "project_name", "experiment_name",
-                                                                 "local_model_result_folder_path",
-                                                                 args={},
-                                                                 val_result_package=DummyResultPackage(),
-                                                                 test_result_package=DummyResultPackage(),
-                                                                 cloud_save_mode='s3')
+            TrainLoopModelCheckpointEndSave(NetUnifiedBatchFeed(), None, None, 100, DummyOptimizer(),
+                                            None,
+                                            "project_name", "experiment_name",
+                                            "local_model_result_folder_path",
+                                            args={},
+                                            val_result_package=DummyResultPackage(),
+                                            test_result_package=DummyResultPackage(),
+                                            cloud_save_mode='s3')
         with self.assertRaises(ValueError):
-            train_loop_non_val = TrainLoopModelCheckpointEndSave(NetUnifiedBatchFeed(), None, 100, None, None,
-                                                                 None,
-                                                                 "project_name", "experiment_name",
-                                                                 "local_model_result_folder_path",
-                                                                 args={},
-                                                                 val_result_package=DummyResultPackage(),
-                                                                 test_result_package=DummyResultPackage(),
-                                                                 cloud_save_mode='s3')
+            TrainLoopModelCheckpointEndSave(NetUnifiedBatchFeed(), None, 100, None, DummyOptimizer(),
+                                            None,
+                                            "project_name", "experiment_name",
+                                            "local_model_result_folder_path",
+                                            args={},
+                                            val_result_package=DummyResultPackage(),
+                                            test_result_package=DummyResultPackage(),
+                                            cloud_save_mode='s3')
         with self.assertRaises(ValueError):
-            train_loop_non_val = TrainLoopModelCheckpointEndSave(NetUnifiedBatchFeed(), None, 100, None, None,
-                                                                 None,
-                                                                 "project_name", "experiment_name",
-                                                                 "local_model_result_folder_path",
-                                                                 args={},
-                                                                 test_result_package=DummyResultPackage(),
-                                                                 cloud_save_mode='s3')
+            TrainLoopModelCheckpointEndSave(NetUnifiedBatchFeed(), None, 100, None, DummyOptimizer(),
+                                            None,
+                                            "project_name", "experiment_name",
+                                            "local_model_result_folder_path",
+                                            args={},
+                                            test_result_package=DummyResultPackage(),
+                                            cloud_save_mode='s3')
         with self.assertRaises(ValueError):
-            train_loop_non_val = TrainLoopModelCheckpointEndSave(NetUnifiedBatchFeed(), None, None, None, None,
-                                                                 None,
-                                                                 "project_name", "experiment_name",
-                                                                 "local_model_result_folder_path",
-                                                                 args={},
-                                                                 val_result_package=DummyResultPackage(),
-                                                                 test_result_package=DummyResultPackage(),
-                                                                 cloud_save_mode='s3')
+            TrainLoopModelCheckpointEndSave(NetUnifiedBatchFeed(), None, None, None, DummyOptimizer(),
+                                            None,
+                                            "project_name", "experiment_name",
+                                            "local_model_result_folder_path",
+                                            args={},
+                                            val_result_package=DummyResultPackage(),
+                                            test_result_package=DummyResultPackage(),
+                                            cloud_save_mode='s3')
         with self.assertRaises(ValueError):
-            train_loop_non_val = TrainLoopModelCheckpointEndSave(NetUnifiedBatchFeed(), None, 100, 100, None,
-                                                                 None,
-                                                                 "project_name", "experiment_name",
-                                                                 "local_model_result_folder_path",
-                                                                 args={},
-                                                                 val_result_package=None,
-                                                                 test_result_package=None,
-                                                                 cloud_save_mode='s3')
+            TrainLoopModelCheckpointEndSave(NetUnifiedBatchFeed(), None, 100, 100, DummyOptimizer(),
+                                            None,
+                                            "project_name", "experiment_name",
+                                            "local_model_result_folder_path",
+                                            args={},
+                                            val_result_package=None,
+                                            test_result_package=None,
+                                            cloud_save_mode='s3')

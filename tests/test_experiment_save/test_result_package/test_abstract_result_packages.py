@@ -20,8 +20,7 @@ class TestAbstractResultPackage(unittest.TestCase):
                    'acc': [0.07999999821186066, 0.33000001311302185, 0.3100000023841858, 0.5299999713897705,
                            0.5799999833106995, 0.6200000047683716, 0.4300000071525574, 0.5099999904632568,
                            0.6700000166893005, 0.7599999904632568]}
-        epoch = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-        train_hist = TrainingHistory().wrap_pre_prepared_history(history, epoch)
+        train_hist = TrainingHistory().wrap_pre_prepared_history(history)
         result_pkg = DummyResultPackageExtend()
         result_pkg.prepare_result_package([10] * 100, [11] * 100, {}, train_hist)
 
@@ -112,8 +111,7 @@ class TestAbstractResultPackage(unittest.TestCase):
                    'acc': [0.07999999821186066, 0.33000001311302185, 0.3100000023841858, 0.5299999713897705,
                            0.5799999833106995, 0.6200000047683716, 0.4300000071525574, 0.5099999904632568,
                            0.6700000166893005, 0.7599999904632568]}
-        epoch = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-        train_hist = TrainingHistory().wrap_pre_prepared_history(history, epoch)
+        train_hist = TrainingHistory().wrap_pre_prepared_history(history)
         return train_hist
 
     def test_combine_packages(self):
@@ -338,8 +336,7 @@ class TestMultipleResultPackageWrapper(unittest.TestCase):
                    'acc': [0.07999999821186066, 0.33000001311302185, 0.3100000023841858, 0.5299999713897705,
                            0.5799999833106995, 0.6200000047683716, 0.4300000071525574, 0.5099999904632568,
                            0.6700000166893005, 0.7599999904632568]}
-        epoch = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-        train_hist = TrainingHistory().wrap_pre_prepared_history(history, epoch)
+        train_hist = TrainingHistory().wrap_pre_prepared_history(history)
         return train_hist
 
     def test_basic(self):

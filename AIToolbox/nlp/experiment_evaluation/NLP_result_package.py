@@ -132,10 +132,7 @@ class QuestionAnswerSpanClassificationResultPackage(AbstractResultPackage):
         span_end_accuracy = AccuracyMetric(y_span_end_true, y_span_end_predicted)
         span_end_accuracy.metric_name += '_span_end'
 
-        span_start_accuracy_result = span_start_accuracy.get_metric_dict()
-        span_end_accuracy_result = span_end_accuracy.get_metric_dict()
-
-        return {**span_start_accuracy_result, **span_end_accuracy_result}
+        return span_start_accuracy + span_end_accuracy
 
 
 class TextSummarizationResultPackage(AbstractResultPackage):
@@ -209,12 +206,12 @@ class MachineTranslationResultPackage(AbstractResultPackage):
         self.y_predicted_text = [self.target_vocab.convert_idx_sent2sent(sent, rm_default_tokens=True) for sent in self.y_predicted]
 
         bleu_avg_sent = BLEUSentenceScoreMetric(self.y_true_text, self.y_predicted_text,
-                                                self.source_sents, self.output_text_dir).get_metric_dict()
-        bleu_corpus_result = BLEUCorpusScoreMetric(self.y_true_text, self.y_predicted_text).get_metric_dict()
-        # bleu_perl_result = BLEUScoreStrTorchNLPMetric(self.y_true_text, self.y_predicted_text).get_metric_dict()
-        # perplexity_result = PerplexityMetric(self.y_true_text, self.y_predicted_text).get_metric_dict()
+                                                self.source_sents, self.output_text_dir)
+        bleu_corpus_result = BLEUCorpusScoreMetric(self.y_true_text, self.y_predicted_text)
+        # bleu_perl_result = BLEUScoreStrTorchNLPMetric(self.y_true_text, self.y_predicted_text)
+        # perplexity_result = PerplexityMetric(self.y_true_text, self.y_predicted_text)
 
-        results_dict = {**bleu_corpus_result, **bleu_avg_sent}
+        results_dict = bleu_corpus_result + bleu_avg_sent
 
         # Don't include TrainLoop objects inside the package - it makes it useful only for PyTorch, not other frameworks
         if self.output_attn_heatmap_dir is not None:
@@ -228,8 +225,7 @@ class MachineTranslationResultPackage(AbstractResultPackage):
             attn_heatmap_metric = AttentionHeatMap(self.attention_matrices, source_sent_text, self.y_predicted_text,
                                                    self.output_attn_heatmap_dir)
 
-            attn_heatmap_plot_paths = attn_heatmap_metric.get_metric_dict()
-            results_dict = {**results_dict, **attn_heatmap_plot_paths}
+            results_dict = results_dict + attn_heatmap_metric
 
         return results_dict
 

@@ -1,5 +1,4 @@
 import unittest
-import os
 from AIToolbox.nlp.dataset.SQuAD2.SQuAD2DataReader import *
 
 
@@ -18,7 +17,7 @@ class TestDataset_SQuAD2ConcatContextDatasetReader(unittest.TestCase):
 
         data, vocab = reader.read()
 
-        self.assertEqual(vocab.num_words, 245740)
+        self.assertEqual(vocab.num_words, 20096)
         self.assertEqual(len(data), 5928)
         self.assertTrue(all([len(span) == 2 for _, _, span, _ in data]))
 
