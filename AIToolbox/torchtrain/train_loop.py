@@ -237,7 +237,7 @@ class TrainLoop:
         """
         if not self.prediction_store.has_train_predictions(self.epoch) or force_prediction:
             predictions = self.predict_with_model(self.train_loader)
-            self.prediction_store.insert_train_predictions(predictions, self.epoch)
+            self.prediction_store.insert_train_predictions(predictions, self.epoch, force_prediction)
         else:
             predictions = self.prediction_store.get_train_predictions(self.epoch)
 
@@ -254,7 +254,7 @@ class TrainLoop:
         """
         if not self.prediction_store.has_val_predictions(self.epoch) or force_prediction:
             predictions = self.predict_with_model(self.validation_loader)
-            self.prediction_store.insert_val_predictions(predictions, self.epoch)
+            self.prediction_store.insert_val_predictions(predictions, self.epoch, force_prediction)
         else:
             predictions = self.prediction_store.get_val_predictions(self.epoch)
 
@@ -271,7 +271,7 @@ class TrainLoop:
         """
         if not self.prediction_store.has_test_predictions(self.epoch) or force_prediction:
             predictions = self.predict_with_model(self.test_loader)
-            self.prediction_store.insert_test_predictions(predictions, self.epoch)
+            self.prediction_store.insert_test_predictions(predictions, self.epoch, force_prediction)
         else:
             predictions = self.prediction_store.get_test_predictions(self.epoch)
 

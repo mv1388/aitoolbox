@@ -300,6 +300,59 @@ class TestTrainLoop(unittest.TestCase):
                           'train_end_test_loss': [1.0],
                           'test_metric_1': [10.11, 100.11], 'test_metric_2': [40.11, 400.11]})
 
+    def test_prediction_store_caching(self):
+        def eval_predictions(data_loader, y_test, y_pred, metadata, offset=0):
+            r = []
+            for i in range(1, len(data_loader) + 1):
+                r += [i + offset] * 64
+            r2 = []
+            for i in range(1, len(data_loader) + 1):
+                r2 += [i + offset + 100] * 64
+            self.assertEqual(y_test.tolist(), r)
+            self.assertEqual(y_pred.tolist(), r2)
+
+            d = {'bla': []}
+            for i in range(1, len(data_loader) + 1):
+                d['bla'] += [i + offset + 200] * 64
+            self.assertEqual(metadata, d)
+
+        dummy_optimizer = DummyOptimizer()
+        dummy_train_loader = list(range(4))
+        dummy_val_loader = list(range(3))
+        dummy_test_loader = list(range(2))
+
+        model = Net()
+        dummy_feed_def = DeactivateModelFeedDefinition()
+        model_wrap = ModelWrap(model=model, batch_model_feed_def=dummy_feed_def)
+
+        train_loop = TrainLoop(model_wrap, dummy_train_loader, dummy_val_loader, dummy_test_loader,
+                               dummy_optimizer, None)
+
+        y_test, y_pred, metadata = train_loop.predict_on_train_set()
+        eval_predictions(dummy_train_loader, y_test, y_pred, metadata)
+
+        # even though we changed to test loader we still get the predictions from the train loader as the predictions
+        # are not calculated again but are taken from the store.
+        train_loop.train_loader = dummy_test_loader
+        y_test_store, y_pred_store, metadata_store = train_loop.predict_on_train_set()
+        eval_predictions(dummy_train_loader, y_test_store, y_pred_store, metadata_store)
+
+        y_test_store, y_pred_store, metadata_store = train_loop.predict_on_train_set(force_prediction=True)
+        eval_predictions(dummy_test_loader, y_test_store, y_pred_store, metadata_store, offset=3+1)
+
+        y_test_test, y_pred_test, metadata = train_loop.predict_on_test_set()
+        eval_predictions(dummy_test_loader, y_test_test, y_pred_test, metadata, offset=4+2)
+
+        self.assertEqual(list(train_loop.prediction_store.prediction_store.keys()),
+                         ['epoch', 'train_pred', 'test_pred'])
+        self.assertEqual(train_loop.prediction_store.prediction_store['epoch'], 0)
+
+        # Test store purge
+        train_loop.epoch += 1
+        y_test, y_pred, metadata = train_loop.predict_on_validation_set()
+        self.assertEqual(train_loop.prediction_store.prediction_store['epoch'], 1)
+        self.assertEqual(list(train_loop.prediction_store.prediction_store.keys()), ['epoch', 'val_pred'])
+
 
 class TestTrainLoopModelCheckpoint(unittest.TestCase):
     def test_init_values(self):

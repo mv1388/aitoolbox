@@ -10,53 +10,56 @@ class ModelPredictionStore:
 
         self.prediction_store = {'epoch': 0}
 
-    def insert_train_predictions(self, predictions, epoch):
+    def insert_train_predictions(self, predictions, epoch, force_prediction=False):
         """
 
         Args:
             predictions (tuple):
             epoch (int):
+            force_prediction (bool):
 
         Returns:
             None
         """
         self.auto_purge(epoch)
 
-        if not self.has_train_predictions(epoch):
+        if not self.has_train_predictions(epoch) or force_prediction:
             self.prediction_store['train_pred'] = predictions
         else:
             raise ValueError
 
-    def insert_val_predictions(self, predictions, epoch):
+    def insert_val_predictions(self, predictions, epoch, force_prediction=False):
         """
 
         Args:
             predictions (tuple):
             epoch (int):
+            force_prediction (bool):
 
         Returns:
             None
         """
         self.auto_purge(epoch)
 
-        if not self.has_val_predictions(epoch):
+        if not self.has_val_predictions(epoch) or force_prediction:
             self.prediction_store['val_pred'] = predictions
         else:
             raise ValueError
 
-    def insert_test_predictions(self, predictions, epoch):
+    def insert_test_predictions(self, predictions, epoch, force_prediction=False):
         """
 
         Args:
             predictions (tuple):
             epoch (int):
+            force_prediction (bool):
 
         Returns:
             None
         """
         self.auto_purge(epoch)
 
-        if not self.has_test_predictions(epoch):
+        if not self.has_test_predictions(epoch) or force_prediction:
             self.prediction_store['test_pred'] = predictions
         else:
             raise ValueError
