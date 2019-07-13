@@ -11,7 +11,7 @@ from AIToolbox.experiment_save.result_reporting.report_generator import Training
 
 class ModelPerformanceEvaluation(AbstractCallback):
     def __init__(self, result_package, args,
-                 on_each_epoch=True, on_train_data=False, on_val_data=True,
+                 on_each_epoch=True, on_train_data=False, on_val_data=True, eval_frequency=None,
                  if_available_output_to_project_dir=True):
         """Track performance metrics from result_package and store them into TrainLoop's history
 
@@ -27,6 +27,8 @@ class ModelPerformanceEvaluation(AbstractCallback):
             on_each_epoch (bool): calculate performance results just at the end of training or at the end of each epoch
             on_train_data (bool):
             on_val_data (bool):
+            eval_frequency (int or None): evaluation is done every specified number of epochs. Useful when predictions
+                are quite expensive and are slowing down the overall training
             if_available_output_to_project_dir (bool): if using train loop version which builds project local folder
                 structure for saving checkpoints or creation of end of training reports, by setting
                 if_available_output_to_project_dir to True the potential additional metadata result outputs from the
@@ -43,6 +45,7 @@ class ModelPerformanceEvaluation(AbstractCallback):
         self.on_each_epoch = on_each_epoch
         self.on_train_data = on_train_data
         self.on_val_data = on_val_data
+        self.eval_frequency = eval_frequency
         self.if_available_output_to_project_dir = if_available_output_to_project_dir
 
         if not on_train_data and not on_val_data:
@@ -57,8 +60,13 @@ class ModelPerformanceEvaluation(AbstractCallback):
 
     def on_epoch_end(self):
         if self.on_each_epoch:
-            self.evaluate_model_performance()
-            self.store_evaluated_metrics_to_history()
+            if self.eval_frequency is None or \
+                    (self.eval_frequency is not None and self.train_loop_obj.epoch % self.eval_frequency == 0):
+                self.evaluate_model_performance()
+                self.store_evaluated_metrics_to_history()
+            else:
+                print(f'Skipping performance evaluation on this epoch ({self.train_loop_obj.epoch}). '
+                      f'Evaluating every {self.eval_frequency} epochs.')
 
     def evaluate_model_performance(self):
         """Calculate performance based on the provided result packages
@@ -117,7 +125,8 @@ class ModelPerformanceEvaluation(AbstractCallback):
 
 
 class ModelPerformancePrintReport(AbstractCallback):
-    def __init__(self, metrics, on_each_epoch=True, strict_metric_reporting=True, list_tracked_metrics=False):
+    def __init__(self, metrics, on_each_epoch=True, report_frequency=None,
+                 strict_metric_reporting=True, list_tracked_metrics=False):
         """Print the model performance to the console
 
         Best used in combination with the callback which actually calculates some performance evaluation metrics, such
@@ -130,6 +139,8 @@ class ModelPerformancePrintReport(AbstractCallback):
         Args:
             metrics (list): list of string metric names which should be presented in the printed report
             on_each_epoch (bool): present results just at the end of training or at the end of each epoch
+            report_frequency (int or None): evaluation is done every specified number of epochs. Useful when predictions
+                are quite expensive and are slowing down the overall training
             strict_metric_reporting (bool): if False ignore missing metric in the TrainLoop.train_history, if True, in
                 case of missing metric throw and exception and thus interrupt the training loop
             list_tracked_metrics (bool):
@@ -137,6 +148,7 @@ class ModelPerformancePrintReport(AbstractCallback):
         AbstractCallback.__init__(self, 'Model performance print reporter')
         self.metrics = metrics
         self.on_each_epoch = on_each_epoch
+        self.report_frequency = report_frequency
         self.strict_metric_reporting = strict_metric_reporting
         self.list_tracked_metrics = list_tracked_metrics
 
@@ -149,8 +161,10 @@ class ModelPerformancePrintReport(AbstractCallback):
 
     def on_epoch_end(self):
         if self.on_each_epoch:
-            print('------------  End of epoch performance report  ------------')
-            self.print_performance_report()
+            if self.report_frequency is None or \
+                    (self.report_frequency is not None and self.train_loop_obj.epoch % self.report_frequency == 0):
+                print('------------  End of epoch performance report  ------------')
+                self.print_performance_report()
 
     def print_performance_report(self, prefix=''):
         """Print the model performance
