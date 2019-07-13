@@ -148,11 +148,9 @@ class ModelPredictionStore:
         Returns:
             None
         """
-        if self.do_auto_purge and epoch == self.prediction_store['epoch'] + 1:
+        if self.do_auto_purge and epoch > self.prediction_store['epoch']:
             print('Auto purging prediction store')
             self.purge_prediction_store()
-        elif epoch > self.prediction_store['epoch'] + 1:
-            raise ValueError
 
     def purge_prediction_store(self):
         self.prediction_store = {'epoch': self.prediction_store['epoch'] + 1}
