@@ -44,7 +44,7 @@ class Vocabulary:
             None
         """
         for word in sentence_tokens:
-            self.add_word(str(word))
+            self.add_word(word.text)
 
     def add_word(self, word):
         """
