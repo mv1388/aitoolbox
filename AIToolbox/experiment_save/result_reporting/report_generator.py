@@ -56,7 +56,7 @@ class TrainingHistoryPlotter:
         fig.set_size_inches(10, 8)
         
         ax = sns.lineplot(x=list(range(len(result_history))), y=result_history,
-                          markers=True)
+                          markers='o')
 
         ax.set_xlabel("Epoch", size=10)
         ax.set_ylabel(metric_name, size=10)
