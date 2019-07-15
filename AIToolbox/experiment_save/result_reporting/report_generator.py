@@ -1,6 +1,8 @@
 import os
 import seaborn as sns
 import matplotlib.pyplot as plt
+import matplotlib.style as style
+style.use('ggplot')
 
 
 class TrainingHistoryPlotter:
@@ -53,10 +55,12 @@ class TrainingHistoryPlotter:
         fig = plt.figure()
         fig.set_size_inches(10, 8)
         
-        ax = sns.lineplot(x=list(range(len(result_history))), y=result_history)
+        ax = sns.lineplot(x=list(range(len(result_history))), y=result_history,
+                          markers=True)
 
         ax.set_xlabel("Epoch", size=10)
         ax.set_ylabel(metric_name, size=10)
+        ax.set_title(metric_name, size=10)
 
         fig.savefig(file_path)
         return file_name, file_path
