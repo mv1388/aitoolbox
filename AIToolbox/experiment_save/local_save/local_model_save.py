@@ -10,7 +10,7 @@ class AbstractLocalModelSaver(ABC):
         """
         
         Args:
-            model (keras.engine.training.Model):
+            model (keras.engine.training.Model or dict):
             project_name (str):
             experiment_name (str):
             experiment_timestamp (str or None):

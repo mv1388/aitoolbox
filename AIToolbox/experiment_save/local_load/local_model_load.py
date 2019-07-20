@@ -10,9 +10,10 @@ class AbstractLocalModelLoader(ABC):
         """
 
         Args:
-            model_name:
-            project_name:
-            experiment_name:
+            model_name (str):
+            project_name (str):
+            experiment_name (str):
+            **kwargs:
 
         Returns:
 
@@ -25,7 +26,7 @@ class PyTorchLocalModelLoader(AbstractLocalModelLoader):
         """
 
         Args:
-            local_model_result_folder_path:
+            local_model_result_folder_path (str):
         """
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
         self.model_load = None
@@ -34,10 +35,10 @@ class PyTorchLocalModelLoader(AbstractLocalModelLoader):
         """
 
         Args:
-            model_name:
-            project_name:
-            experiment_name:
-            map_location:
+            model_name (str):
+            project_name (str):
+            experiment_name (str):
+            map_location (str or None):
 
         Returns:
 
@@ -72,7 +73,7 @@ class PyTorchLocalModelLoader(AbstractLocalModelLoader):
 
         Args:
             optimizer:
-            device:
+            device (str):
 
         Returns:
 
