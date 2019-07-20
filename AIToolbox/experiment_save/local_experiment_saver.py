@@ -32,7 +32,7 @@ class BaseFullExperimentLocalSaver(AbstractExperimentSaver):
         """
 
         Args:
-            model (torch.nn.modules.Module):
+            model (dict or keras.engine.training.Model):
             result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
             experiment_timestamp (str):
             save_true_pred_labels (bool):
@@ -45,14 +45,13 @@ class BaseFullExperimentLocalSaver(AbstractExperimentSaver):
         if experiment_timestamp is None:
             experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
 
-        _, _, model_local_path, model_weights_local_path = \
-            self.model_saver.save_model(model=model,
-                                        project_name=self.project_name,
-                                        experiment_name=self.experiment_name,
-                                        experiment_timestamp=experiment_timestamp,
-                                        protect_existing_folder=protect_existing_folder)
+        _, model_local_path = self.model_saver.save_model(model=model,
+                                                          project_name=self.project_name,
+                                                          experiment_name=self.experiment_name,
+                                                          experiment_timestamp=experiment_timestamp,
+                                                          protect_existing_folder=protect_existing_folder)
 
-        saved_paths = [model_local_path, model_weights_local_path]
+        saved_paths = [model_local_path]
 
         if not separate_files:
             saved_local_results_details = \

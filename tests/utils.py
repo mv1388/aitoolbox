@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from AIToolbox.torchtrain.batch_model_feed_defs import AbstractModelFeedDefinition
+from AIToolbox.torchtrain.data.batch_model_feed_defs import AbstractModelFeedDefinition
 from AIToolbox.torchtrain.callbacks.callbacks import AbstractCallback
 from AIToolbox.experiment_save.result_package.abstract_result_packages import AbstractResultPackage
 from AIToolbox.experiment_save.core_metrics.abstract_metric import AbstractBaseMetric
@@ -191,6 +191,18 @@ class DummyBatch:
         return 1.
 
 
+class MiniDummyOptimizer:
+    def __init__(self):
+        self.zero_grad_ctr = 0
+        self.step_ctr = 0
+
+    def zero_grad(self):
+        self.zero_grad_ctr += 1
+
+    def step(self):
+        self.step_ctr += 1
+
+
 class DummyOptimizer:
     def __init__(self):
         self.zero_grad_ctr = 0
@@ -201,6 +213,9 @@ class DummyOptimizer:
     
     def step(self):
         self.step_ctr += 1
+
+    def state_dict(self):
+        print('In state_dict')
 
 
 class DummyResultPackage(AbstractResultPackage):

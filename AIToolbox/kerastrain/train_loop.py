@@ -28,6 +28,8 @@ class TrainLoop:
         self.criterion = criterion
         self.metrics = metrics
 
+        self.model.compile(optimizer=self.optimizer, loss=self.criterion, metrics=self.metrics)
+
         self.train_loader = train_loader
         self.x_train, self.y_train = train_loader if train_loader is not None and not self.is_generator(train_loader) else (None, None)
 
@@ -72,7 +74,6 @@ class TrainLoop:
             keras.engine.training.Model:
         """
         self.callbacks_handler.register_callbacks(callbacks)
-        self.model.compile(optimizer=self.optimizer, loss=self.criterion, metrics=self.metrics)
 
         if not self.is_generator(self.train_loader):
             self.train_history = self.model.fit(x=self.x_train, y=self.y_train,

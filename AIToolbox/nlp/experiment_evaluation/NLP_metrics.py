@@ -135,7 +135,8 @@ class ROUGEPerlMetric(AbstractBaseMetric):
         os.mkdir(os.path.join(output_text_dir, 'pred_answer'))
 
         for i, text in enumerate(true_text):
-            with open(os.path.join(output_text_dir, f'true_answer/true_answer_text.{i}.txt'), 'w') as f:
+            # TODO: Encoding setting not tested yet
+            with open(os.path.join(output_text_dir, f'true_answer/true_answer_text.{i}.txt'), 'w', encoding='utf-8') as f:
                 # Default regex cleaners: (r'<.*?>', r'[^a-zA-Z0-9.?! ]+')
                 if target_actual_text:
                     text_clean = [text]
@@ -144,7 +145,8 @@ class ROUGEPerlMetric(AbstractBaseMetric):
                 f.write(' '.join(text_clean))
 
         for i, text in enumerate(pred_text):
-            with open(os.path.join(output_text_dir, f'pred_answer/pred_answer_text.{i}.txt'), 'w') as f:
+            # TODO: Encoding setting not tested yet
+            with open(os.path.join(output_text_dir, f'pred_answer/pred_answer_text.{i}.txt'), 'w', encoding='utf-8') as f:
                 # Default regex cleaners: (r'<.*?>', r'[^a-zA-Z0-9.?! ]+')
                 text_clean = ROUGEPerlMetric.regex_clean_text(text, output_text_cleaning_regex)
                 f.write(' '.join(text_clean) if len(text_clean) > 0 else ' ')
@@ -236,7 +238,7 @@ class BLEUSentenceScoreMetric(AbstractBaseMetric):
 
         for i, (source, pred_transl, true_transl, bleu_result) in enumerate(zip(source_sents, pred_translations,
                                                                                 true_translations, sentence_bleu_results)):
-            with open(os.path.join(output_text_dir, f'transl_{i}.txt'), 'w') as f:
+            with open(os.path.join(output_text_dir, f'transl_{i}.txt'), 'w', encoding='utf-8') as f:
                 f.write(f'Source:\t{source}\n')
                 f.write(f'Predicted:\t{pred_transl}\n')
                 f.write(f'True:\t{true_transl}\n')

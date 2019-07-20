@@ -2,10 +2,13 @@ from abc import ABC, abstractmethod
 import torch.nn as nn
 from torch.nn.modules import Module
 
-from AIToolbox.torchtrain.batch_model_feed_defs import AbstractModelFeedDefinition
+from AIToolbox.torchtrain.data.batch_model_feed_defs import AbstractModelFeedDefinition
 
 
 class TTFullModel(nn.Module, ABC):
+    """
+    TT in TTFullModel --> TorchTrain Full Model
+    """
     @abstractmethod
     def get_loss(self, batch_data, criterion, device):
         """Get loss during training stage
@@ -72,6 +75,9 @@ class TTForwardModel(TTFullModel):
 class ModelWrap:
     def __init__(self, model, batch_model_feed_def):
         """
+
+        NOTE: especially useful in the case when you want to train on multi-GPU where TTFullModel abstract functions
+            can't be used.
 
         Args:
             model (Module): neural network model

@@ -7,10 +7,7 @@ from AIToolbox.nlp.dataset.SQuAD2.SQuAD2DataReader import SQuAD2ConcatContextDat
 from AIToolbox.torchtrain.data.dataset import BasicDataset as SQuAD2Dataset
 from AIToolbox.nlp.dataset.torch_collate_fns import qa_concat_ctx_span_collate_fn
 
-from AIToolbox.torchtrain.train_loop import TrainLoopModelCheckpointEndSave
-from AIToolbox.torchtrain.callbacks.performance_eval_callbacks import ModelPerformanceEvaluation, \
-    ModelPerformancePrintReport, ModelTrainHistoryPlot
-from AIToolbox.torchtrain.callbacks.train_schedule_callbacks import ReduceLROnPlateauScheduler
+from AIToolbox.torchtrain.model_predict import PyTorchModelPredictor
 from AIToolbox.nlp.experiment_evaluation.NLP_result_package import QuestionAnswerResultPackage
 
 from AIToolbox.nlp.models.torch.unified_qa_model import UnifiedQABasicRNN
@@ -71,55 +68,14 @@ used_args = {'batch_size': 100, 'hidden_size': 50, 'ctx_n_layers': 1, 'qus_n_lay
              'dev_mode_size': 2, 'lr': 0.001, 'num_epoch': 2}
 
 
-qa_result_pkg_cp = QuestionAnswerResultPackage([paragraph_tokens for paragraph_tokens, _, _, _ in data_dev],
-                                               target_actual_text=[paragraph_text for _, _, _, paragraph_text in data_dev],
-                                               output_text_dir='tempData_checkpoint_callback'
-                                               )
-
-callbacks = [ModelPerformanceEvaluation(qa_result_pkg_cp, used_args,
-                                                on_each_epoch=True,
-                                                on_train_data=False, on_val_data=True),
-             ModelPerformancePrintReport(['val_ROGUE'],
-                                                 on_each_epoch=False, list_tracked_metrics=True),
-             ReduceLROnPlateauScheduler(threshold=0.1, patience=2, verbose=True),
-             ModelTrainHistoryPlot(epoch_end=True)
-             ]
-
-
-print('Starting train loop')
-
-# TrainLoop(model,
-#           train_loader, dev_loader,
-#           QASpanSQuADModelFeedDefinition(), optimizer, criterion)(num_epoch=30, callbacks=callbacks)
-
-
-# qa_result_pkg = QuestionAnswerResultPackage([paragraph_tokens for paragraph_tokens, _, _ in data_dev],
-#                                             '~/project/model_results/tempData')
-
-# TrainLoopModelCheckpointEndSave(model, train_loader, dev_loader, QASpanSQuADModelFeedDefinition(), optimizer, criterion,
-#                                 project_name='fullQAModelRunTest',
-#                                 experiment_name='MemoryNetPytorchTest',
-#                                 local_model_result_folder_path='~/project/model_results',
-#                                 args={},
-#                                 result_package=qa_result_pkg)(num_epoch=3, callbacks=callbacks)
-
-
-qa_result_pkg_final = QuestionAnswerResultPackage([paragraph_tokens for paragraph_tokens, _, _, _ in data_dev],
-                                                  target_actual_text=[paragraph_text for _, _, _, paragraph_text in data_dev],
-                                                  output_text_dir='tempData_final_val'
-                                                  )
+print('Starting model evaluation')
 
 qa_res_test_pkg_fin = QuestionAnswerResultPackage([paragraph_tokens for paragraph_tokens, _, _, _ in data_test],
                                                   target_actual_text=[paragraph_text for _, _, _, paragraph_text in data_test],
                                                   output_text_dir='tempData_final_test'
                                                   )
 
-TrainLoopModelCheckpointEndSave(model, train_loader, dev_loader, test_loader, optimizer, criterion,
-                                project_name='unifiedModelExample',
-                                experiment_name='MemoryNetPytorchTest',
-                                local_model_result_folder_path=f'{project_folder_prefix}/model_results',
-                                args=used_args,
-                                val_result_package=qa_result_pkg_final,
-                                test_result_package=qa_res_test_pkg_fin)\
-    (num_epoch=5, callbacks=callbacks)
-
+PyTorchModelPredictor(model, test_loader).evaluate_model(qa_res_test_pkg_fin,
+                                                         project_name='model_predictor_example',
+                                                         experiment_name='MemoryNetPytorchTest',
+                                                         local_model_result_folder_path=f'{project_folder_prefix}/model_results')

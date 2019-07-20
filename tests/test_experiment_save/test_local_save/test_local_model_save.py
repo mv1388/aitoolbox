@@ -1,16 +1,11 @@
 import unittest
 import random
-import os
-import datetime
-import time
 import shutil
 
 from tests.utils import *
 
 from AIToolbox.experiment_save.local_save.local_model_save import *
 from AIToolbox.torchtrain.train_loop import TrainLoop
-from AIToolbox.torchtrain.batch_model_feed_defs import ImageClassificationFeedDefinition
-
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -219,30 +214,27 @@ class TestPyTorchLocalModelSaver(unittest.TestCase):
         exp_dir_name = 'experimentSubDirPT'
         current_time = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
         model_name_true = f'model_{exp_dir_name}_{current_time}_E{epoch}.pth'
-        model_weights_name_true = f'modelWeights_{exp_dir_name}_{current_time}_E{epoch}.pth'
         
         project_path = os.path.join(THIS_DIR, project_dir_name)
         exp_path = os.path.join(project_path, f'{exp_dir_name}_{current_time}')
         model_path = os.path.join(exp_path, 'checkpoint_model' if checkpoint_model else 'model')
 
         model_file_path = os.path.join(model_path, model_name_true)
-        model_weights_file_path = os.path.join(model_path, model_weights_name_true)
-        
+
+        model_checkpoint = {'model_state_dict': model.state_dict(), 'optimizer_state_dict': None,
+                            'epoch': 10, 'args': {}}
         saver = PyTorchLocalModelSaver(local_model_result_folder_path=THIS_DIR, checkpoint_model=checkpoint_model)
-        paths = saver.save_model(model, project_dir_name, exp_dir_name, current_time, epoch)
-        model_name, model_weights_name, model_local_path, model_weights_local_path = paths
+        paths = saver.save_model(model_checkpoint, project_dir_name, exp_dir_name, current_time, epoch)
+        model_name, model_local_path = paths
 
         self.assertTrue(os.path.exists(project_path))
         self.assertTrue(os.path.exists(exp_path))
         self.assertTrue(os.path.exists(model_path))
 
         self.assertTrue(os.path.exists(model_file_path))
-        self.assertTrue(os.path.exists(model_weights_file_path))
 
         self.assertEqual(model_name_true, model_name)
-        self.assertEqual(model_weights_name_true, model_weights_name)
         self.assertEqual(model_file_path, model_local_path)
-        self.assertEqual(model_weights_file_path, model_weights_local_path)
 
         if os.path.exists(project_path):
             shutil.rmtree(project_path)
@@ -265,30 +257,25 @@ class TestKerasLocalModelSaver(unittest.TestCase):
         exp_dir_name = 'experimentSubDirPT'
         current_time = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
         model_name_true = f'model_{exp_dir_name}_{current_time}_E{epoch}.h5'
-        model_weights_name_true = f'modelWeights_{exp_dir_name}_{current_time}_E{epoch}.h5'
 
         project_path = os.path.join(THIS_DIR, project_dir_name)
         exp_path = os.path.join(project_path, f'{exp_dir_name}_{current_time}')
         model_path = os.path.join(exp_path, 'checkpoint_model' if checkpoint_model else 'model')
 
         model_file_path = os.path.join(model_path, model_name_true)
-        model_weights_file_path = os.path.join(model_path, model_weights_name_true)
 
         saver = KerasLocalModelSaver(local_model_result_folder_path=THIS_DIR, checkpoint_model=checkpoint_model)
         paths = saver.save_model(model, project_dir_name, exp_dir_name, current_time, epoch)
-        model_name, model_weights_name, model_local_path, model_weights_local_path = paths
+        model_name, model_local_path = paths
 
         self.assertTrue(os.path.exists(project_path))
         self.assertTrue(os.path.exists(exp_path))
         self.assertTrue(os.path.exists(model_path))
 
         self.assertTrue(os.path.exists(model_file_path))
-        self.assertTrue(os.path.exists(model_weights_file_path))
 
         self.assertEqual(model_name_true, model_name)
-        self.assertEqual(model_weights_name_true, model_weights_name)
         self.assertEqual(model_file_path, model_local_path)
-        self.assertEqual(model_weights_file_path, model_weights_local_path)
 
         if os.path.exists(project_path):
             shutil.rmtree(project_path)
