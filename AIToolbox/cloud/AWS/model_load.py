@@ -1,7 +1,7 @@
 import os
 
 from AIToolbox.cloud.AWS.data_access import BaseDataFetcher
-from AIToolbox.experiment_save.local_load.local_model_load import PyTorchLocalModelLoader
+from AIToolbox.experiment_save.local_load.local_model_load import AbstractLocalModelLoader, PyTorchLocalModelLoader
 
 
 class BaseModelLoader(BaseDataFetcher):
@@ -11,7 +11,7 @@ class BaseModelLoader(BaseDataFetcher):
         """
 
         Args:
-            local_model_loader (AIToolbox.experiment_save.local_load.local_model_load.AbstractLocalModelLoader):
+            local_model_loader (AbstractLocalModelLoader):
             project_name (str):
             experiment_folder (str):
             model_save_dir (str):
@@ -29,6 +29,9 @@ class BaseModelLoader(BaseDataFetcher):
         self.local_model_folder_path = os.path.join(self.local_base_data_folder_path, self.pretrained_model_dir)
 
         self.local_model_loader = local_model_loader
+
+        if not isinstance(local_model_loader, AbstractLocalModelLoader):
+            raise TypeError('Provided local_model_loader is not inherited from AbstractLocalModelLoader as required.')
 
     def load_model(self, model_name, **kwargs):
         """
