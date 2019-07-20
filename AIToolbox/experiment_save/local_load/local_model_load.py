@@ -6,7 +6,7 @@ import torch
 
 class AbstractLocalModelLoader(ABC):
     @abstractmethod
-    def load_model(self, model_name, project_name, experiment_name):
+    def load_model(self, model_name, project_name, experiment_name, **kwargs):
         """
 
         Args:
