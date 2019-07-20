@@ -27,7 +27,7 @@ class PyTorchLocalModelLoader(AbstractLocalModelLoader):
         Args:
             local_model_result_folder_path:
         """
-        self.local_model_result_folder_path = local_model_result_folder_path
+        self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
         self.model_load = None
 
     def load_model(self, model_name, project_name, experiment_name, map_location=None):
