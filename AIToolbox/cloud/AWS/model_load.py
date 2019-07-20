@@ -56,6 +56,6 @@ class PyTorchS3ModelLoader(BaseModelLoader):
         local_model_file_path = os.path.join(self.local_data_folder_path, model_name)
 
         # TODO: add smart loading... if model is already downloaded, skip file_fetch
-        # self.fetch_file(cloud_model_file_path, local_model_file_path)
+        self.fetch_file(cloud_model_file_path, local_model_file_path)
 
         return self.local_model_loader.load_model(model_name, self.project_name, self.experiment_name, map_location)
