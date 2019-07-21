@@ -1,8 +1,8 @@
 import unittest
 
 from tests.utils import *
-from AIToolbox.experiment_save.training_history import TrainingHistory
-from AIToolbox.experiment_save.result_package.abstract_result_packages import AbstractResultPackage, \
+from AIToolbox.experiment.training_history import TrainingHistory
+from AIToolbox.experiment.result_package.abstract_result_packages import AbstractResultPackage, \
     MultipleResultPackageWrapper, PreCalculatedResultPackage
 
 

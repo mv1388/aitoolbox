@@ -77,7 +77,7 @@ class EarlyStopping(AbstractCallback):
         """Early stopping of the training if the performance stops improving
 
         Args:
-            monitor (str): performance measure that is tracked to decide if performance is  improving during training
+            monitor (str): performance measure that is tracked to decide if performance is improving during training
             min_delta (float): by how much the performance has to improve to still keep training the model
             patience (int): how many epochs the early stopper waits after the performance stopped improving
         """
@@ -125,7 +125,7 @@ class TerminateOnNaN(AbstractCallback):
         """
 
         Args:
-            monitor (str):
+            monitor (str): performance measure that is tracked to decide if performance is improving during training
         """
         AbstractCallback.__init__(self, 'TerminateOnNaN', execution_order=98)
         self.monitor = monitor
@@ -141,6 +141,13 @@ class TerminateOnNaN(AbstractCallback):
 
 class AllPredictionsSame(AbstractCallback):
     def __init__(self, value=0., stop_training=False, verbose=True):
+        """
+
+        Args:
+            value (float): all predictions are the same as this value
+            stop_training (bool): if all predictions match the specified value, should the training be (early) stopped
+            verbose (bool): output messages
+        """
         AbstractCallback.__init__(self, 'All predictions have the same value')
         self.value = value
         self.stop_training = stop_training

@@ -7,32 +7,18 @@ import zipfile
 import tarfile
 
 
-class AbstractDatasetFetcher(ABC):
-    @abstractmethod
-    def fetch_dataset(self, protect_local_folder=True):
-        """
-        
-        Args:
-            protect_local_folder (bool):
-
-        Returns:
-            None
-        """
-        pass
-
-
-class BaseDatasetFetcher:
-    def __init__(self, bucket_name='dataset-store', local_dataset_folder_path='~/project/data'):
+class BaseDataFetcher:
+    def __init__(self, bucket_name='dataset-store', local_base_data_folder_path='~/project/data'):
         """
 
         Args:
             bucket_name (str):
-            local_dataset_folder_path (str):
+            local_base_data_folder_path (str):
         """
         self.bucket_name = bucket_name
         self.s3 = boto3.resource('s3')
 
-        self.local_dataset_folder_path = os.path.expanduser(local_dataset_folder_path)
+        self.local_base_data_folder_path = os.path.expanduser(local_base_data_folder_path)
         self.available_prepocessed_datasets = []
 
     def fetch_file(self, cloud_file_path, local_file_path):
@@ -59,25 +45,27 @@ class BaseDatasetFetcher:
                 else:
                     raise
 
-    def exists_local_dataset_folder(self, dataset_name, protect_local_folder=True):
-        """
+    def exists_local_data_folder(self, data_folder_name, protect_local_folder=True):
+        """Check if a specific folder exists in the base data folder
+
+        For example, Squad dataset folder inside /data folder, or pretrained_models folder inside /model_results folder
 
         Args:
-            dataset_name (str):
+            data_folder_name (str):
             protect_local_folder (bool):
 
         Returns:
             bool:
         """
-        if os.path.exists(os.path.join(self.local_dataset_folder_path, dataset_name)) and protect_local_folder:
+        if os.path.exists(os.path.join(self.local_base_data_folder_path, data_folder_name)) and protect_local_folder:
             print('Local folder exists and protect_local_folder in True: leaving local folder as it is.')
             return True
 
-        if os.path.exists(os.path.join(self.local_dataset_folder_path, dataset_name)) and not protect_local_folder:
+        if os.path.exists(os.path.join(self.local_base_data_folder_path, data_folder_name)) and not protect_local_folder:
             print('Local folder exists and protect_local_folder in False: deleting local folder copy')
-            shutil.rmtree(os.path.join(self.local_dataset_folder_path, dataset_name))
+            shutil.rmtree(os.path.join(self.local_base_data_folder_path, data_folder_name))
 
-        os.mkdir(os.path.join(self.local_dataset_folder_path, dataset_name))
+        os.mkdir(os.path.join(self.local_base_data_folder_path, data_folder_name))
         return False
 
     def preproc_dataset_available(self, preproc_dataset_name):
@@ -99,7 +87,21 @@ class BaseDatasetFetcher:
                 zip_ref.extractall(target_dir_path)
 
 
-class SQuAD2DatasetFetcher(AbstractDatasetFetcher, BaseDatasetFetcher):
+class AbstractDatasetFetcher(ABC):
+    @abstractmethod
+    def fetch_dataset(self, protect_local_folder=True):
+        """
+
+        Args:
+            protect_local_folder (bool):
+
+        Returns:
+            None
+        """
+        pass
+
+
+class SQuAD2DatasetFetcher(AbstractDatasetFetcher, BaseDataFetcher):
     def __init__(self, bucket_name='dataset-store', local_dataset_folder_path='~/project/data'):
         """
 
@@ -107,7 +109,7 @@ class SQuAD2DatasetFetcher(AbstractDatasetFetcher, BaseDatasetFetcher):
             bucket_name (str):
             local_dataset_folder_path (str):
         """
-        BaseDatasetFetcher.__init__(self, bucket_name, local_dataset_folder_path)
+        BaseDataFetcher.__init__(self, bucket_name, local_dataset_folder_path)
 
     def fetch_dataset(self, protect_local_folder=True):
         """
@@ -118,14 +120,14 @@ class SQuAD2DatasetFetcher(AbstractDatasetFetcher, BaseDatasetFetcher):
         Returns:
             None
         """
-        if not self.exists_local_dataset_folder('SQuAD2', protect_local_folder):
+        if not self.exists_local_data_folder('SQuAD2', protect_local_folder):
             self.fetch_file(cloud_file_path='SQuAD2/train-v2.0.json',
-                            local_file_path=os.path.join(self.local_dataset_folder_path, 'SQuAD2', 'train-v2.0.json'))
+                            local_file_path=os.path.join(self.local_base_data_folder_path, 'SQuAD2', 'train-v2.0.json'))
             self.fetch_file(cloud_file_path='SQuAD2/dev-v2.0.json',
-                            local_file_path=os.path.join(self.local_dataset_folder_path, 'SQuAD2', 'dev-v2.0.json'))
+                            local_file_path=os.path.join(self.local_base_data_folder_path, 'SQuAD2', 'dev-v2.0.json'))
 
 
-class QAngarooDatasetFetcher(AbstractDatasetFetcher, BaseDatasetFetcher):
+class QAngarooDatasetFetcher(AbstractDatasetFetcher, BaseDataFetcher):
     def __init__(self, bucket_name='dataset-store', local_dataset_folder_path='~/project/data'):
         """
 
@@ -133,7 +135,7 @@ class QAngarooDatasetFetcher(AbstractDatasetFetcher, BaseDatasetFetcher):
             bucket_name (str):
             local_dataset_folder_path (str):
         """
-        BaseDatasetFetcher.__init__(self, bucket_name, local_dataset_folder_path)
+        BaseDataFetcher.__init__(self, bucket_name, local_dataset_folder_path)
 
     def fetch_dataset(self, protect_local_folder=True):
         """
@@ -144,9 +146,9 @@ class QAngarooDatasetFetcher(AbstractDatasetFetcher, BaseDatasetFetcher):
         Returns:
             None
         """
-        if not self.exists_local_dataset_folder('qangaroo_v1', protect_local_folder):
-            medhop_local_folder_path = os.path.join(self.local_dataset_folder_path, 'qangaroo_v1')
-            wikihop_local_folder_path = os.path.join(self.local_dataset_folder_path, 'qangaroo_v1')
+        if not self.exists_local_data_folder('qangaroo_v1', protect_local_folder):
+            medhop_local_folder_path = os.path.join(self.local_base_data_folder_path, 'qangaroo_v1')
+            wikihop_local_folder_path = os.path.join(self.local_base_data_folder_path, 'qangaroo_v1')
             medhop_local_file_path = os.path.join(medhop_local_folder_path, 'medhop.zip')
             wikihop_local_file_path = os.path.join(wikihop_local_folder_path, 'wikihop.zip')
             self.fetch_file(cloud_file_path='qangaroo_v1/medhop.zip',
@@ -157,7 +159,7 @@ class QAngarooDatasetFetcher(AbstractDatasetFetcher, BaseDatasetFetcher):
             self.unzip_file(wikihop_local_file_path, wikihop_local_folder_path)
 
 
-class CNNDailyMailDatasetFetcher(AbstractDatasetFetcher, BaseDatasetFetcher):
+class CNNDailyMailDatasetFetcher(AbstractDatasetFetcher, BaseDataFetcher):
     def __init__(self, bucket_name='dataset-store', local_dataset_folder_path='~/project/data'):
         """
 
@@ -165,7 +167,7 @@ class CNNDailyMailDatasetFetcher(AbstractDatasetFetcher, BaseDatasetFetcher):
             bucket_name (str):
             local_dataset_folder_path (str):
         """
-        BaseDatasetFetcher.__init__(self, bucket_name, local_dataset_folder_path)
+        BaseDataFetcher.__init__(self, bucket_name, local_dataset_folder_path)
         self.available_prepocessed_datasets = ['abisee', 'danqi']
 
     def fetch_dataset(self, protect_local_folder=True):
@@ -195,9 +197,9 @@ class CNNDailyMailDatasetFetcher(AbstractDatasetFetcher, BaseDatasetFetcher):
             raise ValueError('Preprocessing name not available. Select: abisee / danqi')
 
         if preprocess_name == 'abisee':
-            if not self.exists_local_dataset_folder('cnn-dailymail-abisee', protect_local_folder):
-                cnn_local_folder_path = os.path.join(self.local_dataset_folder_path, 'cnn-dailymail-abisee')
-                dm_local_folder_path = os.path.join(self.local_dataset_folder_path, 'cnn-dailymail-abisee')
+            if not self.exists_local_data_folder('cnn-dailymail-abisee', protect_local_folder):
+                cnn_local_folder_path = os.path.join(self.local_base_data_folder_path, 'cnn-dailymail-abisee')
+                dm_local_folder_path = os.path.join(self.local_base_data_folder_path, 'cnn-dailymail-abisee')
                 cnn_local_file_path = os.path.join(cnn_local_folder_path, 'cnn_stories_tokenized.zip')
                 dm_local_file_path = os.path.join(dm_local_folder_path, 'dm_stories_tokenized.zip')
 
@@ -209,9 +211,9 @@ class CNNDailyMailDatasetFetcher(AbstractDatasetFetcher, BaseDatasetFetcher):
                 self.unzip_file(dm_local_file_path, dm_local_folder_path)
 
         elif preprocess_name == 'danqi':
-            if not self.exists_local_dataset_folder('cnn-dailymail-danqi', protect_local_folder):
-                cnn_local_folder_path = os.path.join(self.local_dataset_folder_path, 'cnn-dailymail-danqi')
-                dm_local_folder_path = os.path.join(self.local_dataset_folder_path, 'cnn-dailymail-danqi')
+            if not self.exists_local_data_folder('cnn-dailymail-danqi', protect_local_folder):
+                cnn_local_folder_path = os.path.join(self.local_base_data_folder_path, 'cnn-dailymail-danqi')
+                dm_local_folder_path = os.path.join(self.local_base_data_folder_path, 'cnn-dailymail-danqi')
                 cnn_local_file_path = os.path.join(cnn_local_folder_path, 'cnn.tar.gz')
                 dm_local_file_path = os.path.join(dm_local_folder_path, 'dailymail.tar.gz')
 
@@ -223,7 +225,7 @@ class CNNDailyMailDatasetFetcher(AbstractDatasetFetcher, BaseDatasetFetcher):
                 self.unzip_file(dm_local_file_path, dm_local_folder_path)
 
 
-class HotpotQADatasetFetcher(AbstractDatasetFetcher, BaseDatasetFetcher):
+class HotpotQADatasetFetcher(AbstractDatasetFetcher, BaseDataFetcher):
     def __init__(self, bucket_name='dataset-store', local_dataset_folder_path='~/project/data'):
         """
 
@@ -237,7 +239,7 @@ class HotpotQADatasetFetcher(AbstractDatasetFetcher, BaseDatasetFetcher):
             bucket_name (str):
             local_dataset_folder_path (str):
         """
-        BaseDatasetFetcher.__init__(self, bucket_name, local_dataset_folder_path)
+        BaseDataFetcher.__init__(self, bucket_name, local_dataset_folder_path)
 
     def fetch_dataset(self, protect_local_folder=True):
         """
@@ -248,8 +250,8 @@ class HotpotQADatasetFetcher(AbstractDatasetFetcher, BaseDatasetFetcher):
         Returns:
             None
         """
-        if not self.exists_local_dataset_folder('HotpotQA', protect_local_folder):
-            hotpotqa_local_folder_path = os.path.join(self.local_dataset_folder_path, 'HotpotQA')
+        if not self.exists_local_data_folder('HotpotQA', protect_local_folder):
+            hotpotqa_local_folder_path = os.path.join(self.local_base_data_folder_path, 'HotpotQA')
             hotpotqa_local_file_path = os.path.join(hotpotqa_local_folder_path, 'HotpotQA.zip')
             self.fetch_file(cloud_file_path='HotpotQA/HotpotQA.zip',
                             local_file_path=hotpotqa_local_file_path)

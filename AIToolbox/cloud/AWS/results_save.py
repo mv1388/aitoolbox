@@ -4,7 +4,7 @@ import os
 import time
 import datetime
 
-from AIToolbox.experiment_save.local_save.local_results_save import LocalResultsSaver
+from AIToolbox.experiment.local_save.local_results_save import LocalResultsSaver
 
 
 class AbstractResultsSaver(ABC):

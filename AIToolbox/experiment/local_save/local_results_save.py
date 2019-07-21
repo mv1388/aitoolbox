@@ -5,7 +5,7 @@ import datetime
 import pickle
 import json
 
-from AIToolbox.experiment_save.result_reporting.report_generator import TrainingHistoryPlotter
+from AIToolbox.experiment.result_reporting.report_generator import TrainingHistoryPlotter
 
 
 class AbstractLocalResultsSaver(ABC):

@@ -1,4 +1,4 @@
-from AIToolbox.experiment_save.core_metrics.abstract_metric import AbstractBaseMetric
+from AIToolbox.experiment.core_metrics.abstract_metric import AbstractBaseMetric
 
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 

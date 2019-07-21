@@ -5,7 +5,7 @@ import matplotlib.gridspec as gridspec
 from matplotlib.font_manager import FontProperties
 import seaborn as sns
 
-from AIToolbox.experiment_save.core_metrics.abstract_metric import AbstractBaseMetric
+from AIToolbox.experiment.core_metrics.abstract_metric import AbstractBaseMetric
 
 
 class AttentionHeatMap(AbstractBaseMetric):
