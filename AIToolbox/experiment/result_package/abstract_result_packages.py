@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 import shutil
 import numpy as np
 
-from AIToolbox.experiment_save.training_history import TrainingHistory
+from AIToolbox.experiment.training_history import TrainingHistory
 
 
 class AbstractResultPackage(ABC):
@@ -292,7 +292,7 @@ class AbstractResultPackage(ABC):
             other (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage or dict):
 
         Returns:
-            AIToolbox.experiment_save.result_package.MultipleResultPackageWrapper:
+            AIToolbox.experiment.result_package.MultipleResultPackageWrapper:
         """
         return self.add_merge_multi_pkg_wrap(other)
 
@@ -303,7 +303,7 @@ class AbstractResultPackage(ABC):
             other (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage or dict):
 
         Returns:
-            AIToolbox.experiment_save.result_package.MultipleResultPackageWrapper:
+            AIToolbox.experiment.result_package.MultipleResultPackageWrapper:
         """
         return self.add_merge_multi_pkg_wrap(other)
 
@@ -458,9 +458,9 @@ class MultipleResultPackageWrapper(AbstractResultPackage):
 
         Args:
             result_packages (list): list of result packages where each of them is object inherited from
-                AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage.
+                AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.
                 If you want to add raw results in dict form, this dict first needs to be wrapped into
-                AIToolbox.experiment_save.result_package.abstract_result_packages.PreCalculatedResultPackage to satisfy
+                AIToolbox.experiment.result_package.abstract_result_packages.PreCalculatedResultPackage to satisfy
                 the result package object requirement.
             hyperparameters (dict or None):
             training_history (AIToolbox.ExperimentSave.training_history.TrainingHistory):

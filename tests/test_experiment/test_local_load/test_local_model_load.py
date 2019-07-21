@@ -4,8 +4,8 @@ import shutil
 
 from tests.utils import *
 
-from AIToolbox.experiment_save.local_load.local_model_load import PyTorchLocalModelLoader
-from AIToolbox.experiment_save.local_save.local_model_save import PyTorchLocalModelSaver
+from AIToolbox.experiment.local_load.local_model_load import PyTorchLocalModelLoader
+from AIToolbox.experiment.local_save.local_model_save import PyTorchLocalModelSaver
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
