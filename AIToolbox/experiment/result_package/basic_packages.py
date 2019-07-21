@@ -1,8 +1,8 @@
-from AIToolbox.experiment_save.result_package.abstract_result_packages import AbstractResultPackage
-from AIToolbox.experiment_save.core_metrics.abstract_metric import AbstractBaseMetric
-from AIToolbox.experiment_save.core_metrics.classification import AccuracyMetric, ROCAUCMetric, \
+from AIToolbox.experiment.result_package.abstract_result_packages import AbstractResultPackage
+from AIToolbox.experiment.core_metrics.abstract_metric import AbstractBaseMetric
+from AIToolbox.experiment.core_metrics.classification import AccuracyMetric, ROCAUCMetric, \
     PrecisionRecallCurveAUCMetric, F1ScoreMetric
-from AIToolbox.experiment_save.core_metrics.regression import MeanSquaredErrorMetric, MeanAbsoluteErrorMetric
+from AIToolbox.experiment.core_metrics.regression import MeanSquaredErrorMetric, MeanAbsoluteErrorMetric
 
 
 class GeneralResultPackage(AbstractResultPackage):
@@ -11,7 +11,7 @@ class GeneralResultPackage(AbstractResultPackage):
 
         Args:
             metrics_list (list): List of objects which are inherited from
-                AIToolbox.experiment_save.core_metrics.BaseMetric.AbstractBaseMetric
+                AIToolbox.experiment.core_metrics.BaseMetric.AbstractBaseMetric
             strict_content_check (bool):
             **kwargs (dict):
         """

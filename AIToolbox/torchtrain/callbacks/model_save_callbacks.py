@@ -2,11 +2,11 @@ import os
 
 from AIToolbox.cloud.AWS.model_save import PyTorchS3ModelSaver
 from AIToolbox.cloud.GoogleCloud.model_save import PyTorchGoogleStorageModelSaver
-from AIToolbox.experiment_save.experiment_saver import FullPyTorchExperimentS3Saver, \
+from AIToolbox.experiment.experiment_saver import FullPyTorchExperimentS3Saver, \
     FullPyTorchExperimentGoogleStorageSaver
-from AIToolbox.experiment_save.local_experiment_saver import FullPyTorchExperimentLocalSaver
-from AIToolbox.experiment_save.local_save.local_model_save import LocalSubOptimalModelRemover, PyTorchLocalModelSaver
-from AIToolbox.experiment_save.result_package.abstract_result_packages import AbstractResultPackage
+from AIToolbox.experiment.local_experiment_saver import FullPyTorchExperimentLocalSaver
+from AIToolbox.experiment.local_save.local_model_save import LocalSubOptimalModelRemover, PyTorchLocalModelSaver
+from AIToolbox.experiment.result_package.abstract_result_packages import AbstractResultPackage
 from AIToolbox.torchtrain.callbacks.callbacks import AbstractCallback
 from AIToolbox.utils import util
 

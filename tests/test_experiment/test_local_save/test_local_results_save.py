@@ -7,9 +7,9 @@ import shutil
 import pickle
 import json
 
-from AIToolbox.experiment_save.local_save.local_results_save import *
-from AIToolbox.experiment_save.result_package.abstract_result_packages import AbstractResultPackage
-from AIToolbox.experiment_save.training_history import TrainingHistory
+from AIToolbox.experiment.local_save.local_results_save import *
+from AIToolbox.experiment.result_package.abstract_result_packages import AbstractResultPackage
+from AIToolbox.experiment.training_history import TrainingHistory
 
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))

@@ -8,7 +8,7 @@ from keras.layers import Conv2D, MaxPooling2D
 import os
 
 from AIToolbox.kerastrain.train_loop import TrainLoop, TrainLoopModelCheckpointEndSave
-from AIToolbox.experiment_save.result_package.basic_packages import ClassificationResultPackage
+from AIToolbox.experiment.result_package.basic_packages import ClassificationResultPackage
 
 
 batch_size = 32

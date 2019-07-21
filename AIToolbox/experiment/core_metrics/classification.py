@@ -1,7 +1,7 @@
 import numpy as np
 from sklearn.metrics import roc_auc_score, precision_recall_curve, auc, accuracy_score, f1_score, precision_score, recall_score
 
-from AIToolbox.experiment_save.core_metrics.abstract_metric import AbstractBaseMetric
+from AIToolbox.experiment.core_metrics.abstract_metric import AbstractBaseMetric
 
 
 class AccuracyMetric(AbstractBaseMetric):

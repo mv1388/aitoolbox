@@ -12,9 +12,9 @@ from AIToolbox.torchtrain.multi_loss import MultiOptimizer
 from AIToolbox.torchtrain.data.batch_model_feed_defs import AbstractModelFeedDefinition
 from AIToolbox.torchtrain.callbacks.callback_handler import CallbacksHandler
 from AIToolbox.torchtrain.callbacks.model_save_callbacks import ModelCheckpoint, ModelTrainEndSave
-from AIToolbox.experiment_save.training_history import TrainingHistory
+from AIToolbox.experiment.training_history import TrainingHistory
 from AIToolbox.torchtrain.model_prediction_store import ModelPredictionStore
-from AIToolbox.experiment_save.result_package.abstract_result_packages import AbstractResultPackage
+from AIToolbox.experiment.result_package.abstract_result_packages import AbstractResultPackage
 
 
 class TrainLoop:

@@ -7,7 +7,7 @@ from rouge import Rouge
 from nltk.translate.bleu_score import sentence_bleu, corpus_bleu
 from torchnlp.metrics import bleu
 
-from AIToolbox.experiment_save.core_metrics.abstract_metric import AbstractBaseMetric
+from AIToolbox.experiment.core_metrics.abstract_metric import AbstractBaseMetric
 
 
 class ROUGEMetric(AbstractBaseMetric):

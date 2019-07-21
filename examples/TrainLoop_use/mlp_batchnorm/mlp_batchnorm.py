@@ -10,7 +10,7 @@ import torch.nn as nn
 from AIToolbox.torchtrain.model import TTFullModel
 from AIToolbox.torchtrain.train_loop import TrainLoop
 from AIToolbox.torchtrain.callbacks.performance_eval_callbacks import ModelPerformanceEvaluation, ModelPerformancePrintReport
-from AIToolbox.experiment_save.result_package.basic_packages import ClassificationResultPackage
+from AIToolbox.experiment.result_package.basic_packages import ClassificationResultPackage
 
 
 if torch.cuda.is_available():
