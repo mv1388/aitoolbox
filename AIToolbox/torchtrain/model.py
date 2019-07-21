@@ -81,7 +81,7 @@ class ModelWrap:
 
         Args:
             model (Module): neural network model
-            batch_model_feed_def (AIToolbox.torchtrain.batch_model_feed_defs.AbstractModelFeedDefinition or None): data
+            batch_model_feed_def (AbstractModelFeedDefinition or None): data
                 prep definition for batched data. This definition prepares the data for each batch that gets than fed
                 into the neural network.
         """

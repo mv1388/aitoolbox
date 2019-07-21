@@ -14,7 +14,7 @@ Further use of this library is more targeted towards PyTorch training. It offers
 By using different implemented derivations of `TrainLoop`, the automatic model checkpoint and performance evaluation report saving or end of training saving can be achieved. Furthermore, saved models and evaluation reports will also be automatically uploaded to AWS S3.  
 
 
-## experiment_save
+## experiment
 
 ### Result Package
 
