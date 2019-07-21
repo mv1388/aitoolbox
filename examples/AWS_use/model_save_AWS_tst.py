@@ -10,8 +10,8 @@ import random
 
 from AIToolbox.cloud.AWS.model_save import KerasS3ModelSaver
 from AIToolbox.cloud.AWS.results_save import S3ResultsSaver
-from AIToolbox.experiment_save.result_package.basic_packages import ClassificationResultPackage
-from AIToolbox.experiment_save.training_history import TrainingHistory
+from AIToolbox.experiment.result_package.basic_packages import ClassificationResultPackage
+from AIToolbox.experiment.training_history import TrainingHistory
 
 
 class RepeatVector4D(layers.Layer):

@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from AIToolbox.torchtrain.train_loop import TrainLoop
 from AIToolbox.cloud.AWS.results_save import S3ResultsSaver
 from AIToolbox.cloud.GoogleCloud.results_save import GoogleStorageResultsSaver
-from AIToolbox.experiment_save.local_save.local_results_save import LocalResultsSaver
+from AIToolbox.experiment.local_save.local_results_save import LocalResultsSaver
 
 
 class AbstractModelPredictor(ABC):
@@ -119,7 +119,7 @@ class PyTorchModelPredictor(AbstractModelPredictor):
             return_result_package (bool):
 
         Returns:
-            AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage or dict:
+            AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or dict:
         """
         y_test, y_pred, additional_results = self.train_loop.predict_on_test_set()
 
@@ -164,7 +164,7 @@ class PyTorchModelPredictor(AbstractModelPredictor):
             return_metric (bool):
 
         Returns:
-            AIToolbox.experiment_save.core_metrics.abstract_metric.AbstractBaseMetric or dict:
+            AIToolbox.experiment.core_metrics.abstract_metric.AbstractBaseMetric or dict:
         """
         y_test, y_pred, additional_results = self.train_loop.predict_on_test_set()
 

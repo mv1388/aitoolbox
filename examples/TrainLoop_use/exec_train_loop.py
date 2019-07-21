@@ -10,7 +10,7 @@ from AIToolbox.torchtrain.train_loop import TrainLoop
 from AIToolbox.torchtrain.model import ModelWrap
 from AIToolbox.torchtrain.data.batch_model_feed_defs import AbstractModelFeedDefinition
 from AIToolbox.torchtrain.callbacks.performance_eval_callbacks import ModelPerformanceEvaluation, ModelPerformancePrintReport
-from AIToolbox.experiment_save.result_package.basic_packages import ClassificationResultPackage
+from AIToolbox.experiment.result_package.basic_packages import ClassificationResultPackage
 
 
 class Net(nn.Module):

@@ -4,9 +4,9 @@ import os
 from AIToolbox.torchtrain.callbacks.callbacks import AbstractCallback
 from AIToolbox.cloud.AWS.results_save import BaseResultsSaver as BaseResultsS3Saver
 from AIToolbox.cloud.GoogleCloud.results_save import BaseResultsGoogleStorageSaver
-from AIToolbox.experiment_save.local_save.local_results_save import BaseLocalResultsSaver
-from AIToolbox.experiment_save.result_package.abstract_result_packages import PreCalculatedResultPackage as EmptyResultPackage
-from AIToolbox.experiment_save.result_reporting.report_generator import TrainingHistoryPlotter
+from AIToolbox.experiment.local_save.local_results_save import BaseLocalResultsSaver
+from AIToolbox.experiment.result_package.abstract_result_packages import PreCalculatedResultPackage as EmptyResultPackage
+from AIToolbox.experiment.result_reporting.report_generator import TrainingHistoryPlotter
 
 
 class ModelPerformanceEvaluation(AbstractCallback):

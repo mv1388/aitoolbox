@@ -1,7 +1,7 @@
 import os
 
 from AIToolbox.cloud.AWS.data_access import BaseDataFetcher
-from AIToolbox.experiment_save.local_load.local_model_load import AbstractLocalModelLoader, PyTorchLocalModelLoader
+from AIToolbox.experiment.local_load.local_model_load import AbstractLocalModelLoader, PyTorchLocalModelLoader
 
 
 class BaseModelLoader(BaseDataFetcher):

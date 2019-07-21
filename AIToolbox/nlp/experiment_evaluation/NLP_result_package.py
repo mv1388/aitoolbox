@@ -1,9 +1,9 @@
 import os
 
 from AIToolbox.utils import dict_util
-from AIToolbox.experiment_save.local_save.local_results_save import BaseLocalResultsSaver
-from AIToolbox.experiment_save.result_package.abstract_result_packages import AbstractResultPackage
-from AIToolbox.experiment_save.core_metrics.classification import AccuracyMetric
+from AIToolbox.experiment.local_save.local_results_save import BaseLocalResultsSaver
+from AIToolbox.experiment.result_package.abstract_result_packages import AbstractResultPackage
+from AIToolbox.experiment.core_metrics.classification import AccuracyMetric
 from AIToolbox.nlp.experiment_evaluation.NLP_metrics import ROUGEMetric, ROUGEPerlMetric, \
     BLEUSentenceScoreMetric, BLEUCorpusScoreMetric, BLEUScoreStrTorchNLPMetric, PerplexityMetric
 from AIToolbox.nlp.experiment_evaluation.attention_heatmap import AttentionHeatMap

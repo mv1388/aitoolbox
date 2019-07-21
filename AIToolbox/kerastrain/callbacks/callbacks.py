@@ -3,10 +3,10 @@ from keras.callbacks import Callback
 
 from AIToolbox.cloud.AWS.model_save import KerasS3ModelSaver
 from AIToolbox.cloud.GoogleCloud.model_save import KerasGoogleStorageModelSaver
-from AIToolbox.experiment_save.local_save.local_model_save import KerasLocalModelSaver, LocalSubOptimalModelRemover
-from AIToolbox.experiment_save.experiment_saver import FullKerasExperimentS3Saver, FullKerasExperimentGoogleStorageSaver
-from AIToolbox.experiment_save.local_experiment_saver import FullKerasExperimentLocalSaver
-from AIToolbox.experiment_save.training_history import TrainingHistory
+from AIToolbox.experiment.local_save.local_model_save import KerasLocalModelSaver, LocalSubOptimalModelRemover
+from AIToolbox.experiment.experiment_saver import FullKerasExperimentS3Saver, FullKerasExperimentGoogleStorageSaver
+from AIToolbox.experiment.local_experiment_saver import FullKerasExperimentLocalSaver
+from AIToolbox.experiment.training_history import TrainingHistory
 
 
 class AbstractKerasCallback(Callback):

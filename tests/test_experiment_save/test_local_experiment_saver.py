@@ -4,12 +4,12 @@ import shutil
 
 from tests.utils import *
 
-from AIToolbox.experiment_save.local_experiment_saver import *
-from AIToolbox.experiment_save.experiment_saver import AbstractExperimentSaver
-from AIToolbox.experiment_save.result_package.abstract_result_packages import AbstractResultPackage
-from AIToolbox.experiment_save.local_save.local_model_save import PyTorchLocalModelSaver, KerasLocalModelSaver
-from AIToolbox.experiment_save.local_save.local_results_save import LocalResultsSaver
-from AIToolbox.experiment_save.training_history import TrainingHistory
+from AIToolbox.experiment.local_experiment_saver import *
+from AIToolbox.experiment.experiment_saver import AbstractExperimentSaver
+from AIToolbox.experiment.result_package.abstract_result_packages import AbstractResultPackage
+from AIToolbox.experiment.local_save.local_model_save import PyTorchLocalModelSaver, KerasLocalModelSaver
+from AIToolbox.experiment.local_save.local_results_save import LocalResultsSaver
+from AIToolbox.experiment.training_history import TrainingHistory
 
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))

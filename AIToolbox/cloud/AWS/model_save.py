@@ -4,7 +4,7 @@ import os
 import time
 import datetime
 
-from AIToolbox.experiment_save.local_save.local_model_save import KerasLocalModelSaver, TensorFlowLocalModelSaver, PyTorchLocalModelSaver
+from AIToolbox.experiment.local_save.local_model_save import KerasLocalModelSaver, TensorFlowLocalModelSaver, PyTorchLocalModelSaver
 
 
 class AbstractModelSaver(ABC):
