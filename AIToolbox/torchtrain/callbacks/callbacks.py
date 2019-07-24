@@ -92,7 +92,7 @@ class EarlyStopping(AbstractCallback):
             self.best_performance = current_performance
             self.best_epoch = self.train_loop_obj.epoch
         else:
-            if 'loss' in self.monitor:
+            if 'loss' in self.monitor.lower() or 'error' in self.monitor.lower():
                 if current_performance < self.best_performance - self.min_delta:
                     self.best_performance = current_performance
                     self.best_epoch = self.train_loop_obj.epoch
