@@ -63,4 +63,5 @@ class TrainingHistoryPlotter:
         ax.set_title(metric_name, size=10)
 
         fig.savefig(file_path)
+        plt.close()
         return file_name, file_path

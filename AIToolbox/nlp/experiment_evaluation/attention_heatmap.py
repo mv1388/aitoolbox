@@ -95,6 +95,7 @@ class AttentionHeatMap(AbstractBaseMetric):
 
         if plot_file_path:
             fig.savefig(plot_file_path, format="png")
+            plt.close()
 
     @staticmethod
     def prepare_folder_for_saving(output_plot_dir):
