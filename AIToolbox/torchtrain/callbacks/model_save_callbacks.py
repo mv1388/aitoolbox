@@ -95,11 +95,11 @@ class ModelCheckpoint(AbstractCallback):
                                                     self.local_model_result_folder_path)
 
             if not os.path.isfile(param_reporter.local_args_file_path):
-                local_param_file_path = param_reporter.save_args_to_text_file(self.args)
+                local_args_file_path = param_reporter.save_args_to_text_file(self.args)
 
                 # Should also save to cloud
                 if type(self.model_checkpointer) != PyTorchLocalModelSaver:
-                    param_reporter.copy_to_cloud_storage(local_param_file_path, self.model_checkpointer)
+                    param_reporter.copy_to_cloud_storage(local_args_file_path, self.model_checkpointer)
 
                 self._args_already_saved = True
 
@@ -202,11 +202,11 @@ class ModelTrainEndSave(AbstractCallback):
                                                     self.local_model_result_folder_path)
 
             if not os.path.isfile(param_reporter.local_args_file_path):
-                local_param_file_path = param_reporter.save_args_to_text_file(self.args)
+                local_args_file_path = param_reporter.save_args_to_text_file(self.args)
 
                 # Should also save to cloud
                 if type(self.results_saver) != FullPyTorchExperimentLocalSaver:
-                    param_reporter.copy_to_cloud_storage(local_param_file_path, self.results_saver.model_saver)
+                    param_reporter.copy_to_cloud_storage(local_args_file_path, self.results_saver.model_saver)
 
                 self._args_already_saved = True
 
