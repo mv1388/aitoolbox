@@ -152,6 +152,7 @@ class ModelTrainEndSave(AbstractCallback):
                                                                  local_model_result_folder_path=self.local_model_result_folder_path)
 
     def on_train_end(self):
+        self.save_args()
         model_final_state = {'model_state_dict': self.train_loop_obj.model.state_dict(),
                              'optimizer_state_dict': self.train_loop_obj.optimizer.state_dict(),
                              'epoch': self.train_loop_obj.epoch,
