@@ -222,7 +222,7 @@ class TestPyTorchLocalModelSaver(unittest.TestCase):
         model_file_path = os.path.join(model_path, model_name_true)
 
         model_checkpoint = {'model_state_dict': model.state_dict(), 'optimizer_state_dict': None,
-                            'epoch': 10, 'args': {}}
+                            'epoch': 10, 'hyperparams': {}}
         saver = PyTorchLocalModelSaver(local_model_result_folder_path=THIS_DIR, checkpoint_model=checkpoint_model)
         paths = saver.save_model(model_checkpoint, project_dir_name, exp_dir_name, current_time, epoch)
         model_name, model_local_path = paths

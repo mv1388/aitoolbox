@@ -17,9 +17,9 @@ class TestHyperParameterReporter(unittest.TestCase):
         self.assertEqual(param_saver.experiment_dir_path, experiment_path)
         self.assertFalse(os.path.exists(os.path.join(experiment_path, 'results')))
         self.assertEqual(len(os.listdir(experiment_path)), 0)
-        self.assertEqual(param_saver.file_name, 'args_list.txt')
+        self.assertEqual(param_saver.file_name, 'hyperparams_list.txt')
 
-        self.assertEqual(param_saver.local_args_file_path, os.path.join(experiment_path, 'args_list.txt'))
+        self.assertEqual(param_saver.local_hyperparams_file_path, os.path.join(experiment_path, 'hyperparams_list.txt'))
 
         project_path = os.path.join(THIS_DIR, 'my_project')
         if os.path.exists(project_path):
@@ -29,7 +29,7 @@ class TestHyperParameterReporter(unittest.TestCase):
         args = {'a': 103, 'pram2': 444, 'LR': 0.0002, 'path': 'dasdas/33332edas'}
 
         param_saver = HyperParameterReporter('my_project', 'fancy_experiment', '2019_01_01_00_11', THIS_DIR)
-        local_args_file_path = param_saver.save_args_to_text_file(args)
+        local_args_file_path = param_saver.save_hyperparams_to_text_file(args)
         self.check_saved_file_contents(local_args_file_path, args)
 
         project_path = os.path.join(THIS_DIR, 'my_project')

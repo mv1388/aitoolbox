@@ -70,7 +70,7 @@ class TestFullPyTorchExperimentLocalSaver(unittest.TestCase):
                                             {'epoch': 20, 'lr': 0.334}, {})
 
         model_checkpoint = {'model_state_dict': model.state_dict(), 'optimizer_state_dict': None,
-                            'epoch': 10, 'args': {}}
+                            'epoch': 10, 'hyperparams': {}}
         saver = FullPyTorchExperimentLocalSaver(project_name=project_dir_name, experiment_name=exp_dir_name,
                                                 local_model_result_folder_path=THIS_DIR)
         saved_paths = saver.save_experiment(model_checkpoint, result_pkg, current_time,

@@ -113,5 +113,5 @@ TrainLoop(ModelWrap(model, MNISTModelFeedDefinition()),
 #                                 project_name='localRunCNNTest',
 #                                 experiment_name='CNN_MNIST_test',
 #                                 local_model_result_folder_path='~/PycharmProjects/MemoryNet/model_results',
-#                                 args=args.__dict__,
+#                                 hyperparams=hyperparams.__dict__,
 #                                 test_result_package=ClassificationResultPackage())(num_epoch=5, callbacks=callbacks)

@@ -33,32 +33,32 @@ class HyperParameterReporter:
         # but in this use case stays empty and is thus not needed
         shutil.rmtree(empty_results_pth)
 
-        self.file_name = 'args_list.txt'
-        self.local_args_file_path = os.path.join(self.experiment_dir_path, self.file_name)
+        self.file_name = 'hyperparams_list.txt'
+        self.local_hyperparams_file_path = os.path.join(self.experiment_dir_path, self.file_name)
 
-    def save_args_to_text_file(self, args, sort_names=False):
+    def save_hyperparams_to_text_file(self, hyperparams, sort_names=False):
         """
 
         Args:
-            args (dict): hyper-parameters listed in the dict
+            hyperparams (dict): hyper-parameters listed in the dict
             sort_names (bool): should presented hyper-param names be listed alphabetically
 
         Returns:
             str: path to the saved hyper-param text file
         """
-        param_names = sorted(args.keys()) if sort_names else args.keys()
+        param_names = sorted(hyperparams.keys()) if sort_names else hyperparams.keys()
 
-        with open(self.local_args_file_path, 'w') as f:
+        with open(self.local_hyperparams_file_path, 'w') as f:
             for k in param_names:
-                f.write(f'{k}:\t{args[k]}\n')
+                f.write(f'{k}:\t{hyperparams[k]}\n')
 
-        return self.local_args_file_path
+        return self.local_hyperparams_file_path
 
-    def copy_to_cloud_storage(self, local_args_file_path, cloud_saver):
+    def copy_to_cloud_storage(self, local_hyperparams_file_path, cloud_saver):
         """
 
         Args:
-            local_args_file_path (str):
+            local_hyperparams_file_path (str):
             cloud_saver (BaseModelSaver or BaseResultsSaver or BaseModelGoogleStorageSaver or BaseResultsGoogleStorageSaver):
 
         Returns:
@@ -69,6 +69,6 @@ class HyperParameterReporter:
                                                               self.experiment_timestamp).rsplit('/', 1)[0]
 
         cloud_file_path = os.path.join(cloud_folder_path, self.file_name)
-        cloud_saver.save_file(local_args_file_path, cloud_file_path)
+        cloud_saver.save_file(local_hyperparams_file_path, cloud_file_path)
 
         return cloud_file_path
