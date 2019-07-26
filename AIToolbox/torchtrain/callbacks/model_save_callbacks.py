@@ -7,6 +7,7 @@ from AIToolbox.experiment.experiment_saver import FullPyTorchExperimentS3Saver, 
 from AIToolbox.experiment.local_experiment_saver import FullPyTorchExperimentLocalSaver
 from AIToolbox.experiment.local_save.local_model_save import LocalSubOptimalModelRemover, PyTorchLocalModelSaver
 from AIToolbox.experiment.result_package.abstract_result_packages import AbstractResultPackage
+from AIToolbox.experiment.result_reporting.hyperparam_reporter import HyperParameterReporter
 from AIToolbox.torchtrain.callbacks.callbacks import AbstractCallback
 from AIToolbox.utils import util
 
@@ -41,6 +42,8 @@ class ModelCheckpoint(AbstractCallback):
         self.args = args
         self.rm_subopt_local_models = rm_subopt_local_models
 
+        self._args_already_saved = False
+
         if self.rm_subopt_local_models is not False:
             metric_name = 'loss' if self.rm_subopt_local_models is True else self.rm_subopt_local_models
             self.subopt_model_remover = LocalSubOptimalModelRemover(metric_name,
@@ -62,6 +65,7 @@ class ModelCheckpoint(AbstractCallback):
             )
 
     def on_epoch_end(self):
+        self.save_args()
         model_checkpoint = {'model_state_dict': self.train_loop_obj.model.state_dict(),
                             'optimizer_state_dict': self.train_loop_obj.optimizer.state_dict(),
                             'epoch': self.train_loop_obj.epoch,
@@ -83,6 +87,21 @@ class ModelCheckpoint(AbstractCallback):
         if not util.function_exists(self.train_loop_obj.optimizer, 'state_dict'):
             raise AttributeError('Provided optimizer does not have the required state_dict() method which is needed'
                                  'for the saving of the model and the optimizer.')
+
+    def save_args(self):
+        if not self._args_already_saved:
+            param_reporter = HyperParameterReporter(self.project_name, self.experiment_name,
+                                                    self.train_loop_obj.experiment_timestamp,
+                                                    self.local_model_result_folder_path)
+
+            if not os.path.isfile(param_reporter.local_args_file_path):
+                local_args_file_path = param_reporter.save_args_to_text_file(self.args)
+
+                # Should also save to cloud
+                if type(self.model_checkpointer) != PyTorchLocalModelSaver:
+                    param_reporter.copy_to_cloud_storage(local_args_file_path, self.model_checkpointer)
+
+                self._args_already_saved = True
 
 
 class ModelTrainEndSave(AbstractCallback):
@@ -117,6 +136,7 @@ class ModelTrainEndSave(AbstractCallback):
         self.result_package = None
 
         self.check_result_packages()
+        self._args_already_saved = False
 
         if cloud_save_mode == 's3' or cloud_save_mode == 'aws_s3' or cloud_save_mode == 'aws':
             self.results_saver = FullPyTorchExperimentS3Saver(self.project_name, self.experiment_name,
@@ -132,6 +152,7 @@ class ModelTrainEndSave(AbstractCallback):
                                                                  local_model_result_folder_path=self.local_model_result_folder_path)
 
     def on_train_end(self):
+        self.save_args()
         model_final_state = {'model_state_dict': self.train_loop_obj.model.state_dict(),
                              'optimizer_state_dict': self.train_loop_obj.optimizer.state_dict(),
                              'epoch': self.train_loop_obj.epoch,
@@ -173,6 +194,21 @@ class ModelTrainEndSave(AbstractCallback):
         if not util.function_exists(self.train_loop_obj.optimizer, 'state_dict'):
             raise AttributeError('Provided optimizer does not have the required state_dict() method which is needed'
                                  'for the saving of the model and the optimizer.')
+
+    def save_args(self):
+        if not self._args_already_saved:
+            param_reporter = HyperParameterReporter(self.project_name, self.experiment_name,
+                                                    self.train_loop_obj.experiment_timestamp,
+                                                    self.local_model_result_folder_path)
+
+            if not os.path.isfile(param_reporter.local_args_file_path):
+                local_args_file_path = param_reporter.save_args_to_text_file(self.args)
+
+                # Should also save to cloud
+                if type(self.results_saver) != FullPyTorchExperimentLocalSaver:
+                    param_reporter.copy_to_cloud_storage(local_args_file_path, self.results_saver.model_saver)
+
+                self._args_already_saved = True
 
     def check_result_packages(self):
         if self.val_result_package is None and self.test_result_package is None:
