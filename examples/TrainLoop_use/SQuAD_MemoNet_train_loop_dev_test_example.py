@@ -98,7 +98,7 @@ TrainLoopModelCheckpointEndSave(ModelWrap(model, QASpanSQuADModelFeedDefinition(
                                 project_name='fifnal_combo_test',
                                 experiment_name='MemoryNetPytorchTest',
                                 local_model_result_folder_path='<PATH>',
-                                args=used_args,
+                                hyperparams=used_args,
                                 val_result_package=qa_result_pkg_final,
                                 test_result_package=qa_res_test_pkg_fin)\
     (num_epoch=3, callbacks=callbacks)

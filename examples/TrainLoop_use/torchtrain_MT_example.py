@@ -414,6 +414,6 @@ TrainLoopModelCheckpointEndSave(ModelWrap(model, MachineTranslationFeedDefinitio
                                 project_name='MT_project_test',
                                 experiment_name='Seq2SeqPytorchTest',
                                 local_model_result_folder_path='<PATH>',
-                                args={},
+                                hyperparams={},
                                 test_result_package=finish_result_pkg_test)\
     (num_epoch=2, grad_clip=10)

@@ -52,6 +52,8 @@ class PyTorchModelPredictor(AbstractModelPredictor):
         self.train_loop = TrainLoop(self.model, None, None, self.data_loader, None, None)
         self.train_loop.callbacks_handler.register_callbacks(callbacks)
 
+        self.train_loop.model.to(self.train_loop.device)
+
     def model_predict(self):
         """
 

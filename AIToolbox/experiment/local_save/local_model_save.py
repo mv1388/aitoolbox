@@ -177,7 +177,7 @@ class PyTorchLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
             None:
         """
         # TODO: maybe add some check about the actual values/content of the dict as well
-        for required_element in ['model_state_dict', 'optimizer_state_dict', 'epoch', 'args']:
+        for required_element in ['model_state_dict', 'optimizer_state_dict', 'epoch', 'hyperparams']:
             if required_element not in model:
                 raise ValueError(f'Required element of the model dict {required_element} is missing. Given model'
                                  f'dict has the following elements: {model.keys()}')
