@@ -50,7 +50,7 @@ class HyperParameterReporter:
 
         with open(self.local_args_file_path, 'w') as f:
             for k in param_names:
-                f.write(f'{k}: {args[k]}\n')
+                f.write(f'{k}:\t{args[k]}\n')
 
         return self.local_args_file_path
 
