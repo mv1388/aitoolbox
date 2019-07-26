@@ -59,11 +59,11 @@ class TestModelCheckpointCallback(unittest.TestCase):
             f_lines = f.readlines()
 
         self.assertEqual(len(f_lines), len(args))
-        self.assertEqual(sorted([el.split(': ')[0] for el in f_lines]),
+        self.assertEqual(sorted([el.split(':\t')[0] for el in f_lines]),
                          sorted(args.keys()))
 
         for line in f_lines:
-            k, v = line.strip().split(': ')
+            k, v = line.strip().split(':\t')
             self.assertEqual(str(args[k]), v)
 
         project_path = os.path.join(THIS_DIR, 'project_name')
@@ -119,11 +119,11 @@ class TestModelTrainEndSaveCallback(unittest.TestCase):
             f_lines = f.readlines()
 
         self.assertEqual(len(f_lines), len(args))
-        self.assertEqual(sorted([el.split(': ')[0] for el in f_lines]),
+        self.assertEqual(sorted([el.split(':\t')[0] for el in f_lines]),
                          sorted(args.keys()))
 
         for line in f_lines:
-            k, v = line.strip().split(': ')
+            k, v = line.strip().split(':\t')
             self.assertEqual(str(args[k]), v)
 
         project_path = os.path.join(THIS_DIR, 'project_name')
