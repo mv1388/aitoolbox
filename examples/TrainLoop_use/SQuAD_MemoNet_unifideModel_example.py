@@ -100,7 +100,7 @@ print('Starting train loop')
 #                                 project_name='fullQAModelRunTest',
 #                                 experiment_name='MemoryNetPytorchTest',
 #                                 local_model_result_folder_path='~/project/model_results',
-#                                 args={},
+#                                 hyperparams={},
 #                                 result_package=qa_result_pkg)(num_epoch=3, callbacks=callbacks)
 
 
@@ -118,7 +118,7 @@ TrainLoopModelCheckpointEndSave(model, train_loader, dev_loader, test_loader, op
                                 project_name='unifiedModelExample',
                                 experiment_name='MemoryNetPytorchTest',
                                 local_model_result_folder_path=f'{project_folder_prefix}/model_results',
-                                args=used_args,
+                                hyperparams=used_args,
                                 val_result_package=qa_result_pkg_final,
                                 test_result_package=qa_res_test_pkg_fin)\
     (num_epoch=5, callbacks=callbacks)

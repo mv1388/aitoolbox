@@ -14,7 +14,7 @@ from AIToolbox.utils import util
 
 class ModelCheckpoint(AbstractCallback):
     def __init__(self, project_name, experiment_name, local_model_result_folder_path,
-                 args,
+                 hyperparams,
                  cloud_save_mode='s3', bucket_name='model-result',
                  rm_subopt_local_models=False, num_best_checkpoints_kept=2):
         """Check-point save the model during training to disk or also to S3 / GCS cloud storage
@@ -23,7 +23,7 @@ class ModelCheckpoint(AbstractCallback):
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             local_model_result_folder_path (str): root local path where project folder will be created
-            args (dict): used hyper-parameters
+            hyperparams (dict): used hyper-parameters
             cloud_save_mode (str or None): Storage destination selector.
                 For AWS S3: 's3' / 'aws_s3' / 'aws'
                 For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
@@ -39,10 +39,10 @@ class ModelCheckpoint(AbstractCallback):
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
-        self.args = args
+        self.hyperparams = hyperparams
         self.rm_subopt_local_models = rm_subopt_local_models
 
-        self._args_already_saved = False
+        self._hyperparams_already_saved = False
 
         if self.rm_subopt_local_models is not False:
             metric_name = 'loss' if self.rm_subopt_local_models is True else self.rm_subopt_local_models
@@ -65,11 +65,11 @@ class ModelCheckpoint(AbstractCallback):
             )
 
     def on_epoch_end(self):
-        self.save_args()
+        self.save_hyperparams()
         model_checkpoint = {'model_state_dict': self.train_loop_obj.model.state_dict(),
                             'optimizer_state_dict': self.train_loop_obj.optimizer.state_dict(),
                             'epoch': self.train_loop_obj.epoch,
-                            'args': self.args}
+                            'hyperparams': self.hyperparams}
 
         model_paths = self.model_checkpointer.save_model(model=model_checkpoint,
                                                          project_name=self.project_name,
@@ -88,25 +88,25 @@ class ModelCheckpoint(AbstractCallback):
             raise AttributeError('Provided optimizer does not have the required state_dict() method which is needed'
                                  'for the saving of the model and the optimizer.')
 
-    def save_args(self):
-        if not self._args_already_saved:
+    def save_hyperparams(self):
+        if not self._hyperparams_already_saved:
             param_reporter = HyperParameterReporter(self.project_name, self.experiment_name,
                                                     self.train_loop_obj.experiment_timestamp,
                                                     self.local_model_result_folder_path)
 
-            if not os.path.isfile(param_reporter.local_args_file_path):
-                local_args_file_path = param_reporter.save_args_to_text_file(self.args)
+            if not os.path.isfile(param_reporter.local_hyperparams_file_path):
+                local_hyperparams_file_path = param_reporter.save_hyperparams_to_text_file(self.hyperparams)
 
                 # Should also save to cloud
                 if type(self.model_checkpointer) != PyTorchLocalModelSaver:
-                    param_reporter.copy_to_cloud_storage(local_args_file_path, self.model_checkpointer)
+                    param_reporter.copy_to_cloud_storage(local_hyperparams_file_path, self.model_checkpointer)
 
-                self._args_already_saved = True
+                self._hyperparams_already_saved = True
 
 
 class ModelTrainEndSave(AbstractCallback):
     def __init__(self, project_name, experiment_name, local_model_result_folder_path,
-                 args, val_result_package=None, test_result_package=None,
+                 hyperparams, val_result_package=None, test_result_package=None,
                  cloud_save_mode='s3', bucket_name='model-result'):
         """At the end of training execute model performance evaluation, build result package repot and save it
             together with the final model to local disk and possibly to S3 / GCS cloud storage
@@ -115,7 +115,7 @@ class ModelTrainEndSave(AbstractCallback):
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             local_model_result_folder_path (str): root local path where project folder will be created
-            args (dict): used hyper-parameters
+            hyperparams (dict): used hyper-parameters
             val_result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
             test_result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
             cloud_save_mode (str or None): Storage destination selector.
@@ -130,13 +130,13 @@ class ModelTrainEndSave(AbstractCallback):
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
-        self.args = args
+        self.hyperparams = hyperparams
         self.val_result_package = val_result_package
         self.test_result_package = test_result_package
         self.result_package = None
 
         self.check_result_packages()
-        self._args_already_saved = False
+        self._hyperparams_already_saved = False
 
         if cloud_save_mode == 's3' or cloud_save_mode == 'aws_s3' or cloud_save_mode == 'aws':
             self.results_saver = FullPyTorchExperimentS3Saver(self.project_name, self.experiment_name,
@@ -152,17 +152,17 @@ class ModelTrainEndSave(AbstractCallback):
                                                                  local_model_result_folder_path=self.local_model_result_folder_path)
 
     def on_train_end(self):
-        self.save_args()
+        self.save_hyperparams()
         model_final_state = {'model_state_dict': self.train_loop_obj.model.state_dict(),
                              'optimizer_state_dict': self.train_loop_obj.optimizer.state_dict(),
                              'epoch': self.train_loop_obj.epoch,
-                             'args': self.args}
+                             'hyperparams': self.hyperparams}
 
         if self.val_result_package is not None:
             y_test, y_pred, additional_results = self.train_loop_obj.predict_on_validation_set()
             self.val_result_package.pkg_name += '_VAL'
             self.val_result_package.prepare_result_package(y_test, y_pred,
-                                                           hyperparameters=self.args,
+                                                           hyperparameters=self.hyperparams,
                                                            training_history=self.train_loop_obj.train_history,
                                                            additional_results=additional_results)
             self.result_package = self.val_result_package
@@ -171,7 +171,7 @@ class ModelTrainEndSave(AbstractCallback):
             y_test_test, y_pred_test, additional_results_test = self.train_loop_obj.predict_on_test_set()
             self.test_result_package.pkg_name += '_TEST'
             self.test_result_package.prepare_result_package(y_test_test, y_pred_test,
-                                                            hyperparameters=self.args,
+                                                            hyperparameters=self.hyperparams,
                                                             training_history=self.train_loop_obj.train_history,
                                                             additional_results=additional_results_test)
             self.result_package = self.test_result_package + self.result_package if self.result_package is not None \
@@ -195,20 +195,20 @@ class ModelTrainEndSave(AbstractCallback):
             raise AttributeError('Provided optimizer does not have the required state_dict() method which is needed'
                                  'for the saving of the model and the optimizer.')
 
-    def save_args(self):
-        if not self._args_already_saved:
+    def save_hyperparams(self):
+        if not self._hyperparams_already_saved:
             param_reporter = HyperParameterReporter(self.project_name, self.experiment_name,
                                                     self.train_loop_obj.experiment_timestamp,
                                                     self.local_model_result_folder_path)
 
-            if not os.path.isfile(param_reporter.local_args_file_path):
-                local_args_file_path = param_reporter.save_args_to_text_file(self.args)
+            if not os.path.isfile(param_reporter.local_hyperparams_file_path):
+                local_hyperparams_file_path = param_reporter.save_hyperparams_to_text_file(self.hyperparams)
 
                 # Should also save to cloud
                 if type(self.results_saver) != FullPyTorchExperimentLocalSaver:
-                    param_reporter.copy_to_cloud_storage(local_args_file_path, self.results_saver.model_saver)
+                    param_reporter.copy_to_cloud_storage(local_hyperparams_file_path, self.results_saver.model_saver)
 
-                self._args_already_saved = True
+                self._hyperparams_already_saved = True
 
     def check_result_packages(self):
         if self.val_result_package is None and self.test_result_package is None:
