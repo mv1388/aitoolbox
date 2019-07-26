@@ -382,14 +382,14 @@ class TestTrainLoopModelEndSave(unittest.TestCase):
     def test_init_values(self):
         train_loop_non_val = TrainLoopModelEndSave(NetUnifiedBatchFeed(), None, 100, 100, DummyOptimizer(), None,
                                                    "project_name", "experiment_name", "local_model_result_folder_path",
-                                                   args={}, val_result_package=DummyResultPackage(),
+                                                   hyperparams={}, val_result_package=DummyResultPackage(),
                                                    test_result_package=DummyResultPackage(), cloud_save_mode='s3')
         self.assertEqual(train_loop_non_val.train_history.train_history, {'loss': [], 'accumulated_loss': [], 'val_loss': []})
 
         dummy_result_package = DummyResultPackage()
         train_loop = TrainLoopModelEndSave(NetUnifiedBatchFeed(), None, 100, None, DummyOptimizer(), None,
                                            "project_name", "experiment_name", "local_model_result_folder_path",
-                                           args={}, val_result_package=dummy_result_package, cloud_save_mode='s3')
+                                           hyperparams={}, val_result_package=dummy_result_package, cloud_save_mode='s3')
         self.assertEqual(train_loop.train_history.train_history, {'loss': [], 'accumulated_loss': [], 'val_loss': []})
 
         self.assertEqual(len(train_loop.callbacks), 1)
@@ -408,7 +408,7 @@ class TestTrainLoopModelEndSave(unittest.TestCase):
                                                        None,
                                                        "project_name", "experiment_name",
                                                        "local_model_result_folder_path",
-                                                       args={},
+                                                       hyperparams={},
                                                        val_result_package=DummyResultPackage(),
                                                        test_result_package=DummyResultPackage(),
                                                        cloud_save_mode='s3')
@@ -417,7 +417,7 @@ class TestTrainLoopModelEndSave(unittest.TestCase):
                                                        None,
                                                        "project_name", "experiment_name",
                                                        "local_model_result_folder_path",
-                                                       args={},
+                                                       hyperparams={},
                                                        val_result_package=DummyResultPackage(),
                                                        test_result_package=DummyResultPackage(),
                                                        cloud_save_mode='s3')
@@ -426,7 +426,7 @@ class TestTrainLoopModelEndSave(unittest.TestCase):
                                                        None,
                                                        "project_name", "experiment_name",
                                                        "local_model_result_folder_path",
-                                                       args={},
+                                                       hyperparams={},
                                                        test_result_package=DummyResultPackage(),
                                                        cloud_save_mode='s3')
         with self.assertRaises(ValueError):
@@ -434,7 +434,7 @@ class TestTrainLoopModelEndSave(unittest.TestCase):
                                                        None,
                                                        "project_name", "experiment_name",
                                                        "local_model_result_folder_path",
-                                                       args={},
+                                                       hyperparams={},
                                                        val_result_package=DummyResultPackage(),
                                                        test_result_package=DummyResultPackage(),
                                                        cloud_save_mode='s3')
@@ -443,7 +443,7 @@ class TestTrainLoopModelEndSave(unittest.TestCase):
                                                        None,
                                                        "project_name", "experiment_name",
                                                        "local_model_result_folder_path",
-                                                       args={},
+                                                       hyperparams={},
                                                        val_result_package=None,
                                                        test_result_package=None,
                                                        cloud_save_mode='s3')
@@ -453,13 +453,13 @@ class TestTrainLoopModelCheckpointEndSave(unittest.TestCase):
     def test_init_values(self):
         train_loop_non_val = TrainLoopModelCheckpointEndSave(NetUnifiedBatchFeed(), None, 100, None, DummyOptimizer(), None,
                                                              "project_name", "experiment_name", "local_model_result_folder_path",
-                                                             args={}, val_result_package=DummyResultPackage(), cloud_save_mode='s3')
+                                                             hyperparams={}, val_result_package=DummyResultPackage(), cloud_save_mode='s3')
         self.assertEqual(train_loop_non_val.train_history.train_history, {'loss': [], 'accumulated_loss': [], 'val_loss': []})
 
         dummy_result_package = DummyResultPackage()
         train_loop = TrainLoopModelCheckpointEndSave(NetUnifiedBatchFeed(), None, 100, None, DummyOptimizer(), None,
                                                      "project_name", "experiment_name", "local_model_result_folder_path",
-                                                     args={}, val_result_package=dummy_result_package, cloud_save_mode='s3')
+                                                     hyperparams={}, val_result_package=dummy_result_package, cloud_save_mode='s3')
         self.assertEqual(train_loop.train_history.train_history, {'loss': [], 'accumulated_loss': [], 'val_loss': []})
 
         self.assertEqual(len(train_loop.callbacks), 2)
@@ -481,7 +481,7 @@ class TestTrainLoopModelCheckpointEndSave(unittest.TestCase):
                                                      None,
                                                      "project_name", "experiment_name",
                                                      "local_model_result_folder_path",
-                                                     args={},
+                                                     hyperparams={},
                                                      val_result_package=dummy_result_package_val,
                                                      test_result_package=dummy_result_package_test,
                                                      cloud_save_mode='s3')
@@ -494,7 +494,7 @@ class TestTrainLoopModelCheckpointEndSave(unittest.TestCase):
         train_loop = TrainLoopModelCheckpointEndSave(NetUnifiedBatchFeed(), None, 100, None, DummyOptimizer(), None,
                                                      "project_name", "experiment_name",
                                                      "local_model_result_folder_path",
-                                                     args={}, val_result_package=dummy_result_package, cloud_save_mode='s3')
+                                                     hyperparams={}, val_result_package=dummy_result_package, cloud_save_mode='s3')
 
         self.assertEqual(len(train_loop.callbacks), 2)
         for reg_cb, true_cb in zip(train_loop.callbacks, [ModelCheckpoint, ModelTrainEndSave]):
@@ -521,7 +521,7 @@ class TestTrainLoopModelCheckpointEndSave(unittest.TestCase):
             TrainLoopModelCheckpointEndSave(NetUnifiedBatchFeed(), None, 100, None, MiniDummyOptimizer(), None,
                                             "project_name", "experiment_name",
                                             "local_model_result_folder_path",
-                                            args={}, val_result_package=dummy_result_package, cloud_save_mode='s3')
+                                            hyperparams={}, val_result_package=dummy_result_package, cloud_save_mode='s3')
 
     def test_loader_package_exceptions(self):
         with self.assertRaises(ValueError):
@@ -529,7 +529,7 @@ class TestTrainLoopModelCheckpointEndSave(unittest.TestCase):
                                             None,
                                             "project_name", "experiment_name",
                                             "local_model_result_folder_path",
-                                            args={},
+                                            hyperparams={},
                                             val_result_package=DummyResultPackage(),
                                             test_result_package=DummyResultPackage(),
                                             cloud_save_mode='s3')
@@ -538,7 +538,7 @@ class TestTrainLoopModelCheckpointEndSave(unittest.TestCase):
                                             None,
                                             "project_name", "experiment_name",
                                             "local_model_result_folder_path",
-                                            args={},
+                                            hyperparams={},
                                             val_result_package=DummyResultPackage(),
                                             test_result_package=DummyResultPackage(),
                                             cloud_save_mode='s3')
@@ -547,7 +547,7 @@ class TestTrainLoopModelCheckpointEndSave(unittest.TestCase):
                                             None,
                                             "project_name", "experiment_name",
                                             "local_model_result_folder_path",
-                                            args={},
+                                            hyperparams={},
                                             test_result_package=DummyResultPackage(),
                                             cloud_save_mode='s3')
         with self.assertRaises(ValueError):
@@ -555,7 +555,7 @@ class TestTrainLoopModelCheckpointEndSave(unittest.TestCase):
                                             None,
                                             "project_name", "experiment_name",
                                             "local_model_result_folder_path",
-                                            args={},
+                                            hyperparams={},
                                             val_result_package=DummyResultPackage(),
                                             test_result_package=DummyResultPackage(),
                                             cloud_save_mode='s3')
@@ -564,7 +564,7 @@ class TestTrainLoopModelCheckpointEndSave(unittest.TestCase):
                                             None,
                                             "project_name", "experiment_name",
                                             "local_model_result_folder_path",
-                                            args={},
+                                            hyperparams={},
                                             val_result_package=None,
                                             test_result_package=None,
                                             cloud_save_mode='s3')

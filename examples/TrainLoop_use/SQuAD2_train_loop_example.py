@@ -83,5 +83,5 @@ TrainLoopModelCheckpointEndSave(ModelWrap(model, QASpanSQuADModelFeedDefinition(
                                 project_name='fullQAModelRunTest',
                                 experiment_name='MemoryNetPytorchTest',
                                 local_model_result_folder_path='<PATH>',
-                                args=used_args,
+                                hyperparams=used_args,
                                 val_result_package=qa_result_pkg_final)(num_epoch=2, callbacks=callbacks)
