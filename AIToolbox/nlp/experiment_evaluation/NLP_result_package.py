@@ -5,7 +5,7 @@ from AIToolbox.experiment.local_save.local_results_save import BaseLocalResultsS
 from AIToolbox.experiment.result_package.abstract_result_packages import AbstractResultPackage
 from AIToolbox.experiment.core_metrics.classification import AccuracyMetric
 from AIToolbox.nlp.experiment_evaluation.NLP_metrics import ROUGEMetric, ROUGEPerlMetric, \
-    BLEUSentenceScoreMetric, BLEUCorpusScoreMetric, BLEUScoreStrTorchNLPMetric, PerplexityMetric
+    BLEUSentenceScoreMetric, BLEUCorpusScoreMetric, BLEUScoreStrTorchNLPMetric
 from AIToolbox.nlp.experiment_evaluation.attention_heatmap import AttentionHeatMap
 
 
