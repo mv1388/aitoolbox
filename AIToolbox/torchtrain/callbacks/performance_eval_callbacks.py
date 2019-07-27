@@ -285,9 +285,9 @@ class ModelTrainHistoryPlot(AbstractCallback):
             None
         """
         experiment_results_local_path = \
-            BaseLocalResultsSaver.create_experiment_local_folders(self.project_name, self.experiment_name,
-                                                                  self.train_loop_obj.experiment_timestamp,
-                                                                  self.local_model_result_folder_path)
+            BaseLocalResultsSaver.create_experiment_local_results_folder(self.project_name, self.experiment_name,
+                                                                         self.train_loop_obj.experiment_timestamp,
+                                                                         self.local_model_result_folder_path)
 
         # Just a dummy empty result package to wrap the train history as RP is expected in the plotter
         result_pkg_wrapper = EmptyResultPackage(results_dict={})
