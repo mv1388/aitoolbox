@@ -29,14 +29,13 @@ class AbstractResultsSaver(ABC):
 
 
 class BaseResultsSaver(BaseDataSaver):
-    def __init__(self, bucket_name='model-result', local_results_folder_path='~/project/model_result'):
+    def __init__(self, bucket_name='model-result'):
         """
 
         Args:
             bucket_name (str):
-            local_results_folder_path (str):
         """
-        BaseDataSaver.__init__(self, bucket_name, local_results_folder_path)
+        BaseDataSaver.__init__(self, bucket_name)
 
     @staticmethod
     def create_experiment_cloud_storage_folder_structure(project_name, experiment_name, experiment_timestamp):
@@ -64,7 +63,7 @@ class S3ResultsSaver(AbstractResultsSaver, BaseResultsSaver):
             bucket_name (str):
             local_model_result_folder_path (str):
         """
-        BaseResultsSaver.__init__(self, bucket_name, local_model_result_folder_path)
+        BaseResultsSaver.__init__(self, bucket_name)
         self.local_results_saver = LocalResultsSaver(local_model_result_folder_path)
 
     def save_experiment_results(self, result_package, project_name, experiment_name, experiment_timestamp=None,

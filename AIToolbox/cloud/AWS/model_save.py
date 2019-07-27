@@ -27,16 +27,14 @@ class AbstractModelSaver(ABC):
 
 
 class BaseModelSaver(BaseDataSaver):
-    def __init__(self, bucket_name='model-result', local_model_result_folder_path='~/project/model_result',
-                 checkpoint_model=False):
+    def __init__(self, bucket_name='model-result', checkpoint_model=False):
         """
 
         Args:
             bucket_name (str):
-            local_model_result_folder_path (str):
             checkpoint_model (bool):
         """
-        BaseDataSaver.__init__(self, bucket_name, local_model_result_folder_path)
+        BaseDataSaver.__init__(self, bucket_name)
         self.checkpoint_model = checkpoint_model
 
     def create_experiment_cloud_storage_folder_structure(self, project_name, experiment_name, experiment_timestamp):
@@ -66,7 +64,7 @@ class KerasS3ModelSaver(AbstractModelSaver, BaseModelSaver):
             local_model_result_folder_path (str):
             checkpoint_model (bool):
         """
-        BaseModelSaver.__init__(self, bucket_name, local_model_result_folder_path, checkpoint_model)
+        BaseModelSaver.__init__(self, bucket_name, checkpoint_model)
         self.keras_local_saver = KerasLocalModelSaver(local_model_result_folder_path, checkpoint_model)
 
     def save_model(self, model, project_name, experiment_name, experiment_timestamp=None, epoch=None, protect_existing_folder=True):
@@ -118,7 +116,7 @@ class TensorFlowS3ModelSaver(AbstractModelSaver, BaseModelSaver):
             local_model_result_folder_path (str):
             checkpoint_model (bool):
         """
-        BaseModelSaver.__init__(self, bucket_name, local_model_result_folder_path, checkpoint_model)
+        BaseModelSaver.__init__(self, bucket_name, checkpoint_model)
         self.tf_local_saver = TensorFlowLocalModelSaver(local_model_result_folder_path, checkpoint_model)
 
         raise NotImplementedError
@@ -138,7 +136,7 @@ class PyTorchS3ModelSaver(AbstractModelSaver, BaseModelSaver):
             local_model_result_folder_path (str):
             checkpoint_model (bool):
         """
-        BaseModelSaver.__init__(self, bucket_name, local_model_result_folder_path, checkpoint_model)
+        BaseModelSaver.__init__(self, bucket_name, checkpoint_model)
         self.pytorch_local_saver = PyTorchLocalModelSaver(local_model_result_folder_path, checkpoint_model)
 
     def save_model(self, model, project_name, experiment_name, experiment_timestamp=None, epoch=None, protect_existing_folder=True):

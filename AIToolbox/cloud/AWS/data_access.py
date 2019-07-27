@@ -8,18 +8,15 @@ import tarfile
 
 
 class BaseDataSaver:
-    def __init__(self, bucket_name='model-result', local_model_result_folder_path='~/project/model_result'):
+    def __init__(self, bucket_name='model-result'):
         """
 
         Args:
             bucket_name (str):
-            local_model_result_folder_path (str):
         """
         self.bucket_name = bucket_name
         self.s3_client = boto3.client('s3')
         self.s3_resource = boto3.resource('s3')
-
-        self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
 
     def save_file(self, local_file_path, cloud_file_path):
         """

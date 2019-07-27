@@ -7,18 +7,15 @@ from AIToolbox.cloud.AWS.data_access import SQuAD2DatasetFetcher as SQuAD2S3Data
 
 
 class BaseGoogleStorageDataSaver:
-    def __init__(self, bucket_name='model-result', local_model_result_folder_path='~/project/model_result'):
+    def __init__(self, bucket_name='model-result'):
         """
 
         Args:
             bucket_name (str):
-            local_model_result_folder_path (str):
         """
         self.bucket_name = bucket_name
         self.gcs_client = storage.Client()
         self.gcs_bucket = self.gcs_client.get_bucket(bucket_name)
-
-        self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
 
     def save_file(self, local_file_path, cloud_file_path):
         """
