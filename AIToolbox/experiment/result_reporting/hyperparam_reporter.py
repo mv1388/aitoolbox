@@ -29,9 +29,11 @@ class HyperParameterReporter:
         empty_results_pth = ResultsSaver.create_experiment_local_folders(project_name, experiment_name,
                                                                          experiment_timestamp,
                                                                          local_model_result_folder_path)
-        # Just a hack to remove the /results folder which gets created by create_experiment_local_folders,
-        # but in this use case stays empty and is thus not needed
-        shutil.rmtree(empty_results_pth)
+
+        # TODO
+        # # Just a hack to remove the /results folder which gets created by create_experiment_local_folders,
+        # # but in this use case stays empty and is thus not needed
+        # shutil.rmtree(empty_results_pth)
 
         self.file_name = 'hyperparams_list.txt'
         self.local_hyperparams_file_path = os.path.join(self.experiment_dir_path, self.file_name)
