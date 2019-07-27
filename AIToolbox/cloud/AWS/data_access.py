@@ -7,6 +7,34 @@ import zipfile
 import tarfile
 
 
+class BaseDataSaver:
+    def __init__(self, bucket_name='model-result', local_model_result_folder_path='~/project/model_result'):
+        """
+
+        Args:
+            bucket_name (str):
+            local_model_result_folder_path (str):
+        """
+        self.bucket_name = bucket_name
+        self.s3_client = boto3.client('s3')
+        self.s3_resource = boto3.resource('s3')
+
+        self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
+
+    def save_file(self, local_file_path, cloud_file_path):
+        """
+
+        Args:
+            local_file_path (str):
+            cloud_file_path (str):
+
+        Returns:
+            None
+        """
+        self.s3_client.upload_file(os.path.expanduser(local_file_path),
+                                   self.bucket_name, cloud_file_path)
+
+
 class BaseDataFetcher:
     def __init__(self, bucket_name='dataset-store', local_base_data_folder_path='~/project/data'):
         """

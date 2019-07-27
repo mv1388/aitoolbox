@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
-import boto3
 import os
 import time
 import datetime
 
+from AIToolbox.cloud.AWS.data_access import BaseDataSaver
 from AIToolbox.experiment.local_save.local_model_save import KerasLocalModelSaver, TensorFlowLocalModelSaver, PyTorchLocalModelSaver
 
 
@@ -26,7 +26,7 @@ class AbstractModelSaver(ABC):
         pass
 
 
-class BaseModelSaver:
+class BaseModelSaver(BaseDataSaver):
     def __init__(self, bucket_name='model-result', local_model_result_folder_path='~/project/model_result',
                  checkpoint_model=False):
         """
@@ -36,25 +36,8 @@ class BaseModelSaver:
             local_model_result_folder_path (str):
             checkpoint_model (bool):
         """
-        self.bucket_name = bucket_name
-        self.s3_client = boto3.client('s3')
-        self.s3_resource = boto3.resource('s3')
-
-        self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
+        BaseDataSaver.__init__(self, bucket_name, local_model_result_folder_path)
         self.checkpoint_model = checkpoint_model
-
-    def save_file(self, local_file_path, cloud_file_path):
-        """
-
-        Args:
-            local_file_path (str):
-            cloud_file_path (str):
-
-        Returns:
-            None
-        """
-        self.s3_client.upload_file(os.path.expanduser(local_file_path),
-                                   self.bucket_name, cloud_file_path)
 
     def create_experiment_cloud_storage_folder_structure(self, project_name, experiment_name, experiment_timestamp):
         """

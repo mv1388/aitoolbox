@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
-import boto3
 import os
 import time
 import datetime
 
+from AIToolbox.cloud.AWS.data_access import BaseDataSaver
 from AIToolbox.experiment.local_save.local_results_save import LocalResultsSaver
 
 
@@ -28,7 +28,7 @@ class AbstractResultsSaver(ABC):
         pass
 
 
-class BaseResultsSaver:
+class BaseResultsSaver(BaseDataSaver):
     def __init__(self, bucket_name='model-result', local_results_folder_path='~/project/model_result'):
         """
 
@@ -36,26 +36,10 @@ class BaseResultsSaver:
             bucket_name (str):
             local_results_folder_path (str):
         """
-        self.bucket_name = bucket_name
-        self.s3_client = boto3.client('s3')
-        self.s3_resource = boto3.resource('s3')
+        BaseDataSaver.__init__(self, bucket_name, local_results_folder_path)
 
-        self.local_model_result_folder_path = os.path.expanduser(local_results_folder_path)
-
-    def save_file(self, local_file_path, cloud_file_path):
-        """
-
-        Args:
-            local_file_path (str):
-            cloud_file_path (str):
-
-        Returns:
-            None
-        """
-        self.s3_client.upload_file(os.path.expanduser(local_file_path),
-                                   self.bucket_name, cloud_file_path)
-
-    def create_experiment_cloud_storage_folder_structure(self, project_name, experiment_name, experiment_timestamp):
+    @staticmethod
+    def create_experiment_cloud_storage_folder_structure(project_name, experiment_name, experiment_timestamp):
         """
 
         Args:

@@ -6,7 +6,35 @@ from AIToolbox.cloud.AWS.data_access import SQuAD2DatasetFetcher as SQuAD2S3Data
     HotpotQADatasetFetcher as HotpotQAS3DatasetFetcher
 
 
-class BaseDatasetGoogleStorageFetcher:
+class BaseGoogleStorageDataSaver:
+    def __init__(self, bucket_name='model-result', local_model_result_folder_path='~/project/model_result'):
+        """
+
+        Args:
+            bucket_name (str):
+            local_model_result_folder_path (str):
+        """
+        self.bucket_name = bucket_name
+        self.gcs_client = storage.Client()
+        self.gcs_bucket = self.gcs_client.get_bucket(bucket_name)
+
+        self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
+
+    def save_file(self, local_file_path, cloud_file_path):
+        """
+
+        Args:
+            local_file_path (str):
+            cloud_file_path (str):
+
+        Returns:
+            None
+        """
+        blob = self.gcs_bucket.blob(cloud_file_path)
+        blob.upload_from_filename(local_file_path)
+
+
+class BaseGoogleStorageDataFetcher:
     def __init__(self, bucket_name='dataset-store', local_dataset_folder_path='~/project/data'):
         """
 
@@ -41,7 +69,7 @@ class BaseDatasetGoogleStorageFetcher:
             blob.download_to_filename(local_file_path)
             
             
-class SQuAD2DatasetFetcher(BaseDatasetGoogleStorageFetcher, SQuAD2S3DatasetFetcher):
+class SQuAD2DatasetFetcher(BaseGoogleStorageDataFetcher, SQuAD2S3DatasetFetcher):
     def __init__(self, bucket_name='dataset-store', local_dataset_folder_path='~/project/data'):
         """
 
@@ -51,10 +79,10 @@ class SQuAD2DatasetFetcher(BaseDatasetGoogleStorageFetcher, SQuAD2S3DatasetFetch
         """
         raise NotImplementedError('This is only api, but the GoogleStorage backend dataset folder structure is not yet prepared')
 
-        BaseDatasetGoogleStorageFetcher.__init__(self, bucket_name, local_dataset_folder_path)
+        BaseGoogleStorageDataFetcher.__init__(self, bucket_name, local_dataset_folder_path)
 
 
-class QAngarooDatasetFetcher(BaseDatasetGoogleStorageFetcher, QAngarooS3DatasetFetcher):
+class QAngarooDatasetFetcher(BaseGoogleStorageDataFetcher, QAngarooS3DatasetFetcher):
     def __init__(self, bucket_name='dataset-store', local_dataset_folder_path='~/project/data'):
         """
 
@@ -64,10 +92,10 @@ class QAngarooDatasetFetcher(BaseDatasetGoogleStorageFetcher, QAngarooS3DatasetF
         """
         raise NotImplementedError('This is only api, but the GoogleStorage backend dataset folder structure is not yet prepared')
 
-        BaseDatasetGoogleStorageFetcher.__init__(self, bucket_name, local_dataset_folder_path)
+        BaseGoogleStorageDataFetcher.__init__(self, bucket_name, local_dataset_folder_path)
 
 
-class CNNDailyMailDatasetFetcher(BaseDatasetGoogleStorageFetcher, CNNDailyMailS3DatasetFetcher):
+class CNNDailyMailDatasetFetcher(BaseGoogleStorageDataFetcher, CNNDailyMailS3DatasetFetcher):
     def __init__(self, bucket_name='dataset-store', local_dataset_folder_path='~/project/data'):
         """
 
@@ -77,10 +105,10 @@ class CNNDailyMailDatasetFetcher(BaseDatasetGoogleStorageFetcher, CNNDailyMailS3
         """
         raise NotImplementedError('This is only api, but the GoogleStorage backend dataset folder structure is not yet prepared')
 
-        BaseDatasetGoogleStorageFetcher.__init__(self, bucket_name, local_dataset_folder_path)
+        BaseGoogleStorageDataFetcher.__init__(self, bucket_name, local_dataset_folder_path)
 
 
-class HotpotQADatasetFetcher(BaseDatasetGoogleStorageFetcher, HotpotQAS3DatasetFetcher):
+class HotpotQADatasetFetcher(BaseGoogleStorageDataFetcher, HotpotQAS3DatasetFetcher):
     def __init__(self, bucket_name='dataset-store', local_dataset_folder_path='~/project/data'):
         """
 
@@ -90,4 +118,4 @@ class HotpotQADatasetFetcher(BaseDatasetGoogleStorageFetcher, HotpotQAS3DatasetF
         """
         raise NotImplementedError('This is only api, but the GoogleStorage backend dataset folder structure is not yet prepared')
 
-        BaseDatasetGoogleStorageFetcher.__init__(self, bucket_name, local_dataset_folder_path)
+        BaseGoogleStorageDataFetcher.__init__(self, bucket_name, local_dataset_folder_path)
