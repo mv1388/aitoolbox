@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
-import boto3
 import os
 import time
 import datetime
 
+from AIToolbox.cloud.AWS.data_access import BaseDataSaver
 from AIToolbox.experiment.local_save.local_model_save import KerasLocalModelSaver, TensorFlowLocalModelSaver, PyTorchLocalModelSaver
 
 
@@ -26,35 +26,16 @@ class AbstractModelSaver(ABC):
         pass
 
 
-class BaseModelSaver:
-    def __init__(self, bucket_name='model-result', local_model_result_folder_path='~/project/model_result',
-                 checkpoint_model=False):
+class BaseModelSaver(BaseDataSaver):
+    def __init__(self, bucket_name='model-result', checkpoint_model=False):
         """
 
         Args:
             bucket_name (str):
-            local_model_result_folder_path (str):
             checkpoint_model (bool):
         """
-        self.bucket_name = bucket_name
-        self.s3_client = boto3.client('s3')
-        self.s3_resource = boto3.resource('s3')
-
-        self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
+        BaseDataSaver.__init__(self, bucket_name)
         self.checkpoint_model = checkpoint_model
-
-    def save_file(self, local_file_path, cloud_file_path):
-        """
-
-        Args:
-            local_file_path (str):
-            cloud_file_path (str):
-
-        Returns:
-            None
-        """
-        self.s3_client.upload_file(os.path.expanduser(local_file_path),
-                                   self.bucket_name, cloud_file_path)
 
     def create_experiment_cloud_storage_folder_structure(self, project_name, experiment_name, experiment_timestamp):
         """
@@ -83,7 +64,7 @@ class KerasS3ModelSaver(AbstractModelSaver, BaseModelSaver):
             local_model_result_folder_path (str):
             checkpoint_model (bool):
         """
-        BaseModelSaver.__init__(self, bucket_name, local_model_result_folder_path, checkpoint_model)
+        BaseModelSaver.__init__(self, bucket_name, checkpoint_model)
         self.keras_local_saver = KerasLocalModelSaver(local_model_result_folder_path, checkpoint_model)
 
     def save_model(self, model, project_name, experiment_name, experiment_timestamp=None, epoch=None, protect_existing_folder=True):
@@ -135,7 +116,7 @@ class TensorFlowS3ModelSaver(AbstractModelSaver, BaseModelSaver):
             local_model_result_folder_path (str):
             checkpoint_model (bool):
         """
-        BaseModelSaver.__init__(self, bucket_name, local_model_result_folder_path, checkpoint_model)
+        BaseModelSaver.__init__(self, bucket_name, checkpoint_model)
         self.tf_local_saver = TensorFlowLocalModelSaver(local_model_result_folder_path, checkpoint_model)
 
         raise NotImplementedError
@@ -155,7 +136,7 @@ class PyTorchS3ModelSaver(AbstractModelSaver, BaseModelSaver):
             local_model_result_folder_path (str):
             checkpoint_model (bool):
         """
-        BaseModelSaver.__init__(self, bucket_name, local_model_result_folder_path, checkpoint_model)
+        BaseModelSaver.__init__(self, bucket_name, checkpoint_model)
         self.pytorch_local_saver = PyTorchLocalModelSaver(local_model_result_folder_path, checkpoint_model)
 
     def save_model(self, model, project_name, experiment_name, experiment_timestamp=None, epoch=None, protect_existing_folder=True):
