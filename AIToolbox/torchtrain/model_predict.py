@@ -91,9 +91,9 @@ class PyTorchModelPredictor(AbstractModelPredictor):
         Returns:
 
         """
-        LocalResultsSaver.create_experiment_local_folders(project_name, experiment_name,
-                                                          self.train_loop.experiment_timestamp,
-                                                          local_model_result_folder_path)
+        LocalResultsSaver.create_experiment_local_results_folder(project_name, experiment_name,
+                                                                 self.train_loop.experiment_timestamp,
+                                                                 local_model_result_folder_path)
         result_package.set_experiment_dir_path_for_additional_results(project_name=project_name,
                                                                       experiment_name=experiment_name,
                                                                       experiment_timestamp=self.train_loop.experiment_timestamp,

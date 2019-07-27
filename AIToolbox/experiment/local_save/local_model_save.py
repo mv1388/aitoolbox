@@ -3,6 +3,8 @@ import os
 import time
 import datetime
 
+from AIToolbox.experiment.local_save.folder_create import ExperimentFolderCreator
+
 
 class AbstractLocalModelSaver(ABC):
     @abstractmethod
@@ -35,7 +37,7 @@ class BaseLocalModelSaver:
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
         self.checkpoint_model = checkpoint_model
 
-    def create_experiment_local_folder_structure(self, project_name, experiment_name, experiment_timestamp):
+    def create_experiment_local_models_folder(self, project_name, experiment_name, experiment_timestamp):
         """
 
         Args:
@@ -46,14 +48,9 @@ class BaseLocalModelSaver:
         Returns:
             str:
         """
-        project_path = os.path.join(self.local_model_result_folder_path, project_name)
-        if not os.path.exists(project_path):
-            os.mkdir(project_path)
-
-        experiment_path = os.path.join(self.local_model_result_folder_path, project_name,
-                                       experiment_name + '_' + experiment_timestamp)
-        if not os.path.exists(experiment_path):
-            os.mkdir(experiment_path)
+        experiment_path = ExperimentFolderCreator.create_experiment_base_folder(project_name, experiment_name,
+                                                                                experiment_timestamp,
+                                                                                self.local_model_result_folder_path)
 
         experiment_model_path = os.path.join(experiment_path,
                                              'model' if not self.checkpoint_model else 'checkpoint_model')
@@ -91,7 +88,8 @@ class KerasLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
         if experiment_timestamp is None:
             experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
 
-        experiment_model_local_path = self.create_experiment_local_folder_structure(project_name, experiment_name, experiment_timestamp)
+        experiment_model_local_path = self.create_experiment_local_models_folder(project_name, experiment_name,
+                                                                                 experiment_timestamp)
 
         if epoch is None:
             model_name = f'model_{experiment_name}_{experiment_timestamp}.h5'
@@ -152,7 +150,8 @@ class PyTorchLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
         if experiment_timestamp is None:
             experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
 
-        experiment_model_local_path = self.create_experiment_local_folder_structure(project_name, experiment_name, experiment_timestamp)
+        experiment_model_local_path = self.create_experiment_local_models_folder(project_name, experiment_name,
+                                                                                 experiment_timestamp)
 
         if epoch is None:
             model_name = f'model_{experiment_name}_{experiment_timestamp}.pth'

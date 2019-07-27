@@ -5,6 +5,7 @@ import datetime
 import pickle
 import json
 
+from AIToolbox.experiment.local_save.folder_create import ExperimentFolderCreator
 from AIToolbox.experiment.result_reporting.report_generator import TrainingHistoryPlotter
 
 
@@ -78,12 +79,12 @@ class BaseLocalResultsSaver:
         Returns:
             str:
         """
-        return self.create_experiment_local_folders(project_name, experiment_name, experiment_timestamp,
-                                                    self.local_model_result_folder_path)
+        return self.create_experiment_local_results_folder(project_name, experiment_name, experiment_timestamp,
+                                                           self.local_model_result_folder_path)
 
     @staticmethod
-    def create_experiment_local_folders(project_name, experiment_name, experiment_timestamp,
-                                        local_model_result_folder_path):
+    def create_experiment_local_results_folder(project_name, experiment_name, experiment_timestamp,
+                                               local_model_result_folder_path):
         """
 
         Args:
@@ -95,21 +96,20 @@ class BaseLocalResultsSaver:
         Returns:
             str:
         """
-        project_path, experiment_path, experiment_results_path = \
-            BaseLocalResultsSaver.form_experiment_local_folders_paths(project_name, experiment_name,
-                                                                      experiment_timestamp,
-                                                                      local_model_result_folder_path)
-        if not os.path.exists(project_path):
-            os.mkdir(project_path)
-        if not os.path.exists(experiment_path):
-            os.mkdir(experiment_path)
+        ExperimentFolderCreator.create_experiment_base_folder(project_name, experiment_name, experiment_timestamp,
+                                                              local_model_result_folder_path)
+
+        _, _, experiment_results_path = \
+            BaseLocalResultsSaver.get_experiment_local_results_folder_paths(project_name, experiment_name,
+                                                                            experiment_timestamp,
+                                                                            local_model_result_folder_path)
         if not os.path.exists(experiment_results_path):
             os.mkdir(experiment_results_path)
         return experiment_results_path
 
     @staticmethod
-    def form_experiment_local_folders_paths(project_name, experiment_name, experiment_timestamp,
-                                            local_model_result_folder_path):
+    def get_experiment_local_results_folder_paths(project_name, experiment_name, experiment_timestamp,
+                                                  local_model_result_folder_path):
         """
 
         Args:
@@ -121,8 +121,10 @@ class BaseLocalResultsSaver:
         Returns:
             str, str, str: project_dir_path, experiment_dir_path, experiment_results_dir_path
         """
-        project_dir_path = os.path.join(os.path.expanduser(local_model_result_folder_path), project_name)
-        experiment_dir_path = os.path.join(project_dir_path, experiment_name + '_' + experiment_timestamp)
+        project_dir_path, experiment_dir_path = \
+            ExperimentFolderCreator.get_experiment_base_folder_paths(project_name, experiment_name,
+                                                                     experiment_timestamp,
+                                                                     local_model_result_folder_path)
         experiment_results_dir_path = os.path.join(experiment_dir_path, 'results')
 
         return project_dir_path, experiment_dir_path, experiment_results_dir_path
