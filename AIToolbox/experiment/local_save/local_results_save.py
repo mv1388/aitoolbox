@@ -5,6 +5,7 @@ import datetime
 import pickle
 import json
 
+from AIToolbox.experiment.local_save.folder_create import ExperimentFolderCreator
 from AIToolbox.experiment.result_reporting.report_generator import TrainingHistoryPlotter
 
 
@@ -16,11 +17,11 @@ class AbstractLocalResultsSaver(ABC):
         
         Args:
             result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
-            project_name (str):
-            experiment_name (str):
-            experiment_timestamp (str or None):
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            experiment_timestamp (str or None): time stamp at the start of training
             save_true_pred_labels (bool):
-            protect_existing_folder (bool):
+            protect_existing_folder (bool): can override potentially already existing folder or not
 
         Returns:
             list: list of list with this format: [[results_file_name, results_file_local_path], ... [ , ]] 
@@ -37,11 +38,11 @@ class AbstractLocalResultsSaver(ABC):
         
         Args:
             result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
-            project_name (str):
-            experiment_name (str):
-            experiment_timestamp (str or None):
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            experiment_timestamp (str or None): time stamp at the start of training
             save_true_pred_labels (bool):
-            protect_existing_folder (bool):
+            protect_existing_folder (bool): can override potentially already existing folder or not
 
         Returns:
             list: list of list with this format: [[results_file_name, results_file_local_path], ... [ , ]] 
@@ -71,58 +72,59 @@ class BaseLocalResultsSaver:
         """
 
         Args:
-            project_name (str):
-            experiment_name (str):
-            experiment_timestamp (str):
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            experiment_timestamp (str): time stamp at the start of training
 
         Returns:
             str:
         """
-        return self.create_experiment_local_folders(project_name, experiment_name, experiment_timestamp,
-                                                    self.local_model_result_folder_path)
+        return self.create_experiment_local_results_folder(project_name, experiment_name, experiment_timestamp,
+                                                           self.local_model_result_folder_path)
 
     @staticmethod
-    def create_experiment_local_folders(project_name, experiment_name, experiment_timestamp,
-                                        local_model_result_folder_path):
+    def create_experiment_local_results_folder(project_name, experiment_name, experiment_timestamp,
+                                               local_model_result_folder_path):
         """
 
         Args:
-            project_name (str):
-            experiment_name (str):
-            experiment_timestamp (str):
-            local_model_result_folder_path (str):
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            experiment_timestamp (str): time stamp at the start of training
+            local_model_result_folder_path (str): root local path where project folder will be created
 
         Returns:
             str:
         """
-        project_path, experiment_path, experiment_results_path = \
-            BaseLocalResultsSaver.form_experiment_local_folders_paths(project_name, experiment_name,
-                                                                      experiment_timestamp,
-                                                                      local_model_result_folder_path)
-        if not os.path.exists(project_path):
-            os.mkdir(project_path)
-        if not os.path.exists(experiment_path):
-            os.mkdir(experiment_path)
+        ExperimentFolderCreator.create_experiment_base_folder(project_name, experiment_name, experiment_timestamp,
+                                                              local_model_result_folder_path)
+
+        _, _, experiment_results_path = \
+            BaseLocalResultsSaver.get_experiment_local_results_folder_paths(project_name, experiment_name,
+                                                                            experiment_timestamp,
+                                                                            local_model_result_folder_path)
         if not os.path.exists(experiment_results_path):
             os.mkdir(experiment_results_path)
         return experiment_results_path
 
     @staticmethod
-    def form_experiment_local_folders_paths(project_name, experiment_name, experiment_timestamp,
-                                            local_model_result_folder_path):
+    def get_experiment_local_results_folder_paths(project_name, experiment_name, experiment_timestamp,
+                                                  local_model_result_folder_path):
         """
 
         Args:
-            project_name (str):
-            experiment_name (str):
-            experiment_timestamp (str):
-            local_model_result_folder_path (str):
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            experiment_timestamp (str): time stamp at the start of training
+            local_model_result_folder_path (str): root local path where project folder will be created
 
         Returns:
             str, str, str: project_dir_path, experiment_dir_path, experiment_results_dir_path
         """
-        project_dir_path = os.path.join(os.path.expanduser(local_model_result_folder_path), project_name)
-        experiment_dir_path = os.path.join(project_dir_path, experiment_name + '_' + experiment_timestamp)
+        project_dir_path, experiment_dir_path = \
+            ExperimentFolderCreator.get_experiment_base_folder_paths(project_name, experiment_name,
+                                                                     experiment_timestamp,
+                                                                     local_model_result_folder_path)
         experiment_results_dir_path = os.path.join(experiment_dir_path, 'results')
 
         return project_dir_path, experiment_dir_path, experiment_results_dir_path
@@ -159,7 +161,7 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
         """
 
         Args:
-            local_model_result_folder_path (str):
+            local_model_result_folder_path (str): root local path where project folder will be created
             file_format (str)
         """
         BaseLocalResultsSaver.__init__(self, local_model_result_folder_path, file_format)
@@ -170,11 +172,11 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
 
         Args:
             result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
-            project_name (str):
-            experiment_name (str):
-            experiment_timestamp (str or None):
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            experiment_timestamp (str or None): time stamp at the start of training
             save_true_pred_labels (bool):
-            protect_existing_folder (bool):
+            protect_existing_folder (bool): can override potentially already existing folder or not
 
         Returns:
             list: list of list with this format: [[results_file_path_inside_results_dir, results_file_local_path], ... [ , ]]
@@ -230,11 +232,11 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
 
         Args:
             result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
-            project_name (str):
-            experiment_name (str):
-            experiment_timestamp (str or None):
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            experiment_timestamp (str or None): time stamp at the start of training
             save_true_pred_labels (bool):
-            protect_existing_folder (bool):
+            protect_existing_folder (bool): can override potentially already existing folder or not
 
         Returns:
             list: list of list with this format: [[results_file_path_inside_results_dir, results_file_local_path], ... [ , ]]

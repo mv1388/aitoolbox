@@ -195,7 +195,8 @@ class ModelPerformancePrintReport(AbstractCallback):
 
 class ModelTrainHistoryPlot(AbstractCallback):
     def __init__(self, epoch_end=True, train_end=False,
-                 project_name=None, experiment_name=None, local_model_result_folder_path=None, cloud_save_mode='s3'):
+                 project_name=None, experiment_name=None, local_model_result_folder_path=None,
+                 cloud_save_mode='s3', bucket_name='model-result'):
         """
 
         Args:
@@ -208,6 +209,7 @@ class ModelTrainHistoryPlot(AbstractCallback):
                 For AWS S3: 's3' / 'aws_s3' / 'aws'
                 For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
                 Everything else results just in local storage to disk
+            bucket_name (str): name of the bucket in the cloud storage
         """
         if epoch_end is False and train_end is False:
             raise ValueError('Both epoch_end and train_end are set to False. At least one of these should be True.')
@@ -222,9 +224,9 @@ class ModelTrainHistoryPlot(AbstractCallback):
             if local_model_result_folder_path is not None \
             else None
         self.cloud_save_mode = cloud_save_mode
+        self.bucket_name = bucket_name
 
         self.cloud_results_saver = None
-        self.experiment_results_local_path = None
 
     def on_train_loop_registration(self):
         self.try_infer_experiment_details()
@@ -257,17 +259,11 @@ class ModelTrainHistoryPlot(AbstractCallback):
         Returns:
             None
         """
-        self.experiment_results_local_path = \
-            BaseLocalResultsSaver.create_experiment_local_folders(self.project_name, self.experiment_name,
-                                                                  self.train_loop_obj.experiment_timestamp,
-                                                                  self.local_model_result_folder_path)
-
         if self.cloud_save_mode == 's3' or self.cloud_save_mode == 'aws_s3' or self.cloud_save_mode == 'aws':
-            self.cloud_results_saver = BaseResultsS3Saver(local_results_folder_path=self.local_model_result_folder_path)
+            self.cloud_results_saver = BaseResultsS3Saver(bucket_name=self.bucket_name)
 
         elif self.cloud_save_mode == 'gcs' or self.cloud_save_mode == 'google_storage' or self.cloud_save_mode == 'google storage':
-            self.cloud_results_saver = BaseResultsGoogleStorageSaver(
-                local_results_folder_path=self.local_model_result_folder_path)
+            self.cloud_results_saver = BaseResultsGoogleStorageSaver(bucket_name=self.bucket_name)
         else:
             self.cloud_results_saver = None
 
@@ -288,12 +284,17 @@ class ModelTrainHistoryPlot(AbstractCallback):
         Returns:
             None
         """
+        experiment_results_local_path = \
+            BaseLocalResultsSaver.create_experiment_local_results_folder(self.project_name, self.experiment_name,
+                                                                         self.train_loop_obj.experiment_timestamp,
+                                                                         self.local_model_result_folder_path)
+
         # Just a dummy empty result package to wrap the train history as RP is expected in the plotter
         result_pkg_wrapper = EmptyResultPackage(results_dict={})
         result_pkg_wrapper.training_history = self.train_loop_obj.train_history
 
         plotter = TrainingHistoryPlotter(result_package=result_pkg_wrapper,
-                                         experiment_results_local_path=self.experiment_results_local_path,
+                                         experiment_results_local_path=experiment_results_local_path,
                                          plots_folder_name=f'{prefix}plots_epoch_{self.train_loop_obj.epoch}')
         saved_local_results_details = plotter.generate_report()
 

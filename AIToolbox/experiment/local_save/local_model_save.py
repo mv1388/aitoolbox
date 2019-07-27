@@ -3,6 +3,8 @@ import os
 import time
 import datetime
 
+from AIToolbox.experiment.local_save.folder_create import ExperimentFolderCreator
+
 
 class AbstractLocalModelSaver(ABC):
     @abstractmethod
@@ -11,11 +13,11 @@ class AbstractLocalModelSaver(ABC):
         
         Args:
             model (keras.engine.training.Model or dict):
-            project_name (str):
-            experiment_name (str):
-            experiment_timestamp (str or None):
-            epoch (int or None):
-            protect_existing_folder (bool):
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            experiment_timestamp (str or None): time stamp at the start of training
+            epoch (int or None): in which epoch the model is being saved
+            protect_existing_folder (bool): can override potentially already existing folder or not
 
         Returns:
             (str, str): model_name, model_local_path
@@ -29,31 +31,26 @@ class BaseLocalModelSaver:
         """
 
         Args:
-            local_model_result_folder_path (str):
-            checkpoint_model (bool):
+            local_model_result_folder_path (str): root local path where project folder will be created
+            checkpoint_model (bool): if the model is coming from the mid-training checkpoint
         """
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
         self.checkpoint_model = checkpoint_model
 
-    def create_experiment_local_folder_structure(self, project_name, experiment_name, experiment_timestamp):
+    def create_experiment_local_models_folder(self, project_name, experiment_name, experiment_timestamp):
         """
 
         Args:
-            project_name (str):
-            experiment_name (str):
-            experiment_timestamp (str):
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            experiment_timestamp (str): time stamp at the start of training
 
         Returns:
-            str:
+            str: path to the created models folder in the experiment base folder
         """
-        project_path = os.path.join(self.local_model_result_folder_path, project_name)
-        if not os.path.exists(project_path):
-            os.mkdir(project_path)
-
-        experiment_path = os.path.join(self.local_model_result_folder_path, project_name,
-                                       experiment_name + '_' + experiment_timestamp)
-        if not os.path.exists(experiment_path):
-            os.mkdir(experiment_path)
+        experiment_path = ExperimentFolderCreator.create_experiment_base_folder(project_name, experiment_name,
+                                                                                experiment_timestamp,
+                                                                                self.local_model_result_folder_path)
 
         experiment_model_path = os.path.join(experiment_path,
                                              'model' if not self.checkpoint_model else 'checkpoint_model')
@@ -69,8 +66,8 @@ class KerasLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
         """
 
         Args:
-            local_model_result_folder_path (str):
-            checkpoint_model (bool):
+            local_model_result_folder_path (str): root local path where project folder will be created
+            checkpoint_model (bool): if the model is coming from the mid-training checkpoint
         """
         BaseLocalModelSaver.__init__(self, local_model_result_folder_path, checkpoint_model)
 
@@ -79,11 +76,11 @@ class KerasLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
 
         Args:
             model (keras.engine.training.Model):
-            project_name (str):
-            experiment_name (str):
-            experiment_timestamp (str or None):
-            epoch (int or None):
-            protect_existing_folder (bool):
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            experiment_timestamp (str or None): time stamp at the start of training
+            epoch (int or None): in which epoch the model is being saved
+            protect_existing_folder (bool): can override potentially already existing folder or not
 
         Returns:
             (str, str): model_name, model_local_path
@@ -91,7 +88,8 @@ class KerasLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
         if experiment_timestamp is None:
             experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
 
-        experiment_model_local_path = self.create_experiment_local_folder_structure(project_name, experiment_name, experiment_timestamp)
+        experiment_model_local_path = self.create_experiment_local_models_folder(project_name, experiment_name,
+                                                                                 experiment_timestamp)
 
         if epoch is None:
             model_name = f'model_{experiment_name}_{experiment_timestamp}.h5'
@@ -111,8 +109,8 @@ class TensorFlowLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
         """
 
         Args:
-            local_model_result_folder_path (str):
-            checkpoint_model (bool):
+            local_model_result_folder_path (str): root local path where project folder will be created
+            checkpoint_model (bool): if the model is coming from the mid-training checkpoint
         """
         BaseLocalModelSaver.__init__(self, local_model_result_folder_path, checkpoint_model)
 
@@ -128,8 +126,8 @@ class PyTorchLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
         """
 
         Args:
-            local_model_result_folder_path (str):
-            checkpoint_model (bool):
+            local_model_result_folder_path (str): root local path where project folder will be created
+            checkpoint_model (bool): if the model is coming from the mid-training checkpoint
         """
         BaseLocalModelSaver.__init__(self, local_model_result_folder_path, checkpoint_model)
 
@@ -137,12 +135,12 @@ class PyTorchLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
         """
 
         Args:
-            model (dict):
-            project_name (str):
-            experiment_name (str):
-            experiment_timestamp (str or None):
-            epoch (int or None):
-            protect_existing_folder (bool):
+            model (dict): PyTorch model represented as a dict of weights, optimizer state and other necessary info
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            experiment_timestamp (str or None): time stamp at the start of training
+            epoch (int or None): in which epoch the model is being saved
+            protect_existing_folder (bool): can override potentially already existing folder or not
 
         Returns:
             (str, str): model_name, model_local_path
@@ -152,7 +150,8 @@ class PyTorchLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
         if experiment_timestamp is None:
             experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
 
-        experiment_model_local_path = self.create_experiment_local_folder_structure(project_name, experiment_name, experiment_timestamp)
+        experiment_model_local_path = self.create_experiment_local_models_folder(project_name, experiment_name,
+                                                                                 experiment_timestamp)
 
         if epoch is None:
             model_name = f'model_{experiment_name}_{experiment_timestamp}.pth'
@@ -171,7 +170,7 @@ class PyTorchLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
         """Check if PyTorch model save dict contains all the necessary elements for the training state reconstruction
 
         Args:
-            model (dict):
+            model (dict): PyTorch model represented as a dict of weights, optimizer state and other necessary info
 
         Returns:
             None:
