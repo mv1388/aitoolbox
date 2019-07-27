@@ -222,7 +222,7 @@ class TestBLEUScoreStrTorchNLPMetric(unittest.TestCase):
 
     def test_sss(self):
         bleu_1 = BLEUScoreStrTorchNLPMetric(['bla bla bla bla'.split(), 'mjaw how how mjav mjaw'.split()],
-                                         ['bla bla bla bla'.split(), 'mjaw how how mjav mjaw'.split()])
+                                            ['bla bla bla bla'.split(), 'mjaw how how mjav mjaw'.split()])
         self.assertAlmostEqual(bleu_1.get_metric(), 100.)
         self.assertEqual(bleu_1.get_metric_dict(), {'BLEU_str_torchNLP_score': 100.})
         self.assertEqual(bleu_1.get_metric_dict(), {'BLEU_str_torchNLP_score': bleu_1.get_metric()})
