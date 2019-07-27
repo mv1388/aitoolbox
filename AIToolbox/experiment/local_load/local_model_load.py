@@ -10,9 +10,9 @@ class AbstractLocalModelLoader(ABC):
         """
 
         Args:
-            model_name (str):
-            project_name (str):
-            experiment_name (str):
+            model_name (str): model file name
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
             **kwargs:
 
         Returns:
@@ -26,7 +26,7 @@ class PyTorchLocalModelLoader(AbstractLocalModelLoader):
         """
 
         Args:
-            local_model_result_folder_path (str):
+            local_model_result_folder_path (str): root local path where project folder will be created
         """
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
         self.model_load = None
@@ -35,9 +35,9 @@ class PyTorchLocalModelLoader(AbstractLocalModelLoader):
         """
 
         Args:
-            model_name (str):
-            project_name (str):
-            experiment_name (str):
+            model_name (str): model file name
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
             map_location (str or None):
 
         Returns:

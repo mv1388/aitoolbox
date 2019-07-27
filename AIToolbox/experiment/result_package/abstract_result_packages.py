@@ -56,9 +56,9 @@ class AbstractResultPackage(ABC):
         """
 
         Args:
-            y_true (numpy.array or list):
-            y_predicted (numpy.array or list):
-            hyperparameters (dict or None):
+            y_true (numpy.array or list): ground truth targets
+            y_predicted (numpy.array or list): predicted targets
+            hyperparameters (dict or None): dictionary filled with the set hyperparameters
             training_history (AIToolbox.experiment_save.training_history.TrainingHistory):
             **kwargs (dict):
 
