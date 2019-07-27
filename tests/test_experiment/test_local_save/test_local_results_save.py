@@ -87,9 +87,9 @@ class TestBaseLocalResultsSaver(unittest.TestCase):
         base_final = BaseLocalResultsSaver(local_model_result_folder_path=THIS_DIR)
         path = base_final.create_experiment_local_folder_structure(project_dir_name, exp_dir_name, current_time)
 
-        paths_list_obj = base_final.form_experiment_local_folders_paths(project_path, exp_dir_name, current_time, THIS_DIR)
-        paths_list_class = BaseLocalResultsSaver.form_experiment_local_folders_paths(project_dir_name, exp_dir_name,
-                                                                                     current_time, THIS_DIR)
+        paths_list_obj = base_final.get_experiment_local_results_folder_paths(project_path, exp_dir_name, current_time, THIS_DIR)
+        paths_list_class = BaseLocalResultsSaver.get_experiment_local_results_folder_paths(project_dir_name, exp_dir_name,
+                                                                                           current_time, THIS_DIR)
         self.assertEqual(paths_list_obj, paths_list_class)
 
         expected_path = os.path.join(THIS_DIR, project_dir_name, f'{exp_dir_name}_{current_time}', 'results')
@@ -107,8 +107,8 @@ class TestBaseLocalResultsSaver(unittest.TestCase):
         experiment_dir_path_true = os.path.join(project_dir_path_true, f'{exp_dir_name}_{current_time}')
         experiment_results_dir_path_true = os.path.join(experiment_dir_path_true, 'results')
 
-        paths = BaseLocalResultsSaver.form_experiment_local_folders_paths(project_dir_name, exp_dir_name, current_time,
-                                                                          THIS_DIR)
+        paths = BaseLocalResultsSaver.get_experiment_local_results_folder_paths(project_dir_name, exp_dir_name, current_time,
+                                                                                THIS_DIR)
         project_dir_path, experiment_dir_path, experiment_results_dir_path = paths
 
         self.assertEqual(len(paths), 3)

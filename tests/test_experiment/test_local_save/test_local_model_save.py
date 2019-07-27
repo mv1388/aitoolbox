@@ -181,7 +181,7 @@ class TestBaseLocalModelSaver(unittest.TestCase):
         current_time = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
 
         base_final = BaseLocalModelSaver(local_model_result_folder_path=THIS_DIR, checkpoint_model=checkpoint_model)
-        path = base_final.create_experiment_local_folder_structure(project_dir_name, exp_dir_name, current_time)
+        path = base_final.create_experiment_local_models_folder(project_dir_name, exp_dir_name, current_time)
 
         project_path = os.path.join(THIS_DIR, project_dir_name)
         exp_path = os.path.join(project_path, f'{exp_dir_name}_{current_time}')

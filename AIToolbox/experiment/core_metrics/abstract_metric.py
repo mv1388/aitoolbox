@@ -8,9 +8,9 @@ class AbstractBaseMetric(ABC):
         """
 
         Args:
-            y_true (numpy.array or list or str):
-            y_predicted (numpy.array or list or str):
-            np_array (bool):
+            y_true (numpy.array or list or str): ground truth targets
+            y_predicted (numpy.array or list or str): predicted targets
+            np_array (bool): should the provided targets be converted to numpy array or left as they are
         """
         self.y_true = np.array(y_true) if np_array else y_true
         self.y_predicted = np.array(y_predicted) if np_array else y_predicted
@@ -32,7 +32,7 @@ class AbstractBaseMetric(ABC):
         """
 
         Returns:
-            float or dict:
+            float or dict: return metric_result
         """
         return self.metric_result
 

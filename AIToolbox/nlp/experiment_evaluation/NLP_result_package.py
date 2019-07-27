@@ -83,8 +83,8 @@ class QuestionAnswerResultPackage(AbstractResultPackage):
                                                        local_model_result_folder_path):
         if self.output_text_dir is not None:
             _, experiment_dir_path, _ = \
-                BaseLocalResultsSaver.form_experiment_local_folders_paths(project_name, experiment_name,
-                                                                          experiment_timestamp, local_model_result_folder_path)
+                BaseLocalResultsSaver.get_experiment_local_results_folder_paths(project_name, experiment_name,
+                                                                                experiment_timestamp, local_model_result_folder_path)
             self.output_text_dir = os.path.join(experiment_dir_path, self.output_text_dir)
 
     def list_additional_results_dump_paths(self):
@@ -233,14 +233,14 @@ class MachineTranslationResultPackage(AbstractResultPackage):
                                                        local_model_result_folder_path):
         if self.output_text_dir is not None:
             _, experiment_dir_path, _ = \
-                BaseLocalResultsSaver.form_experiment_local_folders_paths(project_name, experiment_name,
-                                                                          experiment_timestamp, local_model_result_folder_path)
+                BaseLocalResultsSaver.get_experiment_local_results_folder_paths(project_name, experiment_name,
+                                                                                experiment_timestamp, local_model_result_folder_path)
             self.output_text_dir = os.path.join(experiment_dir_path, self.output_text_dir)
 
         if self.output_attn_heatmap_dir is not None:
             _, experiment_dir_path, _ = \
-                BaseLocalResultsSaver.form_experiment_local_folders_paths(project_name, experiment_name,
-                                                                          experiment_timestamp, local_model_result_folder_path)
+                BaseLocalResultsSaver.get_experiment_local_results_folder_paths(project_name, experiment_name,
+                                                                                experiment_timestamp, local_model_result_folder_path)
             self.output_attn_heatmap_dir = os.path.join(experiment_dir_path, self.output_attn_heatmap_dir)
 
     def list_additional_results_dump_paths(self):
