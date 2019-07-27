@@ -8,13 +8,13 @@ class ExperimentFolderCreator:
         """
 
         Args:
-            project_name (str):
-            experiment_name (str):
-            experiment_timestamp (str):
-            local_model_result_folder_path (str):
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            experiment_timestamp (str): time stamp at the start of training
+            local_model_result_folder_path (str): root local path where project folder will be created
 
         Returns:
-            str:
+            str: path to the created experiment base folder
         """
         project_path, experiment_path = \
             ExperimentFolderCreator.get_experiment_base_folder_paths(project_name, experiment_name,
@@ -34,13 +34,13 @@ class ExperimentFolderCreator:
         """
 
         Args:
-            project_name (str):
-            experiment_name (str):
-            experiment_timestamp (str):
-            local_model_result_folder_path (str):
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            experiment_timestamp (str): time stamp at the start of training
+            local_model_result_folder_path (str): root local path where project folder will be created
 
         Returns:
-            str, str:
+            str, str: path to the main project folder, path to the particular experiment folder
         """
         project_dir_path = os.path.join(os.path.expanduser(local_model_result_folder_path), project_name)
         experiment_dir_path = os.path.join(project_dir_path, experiment_name + '_' + experiment_timestamp)
