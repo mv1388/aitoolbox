@@ -227,7 +227,6 @@ class ModelTrainHistoryPlot(AbstractCallback):
         self.bucket_name = bucket_name
 
         self.cloud_results_saver = None
-        self.experiment_results_local_path = None
 
     def on_train_loop_registration(self):
         self.try_infer_experiment_details()
@@ -260,11 +259,6 @@ class ModelTrainHistoryPlot(AbstractCallback):
         Returns:
             None
         """
-        self.experiment_results_local_path = \
-            BaseLocalResultsSaver.create_experiment_local_results_folder(self.project_name, self.experiment_name,
-                                                                         self.train_loop_obj.experiment_timestamp,
-                                                                         self.local_model_result_folder_path)
-
         if self.cloud_save_mode == 's3' or self.cloud_save_mode == 'aws_s3' or self.cloud_save_mode == 'aws':
             self.cloud_results_saver = BaseResultsS3Saver(bucket_name=self.bucket_name)
 
@@ -290,12 +284,17 @@ class ModelTrainHistoryPlot(AbstractCallback):
         Returns:
             None
         """
+        experiment_results_local_path = \
+            BaseLocalResultsSaver.create_experiment_local_results_folder(self.project_name, self.experiment_name,
+                                                                         self.train_loop_obj.experiment_timestamp,
+                                                                         self.local_model_result_folder_path)
+
         # Just a dummy empty result package to wrap the train history as RP is expected in the plotter
         result_pkg_wrapper = EmptyResultPackage(results_dict={})
         result_pkg_wrapper.training_history = self.train_loop_obj.train_history
 
         plotter = TrainingHistoryPlotter(result_package=result_pkg_wrapper,
-                                         experiment_results_local_path=self.experiment_results_local_path,
+                                         experiment_results_local_path=experiment_results_local_path,
                                          plots_folder_name=f'{prefix}plots_epoch_{self.train_loop_obj.epoch}')
         saved_local_results_details = plotter.generate_report()
 
