@@ -115,7 +115,7 @@ qa_res_test_pkg_fin = QuestionAnswerResultPackage([paragraph_tokens for paragrap
                                                   )
 
 TrainLoopModelCheckpointEndSave(model, train_loader, dev_loader, test_loader, optimizer, criterion,
-                                project_name='unifiedModelExampleNEENEENENEN',
+                                project_name='unifiedModelExample',
                                 experiment_name='MemoryNetPytorchTest',
                                 local_model_result_folder_path=f'{project_folder_prefix}/model_results',
                                 hyperparams=used_args,
