@@ -17,11 +17,11 @@ class AbstractLocalResultsSaver(ABC):
         
         Args:
             result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
-            project_name (str):
-            experiment_name (str):
-            experiment_timestamp (str or None):
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            experiment_timestamp (str or None): time stamp at the start of training
             save_true_pred_labels (bool):
-            protect_existing_folder (bool):
+            protect_existing_folder (bool): can override potentially already existing folder or not
 
         Returns:
             list: list of list with this format: [[results_file_name, results_file_local_path], ... [ , ]] 
@@ -38,11 +38,11 @@ class AbstractLocalResultsSaver(ABC):
         
         Args:
             result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
-            project_name (str):
-            experiment_name (str):
-            experiment_timestamp (str or None):
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            experiment_timestamp (str or None): time stamp at the start of training
             save_true_pred_labels (bool):
-            protect_existing_folder (bool):
+            protect_existing_folder (bool): can override potentially already existing folder or not
 
         Returns:
             list: list of list with this format: [[results_file_name, results_file_local_path], ... [ , ]] 
@@ -72,9 +72,9 @@ class BaseLocalResultsSaver:
         """
 
         Args:
-            project_name (str):
-            experiment_name (str):
-            experiment_timestamp (str):
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            experiment_timestamp (str): time stamp at the start of training
 
         Returns:
             str:
@@ -88,10 +88,10 @@ class BaseLocalResultsSaver:
         """
 
         Args:
-            project_name (str):
-            experiment_name (str):
-            experiment_timestamp (str):
-            local_model_result_folder_path (str):
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            experiment_timestamp (str): time stamp at the start of training
+            local_model_result_folder_path (str): root local path where project folder will be created
 
         Returns:
             str:
@@ -113,10 +113,10 @@ class BaseLocalResultsSaver:
         """
 
         Args:
-            project_name (str):
-            experiment_name (str):
-            experiment_timestamp (str):
-            local_model_result_folder_path (str):
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            experiment_timestamp (str): time stamp at the start of training
+            local_model_result_folder_path (str): root local path where project folder will be created
 
         Returns:
             str, str, str: project_dir_path, experiment_dir_path, experiment_results_dir_path
@@ -161,7 +161,7 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
         """
 
         Args:
-            local_model_result_folder_path (str):
+            local_model_result_folder_path (str): root local path where project folder will be created
             file_format (str)
         """
         BaseLocalResultsSaver.__init__(self, local_model_result_folder_path, file_format)
@@ -172,11 +172,11 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
 
         Args:
             result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
-            project_name (str):
-            experiment_name (str):
-            experiment_timestamp (str or None):
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            experiment_timestamp (str or None): time stamp at the start of training
             save_true_pred_labels (bool):
-            protect_existing_folder (bool):
+            protect_existing_folder (bool): can override potentially already existing folder or not
 
         Returns:
             list: list of list with this format: [[results_file_path_inside_results_dir, results_file_local_path], ... [ , ]]
@@ -232,11 +232,11 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
 
         Args:
             result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
-            project_name (str):
-            experiment_name (str):
-            experiment_timestamp (str or None):
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            experiment_timestamp (str or None): time stamp at the start of training
             save_true_pred_labels (bool):
-            protect_existing_folder (bool):
+            protect_existing_folder (bool): can override potentially already existing folder or not
 
         Returns:
             list: list of list with this format: [[results_file_path_inside_results_dir, results_file_local_path], ... [ , ]]

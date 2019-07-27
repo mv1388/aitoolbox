@@ -13,11 +13,11 @@ class AbstractLocalModelSaver(ABC):
         
         Args:
             model (keras.engine.training.Model or dict):
-            project_name (str):
-            experiment_name (str):
-            experiment_timestamp (str or None):
-            epoch (int or None):
-            protect_existing_folder (bool):
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            experiment_timestamp (str or None): time stamp at the start of training
+            epoch (int or None): in which epoch the model is being saved
+            protect_existing_folder (bool): can override potentially already existing folder or not
 
         Returns:
             (str, str): model_name, model_local_path
@@ -31,8 +31,8 @@ class BaseLocalModelSaver:
         """
 
         Args:
-            local_model_result_folder_path (str):
-            checkpoint_model (bool):
+            local_model_result_folder_path (str): root local path where project folder will be created
+            checkpoint_model (bool): if the model is coming from the mid-training checkpoint
         """
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
         self.checkpoint_model = checkpoint_model
@@ -41,12 +41,12 @@ class BaseLocalModelSaver:
         """
 
         Args:
-            project_name (str):
-            experiment_name (str):
-            experiment_timestamp (str):
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            experiment_timestamp (str): time stamp at the start of training
 
         Returns:
-            str:
+            str: path to the created models folder in the experiment base folder
         """
         experiment_path = ExperimentFolderCreator.create_experiment_base_folder(project_name, experiment_name,
                                                                                 experiment_timestamp,
@@ -66,8 +66,8 @@ class KerasLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
         """
 
         Args:
-            local_model_result_folder_path (str):
-            checkpoint_model (bool):
+            local_model_result_folder_path (str): root local path where project folder will be created
+            checkpoint_model (bool): if the model is coming from the mid-training checkpoint
         """
         BaseLocalModelSaver.__init__(self, local_model_result_folder_path, checkpoint_model)
 
@@ -76,11 +76,11 @@ class KerasLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
 
         Args:
             model (keras.engine.training.Model):
-            project_name (str):
-            experiment_name (str):
-            experiment_timestamp (str or None):
-            epoch (int or None):
-            protect_existing_folder (bool):
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            experiment_timestamp (str or None): time stamp at the start of training
+            epoch (int or None): in which epoch the model is being saved
+            protect_existing_folder (bool): can override potentially already existing folder or not
 
         Returns:
             (str, str): model_name, model_local_path
@@ -109,8 +109,8 @@ class TensorFlowLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
         """
 
         Args:
-            local_model_result_folder_path (str):
-            checkpoint_model (bool):
+            local_model_result_folder_path (str): root local path where project folder will be created
+            checkpoint_model (bool): if the model is coming from the mid-training checkpoint
         """
         BaseLocalModelSaver.__init__(self, local_model_result_folder_path, checkpoint_model)
 
@@ -126,8 +126,8 @@ class PyTorchLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
         """
 
         Args:
-            local_model_result_folder_path (str):
-            checkpoint_model (bool):
+            local_model_result_folder_path (str): root local path where project folder will be created
+            checkpoint_model (bool): if the model is coming from the mid-training checkpoint
         """
         BaseLocalModelSaver.__init__(self, local_model_result_folder_path, checkpoint_model)
 
@@ -135,12 +135,12 @@ class PyTorchLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
         """
 
         Args:
-            model (dict):
-            project_name (str):
-            experiment_name (str):
-            experiment_timestamp (str or None):
-            epoch (int or None):
-            protect_existing_folder (bool):
+            model (dict): PyTorch model represented as a dict of weights, optimizer state and other necessary info
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            experiment_timestamp (str or None): time stamp at the start of training
+            epoch (int or None): in which epoch the model is being saved
+            protect_existing_folder (bool): can override potentially already existing folder or not
 
         Returns:
             (str, str): model_name, model_local_path
@@ -170,7 +170,7 @@ class PyTorchLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
         """Check if PyTorch model save dict contains all the necessary elements for the training state reconstruction
 
         Args:
-            model (dict):
+            model (dict): PyTorch model represented as a dict of weights, optimizer state and other necessary info
 
         Returns:
             None:
