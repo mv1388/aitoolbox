@@ -19,10 +19,10 @@ class AbstractExperimentSaver(ABC):
         Args:
             model:
             result_package (AIToolbox.ExperimentSave.result_package.AbstractResultPackage):
-            experiment_timestamp (str):
+            experiment_timestamp (str): time stamp of the training start
             save_true_pred_labels (bool):
             separate_files (bool):
-            protect_existing_folder (bool):
+            protect_existing_folder (bool): can override potentially already existing folder or not
 
         Returns:
             list: string paths where the experiment files were saved
@@ -37,8 +37,8 @@ class BaseFullExperimentSaver(AbstractExperimentSaver):
         Args:
             model_saver (AIToolbox.cloud.AWS.model_save.AbstractModelSaver):
             results_saver (AIToolbox.cloud.AWS.results_save.AbstractResultsSaver):
-            project_name (str):
-            experiment_name (str):
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
         """
         self.model_saver = model_saver
         self.results_saver = results_saver
@@ -54,10 +54,10 @@ class BaseFullExperimentSaver(AbstractExperimentSaver):
         Args:
             model (dict or keras.engine.training.Model):
             result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
-            experiment_timestamp (str):
+            experiment_timestamp (str): time stamp at the start of training
             save_true_pred_labels (bool):
             separate_files (bool):
-            protect_existing_folder (bool):
+            protect_existing_folder (bool): can override potentially already existing folder or not
 
         Returns:
             (str, str): cloud_model_path, cloud_results_path
@@ -88,10 +88,10 @@ class BaseFullExperimentS3Saver(BaseFullExperimentSaver):
 
         Args:
             model_saver (AIToolbox.cloud.AWS.model_save.AbstractModelSaver):
-            project_name (str):
-            experiment_name (str):
-            bucket_name (str):
-            local_model_result_folder_path (str):
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            bucket_name (str): name of the bucket in the cloud storage
+            local_model_result_folder_path (str): root local path where project folder will be created
         """
         results_saver = S3ResultsSaver(bucket_name=bucket_name,
                                        local_model_result_folder_path=local_model_result_folder_path)
@@ -105,10 +105,10 @@ class FullKerasExperimentS3Saver(BaseFullExperimentS3Saver):
         """
 
         Args:
-            project_name (str):
-            experiment_name (str):
-            bucket_name (str):
-            local_model_result_folder_path (str):
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            bucket_name (str): name of the bucket in the cloud storage
+            local_model_result_folder_path (str): root local path where project folder will be created
         """
         keras_model_saver = KerasS3ModelSaver(bucket_name=bucket_name,
                                               local_model_result_folder_path=local_model_result_folder_path)
@@ -124,10 +124,10 @@ class FullTensorFlowExperimentS3Saver(BaseFullExperimentS3Saver):
         """
 
         Args:
-            project_name (str):
-            experiment_name (str):
-            bucket_name (str):
-            local_model_result_folder_path (str):
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            bucket_name (str): name of the bucket in the cloud storage
+            local_model_result_folder_path (str): root local path where project folder will be created
         """
         tf_model_saver = TensorFlowS3ModelSaver(bucket_name=bucket_name,
                                                 local_model_result_folder_path=local_model_result_folder_path)
@@ -145,10 +145,10 @@ class FullPyTorchExperimentS3Saver(BaseFullExperimentS3Saver):
         """
 
         Args:
-            project_name (str):
-            experiment_name (str):
-            bucket_name (str):
-            local_model_result_folder_path (str):
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            bucket_name (str): name of the bucket in the cloud storage
+            local_model_result_folder_path (str): root local path where project folder will be created
         """
         pytorch_model_saver = PyTorchS3ModelSaver(bucket_name=bucket_name,
                                                   local_model_result_folder_path=local_model_result_folder_path)
@@ -165,10 +165,10 @@ class BaseFullExperimentGoogleStorageSaver(BaseFullExperimentSaver):
 
         Args:
             model_saver (AIToolbox.cloud.AWS.model_save.AbstractModelSaver):
-            project_name (str):
-            experiment_name (str):
-            bucket_name (str):
-            local_model_result_folder_path (str):
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            bucket_name (str): name of the bucket in the cloud storage
+            local_model_result_folder_path (str): root local path where project folder will be created
         """
         results_saver = GoogleStorageResultsSaver(bucket_name=bucket_name,
                                                   local_model_result_folder_path=local_model_result_folder_path)
@@ -182,10 +182,10 @@ class FullKerasExperimentGoogleStorageSaver(BaseFullExperimentGoogleStorageSaver
         """
 
         Args:
-            project_name (str):
-            experiment_name (str):
-            bucket_name (str):
-            local_model_result_folder_path (str):
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            bucket_name (str): name of the bucket in the cloud storage
+            local_model_result_folder_path (str): root local path where project folder will be created
         """
         keras_model_saver = KerasGoogleStorageModelSaver(bucket_name=bucket_name,
                                                          local_model_result_folder_path=local_model_result_folder_path)
@@ -201,10 +201,10 @@ class FullTensorFlowExperimentGoogleStorageSaver(BaseFullExperimentGoogleStorage
         """
 
         Args:
-            project_name (str):
-            experiment_name (str):
-            bucket_name (str):
-            local_model_result_folder_path (str):
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            bucket_name (str): name of the bucket in the cloud storage
+            local_model_result_folder_path (str): root local path where project folder will be created
         """
         tf_model_saver = TensorFlowGoogleStorageModelSaver(bucket_name=bucket_name,
                                                            local_model_result_folder_path=local_model_result_folder_path)
@@ -222,10 +222,10 @@ class FullPyTorchExperimentGoogleStorageSaver(BaseFullExperimentGoogleStorageSav
         """
 
         Args:
-            project_name (str):
-            experiment_name (str):
-            bucket_name (str):
-            local_model_result_folder_path (str):
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            bucket_name (str): name of the bucket in the cloud storage
+            local_model_result_folder_path (str): root local path where project folder will be created
         """
         pytorch_model_saver = PyTorchGoogleStorageModelSaver(bucket_name=bucket_name,
                                                              local_model_result_folder_path=local_model_result_folder_path)

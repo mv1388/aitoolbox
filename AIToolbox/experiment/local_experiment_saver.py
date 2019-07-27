@@ -12,9 +12,9 @@ class BaseFullExperimentLocalSaver(AbstractExperimentSaver):
 
         Args:
             model_saver (AIToolbox.experiment_save.local_save.local_model_save.AbstractLocalModelSaver)
-            project_name (str):
-            experiment_name (str):
-            local_model_result_folder_path (str):
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            local_model_result_folder_path (str): root local path where project folder will be created
         """
         if not isinstance(model_saver, AbstractLocalModelSaver):
             raise TypeError(f'model_saver must be inherited from AbstractLocalModelSaver. '
@@ -34,10 +34,10 @@ class BaseFullExperimentLocalSaver(AbstractExperimentSaver):
         Args:
             model (dict or keras.engine.training.Model):
             result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
-            experiment_timestamp (str):
+            experiment_timestamp (str): time stamp at the start of training
             save_true_pred_labels (bool):
             separate_files (bool):
-            protect_existing_folder (bool):
+            protect_existing_folder (bool): can override potentially already existing folder or not
 
         Returns:
             list:
@@ -80,9 +80,9 @@ class FullPyTorchExperimentLocalSaver(BaseFullExperimentLocalSaver):
         """
 
         Args:
-            project_name (str):
-            experiment_name (str):
-            local_model_result_folder_path (str):
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            local_model_result_folder_path (str): root local path where project folder will be created
         """
         BaseFullExperimentLocalSaver.__init__(self, PyTorchLocalModelSaver(local_model_result_folder_path),
                                               project_name, experiment_name,
@@ -94,9 +94,9 @@ class FullKerasExperimentLocalSaver(BaseFullExperimentLocalSaver):
         """
 
         Args:
-            project_name (str):
-            experiment_name (str):
-            local_model_result_folder_path (str):
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            local_model_result_folder_path (str): root local path where project folder will be created
         """
         BaseFullExperimentLocalSaver.__init__(self, KerasLocalModelSaver(local_model_result_folder_path),
                                               project_name, experiment_name,

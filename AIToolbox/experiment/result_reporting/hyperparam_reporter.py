@@ -51,7 +51,7 @@ class HyperParameterReporter:
         """
 
         Args:
-            local_hyperparams_file_path (str):
+            local_hyperparams_file_path (str): path to hyperparams file stored on local disk. File to be uploaded to cloud
             cloud_saver (BaseModelSaver or BaseResultsSaver or BaseModelGoogleStorageSaver or BaseResultsGoogleStorageSaver):
 
         Returns:
