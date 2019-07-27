@@ -5,7 +5,7 @@ from AIToolbox.experiment.local_save.local_results_save import BaseLocalResultsS
 from AIToolbox.experiment.result_package.abstract_result_packages import AbstractResultPackage
 from AIToolbox.experiment.core_metrics.classification import AccuracyMetric
 from AIToolbox.nlp.experiment_evaluation.NLP_metrics import ROUGEMetric, ROUGEPerlMetric, \
-    BLEUSentenceScoreMetric, BLEUCorpusScoreMetric, BLEUScoreStrTorchNLPMetric, PerplexityMetric
+    BLEUSentenceScoreMetric, BLEUCorpusScoreMetric, BLEUScoreStrTorchNLPMetric
 from AIToolbox.nlp.experiment_evaluation.attention_heatmap import AttentionHeatMap
 
 
@@ -208,10 +208,9 @@ class MachineTranslationResultPackage(AbstractResultPackage):
         bleu_avg_sent = BLEUSentenceScoreMetric(self.y_true_text, self.y_predicted_text,
                                                 self.source_sents, self.output_text_dir)
         bleu_corpus_result = BLEUCorpusScoreMetric(self.y_true_text, self.y_predicted_text)
-        # bleu_perl_result = BLEUScoreStrTorchNLPMetric(self.y_true_text, self.y_predicted_text)
-        # perplexity_result = PerplexityMetric(self.y_true_text, self.y_predicted_text)
+        bleu_perl_result = BLEUScoreStrTorchNLPMetric(self.y_true_text, self.y_predicted_text)
 
-        results_dict = bleu_corpus_result + bleu_avg_sent
+        results_dict = bleu_corpus_result + bleu_avg_sent + bleu_perl_result
 
         # Don't include TrainLoop objects inside the package - it makes it useful only for PyTorch, not other frameworks
         if self.output_attn_heatmap_dir is not None:
