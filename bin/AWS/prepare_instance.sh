@@ -60,6 +60,10 @@ scp -i $key_path -r ../ROUGE-1.5.5 ec2-user@$ec2_instance_address:~/project
 
 echo "#!/usr/bin/env bash
 
+export LANGUAGE=en_US.UTF-8
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+
 echo Ireland AWS zone: eu-west-1
 
 aws configure
