@@ -1,6 +1,8 @@
 import numpy as np
 from typing import Optional
 
+from AIToolbox.cloud.AWS.simple_email_service import SESSender
+
 
 class AbstractCallback:
     def __init__(self, callback_name, execution_order=0):
@@ -157,3 +159,62 @@ class AllPredictionsSame(AbstractCallback):
             if self.stop_training:
                 print('Executing early stopping')
                 self.train_loop_obj.early_stop = True
+
+
+class EmailNotification(AbstractCallback):
+    def __init__(self, sender_name, sender_email, recipient_email,
+                 project_name=None, experiment_name=None, aws_region='eu-west-1'):
+        """
+
+        Args:
+            sender_name:
+            sender_email:
+            recipient_email:
+            project_name:
+            experiment_name:
+            aws_region:
+        """
+        AbstractCallback.__init__(self, 'Send email to notify about the state of training')
+        self.project_name = project_name
+        self.experiment_name = experiment_name
+
+        self.ses_sender = SESSender(sender_name, sender_email, recipient_email, aws_region)
+
+    def on_epoch_end(self):
+        subject = f"End of epoch report: {self.project_name}: {self.experiment_name}"
+
+        performance_list = '<ul>' + \
+            '\n'.join([f'<li><p>{metric_name}: {metric_name[-1]}</p></li>'
+                       for metric_name, hist in self.train_loop_obj.train_history.items()]) + \
+            '</ul>'
+
+        body_text = f"""<h2>End of epoch {self.train_loop_obj.epoch}</h2>
+        {performance_list}
+        """
+
+        self.ses_sender.send_email(subject, body_text)
+
+    def on_train_end(self):
+        subject = f"End of training: {self.project_name}: {self.experiment_name}"
+
+        performance_list = '<ul>' + \
+                           '\n'.join([f'<li><p>{metric_name}: {metric_name[-1]}</p></li>'
+                                      for metric_name, hist in self.train_loop_obj.train_history.items()]) + \
+                           '</ul>'
+
+        body_text = f"""<h2>End of epoch {self.train_loop_obj.epoch}</h2>
+                {performance_list}
+                """
+
+        self.ses_sender.send_email(subject, body_text)
+
+    def on_train_loop_registration(self):
+        try:
+            if self.project_name is None:
+                self.project_name = self.train_loop_obj.project_name
+            if self.experiment_name is None:
+                self.experiment_name = self.train_loop_obj.experiment_name
+        except AttributeError:
+            raise AttributeError('Currently used TrainLoop does not support automatic project folder structure '
+                                 'creation. Project name, etc. thus can not be automatically deduced. Please provide'
+                                 'it in the callback parameters instead of currently used None values.')
