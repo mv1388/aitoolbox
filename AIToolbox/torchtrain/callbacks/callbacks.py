@@ -184,7 +184,7 @@ class EmailNotification(AbstractCallback):
         subject = f"End of epoch report: {self.project_name}: {self.experiment_name}"
 
         performance_list = '<ul>' + \
-                           '\n'.join([f'<li><p>{metric_name}: {metric_name[-1]}</p></li>'
+                           '\n'.join([f'<li><p>{metric_name}: {hist[-1]}</p></li>'
                                       for metric_name, hist in self.train_loop_obj.train_history.items()]) + \
                            '</ul>'
 
@@ -198,7 +198,7 @@ class EmailNotification(AbstractCallback):
         subject = f"End of training: {self.project_name}: {self.experiment_name}"
 
         performance_list = '<ul>' + \
-                           '\n'.join([f'<li><p>{metric_name}: {metric_name[-1]}</p></li>'
+                           '\n'.join([f'<li><p>{metric_name}: {hist[-1]}</p></li>'
                                       for metric_name, hist in self.train_loop_obj.train_history.items()]) + \
                            '</ul>'
 
