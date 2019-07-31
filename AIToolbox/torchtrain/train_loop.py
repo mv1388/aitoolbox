@@ -13,7 +13,8 @@ from AIToolbox.torchtrain.data.batch_model_feed_defs import AbstractModelFeedDef
 from AIToolbox.torchtrain.callbacks.callback_handler import CallbacksHandler
 from AIToolbox.torchtrain.callbacks.model_save_callbacks import ModelCheckpoint, ModelTrainEndSave
 from AIToolbox.experiment.training_history import TrainingHistory
-from AIToolbox.torchtrain.model_prediction_store import ModelPredictionStore
+from AIToolbox.torchtrain.tl_components.model_prediction_store import ModelPredictionStore
+from AIToolbox.torchtrain.tl_components.message_passing import MessageService
 from AIToolbox.experiment.result_package.abstract_result_packages import AbstractResultPackage
 
 
@@ -57,6 +58,8 @@ class TrainLoop:
 
         self.train_history = TrainingHistory(has_validation=self.validation_loader is not None)
         self.prediction_store = ModelPredictionStore(auto_purge=True)
+
+        self.message_service = MessageService()
 
         self.callbacks_handler = CallbacksHandler(self)
         self.callbacks = []
