@@ -2,7 +2,6 @@ import numpy as np
 from typing import Optional
 
 from AIToolbox.cloud.AWS.simple_email_service import SESSender
-from AIToolbox.torchtrain.callbacks.performance_eval_callbacks import ModelTrainHistoryPlot
 
 
 class AbstractCallback:
@@ -232,6 +231,8 @@ class EmailNotification(AbstractCallback):
         Returns:
             list:
         """
+        from AIToolbox.torchtrain.callbacks.performance_eval_callbacks import ModelTrainHistoryPlot
+
         results_file_local_paths = []
 
         for cb in self.train_loop_obj.callbacks:
