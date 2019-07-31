@@ -215,7 +215,7 @@ class ModelTrainHistoryPlot(AbstractCallback):
             raise ValueError('Both epoch_end and train_end are set to False. At least one of these should be True.')
         # execution_order=98 makes sure that any performance calculation callbacks are executed before and the most
         # recent results can already be found in the train_history
-        AbstractCallback.__init__(self, 'Model Train history Plot report', execution_order=98)
+        AbstractCallback.__init__(self, 'Model Train history Plot report', execution_order=97)
         self.epoch_end = epoch_end
         self.train_end = train_end
         self.project_name = project_name
@@ -227,6 +227,8 @@ class ModelTrainHistoryPlot(AbstractCallback):
         self.bucket_name = bucket_name
 
         self.cloud_results_saver = None
+
+        self.results_file_local_paths = None
 
     def on_train_loop_registration(self):
         self.try_infer_experiment_details()
@@ -297,6 +299,9 @@ class ModelTrainHistoryPlot(AbstractCallback):
                                          experiment_results_local_path=experiment_results_local_path,
                                          plots_folder_name=f'{prefix}plots_epoch_{self.train_loop_obj.epoch}')
         saved_local_results_details = plotter.generate_report()
+
+        # TODO: replace with messaging service in TrainLoop
+        self.results_file_local_paths = [result_local_path for _, result_local_path in saved_local_results_details]
 
         if self.cloud_results_saver is not None:
             experiment_cloud_path = \

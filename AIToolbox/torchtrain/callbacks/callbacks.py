@@ -2,6 +2,7 @@ import numpy as np
 from typing import Optional
 
 from AIToolbox.cloud.AWS.simple_email_service import SESSender
+from AIToolbox.torchtrain.callbacks.performance_eval_callbacks import ModelTrainHistoryPlot
 
 
 class AbstractCallback:
@@ -167,14 +168,14 @@ class EmailNotification(AbstractCallback):
         """
 
         Args:
-            sender_name:
-            sender_email:
-            recipient_email:
-            project_name:
-            experiment_name:
-            aws_region:
+            sender_name (str):
+            sender_email (str):
+            recipient_email (str):
+            project_name (str or None):
+            experiment_name (str or None):
+            aws_region (str):
         """
-        AbstractCallback.__init__(self, 'Send email to notify about the state of training')
+        AbstractCallback.__init__(self, 'Send email to notify about the state of training', execution_order=98)
         self.project_name = project_name
         self.experiment_name = experiment_name
 
@@ -184,18 +185,20 @@ class EmailNotification(AbstractCallback):
         subject = f"End of epoch {self.train_loop_obj.epoch} report: {self.project_name}: {self.experiment_name}"
 
         performance_list = self.get_metric_list_html()
+        plots_file_paths = self.get_result_plot_file_paths()
 
         body_text = f"""<h2>End of epoch {self.train_loop_obj.epoch}</h2>
         {performance_list}
         """
 
-        self.ses_sender.send_email(subject, body_text)
+        self.ses_sender.send_email(subject, body_text, plots_file_paths)
 
     def on_train_end(self):
         subject = f"End of training: {self.project_name}: {self.experiment_name}"
 
         performance_list = self.get_metric_list_html()
         hyperparams = self.get_hyperparams_html()
+        plots_file_paths = self.get_result_plot_file_paths()
 
         body_text = f"""<h2>End of training at epoch {self.train_loop_obj.epoch}</h2>
                 {performance_list}
@@ -204,7 +207,7 @@ class EmailNotification(AbstractCallback):
                 {hyperparams}
                 """
 
-        self.ses_sender.send_email(subject, body_text)
+        self.ses_sender.send_email(subject, body_text, plots_file_paths)
 
     def get_metric_list_html(self):
         performance_list = '<ul>' + \
@@ -223,6 +226,21 @@ class EmailNotification(AbstractCallback):
 
         return hyperparams
 
+    def get_result_plot_file_paths(self):
+        """
+
+        Returns:
+            list:
+        """
+        results_file_local_paths = []
+
+        for cb in self.train_loop_obj.callbacks:
+            if isinstance(cb, ModelTrainHistoryPlot):
+                if cb.results_file_local_paths is not None:
+                    results_file_local_paths += cb.results_file_local_paths
+
+        return results_file_local_paths
+
     def on_train_loop_registration(self):
         """
 
@@ -231,7 +249,7 @@ class EmailNotification(AbstractCallback):
         this callback.
 
         Returns:
-
+            None
         """
         try:
             if self.project_name is None:
