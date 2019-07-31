@@ -181,12 +181,9 @@ class EmailNotification(AbstractCallback):
         self.ses_sender = SESSender(sender_name, sender_email, recipient_email, aws_region)
 
     def on_epoch_end(self):
-        subject = f"End of epoch report: {self.project_name}: {self.experiment_name}"
+        subject = f"End of epoch {self.train_loop_obj.epoch} report: {self.project_name}: {self.experiment_name}"
 
-        performance_list = '<ul>' + \
-                           '\n'.join([f'<li><p>{metric_name}: {hist[-1]}</p></li>'
-                                      for metric_name, hist in self.train_loop_obj.train_history.items()]) + \
-                           '</ul>'
+        performance_list = self.get_metric_list_html()
 
         body_text = f"""<h2>End of epoch {self.train_loop_obj.epoch}</h2>
         {performance_list}
@@ -197,16 +194,34 @@ class EmailNotification(AbstractCallback):
     def on_train_end(self):
         subject = f"End of training: {self.project_name}: {self.experiment_name}"
 
+        performance_list = self.get_metric_list_html()
+        hyperparams = self.get_hyperparams_html()
+
+        body_text = f"""<h2>End of training at epoch {self.train_loop_obj.epoch}</h2>
+                {performance_list}
+
+                <h3>Used hyper parameters:</h3>
+                {hyperparams}
+                """
+
+        self.ses_sender.send_email(subject, body_text)
+
+    def get_metric_list_html(self):
         performance_list = '<ul>' + \
                            '\n'.join([f'<li><p>{metric_name}: {hist[-1]}</p></li>'
                                       for metric_name, hist in self.train_loop_obj.train_history.items()]) + \
                            '</ul>'
 
-        body_text = f"""<h2>End of epoch {self.train_loop_obj.epoch}</h2>
-                {performance_list}
-                """
+        return performance_list
 
-        self.ses_sender.send_email(subject, body_text)
+    def get_hyperparams_html(self):
+        hyperparams = '<ul>' + \
+                      '\n'.join([f'<li><p>{param_name}: {val}</p></li>'
+                                 for param_name, val in self.train_loop_obj.hyperparams.items()]) + \
+                      '</ul>' \
+            if hasattr(self.train_loop_obj, 'hyperparams') else 'Not given'
+
+        return hyperparams
 
     def on_train_loop_registration(self):
         try:
