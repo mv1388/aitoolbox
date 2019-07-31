@@ -1,6 +1,8 @@
 import numpy as np
 from typing import Optional
 
+from AIToolbox.cloud.AWS.simple_email_service import SESSender
+
 
 class AbstractCallback:
     def __init__(self, callback_name, execution_order=0):
@@ -157,3 +159,115 @@ class AllPredictionsSame(AbstractCallback):
             if self.stop_training:
                 print('Executing early stopping')
                 self.train_loop_obj.early_stop = True
+
+
+class EmailNotification(AbstractCallback):
+    def __init__(self, sender_name, sender_email, recipient_email,
+                 project_name=None, experiment_name=None, aws_region='eu-west-1'):
+        """
+
+        Args:
+            sender_name (str): Name of the email sender
+            sender_email (str): Email of the email sender
+            recipient_email (str): Email where the email will be sent
+            project_name (str or None): root name of the project
+            experiment_name (str or None): name of the particular experiment
+            aws_region (str): AWS SES region
+        """
+        AbstractCallback.__init__(self, 'Send email to notify about the state of training', execution_order=98)
+        self.project_name = project_name
+        self.experiment_name = experiment_name
+
+        self.ses_sender = SESSender(sender_name, sender_email, recipient_email, aws_region)
+
+    def on_epoch_end(self):
+        subject = f"End of epoch {self.train_loop_obj.epoch} report: {self.project_name}: {self.experiment_name}"
+
+        performance_list = self.get_metric_list_html()
+        plots_file_paths = self.get_result_plot_file_paths()
+
+        body_text = f"""<h2>End of epoch {self.train_loop_obj.epoch}</h2>
+        {performance_list}
+        """
+
+        self.ses_sender.send_email(subject, body_text, plots_file_paths)
+
+    def on_train_end(self):
+        subject = f"End of training: {self.project_name}: {self.experiment_name}"
+
+        performance_list = self.get_metric_list_html()
+        hyperparams = self.get_hyperparams_html()
+        plots_file_paths = self.get_result_plot_file_paths()
+
+        body_text = f"""<h2>End of training at epoch {self.train_loop_obj.epoch}</h2>
+                {performance_list}
+
+                <h3>Used hyper parameters:</h3>
+                {hyperparams}
+                """
+
+        self.ses_sender.send_email(subject, body_text, plots_file_paths)
+
+    def get_metric_list_html(self):
+        """
+
+        Returns:
+            str:
+        """
+        performance_list = '<ul>' + \
+                           '\n'.join([f'<li><p>{metric_name}: {hist[-1]}</p></li>'
+                                      for metric_name, hist in self.train_loop_obj.train_history.items()]) + \
+                           '</ul>'
+
+        return performance_list
+
+    def get_hyperparams_html(self):
+        """
+
+        Returns:
+            str:
+        """
+        hyperparams = '<ul>' + \
+                      '\n'.join([f'<li><p>{param_name}: {val}</p></li>'
+                                 for param_name, val in self.train_loop_obj.hyperparams.items()]) + \
+                      '</ul>' \
+            if hasattr(self.train_loop_obj, 'hyperparams') else 'Not given'
+
+        return hyperparams
+
+    def get_result_plot_file_paths(self):
+        """
+
+        Returns:
+            list:
+        """
+        from AIToolbox.torchtrain.callbacks.performance_eval_callbacks import ModelTrainHistoryPlot
+
+        results_file_local_paths = []
+
+        for cb in self.train_loop_obj.callbacks:
+            if isinstance(cb, ModelTrainHistoryPlot):
+                if cb.results_file_local_paths is not None:
+                    results_file_local_paths += cb.results_file_local_paths
+
+        return results_file_local_paths
+
+    def on_train_loop_registration(self):
+        """
+
+        Tries to infer the project description from the running train loop. If the train loop does not build
+        the project folder structure (e.g. basic TrainLoop) the descriptions need to be provided manually to
+        this callback.
+
+        Returns:
+            None
+        """
+        try:
+            if self.project_name is None:
+                self.project_name = self.train_loop_obj.project_name
+            if self.experiment_name is None:
+                self.experiment_name = self.train_loop_obj.experiment_name
+        except AttributeError:
+            raise AttributeError('Currently used TrainLoop does not support automatic project folder structure '
+                                 'creation. Project name, etc. thus can not be automatically deduced. Please provide'
+                                 'it in the callback parameters instead of currently used None values.')
