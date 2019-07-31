@@ -224,6 +224,15 @@ class EmailNotification(AbstractCallback):
         return hyperparams
 
     def on_train_loop_registration(self):
+        """
+
+        Tries to infer the project description from the running train loop. If the train loop does not build
+        the project folder structure (e.g. basic TrainLoop) the descriptions need to be provided manually to
+        this callback.
+
+        Returns:
+
+        """
         try:
             if self.project_name is None:
                 self.project_name = self.train_loop_obj.project_name
