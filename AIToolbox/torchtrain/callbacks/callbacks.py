@@ -167,12 +167,12 @@ class EmailNotification(AbstractCallback):
         """
 
         Args:
-            sender_name (str):
-            sender_email (str):
-            recipient_email (str):
-            project_name (str or None):
-            experiment_name (str or None):
-            aws_region (str):
+            sender_name (str): Name of the email sender
+            sender_email (str): Email of the email sender
+            recipient_email (str): Email where the email will be sent
+            project_name (str or None): root name of the project
+            experiment_name (str or None): name of the particular experiment
+            aws_region (str): AWS SES region
         """
         AbstractCallback.__init__(self, 'Send email to notify about the state of training', execution_order=98)
         self.project_name = project_name
@@ -209,6 +209,11 @@ class EmailNotification(AbstractCallback):
         self.ses_sender.send_email(subject, body_text, plots_file_paths)
 
     def get_metric_list_html(self):
+        """
+
+        Returns:
+            str:
+        """
         performance_list = '<ul>' + \
                            '\n'.join([f'<li><p>{metric_name}: {hist[-1]}</p></li>'
                                       for metric_name, hist in self.train_loop_obj.train_history.items()]) + \
@@ -217,6 +222,11 @@ class EmailNotification(AbstractCallback):
         return performance_list
 
     def get_hyperparams_html(self):
+        """
+
+        Returns:
+            str:
+        """
         hyperparams = '<ul>' + \
                       '\n'.join([f'<li><p>{param_name}: {val}</p></li>'
                                  for param_name, val in self.train_loop_obj.hyperparams.items()]) + \

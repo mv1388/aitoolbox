@@ -12,10 +12,10 @@ class SESSender:
         """
 
         Args:
-            sender_name (str):
-            sender_email (str):
-            recipient_email (str):
-            aws_region (str):
+            sender_name (str): Name of the email sender
+            sender_email (str): Email of the email sender
+            recipient_email (str): Email where the email will be sent
+            aws_region (str): AWS SES region
         """
         self.sender_name = sender_name
         self.sender_email = sender_email
@@ -33,9 +33,9 @@ class SESSender:
         """
 
         Args:
-            subject (str):
-            body (str):
-            attachment_file_paths (list or None):
+            subject (str): email subject
+            body (str): HTML body of the email
+            attachment_file_paths (list or None): list of local paths pointing to the email attachment files
 
         Returns:
             None
