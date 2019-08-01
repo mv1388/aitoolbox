@@ -59,7 +59,7 @@ class TrainLoop:
         self.train_history = TrainingHistory(has_validation=self.validation_loader is not None)
         self.prediction_store = ModelPredictionStore(auto_purge=True)
 
-        self.message_service = MessageService()
+        self.message_service = MessageService(auto_purge_on_update=True)
 
         self.callbacks_handler = CallbacksHandler(self)
         self.callbacks = []
@@ -130,6 +130,8 @@ class TrainLoop:
             # Automatic end of epoch code - reports the train and if available validation loss and executes callbacks
             self.auto_execute_end_of_epoch()
             self.callbacks_handler.execute_epoch_end()
+
+            self.message_service.end_of_epoch_trigger()
 
             # self.early_stop is changed from the early stopper callback
             if self.early_stop:
