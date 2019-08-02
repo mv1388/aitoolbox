@@ -228,8 +228,6 @@ class ModelTrainHistoryPlot(AbstractCallback):
 
         self.cloud_results_saver = None
 
-        self.results_file_local_paths = None
-
     def on_train_loop_registration(self):
         self.try_infer_experiment_details()
         self.prepare_results_saver()
@@ -300,8 +298,9 @@ class ModelTrainHistoryPlot(AbstractCallback):
                                          plots_folder_name=f'{prefix}plots_epoch_{self.train_loop_obj.epoch}')
         saved_local_results_details = plotter.generate_report()
 
-        # TODO: replace with messaging service in TrainLoop
-        self.results_file_local_paths = [result_local_path for _, result_local_path in saved_local_results_details]
+        results_file_local_paths = [result_local_path for _, result_local_path in saved_local_results_details]
+        self.message_service.write_message('ModelTrainHistoryPlot_results_file_local_paths',
+                                           results_file_local_paths)
 
         if self.cloud_results_saver is not None:
             experiment_cloud_path = \

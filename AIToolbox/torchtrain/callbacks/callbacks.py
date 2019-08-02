@@ -17,10 +17,12 @@ class AbstractCallback:
                 than the callbacks are executed in the order they were registered.
         """
         from AIToolbox.torchtrain.train_loop import TrainLoop
+        from AIToolbox.torchtrain.tl_components.message_passing import MessageService
 
         self.callback_name = callback_name
         self.execution_order = execution_order
         self.train_loop_obj: Optional[TrainLoop] = None
+        self.message_service: Optional[MessageService] = None
 
     def register_train_loop_object(self, train_loop_obj):
         """Introduce the reference to the encapsulating trainloop so that the callback has access to the
@@ -36,6 +38,7 @@ class AbstractCallback:
             AbstractCallback: return the reference to the callback after it is registered
         """
         self.train_loop_obj = train_loop_obj
+        self.message_service = train_loop_obj.message_service
         self.on_train_loop_registration()
         return self
 
@@ -184,7 +187,8 @@ class EmailNotification(AbstractCallback):
         subject = f"End of epoch {self.train_loop_obj.epoch} report: {self.project_name}: {self.experiment_name}"
 
         performance_list = self.get_metric_list_html()
-        plots_file_paths = self.get_result_plot_file_paths()
+        plots_file_paths = self.message_service.read_messages('ModelTrainHistoryPlot_results_file_local_paths')
+        plots_file_paths = self.flatten_list_of_lists(plots_file_paths)
 
         body_text = f"""<h2>End of epoch {self.train_loop_obj.epoch}</h2>
         {performance_list}
@@ -197,7 +201,8 @@ class EmailNotification(AbstractCallback):
 
         performance_list = self.get_metric_list_html()
         hyperparams = self.get_hyperparams_html()
-        plots_file_paths = self.get_result_plot_file_paths()
+        plots_file_paths = self.message_service.read_messages('ModelTrainHistoryPlot_results_file_local_paths')
+        plots_file_paths = self.flatten_list_of_lists(plots_file_paths)
 
         body_text = f"""<h2>End of training at epoch {self.train_loop_obj.epoch}</h2>
                 {performance_list}
@@ -235,22 +240,20 @@ class EmailNotification(AbstractCallback):
 
         return hyperparams
 
-    def get_result_plot_file_paths(self):
+    @staticmethod
+    def flatten_list_of_lists(l):
         """
+
+        Args:
+            l (list):
 
         Returns:
-            list:
+            list or None:
         """
-        from AIToolbox.torchtrain.callbacks.performance_eval_callbacks import ModelTrainHistoryPlot
-
-        results_file_local_paths = []
-
-        for cb in self.train_loop_obj.callbacks:
-            if isinstance(cb, ModelTrainHistoryPlot):
-                if cb.results_file_local_paths is not None:
-                    results_file_local_paths += cb.results_file_local_paths
-
-        return results_file_local_paths
+        if l is not None:
+            return [item for sublist in l for item in sublist]
+        else:
+            return None
 
     def on_train_loop_registration(self):
         """
