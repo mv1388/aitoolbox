@@ -10,7 +10,7 @@ from AIToolbox.utils import dict_util
 from AIToolbox.torchtrain.model import TTFullModel, ModelWrap
 from AIToolbox.torchtrain.multi_loss import MultiOptimizer
 from AIToolbox.torchtrain.data.batch_model_feed_defs import AbstractModelFeedDefinition
-from AIToolbox.torchtrain.callbacks.callback_handler import CallbacksHandler
+from AIToolbox.torchtrain.tl_components.callback_handler import CallbacksHandler
 from AIToolbox.torchtrain.callbacks.model_save_callbacks import ModelCheckpoint, ModelTrainEndSave
 from AIToolbox.experiment.training_history import TrainingHistory
 from AIToolbox.torchtrain.tl_components.model_prediction_store import ModelPredictionStore

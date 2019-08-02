@@ -4,7 +4,7 @@ from tests.utils import *
 
 from AIToolbox.torchtrain.train_loop import TrainLoop, TrainLoopModelCheckpoint, TrainLoopModelEndSave, TrainLoopModelCheckpointEndSave
 from AIToolbox.torchtrain.model import ModelWrap
-from AIToolbox.torchtrain.callbacks.callback_handler import CallbacksHandler
+from AIToolbox.torchtrain.tl_components.callback_handler import CallbacksHandler
 from AIToolbox.torchtrain.callbacks.model_save_callbacks import ModelCheckpoint, ModelTrainEndSave
 
 
