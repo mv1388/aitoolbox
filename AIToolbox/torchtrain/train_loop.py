@@ -58,8 +58,7 @@ class TrainLoop:
 
         self.train_history = TrainingHistory(has_validation=self.validation_loader is not None)
         self.prediction_store = ModelPredictionStore(auto_purge=True)
-
-        self.message_service = MessageService(auto_purge_on_update=True)
+        self.message_service = MessageService()
 
         self.callbacks_handler = CallbacksHandler(self)
         self.callbacks = []

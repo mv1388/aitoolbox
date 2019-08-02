@@ -1,33 +1,52 @@
+KEEP_FOREVER = 'keep_forever'
+UNTIL_END_OF_EPOCH = 'until_end_of_epoch'
+UNTIL_READ = 'until_read'
+
 
 class MessageService:
-    def __init__(self, auto_purge_on_update=True):
-        self.auto_purge_on_update = auto_purge_on_update
-
+    def __init__(self):
         self.message_store = {}
-
         self.message_handling_settings = {}
 
-    def end_of_epoch_trigger(self):
-        pass
-
     def read_messages(self, key):
-        if key in self.message_store and len(self.message_store[key]) > 0:
-            return self.message_store[key] if len(self.message_store[key]) > 1 else self.message_store[key][0]
+        """
+
+        Args:
+            key (str):
+
+        Returns:
+            list or None:
+        """
+        if key in self.message_store:
+            messages = self.message_store[key]
+
+            if self.message_handling_settings[key] == UNTIL_READ:
+                del self.message_store[key]
+
+            return messages
         else:
             return None
 
-    def write_message(self, key, value, msg_handling_setting=None):
-        self.auto_purge_messages(key, msg_handling_setting)
+    def write_message(self, key, value, msg_handling_setting=UNTIL_END_OF_EPOCH):
+        """
+
+        Args:
+            key (str):
+            value:
+            msg_handling_setting (str):
+
+        Returns:
+            None
+        """
+        if key not in self.message_handling_settings:
+            self.message_handling_settings[key] = msg_handling_setting
 
         if key not in self.message_store:
             self.message_store[key] = []
 
         self.message_store[key].append(value)
 
-    def auto_purge_messages(self, key, purge_manual_setting):
-        if purge_manual_setting or (purge_manual_setting is None and self.auto_purge_on_update):
-            self.purge_messages_by_key(key)
-
-    def purge_messages_by_key(self, key):
-        if key in self.message_store:
-            del self.message_store[key]
+    def end_of_epoch_trigger(self):
+        for key, msg_handling_rule in self.message_handling_settings.items():
+            if key in self.message_store and msg_handling_rule == UNTIL_END_OF_EPOCH:
+                del self.message_store[key]
