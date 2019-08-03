@@ -2,6 +2,7 @@ import copy
 import os
 
 from AIToolbox.torchtrain.callbacks.callbacks import AbstractCallback
+from AIToolbox.torchtrain.tl_components import message_passing as msg_passing_settings
 from AIToolbox.cloud.AWS.results_save import BaseResultsSaver as BaseResultsS3Saver
 from AIToolbox.cloud.GoogleCloud.results_save import BaseResultsGoogleStorageSaver
 from AIToolbox.experiment.local_save.local_results_save import BaseLocalResultsSaver
@@ -300,7 +301,8 @@ class ModelTrainHistoryPlot(AbstractCallback):
 
         results_file_local_paths = [result_local_path for _, result_local_path in saved_local_results_details]
         self.message_service.write_message('ModelTrainHistoryPlot_results_file_local_paths',
-                                           results_file_local_paths)
+                                           results_file_local_paths,
+                                           msg_handling_settings=msg_passing_settings.UNTIL_END_OF_EPOCH)
 
         if self.cloud_results_saver is not None:
             experiment_cloud_path = \
