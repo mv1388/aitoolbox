@@ -2,11 +2,19 @@ KEEP_FOREVER = 'keep_forever'
 UNTIL_END_OF_EPOCH = 'until_end_of_epoch'
 UNTIL_READ = 'until_read'
 
+ACCEPTED_SETTINGS = [KEEP_FOREVER, UNTIL_END_OF_EPOCH, UNTIL_READ]
+
+
+class Message:
+    def __init__(self, key, value, msg_handling_setting):
+        self.key = key
+        self.value = value
+        self.msg_handling_setting = msg_handling_setting
+
 
 class MessageService:
     def __init__(self):
         self.message_store = {}
-        self.message_handling_settings = {}
 
     def read_messages(self, key):
         """
@@ -18,11 +26,8 @@ class MessageService:
             list or None:
         """
         if key in self.message_store:
-            messages = self.message_store[key]
-
-            if self.message_handling_settings[key] == UNTIL_READ:
-                del self.message_store[key]
-
+            messages = [msg.value for msg in self.message_store[key]]
+            self.message_store[key] = [msg for msg in self.message_store[key] if msg.msg_handling_setting != UNTIL_READ]
             return messages
         else:
             return None
@@ -38,15 +43,27 @@ class MessageService:
         Returns:
             None
         """
-        if key not in self.message_handling_settings:
-            self.message_handling_settings[key] = msg_handling_setting
+        if msg_handling_setting not in ACCEPTED_SETTINGS:
+            raise ValueError(f'Provided msg_handling_setting {msg_handling_setting} is not supported. '
+                             f'Currently supported settings are: {ACCEPTED_SETTINGS}.')
 
         if key not in self.message_store:
             self.message_store[key] = []
 
-        self.message_store[key].append(value)
+        message = Message(key, value, msg_handling_setting)
+        self.message_store[key].append(message)
 
     def end_of_epoch_trigger(self):
-        for key, msg_handling_rule in self.message_handling_settings.items():
-            if key in self.message_store and msg_handling_rule == UNTIL_END_OF_EPOCH:
+        """Purging of the message service at the end of the epoch
+
+        Normally executed by the TrainLoop automatically after all the callbacks were executed at the end of every epoch
+
+        Returns:
+            None
+        """
+        for key, msgs_list in list(self.message_store.items()):
+            self.message_store[key] = [msg for msg in self.message_store[key]
+                                       if msg.msg_handling_setting != UNTIL_END_OF_EPOCH]
+
+            if len(self.message_store[key]) == 0:
                 del self.message_store[key]
