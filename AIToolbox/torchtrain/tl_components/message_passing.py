@@ -7,14 +7,27 @@ ACCEPTED_SETTINGS = (KEEP_FOREVER, UNTIL_END_OF_EPOCH, UNTIL_READ, OVERWRITE)
 
 
 class Message:
-    def __init__(self, key, value, msg_handling_setting):
+    def __init__(self, key, value, msg_handling_settings):
+        """Wrapper object to represent the messages in the MessageService together with their handling settings
+
+        Args:
+            key (str):
+            value:
+            msg_handling_settings (str or list):
+        """
         self.key = key
         self.value = value
-        self.msg_handling_setting = msg_handling_setting
+        self.msg_handling_settings = msg_handling_settings \
+            if type(msg_handling_settings) is list else [msg_handling_settings]
 
 
 class MessageService:
     def __init__(self):
+        """Message Passing Service
+
+        Primarily intended for passing the messages in the TrainLoop, especially for communication or data sharing
+        between different callbacks.
+        """
         self.message_store = {}
 
     def read_messages(self, key):
@@ -28,32 +41,30 @@ class MessageService:
         """
         if key in self.message_store:
             messages = [msg.value for msg in self.message_store[key]]
-            self.message_store[key] = [msg for msg in self.message_store[key] if msg.msg_handling_setting != UNTIL_READ]
+            self.message_store[key] = [msg for msg in self.message_store[key] if UNTIL_READ not in msg.msg_handling_settings]
             return messages
         else:
             return None
 
-    def write_message(self, key, value, msg_handling_setting=UNTIL_END_OF_EPOCH):
+    def write_message(self, key, value, msg_handling_settings=UNTIL_END_OF_EPOCH):
         """
 
         Args:
             key (str):
             value:
-            msg_handling_setting (str):
+            msg_handling_settings (str or list):
 
         Returns:
             None
         """
-        if msg_handling_setting not in ACCEPTED_SETTINGS:
-            raise ValueError(f'Provided msg_handling_setting {msg_handling_setting} is not supported. '
-                             f'Currently supported settings are: {ACCEPTED_SETTINGS}.')
+        self.validate_msg_handling_settings(msg_handling_settings)
 
         if key not in self.message_store:
             self.message_store[key] = []
 
-        message = Message(key, value, msg_handling_setting)
+        message = Message(key, value, msg_handling_settings)
 
-        if msg_handling_setting == OVERWRITE:
+        if OVERWRITE in msg_handling_settings:
             self.message_store[key] = [message]
         else:
             self.message_store[key].append(message)
@@ -68,7 +79,25 @@ class MessageService:
         """
         for key, msgs_list in list(self.message_store.items()):
             self.message_store[key] = [msg for msg in self.message_store[key]
-                                       if msg.msg_handling_setting != UNTIL_END_OF_EPOCH]
+                                       if UNTIL_END_OF_EPOCH not in msg.msg_handling_settings]
 
             if len(self.message_store[key]) == 0:
                 del self.message_store[key]
+
+    @staticmethod
+    def validate_msg_handling_settings(msg_handling_settings):
+        if type(msg_handling_settings) == str:
+            if msg_handling_settings not in ACCEPTED_SETTINGS:
+                raise ValueError(f'Provided msg_handling_settings {msg_handling_settings} is not supported. '
+                                 f'Currently supported settings are: {ACCEPTED_SETTINGS}.')
+        elif type(msg_handling_settings) == list:
+            for msg_setting in msg_handling_settings:
+                if msg_setting not in ACCEPTED_SETTINGS:
+                    raise ValueError(f'Provided msg_handling_settings {msg_setting} is not supported. '
+                                     f'Currently supported settings are: {ACCEPTED_SETTINGS}.')
+
+            if len(msg_handling_settings) > 1 and OVERWRITE not in msg_handling_settings:
+                raise ValueError(f'Provided two incompatible msg_handling_settings {msg_handling_settings}. '
+                                 f'Only OVERRIDE setting can currently be combined with another available setting')
+        else:
+            raise ValueError(f'Provided msg_handling_settings {msg_handling_settings} type not supported str or list')
