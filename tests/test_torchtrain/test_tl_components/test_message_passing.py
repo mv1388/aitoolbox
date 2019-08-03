@@ -87,6 +87,32 @@ class TestMessageService(unittest.TestCase):
                                               ('test_list_float', [1919191, 333], msg_pass.UNTIL_END_OF_EPOCH),
                                               ('test_list_float', [494.53, 2.], msg_pass.UNTIL_END_OF_EPOCH)]})
 
+        msg_service.write_message('test_overwrite', [1919191, 333], msg_pass.OVERWRITE)
+        self.compare_msg_service_content(msg_service,
+                                         {'test_float': [('test_float', 344.452, msg_pass.UNTIL_END_OF_EPOCH),
+                                                         ('test_float', 1000, msg_pass.UNTIL_END_OF_EPOCH),
+                                                         ('test_float', 123, msg_pass.UNTIL_END_OF_EPOCH)],
+                                          'test_list_float': [
+                                              ('test_list_float', [433.44, 111.3322, 0.4], msg_pass.UNTIL_END_OF_EPOCH),
+                                              ('test_list_float', [1919191, 333], msg_pass.UNTIL_END_OF_EPOCH),
+                                              ('test_list_float', [494.53, 2.], msg_pass.UNTIL_END_OF_EPOCH)],
+                                          'test_overwrite': [
+                                              ('test_overwrite', [1919191, 333], msg_pass.OVERWRITE)
+                                          ]})
+
+        msg_service.write_message('test_overwrite', [1, 2], msg_pass.OVERWRITE)
+        self.compare_msg_service_content(msg_service,
+                                         {'test_float': [('test_float', 344.452, msg_pass.UNTIL_END_OF_EPOCH),
+                                                         ('test_float', 1000, msg_pass.UNTIL_END_OF_EPOCH),
+                                                         ('test_float', 123, msg_pass.UNTIL_END_OF_EPOCH)],
+                                          'test_list_float': [
+                                              ('test_list_float', [433.44, 111.3322, 0.4], msg_pass.UNTIL_END_OF_EPOCH),
+                                              ('test_list_float', [1919191, 333], msg_pass.UNTIL_END_OF_EPOCH),
+                                              ('test_list_float', [494.53, 2.], msg_pass.UNTIL_END_OF_EPOCH)],
+                                          'test_overwrite': [
+                                              ('test_overwrite', [1, 2], msg_pass.OVERWRITE)
+                                          ]})
+
         with self.assertRaises(ValueError):
             msg_service.write_message('test_list_float', [1919191, 333], 'unsupported_setting')
 
