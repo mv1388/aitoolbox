@@ -10,10 +10,11 @@ from AIToolbox.utils import dict_util
 from AIToolbox.torchtrain.model import TTFullModel, ModelWrap
 from AIToolbox.torchtrain.multi_loss import MultiOptimizer
 from AIToolbox.torchtrain.data.batch_model_feed_defs import AbstractModelFeedDefinition
-from AIToolbox.torchtrain.callbacks.callback_handler import CallbacksHandler
+from AIToolbox.torchtrain.tl_components.callback_handler import CallbacksHandler
 from AIToolbox.torchtrain.callbacks.model_save_callbacks import ModelCheckpoint, ModelTrainEndSave
 from AIToolbox.experiment.training_history import TrainingHistory
-from AIToolbox.torchtrain.model_prediction_store import ModelPredictionStore
+from AIToolbox.torchtrain.tl_components.model_prediction_store import ModelPredictionStore
+from AIToolbox.torchtrain.tl_components.message_passing import MessageService
 from AIToolbox.experiment.result_package.abstract_result_packages import AbstractResultPackage
 
 
@@ -57,6 +58,7 @@ class TrainLoop:
 
         self.train_history = TrainingHistory(has_validation=self.validation_loader is not None)
         self.prediction_store = ModelPredictionStore(auto_purge=True)
+        self.message_service = MessageService()
 
         self.callbacks_handler = CallbacksHandler(self)
         self.callbacks = []
@@ -127,6 +129,8 @@ class TrainLoop:
             # Automatic end of epoch code - reports the train and if available validation loss and executes callbacks
             self.auto_execute_end_of_epoch()
             self.callbacks_handler.execute_epoch_end()
+
+            self.message_service.end_of_epoch_trigger()
 
             # self.early_stop is changed from the early stopper callback
             if self.early_stop:
