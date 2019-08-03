@@ -1,8 +1,9 @@
 KEEP_FOREVER = 'keep_forever'
 UNTIL_END_OF_EPOCH = 'until_end_of_epoch'
 UNTIL_READ = 'until_read'
+OVERWRITE = 'overwrite'
 
-ACCEPTED_SETTINGS = [KEEP_FOREVER, UNTIL_END_OF_EPOCH, UNTIL_READ]
+ACCEPTED_SETTINGS = (KEEP_FOREVER, UNTIL_END_OF_EPOCH, UNTIL_READ, OVERWRITE)
 
 
 class Message:
@@ -51,7 +52,11 @@ class MessageService:
             self.message_store[key] = []
 
         message = Message(key, value, msg_handling_setting)
-        self.message_store[key].append(message)
+
+        if msg_handling_setting == OVERWRITE:
+            self.message_store[key] = [message]
+        else:
+            self.message_store[key].append(message)
 
     def end_of_epoch_trigger(self):
         """Purging of the message service at the end of the epoch
