@@ -2,6 +2,7 @@ from tqdm import tqdm
 import os
 import time
 import datetime
+import inspect
 import numpy as np
 import torch
 from torch.nn.modules import Module
@@ -382,6 +383,8 @@ class TrainLoopModelCheckpoint(TrainLoop):
         self.cloud_save_mode = cloud_save_mode
         self.rm_subopt_local_models = rm_subopt_local_models
 
+        self.hyperparams['experiment_file_path'] = inspect.getframeinfo(inspect.currentframe().f_back).filename
+
         self.callbacks_handler.register_callbacks([
             ModelCheckpoint(self.project_name, self.experiment_name, self.local_model_result_folder_path,
                             self.hyperparams,
@@ -429,6 +432,7 @@ class TrainLoopModelEndSave(TrainLoop):
         self.test_result_package = test_result_package
         self.cloud_save_mode = cloud_save_mode
 
+        self.hyperparams['experiment_file_path'] = inspect.getframeinfo(inspect.currentframe().f_back).filename
         self.check_if_result_packages_possible()
 
         self.callbacks_handler.register_callbacks([
@@ -499,6 +503,7 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
                                        hyperparams, val_result_package, test_result_package,
                                        cloud_save_mode, bucket_name)
         self.rm_subopt_local_models = rm_subopt_local_models
+        self.hyperparams['experiment_file_path'] = inspect.getframeinfo(inspect.currentframe().f_back).filename
 
         self.callbacks_handler.register_callbacks([
             ModelCheckpoint(self.project_name, self.experiment_name, self.local_model_result_folder_path,

@@ -1,4 +1,5 @@
 import os
+from shutil import copyfile
 
 from AIToolbox.experiment.local_save.folder_create import ExperimentFolderCreator as FolderCreator
 from AIToolbox.cloud.AWS.model_save import BaseModelSaver
@@ -47,12 +48,14 @@ class HyperParameterReporter:
 
         return self.local_hyperparams_file_path
 
-    def copy_to_cloud_storage(self, local_hyperparams_file_path, cloud_saver):
+    def copy_to_cloud_storage(self, local_hyperparams_file_path, cloud_saver, file_name=None):
         """
 
         Args:
             local_hyperparams_file_path (str): path to hyperparams file stored on local disk. File to be uploaded to cloud
             cloud_saver (BaseModelSaver or BaseResultsSaver or BaseModelGoogleStorageSaver or BaseResultsGoogleStorageSaver):
+            file_name (str or None): manually specify the file name to be saved to the cloud instead of taking
+                the default from self.file_name
 
         Returns:
             str: path where the file was saved in the cloud storage
@@ -61,7 +64,25 @@ class HyperParameterReporter:
             .create_experiment_cloud_storage_folder_structure(self.project_name, self.experiment_name,
                                                               self.experiment_timestamp).rsplit('/', 1)[0]
 
-        cloud_file_path = os.path.join(cloud_folder_path, self.file_name)
+        cloud_file_path = os.path.join(cloud_folder_path, self.file_name if file_name is None else file_name)
         cloud_saver.save_file(local_hyperparams_file_path, cloud_file_path)
 
         return cloud_file_path
+
+    def save_experiment_python_file(self, hyperparams):
+        """
+
+        Args:
+            hyperparams (dict): hyper-parameters listed in the dict
+
+        Returns:
+            str: path to the saved hyper-param text file
+        """
+        if 'experiment_file_path' in hyperparams:
+            destination_file_path = os.path.join(self.experiment_dir_path,
+                                                 os.path.basename(hyperparams['experiment_file_path']))
+            copyfile(hyperparams['experiment_file_path'], destination_file_path)
+            return destination_file_path
+        else:
+            print('experiment_file_path experiment execution file path missing in the hyperparams dict. '
+                  'Consequently not copying the file to the experiment dir.')
