@@ -95,5 +95,4 @@ class SESSender:
         except ClientError as e:
             print(e.response['Error']['Message'])
         else:
-            print("Email sent! Message ID:"),
-            print(response['MessageId'])
+            print("Email successfully sent!")
