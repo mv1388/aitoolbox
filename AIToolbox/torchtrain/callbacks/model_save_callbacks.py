@@ -96,10 +96,16 @@ class ModelCheckpoint(AbstractCallback):
 
             if not os.path.isfile(param_reporter.local_hyperparams_file_path):
                 local_hyperparams_file_path = param_reporter.save_hyperparams_to_text_file(self.hyperparams)
+                local_experiment_python_file_path = param_reporter.save_experiment_python_file(self.hyperparams)
 
                 # Should also save to cloud
                 if type(self.model_checkpointer) != PyTorchLocalModelSaver:
                     param_reporter.copy_to_cloud_storage(local_hyperparams_file_path, self.model_checkpointer)
+
+                    if local_experiment_python_file_path is not None:
+                        param_reporter.copy_to_cloud_storage(local_experiment_python_file_path,
+                                                             self.model_checkpointer,
+                                                             file_name=os.path.basename(local_experiment_python_file_path))
 
                 self._hyperparams_already_saved = True
 
@@ -203,10 +209,16 @@ class ModelTrainEndSave(AbstractCallback):
 
             if not os.path.isfile(param_reporter.local_hyperparams_file_path):
                 local_hyperparams_file_path = param_reporter.save_hyperparams_to_text_file(self.hyperparams)
+                local_experiment_python_file_path = param_reporter.save_experiment_python_file(self.hyperparams)
 
                 # Should also save to cloud
                 if type(self.results_saver) != FullPyTorchExperimentLocalSaver:
                     param_reporter.copy_to_cloud_storage(local_hyperparams_file_path, self.results_saver.model_saver)
+
+                    if local_experiment_python_file_path is not None:
+                        param_reporter.copy_to_cloud_storage(local_experiment_python_file_path,
+                                                             self.results_saver.model_saver,
+                                                             file_name=os.path.basename(local_experiment_python_file_path))
 
                 self._hyperparams_already_saved = True
 
