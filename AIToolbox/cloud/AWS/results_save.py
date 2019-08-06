@@ -29,13 +29,15 @@ class AbstractResultsSaver(ABC):
 
 
 class BaseResultsSaver(BaseDataSaver):
-    def __init__(self, bucket_name='model-result'):
+    def __init__(self, bucket_name='model-result', cloud_dir_prefix=''):
         """
 
         Args:
             bucket_name (str):
+            cloud_dir_prefix (str):
         """
         BaseDataSaver.__init__(self, bucket_name)
+        self.cloud_dir_prefix = cloud_dir_prefix
 
     @staticmethod
     def create_experiment_cloud_storage_folder_structure(project_name, experiment_name, experiment_timestamp):
@@ -56,14 +58,15 @@ class BaseResultsSaver(BaseDataSaver):
 
 
 class S3ResultsSaver(AbstractResultsSaver, BaseResultsSaver):
-    def __init__(self, bucket_name='model-result', local_model_result_folder_path='~/project/model_result'):
+    def __init__(self, bucket_name='model-result', cloud_dir_prefix='', local_model_result_folder_path='~/project/model_result'):
         """
 
         Args:
             bucket_name (str):
+            cloud_dir_prefix (str):
             local_model_result_folder_path (str):
         """
-        BaseResultsSaver.__init__(self, bucket_name)
+        BaseResultsSaver.__init__(self, bucket_name, cloud_dir_prefix)
         self.local_results_saver = LocalResultsSaver(local_model_result_folder_path)
 
     def save_experiment_results(self, result_package, project_name, experiment_name, experiment_timestamp=None,
@@ -104,12 +107,13 @@ class S3ResultsSaver(AbstractResultsSaver, BaseResultsSaver):
         experiment_s3_path = self.create_experiment_cloud_storage_folder_structure(project_name, experiment_name, experiment_timestamp)
 
         for results_file_path_in_s3_results_dir, results_file_local_path in saved_local_results_details:
-            results_file_s3_path = os.path.join(experiment_s3_path, results_file_path_in_s3_results_dir)
+            results_file_s3_path = os.path.join(self.cloud_dir_prefix,
+                                                experiment_s3_path, results_file_path_in_s3_results_dir)
             self.save_file(local_file_path=results_file_local_path, cloud_file_path=results_file_s3_path)
 
         # saved_local_results_details[0][0] used to extract the main results file path which should be the first element
         # of the list with the support files' paths following
-        main_results_s3_file_path = os.path.join(self.bucket_name, experiment_s3_path,
+        main_results_s3_file_path = os.path.join(self.bucket_name, self.cloud_dir_prefix, experiment_s3_path,
                                                  saved_local_results_details[0][0])
 
         return main_results_s3_file_path, experiment_timestamp
