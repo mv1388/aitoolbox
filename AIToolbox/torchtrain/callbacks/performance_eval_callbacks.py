@@ -251,6 +251,8 @@ class ModelTrainHistoryPlot(AbstractCallback):
                 self.experiment_name = self.train_loop_obj.experiment_name
             if self.local_model_result_folder_path is None:
                 self.local_model_result_folder_path = self.train_loop_obj.local_model_result_folder_path
+            if self.cloud_dir_prefix == '':
+                self.cloud_dir_prefix = self.train_loop_obj.cloud_dir_prefix
         except AttributeError:
             raise AttributeError('Currently used TrainLoop does not support automatic project folder structure '
                                  'creation. Project name, etc. thus can not be automatically deduced. Please provide'

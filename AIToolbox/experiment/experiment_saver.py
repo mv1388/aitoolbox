@@ -158,7 +158,7 @@ class FullPyTorchExperimentS3Saver(BaseFullExperimentS3Saver):
                                                   local_model_result_folder_path=local_model_result_folder_path)
 
         BaseFullExperimentS3Saver.__init__(self, pytorch_model_saver, project_name, experiment_name,
-                                           bucket_name=bucket_name, cloud_dir_prefix='',
+                                           bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
                                            local_model_result_folder_path=local_model_result_folder_path)
 
 
