@@ -211,7 +211,7 @@ class ModelTrainHistoryPlot(AbstractCallback):
                 For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
                 Everything else results just in local storage to disk
             bucket_name (str): name of the bucket in the cloud storage
-            cloud_dir_prefix (str):
+            cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
         """
         if epoch_end is False and train_end is False:
             raise ValueError('Both epoch_end and train_end are set to False. At least one of these should be True.')
@@ -265,10 +265,12 @@ class ModelTrainHistoryPlot(AbstractCallback):
             None
         """
         if self.cloud_save_mode == 's3' or self.cloud_save_mode == 'aws_s3' or self.cloud_save_mode == 'aws':
-            self.cloud_results_saver = BaseResultsS3Saver(bucket_name=self.bucket_name, cloud_dir_prefix=self.cloud_dir_prefix)
+            self.cloud_results_saver = BaseResultsS3Saver(bucket_name=self.bucket_name,
+                                                          cloud_dir_prefix=self.cloud_dir_prefix)
 
         elif self.cloud_save_mode == 'gcs' or self.cloud_save_mode == 'google_storage' or self.cloud_save_mode == 'google storage':
-            self.cloud_results_saver = BaseResultsGoogleStorageSaver(bucket_name=self.bucket_name, cloud_dir_prefix=self.cloud_dir_prefix)
+            self.cloud_results_saver = BaseResultsGoogleStorageSaver(bucket_name=self.bucket_name,
+                                                                     cloud_dir_prefix=self.cloud_dir_prefix)
         else:
             self.cloud_results_saver = None
 

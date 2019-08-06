@@ -29,7 +29,7 @@ class ModelCheckpoint(AbstractCallback):
                 For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
                 Everything else results just in local storage to disk
             bucket_name (str): name of the bucket in the cloud storage
-            cloud_dir_prefix (str):
+            cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
             rm_subopt_local_models (bool or str): if True, the deciding metric is set to 'loss'. Give string metric name
                 to set it as a deciding metric for suboptimal model removal. If metric name consists of substring 'loss'
                 the metric minimization is done otherwise metric maximization is done
@@ -132,7 +132,7 @@ class ModelTrainEndSave(AbstractCallback):
                 For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
                 Everything else results just in local storage to disk
             bucket_name (str): name of the bucket in the cloud storage
-            cloud_dir_prefix (str):
+            cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
         """
         # execution_order=100 to make sure that this callback is the very last one to be executed when all the
         # evaluations are already stored in the train_history

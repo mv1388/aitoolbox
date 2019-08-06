@@ -58,8 +58,8 @@ class BaseModelSaver(BaseDataSaver):
 
 
 class KerasS3ModelSaver(AbstractModelSaver, BaseModelSaver):
-    def __init__(self, bucket_name='model-result', cloud_dir_prefix='', local_model_result_folder_path='~/project/model_result',
-                 checkpoint_model=False):
+    def __init__(self, bucket_name='model-result', cloud_dir_prefix='',
+                 local_model_result_folder_path='~/project/model_result', checkpoint_model=False):
         """
 
         Args:
@@ -111,8 +111,8 @@ class KerasS3ModelSaver(AbstractModelSaver, BaseModelSaver):
 
 
 class TensorFlowS3ModelSaver(AbstractModelSaver, BaseModelSaver):
-    def __init__(self, bucket_name='model-result', cloud_dir_prefix='', local_model_result_folder_path='~/project/model_result',
-                 checkpoint_model=False):
+    def __init__(self, bucket_name='model-result', cloud_dir_prefix='',
+                 local_model_result_folder_path='~/project/model_result', checkpoint_model=False):
         """
 
         Args:
@@ -132,8 +132,8 @@ class TensorFlowS3ModelSaver(AbstractModelSaver, BaseModelSaver):
 
 
 class PyTorchS3ModelSaver(AbstractModelSaver, BaseModelSaver):
-    def __init__(self, bucket_name='model-result', cloud_dir_prefix='', local_model_result_folder_path='~/project/model_result',
-                 checkpoint_model=False):
+    def __init__(self, bucket_name='model-result', cloud_dir_prefix='',
+                 local_model_result_folder_path='~/project/model_result', checkpoint_model=False):
         """
 
         Args:

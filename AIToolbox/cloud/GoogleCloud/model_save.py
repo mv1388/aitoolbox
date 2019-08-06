@@ -18,8 +18,8 @@ class BaseModelGoogleStorageSaver(BaseGoogleStorageDataSaver):
 
 
 class KerasGoogleStorageModelSaver(BaseModelGoogleStorageSaver, KerasS3ModelSaver):
-    def __init__(self, bucket_name='model-result', cloud_dir_prefix='', local_model_result_folder_path='~/project/model_result',
-                 checkpoint_model=False):
+    def __init__(self, bucket_name='model-result', cloud_dir_prefix='',
+                 local_model_result_folder_path='~/project/model_result', checkpoint_model=False):
         """
 
         Args:
@@ -33,8 +33,8 @@ class KerasGoogleStorageModelSaver(BaseModelGoogleStorageSaver, KerasS3ModelSave
         
 
 class TensorFlowGoogleStorageModelSaver(BaseModelGoogleStorageSaver, TensorFlowS3ModelSaver):
-    def __init__(self, bucket_name='model-result', cloud_dir_prefix='', local_model_result_folder_path='~/project/model_result',
-                 checkpoint_model=False):
+    def __init__(self, bucket_name='model-result', cloud_dir_prefix='',
+                 local_model_result_folder_path='~/project/model_result', checkpoint_model=False):
         """
 
         Args:
@@ -50,8 +50,8 @@ class TensorFlowGoogleStorageModelSaver(BaseModelGoogleStorageSaver, TensorFlowS
 
 
 class PyTorchGoogleStorageModelSaver(BaseModelGoogleStorageSaver, PyTorchS3ModelSaver):
-    def __init__(self, bucket_name='model-result', cloud_dir_prefix='', local_model_result_folder_path='~/project/model_result',
-                 checkpoint_model=False):
+    def __init__(self, bucket_name='model-result', cloud_dir_prefix='',
+                 local_model_result_folder_path='~/project/model_result', checkpoint_model=False):
         """
 
         Args:

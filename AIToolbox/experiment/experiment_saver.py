@@ -83,7 +83,8 @@ class BaseFullExperimentSaver(AbstractExperimentSaver):
 
 class BaseFullExperimentS3Saver(BaseFullExperimentSaver):
     def __init__(self, model_saver, project_name, experiment_name,
-                 bucket_name='model-result', cloud_dir_prefix='', local_model_result_folder_path='~/project/model_result'):
+                 bucket_name='model-result', cloud_dir_prefix='',
+                 local_model_result_folder_path='~/project/model_result'):
         """
 
         Args:
@@ -91,7 +92,7 @@ class BaseFullExperimentS3Saver(BaseFullExperimentSaver):
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             bucket_name (str): name of the bucket in the cloud storage
-            cloud_dir_prefix (str):
+            cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
             local_model_result_folder_path (str): root local path where project folder will be created
         """
         results_saver = S3ResultsSaver(bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
@@ -102,14 +103,15 @@ class BaseFullExperimentS3Saver(BaseFullExperimentSaver):
 
 class FullKerasExperimentS3Saver(BaseFullExperimentS3Saver):
     def __init__(self, project_name, experiment_name,
-                 bucket_name='model-result', cloud_dir_prefix='', local_model_result_folder_path='~/project/model_result'):
+                 bucket_name='model-result', cloud_dir_prefix='',
+                 local_model_result_folder_path='~/project/model_result'):
         """
 
         Args:
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             bucket_name (str): name of the bucket in the cloud storage
-            cloud_dir_prefix (str):
+            cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
             local_model_result_folder_path (str): root local path where project folder will be created
         """
         keras_model_saver = KerasS3ModelSaver(bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
@@ -122,14 +124,15 @@ class FullKerasExperimentS3Saver(BaseFullExperimentS3Saver):
         
 class FullTensorFlowExperimentS3Saver(BaseFullExperimentS3Saver):
     def __init__(self, project_name, experiment_name,
-                 bucket_name='model-result', cloud_dir_prefix='', local_model_result_folder_path='~/project/model_result'):
+                 bucket_name='model-result', cloud_dir_prefix='',
+                 local_model_result_folder_path='~/project/model_result'):
         """
 
         Args:
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             bucket_name (str): name of the bucket in the cloud storage
-            cloud_dir_prefix (str):
+            cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
             local_model_result_folder_path (str): root local path where project folder will be created
         """
         tf_model_saver = TensorFlowS3ModelSaver(bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
@@ -144,14 +147,15 @@ class FullTensorFlowExperimentS3Saver(BaseFullExperimentS3Saver):
 
 class FullPyTorchExperimentS3Saver(BaseFullExperimentS3Saver):
     def __init__(self, project_name, experiment_name,
-                 bucket_name='model-result', cloud_dir_prefix='', local_model_result_folder_path='~/project/model_result'):
+                 bucket_name='model-result', cloud_dir_prefix='',
+                 local_model_result_folder_path='~/project/model_result'):
         """
 
         Args:
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             bucket_name (str): name of the bucket in the cloud storage
-            cloud_dir_prefix (str):
+            cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
             local_model_result_folder_path (str): root local path where project folder will be created
         """
         pytorch_model_saver = PyTorchS3ModelSaver(bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
@@ -164,7 +168,8 @@ class FullPyTorchExperimentS3Saver(BaseFullExperimentS3Saver):
 
 class BaseFullExperimentGoogleStorageSaver(BaseFullExperimentSaver):
     def __init__(self, model_saver, project_name, experiment_name,
-                 bucket_name='model-result', cloud_dir_prefix='', local_model_result_folder_path='~/project/model_result'):
+                 bucket_name='model-result', cloud_dir_prefix='',
+                 local_model_result_folder_path='~/project/model_result'):
         """
 
         Args:
@@ -172,7 +177,7 @@ class BaseFullExperimentGoogleStorageSaver(BaseFullExperimentSaver):
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             bucket_name (str): name of the bucket in the cloud storage
-            cloud_dir_prefix (str):
+            cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
             local_model_result_folder_path (str): root local path where project folder will be created
         """
         results_saver = GoogleStorageResultsSaver(bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
@@ -183,14 +188,15 @@ class BaseFullExperimentGoogleStorageSaver(BaseFullExperimentSaver):
 
 class FullKerasExperimentGoogleStorageSaver(BaseFullExperimentGoogleStorageSaver):
     def __init__(self, project_name, experiment_name,
-                 bucket_name='model-result',  cloud_dir_prefix='', local_model_result_folder_path='~/project/model_result'):
+                 bucket_name='model-result',  cloud_dir_prefix='',
+                 local_model_result_folder_path='~/project/model_result'):
         """
 
         Args:
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             bucket_name (str): name of the bucket in the cloud storage
-            cloud_dir_prefix (str):
+            cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
             local_model_result_folder_path (str): root local path where project folder will be created
         """
         keras_model_saver = KerasGoogleStorageModelSaver(bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
@@ -203,14 +209,15 @@ class FullKerasExperimentGoogleStorageSaver(BaseFullExperimentGoogleStorageSaver
 
 class FullTensorFlowExperimentGoogleStorageSaver(BaseFullExperimentGoogleStorageSaver):
     def __init__(self, project_name, experiment_name,
-                 bucket_name='model-result',  cloud_dir_prefix='', local_model_result_folder_path='~/project/model_result'):
+                 bucket_name='model-result',  cloud_dir_prefix='',
+                 local_model_result_folder_path='~/project/model_result'):
         """
 
         Args:
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             bucket_name (str): name of the bucket in the cloud storage
-            cloud_dir_prefix (str):
+            cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
             local_model_result_folder_path (str): root local path where project folder will be created
         """
         tf_model_saver = TensorFlowGoogleStorageModelSaver(bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
@@ -225,14 +232,15 @@ class FullTensorFlowExperimentGoogleStorageSaver(BaseFullExperimentGoogleStorage
 
 class FullPyTorchExperimentGoogleStorageSaver(BaseFullExperimentGoogleStorageSaver):
     def __init__(self, project_name, experiment_name,
-                 bucket_name='model-result',  cloud_dir_prefix='', local_model_result_folder_path='~/project/model_result'):
+                 bucket_name='model-result',  cloud_dir_prefix='',
+                 local_model_result_folder_path='~/project/model_result'):
         """
 
         Args:
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             bucket_name (str): name of the bucket in the cloud storage
-            cloud_dir_prefix (str):
+            cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
             local_model_result_folder_path (str): root local path where project folder will be created
         """
         pytorch_model_saver = PyTorchGoogleStorageModelSaver(bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,

@@ -58,7 +58,8 @@ class BaseResultsSaver(BaseDataSaver):
 
 
 class S3ResultsSaver(AbstractResultsSaver, BaseResultsSaver):
-    def __init__(self, bucket_name='model-result', cloud_dir_prefix='', local_model_result_folder_path='~/project/model_result'):
+    def __init__(self, bucket_name='model-result', cloud_dir_prefix='',
+                 local_model_result_folder_path='~/project/model_result'):
         """
 
         Args:
