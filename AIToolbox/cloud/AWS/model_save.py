@@ -50,7 +50,8 @@ class BaseModelSaver(BaseDataSaver):
         Returns:
             str:
         """
-        experiment_cloud_path = os.path.join(project_name,
+        experiment_cloud_path = os.path.join(self.cloud_dir_prefix,
+                                             project_name,
                                              experiment_name + '_' + experiment_timestamp,
                                              'model' if not self.checkpoint_model else 'checkpoint_model')
         return experiment_cloud_path
@@ -100,7 +101,7 @@ class KerasS3ModelSaver(AbstractModelSaver, BaseModelSaver):
                                                                          protect_existing_folder)
 
         experiment_s3_path = self.create_experiment_cloud_storage_folder_structure(project_name, experiment_name, experiment_timestamp)
-        model_s3_path = os.path.join(self.cloud_dir_prefix, experiment_s3_path, model_name)
+        model_s3_path = os.path.join(experiment_s3_path, model_name)
 
         self.save_file(local_file_path=model_local_path, cloud_file_path=model_s3_path)
 
@@ -176,7 +177,7 @@ class PyTorchS3ModelSaver(AbstractModelSaver, BaseModelSaver):
                                                                            protect_existing_folder)
 
         experiment_s3_path = self.create_experiment_cloud_storage_folder_structure(project_name, experiment_name, experiment_timestamp)
-        model_s3_path = os.path.join(self.cloud_dir_prefix, experiment_s3_path, model_name)
+        model_s3_path = os.path.join(experiment_s3_path, model_name)
 
         self.save_file(local_file_path=model_local_path, cloud_file_path=model_s3_path)
 

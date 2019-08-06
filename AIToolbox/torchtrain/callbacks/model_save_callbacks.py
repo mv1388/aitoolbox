@@ -52,12 +52,14 @@ class ModelCheckpoint(AbstractCallback):
 
         if cloud_save_mode == 's3' or cloud_save_mode == 'aws_s3' or cloud_save_mode == 'aws':
             self.model_checkpointer = PyTorchS3ModelSaver(
-                bucket_name=bucket_name, local_model_result_folder_path=self.local_model_result_folder_path,
+                bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
+                local_model_result_folder_path=self.local_model_result_folder_path,
                 checkpoint_model=True
             )
         elif cloud_save_mode == 'gcs' or cloud_save_mode == 'google_storage' or cloud_save_mode == 'google storage':
             self.model_checkpointer = PyTorchGoogleStorageModelSaver(
-                bucket_name=bucket_name, local_model_result_folder_path=self.local_model_result_folder_path,
+                bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
+                local_model_result_folder_path=self.local_model_result_folder_path,
                 checkpoint_model=True
             )
         else:
@@ -148,12 +150,12 @@ class ModelTrainEndSave(AbstractCallback):
 
         if cloud_save_mode == 's3' or cloud_save_mode == 'aws_s3' or cloud_save_mode == 'aws':
             self.results_saver = FullPyTorchExperimentS3Saver(self.project_name, self.experiment_name,
-                                                              bucket_name=bucket_name,
+                                                              bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
                                                               local_model_result_folder_path=self.local_model_result_folder_path)
 
         elif cloud_save_mode == 'gcs' or cloud_save_mode == 'google_storage' or cloud_save_mode == 'google storage':
             self.results_saver = FullPyTorchExperimentGoogleStorageSaver(self.project_name, self.experiment_name,
-                                                                         bucket_name=bucket_name,
+                                                                         bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
                                                                          local_model_result_folder_path=self.local_model_result_folder_path)
         else:
             self.results_saver = FullPyTorchExperimentLocalSaver(self.project_name, self.experiment_name,
