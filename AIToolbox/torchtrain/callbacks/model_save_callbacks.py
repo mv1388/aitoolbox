@@ -15,7 +15,7 @@ from AIToolbox.utils import util
 class ModelCheckpoint(AbstractCallback):
     def __init__(self, project_name, experiment_name, local_model_result_folder_path,
                  hyperparams,
-                 cloud_save_mode='s3', bucket_name='model-result',
+                 cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix='',
                  rm_subopt_local_models=False, num_best_checkpoints_kept=2):
         """Check-point save the model during training to disk or also to S3 / GCS cloud storage
 
@@ -29,6 +29,7 @@ class ModelCheckpoint(AbstractCallback):
                 For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
                 Everything else results just in local storage to disk
             bucket_name (str): name of the bucket in the cloud storage
+            cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
             rm_subopt_local_models (bool or str): if True, the deciding metric is set to 'loss'. Give string metric name
                 to set it as a deciding metric for suboptimal model removal. If metric name consists of substring 'loss'
                 the metric minimization is done otherwise metric maximization is done
@@ -51,12 +52,14 @@ class ModelCheckpoint(AbstractCallback):
 
         if cloud_save_mode == 's3' or cloud_save_mode == 'aws_s3' or cloud_save_mode == 'aws':
             self.model_checkpointer = PyTorchS3ModelSaver(
-                bucket_name=bucket_name, local_model_result_folder_path=self.local_model_result_folder_path,
+                bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
+                local_model_result_folder_path=self.local_model_result_folder_path,
                 checkpoint_model=True
             )
         elif cloud_save_mode == 'gcs' or cloud_save_mode == 'google_storage' or cloud_save_mode == 'google storage':
             self.model_checkpointer = PyTorchGoogleStorageModelSaver(
-                bucket_name=bucket_name, local_model_result_folder_path=self.local_model_result_folder_path,
+                bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
+                local_model_result_folder_path=self.local_model_result_folder_path,
                 checkpoint_model=True
             )
         else:
@@ -113,7 +116,7 @@ class ModelCheckpoint(AbstractCallback):
 class ModelTrainEndSave(AbstractCallback):
     def __init__(self, project_name, experiment_name, local_model_result_folder_path,
                  hyperparams, val_result_package=None, test_result_package=None,
-                 cloud_save_mode='s3', bucket_name='model-result'):
+                 cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix=''):
         """At the end of training execute model performance evaluation, build result package repot and save it
             together with the final model to local disk and possibly to S3 / GCS cloud storage
 
@@ -129,6 +132,7 @@ class ModelTrainEndSave(AbstractCallback):
                 For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
                 Everything else results just in local storage to disk
             bucket_name (str): name of the bucket in the cloud storage
+            cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
         """
         # execution_order=100 to make sure that this callback is the very last one to be executed when all the
         # evaluations are already stored in the train_history
@@ -146,12 +150,12 @@ class ModelTrainEndSave(AbstractCallback):
 
         if cloud_save_mode == 's3' or cloud_save_mode == 'aws_s3' or cloud_save_mode == 'aws':
             self.results_saver = FullPyTorchExperimentS3Saver(self.project_name, self.experiment_name,
-                                                              bucket_name=bucket_name,
+                                                              bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
                                                               local_model_result_folder_path=self.local_model_result_folder_path)
 
         elif cloud_save_mode == 'gcs' or cloud_save_mode == 'google_storage' or cloud_save_mode == 'google storage':
             self.results_saver = FullPyTorchExperimentGoogleStorageSaver(self.project_name, self.experiment_name,
-                                                                         bucket_name=bucket_name,
+                                                                         bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
                                                                          local_model_result_folder_path=self.local_model_result_folder_path)
         else:
             self.results_saver = FullPyTorchExperimentLocalSaver(self.project_name, self.experiment_name,
