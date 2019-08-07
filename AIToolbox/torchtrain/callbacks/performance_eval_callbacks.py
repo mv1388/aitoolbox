@@ -197,7 +197,7 @@ class ModelPerformancePrintReport(AbstractCallback):
 class ModelTrainHistoryPlot(AbstractCallback):
     def __init__(self, epoch_end=True, train_end=False,
                  project_name=None, experiment_name=None, local_model_result_folder_path=None,
-                 cloud_save_mode='s3', bucket_name='model-result'):
+                 cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix=''):
         """
 
         Args:
@@ -211,6 +211,7 @@ class ModelTrainHistoryPlot(AbstractCallback):
                 For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
                 Everything else results just in local storage to disk
             bucket_name (str): name of the bucket in the cloud storage
+            cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
         """
         if epoch_end is False and train_end is False:
             raise ValueError('Both epoch_end and train_end are set to False. At least one of these should be True.')
@@ -226,6 +227,7 @@ class ModelTrainHistoryPlot(AbstractCallback):
             else None
         self.cloud_save_mode = cloud_save_mode
         self.bucket_name = bucket_name
+        self.cloud_dir_prefix = cloud_dir_prefix
 
         self.cloud_results_saver = None
 
@@ -249,6 +251,16 @@ class ModelTrainHistoryPlot(AbstractCallback):
                 self.experiment_name = self.train_loop_obj.experiment_name
             if self.local_model_result_folder_path is None:
                 self.local_model_result_folder_path = self.train_loop_obj.local_model_result_folder_path
+
+            if self.cloud_save_mode == 's3' and \
+                    hasattr(self.train_loop_obj, 'cloud_save_mode') and self.cloud_save_mode != self.train_loop_obj.cloud_save_mode:
+                self.cloud_save_mode = self.train_loop_obj.cloud_save_mode
+            if self.bucket_name == 'model-result' and \
+                    hasattr(self.train_loop_obj, 'bucket_name') and self.bucket_name != self.train_loop_obj.bucket_name:
+                self.bucket_name = self.train_loop_obj.bucket_name
+            if self.cloud_dir_prefix == '' and \
+                    hasattr(self.train_loop_obj, 'cloud_dir_prefix') and self.cloud_dir_prefix != self.train_loop_obj.cloud_dir_prefix:
+                self.cloud_dir_prefix = self.train_loop_obj.cloud_dir_prefix
         except AttributeError:
             raise AttributeError('Currently used TrainLoop does not support automatic project folder structure '
                                  'creation. Project name, etc. thus can not be automatically deduced. Please provide'
@@ -261,10 +273,12 @@ class ModelTrainHistoryPlot(AbstractCallback):
             None
         """
         if self.cloud_save_mode == 's3' or self.cloud_save_mode == 'aws_s3' or self.cloud_save_mode == 'aws':
-            self.cloud_results_saver = BaseResultsS3Saver(bucket_name=self.bucket_name)
+            self.cloud_results_saver = BaseResultsS3Saver(bucket_name=self.bucket_name,
+                                                          cloud_dir_prefix=self.cloud_dir_prefix)
 
         elif self.cloud_save_mode == 'gcs' or self.cloud_save_mode == 'google_storage' or self.cloud_save_mode == 'google storage':
-            self.cloud_results_saver = BaseResultsGoogleStorageSaver(bucket_name=self.bucket_name)
+            self.cloud_results_saver = BaseResultsGoogleStorageSaver(bucket_name=self.bucket_name,
+                                                                     cloud_dir_prefix=self.cloud_dir_prefix)
         else:
             self.cloud_results_saver = None
 

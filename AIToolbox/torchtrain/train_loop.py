@@ -348,7 +348,7 @@ class TrainLoopModelCheckpoint(TrainLoop):
                  optimizer, criterion,
                  project_name, experiment_name, local_model_result_folder_path,
                  hyperparams,
-                 cloud_save_mode='s3', bucket_name='model-result',
+                 cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix='',
                  rm_subopt_local_models=False, num_best_checkpoints_kept=2):
         """TrainLoop with the automatic model check-pointing at the end of each epoch
 
@@ -369,6 +369,7 @@ class TrainLoopModelCheckpoint(TrainLoop):
                 For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
                 Everything else results just in local storage to disk
             bucket_name (str): name of the bucket in the cloud storage
+            cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
             rm_subopt_local_models (bool or str): if True, the deciding metric is set to 'loss'. Give string metric name
                 to set it as a deciding metric for suboptimal model removal. If metric name consists of substring 'loss'
                 the metric minimization is done otherwise metric maximization is done
@@ -381,6 +382,8 @@ class TrainLoopModelCheckpoint(TrainLoop):
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
         self.hyperparams = hyperparams
         self.cloud_save_mode = cloud_save_mode
+        self.bucket_name = bucket_name
+        self.cloud_dir_prefix = cloud_dir_prefix
         self.rm_subopt_local_models = rm_subopt_local_models
 
         self.hyperparams['experiment_file_path'] = inspect.getframeinfo(inspect.currentframe().f_back).filename
@@ -388,7 +391,8 @@ class TrainLoopModelCheckpoint(TrainLoop):
         self.callbacks_handler.register_callbacks([
             ModelCheckpoint(self.project_name, self.experiment_name, self.local_model_result_folder_path,
                             self.hyperparams,
-                            cloud_save_mode=self.cloud_save_mode, bucket_name=bucket_name,
+                            cloud_save_mode=self.cloud_save_mode,
+                            bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
                             rm_subopt_local_models=self.rm_subopt_local_models,
                             num_best_checkpoints_kept=num_best_checkpoints_kept)
         ])
@@ -400,7 +404,7 @@ class TrainLoopModelEndSave(TrainLoop):
                  optimizer, criterion,
                  project_name, experiment_name, local_model_result_folder_path,
                  hyperparams, val_result_package=None, test_result_package=None,
-                 cloud_save_mode='s3', bucket_name='model-result'):
+                 cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix=''):
         """TrainLoop with the model performance evaluation and final model saving at the end of the training process
 
         Args:
@@ -422,6 +426,7 @@ class TrainLoopModelEndSave(TrainLoop):
                 For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
                 Everything else results just in local storage to disk
             bucket_name (str): name of the bucket in the cloud storage
+            cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
         """
         TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion)
         self.project_name = project_name
@@ -431,6 +436,8 @@ class TrainLoopModelEndSave(TrainLoop):
         self.val_result_package = val_result_package
         self.test_result_package = test_result_package
         self.cloud_save_mode = cloud_save_mode
+        self.bucket_name = bucket_name
+        self.cloud_dir_prefix = cloud_dir_prefix
 
         self.hyperparams['experiment_file_path'] = inspect.getframeinfo(inspect.currentframe().f_back).filename
         self.check_if_result_packages_possible()
@@ -438,7 +445,8 @@ class TrainLoopModelEndSave(TrainLoop):
         self.callbacks_handler.register_callbacks([
             ModelTrainEndSave(self.project_name, self.experiment_name, self.local_model_result_folder_path,
                               self.hyperparams, self.val_result_package, self.test_result_package,
-                              cloud_save_mode=self.cloud_save_mode, bucket_name=bucket_name)
+                              cloud_save_mode=self.cloud_save_mode,
+                              bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix)
         ])
 
     def check_if_result_packages_possible(self):
@@ -467,7 +475,7 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
                  optimizer, criterion,
                  project_name, experiment_name, local_model_result_folder_path,
                  hyperparams, val_result_package=None, test_result_package=None,
-                 cloud_save_mode='s3', bucket_name='model-result',
+                 cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix='',
                  rm_subopt_local_models=False, num_best_checkpoints_kept=2):
         """TrainLoop both saving model check-pointing at the end of each epoch and model performance reporting
             and model saving at the end of the training process
@@ -491,6 +499,7 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
                 For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
                 Everything else results just in local storage to disk
             bucket_name (str): name of the bucket in the cloud storage
+            cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
             rm_subopt_local_models (bool or str): if True, the deciding metric is set to 'loss'. Give string metric name
                 to set it as a deciding metric for suboptimal model removal. If metric name consists of substring 'loss'
                 the metric minimization is done otherwise metric maximization is done
@@ -501,14 +510,15 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
                                        optimizer, criterion,
                                        project_name, experiment_name, os.path.expanduser(local_model_result_folder_path),
                                        hyperparams, val_result_package, test_result_package,
-                                       cloud_save_mode, bucket_name)
+                                       cloud_save_mode, bucket_name, cloud_dir_prefix)
         self.rm_subopt_local_models = rm_subopt_local_models
         self.hyperparams['experiment_file_path'] = inspect.getframeinfo(inspect.currentframe().f_back).filename
 
         self.callbacks_handler.register_callbacks([
             ModelCheckpoint(self.project_name, self.experiment_name, self.local_model_result_folder_path,
                             self.hyperparams,
-                            cloud_save_mode=self.cloud_save_mode, bucket_name=bucket_name,
+                            cloud_save_mode=self.cloud_save_mode,
+                            bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
                             rm_subopt_local_models=self.rm_subopt_local_models,
                             num_best_checkpoints_kept=num_best_checkpoints_kept)
         ])
