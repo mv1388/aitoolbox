@@ -27,14 +27,16 @@ class AbstractModelSaver(ABC):
 
 
 class BaseModelSaver(BaseDataSaver):
-    def __init__(self, bucket_name='model-result', checkpoint_model=False):
+    def __init__(self, bucket_name='model-result', cloud_dir_prefix='', checkpoint_model=False):
         """
 
         Args:
             bucket_name (str):
+            cloud_dir_prefix (str):
             checkpoint_model (bool):
         """
         BaseDataSaver.__init__(self, bucket_name)
+        self.cloud_dir_prefix = cloud_dir_prefix
         self.checkpoint_model = checkpoint_model
 
     def create_experiment_cloud_storage_folder_structure(self, project_name, experiment_name, experiment_timestamp):
@@ -48,23 +50,25 @@ class BaseModelSaver(BaseDataSaver):
         Returns:
             str:
         """
-        experiment_cloud_path = os.path.join(project_name,
+        experiment_cloud_path = os.path.join(self.cloud_dir_prefix,
+                                             project_name,
                                              experiment_name + '_' + experiment_timestamp,
                                              'model' if not self.checkpoint_model else 'checkpoint_model')
         return experiment_cloud_path
 
 
 class KerasS3ModelSaver(AbstractModelSaver, BaseModelSaver):
-    def __init__(self, bucket_name='model-result', local_model_result_folder_path='~/project/model_result',
-                 checkpoint_model=False):
+    def __init__(self, bucket_name='model-result', cloud_dir_prefix='',
+                 local_model_result_folder_path='~/project/model_result', checkpoint_model=False):
         """
 
         Args:
             bucket_name (str):
+            cloud_dir_prefix (str):
             local_model_result_folder_path (str):
             checkpoint_model (bool):
         """
-        BaseModelSaver.__init__(self, bucket_name, checkpoint_model)
+        BaseModelSaver.__init__(self, bucket_name, cloud_dir_prefix, checkpoint_model)
         self.keras_local_saver = KerasLocalModelSaver(local_model_result_folder_path, checkpoint_model)
 
     def save_model(self, model, project_name, experiment_name, experiment_timestamp=None, epoch=None, protect_existing_folder=True):
@@ -107,16 +111,17 @@ class KerasS3ModelSaver(AbstractModelSaver, BaseModelSaver):
 
 
 class TensorFlowS3ModelSaver(AbstractModelSaver, BaseModelSaver):
-    def __init__(self, bucket_name='model-result', local_model_result_folder_path='~/project/model_result',
-                 checkpoint_model=False):
+    def __init__(self, bucket_name='model-result', cloud_dir_prefix='',
+                 local_model_result_folder_path='~/project/model_result', checkpoint_model=False):
         """
 
         Args:
             bucket_name (str):
+            cloud_dir_prefix (str):
             local_model_result_folder_path (str):
             checkpoint_model (bool):
         """
-        BaseModelSaver.__init__(self, bucket_name, checkpoint_model)
+        BaseModelSaver.__init__(self, bucket_name, cloud_dir_prefix, checkpoint_model)
         self.tf_local_saver = TensorFlowLocalModelSaver(local_model_result_folder_path, checkpoint_model)
 
         raise NotImplementedError
@@ -127,16 +132,17 @@ class TensorFlowS3ModelSaver(AbstractModelSaver, BaseModelSaver):
 
 
 class PyTorchS3ModelSaver(AbstractModelSaver, BaseModelSaver):
-    def __init__(self, bucket_name='model-result', local_model_result_folder_path='~/project/model_result',
-                 checkpoint_model=False):
+    def __init__(self, bucket_name='model-result', cloud_dir_prefix='',
+                 local_model_result_folder_path='~/project/model_result', checkpoint_model=False):
         """
 
         Args:
             bucket_name (str):
+            cloud_dir_prefix (str):
             local_model_result_folder_path (str):
             checkpoint_model (bool):
         """
-        BaseModelSaver.__init__(self, bucket_name, checkpoint_model)
+        BaseModelSaver.__init__(self, bucket_name, cloud_dir_prefix, checkpoint_model)
         self.pytorch_local_saver = PyTorchLocalModelSaver(local_model_result_folder_path, checkpoint_model)
 
     def save_model(self, model, project_name, experiment_name, experiment_timestamp=None, epoch=None, protect_existing_folder=True):

@@ -4,22 +4,26 @@ from AIToolbox.experiment.local_save.local_results_save import LocalResultsSaver
 
 
 class BaseResultsGoogleStorageSaver(BaseGoogleStorageDataSaver):
-    def __init__(self, bucket_name='model-result'):
+    def __init__(self, bucket_name='model-result', cloud_dir_prefix=''):
         """
 
         Args:
             bucket_name (str):
+            cloud_dir_prefix (str):
         """
         BaseGoogleStorageDataSaver.__init__(self, bucket_name)
+        self.cloud_dir_prefix = cloud_dir_prefix
 
 
 class GoogleStorageResultsSaver(BaseResultsGoogleStorageSaver, S3ResultsSaver):
-    def __init__(self, bucket_name='model-result', local_model_result_folder_path='~/project/model_result'):
+    def __init__(self, bucket_name='model-result', cloud_dir_prefix='',
+                 local_model_result_folder_path='~/project/model_result'):
         """
 
         Args:
             bucket_name (str):
+            cloud_dir_prefix (str):
             local_model_result_folder_path (str):
         """
-        BaseResultsGoogleStorageSaver.__init__(self, bucket_name)
+        BaseResultsGoogleStorageSaver.__init__(self, bucket_name, cloud_dir_prefix)
         self.local_results_saver = LocalResultsSaver(local_model_result_folder_path)
