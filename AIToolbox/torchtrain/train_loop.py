@@ -382,6 +382,7 @@ class TrainLoopModelCheckpoint(TrainLoop):
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
         self.hyperparams = hyperparams
         self.cloud_save_mode = cloud_save_mode
+        self.bucket_name = bucket_name
         self.cloud_dir_prefix = cloud_dir_prefix
         self.rm_subopt_local_models = rm_subopt_local_models
 
@@ -390,7 +391,8 @@ class TrainLoopModelCheckpoint(TrainLoop):
         self.callbacks_handler.register_callbacks([
             ModelCheckpoint(self.project_name, self.experiment_name, self.local_model_result_folder_path,
                             self.hyperparams,
-                            cloud_save_mode=self.cloud_save_mode, bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
+                            cloud_save_mode=self.cloud_save_mode,
+                            bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
                             rm_subopt_local_models=self.rm_subopt_local_models,
                             num_best_checkpoints_kept=num_best_checkpoints_kept)
         ])
@@ -434,6 +436,7 @@ class TrainLoopModelEndSave(TrainLoop):
         self.val_result_package = val_result_package
         self.test_result_package = test_result_package
         self.cloud_save_mode = cloud_save_mode
+        self.bucket_name = bucket_name
         self.cloud_dir_prefix = cloud_dir_prefix
 
         self.hyperparams['experiment_file_path'] = inspect.getframeinfo(inspect.currentframe().f_back).filename
@@ -442,7 +445,8 @@ class TrainLoopModelEndSave(TrainLoop):
         self.callbacks_handler.register_callbacks([
             ModelTrainEndSave(self.project_name, self.experiment_name, self.local_model_result_folder_path,
                               self.hyperparams, self.val_result_package, self.test_result_package,
-                              cloud_save_mode=self.cloud_save_mode, bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix)
+                              cloud_save_mode=self.cloud_save_mode,
+                              bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix)
         ])
 
     def check_if_result_packages_possible(self):
@@ -513,7 +517,8 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
         self.callbacks_handler.register_callbacks([
             ModelCheckpoint(self.project_name, self.experiment_name, self.local_model_result_folder_path,
                             self.hyperparams,
-                            cloud_save_mode=self.cloud_save_mode, bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
+                            cloud_save_mode=self.cloud_save_mode,
+                            bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
                             rm_subopt_local_models=self.rm_subopt_local_models,
                             num_best_checkpoints_kept=num_best_checkpoints_kept)
         ])

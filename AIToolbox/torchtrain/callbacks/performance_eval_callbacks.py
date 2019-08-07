@@ -251,7 +251,15 @@ class ModelTrainHistoryPlot(AbstractCallback):
                 self.experiment_name = self.train_loop_obj.experiment_name
             if self.local_model_result_folder_path is None:
                 self.local_model_result_folder_path = self.train_loop_obj.local_model_result_folder_path
-            if self.cloud_dir_prefix == '':
+
+            if self.cloud_save_mode == 's3' and \
+                    hasattr(self.train_loop_obj, 'cloud_save_mode') and self.cloud_save_mode != self.train_loop_obj.cloud_save_mode:
+                self.cloud_save_mode = self.train_loop_obj.cloud_save_mode
+            if self.bucket_name == 'model-result' and \
+                    hasattr(self.train_loop_obj, 'bucket_name') and self.bucket_name != self.train_loop_obj.bucket_name:
+                self.bucket_name = self.train_loop_obj.bucket_name
+            if self.cloud_dir_prefix == '' and \
+                    hasattr(self.train_loop_obj, 'cloud_dir_prefix') and self.cloud_dir_prefix != self.train_loop_obj.cloud_dir_prefix:
                 self.cloud_dir_prefix = self.train_loop_obj.cloud_dir_prefix
         except AttributeError:
             raise AttributeError('Currently used TrainLoop does not support automatic project folder structure '
