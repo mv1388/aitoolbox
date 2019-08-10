@@ -1,22 +1,22 @@
 import numpy as np
-from tensorboardX import SummaryWriter
+from torch.utils.tensorboard import SummaryWriter
 
 from AIToolbox.torchtrain.callbacks.callbacks import AbstractCallback
 
 
 class TBBatchLossReport(AbstractCallback):
-    def __init__(self, tb_logdir=None, comment='', flush_secs=120, filename_suffix=''):
+    def __init__(self, log_dir=None, comment='', flush_secs=120, filename_suffix=''):
         """
 
         Args:
-            tb_logdir (str):
+            log_dir (str):
             comment (str):
             flush_secs (int):
             filename_suffix (str):
         """
         AbstractCallback.__init__(self, 'Tensorboard end of batch report of batch loss')
 
-        self.tb_writer = SummaryWriter(logdir=tb_logdir, comment=comment,
+        self.tb_writer = SummaryWriter(log_dir=log_dir, comment=comment,
                                        flush_secs=flush_secs, filename_suffix=filename_suffix)
 
     def on_batch_end(self):
@@ -25,12 +25,12 @@ class TBBatchLossReport(AbstractCallback):
 
 
 class TBPerformanceMetricReport(AbstractCallback):
-    def __init__(self, metric_names=None, tb_logdir=None, comment='', flush_secs=120, filename_suffix=''):
+    def __init__(self, metric_names=None, log_dir=None, comment='', flush_secs=120, filename_suffix=''):
         """
 
         Args:
             metric_names (list or None):
-            tb_logdir (str):
+            log_dir (str):
             comment (str):
             flush_secs (int):
             filename_suffix (str):
@@ -39,7 +39,7 @@ class TBPerformanceMetricReport(AbstractCallback):
 
         self.metric_names = metric_names
 
-        self.tb_writer = SummaryWriter(logdir=tb_logdir, comment=comment,
+        self.tb_writer = SummaryWriter(log_dir=log_dir, comment=comment,
                                        flush_secs=flush_secs, filename_suffix=filename_suffix)
 
     def on_epoch_end(self):

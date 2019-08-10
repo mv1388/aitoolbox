@@ -36,7 +36,6 @@ setup(name='AIToolbox',
                         'pytorch-nlp',
                         'rouge',
                         'pyrouge',
-                        'tensorboardX',
                         # New ones... just for testing
                         'sumeval', # https://github.com/chakki-works/sumeval
                         'chakin', # https://github.com/chakki-works/chakin
