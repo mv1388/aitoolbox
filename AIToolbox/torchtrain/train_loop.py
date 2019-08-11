@@ -106,7 +106,7 @@ class TrainLoop:
             print('\n\n========================================================================')
             print('========================================================================')
             # print(self.train_history)
-            print(f'Epoch: {self.epoch + 1}')
+            print(f'Epoch: {self.epoch}')
             self.callbacks_handler.execute_epoch_begin()
 
             for batch_data in tqdm(self.train_loader):
