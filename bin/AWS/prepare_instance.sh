@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Example how to run:
-# ./prepare_instance.sh -k <SSH_KEY_LOCATION> -e <INSTANCE_IP_ADDRESS> -f pytorch -v 0.2 -p ~/PycharmProjects/Transformer -d SQuAD2 -r orig
+# ./prepare_instance.sh -k <SSH_KEY_LOCATION> -a <INSTANCE_IP_ADDRESS> -f pytorch -v 0.2 -p ~/PycharmProjects/Transformer -d SQuAD2 -r orig
 
 # When you get ssh-ed to the instance finish the instance prep process by running:
 # ./finish_prepare_instance.sh
@@ -27,12 +27,12 @@ function usage()
 
    optional arguments:
      -k, --key_path STR     path to ssh key
-     -e, --ec2 STR          ec2 instance Public DNS address
+     -a, --address STR      ec2 instance Public DNS address
      -f, --framework STR    desired deep learning framework
      -v, --version FLOAT    AIToolbox version to be installed on ec2
      -p, --project STR      path to the project to be optionally uploaded to the running ec2 instance
      -d, --dataset STR      dataset to be optionally downloaded from the S3 storage directly to ec2 instance
-     -r, --preproc STR      the
+     -r, --preproc STR      the preprocessed version of the main dataset
      -h, --help             show this help message and exit
 
 HEREDOC
@@ -40,8 +40,8 @@ HEREDOC
 
 key_path=
 ec2_instance_address=
-DL_framework=
-AIToolbox_version=
+DL_framework="pytorch"
+AIToolbox_version="0.2"
 local_project_path=
 dataset_name=
 preproc_dataset=
@@ -54,7 +54,7 @@ case $key in
     key_path="$2"
     shift 2 # past argument value
     ;;
-    -e|--ec2)
+    -a|--address)
     ec2_instance_address="$2"
     shift 2 # past argument value
     ;;
