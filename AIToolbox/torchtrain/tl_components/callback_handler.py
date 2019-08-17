@@ -35,7 +35,7 @@ class CallbacksHandler:
     def print_registered_callback_names(self):
         print('CALLBACKS:')
         for callback in self.train_loop_obj.callbacks:
-            print(f'\t{callback.callback_name}')
+            print(f'\t{callback.callback_name}: {type(callback)}, execution_order: {callback.execution_order}')
 
     def execute_epoch_begin(self):
         for callback in self.train_loop_obj.callbacks:

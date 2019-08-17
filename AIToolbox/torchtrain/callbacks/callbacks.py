@@ -69,6 +69,14 @@ class AbstractCallback:
         pass
 
 
+class ListRegisteredCallbacks(AbstractCallback):
+    def __init__(self):
+        AbstractCallback.__init__(self, 'Print the list of registered callbacks')
+
+    def on_train_begin(self):
+        self.train_loop_obj.callbacks_handler.print_registered_callback_names()
+
+
 class EarlyStopping(AbstractCallback):
     def __init__(self, monitor='val_loss', min_delta=0., patience=0):
         """Early stopping of the training if the performance stops improving
