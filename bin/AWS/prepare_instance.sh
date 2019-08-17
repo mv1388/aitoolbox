@@ -23,10 +23,10 @@ function usage()
 {
    cat << HEREDOC
 
-   Usage: $prepare_instance [--key_path STR] [--address STR] [--project STR]
+   Usage: $prepare_instance [--key STR] [--address STR] [--project STR]
 
    optional arguments:
-     -k, --key_path STR     path to ssh key
+     -k, --key STR          path to ssh key
      -a, --address STR      ec2 instance Public DNS address
      -f, --framework STR    desired deep learning framework
      -v, --version FLOAT    AIToolbox version to be installed on ec2
@@ -50,7 +50,7 @@ while [[ $# -gt 0 ]]; do
 key="$1"
 
 case $key in
-    -k|--key_path)
+    -k|--key)
     key_path="$2"
     shift 2 # past argument value
     ;;
