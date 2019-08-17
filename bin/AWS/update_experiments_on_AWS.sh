@@ -17,9 +17,9 @@ HEREDOC
 }
 
 
-key_path=$1
-ec2_instance_address=$2
-local_project_path=$3
+key_path=
+ec2_instance_address=
+local_project_path=
 
 
 while [[ $# -gt 0 ]]; do

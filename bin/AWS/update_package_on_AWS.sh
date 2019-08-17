@@ -18,8 +18,8 @@ HEREDOC
 }
 
 
-key_path=$1
-ec2_instance_address=$2
+key_path=
+ec2_instance_address=
 DL_framework="pytorch"
 AIToolbox_version="0.2"
 
