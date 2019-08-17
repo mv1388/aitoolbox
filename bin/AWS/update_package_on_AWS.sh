@@ -17,12 +17,10 @@ function usage()
 HEREDOC
 }
 
-
 key_path=
 ec2_instance_address=
 DL_framework="pytorch"
 AIToolbox_version="0.2"
-
 
 while [[ $# -gt 0 ]]; do
 key="$1"

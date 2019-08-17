@@ -157,7 +157,7 @@ pip install AIToolbox-$AIToolbox_version.tar.gz
 
 
 if [ $dataset_name != '' ]; then
-    ./download_data.sh ~/project/data $dataset_name $preproc_dataset
+    ./download_data.sh -p ~/project/data -d $dataset_name -r $preproc_dataset
 fi
 " > finish_prepare_instance.sh
 

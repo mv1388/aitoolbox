@@ -16,11 +16,9 @@ function usage()
 HEREDOC
 }
 
-
 key_path=
 ec2_instance_address=
 local_project_path=
-
 
 while [[ $# -gt 0 ]]; do
 key="$1"
