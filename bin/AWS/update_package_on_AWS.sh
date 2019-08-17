@@ -28,7 +28,7 @@ while [[ $# -gt 0 ]]; do
 key="$1"
 
 case $key in
-    -k|--key_path)
+    -k|--key)
     key_path="$2"
     shift 2 # past argument value
     ;;
