@@ -49,7 +49,7 @@ case $key in
 esac
 done
 
-if [ "$download_path" == "" ] || [ "$dataset_name" == "" ] || [ "$preproc_dataset" == "" ]; then
+if [ "$download_path" == "" ] || [ "$dataset_name" == "" ]; then
     echo "Not provided required parameters"
     usage
     exit
