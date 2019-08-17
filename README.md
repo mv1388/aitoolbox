@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/mv1388/AIToolbox.svg?branch=master)](https://travis-ci.org/mv1388/AIToolbox)
 
-# AI TOOLBOX
+# AI TOOLBOX [Work in Progress]
 
 Library that helps you train neural networks and keep track of different experiments by automatically saving models and creating performance reports. These can be stored both locally or on AWS S3 which makes the library very useful when training on the GPU instance on AWS. Instance can be automatically shut down when training is finished and all the results are safely stored on S3.
 

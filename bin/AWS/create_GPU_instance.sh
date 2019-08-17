@@ -3,7 +3,7 @@
 # https://aws.amazon.com/blogs/machine-learning/train-deep-learning-models-on-gpus-using-amazon-ec2-spot-instances/
 
 
- aws ec2 run-instances \
+aws ec2 run-instances \
     --image-id ami-0061ecbbc1cbd45f5 \
     --security-group-ids <SECURITY_GROUP_ID> \
     --count 1 \

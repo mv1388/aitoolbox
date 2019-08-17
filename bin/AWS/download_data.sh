@@ -1,9 +1,59 @@
 #!/usr/bin/env bash
 
+# usage function
+function usage()
+{
+   cat << HEREDOC
+
+   Usage: $download_data [--dest_path STR] [--dataset STR] [--preproc STR]
+
+   optional arguments:
+     -p, --path_dest STR    destination path where to download the dataset
+     -d, --dataset STR      dataset to be optionally downloaded from the S3 storage directly to ec2 instance
+     -r, --preproc STR      the preprocessed version of the main dataset
+     -h, --help             show this help message and exit
+
+HEREDOC
+}
+
 # Data folder: ~/project/data (most likely)
-download_path=$1
-dataset=$2
-preproc_dataset=$3
+download_path="$HOME/project/data"
+dataset_name=
+preproc_dataset=
+
+while [[ $# -gt 0 ]]; do
+key="$1"
+
+case $key in
+    -p|--path_dest)
+    download_path="$2"
+    shift 2 # past argument value
+    ;;
+    -d|--dataset)
+    dataset_name="$2"
+    shift 2 # past argument value
+    ;;
+    -r|--preproc)
+    preproc_dataset="$2"
+    shift 2 # past argument value
+    ;;
+    -h|--help )
+    usage;
+    exit;
+    ;;
+    *)    # unknown option
+    echo "Don't know the argument"
+    usage;
+    exit;
+    ;;
+esac
+done
+
+if [ "$download_path" == "" ] || [ "$dataset_name" == "" ]; then
+    echo "Not provided required parameters"
+    usage
+    exit
+fi
 
 
 function download_SQuAD2 {
@@ -106,19 +156,19 @@ function download_glove {
 }
 
 
-if [ $dataset == "SQuAD2" ]; then
+if [ $dataset_name == "SQuAD2" ]; then
     download_SQuAD2 $download_path
 
-elif [ $dataset == "cnn-dailymail" ]; then
+elif [ $dataset_name == "cnn-dailymail" ]; then
     download_cnn_dailymail $download_path $preproc_dataset
 
-elif [ $dataset == "qangaroo" ]; then
+elif [ $dataset_name == "qangaroo" ]; then
     download_qangaroo $download_path $preproc_dataset
 
-elif [ $dataset == "HotpotQA" ]; then
+elif [ $dataset_name == "HotpotQA" ]; then
     download_HotpotQA $download_path
 
-elif [ $dataset == "glove" ]; then
+elif [ $dataset_name == "glove" ]; then
     download_glove $download_path $preproc_dataset
 
 else
