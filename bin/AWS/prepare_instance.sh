@@ -23,7 +23,7 @@ function usage()
 {
    cat << HEREDOC
 
-   Usage: $prepare_instance [--key STR] [--address STR] [--project STR]
+   Usage: $prepare_instance [--key STR] [--address STR] [--project STR] ...
 
    optional arguments:
      -k, --key STR          path to ssh key
