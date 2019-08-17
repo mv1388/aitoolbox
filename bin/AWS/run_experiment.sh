@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+# When you get ssh-ed to the instance finish the instance prep process by running:
+# ./finish_prepare_instance.sh
+# ./run_experiment.sh (optional: --terminate)
+
 project_root_path=~/project
 export PYTHONPATH=${PYTHONPATH}:$project_root_path
 
