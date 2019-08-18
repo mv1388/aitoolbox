@@ -8,6 +8,8 @@ from AIToolbox.torchtrain.data.batch_model_feed_defs import AbstractModelFeedDef
 class TTFullModel(nn.Module, ABC):
     """
     TT in TTFullModel --> TorchTrain Full Model
+
+    User also needs to implement forward() method according to the nn.Module inheritance
     """
     @abstractmethod
     def get_loss(self, batch_data, criterion, device):
