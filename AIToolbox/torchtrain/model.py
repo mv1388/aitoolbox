@@ -61,17 +61,6 @@ class TTFullModel(nn.Module, ABC):
         pass
 
 
-class TTForwardModel(TTFullModel):
-    def get_loss(self, batch_data, criterion, device):
-        pass
-    
-    def get_loss_eval(self, batch_data, criterion, device):
-        return self.get_loss(batch_data, criterion, device)
-    
-    def get_predictions(self, batch_data, device):
-        pass
-
-
 class ModelWrap:
     def __init__(self, model, batch_model_feed_def):
         """
