@@ -26,7 +26,9 @@ class GeneralLRScheduler(AbstractCallback):
 
         """
         self.train_loop_obj = train_loop_obj
+        self.message_service = train_loop_obj.message_service
         self.scheduler = self.scheduler_class(self.train_loop_obj.optimizer, **self.scheduler_args)
+        self.on_train_loop_registration()
         return self
 
     def on_epoch_end(self):
