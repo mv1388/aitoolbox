@@ -41,6 +41,10 @@ To automatically terminate the instance after the training is done execute with 
 
 ## Download dataset from S3
 
+To download the datasets stored on S3 you can use the [download_data.sh](download_data.sh) script.
+It is especially useful when used as a part of instance prep script where the necessary training data
+can be automatically downloaded from S3 to the running instance.
+
 ```bash
 ./download_data.sh -p ~/PycharmProjects/MemoryNet/data -d <DATASET_NAME> -r <PREPROC_DATASET>
 ```
