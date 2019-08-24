@@ -11,7 +11,7 @@ on the AWS instance during the instance preparation process.
 
 ```bash
 ./prepare_instance.sh -k <SSH_KEY_LOCATION> -a <INSTANCE_IP_ADDRESS> -f pytorch -v 0.2 \
-    -p <PROJECT_PATH> -d SQuAD2 -r orig
+                      -p <PROJECT_PATH> -d SQuAD2 -r orig
 ```
 
 `prepare_instance` script at the end ssh connects to the instance. 
