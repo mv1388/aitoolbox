@@ -10,7 +10,8 @@ folders from the main research project should be uploaded to the `~/project` fol
 on the AWS instance during the instance preparation process.
 
 ```bash
-./prepare_instance.sh <SSH_KEY_LOCATION> <AWS_INSTANCE_ADDRESS> 0.1 SQuAD2 orig ~/PycharmProjects/MemoryNet
+./prepare_instance.sh -k <SSH_KEY_LOCATION> -a <INSTANCE_IP_ADDRESS> -f pytorch -v 0.2 \
+                      -p <PROJECT_PATH> -d SQuAD2 -r orig
 ```
 
 `prepare_instance` script at the end ssh connects to the instance. 
@@ -34,12 +35,16 @@ Execute this script to run the experiments specified in the main research projec
 To automatically terminate the instance after the training is done execute with `--terminate` option:
 
 ```bash
-./run_experiment.sh --terminate <AWS_INSTANCE_ID>
+./run_experiment.sh --terminate
 ```
 
 
 ## Download dataset from S3
 
+To download the datasets stored on S3 you can use the [download_data.sh](download_data.sh) script.
+It is especially useful when used as a part of instance prep script where the necessary training data
+can be automatically downloaded from S3 to the running instance.
+
 ```bash
-./download_data.sh ~/PycharmProjects/MemoryNet/data <dataset_name> <preproc_dataset>
+./download_data.sh -p ~/PycharmProjects/MemoryNet/data -d <DATASET_NAME> -r <PREPROC_DATASET>
 ```
