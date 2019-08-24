@@ -9,6 +9,7 @@ pandas
 tweepy
 joblib
 tqdm
+awscli
 boto3
 google-cloud-storage
 botocore
