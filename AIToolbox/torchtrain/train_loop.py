@@ -71,7 +71,7 @@ class TrainLoop:
                 isinstance(self.model, Module) and not isinstance(self.batch_model_feed_def, AbstractModelFeedDefinition):
             raise TypeError('Provided the base PyTorch model but did not give the batch_model_feed_def')
 
-    def __call__(self, num_epoch, callbacks=None, grad_clip=None):
+    def __call__(self, num_epoch, callbacks=None):
         """Train the model using the train loop
 
         Args:
