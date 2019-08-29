@@ -77,20 +77,18 @@ class TrainLoop:
         Args:
             num_epoch (int): how many epochs the network will be trained
             callbacks (list): callbacks that are executed during the training run
-            grad_clip (int or float): optional gradient clipping
 
         Returns:
             torch.nn.modules.Module: trained model
         """
-        return self.do_train(num_epoch, callbacks, grad_clip)
+        return self.do_train(num_epoch, callbacks)
 
-    def do_train(self, num_epoch, callbacks=None, grad_clip=None):
+    def do_train(self, num_epoch, callbacks=None):
         """Train the model using the train loop
 
         Args:
             num_epoch (int): how many epochs the network will be trained
             callbacks (list): callbacks that are executed during the training run
-            grad_clip (int or float): optional gradient clipping
 
         Returns:
             torch.nn.modules.Module: trained model
@@ -121,8 +119,6 @@ class TrainLoop:
 
                 self.optimizer.zero_grad()
                 loss_batch.backward()
-                if grad_clip is not None:
-                    torch.nn.utils.clip_grad_norm_(self.model.parameters(), grad_clip)
                 self.callbacks_handler.execute_gradient_update()
                 self.optimizer.step()
 
