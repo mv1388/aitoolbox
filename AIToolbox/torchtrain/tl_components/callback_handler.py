@@ -3,20 +3,20 @@ from AIToolbox.torchtrain.callbacks.callbacks import AbstractCallback
 
 class CallbacksHandler:
     def __init__(self, train_loop_obj):
-        """Callback handler used for the callback orchestration inside the trainloop
+        """Callback handler used for the callback orchestration inside the TrainLoop
 
-        Common use of this handler is to call different methods inside the trainloop at different stages of the training
+        Common use of this handler is to call different methods inside the TrainLoop at different stages of the training
         process. Thus execute desired callbacks' functionality at the desired point of the training process.
 
         Args:
-            train_loop_obj (AIToolbox.torchtrain.train_loop.TrainLoop): reference to the encapsulating trainloop
+            train_loop_obj (AIToolbox.torchtrain.train_loop.TrainLoop): reference to the encapsulating TrainLoop
         """
         self.train_loop_obj = train_loop_obj
 
     def register_callbacks(self, callbacks):
-        """Register trainloop object reference inside the listed callbacks when the trainloop is created
+        """Register TrainLoop object reference inside the listed callbacks when the TrainLoop is created
 
-        Normally, this is called from inside of the train loop by the trainloop itself. Basically train loop "registers"
+        Normally, this is called from inside of the train loop by the TrainLoop itself. Basically train loop "registers"
         itself.
 
         Args:
@@ -60,6 +60,10 @@ class CallbacksHandler:
     def execute_batch_end(self):
         for callback in self.train_loop_obj.callbacks:
             callback.on_batch_end()
+
+    def execute_gradient_update(self):
+        for callback in self.train_loop_obj.callbacks:
+            callback.on_gradient_update()
     
     @staticmethod
     def enforce_callback_type(callbacks):

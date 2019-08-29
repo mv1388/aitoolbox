@@ -22,3 +22,4 @@ class TestCallbacksHandler(unittest.TestCase):
         self.assertTrue(function_exists(callback_handler, 'execute_train_end'))
         self.assertTrue(function_exists(callback_handler, 'execute_batch_begin'))
         self.assertTrue(function_exists(callback_handler, 'execute_batch_end'))
+        self.assertTrue(function_exists(callback_handler, 'execute_gradient_update'))

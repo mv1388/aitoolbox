@@ -17,6 +17,7 @@ class TestAbstractCallback(unittest.TestCase):
         self.assertTrue(function_exists(callback, 'on_train_end'))
         self.assertTrue(function_exists(callback, 'on_batch_begin'))
         self.assertTrue(function_exists(callback, 'on_batch_end'))
+        self.assertTrue(function_exists(callback, 'on_gradient_update'))
 
     def test_on_train_loop_registration_hook(self):
         train_loop = TrainLoop(NetUnifiedBatchFeed(), None, None, None, None, None)
