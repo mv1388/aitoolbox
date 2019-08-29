@@ -68,6 +68,9 @@ class AbstractCallback:
     def on_batch_end(self):
         pass
 
+    def on_gradient_update(self):
+        pass
+
 
 class ListRegisteredCallbacks(AbstractCallback):
     def __init__(self):

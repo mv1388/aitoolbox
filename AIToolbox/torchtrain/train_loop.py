@@ -123,6 +123,7 @@ class TrainLoop:
                 loss_batch.backward()
                 if grad_clip is not None:
                     torch.nn.utils.clip_grad_norm_(self.model.parameters(), grad_clip)
+                self.callbacks_handler.execute_gradient_update()
                 self.optimizer.step()
 
                 self.callbacks_handler.execute_batch_end()
