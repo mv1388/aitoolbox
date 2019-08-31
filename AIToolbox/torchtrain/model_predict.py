@@ -43,7 +43,7 @@ class PyTorchModelPredictor(AbstractModelPredictor):
         """
 
         Args:
-            model (AIToolbox.torchtrain.model.TTFullModel or AIToolbox.torchtrain.model.ModelWrap): neural
+            model (AIToolbox.torchtrain.model.TTModel or AIToolbox.torchtrain.model.ModelWrap): neural
                 network model
             data_loader (torch.utils.data.DataLoader):
         """
