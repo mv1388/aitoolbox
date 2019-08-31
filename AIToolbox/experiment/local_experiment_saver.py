@@ -11,7 +11,7 @@ class BaseFullExperimentLocalSaver(AbstractExperimentSaver):
         """
 
         Args:
-            model_saver (AIToolbox.experiment_save.local_save.local_model_save.AbstractLocalModelSaver)
+            model_saver (AIToolbox.experiment.local_save.local_model_save.AbstractLocalModelSaver)
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             local_model_result_folder_path (str): root local path where project folder will be created
@@ -33,7 +33,7 @@ class BaseFullExperimentLocalSaver(AbstractExperimentSaver):
 
         Args:
             model (dict or keras.engine.training.Model):
-            result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
+            result_package (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
             experiment_timestamp (str): time stamp at the start of training
             save_true_pred_labels (bool):
             separate_files (bool):

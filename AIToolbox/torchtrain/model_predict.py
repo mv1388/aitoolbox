@@ -80,7 +80,7 @@ class PyTorchModelPredictor(AbstractModelPredictor):
         """
 
         Args:
-            result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
+            result_package (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
             project_name (str):
             experiment_name (str):
             local_model_result_folder_path (str):
@@ -117,7 +117,7 @@ class PyTorchModelPredictor(AbstractModelPredictor):
         """
 
         Args:
-            result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
+            result_package (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
             return_result_package (bool):
 
         Returns:
@@ -162,7 +162,7 @@ class PyTorchModelPredictor(AbstractModelPredictor):
         the use of the result package is preferred.
 
         Args:
-            metric_class (AIToolbox.experiment_save.core_metrics.abstract_metric.AbstractBaseMetric): metric class not the object
+            metric_class (AIToolbox.experiment.core_metrics.abstract_metric.AbstractBaseMetric): metric class not the object
             return_metric (bool):
 
         Returns:

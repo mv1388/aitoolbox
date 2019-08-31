@@ -10,7 +10,7 @@ class TrainingHistoryPlotter:
         """
 
         Args:
-            result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
+            result_package (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
             experiment_results_local_path (str):
             plots_folder_name (str):
         """

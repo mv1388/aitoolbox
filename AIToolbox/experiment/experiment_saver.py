@@ -53,7 +53,7 @@ class BaseFullExperimentSaver(AbstractExperimentSaver):
 
         Args:
             model (dict or keras.engine.training.Model):
-            result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
+            result_package (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
             experiment_timestamp (str): time stamp at the start of training
             save_true_pred_labels (bool):
             separate_files (bool):
