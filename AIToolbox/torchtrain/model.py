@@ -63,7 +63,7 @@ class TTModel(nn.Module, ABC):
         pass
 
 
-# For back-compatibility: TTFullModel was previous name for TTModel
+# For back-compatibility: TTFullModel was the previous name for TTModel
 TTFullModel = TTModel
 
 
