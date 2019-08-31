@@ -63,6 +63,10 @@ class TTModel(nn.Module, ABC):
         pass
 
 
+# For back-compatibility: TTFullModel was previous name for TTModel
+TTFullModel = TTModel
+
+
 class ModelWrap:
     def __init__(self, model, batch_model_feed_def):
         """
