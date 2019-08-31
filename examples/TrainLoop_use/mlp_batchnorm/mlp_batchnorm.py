@@ -7,7 +7,7 @@ import torch.nn.functional as F
 import torch
 import torch.nn as nn
 
-from AIToolbox.torchtrain.model import TTFullModel
+from AIToolbox.torchtrain.model import TTModel
 from AIToolbox.torchtrain.train_loop import TrainLoop
 from AIToolbox.torchtrain.callbacks.performance_eval_callbacks import ModelPerformanceEvaluation, ModelPerformancePrintReport
 from AIToolbox.experiment.result_package.basic_packages import ClassificationResultPackage
@@ -72,7 +72,7 @@ for images, labels in train_loader:
 ### MODEL
 ##########################
 
-class MultilayerPerceptron(TTFullModel):
+class MultilayerPerceptron(TTModel):
     def __init__(self, num_features, num_classes, num_hidden_1, num_hidden_2):
         super(MultilayerPerceptron, self).__init__()
 

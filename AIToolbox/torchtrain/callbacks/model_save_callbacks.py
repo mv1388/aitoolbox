@@ -125,8 +125,8 @@ class ModelTrainEndSave(AbstractCallback):
             experiment_name (str): name of the particular experiment
             local_model_result_folder_path (str): root local path where project folder will be created
             hyperparams (dict): used hyper-parameters
-            val_result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
-            test_result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
+            val_result_package (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
+            test_result_package (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
             cloud_save_mode (str or None): Storage destination selector.
                 For AWS S3: 's3' / 'aws_s3' / 'aws'
                 For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'

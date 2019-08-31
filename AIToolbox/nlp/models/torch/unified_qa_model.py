@@ -2,10 +2,10 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from AIToolbox.torchtrain.model import TTFullModel
+from AIToolbox.torchtrain.model import TTModel
 
 
-class UnifiedQABasicRNN(TTFullModel):
+class UnifiedQABasicRNN(TTModel):
     def __init__(self, hidden_size, output_size, embedding_dim, vocab_size, ctx_n_layers=1, qus_n_layers=1, dropout=0.):
         super().__init__()
         self.ctx_n_layers = ctx_n_layers

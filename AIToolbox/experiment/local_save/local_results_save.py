@@ -16,7 +16,7 @@ class AbstractLocalResultsSaver(ABC):
         """
         
         Args:
-            result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
+            result_package (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             experiment_timestamp (str or None): time stamp at the start of training
@@ -37,7 +37,7 @@ class AbstractLocalResultsSaver(ABC):
         """
         
         Args:
-            result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
+            result_package (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             experiment_timestamp (str or None): time stamp at the start of training
@@ -171,7 +171,7 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
         """
 
         Args:
-            result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
+            result_package (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             experiment_timestamp (str or None): time stamp at the start of training
@@ -231,7 +231,7 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
         """
 
         Args:
-            result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
+            result_package (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             experiment_timestamp (str or None): time stamp at the start of training

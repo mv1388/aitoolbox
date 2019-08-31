@@ -23,7 +23,7 @@ class ModelPerformanceEvaluation(AbstractCallback):
         construction.
 
         Args:
-            result_package (AIToolbox.experiment_save.result_package.abstract_result_packages.AbstractResultPackage):
+            result_package (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
             args (dict):
             on_each_epoch (bool): calculate performance results just at the end of training or at the end of each epoch
             on_train_data (bool):
