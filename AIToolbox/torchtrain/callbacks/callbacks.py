@@ -68,7 +68,10 @@ class AbstractCallback:
     def on_batch_end(self):
         pass
 
-    def on_gradient_update(self):
+    def on_after_gradient_update(self):
+        pass
+
+    def on_after_optimizer_step(self):
         pass
 
 

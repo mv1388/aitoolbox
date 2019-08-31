@@ -121,6 +121,7 @@ class TrainLoop:
                 loss_batch.backward()
                 self.callbacks_handler.execute_gradient_update()
                 self.optimizer.step()
+                self.callbacks_handler.execute_optimizer_step()
 
                 self.callbacks_handler.execute_batch_end()
 
