@@ -6,7 +6,7 @@ from AIToolbox.torchtrain.data.batch_model_feed_defs import AbstractModelFeedDef
 from AIToolbox.torchtrain.callbacks.callbacks import AbstractCallback
 from AIToolbox.experiment.result_package.abstract_result_packages import AbstractResultPackage
 from AIToolbox.experiment.core_metrics.abstract_metric import AbstractBaseMetric
-from AIToolbox.torchtrain.model import TTFullModel
+from AIToolbox.torchtrain.model import TTModel
 
 
 def function_exists(object_to_check, fn_name):
@@ -35,9 +35,9 @@ class Net(nn.Module):
         return F.log_softmax(x, dim=1)
 
 
-class NetUnifiedBatchFeed(TTFullModel):
+class NetUnifiedBatchFeed(TTModel):
     def __init__(self):
-        super(TTFullModel, self).__init__()
+        super(TTModel, self).__init__()
         self.conv1 = nn.Conv2d(1, 20, 5, 1)
         self.conv2 = nn.Conv2d(20, 50, 5, 1)
         self.fc1 = nn.Linear(4*4*50, 500)

@@ -5,9 +5,9 @@ from torch.nn.modules import Module
 from AIToolbox.torchtrain.data.batch_model_feed_defs import AbstractModelFeedDefinition
 
 
-class TTFullModel(nn.Module, ABC):
+class TTModel(nn.Module, ABC):
     """
-    TT in TTFullModel --> TorchTrain Full Model
+    TT in TTModel --> TorchTrain Model
 
     User also needs to implement forward() method according to the nn.Module inheritance
     """
@@ -67,7 +67,7 @@ class ModelWrap:
     def __init__(self, model, batch_model_feed_def):
         """
 
-        NOTE: especially useful in the case when you want to train on multi-GPU where TTFullModel abstract functions
+        NOTE: especially useful in the case when you want to train on multi-GPU where TTModel abstract functions
             can't be used.
 
         Args:
