@@ -85,7 +85,8 @@ class CallbackTracker(AbstractCallback):
         AbstractCallback.__init__(self, 'CallbackTracker1')
         self.callback_calls = []
         self.call_ctr = {'on_train_loop_registration': 0, 'on_epoch_begin': 0, 'on_epoch_end': 0, 'on_train_begin': 0,
-                         'on_train_end': 0, 'on_batch_begin': 0, 'on_batch_end': 0, 'on_after_gradient_update': 0}
+                         'on_train_end': 0, 'on_batch_begin': 0, 'on_batch_end': 0,
+                         'on_after_gradient_update': 0, 'on_after_optimizer_step': 0}
 
     def on_train_loop_registration(self):
         self.callback_calls.append('on_train_loop_registration')
@@ -119,13 +120,18 @@ class CallbackTracker(AbstractCallback):
         self.callback_calls.append('on_after_gradient_update')
         self.call_ctr['on_after_gradient_update'] += 1
 
+    def on_after_optimizer_step(self):
+        self.callback_calls.append('on_after_optimizer_step')
+        self.call_ctr['on_after_optimizer_step'] += 1
+
 
 class CallbackTrackerShort(AbstractCallback):
     def __init__(self):
         AbstractCallback.__init__(self, 'CallbackTracker2')
         self.callback_calls = []
         self.call_ctr = {'on_train_loop_registration': 0, 'on_epoch_begin': 0, 'on_epoch_end': 0, 'on_train_begin': 0,
-                         'on_train_end': 0, 'on_batch_begin': 0, 'on_batch_end': 0, 'on_after_gradient_update': 0}
+                         'on_train_end': 0, 'on_batch_begin': 0, 'on_batch_end': 0,
+                         'on_after_gradient_update': 0, 'on_after_optimizer_step': 0}
 
     def on_epoch_begin(self):
         self.callback_calls.append('on_epoch_begin')
@@ -146,6 +152,10 @@ class CallbackTrackerShort(AbstractCallback):
     def on_after_gradient_update(self):
         self.callback_calls.append('on_after_gradient_update')
         self.call_ctr['on_after_gradient_update'] += 1
+
+    def on_after_optimizer_step(self):
+        self.callback_calls.append('on_after_optimizer_step')
+        self.call_ctr['on_after_optimizer_step'] += 1
 
 
 class DeactivateModelFeedDefinition(AbstractModelFeedDefinition):
