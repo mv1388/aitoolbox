@@ -93,7 +93,7 @@ class TestTrainLoop(unittest.TestCase):
         callback_full = train_loop.callbacks[1]
         callback_short = train_loop.callbacks[2]
 
-        model_return = train_loop.do_train(num_epoch=num_epochs)
+        model_return = train_loop.do_train(num_epoch=num_epochs, grad_cb=True)
 
         self.assertEqual(model, model_return)
         self.assertFalse(train_loop.early_stop)
@@ -158,7 +158,7 @@ class TestTrainLoop(unittest.TestCase):
         callback_full = train_loop.callbacks[1]
         callback_short = train_loop.callbacks[2]
 
-        model_return = train_loop.do_train(num_epoch=num_epochs)
+        model_return = train_loop.do_train(num_epoch=num_epochs, grad_cb=True)
 
         self.assertEqual(model, model_return)
         self.assertFalse(train_loop.early_stop)
