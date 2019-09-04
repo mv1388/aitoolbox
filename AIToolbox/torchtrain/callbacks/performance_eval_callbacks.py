@@ -157,14 +157,14 @@ class ModelPerformancePrintReport(AbstractCallback):
             raise ValueError('metrics list is empty')
 
     def on_train_end(self):
-        print('------------  End of training performance report  ------------')
+        print('-----------------  End of training performance report  -----------------')
         self.print_performance_report(prefix='train_end_')
 
     def on_epoch_end(self):
         if self.on_each_epoch:
             if self.report_frequency is None or \
                     (self.report_frequency is not None and self.train_loop_obj.epoch % self.report_frequency == 0):
-                print('------------  End of epoch performance report  ------------')
+                print('------------------  End of epoch performance report  -------------------')
                 self.print_performance_report()
 
     def print_performance_report(self, prefix=''):
