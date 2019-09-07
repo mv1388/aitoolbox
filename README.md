@@ -2,22 +2,29 @@
 
 # AI TOOLBOX [Work in Progress]
 
-Library that helps you train neural networks and keep track of different 
-experiments by automatically saving models and creating performance reports. 
-These can be stored both locally or on AWS S3 which makes the library 
+Library that helps you train neural networks in PyTorch by hiding the repetitive technicalities
+of training the neural nets and freeing you to focus interesting parts of devising advanced models. 
+In essence, it offers a keras-style train loop abstraction which can be used for higher 
+level training process while still allowing to control training on the lower 
+level when desired.
+
+In addition to orchestrating the model training loop the framework also helps you keep track of different 
+experiments by automatically saving models in a structured way and creating performance reports. 
+These can be stored both locally or on AWS S3 (Google Cloud in beta) which makes the library 
 very useful when training on the GPU instance on AWS. Instance can be 
 automatically shut down when training is finished and all the results 
 are safely stored on S3.
 
-Further use of this library is more targeted towards PyTorch training. 
-It offers a keras style train loop abstraction which can be used for higher 
-level training proces while still allowing to control training on the lower 
-level when desired with the use of different callbacks.
-
 
 ## torchtrain
 
-`TrainLoop` abstraction for PyTorch neural net training. Additional logic 
+### TrainLoop
+
+`TrainLoop` is the main abstraction for PyTorch neural net training. At it's core
+it handles to batch feeding of data into the model, calculating loss and updating parameters.
+
+
+Additional logic 
 can be injected into the training procedure by using `callbacks`. 
 Implement corresponding methods to execute callbacks at the start/end of batch, epoch, training.
 
