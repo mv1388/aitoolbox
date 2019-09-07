@@ -387,7 +387,7 @@ class MachineTranslationFeedDefinition(AbstractModelFeedDefinition):
             translation_true_l.append(translation_true)
             attention_l.append(attention)
             source_sent_l.append(src[:src_len[i], i])
-            
+
         metadata_dict = {'attention_matrices': attention_l,
                          'source_sent_text': source_sent_l}
 

@@ -76,7 +76,7 @@ class KerasCallbackTrackerShort(AbstractKerasCallback):
 class TestTrainLoop(unittest.TestCase):
     def test_init_values(self):
         train_loop = TrainLoop(keras_dummy_model(), None, None, None,
-                               optimizer=keras.optimizers.rmsprop(lr=0.0001, decay=1e-6), 
+                               optimizer=keras.optimizers.rmsprop(lr=0.0001, decay=1e-6),
                                criterion='categorical_crossentropy', metrics=['accuracy'])
 
         self.assertEqual(train_loop.callbacks, [])
