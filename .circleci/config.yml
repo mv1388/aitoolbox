@@ -50,7 +50,7 @@ jobs:
           name: run tests
           command: |
             . venv/bin/activate
-            run pytest
+            pytest
 #            python -m pytest
 #            python manage.py test
 
