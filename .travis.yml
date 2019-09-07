@@ -4,6 +4,8 @@ python:
   - "3.6"
   - "3.7"
 
+cache: pip
+
 # command to install dependencies
 install:
   - pip install tensorflow
