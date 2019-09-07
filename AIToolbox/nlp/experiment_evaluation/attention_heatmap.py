@@ -73,14 +73,14 @@ class AttentionHeatMap(AbstractBaseMetric):
 
         cmap = sns.light_palette((200, 75, 60), input="husl", as_cmap=True)
         # prop = FontProperties(fname='fonts/IPAfont00303/ipam.ttf', size=12)
-        ax = sns.heatmap(attention_matrix, xticklabels=sentence_source, yticklabels=sentence_target, 
+        ax = sns.heatmap(attention_matrix, xticklabels=sentence_source, yticklabels=sentence_target,
                          ax=ax, cmap=cmap, cbar_ax=ax_c)
 
         ax.xaxis.tick_top()
         ax.yaxis.tick_right()
 
         ax.set_xticklabels(sentence_target, minor=True, rotation=60, size=12)
-        
+
         for label in ax.get_xticklabels(minor=False):
             label.set_fontsize(12)
             # label.set_font_properties(prop)

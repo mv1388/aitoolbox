@@ -45,7 +45,7 @@ class TensorFlowGoogleStorageModelSaver(BaseModelGoogleStorageSaver, TensorFlowS
         """
         BaseModelGoogleStorageSaver.__init__(self, bucket_name, cloud_dir_prefix, checkpoint_model)
         self.tf_local_saver = TensorFlowLocalModelSaver(local_model_result_folder_path, checkpoint_model)
-        
+
         raise NotImplementedError
 
 
