@@ -133,7 +133,7 @@ class EarlyStopping(AbstractCallback):
 
 class TerminateOnNaN(AbstractCallback):
     def __init__(self, monitor='loss'):
-        """
+        """Terminate training if NaNs are predicted, thus metrics are NaN
 
         Args:
             monitor (str): performance measure that is tracked to decide if performance is improving during training
@@ -152,7 +152,9 @@ class TerminateOnNaN(AbstractCallback):
 
 class AllPredictionsSame(AbstractCallback):
     def __init__(self, value=0., stop_training=False, verbose=True):
-        """
+        """Checks if all the predicted values are the same
+
+        Useful for example when dealing with extremely unbalanced classes.
 
         Args:
             value (float): all predictions are the same as this value
@@ -181,7 +183,7 @@ class AllPredictionsSame(AbstractCallback):
 class EmailNotification(AbstractCallback):
     def __init__(self, sender_name, sender_email, recipient_email,
                  project_name=None, experiment_name=None, aws_region='eu-west-1'):
-        """
+        """Notify user via email about the training progression
 
         Args:
             sender_name (str): Name of the email sender

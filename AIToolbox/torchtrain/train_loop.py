@@ -23,7 +23,11 @@ class TrainLoop:
     def __init__(self, model,
                  train_loader, validation_loader, test_loader,
                  optimizer, criterion):
-        """
+        """Core PyTorch TrainLoop supporting the model training and target prediction
+
+        Implements core training procedures: batch feeding into the network as part of (multi)epoch train loop,
+        calculation of the loss & gradients. Apart from training related functionality the TrainLoop also implements
+        the logic needed for prediction of target variables.
 
         Args:
             model (AIToolbox.torchtrain.model.TTModel or AIToolbox.torchtrain.model.ModelWrap): neural

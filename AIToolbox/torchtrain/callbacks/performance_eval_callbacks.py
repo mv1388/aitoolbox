@@ -157,14 +157,14 @@ class ModelPerformancePrintReport(AbstractCallback):
             raise ValueError('metrics list is empty')
 
     def on_train_end(self):
-        print('------------  End of training performance report  ------------')
+        print('-----------------  End of training performance report  -----------------')
         self.print_performance_report(prefix='train_end_')
 
     def on_epoch_end(self):
         if self.on_each_epoch:
             if self.report_frequency is None or \
                     (self.report_frequency is not None and self.train_loop_obj.epoch % self.report_frequency == 0):
-                print('------------  End of epoch performance report  ------------')
+                print('------------------  End of epoch performance report  -------------------')
                 self.print_performance_report()
 
     def print_performance_report(self, prefix=''):
@@ -198,11 +198,11 @@ class ModelTrainHistoryPlot(AbstractCallback):
     def __init__(self, epoch_end=True, train_end=False,
                  project_name=None, experiment_name=None, local_model_result_folder_path=None,
                  cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix=''):
-        """
+        """Plot the evaluated performance metric history
 
         Args:
-            epoch_end (bool):
-            train_end (bool):
+            epoch_end (bool): should plot after every epoch
+            train_end (bool): should plot at the end of the training
             project_name (str or None): root name of the project
             experiment_name (str or None): name of the particular experiment
             local_model_result_folder_path (str or None): root local path where project folder will be created

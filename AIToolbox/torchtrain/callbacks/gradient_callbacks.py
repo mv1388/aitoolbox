@@ -5,7 +5,7 @@ from AIToolbox.torchtrain.callbacks.callbacks import AbstractCallback
 
 class GradNormClipCallback(AbstractCallback):
     def __init__(self, max_norm, **kwargs):
-        """
+        """Gradient norm clipping
 
         Args:
             max_norm (int or float): gradient clipping
