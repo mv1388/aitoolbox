@@ -11,7 +11,7 @@ from AIToolbox.nlp.core.vocabulary import Vocabulary
 
 """
 
-    Implementation relying on the allennlp library for the data processing instead of AIToolbox's NLP core package functions 
+    Implementation relying on the allennlp library for the data processing instead of AIToolbox's NLP core package functions
 
     Faster processing, however, now non alphanum remove, etc.
 

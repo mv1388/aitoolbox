@@ -1,5 +1,3 @@
-from nltk.tokenize import word_tokenize
-
 
 class Vocabulary:
     def __init__(self, name, document_level=False):
