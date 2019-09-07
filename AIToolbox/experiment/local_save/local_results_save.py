@@ -215,7 +215,7 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
                                                                     results_file_name_w_type,
                                                                     results_file_local_path_w_type)
         
-        experiment_results_paths = [[results_file_name, results_file_local_path]] 
+        experiment_results_paths = [[results_file_name, results_file_local_path]]
         
         if additional_results_dump_paths is not None:
             experiment_results_paths += additional_results_dump_paths
@@ -298,7 +298,7 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
                                                                       labels_file_name_w_type,
                                                                       labels_file_local_path_w_type)
             saved_results_paths.append([labels_file_name, labels_file_local_path])
-            
+
         if additional_results_dump_paths is not None:
             saved_results_paths += additional_results_dump_paths
 

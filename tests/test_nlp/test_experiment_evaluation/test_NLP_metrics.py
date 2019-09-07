@@ -111,16 +111,16 @@ class TestBLEUSentenceScoreMetric(unittest.TestCase):
 
     def test_catch_not_equal_num_of_examples(self):
         with self.assertRaises(ValueError):
-            bleu_1 = BLEUSentenceScoreMetric(['bla bla bla bla'.split(), 'mjaw how how mjav mjaw'.split()],
-                                             ['bla bla bla bla'.split()])
+            BLEUSentenceScoreMetric(['bla bla bla bla'.split(), 'mjaw how how mjav mjaw'.split()],
+                                    ['bla bla bla bla'.split()])
 
         with self.assertRaises(ValueError):
-            bleu_2 = BLEUSentenceScoreMetric(['bla bla bla bla'.split(), 'mjaw how how mjav mjaw'.split(), 'dsad qwqw'.split()],
-                                             ['bla bla bla bla'.split()])
+            BLEUSentenceScoreMetric(['bla bla bla bla'.split(), 'mjaw how how mjav mjaw'.split(), 'dsad qwqw'.split()],
+                                    ['bla bla bla bla'.split()])
 
         with self.assertRaises(ValueError):
-            bleu_3 = BLEUSentenceScoreMetric(['bla bla bla bla'.split(), 'mjaw how how mjav mjaw'.split(), 'dsad qwqw'.split()],
-                                             ['bla bla bla bla'.split(), '1122 mm44 fadfdas'.split()])
+            BLEUSentenceScoreMetric(['bla bla bla bla'.split(), 'mjaw how how mjav mjaw'.split(), 'dsad qwqw'.split()],
+                                    ['bla bla bla bla'.split(), '1122 mm44 fadfdas'.split()])
 
 
 class TestBLEUCorpusScoreMetric(unittest.TestCase):
@@ -179,16 +179,16 @@ class TestBLEUCorpusScoreMetric(unittest.TestCase):
 
     def test_catch_not_equal_num_of_examples(self):
         with self.assertRaises(ValueError):
-            bleu_1 = BLEUCorpusScoreMetric(['bla bla bla bla'.split(), 'mjaw how how mjav mjaw'.split()],
-                                           ['bla bla bla bla'.split()])
+            BLEUCorpusScoreMetric(['bla bla bla bla'.split(), 'mjaw how how mjav mjaw'.split()],
+                                  ['bla bla bla bla'.split()])
 
         with self.assertRaises(ValueError):
-            bleu_2 = BLEUCorpusScoreMetric(['bla bla bla bla'.split(), 'mjaw how how mjav mjaw'.split(), 'dsad qwqw'.split()],
-                                           ['bla bla bla bla'.split()])
+            BLEUCorpusScoreMetric(['bla bla bla bla'.split(), 'mjaw how how mjav mjaw'.split(), 'dsad qwqw'.split()],
+                                  ['bla bla bla bla'.split()])
 
         with self.assertRaises(ValueError):
-            bleu_3 = BLEUCorpusScoreMetric(['bla bla bla bla'.split(), 'mjaw how how mjav mjaw'.split(), 'dsad qwqw'.split()],
-                                           ['bla bla bla bla'.split(), '1122 mm44 fadfdas'.split()])
+            BLEUCorpusScoreMetric(['bla bla bla bla'.split(), 'mjaw how how mjav mjaw'.split(), 'dsad qwqw'.split()],
+                                  ['bla bla bla bla'.split(), '1122 mm44 fadfdas'.split()])
 
 
 class TestBLEUScoreStrTorchNLPMetric(unittest.TestCase):
@@ -247,13 +247,13 @@ class TestBLEUScoreStrTorchNLPMetric(unittest.TestCase):
 
     def test_catch_not_equal_num_of_examples(self):
         with self.assertRaises(ValueError):
-            bleu_1 = BLEUScoreStrTorchNLPMetric(['bla bla bla bla'.split(), 'mjaw how how mjav mjaw'.split()],
-                                                ['bla bla bla bla'.split()])
+            BLEUScoreStrTorchNLPMetric(['bla bla bla bla'.split(), 'mjaw how how mjav mjaw'.split()],
+                                       ['bla bla bla bla'.split()])
 
         with self.assertRaises(ValueError):
-            bleu_2 = BLEUScoreStrTorchNLPMetric(['bla bla bla bla'.split(), 'mjaw how how mjav mjaw'.split(), 'dsad qwqw'.split()],
-                                                ['bla bla bla bla'.split()])
+            BLEUScoreStrTorchNLPMetric(['bla bla bla bla'.split(), 'mjaw how how mjav mjaw'.split(), 'dsad qwqw'.split()],
+                                       ['bla bla bla bla'.split()])
 
         with self.assertRaises(ValueError):
-            bleu_3 = BLEUScoreStrTorchNLPMetric(['bla bla bla bla'.split(), 'mjaw how how mjav mjaw'.split(), 'dsad qwqw'.split()],
-                                                ['bla bla bla bla'.split(), '1122 mm44 fadfdas'.split()])
+            BLEUScoreStrTorchNLPMetric(['bla bla bla bla'.split(), 'mjaw how how mjav mjaw'.split(), 'dsad qwqw'.split()],
+                                       ['bla bla bla bla'.split(), '1122 mm44 fadfdas'.split()])
