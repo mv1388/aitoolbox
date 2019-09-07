@@ -87,7 +87,7 @@ class TestTrainingHistory(unittest.TestCase):
         th.insert_single_result_into_history('loss', 1223.4)
         th.insert_single_result_into_history('loss', 1224443.4)
         self.assertEqual(th.train_history, {'loss': [123.4, 1223.4, 1224443.4], 'accumulated_loss': [], 'val_loss': []})
-        
+
         th.insert_single_result_into_history('accumulated_loss', 1224443.4)
         th.insert_single_result_into_history('accumulated_loss', 1224443.4)
         self.assertEqual(th.train_history, {'loss': [123.4, 1223.4, 1224443.4],

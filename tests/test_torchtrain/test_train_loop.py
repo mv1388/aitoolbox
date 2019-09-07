@@ -412,49 +412,49 @@ class TestTrainLoopModelEndSave(unittest.TestCase):
 
     def test_loader_package_exceptions(self):
         with self.assertRaises(ValueError):
-            train_loop_non_val = TrainLoopModelEndSave(NetUnifiedBatchFeed(), None, None, 100, None,
-                                                       None,
-                                                       "project_name", "experiment_name",
-                                                       "local_model_result_folder_path",
-                                                       hyperparams={},
-                                                       val_result_package=DummyResultPackage(),
-                                                       test_result_package=DummyResultPackage(),
-                                                       cloud_save_mode='s3')
+            TrainLoopModelEndSave(NetUnifiedBatchFeed(), None, None, 100, None,
+                                  None,
+                                  "project_name", "experiment_name",
+                                  "local_model_result_folder_path",
+                                  hyperparams={},
+                                  val_result_package=DummyResultPackage(),
+                                  test_result_package=DummyResultPackage(),
+                                  cloud_save_mode='s3')
         with self.assertRaises(ValueError):
-            train_loop_non_val = TrainLoopModelEndSave(NetUnifiedBatchFeed(), None, 100, None, None,
-                                                       None,
-                                                       "project_name", "experiment_name",
-                                                       "local_model_result_folder_path",
-                                                       hyperparams={},
-                                                       val_result_package=DummyResultPackage(),
-                                                       test_result_package=DummyResultPackage(),
-                                                       cloud_save_mode='s3')
+            TrainLoopModelEndSave(NetUnifiedBatchFeed(), None, 100, None, None,
+                                  None,
+                                  "project_name", "experiment_name",
+                                  "local_model_result_folder_path",
+                                  hyperparams={},
+                                  val_result_package=DummyResultPackage(),
+                                  test_result_package=DummyResultPackage(),
+                                  cloud_save_mode='s3')
         with self.assertRaises(ValueError):
-            train_loop_non_val = TrainLoopModelEndSave(NetUnifiedBatchFeed(), None, 100, None, None,
-                                                       None,
-                                                       "project_name", "experiment_name",
-                                                       "local_model_result_folder_path",
-                                                       hyperparams={},
-                                                       test_result_package=DummyResultPackage(),
-                                                       cloud_save_mode='s3')
+            TrainLoopModelEndSave(NetUnifiedBatchFeed(), None, 100, None, None,
+                                  None,
+                                  "project_name", "experiment_name",
+                                  "local_model_result_folder_path",
+                                  hyperparams={},
+                                  test_result_package=DummyResultPackage(),
+                                  cloud_save_mode='s3')
         with self.assertRaises(ValueError):
-            train_loop_non_val = TrainLoopModelEndSave(NetUnifiedBatchFeed(), None, None, None, None,
-                                                       None,
-                                                       "project_name", "experiment_name",
-                                                       "local_model_result_folder_path",
-                                                       hyperparams={},
-                                                       val_result_package=DummyResultPackage(),
-                                                       test_result_package=DummyResultPackage(),
-                                                       cloud_save_mode='s3')
+            TrainLoopModelEndSave(NetUnifiedBatchFeed(), None, None, None, None,
+                                  None,
+                                  "project_name", "experiment_name",
+                                  "local_model_result_folder_path",
+                                  hyperparams={},
+                                  val_result_package=DummyResultPackage(),
+                                  test_result_package=DummyResultPackage(),
+                                  cloud_save_mode='s3')
         with self.assertRaises(ValueError):
-            train_loop_non_val = TrainLoopModelEndSave(NetUnifiedBatchFeed(), None, 100, 100, None,
-                                                       None,
-                                                       "project_name", "experiment_name",
-                                                       "local_model_result_folder_path",
-                                                       hyperparams={},
-                                                       val_result_package=None,
-                                                       test_result_package=None,
-                                                       cloud_save_mode='s3')
+            TrainLoopModelEndSave(NetUnifiedBatchFeed(), None, 100, 100, None,
+                                  None,
+                                  "project_name", "experiment_name",
+                                  "local_model_result_folder_path",
+                                  hyperparams={},
+                                  val_result_package=None,
+                                  test_result_package=None,
+                                  cloud_save_mode='s3')
 
 
 class TestTrainLoopModelCheckpointEndSave(unittest.TestCase):
