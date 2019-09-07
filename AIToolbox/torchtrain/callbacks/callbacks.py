@@ -25,14 +25,14 @@ class AbstractCallback:
         self.message_service: Optional[MessageService] = None
 
     def register_train_loop_object(self, train_loop_obj):
-        """Introduce the reference to the encapsulating trainloop so that the callback has access to the
-            low level functionality of the trainloop
+        """Introduce the reference to the encapsulating TrainLoop so that the callback has access to the
+            low level functionality of the TrainLoop
 
         The registration is normally handled by the callback handler found inside the train loops. The handler is
-        responsible for all the callback orchestration of the callbacks inside the trainloops.
+        responsible for all the callback orchestration of the callbacks inside the TrainLoop.
 
         Args:
-            train_loop_obj (AIToolbox.torchtrain.train_loop.TrainLoop): reference to the encapsulating trainloop
+            train_loop_obj (AIToolbox.torchtrain.train_loop.TrainLoop): reference to the encapsulating TrainLoop
 
         Returns:
             AbstractCallback: return the reference to the callback after it is registered
