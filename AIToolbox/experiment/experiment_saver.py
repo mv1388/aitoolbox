@@ -226,7 +226,7 @@ class FullTensorFlowExperimentGoogleStorageSaver(BaseFullExperimentGoogleStorage
         BaseFullExperimentGoogleStorageSaver.__init__(self, tf_model_saver, project_name, experiment_name,
                                                       bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
                                                       local_model_result_folder_path=local_model_result_folder_path)
-        
+
         raise NotImplementedError
 
 

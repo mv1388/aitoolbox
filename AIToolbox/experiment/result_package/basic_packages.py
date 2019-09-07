@@ -56,7 +56,7 @@ class BinaryClassificationResultPackage(AbstractResultPackage):
             strict_content_check (bool):
             **kwargs (dict):
         """
-        AbstractResultPackage.__init__(self, pkg_name='BinaryClassificationResult', 
+        AbstractResultPackage.__init__(self, pkg_name='BinaryClassificationResult',
                                        strict_content_check=strict_content_check, **kwargs)
 
     def prepare_results_dict(self):
@@ -83,7 +83,7 @@ class ClassificationResultPackage(AbstractResultPackage):
             strict_content_check (bool):
             **kwargs (dict):
         """
-        AbstractResultPackage.__init__(self, pkg_name='ClassificationResult', 
+        AbstractResultPackage.__init__(self, pkg_name='ClassificationResult',
                                        strict_content_check=strict_content_check, **kwargs)
 
     def prepare_results_dict(self):
