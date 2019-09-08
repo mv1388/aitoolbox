@@ -65,3 +65,43 @@ class TrainingHistoryPlotter:
         fig.savefig(file_path)
         plt.close()
         return file_name, file_path
+
+
+class TrainingHistoryWriter:
+    def __init__(self, result_package, experiment_results_local_path, results_folder_name='results'):
+        """
+
+        Args:
+            result_package (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
+            experiment_results_local_path (str):
+            results_folder_name (str):
+        """
+        self.result_package = result_package
+        self.training_history = result_package.get_training_history_object()
+
+        self.results_folder_name = results_folder_name
+        self.plots_local_folder_path = os.path.join(experiment_results_local_path, results_folder_name)
+        if not os.path.exists(self.plots_local_folder_path):
+            os.mkdir(self.plots_local_folder_path)
+
+    def generate_report(self, epoch, file_name):
+        """
+
+        Args:
+            epoch (int):
+            file_name (str):
+
+        Returns:
+            str, str: file name/path inside the experiment folder, local file_path
+        """
+        file_path = os.path.join(self.plots_local_folder_path, file_name)
+
+        with open(file_path, 'wa') as f:
+            f.write('============================\n')
+            f.write(f'Epoch: {epoch}\n')
+            f.write('============================\n')
+            for metric_name, result_history in self.training_history.get_train_history_dict(flatten_dict=True).items():
+                f.write(f'{metric_name}:\t{result_history[-1]}\n')
+            f.write('\n\n')
+
+        return os.path.join(self.results_folder_name, file_name), file_path

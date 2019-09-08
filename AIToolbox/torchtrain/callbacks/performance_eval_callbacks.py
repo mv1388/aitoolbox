@@ -7,7 +7,7 @@ from AIToolbox.cloud.AWS.results_save import BaseResultsSaver as BaseResultsS3Sa
 from AIToolbox.cloud.GoogleCloud.results_save import BaseResultsGoogleStorageSaver
 from AIToolbox.experiment.local_save.local_results_save import BaseLocalResultsSaver
 from AIToolbox.experiment.result_package.abstract_result_packages import PreCalculatedResultPackage as EmptyResultPackage
-from AIToolbox.experiment.result_reporting.report_generator import TrainingHistoryPlotter
+from AIToolbox.experiment.result_reporting.report_generator import TrainingHistoryPlotter, TrainingHistoryWriter
 
 
 class ModelPerformanceEvaluation(AbstractCallback):
@@ -321,7 +321,42 @@ class ModelTrainHistoryFileWriter(ModelTrainHistoryBaseCB):
             self.write_current_train_history(prefix='train_end_')
 
     def write_current_train_history(self, prefix=''):
-        pass
+        """
+
+        Args:
+            prefix (str):
+
+        Returns:
+
+        """
+        experiment_results_local_path = \
+            BaseLocalResultsSaver.create_experiment_local_results_folder(self.project_name, self.experiment_name,
+                                                                         self.train_loop_obj.experiment_timestamp,
+                                                                         self.local_model_result_folder_path)
+
+        # Just a dummy empty result package to wrap the train history as RP is expected in the plotter
+        result_pkg_wrapper = EmptyResultPackage(results_dict={})
+        result_pkg_wrapper.training_history = self.train_loop_obj.train_history
+
+        result_writer = TrainingHistoryWriter(result_package=result_pkg_wrapper,
+                                              experiment_results_local_path=experiment_results_local_path)
+        results_file_path_in_cloud_results_dir, results_file_local_path = \
+            result_writer.generate_report(epoch=self.train_loop_obj.epoch,
+                                          file_name=f'{prefix}results.txt')
+
+        self.message_service.write_message('ModelTrainHistoryFileWriter_results_file_local_paths',
+                                           results_file_local_path,
+                                           msg_handling_settings=msg_passing_settings.UNTIL_END_OF_EPOCH)
+
+        if self.cloud_results_saver is not None:
+            experiment_cloud_path = \
+                self.cloud_results_saver.create_experiment_cloud_storage_folder_structure(self.project_name,
+                                                                                          self.experiment_name,
+                                                                                          self.train_loop_obj.experiment_timestamp)
+
+            results_file_s3_path = os.path.join(experiment_cloud_path, results_file_path_in_cloud_results_dir)
+            self.cloud_results_saver.save_file(local_file_path=results_file_local_path,
+                                               cloud_file_path=results_file_s3_path)
 
 
 class ModelTrainHistoryPlot(ModelTrainHistoryBaseCB):
