@@ -96,7 +96,7 @@ class TrainingHistoryWriter:
         """
         file_path = os.path.join(self.plots_local_folder_path, file_name)
 
-        with open(file_path, 'wa') as f:
+        with open(file_path, 'a') as f:
             f.write('============================\n')
             f.write(f'Epoch: {epoch}\n')
             f.write('============================\n')
