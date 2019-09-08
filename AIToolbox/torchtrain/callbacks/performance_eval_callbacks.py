@@ -6,7 +6,6 @@ from AIToolbox.torchtrain.tl_components import message_passing as msg_passing_se
 from AIToolbox.cloud.AWS.results_save import BaseResultsSaver as BaseResultsS3Saver
 from AIToolbox.cloud.GoogleCloud.results_save import BaseResultsGoogleStorageSaver
 from AIToolbox.experiment.local_save.local_results_save import BaseLocalResultsSaver
-from AIToolbox.experiment.result_package.abstract_result_packages import PreCalculatedResultPackage as EmptyResultPackage
 from AIToolbox.experiment.result_reporting.report_generator import TrainingHistoryPlotter, TrainingHistoryWriter
 
 
@@ -334,11 +333,7 @@ class ModelTrainHistoryFileWriter(ModelTrainHistoryBaseCB):
                                                                          self.train_loop_obj.experiment_timestamp,
                                                                          self.local_model_result_folder_path)
 
-        # Just a dummy empty result package to wrap the train history as RP is expected in the plotter
-        result_pkg_wrapper = EmptyResultPackage(results_dict={})
-        result_pkg_wrapper.training_history = self.train_loop_obj.train_history
-
-        result_writer = TrainingHistoryWriter(result_package=result_pkg_wrapper,
+        result_writer = TrainingHistoryWriter(training_history=self.train_loop_obj.train_history,
                                               experiment_results_local_path=experiment_results_local_path)
         results_file_path_in_cloud_results_dir, results_file_local_path = \
             result_writer.generate_report(epoch=self.train_loop_obj.epoch,
@@ -413,11 +408,7 @@ class ModelTrainHistoryPlot(ModelTrainHistoryBaseCB):
                                                                          self.train_loop_obj.experiment_timestamp,
                                                                          self.local_model_result_folder_path)
 
-        # Just a dummy empty result package to wrap the train history as RP is expected in the plotter
-        result_pkg_wrapper = EmptyResultPackage(results_dict={})
-        result_pkg_wrapper.training_history = self.train_loop_obj.train_history
-
-        plotter = TrainingHistoryPlotter(result_package=result_pkg_wrapper,
+        plotter = TrainingHistoryPlotter(training_history=self.train_loop_obj.train_history,
                                          experiment_results_local_path=experiment_results_local_path,
                                          plots_folder_name=f'{prefix}plots_epoch_{self.train_loop_obj.epoch}')
         saved_local_results_details = plotter.generate_report()

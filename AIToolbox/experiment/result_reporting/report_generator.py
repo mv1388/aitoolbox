@@ -6,16 +6,15 @@ style.use('ggplot')
 
 
 class TrainingHistoryPlotter:
-    def __init__(self, result_package, experiment_results_local_path, plots_folder_name='plots'):
+    def __init__(self, training_history, experiment_results_local_path, plots_folder_name='plots'):
         """
 
         Args:
-            result_package (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
+            training_history (AIToolbox.experiment.training_history.TrainingHistory):
             experiment_results_local_path (str):
             plots_folder_name (str):
         """
-        self.result_package = result_package
-        self.training_history = result_package.get_training_history_object()
+        self.training_history = training_history
 
         self.plots_folder_name = plots_folder_name
         self.plots_local_folder_path = os.path.join(experiment_results_local_path, plots_folder_name)
@@ -68,16 +67,15 @@ class TrainingHistoryPlotter:
 
 
 class TrainingHistoryWriter:
-    def __init__(self, result_package, experiment_results_local_path, results_folder_name='results'):
+    def __init__(self, training_history, experiment_results_local_path, results_folder_name='results'):
         """
 
         Args:
-            result_package (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
+            training_history (AIToolbox.experiment.training_history.TrainingHistory):
             experiment_results_local_path (str):
             results_folder_name (str):
         """
-        self.result_package = result_package
-        self.training_history = result_package.get_training_history_object()
+        self.training_history = training_history
 
         self.results_folder_name = results_folder_name
         self.plots_local_folder_path = os.path.join(experiment_results_local_path, results_folder_name)
