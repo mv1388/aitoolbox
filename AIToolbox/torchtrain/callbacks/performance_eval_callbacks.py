@@ -194,13 +194,16 @@ class ModelPerformancePrintReport(AbstractCallback):
                 print(f'{metric_name}: {self.train_loop_obj.train_history[metric_name][-1]}')
 
 
-class ModelTrainHistoryPlot(AbstractCallback):
-    def __init__(self, epoch_end=True, train_end=False,
+class ModelTrainHistoryBaseCB(AbstractCallback):
+    def __init__(self, callback_name, execution_order=0,
+                 epoch_end=True, train_end=False,
                  project_name=None, experiment_name=None, local_model_result_folder_path=None,
                  cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix=''):
-        """Plot the evaluated performance metric history
+        """Base callback class to be inherited from when reporting train performance history
 
         Args:
+            callback_name (str):
+            execution_order (int):
             epoch_end (bool): should plot after every epoch
             train_end (bool): should plot at the end of the training
             project_name (str or None): root name of the project
@@ -213,11 +216,9 @@ class ModelTrainHistoryPlot(AbstractCallback):
             bucket_name (str): name of the bucket in the cloud storage
             cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
         """
+        AbstractCallback.__init__(self, callback_name, execution_order)
         if epoch_end is False and train_end is False:
             raise ValueError('Both epoch_end and train_end are set to False. At least one of these should be True.')
-        # execution_order=98 makes sure that any performance calculation callbacks are executed before and the most
-        # recent results can already be found in the train_history
-        AbstractCallback.__init__(self, 'Model Train history Plot report', execution_order=97)
         self.epoch_end = epoch_end
         self.train_end = train_end
         self.project_name = project_name
@@ -230,10 +231,6 @@ class ModelTrainHistoryPlot(AbstractCallback):
         self.cloud_dir_prefix = cloud_dir_prefix
 
         self.cloud_results_saver = None
-
-    def on_train_loop_registration(self):
-        self.try_infer_experiment_details()
-        self.prepare_results_saver()
 
     def try_infer_experiment_details(self):
         """
@@ -281,6 +278,83 @@ class ModelTrainHistoryPlot(AbstractCallback):
                                                                      cloud_dir_prefix=self.cloud_dir_prefix)
         else:
             self.cloud_results_saver = None
+
+
+class ModelTrainHistoryFileWriter(ModelTrainHistoryBaseCB):
+    def __init__(self, epoch_end=True, train_end=False,
+                 project_name=None, experiment_name=None, local_model_result_folder_path=None,
+                 cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix=''):
+        """Write evaluated performance metric history to the text file
+
+        Args:
+            epoch_end (bool): should plot after every epoch
+            train_end (bool): should plot at the end of the training
+            project_name (str or None): root name of the project
+            experiment_name (str or None): name of the particular experiment
+            local_model_result_folder_path (str or None): root local path where project folder will be created
+            cloud_save_mode (str or None): Storage destination selector.
+                For AWS S3: 's3' / 'aws_s3' / 'aws'
+                For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
+                Everything else results just in local storage to disk
+            bucket_name (str): name of the bucket in the cloud storage
+            cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
+        """
+        # execution_order=97 makes sure that any performance calculation callbacks are executed before and the most
+        # recent results can already be found in the train_history
+        ModelTrainHistoryBaseCB.__init__(self, 'Model Train performance history file writer', execution_order=97,
+                                         epoch_end=epoch_end, train_end=train_end,
+                                         project_name=project_name, experiment_name=experiment_name,
+                                         local_model_result_folder_path=local_model_result_folder_path,
+                                         cloud_save_mode=cloud_save_mode, bucket_name=bucket_name,
+                                         cloud_dir_prefix=cloud_dir_prefix)
+
+    def on_train_loop_registration(self):
+        self.try_infer_experiment_details()
+        self.prepare_results_saver()
+
+    def on_epoch_end(self):
+        if self.epoch_end:
+            self.write_current_train_history()
+
+    def on_train_end(self):
+        if self.train_end:
+            self.write_current_train_history(prefix='train_end_')
+
+    def write_current_train_history(self, prefix=''):
+        pass
+
+
+class ModelTrainHistoryPlot(ModelTrainHistoryBaseCB):
+    def __init__(self, epoch_end=True, train_end=False,
+                 project_name=None, experiment_name=None, local_model_result_folder_path=None,
+                 cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix=''):
+        """Plot the evaluated performance metric history
+
+        Args:
+            epoch_end (bool): should plot after every epoch
+            train_end (bool): should plot at the end of the training
+            project_name (str or None): root name of the project
+            experiment_name (str or None): name of the particular experiment
+            local_model_result_folder_path (str or None): root local path where project folder will be created
+            cloud_save_mode (str or None): Storage destination selector.
+                For AWS S3: 's3' / 'aws_s3' / 'aws'
+                For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
+                Everything else results just in local storage to disk
+            bucket_name (str): name of the bucket in the cloud storage
+            cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
+        """
+        # execution_order=97 makes sure that any performance calculation callbacks are executed before and the most
+        # recent results can already be found in the train_history
+        ModelTrainHistoryBaseCB.__init__(self, 'Model Train history Plot report', execution_order=97,
+                                         epoch_end=epoch_end, train_end=train_end,
+                                         project_name=project_name, experiment_name=experiment_name,
+                                         local_model_result_folder_path=local_model_result_folder_path,
+                                         cloud_save_mode=cloud_save_mode, bucket_name=bucket_name,
+                                         cloud_dir_prefix=cloud_dir_prefix)
+
+    def on_train_loop_registration(self):
+        self.try_infer_experiment_details()
+        self.prepare_results_saver()
 
     def on_epoch_end(self):
         if self.epoch_end:
