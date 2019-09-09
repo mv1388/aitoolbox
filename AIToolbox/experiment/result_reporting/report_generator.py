@@ -75,23 +75,24 @@ class TrainingHistoryWriter:
             experiment_results_local_path (str):
         """
         self.experiment_results_local_path = experiment_results_local_path
-        self.plots_local_folder_path = None
+        self.plots_local_folder_path = experiment_results_local_path
 
-    def generate_report(self, training_history, epoch, file_name, results_folder_name='results_txt'):
+    def generate_report(self, training_history, epoch, file_name, results_folder_name=None):
         """
 
         Args:
             training_history (AIToolbox.experiment.training_history.TrainingHistory):
             epoch (int):
             file_name (str):
-            results_folder_name (str):
+            results_folder_name (str or None):
 
         Returns:
             str, str: file name/path inside the experiment folder, local file_path
         """
-        self.plots_local_folder_path = os.path.join(self.experiment_results_local_path, results_folder_name)
-        if not os.path.exists(self.plots_local_folder_path):
-            os.mkdir(self.plots_local_folder_path)
+        if results_folder_name is not None:
+            self.plots_local_folder_path = os.path.join(self.experiment_results_local_path, results_folder_name)
+            if not os.path.exists(self.plots_local_folder_path):
+                os.mkdir(self.plots_local_folder_path)
 
         file_path = os.path.join(self.plots_local_folder_path, file_name)
 
@@ -103,4 +104,5 @@ class TrainingHistoryWriter:
                 f.write(f'{metric_name}:\t{result_history[-1]}\n')
             f.write('\n\n')
 
-        return os.path.join(results_folder_name, file_name), file_path
+        return os.path.join(results_folder_name if results_folder_name is not None else '',
+                            file_name), file_path

@@ -206,7 +206,7 @@ class TestModelTrainHistoryFileWriter(unittest.TestCase):
         # Epoch 1
         train_loop.callbacks_handler.execute_epoch_end()
         f_path = os.path.join(THIS_DIR, 'dummyProject', f'exper_{train_loop.experiment_timestamp}',
-                              'results', 'results_txt', 'results.txt')
+                              'results', 'results.txt')
 
         with open(f_path, 'r') as f:
             f_content = [l.strip() for l in f.readlines()]
