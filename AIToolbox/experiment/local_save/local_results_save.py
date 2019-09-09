@@ -192,11 +192,12 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
 
         results = result_package.get_results()
         hyperparameters = result_package.get_hyperparameters()
+        training_history_object = result_package.training_history
         training_history = result_package.get_training_history()
 
         additional_results_dump_paths = result_package.get_additional_results_dump_paths()
-        plots_paths = TrainingHistoryPlotter(result_package, experiment_results_local_path,
-                                             plots_folder_name='plots').generate_report()
+        plots_paths = TrainingHistoryPlotter(experiment_results_local_path).generate_report(training_history_object,
+                                                                                            plots_folder_name='plots')
 
         exp_results_hyperparam_dict = {'experiment_name': experiment_name,
                                        'experiment_results_local_path': experiment_results_local_path,
@@ -249,11 +250,12 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
 
         results = result_package.get_results()
         hyperparameters = result_package.get_hyperparameters()
+        training_history_object = result_package.training_history
         training_history = result_package.get_training_history()
 
         additional_results_dump_paths = result_package.get_additional_results_dump_paths()
-        plots_paths = TrainingHistoryPlotter(result_package, experiment_results_local_path,
-                                             plots_folder_name='plots').generate_report()
+        plots_paths = TrainingHistoryPlotter(experiment_results_local_path).generate_report(training_history_object,
+                                                                                            plots_folder_name='plots')
 
         experiment_results_dict = {'experiment_name': experiment_name,
                                    'experiment_results_local_path': experiment_results_local_path,

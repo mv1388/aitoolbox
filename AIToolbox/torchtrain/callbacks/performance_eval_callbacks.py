@@ -333,11 +333,11 @@ class ModelTrainHistoryFileWriter(ModelTrainHistoryBaseCB):
                                                                          self.train_loop_obj.experiment_timestamp,
                                                                          self.local_model_result_folder_path)
 
-        result_writer = TrainingHistoryWriter(training_history=self.train_loop_obj.train_history,
-                                              experiment_results_local_path=experiment_results_local_path)
+        result_writer = TrainingHistoryWriter(experiment_results_local_path=experiment_results_local_path)
         results_file_path_in_cloud_results_dir, results_file_local_path = \
-            result_writer.generate_report(epoch=self.train_loop_obj.epoch,
-                                          file_name=f'{prefix}results.txt')
+            result_writer.generate_report(training_history=self.train_loop_obj.train_history,
+                                          epoch=self.train_loop_obj.epoch,
+                                          file_name=f'{prefix}results.txt', results_folder_name='results')
 
         self.message_service.write_message('ModelTrainHistoryFileWriter_results_file_local_paths',
                                            results_file_local_path,
@@ -408,10 +408,10 @@ class ModelTrainHistoryPlot(ModelTrainHistoryBaseCB):
                                                                          self.train_loop_obj.experiment_timestamp,
                                                                          self.local_model_result_folder_path)
 
-        plotter = TrainingHistoryPlotter(training_history=self.train_loop_obj.train_history,
-                                         experiment_results_local_path=experiment_results_local_path,
-                                         plots_folder_name=f'{prefix}plots_epoch_{self.train_loop_obj.epoch}')
-        saved_local_results_details = plotter.generate_report()
+        plotter = TrainingHistoryPlotter(experiment_results_local_path=experiment_results_local_path)
+        saved_local_results_details = \
+            plotter.generate_report(training_history=self.train_loop_obj.train_history,
+                                    plots_folder_name=f'{prefix}plots_epoch_{self.train_loop_obj.epoch}')
 
         results_file_local_paths = [result_local_path for _, result_local_path in saved_local_results_details]
         self.message_service.write_message('ModelTrainHistoryPlot_results_file_local_paths',
