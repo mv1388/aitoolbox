@@ -2,7 +2,8 @@ import unittest
 
 from tests.utils import *
 
-from AIToolbox.torchtrain.callbacks.performance_eval_callbacks import ModelPerformanceEvaluation, MetricHistoryRename
+from AIToolbox.torchtrain.callbacks.performance_eval_callbacks import ModelPerformanceEvaluation, \
+    ModelTrainHistoryFileWriter, MetricHistoryRename
 from AIToolbox.torchtrain.train_loop import TrainLoop, TrainLoopModelCheckpoint
 
 
@@ -179,6 +180,15 @@ class TestModelPerformanceEvaluationCallback(unittest.TestCase):
         self.assertEqual(train_loop.train_history.train_history,
                          {'loss': [], 'accumulated_loss': [], 'val_loss': [], 'val_dummy': [111.0, 123.0, 135.0],
                           'val_extended_dummy': [1323123.44, 1323135.44, 1323147.44]})
+
+
+class TestModelTrainHistoryFileWriter(unittest.TestCase):
+    def test_init(self):
+        pass
+
+
+
+
 
 
 class TestMetricHistoryRename(unittest.TestCase):
