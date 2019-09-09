@@ -77,7 +77,7 @@ class TrainingHistoryWriter:
         self.experiment_results_local_path = experiment_results_local_path
         self.plots_local_folder_path = None
 
-    def generate_report(self, training_history, epoch, file_name, results_folder_name='results'):
+    def generate_report(self, training_history, epoch, file_name, results_folder_name='results_txt'):
         """
 
         Args:

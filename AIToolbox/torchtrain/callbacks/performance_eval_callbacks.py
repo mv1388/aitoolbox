@@ -337,7 +337,7 @@ class ModelTrainHistoryFileWriter(ModelTrainHistoryBaseCB):
         results_file_path_in_cloud_results_dir, results_file_local_path = \
             result_writer.generate_report(training_history=self.train_loop_obj.train_history,
                                           epoch=self.train_loop_obj.epoch,
-                                          file_name=f'{prefix}results.txt', results_folder_name='results')
+                                          file_name=f'{prefix}results.txt', results_folder_name='results_txt')
 
         self.message_service.write_message('ModelTrainHistoryFileWriter_results_file_local_paths',
                                            results_file_local_path,

@@ -18,12 +18,12 @@ class TestTrainingHistoryWriter(unittest.TestCase):
 
         results_file_path_in_cloud_results_dir, results_file_local_path = \
             result_writer.generate_report(train_history, epoch=0,
-                                          file_name=f'results.txt', results_folder_name='results')
+                                          file_name=f'results.txt', results_folder_name='results_txt')
 
-        self.assertEqual(results_file_path_in_cloud_results_dir, 'results/results.txt')
-        self.assertEqual(results_file_local_path, os.path.join(THIS_DIR, 'results/results.txt'))
+        self.assertEqual(results_file_path_in_cloud_results_dir, 'results_txt/results.txt')
+        self.assertEqual(results_file_local_path, os.path.join(THIS_DIR, 'results_txt/results.txt'))
 
-        with open(os.path.join(THIS_DIR, 'results/results.txt'), 'r') as f:
+        with open(os.path.join(THIS_DIR, 'results_txt/results.txt'), 'r') as f:
             f_content = [l.strip() for l in f.readlines()]
 
         self.assertEqual(f_content,
@@ -35,9 +35,9 @@ class TestTrainingHistoryWriter(unittest.TestCase):
 
         results_file_path_in_cloud_results_dir, results_file_local_path = \
             result_writer.generate_report(train_history, epoch=1,
-                                          file_name=f'results.txt', results_folder_name='results')
+                                          file_name=f'results.txt', results_folder_name='results_txt')
 
-        with open(os.path.join(THIS_DIR, 'results/results.txt'), 'r') as f:
+        with open(os.path.join(THIS_DIR, 'results_txt/results.txt'), 'r') as f:
             f_content = [l.strip() for l in f.readlines()]
 
         self.assertEqual(f_content,
@@ -46,7 +46,7 @@ class TestTrainingHistoryWriter(unittest.TestCase):
                           '============================', 'Epoch: 1', '============================',
                           'loss:\t99999', 'NEW_METRIC:\t222222.3', 'Completely_new_metric:\t442.3', '', ''])
 
-        project_path = os.path.join(THIS_DIR, 'results')
+        project_path = os.path.join(THIS_DIR, 'results_txt')
         if os.path.exists(project_path):
             shutil.rmtree(project_path)
 
