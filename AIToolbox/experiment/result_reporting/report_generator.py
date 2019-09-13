@@ -6,34 +6,34 @@ style.use('ggplot')
 
 
 class TrainingHistoryPlotter:
-    def __init__(self, result_package, experiment_results_local_path, plots_folder_name='plots'):
+    def __init__(self, experiment_results_local_path):
         """
 
         Args:
-            result_package (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
             experiment_results_local_path (str):
+        """
+        self.experiment_results_local_path = experiment_results_local_path
+
+    def generate_report(self, training_history, plots_folder_name='plots'):
+        """
+
+        Args:
+            training_history (AIToolbox.experiment.training_history.TrainingHistory):
             plots_folder_name (str):
-        """
-        self.result_package = result_package
-        self.training_history = result_package.get_training_history_object()
-
-        self.plots_folder_name = plots_folder_name
-        self.plots_local_folder_path = os.path.join(experiment_results_local_path, plots_folder_name)
-        if not os.path.exists(self.plots_local_folder_path):
-            os.mkdir(self.plots_local_folder_path)
-
-    def generate_report(self):
-        """
 
         Returns:
             list:
         """
+        plots_local_folder_path = os.path.join(self.experiment_results_local_path, plots_folder_name)
+        if not os.path.exists(plots_local_folder_path):
+            os.mkdir(plots_local_folder_path)
+
         plots_paths = []
 
-        for metric_name, result_history in self.training_history.get_train_history_dict(flatten_dict=True).items():
+        for metric_name, result_history in training_history.get_train_history_dict(flatten_dict=True).items():
             if len(result_history) > 1:
-                file_name, file_path = self.plot_performance_curve(metric_name, result_history, self.plots_local_folder_path)
-                plots_paths.append([os.path.join(self.plots_folder_name, file_name), file_path])
+                file_name, file_path = self.plot_performance_curve(metric_name, result_history, plots_local_folder_path)
+                plots_paths.append([os.path.join(plots_folder_name, file_name), file_path])
 
         return plots_paths
 
@@ -65,3 +65,44 @@ class TrainingHistoryPlotter:
         fig.savefig(file_path)
         plt.close()
         return file_name, file_path
+
+
+class TrainingHistoryWriter:
+    def __init__(self, experiment_results_local_path):
+        """
+
+        Args:
+            experiment_results_local_path (str):
+        """
+        self.experiment_results_local_path = experiment_results_local_path
+        self.plots_local_folder_path = experiment_results_local_path
+
+    def generate_report(self, training_history, epoch, file_name, results_folder_name=None):
+        """
+
+        Args:
+            training_history (AIToolbox.experiment.training_history.TrainingHistory):
+            epoch (int):
+            file_name (str):
+            results_folder_name (str or None):
+
+        Returns:
+            str, str: file name/path inside the experiment folder, local file_path
+        """
+        if results_folder_name is not None:
+            self.plots_local_folder_path = os.path.join(self.experiment_results_local_path, results_folder_name)
+            if not os.path.exists(self.plots_local_folder_path):
+                os.mkdir(self.plots_local_folder_path)
+
+        file_path = os.path.join(self.plots_local_folder_path, file_name)
+
+        with open(file_path, 'a') as f:
+            f.write('============================\n')
+            f.write(f'Epoch: {epoch}\n')
+            f.write('============================\n')
+            for metric_name, result_history in training_history.get_train_history_dict(flatten_dict=True).items():
+                f.write(f'{metric_name}:\t{result_history[-1]}\n')
+            f.write('\n\n')
+
+        return os.path.join(results_folder_name if results_folder_name is not None else '',
+                            file_name), file_path

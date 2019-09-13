@@ -6,8 +6,7 @@ from AIToolbox.torchtrain.tl_components import message_passing as msg_passing_se
 from AIToolbox.cloud.AWS.results_save import BaseResultsSaver as BaseResultsS3Saver
 from AIToolbox.cloud.GoogleCloud.results_save import BaseResultsGoogleStorageSaver
 from AIToolbox.experiment.local_save.local_results_save import BaseLocalResultsSaver
-from AIToolbox.experiment.result_package.abstract_result_packages import PreCalculatedResultPackage as EmptyResultPackage
-from AIToolbox.experiment.result_reporting.report_generator import TrainingHistoryPlotter
+from AIToolbox.experiment.result_reporting.report_generator import TrainingHistoryPlotter, TrainingHistoryWriter
 
 
 class ModelPerformanceEvaluation(AbstractCallback):
@@ -194,142 +193,6 @@ class ModelPerformancePrintReport(AbstractCallback):
                 print(f'{metric_name}: {self.train_loop_obj.train_history[metric_name][-1]}')
 
 
-class ModelTrainHistoryPlot(AbstractCallback):
-    def __init__(self, epoch_end=True, train_end=False,
-                 project_name=None, experiment_name=None, local_model_result_folder_path=None,
-                 cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix=''):
-        """Plot the evaluated performance metric history
-
-        Args:
-            epoch_end (bool): should plot after every epoch
-            train_end (bool): should plot at the end of the training
-            project_name (str or None): root name of the project
-            experiment_name (str or None): name of the particular experiment
-            local_model_result_folder_path (str or None): root local path where project folder will be created
-            cloud_save_mode (str or None): Storage destination selector.
-                For AWS S3: 's3' / 'aws_s3' / 'aws'
-                For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
-                Everything else results just in local storage to disk
-            bucket_name (str): name of the bucket in the cloud storage
-            cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
-        """
-        if epoch_end is False and train_end is False:
-            raise ValueError('Both epoch_end and train_end are set to False. At least one of these should be True.')
-        # execution_order=98 makes sure that any performance calculation callbacks are executed before and the most
-        # recent results can already be found in the train_history
-        AbstractCallback.__init__(self, 'Model Train history Plot report', execution_order=97)
-        self.epoch_end = epoch_end
-        self.train_end = train_end
-        self.project_name = project_name
-        self.experiment_name = experiment_name
-        self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path) \
-            if local_model_result_folder_path is not None \
-            else None
-        self.cloud_save_mode = cloud_save_mode
-        self.bucket_name = bucket_name
-        self.cloud_dir_prefix = cloud_dir_prefix
-
-        self.cloud_results_saver = None
-
-    def on_train_loop_registration(self):
-        self.try_infer_experiment_details()
-        self.prepare_results_saver()
-
-    def try_infer_experiment_details(self):
-        """
-
-        Returns:
-            None
-
-        Raises:
-            AttributeError
-        """
-        try:
-            if self.project_name is None:
-                self.project_name = self.train_loop_obj.project_name
-            if self.experiment_name is None:
-                self.experiment_name = self.train_loop_obj.experiment_name
-            if self.local_model_result_folder_path is None:
-                self.local_model_result_folder_path = self.train_loop_obj.local_model_result_folder_path
-
-            if self.cloud_save_mode == 's3' and \
-                    hasattr(self.train_loop_obj, 'cloud_save_mode') and self.cloud_save_mode != self.train_loop_obj.cloud_save_mode:
-                self.cloud_save_mode = self.train_loop_obj.cloud_save_mode
-            if self.bucket_name == 'model-result' and \
-                    hasattr(self.train_loop_obj, 'bucket_name') and self.bucket_name != self.train_loop_obj.bucket_name:
-                self.bucket_name = self.train_loop_obj.bucket_name
-            if self.cloud_dir_prefix == '' and \
-                    hasattr(self.train_loop_obj, 'cloud_dir_prefix') and self.cloud_dir_prefix != self.train_loop_obj.cloud_dir_prefix:
-                self.cloud_dir_prefix = self.train_loop_obj.cloud_dir_prefix
-        except AttributeError:
-            raise AttributeError('Currently used TrainLoop does not support automatic project folder structure '
-                                 'creation. Project name, etc. thus can not be automatically deduced. Please provide'
-                                 'it in the callback parameters instead of currently used None values.')
-
-    def prepare_results_saver(self):
-        """
-
-        Returns:
-            None
-        """
-        if self.cloud_save_mode == 's3' or self.cloud_save_mode == 'aws_s3' or self.cloud_save_mode == 'aws':
-            self.cloud_results_saver = BaseResultsS3Saver(bucket_name=self.bucket_name,
-                                                          cloud_dir_prefix=self.cloud_dir_prefix)
-
-        elif self.cloud_save_mode == 'gcs' or self.cloud_save_mode == 'google_storage' or self.cloud_save_mode == 'google storage':
-            self.cloud_results_saver = BaseResultsGoogleStorageSaver(bucket_name=self.bucket_name,
-                                                                     cloud_dir_prefix=self.cloud_dir_prefix)
-        else:
-            self.cloud_results_saver = None
-
-    def on_epoch_end(self):
-        if self.epoch_end:
-            self.plot_current_train_history()
-
-    def on_train_end(self):
-        if self.train_end:
-            self.plot_current_train_history(prefix='train_end_')
-
-    def plot_current_train_history(self, prefix=''):
-        """
-
-        Args:
-            prefix (str):
-
-        Returns:
-            None
-        """
-        experiment_results_local_path = \
-            BaseLocalResultsSaver.create_experiment_local_results_folder(self.project_name, self.experiment_name,
-                                                                         self.train_loop_obj.experiment_timestamp,
-                                                                         self.local_model_result_folder_path)
-
-        # Just a dummy empty result package to wrap the train history as RP is expected in the plotter
-        result_pkg_wrapper = EmptyResultPackage(results_dict={})
-        result_pkg_wrapper.training_history = self.train_loop_obj.train_history
-
-        plotter = TrainingHistoryPlotter(result_package=result_pkg_wrapper,
-                                         experiment_results_local_path=experiment_results_local_path,
-                                         plots_folder_name=f'{prefix}plots_epoch_{self.train_loop_obj.epoch}')
-        saved_local_results_details = plotter.generate_report()
-
-        results_file_local_paths = [result_local_path for _, result_local_path in saved_local_results_details]
-        self.message_service.write_message('ModelTrainHistoryPlot_results_file_local_paths',
-                                           results_file_local_paths,
-                                           msg_handling_settings=msg_passing_settings.UNTIL_END_OF_EPOCH)
-
-        if self.cloud_results_saver is not None:
-            experiment_cloud_path = \
-                self.cloud_results_saver.create_experiment_cloud_storage_folder_structure(self.project_name,
-                                                                                          self.experiment_name,
-                                                                                          self.train_loop_obj.experiment_timestamp)
-
-            for results_file_path_in_cloud_results_dir, results_file_local_path in saved_local_results_details:
-                results_file_s3_path = os.path.join(experiment_cloud_path, results_file_path_in_cloud_results_dir)
-                self.cloud_results_saver.save_file(local_file_path=results_file_local_path,
-                                                   cloud_file_path=results_file_s3_path)
-
-
 class TrainHistoryFormatter(AbstractCallback):
     def __init__(self, input_metric_getter, output_metric_setter,
                  epoch_end=True, train_end=False, strict_metric_extract=True):
@@ -425,3 +288,240 @@ class MetricHistoryRename(TrainHistoryFormatter):
                                        output_metric_setter=lambda input_metric: (new_metric_name, input_metric[-1]),
                                        epoch_end=epoch_end, train_end=train_end,
                                        strict_metric_extract=strict_metric_extract)
+
+
+class ModelTrainHistoryBaseCB(AbstractCallback):
+    def __init__(self, callback_name, execution_order=0,
+                 epoch_end=True, train_end=False,
+                 project_name=None, experiment_name=None, local_model_result_folder_path=None,
+                 cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix=''):
+        """Base callback class to be inherited from when reporting train performance history
+
+        Args:
+            callback_name (str):
+            execution_order (int):
+            epoch_end (bool): should plot after every epoch
+            train_end (bool): should plot at the end of the training
+            project_name (str or None): root name of the project
+            experiment_name (str or None): name of the particular experiment
+            local_model_result_folder_path (str or None): root local path where project folder will be created
+            cloud_save_mode (str or None): Storage destination selector.
+                For AWS S3: 's3' / 'aws_s3' / 'aws'
+                For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
+                Everything else results just in local storage to disk
+            bucket_name (str): name of the bucket in the cloud storage
+            cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
+        """
+        AbstractCallback.__init__(self, callback_name, execution_order)
+        if epoch_end is False and train_end is False:
+            raise ValueError('Both epoch_end and train_end are set to False. At least one of these should be True.')
+        self.epoch_end = epoch_end
+        self.train_end = train_end
+        self.project_name = project_name
+        self.experiment_name = experiment_name
+        self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path) \
+            if local_model_result_folder_path is not None \
+            else None
+        self.cloud_save_mode = cloud_save_mode
+        self.bucket_name = bucket_name
+        self.cloud_dir_prefix = cloud_dir_prefix
+
+        self.cloud_results_saver = None
+
+    def try_infer_experiment_details(self):
+        """
+
+        Returns:
+            None
+
+        Raises:
+            AttributeError
+        """
+        try:
+            if self.project_name is None:
+                self.project_name = self.train_loop_obj.project_name
+            if self.experiment_name is None:
+                self.experiment_name = self.train_loop_obj.experiment_name
+            if self.local_model_result_folder_path is None:
+                self.local_model_result_folder_path = self.train_loop_obj.local_model_result_folder_path
+
+            if self.cloud_save_mode == 's3' and \
+                    hasattr(self.train_loop_obj, 'cloud_save_mode') and self.cloud_save_mode != self.train_loop_obj.cloud_save_mode:
+                self.cloud_save_mode = self.train_loop_obj.cloud_save_mode
+            if self.bucket_name == 'model-result' and \
+                    hasattr(self.train_loop_obj, 'bucket_name') and self.bucket_name != self.train_loop_obj.bucket_name:
+                self.bucket_name = self.train_loop_obj.bucket_name
+            if self.cloud_dir_prefix == '' and \
+                    hasattr(self.train_loop_obj, 'cloud_dir_prefix') and self.cloud_dir_prefix != self.train_loop_obj.cloud_dir_prefix:
+                self.cloud_dir_prefix = self.train_loop_obj.cloud_dir_prefix
+        except AttributeError:
+            raise AttributeError('Currently used TrainLoop does not support automatic project folder structure '
+                                 'creation. Project name, etc. thus can not be automatically deduced. Please provide'
+                                 'it in the callback parameters instead of currently used None values.')
+
+    def prepare_results_saver(self):
+        """
+
+        Returns:
+            None
+        """
+        if self.cloud_save_mode == 's3' or self.cloud_save_mode == 'aws_s3' or self.cloud_save_mode == 'aws':
+            self.cloud_results_saver = BaseResultsS3Saver(bucket_name=self.bucket_name,
+                                                          cloud_dir_prefix=self.cloud_dir_prefix)
+
+        elif self.cloud_save_mode == 'gcs' or self.cloud_save_mode == 'google_storage' or self.cloud_save_mode == 'google storage':
+            self.cloud_results_saver = BaseResultsGoogleStorageSaver(bucket_name=self.bucket_name,
+                                                                     cloud_dir_prefix=self.cloud_dir_prefix)
+        else:
+            self.cloud_results_saver = None
+
+
+class ModelTrainHistoryPlot(ModelTrainHistoryBaseCB):
+    def __init__(self, epoch_end=True, train_end=False,
+                 project_name=None, experiment_name=None, local_model_result_folder_path=None,
+                 cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix=''):
+        """Plot the evaluated performance metric history
+
+        Args:
+            epoch_end (bool): should plot after every epoch
+            train_end (bool): should plot at the end of the training
+            project_name (str or None): root name of the project
+            experiment_name (str or None): name of the particular experiment
+            local_model_result_folder_path (str or None): root local path where project folder will be created
+            cloud_save_mode (str or None): Storage destination selector.
+                For AWS S3: 's3' / 'aws_s3' / 'aws'
+                For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
+                Everything else results just in local storage to disk
+            bucket_name (str): name of the bucket in the cloud storage
+            cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
+        """
+        # execution_order=97 makes sure that any performance calculation callbacks are executed before and the most
+        # recent results can already be found in the train_history
+        ModelTrainHistoryBaseCB.__init__(self, 'Model Train history Plot report', execution_order=97,
+                                         epoch_end=epoch_end, train_end=train_end,
+                                         project_name=project_name, experiment_name=experiment_name,
+                                         local_model_result_folder_path=local_model_result_folder_path,
+                                         cloud_save_mode=cloud_save_mode, bucket_name=bucket_name,
+                                         cloud_dir_prefix=cloud_dir_prefix)
+
+    def on_train_loop_registration(self):
+        self.try_infer_experiment_details()
+        self.prepare_results_saver()
+
+    def on_epoch_end(self):
+        if self.epoch_end:
+            self.plot_current_train_history()
+
+    def on_train_end(self):
+        if self.train_end:
+            self.plot_current_train_history(prefix='train_end_')
+
+    def plot_current_train_history(self, prefix=''):
+        """
+
+        Args:
+            prefix (str):
+
+        Returns:
+            None
+        """
+        experiment_results_local_path = \
+            BaseLocalResultsSaver.create_experiment_local_results_folder(self.project_name, self.experiment_name,
+                                                                         self.train_loop_obj.experiment_timestamp,
+                                                                         self.local_model_result_folder_path)
+
+        plotter = TrainingHistoryPlotter(experiment_results_local_path=experiment_results_local_path)
+        saved_local_results_details = \
+            plotter.generate_report(training_history=self.train_loop_obj.train_history,
+                                    plots_folder_name=f'{prefix}plots_epoch_{self.train_loop_obj.epoch}')
+
+        results_file_local_paths = [result_local_path for _, result_local_path in saved_local_results_details]
+        self.message_service.write_message('ModelTrainHistoryPlot_results_file_local_paths',
+                                           results_file_local_paths,
+                                           msg_handling_settings=msg_passing_settings.UNTIL_END_OF_EPOCH)
+
+        if self.cloud_results_saver is not None:
+            experiment_cloud_path = \
+                self.cloud_results_saver.create_experiment_cloud_storage_folder_structure(self.project_name,
+                                                                                          self.experiment_name,
+                                                                                          self.train_loop_obj.experiment_timestamp)
+
+            for results_file_path_in_cloud_results_dir, results_file_local_path in saved_local_results_details:
+                results_file_s3_path = os.path.join(experiment_cloud_path, results_file_path_in_cloud_results_dir)
+                self.cloud_results_saver.save_file(local_file_path=results_file_local_path,
+                                                   cloud_file_path=results_file_s3_path)
+
+
+class ModelTrainHistoryFileWriter(ModelTrainHistoryBaseCB):
+    def __init__(self, epoch_end=True, train_end=False,
+                 project_name=None, experiment_name=None, local_model_result_folder_path=None,
+                 cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix=''):
+        """Write evaluated performance metric history to the text file
+
+        Args:
+            epoch_end (bool): should plot after every epoch
+            train_end (bool): should plot at the end of the training
+            project_name (str or None): root name of the project
+            experiment_name (str or None): name of the particular experiment
+            local_model_result_folder_path (str or None): root local path where project folder will be created
+            cloud_save_mode (str or None): Storage destination selector.
+                For AWS S3: 's3' / 'aws_s3' / 'aws'
+                For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
+                Everything else results just in local storage to disk
+            bucket_name (str): name of the bucket in the cloud storage
+            cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
+        """
+        # execution_order=97 makes sure that any performance calculation callbacks are executed before and the most
+        # recent results can already be found in the train_history
+        ModelTrainHistoryBaseCB.__init__(self, 'Model Train performance history file writer', execution_order=97,
+                                         epoch_end=epoch_end, train_end=train_end,
+                                         project_name=project_name, experiment_name=experiment_name,
+                                         local_model_result_folder_path=local_model_result_folder_path,
+                                         cloud_save_mode=cloud_save_mode, bucket_name=bucket_name,
+                                         cloud_dir_prefix=cloud_dir_prefix)
+
+    def on_train_loop_registration(self):
+        self.try_infer_experiment_details()
+        self.prepare_results_saver()
+
+    def on_epoch_end(self):
+        if self.epoch_end:
+            self.write_current_train_history()
+
+    def on_train_end(self):
+        if self.train_end:
+            self.write_current_train_history(prefix='train_end_')
+
+    def write_current_train_history(self, prefix=''):
+        """
+
+        Args:
+            prefix (str):
+
+        Returns:
+
+        """
+        experiment_results_local_path = \
+            BaseLocalResultsSaver.create_experiment_local_results_folder(self.project_name, self.experiment_name,
+                                                                         self.train_loop_obj.experiment_timestamp,
+                                                                         self.local_model_result_folder_path)
+
+        result_writer = TrainingHistoryWriter(experiment_results_local_path=experiment_results_local_path)
+        results_file_path_in_cloud_results_dir, results_file_local_path = \
+            result_writer.generate_report(training_history=self.train_loop_obj.train_history,
+                                          epoch=self.train_loop_obj.epoch,
+                                          file_name=f'{prefix}results.txt')
+
+        self.message_service.write_message('ModelTrainHistoryFileWriter_results_file_local_paths',
+                                           [results_file_local_path],
+                                           msg_handling_settings=msg_passing_settings.UNTIL_END_OF_EPOCH)
+
+        if self.cloud_results_saver is not None:
+            experiment_cloud_path = \
+                self.cloud_results_saver.create_experiment_cloud_storage_folder_structure(self.project_name,
+                                                                                          self.experiment_name,
+                                                                                          self.train_loop_obj.experiment_timestamp)
+
+            results_file_s3_path = os.path.join(experiment_cloud_path, results_file_path_in_cloud_results_dir)
+            self.cloud_results_saver.save_file(local_file_path=results_file_local_path,
+                                               cloud_file_path=results_file_s3_path)
