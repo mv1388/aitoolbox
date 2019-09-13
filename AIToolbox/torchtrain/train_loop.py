@@ -75,24 +75,28 @@ class TrainLoop:
                 isinstance(self.model, Module) and not isinstance(self.batch_model_feed_def, AbstractModelFeedDefinition):
             raise TypeError('Provided the base PyTorch model but did not give the batch_model_feed_def')
 
-    def __call__(self, num_epoch, callbacks=None):
+    def __call__(self, num_epoch, callbacks=None, grad_cb=False):
         """Train the model using the train loop
 
         Args:
             num_epoch (int): how many epochs the network will be trained
             callbacks (list): callbacks that are executed during the training run
+            grad_cb (bool): should the callbacks related to gradient updating be executed. If you don't intend to
+                use such callbacks disabling this option might make the loop run faster
 
         Returns:
             torch.nn.modules.Module: trained model
         """
-        return self.do_train(num_epoch, callbacks)
+        return self.do_train(num_epoch, callbacks, grad_cb)
 
-    def do_train(self, num_epoch, callbacks=None):
+    def do_train(self, num_epoch, callbacks=None, grad_cb=False):
         """Train the model using the train loop
 
         Args:
             num_epoch (int): how many epochs the network will be trained
             callbacks (list): callbacks that are executed during the training run
+            grad_cb (bool): should the callbacks related to gradient updating be executed. If you don't intend to
+                use such callbacks disabling this option might make the loop run faster
 
         Returns:
             torch.nn.modules.Module: trained model
@@ -123,8 +127,11 @@ class TrainLoop:
 
                 self.optimizer.zero_grad()
                 loss_batch.backward()
-                self.callbacks_handler.execute_gradient_update()
+                if grad_cb:
+                    self.callbacks_handler.execute_gradient_update()
                 self.optimizer.step()
+                if grad_cb:
+                    self.callbacks_handler.execute_optimizer_step()
 
                 self.callbacks_handler.execute_batch_end()
 
