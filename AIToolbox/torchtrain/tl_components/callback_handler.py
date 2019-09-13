@@ -63,7 +63,11 @@ class CallbacksHandler:
 
     def execute_gradient_update(self):
         for callback in self.train_loop_obj.callbacks:
-            callback.on_gradient_update()
+            callback.on_after_gradient_update()
+
+    def execute_optimizer_step(self):
+        for callback in self.train_loop_obj.callbacks:
+            callback.on_after_optimizer_step()
     
     @staticmethod
     def enforce_callback_type(callbacks):

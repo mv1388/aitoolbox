@@ -93,7 +93,7 @@ class TestTrainLoop(unittest.TestCase):
         callback_full = train_loop.callbacks[1]
         callback_short = train_loop.callbacks[2]
 
-        model_return = train_loop.do_train(num_epoch=num_epochs)
+        model_return = train_loop.do_train(num_epoch=num_epochs, grad_cb=True)
 
         self.assertEqual(model, model_return)
         self.assertFalse(train_loop.early_stop)
@@ -110,25 +110,33 @@ class TestTrainLoop(unittest.TestCase):
 
         self.assertEqual(callback_full.callback_calls,
                          ['on_train_loop_registration', 'on_train_begin', 'on_epoch_begin', 'on_batch_begin',
-                          'on_gradient_update', 'on_batch_end', 'on_batch_begin', 'on_gradient_update', 'on_batch_end',
-                          'on_batch_begin', 'on_gradient_update', 'on_batch_end', 'on_batch_begin',
-                          'on_gradient_update', 'on_batch_end', 'on_epoch_end', 'on_epoch_begin', 'on_batch_begin',
-                          'on_gradient_update', 'on_batch_end', 'on_batch_begin', 'on_gradient_update', 'on_batch_end',
-                          'on_batch_begin', 'on_gradient_update', 'on_batch_end', 'on_batch_begin',
-                          'on_gradient_update', 'on_batch_end', 'on_epoch_end', 'on_train_end'])
+                          'on_after_gradient_update', 'on_after_optimizer_step', 'on_batch_end', 'on_batch_begin',
+                          'on_after_gradient_update', 'on_after_optimizer_step', 'on_batch_end', 'on_batch_begin',
+                          'on_after_gradient_update', 'on_after_optimizer_step', 'on_batch_end', 'on_batch_begin',
+                          'on_after_gradient_update', 'on_after_optimizer_step', 'on_batch_end', 'on_epoch_end',
+                          'on_epoch_begin', 'on_batch_begin', 'on_after_gradient_update', 'on_after_optimizer_step',
+                          'on_batch_end', 'on_batch_begin', 'on_after_gradient_update', 'on_after_optimizer_step',
+                          'on_batch_end', 'on_batch_begin', 'on_after_gradient_update', 'on_after_optimizer_step',
+                          'on_batch_end', 'on_batch_begin', 'on_after_gradient_update', 'on_after_optimizer_step',
+                          'on_batch_end', 'on_epoch_end', 'on_train_end'])
         self.assertEqual(callback_full.call_ctr,
                          {'on_train_loop_registration': 1, 'on_epoch_begin': 2, 'on_epoch_end': 2, 'on_train_begin': 1,
-                          'on_train_end': 1, 'on_batch_begin': 8, 'on_batch_end': 8, 'on_gradient_update': 8})
+                          'on_train_end': 1, 'on_batch_begin': 8, 'on_batch_end': 8,
+                          'on_after_gradient_update': 8, 'on_after_optimizer_step': 8})
 
         self.assertEqual(callback_short.callback_calls,
-                         ['on_epoch_begin', 'on_batch_begin', 'on_gradient_update', 'on_batch_begin',
-                          'on_gradient_update', 'on_batch_begin', 'on_gradient_update', 'on_batch_begin',
-                          'on_gradient_update', 'on_epoch_end', 'on_epoch_begin', 'on_batch_begin',
-                          'on_gradient_update', 'on_batch_begin', 'on_gradient_update', 'on_batch_begin',
-                          'on_gradient_update', 'on_batch_begin', 'on_gradient_update', 'on_epoch_end', 'on_train_end'])
+                         ['on_epoch_begin', 'on_batch_begin', 'on_after_gradient_update', 'on_after_optimizer_step',
+                          'on_batch_begin', 'on_after_gradient_update', 'on_after_optimizer_step', 'on_batch_begin',
+                          'on_after_gradient_update', 'on_after_optimizer_step', 'on_batch_begin',
+                          'on_after_gradient_update', 'on_after_optimizer_step', 'on_epoch_end', 'on_epoch_begin',
+                          'on_batch_begin', 'on_after_gradient_update', 'on_after_optimizer_step', 'on_batch_begin',
+                          'on_after_gradient_update', 'on_after_optimizer_step', 'on_batch_begin',
+                          'on_after_gradient_update', 'on_after_optimizer_step', 'on_batch_begin',
+                          'on_after_gradient_update', 'on_after_optimizer_step', 'on_epoch_end', 'on_train_end'])
         self.assertEqual(callback_short.call_ctr,
                          {'on_train_loop_registration': 0, 'on_epoch_begin': 2, 'on_epoch_end': 2, 'on_train_begin': 0,
-                          'on_train_end': 1, 'on_batch_begin': 8, 'on_batch_end': 0, 'on_gradient_update': 8})
+                          'on_train_end': 1, 'on_batch_begin': 8, 'on_batch_end': 0,
+                          'on_after_gradient_update': 8, 'on_after_optimizer_step': 8})
 
     def test_callback_on_execution_separate_batch_feed(self):
         num_epochs = 2
@@ -150,7 +158,7 @@ class TestTrainLoop(unittest.TestCase):
         callback_full = train_loop.callbacks[1]
         callback_short = train_loop.callbacks[2]
 
-        model_return = train_loop.do_train(num_epoch=num_epochs)
+        model_return = train_loop.do_train(num_epoch=num_epochs, grad_cb=True)
 
         self.assertEqual(model, model_return)
         self.assertFalse(train_loop.early_stop)
@@ -167,25 +175,33 @@ class TestTrainLoop(unittest.TestCase):
 
         self.assertEqual(callback_full.callback_calls,
                          ['on_train_loop_registration', 'on_train_begin', 'on_epoch_begin', 'on_batch_begin',
-                          'on_gradient_update', 'on_batch_end', 'on_batch_begin', 'on_gradient_update', 'on_batch_end',
-                          'on_batch_begin', 'on_gradient_update', 'on_batch_end', 'on_batch_begin',
-                          'on_gradient_update', 'on_batch_end', 'on_epoch_end', 'on_epoch_begin', 'on_batch_begin',
-                          'on_gradient_update', 'on_batch_end', 'on_batch_begin', 'on_gradient_update', 'on_batch_end',
-                          'on_batch_begin', 'on_gradient_update', 'on_batch_end', 'on_batch_begin',
-                          'on_gradient_update', 'on_batch_end', 'on_epoch_end', 'on_train_end'])
+                          'on_after_gradient_update', 'on_after_optimizer_step', 'on_batch_end', 'on_batch_begin',
+                          'on_after_gradient_update', 'on_after_optimizer_step', 'on_batch_end', 'on_batch_begin',
+                          'on_after_gradient_update', 'on_after_optimizer_step', 'on_batch_end', 'on_batch_begin',
+                          'on_after_gradient_update', 'on_after_optimizer_step', 'on_batch_end', 'on_epoch_end',
+                          'on_epoch_begin', 'on_batch_begin', 'on_after_gradient_update', 'on_after_optimizer_step',
+                          'on_batch_end', 'on_batch_begin', 'on_after_gradient_update', 'on_after_optimizer_step',
+                          'on_batch_end', 'on_batch_begin', 'on_after_gradient_update', 'on_after_optimizer_step',
+                          'on_batch_end', 'on_batch_begin', 'on_after_gradient_update', 'on_after_optimizer_step',
+                          'on_batch_end', 'on_epoch_end', 'on_train_end'])
         self.assertEqual(callback_full.call_ctr,
                          {'on_train_loop_registration': 1, 'on_epoch_begin': 2, 'on_epoch_end': 2, 'on_train_begin': 1,
-                          'on_train_end': 1, 'on_batch_begin': 8, 'on_batch_end': 8, 'on_gradient_update': 8})
+                          'on_train_end': 1, 'on_batch_begin': 8, 'on_batch_end': 8,
+                          'on_after_gradient_update': 8, 'on_after_optimizer_step': 8})
 
         self.assertEqual(callback_short.callback_calls,
-                         ['on_epoch_begin', 'on_batch_begin', 'on_gradient_update', 'on_batch_begin',
-                          'on_gradient_update', 'on_batch_begin', 'on_gradient_update', 'on_batch_begin',
-                          'on_gradient_update', 'on_epoch_end', 'on_epoch_begin', 'on_batch_begin',
-                          'on_gradient_update', 'on_batch_begin', 'on_gradient_update', 'on_batch_begin',
-                          'on_gradient_update', 'on_batch_begin', 'on_gradient_update', 'on_epoch_end', 'on_train_end'])
+                         ['on_epoch_begin', 'on_batch_begin', 'on_after_gradient_update', 'on_after_optimizer_step',
+                          'on_batch_begin', 'on_after_gradient_update', 'on_after_optimizer_step', 'on_batch_begin',
+                          'on_after_gradient_update', 'on_after_optimizer_step', 'on_batch_begin',
+                          'on_after_gradient_update', 'on_after_optimizer_step', 'on_epoch_end', 'on_epoch_begin',
+                          'on_batch_begin', 'on_after_gradient_update', 'on_after_optimizer_step', 'on_batch_begin',
+                          'on_after_gradient_update', 'on_after_optimizer_step', 'on_batch_begin',
+                          'on_after_gradient_update', 'on_after_optimizer_step', 'on_batch_begin',
+                          'on_after_gradient_update', 'on_after_optimizer_step', 'on_epoch_end', 'on_train_end'])
         self.assertEqual(callback_short.call_ctr,
                          {'on_train_loop_registration': 0, 'on_epoch_begin': 2, 'on_epoch_end': 2, 'on_train_begin': 0,
-                          'on_train_end': 1, 'on_batch_begin': 8, 'on_batch_end': 0, 'on_gradient_update': 8})
+                          'on_train_end': 1, 'on_batch_begin': 8, 'on_batch_end': 0,
+                          'on_after_gradient_update': 8, 'on_after_optimizer_step': 8})
 
     def test_predict_train_data(self):
         self.eval_prediction('train')
