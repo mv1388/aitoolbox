@@ -193,6 +193,103 @@ class ModelPerformancePrintReport(AbstractCallback):
                 print(f'{metric_name}: {self.train_loop_obj.train_history[metric_name][-1]}')
 
 
+class TrainHistoryFormatter(AbstractCallback):
+    def __init__(self, input_metric_getter, output_metric_setter,
+                 epoch_end=True, train_end=False, strict_metric_extract=True):
+        """Format stored training history results
+
+        Args:
+            input_metric_getter (lambda): extract full history for the desired metric, not just the last history input.
+                Return should be represented as a list.
+            output_metric_setter (lambda): take the extracted full history of a metric and convert it as desired.
+                Return new / transformed metric name and transformed metric result.
+            epoch_end (bool): should the formatting be executed at the end of the epoch
+            train_end (bool): should the formatting be executed at the end of the training process
+            strict_metric_extract (bool):
+        """
+        if epoch_end == train_end:
+            raise ValueError(f'Only either epoch_end or train_end have to be set to True. '
+                             f'Have set epoch_end to {epoch_end} and train_end to {train_end}')
+
+        AbstractCallback.__init__(self, 'Train history general formatter engine')
+        self.input_metric_getter = input_metric_getter
+        self.output_metric_setter = output_metric_setter
+
+        self.epoch_end = epoch_end
+        self.train_end = train_end
+        self.strict_metric_extract = strict_metric_extract
+
+    def on_epoch_end(self):
+        if self.epoch_end:
+            if self.check_if_history_updated(not self.epoch_end):
+                self.format_history()
+
+    def on_train_end(self):
+        if self.train_end:
+            if self.check_if_history_updated(self.train_end):
+                self.format_history()
+
+    def format_history(self):
+        input_metric = self.input_metric_getter(self.train_loop_obj.train_history)
+        output_metric_name, output_metric = self.output_metric_setter(input_metric)
+        self.train_loop_obj.insert_metric_result_into_history(output_metric_name, output_metric)
+
+    def check_if_history_updated(self, train_end_phase):
+        if train_end_phase:
+            history_elements_expected = 1
+        else:
+            history_elements_expected = self.train_loop_obj.epoch + 1
+        metric_result_list = self.input_metric_getter(self.train_loop_obj.train_history)
+        metric_result_len = len(metric_result_list)
+
+        if history_elements_expected != metric_result_len:
+            if self.strict_metric_extract:
+                raise ValueError(f'Metric found at path specified in input_metric_getter not yet updated. '
+                                 f'Expecting {history_elements_expected} history elements, '
+                                 f'but got {metric_result_len} elements.')
+            else:
+                print(f'Metric found at path specified in input_metric_getter not yet updated. '
+                      f'Expecting {history_elements_expected} history elements, but got {metric_result_len} elements.')
+                return False
+        return True
+
+
+class MetricHistoryRename(TrainHistoryFormatter):
+    def __init__(self, input_metric_path, new_metric_name,
+                 epoch_end=True, train_end=False, strict_metric_extract=True):
+        """Specific interface for TrainHistoryFormatter which renames the metric in the training history
+
+        Args:
+            input_metric_path (str or lambda): if using lambda, extract full history for the desired metric,
+                not just the last history input. Return should be represented as a list.
+            new_metric_name (str): the new metric name
+            epoch_end (bool): should the formatting be executed at the end of the epoch
+            train_end (bool): should the formatting be executed at the end of the training process
+            strict_metric_extract (bool):
+        """
+
+        # TODO: decide which of these two options is better
+
+        # if callable(input_metric_path):
+        #     input_metric_getter = input_metric_path
+        # else:
+        #     input_metric_getter = lambda train_history: train_history[input_metric_path]
+
+        # input_metric_getter = input_metric_path if callable(input_metric_path) \
+        #     else lambda train_history: train_history[input_metric_path]
+        # output_metric_setter = lambda input_metric: (new_metric_name, input_metric[-1])
+
+        # TrainHistoryFormatter.__init__(self, input_metric_getter, output_metric_setter,
+        #                                epoch_end=True, train_end=True, strict_metric_extract=strict_metric_extract)
+
+        TrainHistoryFormatter.__init__(self,
+                                       input_metric_getter=input_metric_path if callable(input_metric_path) else
+                                       lambda train_history: train_history[input_metric_path],
+                                       output_metric_setter=lambda input_metric: (new_metric_name, input_metric[-1]),
+                                       epoch_end=epoch_end, train_end=train_end,
+                                       strict_metric_extract=strict_metric_extract)
+
+
 class ModelTrainHistoryBaseCB(AbstractCallback):
     def __init__(self, callback_name, execution_order=0,
                  epoch_end=True, train_end=False,
@@ -428,100 +525,3 @@ class ModelTrainHistoryFileWriter(ModelTrainHistoryBaseCB):
             results_file_s3_path = os.path.join(experiment_cloud_path, results_file_path_in_cloud_results_dir)
             self.cloud_results_saver.save_file(local_file_path=results_file_local_path,
                                                cloud_file_path=results_file_s3_path)
-
-
-class TrainHistoryFormatter(AbstractCallback):
-    def __init__(self, input_metric_getter, output_metric_setter,
-                 epoch_end=True, train_end=False, strict_metric_extract=True):
-        """Format stored training history results
-
-        Args:
-            input_metric_getter (lambda): extract full history for the desired metric, not just the last history input.
-                Return should be represented as a list.
-            output_metric_setter (lambda): take the extracted full history of a metric and convert it as desired.
-                Return new / transformed metric name and transformed metric result.
-            epoch_end (bool): should the formatting be executed at the end of the epoch
-            train_end (bool): should the formatting be executed at the end of the training process
-            strict_metric_extract (bool):
-        """
-        if epoch_end == train_end:
-            raise ValueError(f'Only either epoch_end or train_end have to be set to True. '
-                             f'Have set epoch_end to {epoch_end} and train_end to {train_end}')
-
-        AbstractCallback.__init__(self, 'Train history general formatter engine')
-        self.input_metric_getter = input_metric_getter
-        self.output_metric_setter = output_metric_setter
-
-        self.epoch_end = epoch_end
-        self.train_end = train_end
-        self.strict_metric_extract = strict_metric_extract
-
-    def on_epoch_end(self):
-        if self.epoch_end:
-            if self.check_if_history_updated(not self.epoch_end):
-                self.format_history()
-
-    def on_train_end(self):
-        if self.train_end:
-            if self.check_if_history_updated(self.train_end):
-                self.format_history()
-
-    def format_history(self):
-        input_metric = self.input_metric_getter(self.train_loop_obj.train_history)
-        output_metric_name, output_metric = self.output_metric_setter(input_metric)
-        self.train_loop_obj.insert_metric_result_into_history(output_metric_name, output_metric)
-
-    def check_if_history_updated(self, train_end_phase):
-        if train_end_phase:
-            history_elements_expected = 1
-        else:
-            history_elements_expected = self.train_loop_obj.epoch + 1
-        metric_result_list = self.input_metric_getter(self.train_loop_obj.train_history)
-        metric_result_len = len(metric_result_list)
-
-        if history_elements_expected != metric_result_len:
-            if self.strict_metric_extract:
-                raise ValueError(f'Metric found at path specified in input_metric_getter not yet updated. '
-                                 f'Expecting {history_elements_expected} history elements, '
-                                 f'but got {metric_result_len} elements.')
-            else:
-                print(f'Metric found at path specified in input_metric_getter not yet updated. '
-                      f'Expecting {history_elements_expected} history elements, but got {metric_result_len} elements.')
-                return False
-        return True
-
-
-class MetricHistoryRename(TrainHistoryFormatter):
-    def __init__(self, input_metric_path, new_metric_name,
-                 epoch_end=True, train_end=False, strict_metric_extract=True):
-        """Specific interface for TrainHistoryFormatter which renames the metric in the training history
-
-        Args:
-            input_metric_path (str or lambda): if using lambda, extract full history for the desired metric,
-                not just the last history input. Return should be represented as a list.
-            new_metric_name (str): the new metric name
-            epoch_end (bool): should the formatting be executed at the end of the epoch
-            train_end (bool): should the formatting be executed at the end of the training process
-            strict_metric_extract (bool):
-        """
-
-        # TODO: decide which of these two options is better
-
-        # if callable(input_metric_path):
-        #     input_metric_getter = input_metric_path
-        # else:
-        #     input_metric_getter = lambda train_history: train_history[input_metric_path]
-
-        # input_metric_getter = input_metric_path if callable(input_metric_path) \
-        #     else lambda train_history: train_history[input_metric_path]
-        # output_metric_setter = lambda input_metric: (new_metric_name, input_metric[-1])
-
-        # TrainHistoryFormatter.__init__(self, input_metric_getter, output_metric_setter,
-        #                                epoch_end=True, train_end=True, strict_metric_extract=strict_metric_extract)
-
-        TrainHistoryFormatter.__init__(self,
-                                       input_metric_getter=input_metric_path if callable(input_metric_path) else
-                                       lambda train_history: train_history[input_metric_path],
-                                       output_metric_setter=lambda input_metric: (new_metric_name, input_metric[-1]),
-                                       epoch_end=epoch_end, train_end=train_end,
-                                       strict_metric_extract=strict_metric_extract)
