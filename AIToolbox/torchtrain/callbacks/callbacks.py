@@ -201,6 +201,7 @@ class EmailNotification(AbstractCallback):
 
         performance_list = self.get_metric_list_html()
         plots_file_paths = self.message_service.read_messages('ModelTrainHistoryPlot_results_file_local_paths')
+        plots_file_paths += self.message_service.read_messages('ModelTrainHistoryFileWriter_results_file_local_paths')
         plots_file_paths = self.flatten_list_of_lists(plots_file_paths)
 
         body_text = f"""<h2>End of epoch {self.train_loop_obj.epoch}</h2>
@@ -215,6 +216,7 @@ class EmailNotification(AbstractCallback):
         performance_list = self.get_metric_list_html()
         hyperparams = self.get_hyperparams_html()
         plots_file_paths = self.message_service.read_messages('ModelTrainHistoryPlot_results_file_local_paths')
+        plots_file_paths += self.message_service.read_messages('ModelTrainHistoryFileWriter_results_file_local_paths')
         plots_file_paths = self.flatten_list_of_lists(plots_file_paths)
 
         body_text = f"""<h2>End of training at epoch {self.train_loop_obj.epoch}</h2>

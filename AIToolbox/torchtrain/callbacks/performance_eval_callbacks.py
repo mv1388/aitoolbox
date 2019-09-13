@@ -416,7 +416,7 @@ class ModelTrainHistoryFileWriter(ModelTrainHistoryBaseCB):
                                           file_name=f'{prefix}results.txt')
 
         self.message_service.write_message('ModelTrainHistoryFileWriter_results_file_local_paths',
-                                           results_file_local_path,
+                                           [results_file_local_path],
                                            msg_handling_settings=msg_passing_settings.UNTIL_END_OF_EPOCH)
 
         if self.cloud_results_saver is not None:
