@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Example how to run:
-# ./prepare_instance.sh -k <SSH_KEY_LOCATION> -a <INSTANCE_IP_ADDRESS> -f pytorch -v 0.2 -p ~/PycharmProjects/Transformer -d SQuAD2 -r orig
+# ./prepare_instance.sh -k <SSH_KEY_LOCATION> -a <INSTANCE_IP_ADDRESS> -f pytorch -v 0.3 -p ~/PycharmProjects/Transformer -d SQuAD2 -r orig
 
 # When you get ssh-ed to the instance finish the instance prep process by running:
 # ./finish_prepare_instance.sh
@@ -41,7 +41,7 @@ HEREDOC
 key_path=
 ec2_instance_address=
 DL_framework="pytorch"
-AIToolbox_version="0.2"
+AIToolbox_version="0.3"
 local_project_path=
 dataset_name=
 preproc_dataset=

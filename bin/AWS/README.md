@@ -10,7 +10,7 @@ folders from the main research project should be uploaded to the `~/project` fol
 on the AWS instance during the instance preparation process.
 
 ```bash
-./prepare_instance.sh -k <SSH_KEY_LOCATION> -a <INSTANCE_IP_ADDRESS> -f pytorch -v 0.2 \
+./prepare_instance.sh -k <SSH_KEY_LOCATION> -a <INSTANCE_IP_ADDRESS> -f pytorch -v 0.3 \
                       -p <PROJECT_PATH> -d SQuAD2 -r orig
 ```
 
