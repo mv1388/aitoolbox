@@ -41,7 +41,6 @@ setup(name='AIToolbox',
 
       test_suite='tests',
       tests_require=['nose'],
-
       # scripts=['bin/AWS/'],
 
       zip_safe=False)
