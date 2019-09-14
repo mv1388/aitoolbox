@@ -44,7 +44,9 @@ or can also be automatically also stored on AWS S3.  Currently implemented advan
 [`TrainLoops`](/AIToolbox/torchtrain/train_loop.py) are `TrainLoopModelCheckpoint`, `TrainLoopModelEndSave` and `TrainLoopModelCheckpointEndSave`.
 Here, 'Checkpoint' stands for checkpointing after each epoch, while 'EndSave' will only persist and evaluate at the very end of the training. 
 
-For the most complete experiment tracking it is recommended to use the `TrainLoopModelCheckpointEndSave` option:
+For the most complete experiment tracking it is recommended to use the `TrainLoopModelCheckpointEndSave` option. 
+The optional use of the *result packages* needed for the neural net performance evaluation is explained in 
+the [experiment section](#experiment) bellow.
 ```
 TrainLoopModelCheckpointEndSave(model,
                                 train_loader, validation_loader, test_loader,
@@ -70,8 +72,16 @@ at the desired point in the train loop, such as: start/end of batch, epoch, trai
 
 ### Result Package
 
-Definition of the model evaluation procedure on the task we are experimenting with. 
-Under the hood the result package executes one or more `metrics` objects which actually 
+This is the definition of the model evaluation procedure on the task we are experimenting with.
+Result packages available out of the box can be found in the [`result_package`](/AIToolbox/experiment/result_package/)
+where we have basic, general result packages. Furthermore, for those dealing with NLP result packages for
+several widely researched NLP tasks such as translation, QA can be found as part of the 
+[`NLP` module](/AIToolbox/nlp/experiment_evaluation/NLP_result_package.py)
+module. Last but not least, as the framework was built with extensibility in mind and thus 
+if needed the users can easily define their own result packages with custom evaluations by extending the base
+[`AbstractResultPackage`](/AIToolbox/experiment/result_package/abstract_result_packages.py).
+ 
+Under the hood the result package executes one or more [`metrics`](/AIToolbox/experiment/core_metrics) objects which actually 
 calculate the performance metric calculation. Result package object is thus used as a wrapper 
 around potentially multiple performance calculations which are needed for our task.
 
