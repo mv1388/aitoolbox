@@ -1,9 +1,15 @@
 import unittest
-
+import os
+import shutil
 from tests.utils import *
 
-from AIToolbox.torchtrain.callbacks.performance_eval_callbacks import ModelPerformanceEvaluation, MetricHistoryRename
+from AIToolbox.torchtrain.callbacks.performance_eval_callbacks import ModelPerformanceEvaluation, \
+    ModelTrainHistoryFileWriter, MetricHistoryRename
 from AIToolbox.torchtrain.train_loop import TrainLoop, TrainLoopModelCheckpoint
+from AIToolbox.experiment.training_history import TrainingHistory
+
+
+THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 class TestModelPerformanceEvaluationCallback(unittest.TestCase):
@@ -179,6 +185,54 @@ class TestModelPerformanceEvaluationCallback(unittest.TestCase):
         self.assertEqual(train_loop.train_history.train_history,
                          {'loss': [], 'accumulated_loss': [], 'val_loss': [], 'val_dummy': [111.0, 123.0, 135.0],
                           'val_extended_dummy': [1323123.44, 1323135.44, 1323147.44]})
+
+
+class TestModelTrainHistoryFileWriter(unittest.TestCase):
+    def test_execute_callback(self):
+        dummy_optimizer = DummyOptimizer()
+        dummy_train_loader = list(range(4))
+        dummy_val_loader = list(range(3))
+        dummy_test_loader = list(range(2))
+        model = NetUnifiedBatchFeed()
+
+        callback = ModelTrainHistoryFileWriter(project_name='dummyProject', experiment_name='exper',
+                                               local_model_result_folder_path=THIS_DIR, cloud_save_mode=None)
+        train_loop = TrainLoop(model, dummy_train_loader, dummy_val_loader, dummy_test_loader, dummy_optimizer, None)
+        train_loop.callbacks_handler.register_callbacks([callback])
+        train_loop.train_history = TrainingHistory().wrap_pre_prepared_history({'loss': [123.4, 1223.4, 13323.4, 13323.4, 99999],
+                                                                                'accumulated_loss': [], 'val_loss': [],
+                                                                                'NEW_METRIC': [13323.4, 133323.4]})
+
+        # Epoch 1
+        train_loop.callbacks_handler.execute_epoch_end()
+        f_path = os.path.join(THIS_DIR, 'dummyProject', f'exper_{train_loop.experiment_timestamp}',
+                              'results', 'results.txt')
+
+        with open(f_path, 'r') as f:
+            f_content = [l.strip() for l in f.readlines()]
+
+        self.assertEqual(f_content,
+                         ['============================', 'Epoch: 0', '============================',
+                          'loss:\t99999', 'NEW_METRIC:\t133323.4', '', ''])
+
+        # Epoch 2
+        train_loop.epoch += 1
+        train_loop.insert_metric_result_into_history('COMPLETEY_NEW_METRIC', 3333.4)
+        train_loop.callbacks_handler.execute_epoch_end()
+
+        with open(f_path, 'r') as f:
+            f_content = [l.strip() for l in f.readlines()]
+
+        print(f_content)
+        self.assertEqual(f_content,
+                         ['============================', 'Epoch: 0', '============================',
+                          'loss:\t99999', 'NEW_METRIC:\t133323.4', '', '',
+                          '============================', 'Epoch: 1', '============================',
+                          'loss:\t99999', 'NEW_METRIC:\t133323.4', 'COMPLETEY_NEW_METRIC:\t3333.4', '', ''])
+
+        project_path = os.path.join(THIS_DIR, 'dummyProject')
+        if os.path.exists(project_path):
+            shutil.rmtree(project_path)
 
 
 class TestMetricHistoryRename(unittest.TestCase):
