@@ -74,7 +74,9 @@ evaluation mode.
 The code below shows the general skeleton all the TTModels have to follow to enable them to be trained 
 with the TrainLoop:
 ```python
-class TTModel(nn.Module, ABC):
+from AIToolbox.torchtrain.model import TTModel
+
+class MyNeuralModel(TTModel):
     def __init__(self):
         # model layers, etc.
 
