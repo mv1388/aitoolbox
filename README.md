@@ -28,17 +28,26 @@ are safely stored on S3.
 ### TrainLoop
 
 [`TrainLoop`](/AIToolbox/torchtrain/train_loop.py) is the main abstraction for PyTorch neural net training. At it's core
-it handles to batch feeding of data into the model, calculating loss and updating parameters.
-
+it handles the batch feeding of data into the model, calculating loss and updating parameters for a specified number of epochs.
+The simplest way to train a neural net is thus by doing the following:
 ```
-TrainLoop(model,
-          train_loader, val_loader, test_loader,
-          optimizer, criterion).fit(num_epoch=10)
+tl = TrainLoop(model,
+               train_loader, val_loader, test_loader,
+               optimizer, criterion)
+model = tl.fit(num_epoch=10)
 ```
 
+AIToolbox includes a few more advanced derivations of the basic TrainLoop
+which automatically handle the experiment tracking by creating model
+checkpoints, performance reports, example predictions, etc. All of this can be saved just on the local drive
+or can also be automatically also stored on AWS S3.  Currently implemented advanced 
+[`TrainLoops`](/AIToolbox/torchtrain/train_loop.py) are `TrainLoopModelCheckpoint`, `TrainLoopModelEndSave` and `TrainLoopModelCheckpointEndSave`.
+Here, 'Checkpoint' stands for checkpointing after each epoch, while 'EndSave' will only persist and evaluate at the very end of the training. 
 
-Additional logic 
-can be injected into the training procedure by using `callbacks`. 
+### Callbacks
+
+For advanced applications the basic logic offered in different default TrainLoops might not be enough.
+Additional needed logic can be injected into the training procedure by using [`callbacks`](/AIToolbox/torchtrain/callbacks). 
 Implement corresponding methods to execute callbacks at the start/end of batch, epoch, training.
 
 By using different implemented derivations of `TrainLoop`, the automatic 
