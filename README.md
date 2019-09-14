@@ -1,11 +1,11 @@
 # AI Toolbox
 
-<!--[![Build Status](https://travis-ci.org/mv1388/AIToolbox.svg?branch=master)](https://travis-ci.org/mv1388/AIToolbox)-->
-<!--[![CircleCI](https://circleci.com/gh/mv1388/AIToolbox/tree/master.svg?style=svg)](https://circleci.com/gh/mv1388/AIToolbox/tree/master)-->
-<!--&nbsp; &nbsp;-->
-<!--[![codebeat badge](https://codebeat.co/badges/04217a3f-a838-418f-8f14-66cf6ae1b03d)](https://codebeat.co/projects/github-com-mv1388-aitoolbox-master)-->
-<!--[![Codacy Badge](https://api.codacy.com/project/badge/Grade/2a497fd39a0049d19d0749d6dc0beb75)](https://www.codacy.com/manual/mv1388/AIToolbox?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=mv1388/AIToolbox&amp;utm_campaign=Badge_Grade)-->
-<!--[![CodeFactor](https://www.codefactor.io/repository/github/mv1388/aitoolbox/badge)](https://www.codefactor.io/repository/github/mv1388/aitoolbox)-->
+[![Build Status](https://travis-ci.org/mv1388/AIToolbox.svg?branch=master)](https://travis-ci.org/mv1388/AIToolbox)
+[![CircleCI](https://circleci.com/gh/mv1388/AIToolbox/tree/master.svg?style=svg)](https://circleci.com/gh/mv1388/AIToolbox/tree/master)
+&nbsp; &nbsp;
+[![codebeat badge](https://codebeat.co/badges/04217a3f-a838-418f-8f14-66cf6ae1b03d)](https://codebeat.co/projects/github-com-mv1388-aitoolbox-master)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/2a497fd39a0049d19d0749d6dc0beb75)](https://www.codacy.com/manual/mv1388/AIToolbox?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=mv1388/AIToolbox&amp;utm_campaign=Badge_Grade)
+[![CodeFactor](https://www.codefactor.io/repository/github/mv1388/aitoolbox/badge)](https://www.codefactor.io/repository/github/mv1388/aitoolbox)
 
 
 Library which helps you train deep learning models in PyTorch and quickly iterate experiments. 
@@ -127,10 +127,12 @@ Still work in progress...
 
 Currently, mainly used for the performance evaluation [`result packages`](/AIToolbox/nlp/experiment_evaluation/NLP_result_package.py) 
 needed for different NLP tasks, such as Q&A, summarization, machine translation. 
-For example for the case of NMT the module also provides [attention heatmap plotting](/AIToolbox/nlp/experiment_evaluation/attention_heatmap.py)
+
+For the case of e.g. NMT the module also provides [attention heatmap plotting](/AIToolbox/nlp/experiment_evaluation/attention_heatmap.py)
 which is often helpful for gaining addition insights into the seq2seq model. The heatmap plotter
 creates attention heatmap plots for every validation example and saves them as pictures to disk 
 (potentially also to cloud).
+
 Lastly, the nlp module also provides several rudimentary NLP data processing functions.
 
 
