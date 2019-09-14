@@ -29,7 +29,9 @@ are safely stored on S3.
 
 [`TrainLoop`](/AIToolbox/torchtrain/train_loop.py) is the main abstraction for PyTorch neural net training. At its core
 it handles the batch feeding of data into the model, calculating loss and updating parameters for a specified number of epochs.
-The simplest way to train a neural net is thus by doing the following:
+To learn how to define the TrainLoop supported PyTorch model please look at the [Model](#model) section bellow.
+
+After the model is created, the simplest way to train it via the TrainLoop abstraction is by doing the following:
 ```
 tl = TrainLoop(model,
                train_loader, val_loader, test_loader,
@@ -55,6 +57,46 @@ TrainLoopModelCheckpointEndSave(model,
                                 hyperparams, val_result_package=None, test_result_package=None,
                                 cloud_save_mode='s3', bucket_name='models', cloud_dir_prefix='',
                                 rm_subopt_local_models=False, num_best_checkpoints_kept=2)
+```
+
+### Model
+
+To take advantage of the TrainLoop abstraction the user has to define their model as a class which is a standard way
+in core PyTorch as well. The only difference is that for TrainLoop supported training the model class has 
+to be inherited from the AIToolbox specific [`TTModel`](/AIToolbox/torchtrain/model.py) base class instead of PyTorch `nn.Module`.
+
+`TTModel` itself inherits from the normally used `nn.Module` class thus our models still
+retain all the expected PyTorch enabled functionality. The reason for using the TTModel super class is that
+TrainLoop requires users to implement two additional methods which describe how each batch of data
+is fed into the model when calculating the loss in the training mode and when making the predictions in the 
+evaluation mode.
+
+The code below shows the general skeleton all the TTModels have to follow to enable them to be trained 
+with the TrainLoop:
+```
+class TTModel(nn.Module, ABC):
+    def __init__(self):
+        # model layers, etc.
+
+    def forward(self, x_data_batch):
+        # The same method as required in the base PyTorch nn.Module
+        ...
+        # return prediction
+        
+    def get_loss(self, batch_data, criterion, device):
+        # Get loss during training stage, called from fit() in TrainLoop
+        ...
+        # return batch loss
+
+    def get_loss_eval(self, batch_data, criterion, device):
+        # Get loss during evaluation stage. Normally just calls get_loss()
+        return self.get_loss(batch_data, criterion, device)
+
+    def get_predictions(self, batch_data, device):
+        # Get predictions during evaluation stage 
+        # + return any metadata potentially needed for evaluation
+        ...
+        # return true_targets, predictions, metadata
 ```
 
 ### Callbacks
