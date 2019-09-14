@@ -44,16 +44,26 @@ or can also be automatically also stored on AWS S3.  Currently implemented advan
 [`TrainLoops`](/AIToolbox/torchtrain/train_loop.py) are `TrainLoopModelCheckpoint`, `TrainLoopModelEndSave` and `TrainLoopModelCheckpointEndSave`.
 Here, 'Checkpoint' stands for checkpointing after each epoch, while 'EndSave' will only persist and evaluate at the very end of the training. 
 
+For the most complete experiment tracking it is recommended to use the `TrainLoopModelCheckpointEndSave` option:
+```
+TrainLoopModelCheckpointEndSave(model,
+                                train_loader, validation_loader, test_loader,
+                                optimizer, criterion,
+                                project_name, experiment_name, local_model_result_folder_path,
+                                hyperparams, val_result_package=None, test_result_package=None,
+                                cloud_save_mode='s3', bucket_name='models', cloud_dir_prefix='',
+                                rm_subopt_local_models=False, num_best_checkpoints_kept=2)
+```
+
 ### Callbacks
 
 For advanced applications the basic logic offered in different default TrainLoops might not be enough.
 Additional needed logic can be injected into the training procedure by using [`callbacks`](/AIToolbox/torchtrain/callbacks). 
-Implement corresponding methods to execute callbacks at the start/end of batch, epoch, training.
-
-By using different implemented derivations of `TrainLoop`, the automatic 
-model checkpoint and performance evaluation report saving or end of training 
-saving can be achieved. Furthermore, saved models and evaluation reports 
-will also be automatically uploaded to AWS S3.  
+AIToolbox by default already offers a wide selection of different useful callbacks. However when
+some completely new functionality is desired the user can also implement their own callbacks by 
+inheriting from the base callback object [`AbstractCallback`](/AIToolbox/torchtrain/callbacks/callbacks.py). 
+All that the user has to do is to implement corresponding methods to execute the new callback 
+at the desired point in the train loop, such as: start/end of batch, epoch, training.
 
 
 ## experiment
