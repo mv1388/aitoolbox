@@ -27,13 +27,13 @@ are safely stored on S3.
 
 ### TrainLoop
 
-`TrainLoop` is the main abstraction for PyTorch neural net training. At it's core
+[`TrainLoop`](/AIToolbox/torchtrain/train_loop.py) is the main abstraction for PyTorch neural net training. At it's core
 it handles to batch feeding of data into the model, calculating loss and updating parameters.
 
 ```
 TrainLoop(model,
-                   train_loader, val_loader, test_loader,
-                   optimizer, criterion).fit(num_epoch=10)
+          train_loader, val_loader, test_loader,
+          optimizer, criterion).fit(num_epoch=10)
 ```
 
 
