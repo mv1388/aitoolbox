@@ -87,9 +87,9 @@ class TrainLoop:
         Returns:
             torch.nn.modules.Module: trained model
         """
-        return self.do_train(num_epoch, callbacks, grad_cb)
+        return self.fit(num_epoch, callbacks, grad_cb)
 
-    def do_train(self, num_epoch, callbacks=None, grad_cb=False):
+    def fit(self, num_epoch, callbacks=None, grad_cb=False):
         """Train the model using the train loop
 
         Args:

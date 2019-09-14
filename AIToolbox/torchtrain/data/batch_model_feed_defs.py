@@ -14,7 +14,7 @@ class AbstractModelFeedDefinition(ABC):
     def get_loss(self, model, batch_data, criterion, device):
         """Get loss during training stage
 
-        Called from do_train() in TrainLoop
+        Called from fit() in TrainLoop
 
         Executed during training stage where model weights are updated based on the loss returned from this function.
 
