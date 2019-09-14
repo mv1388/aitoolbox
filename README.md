@@ -1,21 +1,22 @@
-# AI TOOLBOX [Work in Progress]
+# AI Toolbox
 
-[![Build Status](https://travis-ci.org/mv1388/AIToolbox.svg?branch=master)](https://travis-ci.org/mv1388/AIToolbox)
-[![CircleCI](https://circleci.com/gh/mv1388/AIToolbox/tree/master.svg?style=svg)](https://circleci.com/gh/mv1388/AIToolbox/tree/master)
-&nbsp; &nbsp;
-[![codebeat badge](https://codebeat.co/badges/04217a3f-a838-418f-8f14-66cf6ae1b03d)](https://codebeat.co/projects/github-com-mv1388-aitoolbox-master)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/2a497fd39a0049d19d0749d6dc0beb75)](https://www.codacy.com/manual/mv1388/AIToolbox?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=mv1388/AIToolbox&amp;utm_campaign=Badge_Grade)
-[![CodeFactor](https://www.codefactor.io/repository/github/mv1388/aitoolbox/badge)](https://www.codefactor.io/repository/github/mv1388/aitoolbox)
+<!--[![Build Status](https://travis-ci.org/mv1388/AIToolbox.svg?branch=master)](https://travis-ci.org/mv1388/AIToolbox)-->
+<!--[![CircleCI](https://circleci.com/gh/mv1388/AIToolbox/tree/master.svg?style=svg)](https://circleci.com/gh/mv1388/AIToolbox/tree/master)-->
+<!--&nbsp; &nbsp;-->
+<!--[![codebeat badge](https://codebeat.co/badges/04217a3f-a838-418f-8f14-66cf6ae1b03d)](https://codebeat.co/projects/github-com-mv1388-aitoolbox-master)-->
+<!--[![Codacy Badge](https://api.codacy.com/project/badge/Grade/2a497fd39a0049d19d0749d6dc0beb75)](https://www.codacy.com/manual/mv1388/AIToolbox?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=mv1388/AIToolbox&amp;utm_campaign=Badge_Grade)-->
+<!--[![CodeFactor](https://www.codefactor.io/repository/github/mv1388/aitoolbox/badge)](https://www.codefactor.io/repository/github/mv1388/aitoolbox)-->
 
 
-Library that helps you train neural networks in PyTorch by hiding the repetitive technicalities
-of training the neural nets and freeing you to focus interesting parts of devising advanced models. 
+Library which helps you train deep learning models in PyTorch and quickly iterate experiments. 
+It hides the repetitive technicalities of training the neural nets and 
+frees you to focus on interesting part of devising new models. 
 In essence, it offers a keras-style train loop abstraction which can be used for higher 
-level training process while still allowing to control training on the lower 
+level training process while still allowing the manual control on the lower 
 level when desired.
 
 In addition to orchestrating the model training loop the framework also helps you keep track of different 
-experiments by automatically saving models in a structured way and creating performance reports. 
+experiments by automatically saving models in a structured traceable way and creating performance reports. 
 These can be stored both locally or on AWS S3 (Google Cloud in beta) which makes the library 
 very useful when training on the GPU instance on AWS. Instance can be 
 automatically shut down when training is finished and all the results 
@@ -28,6 +29,12 @@ are safely stored on S3.
 
 `TrainLoop` is the main abstraction for PyTorch neural net training. At it's core
 it handles to batch feeding of data into the model, calculating loss and updating parameters.
+
+```
+TrainLoop(model,
+                   train_loader, val_loader, test_loader,
+                   optimizer, criterion).fit(num_epoch=10)
+```
 
 
 Additional logic 
