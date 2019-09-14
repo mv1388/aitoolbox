@@ -167,7 +167,7 @@ Implemented, however, not yet tested in practice.
 
 ## nlp
 
-Still work in progress... 
+*Still work in progress... *
 
 Currently, mainly used for the performance evaluation [`result packages`](/AIToolbox/nlp/experiment_evaluation/NLP_result_package.py) 
 needed for different NLP tasks, such as Q&A, summarization, machine translation. 
