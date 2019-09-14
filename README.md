@@ -73,8 +73,9 @@ at the desired point in the train loop, such as: start/end of batch, epoch, trai
 ### Result Package
 
 This is the definition of the model evaluation procedure on the task we are experimenting with.
-Result packages available out of the box can be found in the [`result_package`](/AIToolbox/experiment/result_package/)
-where we have basic, general result packages. Furthermore, for those dealing with NLP result packages for
+Result packages available out of the box can be found in the [`result_package` module](/AIToolbox/experiment/result_package/)
+where we have implemented several [basic, general result packages](/AIToolbox/experiment/result_package/basic_packages.py). 
+Furthermore, for those dealing with NLP, result packages for
 several widely researched NLP tasks such as translation, QA can be found as part of the 
 [`NLP` module](/AIToolbox/nlp/experiment_evaluation/NLP_result_package.py)
 module. Last but not least, as the framework was built with extensibility in mind and thus 
@@ -87,8 +88,14 @@ around potentially multiple performance calculations which are needed for our ta
 
 ### Experiment Saver 
 
-Saves the model architecture as well as model performance evaluation results and training history. 
+The experiment saver saves the model architecture as well as model performance evaluation results and training history. 
 This can be done at the end of each epoch as a model checkpointing or at the end of training.
+
+Normally not really a point of great interest when using the TrainLoop interface as it is hidden under the hood.
+However as AIToolbox was designed to be modular one can decide to write their own training loop logic but
+just use the provided experiment saver module to help with the experiment tracking and model saving.
+For PyTorch users we recommend using the [`FullPyTorchExperimentS3Saver`](/AIToolbox/experiment/experiment_saver.py) 
+which has also been most thoroughly tested.
 
 
 ## cloud
