@@ -1,39 +1,39 @@
 language: python
 
-python:
- - "3.6"
- - "3.7"
+#python:
+# - "3.6"
+# - "3.7"
 
-#matrix:
-#  include:
-#    - name: "Ubuntu 16.04 - Python 3.6"
+matrix:
+  include:
+    - name: "Ubuntu 16.04 - Python 3.6"
+      os: linux
+      dist: xenial  # Ubuntu 16.04
+      python: 3.6
+    - name: "Ubuntu 16.04 - Python 3.7"
+      os: linux
+      dist: xenial  # Ubuntu 16.04
+      python: 3.7
+#    - name: "Ubuntu 18.04 - Python 3.6"
 #      os: linux
-#      dist: xenial  # Ubuntu 16.04
+#      dist: bionic  # Ubuntu 18.04
 #      python: 3.6
-#    - name: "Ubuntu 16.04 - Python 3.7"
+#    - name: "Ubuntu 18.04 - Python 3.7"
 #      os: linux
-#      dist: xenial  # Ubuntu 16.04
+#      dist: bionic  # Ubuntu 18.04
 #      python: 3.7
-##    - name: "Ubuntu 18.04 - Python 3.6"
-##      os: linux
-##      dist: bionic  # Ubuntu 18.04
-##      python: 3.6
-##    - name: "Ubuntu 18.04 - Python 3.7"
-##      os: linux
-##      dist: bionic  # Ubuntu 18.04
-##      python: 3.7
-#    - name: "OSX xcode10.2 - Python 3"
-#      os: osx
-#      osx_image: xcode10.2
-#      language: generic
-#      addons:
-#        homebrew:
-#          # update: true
-#          packages: python3
-#      before_install:
-#        - pip3 install virtualenv
-#        - virtualenv -p python3 ~/venv
-#        - source ~/venv/bin/activate
+    - name: "OSX xcode10.2 - Python 3"
+      os: osx
+      osx_image: xcode10.2
+      language: generic
+      addons:
+        homebrew:
+          # update: true
+          packages: python3
+      before_install:
+        - pip3 install virtualenv
+        - virtualenv -p python3 ~/venv
+        - source ~/venv/bin/activate
 
 cache: pip
 
