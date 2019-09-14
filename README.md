@@ -80,11 +80,13 @@ several widely researched NLP tasks such as translation, QA can be found as part
 [`NLP` module](/AIToolbox/nlp/experiment_evaluation/NLP_result_package.py)
 module. Last but not least, as the framework was built with extensibility in mind and thus 
 if needed the users can easily define their own result packages with custom evaluations by extending the base
-[`AbstractResultPackage`](/AIToolbox/experiment/result_package/abstract_result_packages.py).
+[`AbstractResultPackage`](/AIToolbox/experiment/result_package/abstract_result_packages.py). 
  
 Under the hood the result package executes one or more [`metrics`](/AIToolbox/experiment/core_metrics) objects which actually 
 calculate the performance metric calculation. Result package object is thus used as a wrapper 
-around potentially multiple performance calculations which are needed for our task.
+around potentially multiple performance calculations which are needed for our task. The metrics
+which are part of the specified result package are calculated by calling the `prepare_result_package()` method 
+of the result package which we are using to evaluate model's performance.
 
 ### Experiment Saver 
 
@@ -95,16 +97,23 @@ Normally not really a point of great interest when using the TrainLoop interface
 However as AIToolbox was designed to be modular one can decide to write their own training loop logic but
 just use the provided experiment saver module to help with the experiment tracking and model saving.
 For PyTorch users we recommend using the [`FullPyTorchExperimentS3Saver`](/AIToolbox/experiment/experiment_saver.py) 
-which has also been most thoroughly tested.
+which has also been most thoroughly tested. 
+The experiment is saved by calling the `save_experiment()` function from the selected experiment saver and 
+providing the trained model and the evaluated result package containing the calculated performance results.
 
 
 ## cloud
 
+All of these modules are mainly hidden under the hood when using different experiment tracking
+abstractions. However, if desired and only the cloud saving functionality is needed it is easy to use them
+as standalone modules in some desired downstream application.
+
 ### AWS 
 
-Functionality for saving model architecture and weights to S3 either during 
-training or at the training end. At the same time the code here can be also 
-used to store model performance reports to S3 in the similar fashion as in the case of model saving.
+Functionality for saving model architecture and training results to S3 either during 
+training or at the training end. On the other hand, the module also offers the dataset downloading
+from the S3 based dataset store. This is useful when we are experimenting with datasets and have only slow
+local connection, thus scp/FTP is out of the picture.
 
 ### Google Cloud
 
@@ -112,11 +121,18 @@ Same functionality as for AWS S3 but for Google Cloud Storage.
 Implemented, however, not yet tested in practice. 
 
 
-## NLP
+## nlp
 
 Still work in progress... 
-Different NLP data processing functions and NLP oriented task performance 
-evaluation definitions such as Q&A, summarization, machine translation, ...
+
+Currently, mainly used for the performance evaluation [`result packages`](/AIToolbox/nlp/experiment_evaluation/NLP_result_package.py) 
+needed for different NLP tasks, such as Q&A, summarization, machine translation. 
+For example for the case of NMT the module also provides [attention heatmap plotting](/AIToolbox/nlp/experiment_evaluation/attention_heatmap.py)
+which is often helpful for gaining addition insights into the seq2seq model. The heatmap plotter
+creates attention heatmap plots for every validation example and saves them as pictures to disk 
+(potentially also to cloud).
+Lastly, the nlp module also provides several rudimentary NLP data processing functions.
+
 
 ## kerastrain
 
