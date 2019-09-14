@@ -1,6 +1,5 @@
 # AI Toolbox
 
-[![Build Status](https://travis-ci.org/mv1388/AIToolbox.svg?branch=master)](https://travis-ci.org/mv1388/AIToolbox)
 [![CircleCI](https://circleci.com/gh/mv1388/AIToolbox/tree/master.svg?style=svg)](https://circleci.com/gh/mv1388/AIToolbox/tree/master)
 &nbsp; &nbsp;
 [![codebeat badge](https://codebeat.co/badges/04217a3f-a838-418f-8f14-66cf6ae1b03d)](https://codebeat.co/projects/github-com-mv1388-aitoolbox-master)
