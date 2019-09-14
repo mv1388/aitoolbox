@@ -32,7 +32,7 @@ it handles the batch feeding of data into the model, calculating loss and updati
 To learn how to define the TrainLoop supported PyTorch model please look at the [Model](#model) section bellow.
 
 After the model is created, the simplest way to train it via the TrainLoop abstraction is by doing the following:
-```
+```python
 tl = TrainLoop(model,
                train_loader, val_loader, test_loader,
                optimizer, criterion)
@@ -49,7 +49,7 @@ Here, 'Checkpoint' stands for checkpointing after each epoch, while 'EndSave' wi
 For the most complete experiment tracking it is recommended to use the `TrainLoopModelCheckpointEndSave` option. 
 The optional use of the *result packages* needed for the neural net performance evaluation is explained in 
 the [experiment section](#experiment) bellow.
-```
+```python
 TrainLoopModelCheckpointEndSave(model,
                                 train_loader, validation_loader, test_loader,
                                 optimizer, criterion,
@@ -73,7 +73,7 @@ evaluation mode.
 
 The code below shows the general skeleton all the TTModels have to follow to enable them to be trained 
 with the TrainLoop:
-```
+```python
 class TTModel(nn.Module, ABC):
     def __init__(self):
         # model layers, etc.
