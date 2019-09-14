@@ -8,7 +8,7 @@
 [![CodeFactor](https://www.codefactor.io/repository/github/mv1388/aitoolbox/badge)](https://www.codefactor.io/repository/github/mv1388/aitoolbox)
 
 
-Library which helps you train deep learning models in PyTorch and quickly iterate experiments. 
+A framework which helps you train deep learning models in PyTorch and quickly iterate experiments. 
 It hides the repetitive technicalities of training the neural nets and 
 frees you to focus on interesting part of devising new models. 
 In essence, it offers a keras-style train loop abstraction which can be used for higher 
@@ -27,7 +27,7 @@ are safely stored on S3.
 
 ### TrainLoop
 
-[`TrainLoop`](/AIToolbox/torchtrain/train_loop.py) is the main abstraction for PyTorch neural net training. At it's core
+[`TrainLoop`](/AIToolbox/torchtrain/train_loop.py) is the main abstraction for PyTorch neural net training. At its core
 it handles the batch feeding of data into the model, calculating loss and updating parameters for a specified number of epochs.
 The simplest way to train a neural net is thus by doing the following:
 ```
@@ -112,7 +112,7 @@ as standalone modules in some desired downstream application.
 
 Functionality for saving model architecture and training results to S3 either during 
 training or at the training end. On the other hand, the module also offers the dataset downloading
-from the S3 based dataset store. This is useful when we are experimenting with datasets and have only slow
+from the S3 based dataset store. This is useful when we are experimenting with datasets and have only a slow
 local connection, thus scp/FTP is out of the picture.
 
 ### Google Cloud
