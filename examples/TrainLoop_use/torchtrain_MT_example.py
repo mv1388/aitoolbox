@@ -19,8 +19,8 @@ from AIToolbox.nlp.core.vocabulary import Vocabulary
 
 """
         
-        Based on:
-            https://github.com/bentrevett/pytorch-seq2seq/blob/master/4%20-%20Packed%20Padded%20Sequences%2C%20Masking%20and%20Inference.ipynb
+Based on:
+    https://github.com/bentrevett/pytorch-seq2seq/blob/master/4%20-%20Packed%20Padded%20Sequences%2C%20Masking%20and%20Inference.ipynb
 
 """
 
@@ -330,11 +330,12 @@ dec = Decoder(OUTPUT_DIM, DEC_EMB_DIM, ENC_HID_DIM, DEC_HID_DIM, DEC_DROPOUT, at
 
 model = Seq2Seq(enc, dec, PAD_IDX, SOS_IDX, EOS_IDX, device).to(device)
 
+
 def count_parameters(model):
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
-count_parameters(model)
 
+count_parameters(model)
 
 optimizer = optim.Adam(model.parameters())
 

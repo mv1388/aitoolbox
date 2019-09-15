@@ -6,14 +6,13 @@ import torch.nn.functional as F
 import torch.optim as optim
 from torchvision import datasets, transforms
 
-from AIToolbox.torchtrain.train_loop import TrainLoop
-from AIToolbox.torchtrain.model import ModelWrap
-from AIToolbox.torchtrain.data.batch_model_feed_defs import AbstractModelFeedDefinition
+from AIToolbox.torchtrain.train_loop import TrainLoop, TrainLoopModelCheckpointEndSave
+from AIToolbox.torchtrain.model import TTModel
 from AIToolbox.torchtrain.callbacks.performance_eval_callbacks import ModelPerformanceEvaluation, ModelPerformancePrintReport
 from AIToolbox.experiment.result_package.basic_packages import ClassificationResultPackage
 
 
-class Net(nn.Module):
+class Net(TTModel):
     def __init__(self):
         super(Net, self).__init__()
         self.conv1 = nn.Conv2d(1, 20, 5, 1)
@@ -31,9 +30,7 @@ class Net(nn.Module):
         x = self.fc2(x)
         return F.log_softmax(x, dim=1)
 
-
-class MNISTModelFeedDefinition(AbstractModelFeedDefinition):
-    def get_loss(self, model, batch_data, criterion, device):
+    def get_loss(self, batch_data, criterion, device):
         data, target = batch_data
         data, target = data.to(device), target.to(device)
 
@@ -42,7 +39,7 @@ class MNISTModelFeedDefinition(AbstractModelFeedDefinition):
 
         return loss
 
-    def get_predictions(self, model, batch_data, device):
+    def get_predictions(self, batch_data, device):
         data, y_test = batch_data
         data = data.to(device)
 
@@ -104,14 +101,16 @@ callbacks = [ModelPerformanceEvaluation(ClassificationResultPackage(), args.__di
              ModelPerformancePrintReport(['loss', 'train_Accuracy', 'val_Accuracy'], strict_metric_reporting=True)]
 
 
-TrainLoop(ModelWrap(model, MNISTModelFeedDefinition()),
+TrainLoop(model,
           train_loader, test_loader, None,
           optimizer, criterion)(num_epoch=10, callbacks=callbacks)
 
 
-# TrainLoopModelCheckpointEndSave(ModelWrap(model, MNISTModelFeedDefinition()), train_loader, test_loader, test_loader, optimizer, criterion,
+# TrainLoopModelCheckpointEndSave(model,
+#                                 train_loader, test_loader, test_loader,
+#                                 optimizer, criterion,
 #                                 project_name='localRunCNNTest',
 #                                 experiment_name='CNN_MNIST_test',
-#                                 local_model_result_folder_path='~/PycharmProjects/MemoryNet/model_results',
-#                                 hyperparams=hyperparams.__dict__,
+#                                 local_model_result_folder_path='~/MemoryNet/model_results',
+#                                 hyperparams=args.__dict__,
 #                                 test_result_package=ClassificationResultPackage())(num_epoch=5, callbacks=callbacks)
