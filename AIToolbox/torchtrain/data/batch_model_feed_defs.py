@@ -2,11 +2,11 @@ from abc import ABC, abstractmethod
 import torch
 
 
-"""
+'''
     Class / Functions defining the handling of a single batch and feeding it into the PyTorch model
 
     Such a function is supplied as an argument to the main train loop code
-"""
+'''
 
 
 class AbstractModelFeedDefinition(ABC):
