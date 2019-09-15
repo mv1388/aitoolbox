@@ -166,4 +166,7 @@ callbacks = [ModelPerformanceEvaluation(ClassificationResultPackage(), args,
                                         on_train_data=True, on_val_data=True),
              ModelPerformancePrintReport(['val_loss', 'train_Accuracy', 'val_Accuracy'], strict_metric_reporting=True)]
 
-TrainLoop(model, train_loader, test_loader, test_loader, optimizer, criterion)(num_epochs, callbacks)
+TrainLoop(model,
+          train_loader, test_loader, test_loader,
+          optimizer, criterion)\
+    (num_epochs, callbacks)
