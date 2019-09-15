@@ -1,10 +1,10 @@
 import os
 
-from AIToolbox.cloud.AWS.data_access import BaseDataFetcher
+from AIToolbox.cloud.AWS.data_access import BaseDataLoader
 from AIToolbox.experiment.local_load.local_model_load import AbstractLocalModelLoader, PyTorchLocalModelLoader
 
 
-class BaseModelLoader(BaseDataFetcher):
+class BaseModelLoader(BaseDataLoader):
     def __init__(self, local_model_loader, project_name, experiment_folder, model_save_dir,
                  local_model_result_folder_path, pretrained_model_dir='pretrained_models',
                  bucket_name='model-result'):
@@ -19,7 +19,7 @@ class BaseModelLoader(BaseDataFetcher):
             pretrained_model_dir (str):
             bucket_name (str):
         """
-        BaseDataFetcher.__init__(self, bucket_name, local_model_result_folder_path)
+        BaseDataLoader.__init__(self, bucket_name, local_model_result_folder_path)
 
         self.project_name = project_name
         self.experiment_folder = experiment_folder
@@ -49,7 +49,7 @@ class BaseModelLoader(BaseDataFetcher):
         cloud_model_file_path = os.path.join(self.cloud_model_folder_path, model_name)
         local_model_file_path = os.path.join(self.local_model_folder_path, model_name)
 
-        self.fetch_file(cloud_model_file_path, local_model_file_path)
+        self.load_file(cloud_model_file_path, local_model_file_path)
 
         return self.local_model_loader.load_model(model_name, self.project_name, self.experiment_folder, **kwargs)
 
