@@ -3,7 +3,7 @@ from os import path
 
 
 def create_folder_hierarchy(base_folder_path, folder_names):
-    """
+    """Create nested folder hierarchy
 
     Args:
         base_folder_path (str): folder from which the created folder hierarchy will go into further depth

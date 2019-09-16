@@ -45,7 +45,7 @@ def flatten_dict(d, parent_key='', sep='_'):
 
 
 def combine_dict_elements(list_of_dicts):
-    """
+    """Combine into single list the elements with the same key across several dicts
 
     Args:
         list_of_dicts (list): list of dicts with matching keys
@@ -65,7 +65,7 @@ def combine_dict_elements(list_of_dicts):
 
 
 def flatten_combine_dict(train_history):
-    """
+    """Flatten all dict of dicts and combine elements with the same key into a single list in the dict
 
     Args:
         train_history (dict):
