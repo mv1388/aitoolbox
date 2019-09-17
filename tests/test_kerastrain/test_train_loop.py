@@ -171,9 +171,9 @@ class TestTrainLoop(unittest.TestCase):
 
         self.assertEqual(train_history.epoch, [0, 1])
         self.assertEqual(len(train_history.history), 2)
-        self.assertEqual(sorted(train_history.history.keys()), sorted(['loss', 'acc']))
+        self.assertEqual(sorted(train_history.history.keys()), sorted(['loss', 'accuracy']))
         self.assertEqual(len(train_history.history['loss']), 2)
-        self.assertEqual(len(train_history.history['acc']), 2)
+        self.assertEqual(len(train_history.history['accuracy']), 2)
         self.assertEqual(train_history.params,
                          {'batch_size': 300, 'epochs': 2, 'steps': None, 'samples': 768, 'verbose': 1,
-                          'do_validation': False, 'metrics': ['loss', 'acc']})
+                          'do_validation': False, 'metrics': ['loss', 'accuracy']})
