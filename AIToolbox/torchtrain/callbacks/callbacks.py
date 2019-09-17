@@ -1,8 +1,8 @@
 import numpy as np
 from typing import Optional
 
-from AIToolbox.cloud.AWS.simple_email_service import SESSender
 from AIToolbox.utils import util
+from AIToolbox.cloud.AWS.simple_email_service import SESSender
 
 
 class AbstractCallback:
