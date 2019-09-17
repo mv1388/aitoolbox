@@ -13,3 +13,18 @@ def function_exists(object_to_check, fn_name):
         fn_obj = getattr(object_to_check, fn_name, None)
         return callable(fn_obj)
     return False
+
+
+def flatten_list_of_lists(l):
+    """
+
+    Args:
+        l (list):
+
+    Returns:
+        list or None:
+    """
+    if l is not None:
+        return [item for sublist in l for item in sublist]
+    else:
+        return None
