@@ -15,8 +15,6 @@ import sys
 sys.path.insert(0, os.path.abspath('../..'))
 # sys.path.insert(0, os.path.abspath('.'))
 
-print(os.path.abspath('../..'))
-print(os.path.abspath('.'))
 # -- Project information -----------------------------------------------------
 
 project = 'AIToolbox'
@@ -33,7 +31,8 @@ release = '0.3.1'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx.ext.napoleon'
+    'sphinx.ext.napoleon',
+    'recommonmark'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
