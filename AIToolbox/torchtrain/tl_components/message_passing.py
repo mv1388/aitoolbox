@@ -31,13 +31,13 @@ class MessageService:
         self.message_store = {}
 
     def read_messages(self, key):
-        """
+        """Read messages by key from the TrainLoop message service
 
         Args:
-            key (str):
+            key (str): message key
 
         Returns:
-            list or None:
+            list or None: if message key present return content, otherwise return None
         """
         if key in self.message_store:
             messages = [msg.value for msg in self.message_store[key]]
@@ -47,12 +47,12 @@ class MessageService:
             return None
 
     def write_message(self, key, value, msg_handling_settings=UNTIL_END_OF_EPOCH):
-        """
+        """Write a new message to the message service
 
         Args:
-            key (str):
-            value:
-            msg_handling_settings (str or list):
+            key (str):message key
+            value: message content
+            msg_handling_settings (str or list): setting how to handle the lifespan of the message
 
         Returns:
             None

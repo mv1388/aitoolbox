@@ -5,7 +5,7 @@ from AIToolbox.torchtrain.callbacks.callbacks import AbstractCallback
 
 class GeneralLRScheduler(AbstractCallback):
     def __init__(self, scheduler_class, **kwargs):
-        """
+        """Learning rate scheduler base class
 
         Args:
             scheduler_class:
@@ -38,7 +38,7 @@ class GeneralLRScheduler(AbstractCallback):
 
 class ReduceLROnPlateauScheduler(GeneralLRScheduler):
     def __init__(self, **kwargs):
-        """
+        """Learning rate scheduler which reduces the rate if the loss performance stops improving
 
         Args:
             **kwargs:
@@ -49,7 +49,7 @@ class ReduceLROnPlateauScheduler(GeneralLRScheduler):
 
 class ReduceLROnPlateauMetricScheduler(GeneralLRScheduler):
     def __init__(self, metric_name, **kwargs):
-        """
+        """Learning rate scheduler which reduces the rate if the performance of the selected metric stops improving
 
         Needs to be used in combination with ModelPerformanceEvaluation to calculate the metric and fill it in
         the TrainLoop history.

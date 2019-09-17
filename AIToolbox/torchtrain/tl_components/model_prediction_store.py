@@ -1,7 +1,11 @@
 
 class ModelPredictionStore:
     def __init__(self, auto_purge=False):
-        """
+        """Service for TrainLoop enabling the prediction caching
+
+        Prediction calculation can be costly and it can have severe performance implications if the same predictions
+        would be calculated repeatedly. This store caches already made predictions in the current epoch of
+        the TrainLoop which takes the cached values if they are available instead of recalculating.
 
         Args:
             auto_purge (bool):

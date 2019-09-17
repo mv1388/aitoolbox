@@ -51,32 +51,81 @@ class AbstractCallback:
         pass
 
     def on_epoch_begin(self):
+        """Logic executed at the beginning of the epoch
+
+        Returns:
+
+        """
         pass
 
     def on_epoch_end(self):
+        """Logic executed at the end of the epoch
+
+        Returns:
+
+        """
         pass
 
     def on_train_begin(self):
+        """Logic executed at the beginning of the overall training
+
+        Returns:
+
+        """
         pass
 
     def on_train_end(self):
+        """Logic executed at the end of the overall training
+
+        Returns:
+
+        """
         pass
 
     def on_batch_begin(self):
+        """Logic executed before the batch is inserted into the model
+
+        Returns:
+
+        """
         pass
 
     def on_batch_end(self):
+        """Logic executed after the batch is inserted into the model
+
+        Returns:
+
+        """
         pass
 
     def on_after_gradient_update(self):
+        """Logic executed after the model gradients are updated
+
+        To ensure the execution of this callback enable the grad_cb=True option in the fit() function of TrainLoop.
+        Otherwise logic implemented here will not be executed.
+
+        Returns:
+
+        """
         pass
 
     def on_after_optimizer_step(self):
+        """Logic executed after the optimizer does a new step and updates the model weights
+
+        To ensure the execution of this callback enable the grad_cb=True option in the fit() function of TrainLoop.
+        Otherwise logic implemented here will not be executed.
+
+        Returns:
+
+        """
         pass
 
 
 class ListRegisteredCallbacks(AbstractCallback):
     def __init__(self):
+        """List all the callbacks which are used in the current TrainLoop
+
+        """
         AbstractCallback.__init__(self, 'Print the list of registered callbacks')
 
     def on_train_begin(self):
