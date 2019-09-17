@@ -1,0 +1,569 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>AIToolbox.experiment.local_save package &#8212; AIToolbox 0.3.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="aitoolbox-experiment-local-save-package">
+<h1>AIToolbox.experiment.local_save package<a class="headerlink" href="#aitoolbox-experiment-local-save-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-AIToolbox.experiment.local_save.folder_create">
+<span id="aitoolbox-experiment-local-save-folder-create-module"></span><h2>AIToolbox.experiment.local_save.folder_create module<a class="headerlink" href="#module-AIToolbox.experiment.local_save.folder_create" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="AIToolbox.experiment.local_save.folder_create.ExperimentFolderCreator">
+<em class="property">class </em><code class="descclassname">AIToolbox.experiment.local_save.folder_create.</code><code class="descname">ExperimentFolderCreator</code><a class="headerlink" href="#AIToolbox.experiment.local_save.folder_create.ExperimentFolderCreator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="staticmethod">
+<dt id="AIToolbox.experiment.local_save.folder_create.ExperimentFolderCreator.create_experiment_base_folder">
+<em class="property">static </em><code class="descname">create_experiment_base_folder</code><span class="sig-paren">(</span><em>project_name</em>, <em>experiment_name</em>, <em>experiment_timestamp</em>, <em>local_model_result_folder_path</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.local_save.folder_create.ExperimentFolderCreator.create_experiment_base_folder" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>project_name</strong> (<em>str</em>) – root name of the project</p></li>
+<li><p><strong>experiment_name</strong> (<em>str</em>) – name of the particular experiment</p></li>
+<li><p><strong>experiment_timestamp</strong> (<em>str</em>) – time stamp at the start of training</p></li>
+<li><p><strong>local_model_result_folder_path</strong> (<em>str</em>) – root local path where project folder will be created</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>path to the created experiment base folder</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="AIToolbox.experiment.local_save.folder_create.ExperimentFolderCreator.get_experiment_base_folder_paths">
+<em class="property">static </em><code class="descname">get_experiment_base_folder_paths</code><span class="sig-paren">(</span><em>project_name</em>, <em>experiment_name</em>, <em>experiment_timestamp</em>, <em>local_model_result_folder_path</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.local_save.folder_create.ExperimentFolderCreator.get_experiment_base_folder_paths" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>project_name</strong> (<em>str</em>) – root name of the project</p></li>
+<li><p><strong>experiment_name</strong> (<em>str</em>) – name of the particular experiment</p></li>
+<li><p><strong>experiment_timestamp</strong> (<em>str</em>) – time stamp at the start of training</p></li>
+<li><p><strong>local_model_result_folder_path</strong> (<em>str</em>) – root local path where project folder will be created</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>path to the main project folder, path to the particular experiment folder</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str, str</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-AIToolbox.experiment.local_save.local_model_save">
+<span id="aitoolbox-experiment-local-save-local-model-save-module"></span><h2>AIToolbox.experiment.local_save.local_model_save module<a class="headerlink" href="#module-AIToolbox.experiment.local_save.local_model_save" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="AIToolbox.experiment.local_save.local_model_save.AbstractLocalModelSaver">
+<em class="property">class </em><code class="descclassname">AIToolbox.experiment.local_save.local_model_save.</code><code class="descname">AbstractLocalModelSaver</code><a class="headerlink" href="#AIToolbox.experiment.local_save.local_model_save.AbstractLocalModelSaver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<dl class="method">
+<dt id="AIToolbox.experiment.local_save.local_model_save.AbstractLocalModelSaver.save_model">
+<code class="descname">save_model</code><span class="sig-paren">(</span><em>model</em>, <em>project_name</em>, <em>experiment_name</em>, <em>experiment_timestamp=None</em>, <em>epoch=None</em>, <em>protect_existing_folder=True</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.local_save.local_model_save.AbstractLocalModelSaver.save_model" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<em>keras.engine.training.Model</em><em> or </em><em>dict</em>) – </p></li>
+<li><p><strong>project_name</strong> (<em>str</em>) – root name of the project</p></li>
+<li><p><strong>experiment_name</strong> (<em>str</em>) – name of the particular experiment</p></li>
+<li><p><strong>experiment_timestamp</strong> (<em>str</em><em> or </em><em>None</em>) – time stamp at the start of training</p></li>
+<li><p><strong>epoch</strong> (<em>int</em><em> or </em><em>None</em>) – in which epoch the model is being saved</p></li>
+<li><p><strong>protect_existing_folder</strong> (<em>bool</em>) – can override potentially already existing folder or not</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>model_name, model_local_path</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(str, str)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.experiment.local_save.local_model_save.BaseLocalModelSaver">
+<em class="property">class </em><code class="descclassname">AIToolbox.experiment.local_save.local_model_save.</code><code class="descname">BaseLocalModelSaver</code><span class="sig-paren">(</span><em>local_model_result_folder_path='~/project/model_result'</em>, <em>checkpoint_model=False</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.local_save.local_model_save.BaseLocalModelSaver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="AIToolbox.experiment.local_save.local_model_save.BaseLocalModelSaver.create_experiment_local_models_folder">
+<code class="descname">create_experiment_local_models_folder</code><span class="sig-paren">(</span><em>project_name</em>, <em>experiment_name</em>, <em>experiment_timestamp</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.local_save.local_model_save.BaseLocalModelSaver.create_experiment_local_models_folder" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>project_name</strong> (<em>str</em>) – root name of the project</p></li>
+<li><p><strong>experiment_name</strong> (<em>str</em>) – name of the particular experiment</p></li>
+<li><p><strong>experiment_timestamp</strong> (<em>str</em>) – time stamp at the start of training</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>path to the created models folder in the experiment base folder</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.experiment.local_save.local_model_save.KerasLocalModelSaver">
+<em class="property">class </em><code class="descclassname">AIToolbox.experiment.local_save.local_model_save.</code><code class="descname">KerasLocalModelSaver</code><span class="sig-paren">(</span><em>local_model_result_folder_path='~/project/model_result'</em>, <em>checkpoint_model=False</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.local_save.local_model_save.KerasLocalModelSaver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.experiment.local_save.local_model_save.AbstractLocalModelSaver" title="AIToolbox.experiment.local_save.local_model_save.AbstractLocalModelSaver"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.experiment.local_save.local_model_save.AbstractLocalModelSaver</span></code></a>, <a class="reference internal" href="#AIToolbox.experiment.local_save.local_model_save.BaseLocalModelSaver" title="AIToolbox.experiment.local_save.local_model_save.BaseLocalModelSaver"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.experiment.local_save.local_model_save.BaseLocalModelSaver</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.experiment.local_save.local_model_save.KerasLocalModelSaver.save_model">
+<code class="descname">save_model</code><span class="sig-paren">(</span><em>model</em>, <em>project_name</em>, <em>experiment_name</em>, <em>experiment_timestamp=None</em>, <em>epoch=None</em>, <em>protect_existing_folder=True</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.local_save.local_model_save.KerasLocalModelSaver.save_model" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<em>keras.engine.training.Model</em>) – </p></li>
+<li><p><strong>project_name</strong> (<em>str</em>) – root name of the project</p></li>
+<li><p><strong>experiment_name</strong> (<em>str</em>) – name of the particular experiment</p></li>
+<li><p><strong>experiment_timestamp</strong> (<em>str</em><em> or </em><em>None</em>) – time stamp at the start of training</p></li>
+<li><p><strong>epoch</strong> (<em>int</em><em> or </em><em>None</em>) – in which epoch the model is being saved</p></li>
+<li><p><strong>protect_existing_folder</strong> (<em>bool</em>) – can override potentially already existing folder or not</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>model_name, model_local_path</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(str, str)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.experiment.local_save.local_model_save.LocalSubOptimalModelRemover">
+<em class="property">class </em><code class="descclassname">AIToolbox.experiment.local_save.local_model_save.</code><code class="descname">LocalSubOptimalModelRemover</code><span class="sig-paren">(</span><em>metric_name</em>, <em>num_best_kept=2</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.local_save.local_model_save.LocalSubOptimalModelRemover" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="AIToolbox.experiment.local_save.local_model_save.LocalSubOptimalModelRemover.decide_if_remove_suboptimal_model">
+<code class="descname">decide_if_remove_suboptimal_model</code><span class="sig-paren">(</span><em>history</em>, <em>new_model_dump_paths</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.local_save.local_model_save.LocalSubOptimalModelRemover.decide_if_remove_suboptimal_model" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>history</strong> (<a class="reference internal" href="AIToolbox.experiment.html#AIToolbox.experiment.training_history.TrainingHistory" title="AIToolbox.experiment.training_history.TrainingHistory"><em>AIToolbox.experiment.training_history.TrainingHistory</em></a>) – </p></li>
+<li><p><strong>new_model_dump_paths</strong> (<em>list</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="AIToolbox.experiment.local_save.local_model_save.LocalSubOptimalModelRemover.rm_suboptimal_model">
+<em class="property">static </em><code class="descname">rm_suboptimal_model</code><span class="sig-paren">(</span><em>rm_model_paths</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.local_save.local_model_save.LocalSubOptimalModelRemover.rm_suboptimal_model" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>rm_model_paths</strong> (<em>list</em>) – list of string paths</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.experiment.local_save.local_model_save.PyTorchLocalModelSaver">
+<em class="property">class </em><code class="descclassname">AIToolbox.experiment.local_save.local_model_save.</code><code class="descname">PyTorchLocalModelSaver</code><span class="sig-paren">(</span><em>local_model_result_folder_path='~/project/model_result'</em>, <em>checkpoint_model=False</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.local_save.local_model_save.PyTorchLocalModelSaver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.experiment.local_save.local_model_save.AbstractLocalModelSaver" title="AIToolbox.experiment.local_save.local_model_save.AbstractLocalModelSaver"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.experiment.local_save.local_model_save.AbstractLocalModelSaver</span></code></a>, <a class="reference internal" href="#AIToolbox.experiment.local_save.local_model_save.BaseLocalModelSaver" title="AIToolbox.experiment.local_save.local_model_save.BaseLocalModelSaver"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.experiment.local_save.local_model_save.BaseLocalModelSaver</span></code></a></p>
+<dl class="staticmethod">
+<dt id="AIToolbox.experiment.local_save.local_model_save.PyTorchLocalModelSaver.check_model_dict_contents">
+<em class="property">static </em><code class="descname">check_model_dict_contents</code><span class="sig-paren">(</span><em>model</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.local_save.local_model_save.PyTorchLocalModelSaver.check_model_dict_contents" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if PyTorch model save dict contains all the necessary elements for the training state reconstruction</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>model</strong> (<em>dict</em>) – PyTorch model represented as a dict of weights, optimizer state and other necessary info</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.experiment.local_save.local_model_save.PyTorchLocalModelSaver.save_model">
+<code class="descname">save_model</code><span class="sig-paren">(</span><em>model</em>, <em>project_name</em>, <em>experiment_name</em>, <em>experiment_timestamp=None</em>, <em>epoch=None</em>, <em>protect_existing_folder=True</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.local_save.local_model_save.PyTorchLocalModelSaver.save_model" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<em>dict</em>) – PyTorch model represented as a dict of weights, optimizer state and other necessary info</p></li>
+<li><p><strong>project_name</strong> (<em>str</em>) – root name of the project</p></li>
+<li><p><strong>experiment_name</strong> (<em>str</em>) – name of the particular experiment</p></li>
+<li><p><strong>experiment_timestamp</strong> (<em>str</em><em> or </em><em>None</em>) – time stamp at the start of training</p></li>
+<li><p><strong>epoch</strong> (<em>int</em><em> or </em><em>None</em>) – in which epoch the model is being saved</p></li>
+<li><p><strong>protect_existing_folder</strong> (<em>bool</em>) – can override potentially already existing folder or not</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>model_name, model_local_path</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(str, str)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.experiment.local_save.local_model_save.TensorFlowLocalModelSaver">
+<em class="property">class </em><code class="descclassname">AIToolbox.experiment.local_save.local_model_save.</code><code class="descname">TensorFlowLocalModelSaver</code><span class="sig-paren">(</span><em>local_model_result_folder_path='~/project/model_result'</em>, <em>checkpoint_model=False</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.local_save.local_model_save.TensorFlowLocalModelSaver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.experiment.local_save.local_model_save.AbstractLocalModelSaver" title="AIToolbox.experiment.local_save.local_model_save.AbstractLocalModelSaver"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.experiment.local_save.local_model_save.AbstractLocalModelSaver</span></code></a>, <a class="reference internal" href="#AIToolbox.experiment.local_save.local_model_save.BaseLocalModelSaver" title="AIToolbox.experiment.local_save.local_model_save.BaseLocalModelSaver"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.experiment.local_save.local_model_save.BaseLocalModelSaver</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.experiment.local_save.local_model_save.TensorFlowLocalModelSaver.save_model">
+<code class="descname">save_model</code><span class="sig-paren">(</span><em>model</em>, <em>project_name</em>, <em>experiment_name</em>, <em>experiment_timestamp=None</em>, <em>epoch=None</em>, <em>protect_existing_folder=True</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.local_save.local_model_save.TensorFlowLocalModelSaver.save_model" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<em>keras.engine.training.Model</em><em> or </em><em>dict</em>) – </p></li>
+<li><p><strong>project_name</strong> (<em>str</em>) – root name of the project</p></li>
+<li><p><strong>experiment_name</strong> (<em>str</em>) – name of the particular experiment</p></li>
+<li><p><strong>experiment_timestamp</strong> (<em>str</em><em> or </em><em>None</em>) – time stamp at the start of training</p></li>
+<li><p><strong>epoch</strong> (<em>int</em><em> or </em><em>None</em>) – in which epoch the model is being saved</p></li>
+<li><p><strong>protect_existing_folder</strong> (<em>bool</em>) – can override potentially already existing folder or not</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>model_name, model_local_path</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(str, str)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-AIToolbox.experiment.local_save.local_results_save">
+<span id="aitoolbox-experiment-local-save-local-results-save-module"></span><h2>AIToolbox.experiment.local_save.local_results_save module<a class="headerlink" href="#module-AIToolbox.experiment.local_save.local_results_save" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="AIToolbox.experiment.local_save.local_results_save.AbstractLocalResultsSaver">
+<em class="property">class </em><code class="descclassname">AIToolbox.experiment.local_save.local_results_save.</code><code class="descname">AbstractLocalResultsSaver</code><a class="headerlink" href="#AIToolbox.experiment.local_save.local_results_save.AbstractLocalResultsSaver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<dl class="method">
+<dt id="AIToolbox.experiment.local_save.local_results_save.AbstractLocalResultsSaver.save_experiment_results">
+<code class="descname">save_experiment_results</code><span class="sig-paren">(</span><em>result_package</em>, <em>project_name</em>, <em>experiment_name</em>, <em>experiment_timestamp=None</em>, <em>save_true_pred_labels=False</em>, <em>protect_existing_folder=True</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.local_save.local_results_save.AbstractLocalResultsSaver.save_experiment_results" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>result_package</strong> (<a class="reference internal" href="AIToolbox.experiment.result_package.html#AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage" title="AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage"><em>AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage</em></a>) – </p></li>
+<li><p><strong>project_name</strong> (<em>str</em>) – root name of the project</p></li>
+<li><p><strong>experiment_name</strong> (<em>str</em>) – name of the particular experiment</p></li>
+<li><p><strong>experiment_timestamp</strong> (<em>str</em><em> or </em><em>None</em>) – time stamp at the start of training</p></li>
+<li><p><strong>save_true_pred_labels</strong> (<em>bool</em>) – </p></li>
+<li><p><strong>protect_existing_folder</strong> (<em>bool</em>) – can override potentially already existing folder or not</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl>
+<dt>list of list with this format: [[results_file_name, results_file_local_path], … [ , ]]</dt><dd><p>Each file should be a new list specifying the file name and its full path</p>
+<p>The first file path should be pointing to the main experiment results file.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.experiment.local_save.local_results_save.AbstractLocalResultsSaver.save_experiment_results_separate_files">
+<code class="descname">save_experiment_results_separate_files</code><span class="sig-paren">(</span><em>result_package</em>, <em>project_name</em>, <em>experiment_name</em>, <em>experiment_timestamp</em>, <em>save_true_pred_labels=False</em>, <em>protect_existing_folder=True</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.local_save.local_results_save.AbstractLocalResultsSaver.save_experiment_results_separate_files" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>result_package</strong> (<a class="reference internal" href="AIToolbox.experiment.result_package.html#AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage" title="AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage"><em>AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage</em></a>) – </p></li>
+<li><p><strong>project_name</strong> (<em>str</em>) – root name of the project</p></li>
+<li><p><strong>experiment_name</strong> (<em>str</em>) – name of the particular experiment</p></li>
+<li><p><strong>experiment_timestamp</strong> (<em>str</em><em> or </em><em>None</em>) – time stamp at the start of training</p></li>
+<li><p><strong>save_true_pred_labels</strong> (<em>bool</em>) – </p></li>
+<li><p><strong>protect_existing_folder</strong> (<em>bool</em>) – can override potentially already existing folder or not</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl>
+<dt>list of list with this format: [[results_file_name, results_file_local_path], … [ , ]]</dt><dd><p>Each file should be a new list specifying the file name and its full path</p>
+<p>The first file path should be pointing to the main experiment results file.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.experiment.local_save.local_results_save.BaseLocalResultsSaver">
+<em class="property">class </em><code class="descclassname">AIToolbox.experiment.local_save.local_results_save.</code><code class="descname">BaseLocalResultsSaver</code><span class="sig-paren">(</span><em>local_model_result_folder_path='~/project/model_result'</em>, <em>file_format='pickle'</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.local_save.local_results_save.BaseLocalResultsSaver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="AIToolbox.experiment.local_save.local_results_save.BaseLocalResultsSaver.create_experiment_local_folder_structure">
+<code class="descname">create_experiment_local_folder_structure</code><span class="sig-paren">(</span><em>project_name</em>, <em>experiment_name</em>, <em>experiment_timestamp</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.local_save.local_results_save.BaseLocalResultsSaver.create_experiment_local_folder_structure" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>project_name</strong> (<em>str</em>) – root name of the project</p></li>
+<li><p><strong>experiment_name</strong> (<em>str</em>) – name of the particular experiment</p></li>
+<li><p><strong>experiment_timestamp</strong> (<em>str</em>) – time stamp at the start of training</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="AIToolbox.experiment.local_save.local_results_save.BaseLocalResultsSaver.create_experiment_local_results_folder">
+<em class="property">static </em><code class="descname">create_experiment_local_results_folder</code><span class="sig-paren">(</span><em>project_name</em>, <em>experiment_name</em>, <em>experiment_timestamp</em>, <em>local_model_result_folder_path</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.local_save.local_results_save.BaseLocalResultsSaver.create_experiment_local_results_folder" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>project_name</strong> (<em>str</em>) – root name of the project</p></li>
+<li><p><strong>experiment_name</strong> (<em>str</em>) – name of the particular experiment</p></li>
+<li><p><strong>experiment_timestamp</strong> (<em>str</em>) – time stamp at the start of training</p></li>
+<li><p><strong>local_model_result_folder_path</strong> (<em>str</em>) – root local path where project folder will be created</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="AIToolbox.experiment.local_save.local_results_save.BaseLocalResultsSaver.get_experiment_local_results_folder_paths">
+<em class="property">static </em><code class="descname">get_experiment_local_results_folder_paths</code><span class="sig-paren">(</span><em>project_name</em>, <em>experiment_name</em>, <em>experiment_timestamp</em>, <em>local_model_result_folder_path</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.local_save.local_results_save.BaseLocalResultsSaver.get_experiment_local_results_folder_paths" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>project_name</strong> (<em>str</em>) – root name of the project</p></li>
+<li><p><strong>experiment_name</strong> (<em>str</em>) – name of the particular experiment</p></li>
+<li><p><strong>experiment_timestamp</strong> (<em>str</em>) – time stamp at the start of training</p></li>
+<li><p><strong>local_model_result_folder_path</strong> (<em>str</em>) – root local path where project folder will be created</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>project_dir_path, experiment_dir_path, experiment_results_dir_path</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str, str, str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.experiment.local_save.local_results_save.BaseLocalResultsSaver.save_file">
+<code class="descname">save_file</code><span class="sig-paren">(</span><em>result_dict</em>, <em>file_name_w_type</em>, <em>file_local_path_w_type</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.local_save.local_results_save.BaseLocalResultsSaver.save_file" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>result_dict</strong> (<em>dict</em>) – </p></li>
+<li><p><strong>file_name_w_type</strong> (<em>str</em>) – </p></li>
+<li><p><strong>file_local_path_w_type</strong> (<em>str</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str, str</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.experiment.local_save.local_results_save.LocalResultsSaver">
+<em class="property">class </em><code class="descclassname">AIToolbox.experiment.local_save.local_results_save.</code><code class="descname">LocalResultsSaver</code><span class="sig-paren">(</span><em>local_model_result_folder_path='~/project/model_result'</em>, <em>file_format='pickle'</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.local_save.local_results_save.LocalResultsSaver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.experiment.local_save.local_results_save.AbstractLocalResultsSaver" title="AIToolbox.experiment.local_save.local_results_save.AbstractLocalResultsSaver"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.experiment.local_save.local_results_save.AbstractLocalResultsSaver</span></code></a>, <a class="reference internal" href="#AIToolbox.experiment.local_save.local_results_save.BaseLocalResultsSaver" title="AIToolbox.experiment.local_save.local_results_save.BaseLocalResultsSaver"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.experiment.local_save.local_results_save.BaseLocalResultsSaver</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.experiment.local_save.local_results_save.LocalResultsSaver.save_experiment_results">
+<code class="descname">save_experiment_results</code><span class="sig-paren">(</span><em>result_package</em>, <em>project_name</em>, <em>experiment_name</em>, <em>experiment_timestamp=None</em>, <em>save_true_pred_labels=False</em>, <em>protect_existing_folder=True</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.local_save.local_results_save.LocalResultsSaver.save_experiment_results" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>result_package</strong> (<a class="reference internal" href="AIToolbox.experiment.result_package.html#AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage" title="AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage"><em>AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage</em></a>) – </p></li>
+<li><p><strong>project_name</strong> (<em>str</em>) – root name of the project</p></li>
+<li><p><strong>experiment_name</strong> (<em>str</em>) – name of the particular experiment</p></li>
+<li><p><strong>experiment_timestamp</strong> (<em>str</em><em> or </em><em>None</em>) – time stamp at the start of training</p></li>
+<li><p><strong>save_true_pred_labels</strong> (<em>bool</em>) – </p></li>
+<li><p><strong>protect_existing_folder</strong> (<em>bool</em>) – can override potentially already existing folder or not</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl>
+<dt>list of list with this format: [[results_file_path_inside_results_dir, results_file_local_path], … [ , ]]</dt><dd><p>Each file should be a new list specifying the file name and its full path.</p>
+<p>The first file path should be pointing to the main experiment results file.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.experiment.local_save.local_results_save.LocalResultsSaver.save_experiment_results_separate_files">
+<code class="descname">save_experiment_results_separate_files</code><span class="sig-paren">(</span><em>result_package</em>, <em>project_name</em>, <em>experiment_name</em>, <em>experiment_timestamp=None</em>, <em>save_true_pred_labels=False</em>, <em>protect_existing_folder=True</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.local_save.local_results_save.LocalResultsSaver.save_experiment_results_separate_files" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>result_package</strong> (<a class="reference internal" href="AIToolbox.experiment.result_package.html#AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage" title="AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage"><em>AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage</em></a>) – </p></li>
+<li><p><strong>project_name</strong> (<em>str</em>) – root name of the project</p></li>
+<li><p><strong>experiment_name</strong> (<em>str</em>) – name of the particular experiment</p></li>
+<li><p><strong>experiment_timestamp</strong> (<em>str</em><em> or </em><em>None</em>) – time stamp at the start of training</p></li>
+<li><p><strong>save_true_pred_labels</strong> (<em>bool</em>) – </p></li>
+<li><p><strong>protect_existing_folder</strong> (<em>bool</em>) – can override potentially already existing folder or not</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl>
+<dt>list of list with this format: [[results_file_path_inside_results_dir, results_file_local_path], … [ , ]]</dt><dd><p>Each file should be a new list specifying the file name and its full path.</p>
+<p>The first file path should be pointing to the main experiment results file.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-AIToolbox.experiment.local_save">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-AIToolbox.experiment.local_save" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">AIToolbox</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Marko Vidoni.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/AIToolbox.experiment.local_save.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

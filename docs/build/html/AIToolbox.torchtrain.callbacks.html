@@ -1,0 +1,806 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>AIToolbox.torchtrain.callbacks package &#8212; AIToolbox 0.3.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="aitoolbox-torchtrain-callbacks-package">
+<h1>AIToolbox.torchtrain.callbacks package<a class="headerlink" href="#aitoolbox-torchtrain-callbacks-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-AIToolbox.torchtrain.callbacks.callbacks">
+<span id="aitoolbox-torchtrain-callbacks-callbacks-module"></span><h2>AIToolbox.torchtrain.callbacks.callbacks module<a class="headerlink" href="#module-AIToolbox.torchtrain.callbacks.callbacks" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback">
+<em class="property">class </em><code class="descclassname">AIToolbox.torchtrain.callbacks.callbacks.</code><code class="descname">AbstractCallback</code><span class="sig-paren">(</span><em>callback_name</em>, <em>execution_order=0</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback.on_after_gradient_update">
+<code class="descname">on_after_gradient_update</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback.on_after_gradient_update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logic executed after the model gradients are updated</p>
+<p>To ensure the execution of this callback enable the grad_cb=True option in the fit() function of TrainLoop.
+Otherwise logic implemented here will not be executed.</p>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback.on_after_optimizer_step">
+<code class="descname">on_after_optimizer_step</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback.on_after_optimizer_step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logic executed after the optimizer does a new step and updates the model weights</p>
+<p>To ensure the execution of this callback enable the grad_cb=True option in the fit() function of TrainLoop.
+Otherwise logic implemented here will not be executed.</p>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback.on_batch_begin">
+<code class="descname">on_batch_begin</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback.on_batch_begin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logic executed before the batch is inserted into the model</p>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback.on_batch_end">
+<code class="descname">on_batch_end</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback.on_batch_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logic executed after the batch is inserted into the model</p>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback.on_epoch_begin">
+<code class="descname">on_epoch_begin</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback.on_epoch_begin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logic executed at the beginning of the epoch</p>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback.on_epoch_end">
+<code class="descname">on_epoch_end</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback.on_epoch_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logic executed at the end of the epoch</p>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback.on_train_begin">
+<code class="descname">on_train_begin</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback.on_train_begin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logic executed at the beginning of the overall training</p>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback.on_train_end">
+<code class="descname">on_train_end</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback.on_train_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logic executed at the end of the overall training</p>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback.on_train_loop_registration">
+<code class="descname">on_train_loop_registration</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback.on_train_loop_registration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute callback initialization / preparation after the train_loop_object becomes available</p>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback.register_train_loop_object">
+<code class="descname">register_train_loop_object</code><span class="sig-paren">(</span><em>train_loop_obj</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback.register_train_loop_object" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Introduce the reference to the encapsulating trainloop so that the callback has access to the</dt><dd><p>low level functionality of the trainloop</p>
+</dd>
+</dl>
+<p>The registration is normally handled by the callback handler found inside the train loops. The handler is
+responsible for all the callback orchestration of the callbacks inside the trainloops.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>train_loop_obj</strong> (<a class="reference internal" href="AIToolbox.torchtrain.html#AIToolbox.torchtrain.train_loop.TrainLoop" title="AIToolbox.torchtrain.train_loop.TrainLoop"><em>AIToolbox.torchtrain.train_loop.TrainLoop</em></a>) – reference to the encapsulating trainloop</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>return the reference to the callback after it is registered</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback" title="AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback">AbstractCallback</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.torchtrain.callbacks.callbacks.AllPredictionsSame">
+<em class="property">class </em><code class="descclassname">AIToolbox.torchtrain.callbacks.callbacks.</code><code class="descname">AllPredictionsSame</code><span class="sig-paren">(</span><em>value=0.0</em>, <em>stop_training=False</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.callbacks.AllPredictionsSame" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback" title="AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.callbacks.AllPredictionsSame.on_epoch_end">
+<code class="descname">on_epoch_end</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.callbacks.AllPredictionsSame.on_epoch_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logic executed at the end of the epoch</p>
+<p>Returns:</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.torchtrain.callbacks.callbacks.EarlyStopping">
+<em class="property">class </em><code class="descclassname">AIToolbox.torchtrain.callbacks.callbacks.</code><code class="descname">EarlyStopping</code><span class="sig-paren">(</span><em>monitor='val_loss'</em>, <em>min_delta=0.0</em>, <em>patience=0</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.callbacks.EarlyStopping" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback" title="AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.callbacks.EarlyStopping.on_epoch_end">
+<code class="descname">on_epoch_end</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.callbacks.EarlyStopping.on_epoch_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logic executed at the end of the epoch</p>
+<p>Returns:</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.torchtrain.callbacks.callbacks.EmailNotification">
+<em class="property">class </em><code class="descclassname">AIToolbox.torchtrain.callbacks.callbacks.</code><code class="descname">EmailNotification</code><span class="sig-paren">(</span><em>sender_name</em>, <em>sender_email</em>, <em>recipient_email</em>, <em>project_name=None</em>, <em>experiment_name=None</em>, <em>aws_region='eu-west-1'</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.callbacks.EmailNotification" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback" title="AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.callbacks.EmailNotification.get_hyperparams_html">
+<code class="descname">get_hyperparams_html</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.callbacks.EmailNotification.get_hyperparams_html" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.callbacks.EmailNotification.get_metric_list_html">
+<code class="descname">get_metric_list_html</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.callbacks.EmailNotification.get_metric_list_html" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.callbacks.EmailNotification.on_epoch_end">
+<code class="descname">on_epoch_end</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.callbacks.EmailNotification.on_epoch_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logic executed at the end of the epoch</p>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.callbacks.EmailNotification.on_train_end">
+<code class="descname">on_train_end</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.callbacks.EmailNotification.on_train_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logic executed at the end of the overall training</p>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.callbacks.EmailNotification.on_train_loop_registration">
+<code class="descname">on_train_loop_registration</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.callbacks.EmailNotification.on_train_loop_registration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tries to infer the project description from the running train loop. If the train loop does not build
+the project folder structure (e.g. basic TrainLoop) the descriptions need to be provided manually to
+this callback.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.torchtrain.callbacks.callbacks.ListRegisteredCallbacks">
+<em class="property">class </em><code class="descclassname">AIToolbox.torchtrain.callbacks.callbacks.</code><code class="descname">ListRegisteredCallbacks</code><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.callbacks.ListRegisteredCallbacks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback" title="AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.callbacks.ListRegisteredCallbacks.on_train_begin">
+<code class="descname">on_train_begin</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.callbacks.ListRegisteredCallbacks.on_train_begin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logic executed at the beginning of the overall training</p>
+<p>Returns:</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.torchtrain.callbacks.callbacks.TerminateOnNaN">
+<em class="property">class </em><code class="descclassname">AIToolbox.torchtrain.callbacks.callbacks.</code><code class="descname">TerminateOnNaN</code><span class="sig-paren">(</span><em>monitor='loss'</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.callbacks.TerminateOnNaN" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback" title="AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.callbacks.TerminateOnNaN.on_epoch_end">
+<code class="descname">on_epoch_end</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.callbacks.TerminateOnNaN.on_epoch_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logic executed at the end of the epoch</p>
+<p>Returns:</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-AIToolbox.torchtrain.callbacks.gradient_callbacks">
+<span id="aitoolbox-torchtrain-callbacks-gradient-callbacks-module"></span><h2>AIToolbox.torchtrain.callbacks.gradient_callbacks module<a class="headerlink" href="#module-AIToolbox.torchtrain.callbacks.gradient_callbacks" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="AIToolbox.torchtrain.callbacks.gradient_callbacks.GradNormClipCallback">
+<em class="property">class </em><code class="descclassname">AIToolbox.torchtrain.callbacks.gradient_callbacks.</code><code class="descname">GradNormClipCallback</code><span class="sig-paren">(</span><em>max_norm</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.gradient_callbacks.GradNormClipCallback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback" title="AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.gradient_callbacks.GradNormClipCallback.on_after_gradient_update">
+<code class="descname">on_after_gradient_update</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.gradient_callbacks.GradNormClipCallback.on_after_gradient_update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logic executed after the model gradients are updated</p>
+<p>To ensure the execution of this callback enable the grad_cb=True option in the fit() function of TrainLoop.
+Otherwise logic implemented here will not be executed.</p>
+<p>Returns:</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-AIToolbox.torchtrain.callbacks.model_save_callbacks">
+<span id="aitoolbox-torchtrain-callbacks-model-save-callbacks-module"></span><h2>AIToolbox.torchtrain.callbacks.model_save_callbacks module<a class="headerlink" href="#module-AIToolbox.torchtrain.callbacks.model_save_callbacks" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="AIToolbox.torchtrain.callbacks.model_save_callbacks.ModelCheckpoint">
+<em class="property">class </em><code class="descclassname">AIToolbox.torchtrain.callbacks.model_save_callbacks.</code><code class="descname">ModelCheckpoint</code><span class="sig-paren">(</span><em>project_name</em>, <em>experiment_name</em>, <em>local_model_result_folder_path</em>, <em>hyperparams</em>, <em>cloud_save_mode='s3'</em>, <em>bucket_name='model-result'</em>, <em>cloud_dir_prefix=''</em>, <em>rm_subopt_local_models=False</em>, <em>num_best_checkpoints_kept=2</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.model_save_callbacks.ModelCheckpoint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback" title="AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.model_save_callbacks.ModelCheckpoint.on_epoch_end">
+<code class="descname">on_epoch_end</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.model_save_callbacks.ModelCheckpoint.on_epoch_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logic executed at the end of the epoch</p>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.model_save_callbacks.ModelCheckpoint.on_train_loop_registration">
+<code class="descname">on_train_loop_registration</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.model_save_callbacks.ModelCheckpoint.on_train_loop_registration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute callback initialization / preparation after the train_loop_object becomes available</p>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.model_save_callbacks.ModelCheckpoint.save_hyperparams">
+<code class="descname">save_hyperparams</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.model_save_callbacks.ModelCheckpoint.save_hyperparams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.torchtrain.callbacks.model_save_callbacks.ModelTrainEndSave">
+<em class="property">class </em><code class="descclassname">AIToolbox.torchtrain.callbacks.model_save_callbacks.</code><code class="descname">ModelTrainEndSave</code><span class="sig-paren">(</span><em>project_name</em>, <em>experiment_name</em>, <em>local_model_result_folder_path</em>, <em>hyperparams</em>, <em>val_result_package=None</em>, <em>test_result_package=None</em>, <em>cloud_save_mode='s3'</em>, <em>bucket_name='model-result'</em>, <em>cloud_dir_prefix=''</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.model_save_callbacks.ModelTrainEndSave" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback" title="AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.model_save_callbacks.ModelTrainEndSave.check_result_packages">
+<code class="descname">check_result_packages</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.model_save_callbacks.ModelTrainEndSave.check_result_packages" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.model_save_callbacks.ModelTrainEndSave.on_train_end">
+<code class="descname">on_train_end</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.model_save_callbacks.ModelTrainEndSave.on_train_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logic executed at the end of the overall training</p>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.model_save_callbacks.ModelTrainEndSave.on_train_loop_registration">
+<code class="descname">on_train_loop_registration</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.model_save_callbacks.ModelTrainEndSave.on_train_loop_registration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute callback initialization / preparation after the train_loop_object becomes available</p>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.model_save_callbacks.ModelTrainEndSave.save_hyperparams">
+<code class="descname">save_hyperparams</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.model_save_callbacks.ModelTrainEndSave.save_hyperparams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-AIToolbox.torchtrain.callbacks.performance_eval_callbacks">
+<span id="aitoolbox-torchtrain-callbacks-performance-eval-callbacks-module"></span><h2>AIToolbox.torchtrain.callbacks.performance_eval_callbacks module<a class="headerlink" href="#module-AIToolbox.torchtrain.callbacks.performance_eval_callbacks" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="AIToolbox.torchtrain.callbacks.performance_eval_callbacks.MetricHistoryRename">
+<em class="property">class </em><code class="descclassname">AIToolbox.torchtrain.callbacks.performance_eval_callbacks.</code><code class="descname">MetricHistoryRename</code><span class="sig-paren">(</span><em>input_metric_path</em>, <em>new_metric_name</em>, <em>epoch_end=True</em>, <em>train_end=False</em>, <em>strict_metric_extract=True</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.performance_eval_callbacks.MetricHistoryRename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.torchtrain.callbacks.performance_eval_callbacks.TrainHistoryFormatter" title="AIToolbox.torchtrain.callbacks.performance_eval_callbacks.TrainHistoryFormatter"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.torchtrain.callbacks.performance_eval_callbacks.TrainHistoryFormatter</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelPerformanceEvaluation">
+<em class="property">class </em><code class="descclassname">AIToolbox.torchtrain.callbacks.performance_eval_callbacks.</code><code class="descname">ModelPerformanceEvaluation</code><span class="sig-paren">(</span><em>result_package</em>, <em>args</em>, <em>on_each_epoch=True</em>, <em>on_train_data=False</em>, <em>on_val_data=True</em>, <em>eval_frequency=None</em>, <em>if_available_output_to_project_dir=True</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelPerformanceEvaluation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback" title="AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelPerformanceEvaluation.evaluate_model_performance">
+<code class="descname">evaluate_model_performance</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelPerformanceEvaluation.evaluate_model_performance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate performance based on the provided result packages</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelPerformanceEvaluation.on_epoch_end">
+<code class="descname">on_epoch_end</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelPerformanceEvaluation.on_epoch_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logic executed at the end of the epoch</p>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelPerformanceEvaluation.on_train_end">
+<code class="descname">on_train_end</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelPerformanceEvaluation.on_train_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logic executed at the end of the overall training</p>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelPerformanceEvaluation.on_train_loop_registration">
+<code class="descname">on_train_loop_registration</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelPerformanceEvaluation.on_train_loop_registration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute callback initialization / preparation after the train_loop_object becomes available</p>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelPerformanceEvaluation.store_evaluated_metrics_to_history">
+<code class="descname">store_evaluated_metrics_to_history</code><span class="sig-paren">(</span><em>prefix=''</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelPerformanceEvaluation.store_evaluated_metrics_to_history" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save the calculated performance results into the training history</p>
+<p>The performance results are saved into the training history after they are calculated by the before called
+evaluate_model_performance() function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>prefix</strong> (<em>str</em>) – additional prefix for metric names that will get saved into the training history</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelPerformancePrintReport">
+<em class="property">class </em><code class="descclassname">AIToolbox.torchtrain.callbacks.performance_eval_callbacks.</code><code class="descname">ModelPerformancePrintReport</code><span class="sig-paren">(</span><em>metrics</em>, <em>on_each_epoch=True</em>, <em>report_frequency=None</em>, <em>strict_metric_reporting=True</em>, <em>list_tracked_metrics=False</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelPerformancePrintReport" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback" title="AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelPerformancePrintReport.on_epoch_end">
+<code class="descname">on_epoch_end</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelPerformancePrintReport.on_epoch_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logic executed at the end of the epoch</p>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelPerformancePrintReport.on_train_end">
+<code class="descname">on_train_end</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelPerformancePrintReport.on_train_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logic executed at the end of the overall training</p>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelPerformancePrintReport.print_performance_report">
+<code class="descname">print_performance_report</code><span class="sig-paren">(</span><em>prefix=''</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelPerformancePrintReport.print_performance_report" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print the model performance</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>prefix</strong> (<em>str</em>) – additional prefix for metric names that will get saved into the training history</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelTrainHistoryBaseCB">
+<em class="property">class </em><code class="descclassname">AIToolbox.torchtrain.callbacks.performance_eval_callbacks.</code><code class="descname">ModelTrainHistoryBaseCB</code><span class="sig-paren">(</span><em>callback_name</em>, <em>execution_order=0</em>, <em>epoch_end=True</em>, <em>train_end=False</em>, <em>project_name=None</em>, <em>experiment_name=None</em>, <em>local_model_result_folder_path=None</em>, <em>cloud_save_mode='s3'</em>, <em>bucket_name='model-result'</em>, <em>cloud_dir_prefix=''</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelTrainHistoryBaseCB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback" title="AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelTrainHistoryBaseCB.prepare_results_saver">
+<code class="descname">prepare_results_saver</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelTrainHistoryBaseCB.prepare_results_saver" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelTrainHistoryBaseCB.try_infer_experiment_details">
+<code class="descname">try_infer_experiment_details</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelTrainHistoryBaseCB.try_infer_experiment_details" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>AttributeError</strong> – </p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelTrainHistoryFileWriter">
+<em class="property">class </em><code class="descclassname">AIToolbox.torchtrain.callbacks.performance_eval_callbacks.</code><code class="descname">ModelTrainHistoryFileWriter</code><span class="sig-paren">(</span><em>epoch_end=True</em>, <em>train_end=False</em>, <em>project_name=None</em>, <em>experiment_name=None</em>, <em>local_model_result_folder_path=None</em>, <em>cloud_save_mode='s3'</em>, <em>bucket_name='model-result'</em>, <em>cloud_dir_prefix=''</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelTrainHistoryFileWriter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelTrainHistoryBaseCB" title="AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelTrainHistoryBaseCB"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelTrainHistoryBaseCB</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelTrainHistoryFileWriter.on_epoch_end">
+<code class="descname">on_epoch_end</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelTrainHistoryFileWriter.on_epoch_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logic executed at the end of the epoch</p>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelTrainHistoryFileWriter.on_train_end">
+<code class="descname">on_train_end</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelTrainHistoryFileWriter.on_train_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logic executed at the end of the overall training</p>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelTrainHistoryFileWriter.on_train_loop_registration">
+<code class="descname">on_train_loop_registration</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelTrainHistoryFileWriter.on_train_loop_registration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute callback initialization / preparation after the train_loop_object becomes available</p>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelTrainHistoryFileWriter.write_current_train_history">
+<code class="descname">write_current_train_history</code><span class="sig-paren">(</span><em>prefix=''</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelTrainHistoryFileWriter.write_current_train_history" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>prefix</strong> (<em>str</em>) – </p>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelTrainHistoryPlot">
+<em class="property">class </em><code class="descclassname">AIToolbox.torchtrain.callbacks.performance_eval_callbacks.</code><code class="descname">ModelTrainHistoryPlot</code><span class="sig-paren">(</span><em>epoch_end=True</em>, <em>train_end=False</em>, <em>project_name=None</em>, <em>experiment_name=None</em>, <em>local_model_result_folder_path=None</em>, <em>cloud_save_mode='s3'</em>, <em>bucket_name='model-result'</em>, <em>cloud_dir_prefix=''</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelTrainHistoryPlot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelTrainHistoryBaseCB" title="AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelTrainHistoryBaseCB"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelTrainHistoryBaseCB</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelTrainHistoryPlot.on_epoch_end">
+<code class="descname">on_epoch_end</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelTrainHistoryPlot.on_epoch_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logic executed at the end of the epoch</p>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelTrainHistoryPlot.on_train_end">
+<code class="descname">on_train_end</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelTrainHistoryPlot.on_train_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logic executed at the end of the overall training</p>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelTrainHistoryPlot.on_train_loop_registration">
+<code class="descname">on_train_loop_registration</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelTrainHistoryPlot.on_train_loop_registration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute callback initialization / preparation after the train_loop_object becomes available</p>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelTrainHistoryPlot.plot_current_train_history">
+<code class="descname">plot_current_train_history</code><span class="sig-paren">(</span><em>prefix=''</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.performance_eval_callbacks.ModelTrainHistoryPlot.plot_current_train_history" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>prefix</strong> (<em>str</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.torchtrain.callbacks.performance_eval_callbacks.TrainHistoryFormatter">
+<em class="property">class </em><code class="descclassname">AIToolbox.torchtrain.callbacks.performance_eval_callbacks.</code><code class="descname">TrainHistoryFormatter</code><span class="sig-paren">(</span><em>input_metric_getter</em>, <em>output_metric_setter</em>, <em>epoch_end=True</em>, <em>train_end=False</em>, <em>strict_metric_extract=True</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.performance_eval_callbacks.TrainHistoryFormatter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback" title="AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.performance_eval_callbacks.TrainHistoryFormatter.check_if_history_updated">
+<code class="descname">check_if_history_updated</code><span class="sig-paren">(</span><em>train_end_phase</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.performance_eval_callbacks.TrainHistoryFormatter.check_if_history_updated" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.performance_eval_callbacks.TrainHistoryFormatter.format_history">
+<code class="descname">format_history</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.performance_eval_callbacks.TrainHistoryFormatter.format_history" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.performance_eval_callbacks.TrainHistoryFormatter.on_epoch_end">
+<code class="descname">on_epoch_end</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.performance_eval_callbacks.TrainHistoryFormatter.on_epoch_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logic executed at the end of the epoch</p>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.performance_eval_callbacks.TrainHistoryFormatter.on_train_end">
+<code class="descname">on_train_end</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.performance_eval_callbacks.TrainHistoryFormatter.on_train_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logic executed at the end of the overall training</p>
+<p>Returns:</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-AIToolbox.torchtrain.callbacks.tensorboard">
+<span id="aitoolbox-torchtrain-callbacks-tensorboard-module"></span><h2>AIToolbox.torchtrain.callbacks.tensorboard module<a class="headerlink" href="#module-AIToolbox.torchtrain.callbacks.tensorboard" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="AIToolbox.torchtrain.callbacks.tensorboard.TBAttentionReport">
+<em class="property">class </em><code class="descclassname">AIToolbox.torchtrain.callbacks.tensorboard.</code><code class="descname">TBAttentionReport</code><span class="sig-paren">(</span><em>log_dir=None</em>, <em>comment=''</em>, <em>flush_secs=120</em>, <em>filename_suffix=''</em>, <em>project_name=None</em>, <em>experiment_name=None</em>, <em>local_model_result_folder_path=None</em>, <em>is_project=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.tensorboard.TBAttentionReport" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.torchtrain.callbacks.tensorboard.TensorboardReporterBaseCB" title="AIToolbox.torchtrain.callbacks.tensorboard.TensorboardReporterBaseCB"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.torchtrain.callbacks.tensorboard.TensorboardReporterBaseCB</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.tensorboard.TBAttentionReport.on_epoch_end">
+<code class="descname">on_epoch_end</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.tensorboard.TBAttentionReport.on_epoch_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logic executed at the end of the epoch</p>
+<p>Returns:</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.torchtrain.callbacks.tensorboard.TBBatchLossReport">
+<em class="property">class </em><code class="descclassname">AIToolbox.torchtrain.callbacks.tensorboard.</code><code class="descname">TBBatchLossReport</code><span class="sig-paren">(</span><em>log_dir=None</em>, <em>comment=''</em>, <em>flush_secs=120</em>, <em>filename_suffix=''</em>, <em>project_name=None</em>, <em>experiment_name=None</em>, <em>local_model_result_folder_path=None</em>, <em>is_project=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.tensorboard.TBBatchLossReport" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.torchtrain.callbacks.tensorboard.TensorboardReporterBaseCB" title="AIToolbox.torchtrain.callbacks.tensorboard.TensorboardReporterBaseCB"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.torchtrain.callbacks.tensorboard.TensorboardReporterBaseCB</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.tensorboard.TBBatchLossReport.on_batch_end">
+<code class="descname">on_batch_end</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.tensorboard.TBBatchLossReport.on_batch_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logic executed after the batch is inserted into the model</p>
+<p>Returns:</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.torchtrain.callbacks.tensorboard.TBEmbeddingReport">
+<em class="property">class </em><code class="descclassname">AIToolbox.torchtrain.callbacks.tensorboard.</code><code class="descname">TBEmbeddingReport</code><span class="sig-paren">(</span><em>log_dir=None</em>, <em>comment=''</em>, <em>flush_secs=120</em>, <em>filename_suffix=''</em>, <em>project_name=None</em>, <em>experiment_name=None</em>, <em>local_model_result_folder_path=None</em>, <em>is_project=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.tensorboard.TBEmbeddingReport" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.torchtrain.callbacks.tensorboard.TensorboardReporterBaseCB" title="AIToolbox.torchtrain.callbacks.tensorboard.TensorboardReporterBaseCB"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.torchtrain.callbacks.tensorboard.TensorboardReporterBaseCB</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.tensorboard.TBEmbeddingReport.on_epoch_end">
+<code class="descname">on_epoch_end</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.tensorboard.TBEmbeddingReport.on_epoch_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logic executed at the end of the epoch</p>
+<p>Returns:</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.torchtrain.callbacks.tensorboard.TBHImageReport">
+<em class="property">class </em><code class="descclassname">AIToolbox.torchtrain.callbacks.tensorboard.</code><code class="descname">TBHImageReport</code><span class="sig-paren">(</span><em>log_dir=None</em>, <em>comment=''</em>, <em>flush_secs=120</em>, <em>filename_suffix=''</em>, <em>project_name=None</em>, <em>experiment_name=None</em>, <em>local_model_result_folder_path=None</em>, <em>is_project=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.tensorboard.TBHImageReport" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.torchtrain.callbacks.tensorboard.TensorboardReporterBaseCB" title="AIToolbox.torchtrain.callbacks.tensorboard.TensorboardReporterBaseCB"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.torchtrain.callbacks.tensorboard.TensorboardReporterBaseCB</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.tensorboard.TBHImageReport.on_epoch_end">
+<code class="descname">on_epoch_end</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.tensorboard.TBHImageReport.on_epoch_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logic executed at the end of the epoch</p>
+<p>Returns:</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.torchtrain.callbacks.tensorboard.TBHistogramReport">
+<em class="property">class </em><code class="descclassname">AIToolbox.torchtrain.callbacks.tensorboard.</code><code class="descname">TBHistogramReport</code><span class="sig-paren">(</span><em>log_dir=None</em>, <em>comment=''</em>, <em>flush_secs=120</em>, <em>filename_suffix=''</em>, <em>project_name=None</em>, <em>experiment_name=None</em>, <em>local_model_result_folder_path=None</em>, <em>is_project=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.tensorboard.TBHistogramReport" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.torchtrain.callbacks.tensorboard.TensorboardReporterBaseCB" title="AIToolbox.torchtrain.callbacks.tensorboard.TensorboardReporterBaseCB"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.torchtrain.callbacks.tensorboard.TensorboardReporterBaseCB</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.tensorboard.TBHistogramReport.on_batch_end">
+<code class="descname">on_batch_end</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.tensorboard.TBHistogramReport.on_batch_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logic executed after the batch is inserted into the model</p>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.tensorboard.TBHistogramReport.on_epoch_end">
+<code class="descname">on_epoch_end</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.tensorboard.TBHistogramReport.on_epoch_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logic executed at the end of the epoch</p>
+<p>Returns:</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.torchtrain.callbacks.tensorboard.TBPerformanceMetricReport">
+<em class="property">class </em><code class="descclassname">AIToolbox.torchtrain.callbacks.tensorboard.</code><code class="descname">TBPerformanceMetricReport</code><span class="sig-paren">(</span><em>metric_names=None</em>, <em>log_dir=None</em>, <em>comment=''</em>, <em>flush_secs=120</em>, <em>filename_suffix=''</em>, <em>project_name=None</em>, <em>experiment_name=None</em>, <em>local_model_result_folder_path=None</em>, <em>is_project=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.tensorboard.TBPerformanceMetricReport" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.torchtrain.callbacks.tensorboard.TensorboardReporterBaseCB" title="AIToolbox.torchtrain.callbacks.tensorboard.TensorboardReporterBaseCB"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.torchtrain.callbacks.tensorboard.TensorboardReporterBaseCB</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.tensorboard.TBPerformanceMetricReport.on_epoch_end">
+<code class="descname">on_epoch_end</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.tensorboard.TBPerformanceMetricReport.on_epoch_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logic executed at the end of the epoch</p>
+<p>Returns:</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.torchtrain.callbacks.tensorboard.TensorboardReporterBaseCB">
+<em class="property">class </em><code class="descclassname">AIToolbox.torchtrain.callbacks.tensorboard.</code><code class="descname">TensorboardReporterBaseCB</code><span class="sig-paren">(</span><em>callback_name</em>, <em>comment=''</em>, <em>flush_secs=120</em>, <em>filename_suffix=''</em>, <em>project_name=None</em>, <em>experiment_name=None</em>, <em>local_model_result_folder_path=None</em>, <em>log_dir=None</em>, <em>is_project=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.tensorboard.TensorboardReporterBaseCB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback" title="AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.tensorboard.TensorboardReporterBaseCB.on_train_end">
+<code class="descname">on_train_end</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.tensorboard.TensorboardReporterBaseCB.on_train_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logic executed at the end of the overall training</p>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.tensorboard.TensorboardReporterBaseCB.try_infer_experiment_details">
+<code class="descname">try_infer_experiment_details</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.tensorboard.TensorboardReporterBaseCB.try_infer_experiment_details" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>tensorboard folder path</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>AttributeError</strong> – </p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-AIToolbox.torchtrain.callbacks.train_schedule_callbacks">
+<span id="aitoolbox-torchtrain-callbacks-train-schedule-callbacks-module"></span><h2>AIToolbox.torchtrain.callbacks.train_schedule_callbacks module<a class="headerlink" href="#module-AIToolbox.torchtrain.callbacks.train_schedule_callbacks" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="AIToolbox.torchtrain.callbacks.train_schedule_callbacks.GeneralLRScheduler">
+<em class="property">class </em><code class="descclassname">AIToolbox.torchtrain.callbacks.train_schedule_callbacks.</code><code class="descname">GeneralLRScheduler</code><span class="sig-paren">(</span><em>scheduler_class</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.train_schedule_callbacks.GeneralLRScheduler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback" title="AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.torchtrain.callbacks.callbacks.AbstractCallback</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.train_schedule_callbacks.GeneralLRScheduler.on_epoch_end">
+<code class="descname">on_epoch_end</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.train_schedule_callbacks.GeneralLRScheduler.on_epoch_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logic executed at the end of the epoch</p>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.train_schedule_callbacks.GeneralLRScheduler.register_train_loop_object">
+<code class="descname">register_train_loop_object</code><span class="sig-paren">(</span><em>train_loop_obj</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.train_schedule_callbacks.GeneralLRScheduler.register_train_loop_object" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>train_loop_obj</strong> (<a class="reference internal" href="AIToolbox.torchtrain.html#AIToolbox.torchtrain.train_loop.TrainLoop" title="AIToolbox.torchtrain.train_loop.TrainLoop"><em>AIToolbox.torchtrain.train_loop.TrainLoop</em></a>) – </p>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.torchtrain.callbacks.train_schedule_callbacks.LambdaLRScheduler">
+<em class="property">class </em><code class="descclassname">AIToolbox.torchtrain.callbacks.train_schedule_callbacks.</code><code class="descname">LambdaLRScheduler</code><span class="sig-paren">(</span><em>lr_lambda_list</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.train_schedule_callbacks.LambdaLRScheduler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.torchtrain.callbacks.train_schedule_callbacks.GeneralLRScheduler" title="AIToolbox.torchtrain.callbacks.train_schedule_callbacks.GeneralLRScheduler"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.torchtrain.callbacks.train_schedule_callbacks.GeneralLRScheduler</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.torchtrain.callbacks.train_schedule_callbacks.MultiStepLRScheduler">
+<em class="property">class </em><code class="descclassname">AIToolbox.torchtrain.callbacks.train_schedule_callbacks.</code><code class="descname">MultiStepLRScheduler</code><span class="sig-paren">(</span><em>milestones_list</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.train_schedule_callbacks.MultiStepLRScheduler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.torchtrain.callbacks.train_schedule_callbacks.GeneralLRScheduler" title="AIToolbox.torchtrain.callbacks.train_schedule_callbacks.GeneralLRScheduler"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.torchtrain.callbacks.train_schedule_callbacks.GeneralLRScheduler</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.torchtrain.callbacks.train_schedule_callbacks.ReduceLROnPlateauMetricScheduler">
+<em class="property">class </em><code class="descclassname">AIToolbox.torchtrain.callbacks.train_schedule_callbacks.</code><code class="descname">ReduceLROnPlateauMetricScheduler</code><span class="sig-paren">(</span><em>metric_name</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.train_schedule_callbacks.ReduceLROnPlateauMetricScheduler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.torchtrain.callbacks.train_schedule_callbacks.GeneralLRScheduler" title="AIToolbox.torchtrain.callbacks.train_schedule_callbacks.GeneralLRScheduler"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.torchtrain.callbacks.train_schedule_callbacks.GeneralLRScheduler</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.torchtrain.callbacks.train_schedule_callbacks.ReduceLROnPlateauMetricScheduler.on_epoch_end">
+<code class="descname">on_epoch_end</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.train_schedule_callbacks.ReduceLROnPlateauMetricScheduler.on_epoch_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logic executed at the end of the epoch</p>
+<p>Returns:</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.torchtrain.callbacks.train_schedule_callbacks.ReduceLROnPlateauScheduler">
+<em class="property">class </em><code class="descclassname">AIToolbox.torchtrain.callbacks.train_schedule_callbacks.</code><code class="descname">ReduceLROnPlateauScheduler</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.train_schedule_callbacks.ReduceLROnPlateauScheduler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.torchtrain.callbacks.train_schedule_callbacks.GeneralLRScheduler" title="AIToolbox.torchtrain.callbacks.train_schedule_callbacks.GeneralLRScheduler"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.torchtrain.callbacks.train_schedule_callbacks.GeneralLRScheduler</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.torchtrain.callbacks.train_schedule_callbacks.StepLRScheduler">
+<em class="property">class </em><code class="descclassname">AIToolbox.torchtrain.callbacks.train_schedule_callbacks.</code><code class="descname">StepLRScheduler</code><span class="sig-paren">(</span><em>step_size</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.callbacks.train_schedule_callbacks.StepLRScheduler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.torchtrain.callbacks.train_schedule_callbacks.GeneralLRScheduler" title="AIToolbox.torchtrain.callbacks.train_schedule_callbacks.GeneralLRScheduler"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.torchtrain.callbacks.train_schedule_callbacks.GeneralLRScheduler</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-AIToolbox.torchtrain.callbacks">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-AIToolbox.torchtrain.callbacks" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">AIToolbox</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Marko Vidoni.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/AIToolbox.torchtrain.callbacks.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

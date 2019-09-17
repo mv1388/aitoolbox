@@ -1,0 +1,219 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>AIToolbox.cloud.GoogleCloud package &#8212; AIToolbox 0.3.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="aitoolbox-cloud-googlecloud-package">
+<h1>AIToolbox.cloud.GoogleCloud package<a class="headerlink" href="#aitoolbox-cloud-googlecloud-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-AIToolbox.cloud.GoogleCloud.data_access">
+<span id="aitoolbox-cloud-googlecloud-data-access-module"></span><h2>AIToolbox.cloud.GoogleCloud.data_access module<a class="headerlink" href="#module-AIToolbox.cloud.GoogleCloud.data_access" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="AIToolbox.cloud.GoogleCloud.data_access.BaseGoogleStorageDataLoader">
+<em class="property">class </em><code class="descclassname">AIToolbox.cloud.GoogleCloud.data_access.</code><code class="descname">BaseGoogleStorageDataLoader</code><span class="sig-paren">(</span><em>bucket_name='dataset-store'</em>, <em>local_dataset_folder_path='~/project/data'</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.cloud.GoogleCloud.data_access.BaseGoogleStorageDataLoader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="AIToolbox.cloud.GoogleCloud.data_access.BaseGoogleStorageDataLoader.load_file">
+<code class="descname">load_file</code><span class="sig-paren">(</span><em>cloud_file_path</em>, <em>local_file_path</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.cloud.GoogleCloud.data_access.BaseGoogleStorageDataLoader.load_file" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cloud_file_path</strong> (<em>str</em>) – </p></li>
+<li><p><strong>local_file_path</strong> (<em>str</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.cloud.GoogleCloud.data_access.BaseGoogleStorageDataSaver">
+<em class="property">class </em><code class="descclassname">AIToolbox.cloud.GoogleCloud.data_access.</code><code class="descname">BaseGoogleStorageDataSaver</code><span class="sig-paren">(</span><em>bucket_name='model-result'</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.cloud.GoogleCloud.data_access.BaseGoogleStorageDataSaver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="AIToolbox.cloud.GoogleCloud.data_access.BaseGoogleStorageDataSaver.save_file">
+<code class="descname">save_file</code><span class="sig-paren">(</span><em>local_file_path</em>, <em>cloud_file_path</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.cloud.GoogleCloud.data_access.BaseGoogleStorageDataSaver.save_file" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>local_file_path</strong> (<em>str</em>) – </p></li>
+<li><p><strong>cloud_file_path</strong> (<em>str</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.cloud.GoogleCloud.data_access.CNNDailyMailDatasetFetcher">
+<em class="property">class </em><code class="descclassname">AIToolbox.cloud.GoogleCloud.data_access.</code><code class="descname">CNNDailyMailDatasetFetcher</code><span class="sig-paren">(</span><em>bucket_name='dataset-store'</em>, <em>local_dataset_folder_path='~/project/data'</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.cloud.GoogleCloud.data_access.CNNDailyMailDatasetFetcher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.cloud.GoogleCloud.data_access.BaseGoogleStorageDataLoader" title="AIToolbox.cloud.GoogleCloud.data_access.BaseGoogleStorageDataLoader"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.cloud.GoogleCloud.data_access.BaseGoogleStorageDataLoader</span></code></a>, <a class="reference internal" href="AIToolbox.cloud.AWS.html#AIToolbox.cloud.AWS.data_access.CNNDailyMailDatasetFetcher" title="AIToolbox.cloud.AWS.data_access.CNNDailyMailDatasetFetcher"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.cloud.AWS.data_access.CNNDailyMailDatasetFetcher</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.cloud.GoogleCloud.data_access.HotpotQADatasetFetcher">
+<em class="property">class </em><code class="descclassname">AIToolbox.cloud.GoogleCloud.data_access.</code><code class="descname">HotpotQADatasetFetcher</code><span class="sig-paren">(</span><em>bucket_name='dataset-store'</em>, <em>local_dataset_folder_path='~/project/data'</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.cloud.GoogleCloud.data_access.HotpotQADatasetFetcher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.cloud.GoogleCloud.data_access.BaseGoogleStorageDataLoader" title="AIToolbox.cloud.GoogleCloud.data_access.BaseGoogleStorageDataLoader"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.cloud.GoogleCloud.data_access.BaseGoogleStorageDataLoader</span></code></a>, <a class="reference internal" href="AIToolbox.cloud.AWS.html#AIToolbox.cloud.AWS.data_access.HotpotQADatasetFetcher" title="AIToolbox.cloud.AWS.data_access.HotpotQADatasetFetcher"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.cloud.AWS.data_access.HotpotQADatasetFetcher</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.cloud.GoogleCloud.data_access.QAngarooDatasetFetcher">
+<em class="property">class </em><code class="descclassname">AIToolbox.cloud.GoogleCloud.data_access.</code><code class="descname">QAngarooDatasetFetcher</code><span class="sig-paren">(</span><em>bucket_name='dataset-store'</em>, <em>local_dataset_folder_path='~/project/data'</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.cloud.GoogleCloud.data_access.QAngarooDatasetFetcher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.cloud.GoogleCloud.data_access.BaseGoogleStorageDataLoader" title="AIToolbox.cloud.GoogleCloud.data_access.BaseGoogleStorageDataLoader"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.cloud.GoogleCloud.data_access.BaseGoogleStorageDataLoader</span></code></a>, <a class="reference internal" href="AIToolbox.cloud.AWS.html#AIToolbox.cloud.AWS.data_access.QAngarooDatasetFetcher" title="AIToolbox.cloud.AWS.data_access.QAngarooDatasetFetcher"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.cloud.AWS.data_access.QAngarooDatasetFetcher</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.cloud.GoogleCloud.data_access.SQuAD2DatasetFetcher">
+<em class="property">class </em><code class="descclassname">AIToolbox.cloud.GoogleCloud.data_access.</code><code class="descname">SQuAD2DatasetFetcher</code><span class="sig-paren">(</span><em>bucket_name='dataset-store'</em>, <em>local_dataset_folder_path='~/project/data'</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.cloud.GoogleCloud.data_access.SQuAD2DatasetFetcher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.cloud.GoogleCloud.data_access.BaseGoogleStorageDataLoader" title="AIToolbox.cloud.GoogleCloud.data_access.BaseGoogleStorageDataLoader"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.cloud.GoogleCloud.data_access.BaseGoogleStorageDataLoader</span></code></a>, <a class="reference internal" href="AIToolbox.cloud.AWS.html#AIToolbox.cloud.AWS.data_access.SQuAD2DatasetFetcher" title="AIToolbox.cloud.AWS.data_access.SQuAD2DatasetFetcher"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.cloud.AWS.data_access.SQuAD2DatasetFetcher</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-AIToolbox.cloud.GoogleCloud.model_save">
+<span id="aitoolbox-cloud-googlecloud-model-save-module"></span><h2>AIToolbox.cloud.GoogleCloud.model_save module<a class="headerlink" href="#module-AIToolbox.cloud.GoogleCloud.model_save" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="AIToolbox.cloud.GoogleCloud.model_save.BaseModelGoogleStorageSaver">
+<em class="property">class </em><code class="descclassname">AIToolbox.cloud.GoogleCloud.model_save.</code><code class="descname">BaseModelGoogleStorageSaver</code><span class="sig-paren">(</span><em>bucket_name='model-result'</em>, <em>cloud_dir_prefix=''</em>, <em>checkpoint_model=False</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.cloud.GoogleCloud.model_save.BaseModelGoogleStorageSaver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.cloud.GoogleCloud.data_access.BaseGoogleStorageDataSaver" title="AIToolbox.cloud.GoogleCloud.data_access.BaseGoogleStorageDataSaver"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.cloud.GoogleCloud.data_access.BaseGoogleStorageDataSaver</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.cloud.GoogleCloud.model_save.KerasGoogleStorageModelSaver">
+<em class="property">class </em><code class="descclassname">AIToolbox.cloud.GoogleCloud.model_save.</code><code class="descname">KerasGoogleStorageModelSaver</code><span class="sig-paren">(</span><em>bucket_name='model-result'</em>, <em>cloud_dir_prefix=''</em>, <em>local_model_result_folder_path='~/project/model_result'</em>, <em>checkpoint_model=False</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.cloud.GoogleCloud.model_save.KerasGoogleStorageModelSaver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.cloud.GoogleCloud.model_save.BaseModelGoogleStorageSaver" title="AIToolbox.cloud.GoogleCloud.model_save.BaseModelGoogleStorageSaver"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.cloud.GoogleCloud.model_save.BaseModelGoogleStorageSaver</span></code></a>, <a class="reference internal" href="AIToolbox.cloud.AWS.html#AIToolbox.cloud.AWS.model_save.KerasS3ModelSaver" title="AIToolbox.cloud.AWS.model_save.KerasS3ModelSaver"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.cloud.AWS.model_save.KerasS3ModelSaver</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.cloud.GoogleCloud.model_save.PyTorchGoogleStorageModelSaver">
+<em class="property">class </em><code class="descclassname">AIToolbox.cloud.GoogleCloud.model_save.</code><code class="descname">PyTorchGoogleStorageModelSaver</code><span class="sig-paren">(</span><em>bucket_name='model-result'</em>, <em>cloud_dir_prefix=''</em>, <em>local_model_result_folder_path='~/project/model_result'</em>, <em>checkpoint_model=False</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.cloud.GoogleCloud.model_save.PyTorchGoogleStorageModelSaver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.cloud.GoogleCloud.model_save.BaseModelGoogleStorageSaver" title="AIToolbox.cloud.GoogleCloud.model_save.BaseModelGoogleStorageSaver"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.cloud.GoogleCloud.model_save.BaseModelGoogleStorageSaver</span></code></a>, <a class="reference internal" href="AIToolbox.cloud.AWS.html#AIToolbox.cloud.AWS.model_save.PyTorchS3ModelSaver" title="AIToolbox.cloud.AWS.model_save.PyTorchS3ModelSaver"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.cloud.AWS.model_save.PyTorchS3ModelSaver</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.cloud.GoogleCloud.model_save.TensorFlowGoogleStorageModelSaver">
+<em class="property">class </em><code class="descclassname">AIToolbox.cloud.GoogleCloud.model_save.</code><code class="descname">TensorFlowGoogleStorageModelSaver</code><span class="sig-paren">(</span><em>bucket_name='model-result'</em>, <em>cloud_dir_prefix=''</em>, <em>local_model_result_folder_path='~/project/model_result'</em>, <em>checkpoint_model=False</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.cloud.GoogleCloud.model_save.TensorFlowGoogleStorageModelSaver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.cloud.GoogleCloud.model_save.BaseModelGoogleStorageSaver" title="AIToolbox.cloud.GoogleCloud.model_save.BaseModelGoogleStorageSaver"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.cloud.GoogleCloud.model_save.BaseModelGoogleStorageSaver</span></code></a>, <a class="reference internal" href="AIToolbox.cloud.AWS.html#AIToolbox.cloud.AWS.model_save.TensorFlowS3ModelSaver" title="AIToolbox.cloud.AWS.model_save.TensorFlowS3ModelSaver"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.cloud.AWS.model_save.TensorFlowS3ModelSaver</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-AIToolbox.cloud.GoogleCloud.results_save">
+<span id="aitoolbox-cloud-googlecloud-results-save-module"></span><h2>AIToolbox.cloud.GoogleCloud.results_save module<a class="headerlink" href="#module-AIToolbox.cloud.GoogleCloud.results_save" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="AIToolbox.cloud.GoogleCloud.results_save.BaseResultsGoogleStorageSaver">
+<em class="property">class </em><code class="descclassname">AIToolbox.cloud.GoogleCloud.results_save.</code><code class="descname">BaseResultsGoogleStorageSaver</code><span class="sig-paren">(</span><em>bucket_name='model-result'</em>, <em>cloud_dir_prefix=''</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.cloud.GoogleCloud.results_save.BaseResultsGoogleStorageSaver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.cloud.GoogleCloud.data_access.BaseGoogleStorageDataSaver" title="AIToolbox.cloud.GoogleCloud.data_access.BaseGoogleStorageDataSaver"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.cloud.GoogleCloud.data_access.BaseGoogleStorageDataSaver</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.cloud.GoogleCloud.results_save.GoogleStorageResultsSaver">
+<em class="property">class </em><code class="descclassname">AIToolbox.cloud.GoogleCloud.results_save.</code><code class="descname">GoogleStorageResultsSaver</code><span class="sig-paren">(</span><em>bucket_name='model-result'</em>, <em>cloud_dir_prefix=''</em>, <em>local_model_result_folder_path='~/project/model_result'</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.cloud.GoogleCloud.results_save.GoogleStorageResultsSaver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.cloud.GoogleCloud.results_save.BaseResultsGoogleStorageSaver" title="AIToolbox.cloud.GoogleCloud.results_save.BaseResultsGoogleStorageSaver"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.cloud.GoogleCloud.results_save.BaseResultsGoogleStorageSaver</span></code></a>, <a class="reference internal" href="AIToolbox.cloud.AWS.html#AIToolbox.cloud.AWS.results_save.S3ResultsSaver" title="AIToolbox.cloud.AWS.results_save.S3ResultsSaver"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.cloud.AWS.results_save.S3ResultsSaver</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-AIToolbox.cloud.GoogleCloud">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-AIToolbox.cloud.GoogleCloud" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">AIToolbox</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Marko Vidoni.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/AIToolbox.cloud.GoogleCloud.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

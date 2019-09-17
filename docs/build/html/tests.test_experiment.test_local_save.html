@@ -1,0 +1,374 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>tests.test_experiment.test_local_save package &#8212; AIToolbox 0.3.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="tests-test-experiment-test-local-save-package">
+<h1>tests.test_experiment.test_local_save package<a class="headerlink" href="#tests-test-experiment-test-local-save-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-tests.test_experiment.test_local_save.test_local_model_save">
+<span id="tests-test-experiment-test-local-save-test-local-model-save-module"></span><h2>tests.test_experiment.test_local_save.test_local_model_save module<a class="headerlink" href="#module-tests.test_experiment.test_local_save.test_local_model_save" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tests.test_experiment.test_local_save.test_local_model_save.DummyLocalSubOptimalModelRemover">
+<em class="property">class </em><code class="descclassname">tests.test_experiment.test_local_save.test_local_model_save.</code><code class="descname">DummyLocalSubOptimalModelRemover</code><span class="sig-paren">(</span><em>metric_name</em>, <em>num_best_kept=2</em><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_experiment.test_local_save.test_local_model_save.DummyLocalSubOptimalModelRemover" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="AIToolbox.experiment.local_save.html#AIToolbox.experiment.local_save.local_model_save.LocalSubOptimalModelRemover" title="AIToolbox.experiment.local_save.local_model_save.LocalSubOptimalModelRemover"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.experiment.local_save.local_model_save.LocalSubOptimalModelRemover</span></code></a></p>
+<dl class="method">
+<dt id="tests.test_experiment.test_local_save.test_local_model_save.DummyLocalSubOptimalModelRemover.rm_suboptimal_model">
+<code class="descname">rm_suboptimal_model</code><span class="sig-paren">(</span><em>rm_model_paths</em><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_experiment.test_local_save.test_local_model_save.DummyLocalSubOptimalModelRemover.rm_suboptimal_model" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>rm_model_paths</strong> (<em>list</em>) – list of string paths</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tests.test_experiment.test_local_save.test_local_model_save.TestBaseLocalModelSaver">
+<em class="property">class </em><code class="descclassname">tests.test_experiment.test_local_save.test_local_model_save.</code><code class="descname">TestBaseLocalModelSaver</code><span class="sig-paren">(</span><em>methodName='runTest'</em><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_experiment.test_local_save.test_local_model_save.TestBaseLocalModelSaver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">unittest.case.TestCase</span></code></p>
+<dl class="method">
+<dt id="tests.test_experiment.test_local_save.test_local_model_save.TestBaseLocalModelSaver.prepare_folder_structure">
+<code class="descname">prepare_folder_structure</code><span class="sig-paren">(</span><em>checkpoint_model</em><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_experiment.test_local_save.test_local_model_save.TestBaseLocalModelSaver.prepare_folder_structure" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.test_experiment.test_local_save.test_local_model_save.TestBaseLocalModelSaver.test_folder_structure_prep">
+<code class="descname">test_folder_structure_prep</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_experiment.test_local_save.test_local_model_save.TestBaseLocalModelSaver.test_folder_structure_prep" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tests.test_experiment.test_local_save.test_local_model_save.TestKerasLocalModelSaver">
+<em class="property">class </em><code class="descclassname">tests.test_experiment.test_local_save.test_local_model_save.</code><code class="descname">TestKerasLocalModelSaver</code><span class="sig-paren">(</span><em>methodName='runTest'</em><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_experiment.test_local_save.test_local_model_save.TestKerasLocalModelSaver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">unittest.case.TestCase</span></code></p>
+<dl class="method">
+<dt id="tests.test_experiment.test_local_save.test_local_model_save.TestKerasLocalModelSaver.save_model_local">
+<code class="descname">save_model_local</code><span class="sig-paren">(</span><em>checkpoint_model</em>, <em>epoch</em><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_experiment.test_local_save.test_local_model_save.TestKerasLocalModelSaver.save_model_local" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.test_experiment.test_local_save.test_local_model_save.TestKerasLocalModelSaver.test_init">
+<code class="descname">test_init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_experiment.test_local_save.test_local_model_save.TestKerasLocalModelSaver.test_init" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.test_experiment.test_local_save.test_local_model_save.TestKerasLocalModelSaver.test_save_model">
+<code class="descname">test_save_model</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_experiment.test_local_save.test_local_model_save.TestKerasLocalModelSaver.test_save_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tests.test_experiment.test_local_save.test_local_model_save.TestLocalSubOptimalModelRemover">
+<em class="property">class </em><code class="descclassname">tests.test_experiment.test_local_save.test_local_model_save.</code><code class="descname">TestLocalSubOptimalModelRemover</code><span class="sig-paren">(</span><em>methodName='runTest'</em><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_experiment.test_local_save.test_local_model_save.TestLocalSubOptimalModelRemover" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">unittest.case.TestCase</span></code></p>
+<dl class="method">
+<dt id="tests.test_experiment.test_local_save.test_local_model_save.TestLocalSubOptimalModelRemover.is_in_default_metric_list">
+<code class="descname">is_in_default_metric_list</code><span class="sig-paren">(</span><em>tl_metric_defaults</em><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_experiment.test_local_save.test_local_model_save.TestLocalSubOptimalModelRemover.is_in_default_metric_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.test_experiment.test_local_save.test_local_model_save.TestLocalSubOptimalModelRemover.test_decide_if_remove_suboptimal_model_custom_loss">
+<code class="descname">test_decide_if_remove_suboptimal_model_custom_loss</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_experiment.test_local_save.test_local_model_save.TestLocalSubOptimalModelRemover.test_decide_if_remove_suboptimal_model_custom_loss" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.test_experiment.test_local_save.test_local_model_save.TestLocalSubOptimalModelRemover.test_decide_if_remove_suboptimal_model_custom_non_loss">
+<code class="descname">test_decide_if_remove_suboptimal_model_custom_non_loss</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_experiment.test_local_save.test_local_model_save.TestLocalSubOptimalModelRemover.test_decide_if_remove_suboptimal_model_custom_non_loss" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.test_experiment.test_local_save.test_local_model_save.TestLocalSubOptimalModelRemover.test_decide_if_remove_suboptimal_model_default_metric">
+<code class="descname">test_decide_if_remove_suboptimal_model_default_metric</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_experiment.test_local_save.test_local_model_save.TestLocalSubOptimalModelRemover.test_decide_if_remove_suboptimal_model_default_metric" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.test_experiment.test_local_save.test_local_model_save.TestLocalSubOptimalModelRemover.test_init">
+<code class="descname">test_init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_experiment.test_local_save.test_local_model_save.TestLocalSubOptimalModelRemover.test_init" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.test_experiment.test_local_save.test_local_model_save.TestLocalSubOptimalModelRemover.test_num_best_kept_acc">
+<code class="descname">test_num_best_kept_acc</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_experiment.test_local_save.test_local_model_save.TestLocalSubOptimalModelRemover.test_num_best_kept_acc" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.test_experiment.test_local_save.test_local_model_save.TestLocalSubOptimalModelRemover.test_num_best_kept_loss">
+<code class="descname">test_num_best_kept_loss</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_experiment.test_local_save.test_local_model_save.TestLocalSubOptimalModelRemover.test_num_best_kept_loss" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tests.test_experiment.test_local_save.test_local_model_save.TestPyTorchLocalModelSaver">
+<em class="property">class </em><code class="descclassname">tests.test_experiment.test_local_save.test_local_model_save.</code><code class="descname">TestPyTorchLocalModelSaver</code><span class="sig-paren">(</span><em>methodName='runTest'</em><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_experiment.test_local_save.test_local_model_save.TestPyTorchLocalModelSaver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">unittest.case.TestCase</span></code></p>
+<dl class="method">
+<dt id="tests.test_experiment.test_local_save.test_local_model_save.TestPyTorchLocalModelSaver.save_model_local">
+<code class="descname">save_model_local</code><span class="sig-paren">(</span><em>checkpoint_model</em>, <em>epoch</em><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_experiment.test_local_save.test_local_model_save.TestPyTorchLocalModelSaver.save_model_local" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.test_experiment.test_local_save.test_local_model_save.TestPyTorchLocalModelSaver.test_init">
+<code class="descname">test_init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_experiment.test_local_save.test_local_model_save.TestPyTorchLocalModelSaver.test_init" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.test_experiment.test_local_save.test_local_model_save.TestPyTorchLocalModelSaver.test_save_model">
+<code class="descname">test_save_model</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_experiment.test_local_save.test_local_model_save.TestPyTorchLocalModelSaver.test_save_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tests.test_experiment.test_local_save.test_local_results_save">
+<span id="tests-test-experiment-test-local-save-test-local-results-save-module"></span><h2>tests.test_experiment.test_local_save.test_local_results_save module<a class="headerlink" href="#module-tests.test_experiment.test_local_save.test_local_results_save" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tests.test_experiment.test_local_save.test_local_results_save.DummyFullResultPackage">
+<em class="property">class </em><code class="descclassname">tests.test_experiment.test_local_save.test_local_results_save.</code><code class="descname">DummyFullResultPackage</code><span class="sig-paren">(</span><em>result_dict</em>, <em>hyper_params</em>, <em>train_hist</em><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_experiment.test_local_save.test_local_results_save.DummyFullResultPackage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="AIToolbox.experiment.result_package.html#AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage" title="AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage</span></code></a></p>
+<dl class="method">
+<dt id="tests.test_experiment.test_local_save.test_local_results_save.DummyFullResultPackage.get_hyperparameters">
+<code class="descname">get_hyperparameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_experiment.test_local_save.test_local_results_save.DummyFullResultPackage.get_hyperparameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns:
+dict:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tests.test_experiment.test_local_save.test_local_results_save.DummyFullResultPackage.get_results">
+<code class="descname">get_results</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_experiment.test_local_save.test_local_results_save.DummyFullResultPackage.get_results" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns:
+dict:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tests.test_experiment.test_local_save.test_local_results_save.DummyFullResultPackage.prepare_results_dict">
+<code class="descname">prepare_results_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_experiment.test_local_save.test_local_results_save.DummyFullResultPackage.prepare_results_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform result package building</p>
+<p>Mostly this consists of executing calculation of selected performance metrics and returning their result dicts.
+If you want to use multiple performance metrics you have to combine them in the single self.results_dict
+at the end by doing this:</p>
+<blockquote>
+<div><p>self.results_dict = {<a href="#id1"><span class="problematic" id="id2">**</span></a>metric_dict_1, <a href="#id3"><span class="problematic" id="id4">**</span></a>metric_dict_2}</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>calculated result dict</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tests.test_experiment.test_local_save.test_local_results_save.DummyTrainingHistory">
+<em class="property">class </em><code class="descclassname">tests.test_experiment.test_local_save.test_local_results_save.</code><code class="descname">DummyTrainingHistory</code><a class="headerlink" href="#tests.test_experiment.test_local_save.test_local_results_save.DummyTrainingHistory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="AIToolbox.experiment.html#AIToolbox.experiment.training_history.TrainingHistory" title="AIToolbox.experiment.training_history.TrainingHistory"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.experiment.training_history.TrainingHistory</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="tests.test_experiment.test_local_save.test_local_results_save.TestBaseLocalResultsSaver">
+<em class="property">class </em><code class="descclassname">tests.test_experiment.test_local_save.test_local_results_save.</code><code class="descname">TestBaseLocalResultsSaver</code><span class="sig-paren">(</span><em>methodName='runTest'</em><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_experiment.test_local_save.test_local_results_save.TestBaseLocalResultsSaver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">unittest.case.TestCase</span></code></p>
+<dl class="method">
+<dt id="tests.test_experiment.test_local_save.test_local_results_save.TestBaseLocalResultsSaver.save_file_result">
+<code class="descname">save_file_result</code><span class="sig-paren">(</span><em>file_format</em>, <em>expected_extension</em><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_experiment.test_local_save.test_local_results_save.TestBaseLocalResultsSaver.save_file_result" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.test_experiment.test_local_save.test_local_results_save.TestBaseLocalResultsSaver.test_create_experiment_local_folder_structure">
+<code class="descname">test_create_experiment_local_folder_structure</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_experiment.test_local_save.test_local_results_save.TestBaseLocalResultsSaver.test_create_experiment_local_folder_structure" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.test_experiment.test_local_save.test_local_results_save.TestBaseLocalResultsSaver.test_create_experiment_local_folder_structure_calls_paths_sub_fn">
+<code class="descname">test_create_experiment_local_folder_structure_calls_paths_sub_fn</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_experiment.test_local_save.test_local_results_save.TestBaseLocalResultsSaver.test_create_experiment_local_folder_structure_calls_paths_sub_fn" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.test_experiment.test_local_save.test_local_results_save.TestBaseLocalResultsSaver.test_form_experiment_local_folders_paths">
+<code class="descname">test_form_experiment_local_folders_paths</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_experiment.test_local_save.test_local_results_save.TestBaseLocalResultsSaver.test_form_experiment_local_folders_paths" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.test_experiment.test_local_save.test_local_results_save.TestBaseLocalResultsSaver.test_init">
+<code class="descname">test_init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_experiment.test_local_save.test_local_results_save.TestBaseLocalResultsSaver.test_init" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.test_experiment.test_local_save.test_local_results_save.TestBaseLocalResultsSaver.test_save_file_json">
+<code class="descname">test_save_file_json</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_experiment.test_local_save.test_local_results_save.TestBaseLocalResultsSaver.test_save_file_json" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.test_experiment.test_local_save.test_local_results_save.TestBaseLocalResultsSaver.test_save_file_pickle">
+<code class="descname">test_save_file_pickle</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_experiment.test_local_save.test_local_results_save.TestBaseLocalResultsSaver.test_save_file_pickle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.test_experiment.test_local_save.test_local_results_save.TestBaseLocalResultsSaver.test_save_file_unsupported_format">
+<code class="descname">test_save_file_unsupported_format</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_experiment.test_local_save.test_local_results_save.TestBaseLocalResultsSaver.test_save_file_unsupported_format" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tests.test_experiment.test_local_save.test_local_results_save.TestLocalResultsSaverSeparateFiles">
+<em class="property">class </em><code class="descclassname">tests.test_experiment.test_local_save.test_local_results_save.</code><code class="descname">TestLocalResultsSaverSeparateFiles</code><span class="sig-paren">(</span><em>methodName='runTest'</em><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_experiment.test_local_save.test_local_results_save.TestLocalResultsSaverSeparateFiles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">unittest.case.TestCase</span></code></p>
+<dl class="method">
+<dt id="tests.test_experiment.test_local_save.test_local_results_save.TestLocalResultsSaverSeparateFiles.save_experiment_results">
+<code class="descname">save_experiment_results</code><span class="sig-paren">(</span><em>file_format</em>, <em>expected_extension</em>, <em>save_true_pred_labels</em><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_experiment.test_local_save.test_local_results_save.TestLocalResultsSaverSeparateFiles.save_experiment_results" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.test_experiment.test_local_save.test_local_results_save.TestLocalResultsSaverSeparateFiles.test_save_experiment_results_json">
+<code class="descname">test_save_experiment_results_json</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_experiment.test_local_save.test_local_results_save.TestLocalResultsSaverSeparateFiles.test_save_experiment_results_json" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.test_experiment.test_local_save.test_local_results_save.TestLocalResultsSaverSeparateFiles.test_save_experiment_results_pickle">
+<code class="descname">test_save_experiment_results_pickle</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_experiment.test_local_save.test_local_results_save.TestLocalResultsSaverSeparateFiles.test_save_experiment_results_pickle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.test_experiment.test_local_save.test_local_results_save.TestLocalResultsSaverSeparateFiles.test_save_experiment_results_unsupported_format">
+<code class="descname">test_save_experiment_results_unsupported_format</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_experiment.test_local_save.test_local_results_save.TestLocalResultsSaverSeparateFiles.test_save_experiment_results_unsupported_format" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tests.test_experiment.test_local_save.test_local_results_save.TestLocalResultsSaverSingleFile">
+<em class="property">class </em><code class="descclassname">tests.test_experiment.test_local_save.test_local_results_save.</code><code class="descname">TestLocalResultsSaverSingleFile</code><span class="sig-paren">(</span><em>methodName='runTest'</em><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_experiment.test_local_save.test_local_results_save.TestLocalResultsSaverSingleFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">unittest.case.TestCase</span></code></p>
+<dl class="method">
+<dt id="tests.test_experiment.test_local_save.test_local_results_save.TestLocalResultsSaverSingleFile.save_experiment_results">
+<code class="descname">save_experiment_results</code><span class="sig-paren">(</span><em>file_format</em>, <em>expected_extension</em>, <em>save_true_pred_labels</em><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_experiment.test_local_save.test_local_results_save.TestLocalResultsSaverSingleFile.save_experiment_results" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.test_experiment.test_local_save.test_local_results_save.TestLocalResultsSaverSingleFile.test_save_experiment_results_json">
+<code class="descname">test_save_experiment_results_json</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_experiment.test_local_save.test_local_results_save.TestLocalResultsSaverSingleFile.test_save_experiment_results_json" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.test_experiment.test_local_save.test_local_results_save.TestLocalResultsSaverSingleFile.test_save_experiment_results_pickle">
+<code class="descname">test_save_experiment_results_pickle</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_experiment.test_local_save.test_local_results_save.TestLocalResultsSaverSingleFile.test_save_experiment_results_pickle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.test_experiment.test_local_save.test_local_results_save.TestLocalResultsSaverSingleFile.test_save_experiment_results_unsupported_format">
+<code class="descname">test_save_experiment_results_unsupported_format</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_experiment.test_local_save.test_local_results_save.TestLocalResultsSaverSingleFile.test_save_experiment_results_unsupported_format" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tests.test_experiment.test_local_save">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-tests.test_experiment.test_local_save" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">AIToolbox</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Marko Vidoni.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/tests.test_experiment.test_local_save.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

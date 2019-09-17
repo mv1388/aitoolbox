@@ -1,0 +1,463 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>AIToolbox.torchtrain.data package &#8212; AIToolbox 0.3.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="aitoolbox-torchtrain-data-package">
+<h1>AIToolbox.torchtrain.data package<a class="headerlink" href="#aitoolbox-torchtrain-data-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-AIToolbox.torchtrain.data.batch_model_feed_defs">
+<span id="aitoolbox-torchtrain-data-batch-model-feed-defs-module"></span><h2>AIToolbox.torchtrain.data.batch_model_feed_defs module<a class="headerlink" href="#module-AIToolbox.torchtrain.data.batch_model_feed_defs" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="AIToolbox.torchtrain.data.batch_model_feed_defs.AbstractModelFeedDefinition">
+<em class="property">class </em><code class="descclassname">AIToolbox.torchtrain.data.batch_model_feed_defs.</code><code class="descname">AbstractModelFeedDefinition</code><a class="headerlink" href="#AIToolbox.torchtrain.data.batch_model_feed_defs.AbstractModelFeedDefinition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<dl class="method">
+<dt id="AIToolbox.torchtrain.data.batch_model_feed_defs.AbstractModelFeedDefinition.get_loss">
+<code class="descname">get_loss</code><span class="sig-paren">(</span><em>model</em>, <em>batch_data</em>, <em>criterion</em>, <em>device</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.data.batch_model_feed_defs.AbstractModelFeedDefinition.get_loss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get loss during training stage</p>
+<p>Called from fit() in TrainLoop</p>
+<p>Executed during training stage where model weights are updated based on the loss returned from this function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> – </p></li>
+<li><p><strong>batch_data</strong> – </p></li>
+<li><p><strong>criterion</strong> – </p></li>
+<li><p><strong>device</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>PyTorch loss</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.data.batch_model_feed_defs.AbstractModelFeedDefinition.get_loss_eval">
+<code class="descname">get_loss_eval</code><span class="sig-paren">(</span><em>model</em>, <em>batch_data</em>, <em>criterion</em>, <em>device</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.data.batch_model_feed_defs.AbstractModelFeedDefinition.get_loss_eval" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get loss during evaluation stage</p>
+<p>Called from evaluate_model_loss() in TrainLoop.</p>
+<p>The difference compared with get_loss() is that here the backprop weight update is not done.
+This function is executed in the evaluation stage not training.</p>
+<p>For simple examples this function can just call the get_loss() and return its result.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> – </p></li>
+<li><p><strong>batch_data</strong> – </p></li>
+<li><p><strong>criterion</strong> – </p></li>
+<li><p><strong>device</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.data.batch_model_feed_defs.AbstractModelFeedDefinition.get_predictions">
+<code class="descname">get_predictions</code><span class="sig-paren">(</span><em>model</em>, <em>batch_data</em>, <em>device</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.data.batch_model_feed_defs.AbstractModelFeedDefinition.get_predictions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get predictions during evaluation stage</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> – </p></li>
+<li><p><strong>batch_data</strong> – </p></li>
+<li><p><strong>device</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>y_test.cpu(), y_pred.cpu(), metadata</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.array, np.array, dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.torchtrain.data.batch_model_feed_defs.ImageClassificationFeedDefinition">
+<em class="property">class </em><code class="descclassname">AIToolbox.torchtrain.data.batch_model_feed_defs.</code><code class="descname">ImageClassificationFeedDefinition</code><a class="headerlink" href="#AIToolbox.torchtrain.data.batch_model_feed_defs.ImageClassificationFeedDefinition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.torchtrain.data.batch_model_feed_defs.AbstractModelFeedDefinition" title="AIToolbox.torchtrain.data.batch_model_feed_defs.AbstractModelFeedDefinition"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.torchtrain.data.batch_model_feed_defs.AbstractModelFeedDefinition</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.torchtrain.data.batch_model_feed_defs.ImageClassificationFeedDefinition.get_loss">
+<code class="descname">get_loss</code><span class="sig-paren">(</span><em>model</em>, <em>batch_data</em>, <em>criterion</em>, <em>device</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.data.batch_model_feed_defs.ImageClassificationFeedDefinition.get_loss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get loss during training stage</p>
+<p>Called from fit() in TrainLoop</p>
+<p>Executed during training stage where model weights are updated based on the loss returned from this function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> – </p></li>
+<li><p><strong>batch_data</strong> – </p></li>
+<li><p><strong>criterion</strong> – </p></li>
+<li><p><strong>device</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>PyTorch loss</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.data.batch_model_feed_defs.ImageClassificationFeedDefinition.get_loss_eval">
+<code class="descname">get_loss_eval</code><span class="sig-paren">(</span><em>model</em>, <em>batch_data</em>, <em>criterion</em>, <em>device</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.data.batch_model_feed_defs.ImageClassificationFeedDefinition.get_loss_eval" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get loss during evaluation stage</p>
+<p>Called from evaluate_model_loss() in TrainLoop.</p>
+<p>The difference compared with get_loss() is that here the backprop weight update is not done.
+This function is executed in the evaluation stage not training.</p>
+<p>For simple examples this function can just call the get_loss() and return its result.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> – </p></li>
+<li><p><strong>batch_data</strong> – </p></li>
+<li><p><strong>criterion</strong> – </p></li>
+<li><p><strong>device</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.data.batch_model_feed_defs.ImageClassificationFeedDefinition.get_predictions">
+<code class="descname">get_predictions</code><span class="sig-paren">(</span><em>model</em>, <em>batch_data</em>, <em>device</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.data.batch_model_feed_defs.ImageClassificationFeedDefinition.get_predictions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get predictions during evaluation stage</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> – </p></li>
+<li><p><strong>batch_data</strong> – </p></li>
+<li><p><strong>device</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>y_test.cpu(), y_pred.cpu(), metadata</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.array, np.array, dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.torchtrain.data.batch_model_feed_defs.MachineTranslationFeedDefinition">
+<em class="property">class </em><code class="descclassname">AIToolbox.torchtrain.data.batch_model_feed_defs.</code><code class="descname">MachineTranslationFeedDefinition</code><a class="headerlink" href="#AIToolbox.torchtrain.data.batch_model_feed_defs.MachineTranslationFeedDefinition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.torchtrain.data.batch_model_feed_defs.AbstractModelFeedDefinition" title="AIToolbox.torchtrain.data.batch_model_feed_defs.AbstractModelFeedDefinition"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.torchtrain.data.batch_model_feed_defs.AbstractModelFeedDefinition</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.torchtrain.data.batch_model_feed_defs.MachineTranslationFeedDefinition.get_loss">
+<code class="descname">get_loss</code><span class="sig-paren">(</span><em>model</em>, <em>batch_data</em>, <em>criterion</em>, <em>device</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.data.batch_model_feed_defs.MachineTranslationFeedDefinition.get_loss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get loss during training stage</p>
+<p>Called from fit() in TrainLoop</p>
+<p>Executed during training stage where model weights are updated based on the loss returned from this function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> – </p></li>
+<li><p><strong>batch_data</strong> – </p></li>
+<li><p><strong>criterion</strong> – </p></li>
+<li><p><strong>device</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>PyTorch loss</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.data.batch_model_feed_defs.MachineTranslationFeedDefinition.get_loss_eval">
+<code class="descname">get_loss_eval</code><span class="sig-paren">(</span><em>model</em>, <em>batch_data</em>, <em>criterion</em>, <em>device</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.data.batch_model_feed_defs.MachineTranslationFeedDefinition.get_loss_eval" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get loss during evaluation stage</p>
+<p>Called from evaluate_model_loss() in TrainLoop.</p>
+<p>The difference compared with get_loss() is that here the backprop weight update is not done.
+This function is executed in the evaluation stage not training.</p>
+<p>For simple examples this function can just call the get_loss() and return its result.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> – </p></li>
+<li><p><strong>batch_data</strong> – </p></li>
+<li><p><strong>criterion</strong> – </p></li>
+<li><p><strong>device</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.data.batch_model_feed_defs.MachineTranslationFeedDefinition.get_predictions">
+<code class="descname">get_predictions</code><span class="sig-paren">(</span><em>model</em>, <em>batch_data</em>, <em>device</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.data.batch_model_feed_defs.MachineTranslationFeedDefinition.get_predictions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get predictions during evaluation stage</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> – </p></li>
+<li><p><strong>batch_data</strong> – </p></li>
+<li><p><strong>device</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>y_test.cpu(), y_pred.cpu(), metadata</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.array, np.array, dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.torchtrain.data.batch_model_feed_defs.QASpanSQuADModelFeedDefinition">
+<em class="property">class </em><code class="descclassname">AIToolbox.torchtrain.data.batch_model_feed_defs.</code><code class="descname">QASpanSQuADModelFeedDefinition</code><a class="headerlink" href="#AIToolbox.torchtrain.data.batch_model_feed_defs.QASpanSQuADModelFeedDefinition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.torchtrain.data.batch_model_feed_defs.AbstractModelFeedDefinition" title="AIToolbox.torchtrain.data.batch_model_feed_defs.AbstractModelFeedDefinition"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.torchtrain.data.batch_model_feed_defs.AbstractModelFeedDefinition</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.torchtrain.data.batch_model_feed_defs.QASpanSQuADModelFeedDefinition.get_loss">
+<code class="descname">get_loss</code><span class="sig-paren">(</span><em>model</em>, <em>batch_data</em>, <em>criterion</em>, <em>device</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.data.batch_model_feed_defs.QASpanSQuADModelFeedDefinition.get_loss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get loss during training stage</p>
+<p>Called from fit() in TrainLoop</p>
+<p>Executed during training stage where model weights are updated based on the loss returned from this function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> – </p></li>
+<li><p><strong>batch_data</strong> – </p></li>
+<li><p><strong>criterion</strong> – </p></li>
+<li><p><strong>device</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>PyTorch loss</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.data.batch_model_feed_defs.QASpanSQuADModelFeedDefinition.get_loss_eval">
+<code class="descname">get_loss_eval</code><span class="sig-paren">(</span><em>model</em>, <em>batch_data</em>, <em>criterion</em>, <em>device</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.data.batch_model_feed_defs.QASpanSQuADModelFeedDefinition.get_loss_eval" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get loss during evaluation stage</p>
+<p>Called from evaluate_model_loss() in TrainLoop.</p>
+<p>The difference compared with get_loss() is that here the backprop weight update is not done.
+This function is executed in the evaluation stage not training.</p>
+<p>For simple examples this function can just call the get_loss() and return its result.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> – </p></li>
+<li><p><strong>batch_data</strong> – </p></li>
+<li><p><strong>criterion</strong> – </p></li>
+<li><p><strong>device</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.data.batch_model_feed_defs.QASpanSQuADModelFeedDefinition.get_predictions">
+<code class="descname">get_predictions</code><span class="sig-paren">(</span><em>model</em>, <em>batch_data</em>, <em>device</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.data.batch_model_feed_defs.QASpanSQuADModelFeedDefinition.get_predictions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get predictions during evaluation stage</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> – </p></li>
+<li><p><strong>batch_data</strong> – </p></li>
+<li><p><strong>device</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>y_test.cpu(), y_pred.cpu(), metadata</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.array, np.array, dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.torchtrain.data.batch_model_feed_defs.TextClassificationFeedDefinition">
+<em class="property">class </em><code class="descclassname">AIToolbox.torchtrain.data.batch_model_feed_defs.</code><code class="descname">TextClassificationFeedDefinition</code><a class="headerlink" href="#AIToolbox.torchtrain.data.batch_model_feed_defs.TextClassificationFeedDefinition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.torchtrain.data.batch_model_feed_defs.AbstractModelFeedDefinition" title="AIToolbox.torchtrain.data.batch_model_feed_defs.AbstractModelFeedDefinition"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.torchtrain.data.batch_model_feed_defs.AbstractModelFeedDefinition</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.torchtrain.data.batch_model_feed_defs.TextClassificationFeedDefinition.get_loss">
+<code class="descname">get_loss</code><span class="sig-paren">(</span><em>model</em>, <em>batch_data</em>, <em>criterion</em>, <em>device</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.data.batch_model_feed_defs.TextClassificationFeedDefinition.get_loss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get loss during training stage</p>
+<p>Called from fit() in TrainLoop</p>
+<p>Executed during training stage where model weights are updated based on the loss returned from this function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> – </p></li>
+<li><p><strong>batch_data</strong> – </p></li>
+<li><p><strong>criterion</strong> – </p></li>
+<li><p><strong>device</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>PyTorch loss</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.data.batch_model_feed_defs.TextClassificationFeedDefinition.get_loss_eval">
+<code class="descname">get_loss_eval</code><span class="sig-paren">(</span><em>model</em>, <em>batch_data</em>, <em>criterion</em>, <em>device</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.data.batch_model_feed_defs.TextClassificationFeedDefinition.get_loss_eval" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get loss during evaluation stage</p>
+<p>Called from evaluate_model_loss() in TrainLoop.</p>
+<p>The difference compared with get_loss() is that here the backprop weight update is not done.
+This function is executed in the evaluation stage not training.</p>
+<p>For simple examples this function can just call the get_loss() and return its result.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> – </p></li>
+<li><p><strong>batch_data</strong> – </p></li>
+<li><p><strong>criterion</strong> – </p></li>
+<li><p><strong>device</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.data.batch_model_feed_defs.TextClassificationFeedDefinition.get_predictions">
+<code class="descname">get_predictions</code><span class="sig-paren">(</span><em>model</em>, <em>batch_data</em>, <em>device</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.data.batch_model_feed_defs.TextClassificationFeedDefinition.get_predictions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get predictions during evaluation stage</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> – </p></li>
+<li><p><strong>batch_data</strong> – </p></li>
+<li><p><strong>device</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>y_test.cpu(), y_pred.cpu(), metadata</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.array, np.array, dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-AIToolbox.torchtrain.data.dataset">
+<span id="aitoolbox-torchtrain-data-dataset-module"></span><h2>AIToolbox.torchtrain.data.dataset module<a class="headerlink" href="#module-AIToolbox.torchtrain.data.dataset" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="AIToolbox.torchtrain.data.dataset.BasicDataset">
+<em class="property">class </em><code class="descclassname">AIToolbox.torchtrain.data.dataset.</code><code class="descname">BasicDataset</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.data.dataset.BasicDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.utils.data.dataset.Dataset</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-AIToolbox.torchtrain.data">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-AIToolbox.torchtrain.data" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">AIToolbox</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Marko Vidoni.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/AIToolbox.torchtrain.data.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

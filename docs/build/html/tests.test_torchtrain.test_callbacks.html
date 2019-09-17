@@ -1,0 +1,317 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>tests.test_torchtrain.test_callbacks package &#8212; AIToolbox 0.3.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="tests-test-torchtrain-test-callbacks-package">
+<h1>tests.test_torchtrain.test_callbacks package<a class="headerlink" href="#tests-test-torchtrain-test-callbacks-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-tests.test_torchtrain.test_callbacks.test_callbacks">
+<span id="tests-test-torchtrain-test-callbacks-test-callbacks-module"></span><h2>tests.test_torchtrain.test_callbacks.test_callbacks module<a class="headerlink" href="#module-tests.test_torchtrain.test_callbacks.test_callbacks" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tests.test_torchtrain.test_callbacks.test_callbacks.TestAbstractCallback">
+<em class="property">class </em><code class="descclassname">tests.test_torchtrain.test_callbacks.test_callbacks.</code><code class="descname">TestAbstractCallback</code><span class="sig-paren">(</span><em>methodName='runTest'</em><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_torchtrain.test_callbacks.test_callbacks.TestAbstractCallback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">unittest.case.TestCase</span></code></p>
+<dl class="method">
+<dt id="tests.test_torchtrain.test_callbacks.test_callbacks.TestAbstractCallback.test_abstract_callback_has_hook_methods">
+<code class="descname">test_abstract_callback_has_hook_methods</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_torchtrain.test_callbacks.test_callbacks.TestAbstractCallback.test_abstract_callback_has_hook_methods" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.test_torchtrain.test_callbacks.test_callbacks.TestAbstractCallback.test_on_train_loop_registration_hook">
+<code class="descname">test_on_train_loop_registration_hook</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_torchtrain.test_callbacks.test_callbacks.TestAbstractCallback.test_on_train_loop_registration_hook" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tests.test_torchtrain.test_callbacks.test_callbacks.TestEarlyStoppingCallback">
+<em class="property">class </em><code class="descclassname">tests.test_torchtrain.test_callbacks.test_callbacks.</code><code class="descname">TestEarlyStoppingCallback</code><span class="sig-paren">(</span><em>methodName='runTest'</em><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_torchtrain.test_callbacks.test_callbacks.TestEarlyStoppingCallback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">unittest.case.TestCase</span></code></p>
+<dl class="method">
+<dt id="tests.test_torchtrain.test_callbacks.test_callbacks.TestEarlyStoppingCallback.basic_early_stop_change_check_acc">
+<code class="descname">basic_early_stop_change_check_acc</code><span class="sig-paren">(</span><em>val1</em>, <em>val2</em>, <em>expected_result</em>, <em>min_delta=0.0</em><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_torchtrain.test_callbacks.test_callbacks.TestEarlyStoppingCallback.basic_early_stop_change_check_acc" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.test_torchtrain.test_callbacks.test_callbacks.TestEarlyStoppingCallback.basic_early_stop_change_check_loss">
+<code class="descname">basic_early_stop_change_check_loss</code><span class="sig-paren">(</span><em>val1</em>, <em>val2</em>, <em>expected_result</em>, <em>min_delta=0.0</em><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_torchtrain.test_callbacks.test_callbacks.TestEarlyStoppingCallback.basic_early_stop_change_check_loss" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.test_torchtrain.test_callbacks.test_callbacks.TestEarlyStoppingCallback.eval_patience">
+<code class="descname">eval_patience</code><span class="sig-paren">(</span><em>min_delta</em>, <em>patience</em>, <em>val_list</em>, <em>expected_result</em>, <em>monitor</em><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_torchtrain.test_callbacks.test_callbacks.TestEarlyStoppingCallback.eval_patience" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.test_torchtrain.test_callbacks.test_callbacks.TestEarlyStoppingCallback.test_basic_acc_drops">
+<code class="descname">test_basic_acc_drops</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_torchtrain.test_callbacks.test_callbacks.TestEarlyStoppingCallback.test_basic_acc_drops" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.test_torchtrain.test_callbacks.test_callbacks.TestEarlyStoppingCallback.test_basic_acc_grows">
+<code class="descname">test_basic_acc_grows</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_torchtrain.test_callbacks.test_callbacks.TestEarlyStoppingCallback.test_basic_acc_grows" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.test_torchtrain.test_callbacks.test_callbacks.TestEarlyStoppingCallback.test_basic_loss_drops">
+<code class="descname">test_basic_loss_drops</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_torchtrain.test_callbacks.test_callbacks.TestEarlyStoppingCallback.test_basic_loss_drops" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.test_torchtrain.test_callbacks.test_callbacks.TestEarlyStoppingCallback.test_basic_loss_grows">
+<code class="descname">test_basic_loss_grows</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_torchtrain.test_callbacks.test_callbacks.TestEarlyStoppingCallback.test_basic_loss_grows" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.test_torchtrain.test_callbacks.test_callbacks.TestEarlyStoppingCallback.test_basic_no_acc_change">
+<code class="descname">test_basic_no_acc_change</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_torchtrain.test_callbacks.test_callbacks.TestEarlyStoppingCallback.test_basic_no_acc_change" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.test_torchtrain.test_callbacks.test_callbacks.TestEarlyStoppingCallback.test_basic_no_loss_change">
+<code class="descname">test_basic_no_loss_change</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_torchtrain.test_callbacks.test_callbacks.TestEarlyStoppingCallback.test_basic_no_loss_change" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.test_torchtrain.test_callbacks.test_callbacks.TestEarlyStoppingCallback.test_delta_acc">
+<code class="descname">test_delta_acc</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_torchtrain.test_callbacks.test_callbacks.TestEarlyStoppingCallback.test_delta_acc" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.test_torchtrain.test_callbacks.test_callbacks.TestEarlyStoppingCallback.test_delta_loss">
+<code class="descname">test_delta_loss</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_torchtrain.test_callbacks.test_callbacks.TestEarlyStoppingCallback.test_delta_loss" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.test_torchtrain.test_callbacks.test_callbacks.TestEarlyStoppingCallback.test_patience_acc">
+<code class="descname">test_patience_acc</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_torchtrain.test_callbacks.test_callbacks.TestEarlyStoppingCallback.test_patience_acc" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.test_torchtrain.test_callbacks.test_callbacks.TestEarlyStoppingCallback.test_patience_loss">
+<code class="descname">test_patience_loss</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_torchtrain.test_callbacks.test_callbacks.TestEarlyStoppingCallback.test_patience_loss" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tests.test_torchtrain.test_callbacks.test_model_save_callbacks">
+<span id="tests-test-torchtrain-test-callbacks-test-model-save-callbacks-module"></span><h2>tests.test_torchtrain.test_callbacks.test_model_save_callbacks module<a class="headerlink" href="#module-tests.test_torchtrain.test_callbacks.test_model_save_callbacks" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tests.test_torchtrain.test_callbacks.test_model_save_callbacks.TestModelCheckpointCallback">
+<em class="property">class </em><code class="descclassname">tests.test_torchtrain.test_callbacks.test_model_save_callbacks.</code><code class="descname">TestModelCheckpointCallback</code><span class="sig-paren">(</span><em>methodName='runTest'</em><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_torchtrain.test_callbacks.test_model_save_callbacks.TestModelCheckpointCallback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">unittest.case.TestCase</span></code></p>
+<dl class="method">
+<dt id="tests.test_torchtrain.test_callbacks.test_model_save_callbacks.TestModelCheckpointCallback.test_init">
+<code class="descname">test_init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_torchtrain.test_callbacks.test_model_save_callbacks.TestModelCheckpointCallback.test_init" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.test_torchtrain.test_callbacks.test_model_save_callbacks.TestModelCheckpointCallback.test_optimizer_missing_state_dict_exception">
+<code class="descname">test_optimizer_missing_state_dict_exception</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_torchtrain.test_callbacks.test_model_save_callbacks.TestModelCheckpointCallback.test_optimizer_missing_state_dict_exception" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.test_torchtrain.test_callbacks.test_model_save_callbacks.TestModelCheckpointCallback.test_save_args">
+<code class="descname">test_save_args</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_torchtrain.test_callbacks.test_model_save_callbacks.TestModelCheckpointCallback.test_save_args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tests.test_torchtrain.test_callbacks.test_model_save_callbacks.TestModelTrainEndSaveCallback">
+<em class="property">class </em><code class="descclassname">tests.test_torchtrain.test_callbacks.test_model_save_callbacks.</code><code class="descname">TestModelTrainEndSaveCallback</code><span class="sig-paren">(</span><em>methodName='runTest'</em><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_torchtrain.test_callbacks.test_model_save_callbacks.TestModelTrainEndSaveCallback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">unittest.case.TestCase</span></code></p>
+<dl class="method">
+<dt id="tests.test_torchtrain.test_callbacks.test_model_save_callbacks.TestModelTrainEndSaveCallback.test_init">
+<code class="descname">test_init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_torchtrain.test_callbacks.test_model_save_callbacks.TestModelTrainEndSaveCallback.test_init" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.test_torchtrain.test_callbacks.test_model_save_callbacks.TestModelTrainEndSaveCallback.test_save_args">
+<code class="descname">test_save_args</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_torchtrain.test_callbacks.test_model_save_callbacks.TestModelTrainEndSaveCallback.test_save_args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.test_torchtrain.test_callbacks.test_model_save_callbacks.TestModelTrainEndSaveCallback.test_train_loop_reg_set_experiment_dir_path_for_additional_results">
+<code class="descname">test_train_loop_reg_set_experiment_dir_path_for_additional_results</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_torchtrain.test_callbacks.test_model_save_callbacks.TestModelTrainEndSaveCallback.test_train_loop_reg_set_experiment_dir_path_for_additional_results" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tests.test_torchtrain.test_callbacks.test_performance_eval_callbacks">
+<span id="tests-test-torchtrain-test-callbacks-test-performance-eval-callbacks-module"></span><h2>tests.test_torchtrain.test_callbacks.test_performance_eval_callbacks module<a class="headerlink" href="#module-tests.test_torchtrain.test_callbacks.test_performance_eval_callbacks" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tests.test_torchtrain.test_callbacks.test_performance_eval_callbacks.TestMetricHistoryRename">
+<em class="property">class </em><code class="descclassname">tests.test_torchtrain.test_callbacks.test_performance_eval_callbacks.</code><code class="descname">TestMetricHistoryRename</code><span class="sig-paren">(</span><em>methodName='runTest'</em><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_torchtrain.test_callbacks.test_performance_eval_callbacks.TestMetricHistoryRename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">unittest.case.TestCase</span></code></p>
+<dl class="method">
+<dt id="tests.test_torchtrain.test_callbacks.test_performance_eval_callbacks.TestMetricHistoryRename.test_fail_check_if_history_updated">
+<code class="descname">test_fail_check_if_history_updated</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_torchtrain.test_callbacks.test_performance_eval_callbacks.TestMetricHistoryRename.test_fail_check_if_history_updated" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.test_torchtrain.test_callbacks.test_performance_eval_callbacks.TestMetricHistoryRename.test_rename_metric">
+<code class="descname">test_rename_metric</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_torchtrain.test_callbacks.test_performance_eval_callbacks.TestMetricHistoryRename.test_rename_metric" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.test_torchtrain.test_callbacks.test_performance_eval_callbacks.TestMetricHistoryRename.test_rename_metric_multi_epoch_simulation">
+<code class="descname">test_rename_metric_multi_epoch_simulation</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_torchtrain.test_callbacks.test_performance_eval_callbacks.TestMetricHistoryRename.test_rename_metric_multi_epoch_simulation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tests.test_torchtrain.test_callbacks.test_performance_eval_callbacks.TestModelPerformanceEvaluationCallback">
+<em class="property">class </em><code class="descclassname">tests.test_torchtrain.test_callbacks.test_performance_eval_callbacks.</code><code class="descname">TestModelPerformanceEvaluationCallback</code><span class="sig-paren">(</span><em>methodName='runTest'</em><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_torchtrain.test_callbacks.test_performance_eval_callbacks.TestModelPerformanceEvaluationCallback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">unittest.case.TestCase</span></code></p>
+<dl class="method">
+<dt id="tests.test_torchtrain.test_callbacks.test_performance_eval_callbacks.TestModelPerformanceEvaluationCallback.test_basic_store_evaluated_metrics_to_history">
+<code class="descname">test_basic_store_evaluated_metrics_to_history</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_torchtrain.test_callbacks.test_performance_eval_callbacks.TestModelPerformanceEvaluationCallback.test_basic_store_evaluated_metrics_to_history" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.test_torchtrain.test_callbacks.test_performance_eval_callbacks.TestModelPerformanceEvaluationCallback.test_create_train_result_package">
+<code class="descname">test_create_train_result_package</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_torchtrain.test_callbacks.test_performance_eval_callbacks.TestModelPerformanceEvaluationCallback.test_create_train_result_package" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.test_torchtrain.test_callbacks.test_performance_eval_callbacks.TestModelPerformanceEvaluationCallback.test_reg_set_experiment_dir_path_for_additional_results">
+<code class="descname">test_reg_set_experiment_dir_path_for_additional_results</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_torchtrain.test_callbacks.test_performance_eval_callbacks.TestModelPerformanceEvaluationCallback.test_reg_set_experiment_dir_path_for_additional_results" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.test_torchtrain.test_callbacks.test_performance_eval_callbacks.TestModelPerformanceEvaluationCallback.test_result_package_prepare">
+<code class="descname">test_result_package_prepare</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_torchtrain.test_callbacks.test_performance_eval_callbacks.TestModelPerformanceEvaluationCallback.test_result_package_prepare" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.test_torchtrain.test_callbacks.test_performance_eval_callbacks.TestModelPerformanceEvaluationCallback.test_store_evaluated_metrics_to_history">
+<code class="descname">test_store_evaluated_metrics_to_history</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_torchtrain.test_callbacks.test_performance_eval_callbacks.TestModelPerformanceEvaluationCallback.test_store_evaluated_metrics_to_history" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.test_torchtrain.test_callbacks.test_performance_eval_callbacks.TestModelPerformanceEvaluationCallback.test_store_evaluated_metrics_to_history_extended">
+<code class="descname">test_store_evaluated_metrics_to_history_extended</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_torchtrain.test_callbacks.test_performance_eval_callbacks.TestModelPerformanceEvaluationCallback.test_store_evaluated_metrics_to_history_extended" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.test_torchtrain.test_callbacks.test_performance_eval_callbacks.TestModelPerformanceEvaluationCallback.test_store_evaluated_metrics_to_history_multi_epoch_simulation">
+<code class="descname">test_store_evaluated_metrics_to_history_multi_epoch_simulation</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_torchtrain.test_callbacks.test_performance_eval_callbacks.TestModelPerformanceEvaluationCallback.test_store_evaluated_metrics_to_history_multi_epoch_simulation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tests.test_torchtrain.test_callbacks.test_performance_eval_callbacks.TestModelTrainHistoryFileWriter">
+<em class="property">class </em><code class="descclassname">tests.test_torchtrain.test_callbacks.test_performance_eval_callbacks.</code><code class="descname">TestModelTrainHistoryFileWriter</code><span class="sig-paren">(</span><em>methodName='runTest'</em><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_torchtrain.test_callbacks.test_performance_eval_callbacks.TestModelTrainHistoryFileWriter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">unittest.case.TestCase</span></code></p>
+<dl class="method">
+<dt id="tests.test_torchtrain.test_callbacks.test_performance_eval_callbacks.TestModelTrainHistoryFileWriter.test_execute_callback">
+<code class="descname">test_execute_callback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_torchtrain.test_callbacks.test_performance_eval_callbacks.TestModelTrainHistoryFileWriter.test_execute_callback" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tests.test_torchtrain.test_callbacks">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-tests.test_torchtrain.test_callbacks" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">AIToolbox</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Marko Vidoni.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/tests.test_torchtrain.test_callbacks.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

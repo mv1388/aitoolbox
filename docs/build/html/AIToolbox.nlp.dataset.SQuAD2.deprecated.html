@@ -1,0 +1,308 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>AIToolbox.nlp.dataset.SQuAD2.deprecated package &#8212; AIToolbox 0.3.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="aitoolbox-nlp-dataset-squad2-deprecated-package">
+<h1>AIToolbox.nlp.dataset.SQuAD2.deprecated package<a class="headerlink" href="#aitoolbox-nlp-dataset-squad2-deprecated-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-AIToolbox.nlp.dataset.SQuAD2.deprecated.manual_SQuAD2">
+<span id="aitoolbox-nlp-dataset-squad2-deprecated-manual-squad2-module"></span><h2>AIToolbox.nlp.dataset.SQuAD2.deprecated.manual_SQuAD2 module<a class="headerlink" href="#module-AIToolbox.nlp.dataset.SQuAD2.deprecated.manual_SQuAD2" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="AIToolbox.nlp.dataset.SQuAD2.deprecated.manual_SQuAD2.SQuAD2DataPreparation">
+<em class="property">class </em><code class="descclassname">AIToolbox.nlp.dataset.SQuAD2.deprecated.manual_SQuAD2.</code><code class="descname">SQuAD2DataPreparation</code><span class="sig-paren">(</span><em>train_path</em>, <em>dev_path</em>, <em>skip_is_impossible=True</em>, <em>skip_examples_w_span=True</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.dataset.SQuAD2.deprecated.manual_SQuAD2.SQuAD2DataPreparation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="AIToolbox.nlp.dataset.SQuAD2.deprecated.manual_SQuAD2.SQuAD2DataPreparation.build_dataset">
+<code class="descname">build_dataset</code><span class="sig-paren">(</span><em>data_json</em>, <em>dataset_name</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.dataset.SQuAD2.deprecated.manual_SQuAD2.SQuAD2DataPreparation.build_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data_json</strong> – </p></li>
+<li><p><strong>dataset_name</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.nlp.dataset.SQuAD2.deprecated.manual_SQuAD2.SQuAD2DataPreparation.get_vectorized_data_prep_result">
+<code class="descname">get_vectorized_data_prep_result</code><span class="sig-paren">(</span><em>data_prep_result</em>, <em>vocab</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.dataset.SQuAD2.deprecated.manual_SQuAD2.SQuAD2DataPreparation.get_vectorized_data_prep_result" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data_prep_result</strong> – </p></li>
+<li><p><strong>vocab</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.nlp.dataset.SQuAD2.deprecated.manual_SQuAD2.SQuAD2DataPreparation.load_json_file">
+<code class="descname">load_json_file</code><span class="sig-paren">(</span><em>file_path</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.dataset.SQuAD2.deprecated.manual_SQuAD2.SQuAD2DataPreparation.load_json_file" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>file_path</strong> – </p>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.nlp.dataset.SQuAD2.deprecated.manual_SQuAD2.SQuAD2DataPreparation.load_prep_dumps">
+<code class="descname">load_prep_dumps</code><span class="sig-paren">(</span><em>dump_folder_path</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.dataset.SQuAD2.deprecated.manual_SQuAD2.SQuAD2DataPreparation.load_prep_dumps" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dump_folder_path</strong> – </p>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.nlp.dataset.SQuAD2.deprecated.manual_SQuAD2.SQuAD2DataPreparation.load_vect_prep_dumps">
+<code class="descname">load_vect_prep_dumps</code><span class="sig-paren">(</span><em>dump_folder_path</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.dataset.SQuAD2.deprecated.manual_SQuAD2.SQuAD2DataPreparation.load_vect_prep_dumps" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dump_folder_path</strong> – </p>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.nlp.dataset.SQuAD2.deprecated.manual_SQuAD2.SQuAD2DataPreparation.process_answer_text">
+<code class="descname">process_answer_text</code><span class="sig-paren">(</span><em>answer_text</em>, <em>is_train</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.dataset.SQuAD2.deprecated.manual_SQuAD2.SQuAD2DataPreparation.process_answer_text" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>answer_text</strong> – </p></li>
+<li><p><strong>is_train</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.nlp.dataset.SQuAD2.deprecated.manual_SQuAD2.SQuAD2DataPreparation.process_context_text">
+<code class="descname">process_context_text</code><span class="sig-paren">(</span><em>context_text</em>, <em>is_train</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.dataset.SQuAD2.deprecated.manual_SQuAD2.SQuAD2DataPreparation.process_context_text" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>context_text</strong> – </p></li>
+<li><p><strong>is_train</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.nlp.dataset.SQuAD2.deprecated.manual_SQuAD2.SQuAD2DataPreparation.process_data">
+<code class="descname">process_data</code><span class="sig-paren">(</span><em>dump_folder_path=None</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.dataset.SQuAD2.deprecated.manual_SQuAD2.SQuAD2DataPreparation.process_data" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dump_folder_path</strong> – </p>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.nlp.dataset.SQuAD2.deprecated.manual_SQuAD2.SQuAD2DataPreparation.process_question_text">
+<code class="descname">process_question_text</code><span class="sig-paren">(</span><em>question_text</em>, <em>is_train</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.dataset.SQuAD2.deprecated.manual_SQuAD2.SQuAD2DataPreparation.process_question_text" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>question_text</strong> – </p></li>
+<li><p><strong>is_train</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.nlp.dataset.SQuAD2.deprecated.manual_SQuAD2.SQuAD2DataPreparation.vectorize_data">
+<code class="descname">vectorize_data</code><span class="sig-paren">(</span><em>train_data=None</em>, <em>dev_data=None</em>, <em>vocab=None</em>, <em>dump_folder_path=None</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.dataset.SQuAD2.deprecated.manual_SQuAD2.SQuAD2DataPreparation.vectorize_data" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>train_data</strong> – </p></li>
+<li><p><strong>dev_data</strong> – </p></li>
+<li><p><strong>vocab</strong> – </p></li>
+<li><p><strong>dump_folder_path</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.nlp.dataset.SQuAD2.deprecated.manual_SQuAD2.SQuAD2DatasetPrepareResult">
+<em class="property">class </em><code class="descclassname">AIToolbox.nlp.dataset.SQuAD2.deprecated.manual_SQuAD2.</code><code class="descname">SQuAD2DatasetPrepareResult</code><span class="sig-paren">(</span><em>dataset_name</em>, <em>dataset_type='train'</em>, <em>save_vocab=True</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.dataset.SQuAD2.deprecated.manual_SQuAD2.SQuAD2DatasetPrepareResult" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="AIToolbox.nlp.dataset.SQuAD2.deprecated.manual_SQuAD2.SQuAD2DatasetPrepareResult.store_data">
+<code class="descname">store_data</code><span class="sig-paren">(</span><em>context_text_list</em>, <em>question_text_list</em>, <em>answer_text_list</em>, <em>orig_answer_start_end_tuple_list</em>, <em>answer_start_end_tuple_list</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.dataset.SQuAD2.deprecated.manual_SQuAD2.SQuAD2DatasetPrepareResult.store_data" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>context_text_list</strong> – </p></li>
+<li><p><strong>question_text_list</strong> – </p></li>
+<li><p><strong>answer_text_list</strong> – </p></li>
+<li><p><strong>orig_answer_start_end_tuple_list</strong> – </p></li>
+<li><p><strong>answer_start_end_tuple_list</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.nlp.dataset.SQuAD2.deprecated.manual_SQuAD2.SQuAD2DatasetPrepareResult.store_max_context_questions_max_len">
+<code class="descname">store_max_context_questions_max_len</code><span class="sig-paren">(</span><em>max_ctx_qs_len</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.dataset.SQuAD2.deprecated.manual_SQuAD2.SQuAD2DatasetPrepareResult.store_max_context_questions_max_len" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>max_ctx_qs_len</strong> – </p>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.nlp.dataset.SQuAD2.deprecated.manual_SQuAD2.SQuAD2DatasetPrepareResult.store_vocab">
+<code class="descname">store_vocab</code><span class="sig-paren">(</span><em>vocab</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.dataset.SQuAD2.deprecated.manual_SQuAD2.SQuAD2DatasetPrepareResult.store_vocab" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>vocab</strong> – </p>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="AIToolbox.nlp.dataset.SQuAD2.deprecated.manual_SQuAD2.get_dataset_local_copy">
+<code class="descclassname">AIToolbox.nlp.dataset.SQuAD2.deprecated.manual_SQuAD2.</code><code class="descname">get_dataset_local_copy</code><span class="sig-paren">(</span><em>local_dataset_folder_path</em>, <em>protect_local_folder=True</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.dataset.SQuAD2.deprecated.manual_SQuAD2.get_dataset_local_copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Interface method for getting a local copy of SQuAD2 dataset</p>
+<p>If a local copy is not found, dataset is automatically downloaded from S3.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>local_dataset_folder_path</strong> (<em>str</em>) – </p></li>
+<li><p><strong>protect_local_folder</strong> (<em>bool</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-AIToolbox.nlp.dataset.SQuAD2.deprecated">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-AIToolbox.nlp.dataset.SQuAD2.deprecated" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">AIToolbox</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Marko Vidoni.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/AIToolbox.nlp.dataset.SQuAD2.deprecated.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,615 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>AIToolbox.cloud.AWS package &#8212; AIToolbox 0.3.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="aitoolbox-cloud-aws-package">
+<h1>AIToolbox.cloud.AWS package<a class="headerlink" href="#aitoolbox-cloud-aws-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-AIToolbox.cloud.AWS.data_access">
+<span id="aitoolbox-cloud-aws-data-access-module"></span><h2>AIToolbox.cloud.AWS.data_access module<a class="headerlink" href="#module-AIToolbox.cloud.AWS.data_access" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="AIToolbox.cloud.AWS.data_access.AbstractDatasetFetcher">
+<em class="property">class </em><code class="descclassname">AIToolbox.cloud.AWS.data_access.</code><code class="descname">AbstractDatasetFetcher</code><a class="headerlink" href="#AIToolbox.cloud.AWS.data_access.AbstractDatasetFetcher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<dl class="method">
+<dt id="AIToolbox.cloud.AWS.data_access.AbstractDatasetFetcher.fetch_dataset">
+<code class="descname">fetch_dataset</code><span class="sig-paren">(</span><em>protect_local_folder=True</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.cloud.AWS.data_access.AbstractDatasetFetcher.fetch_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>protect_local_folder</strong> (<em>bool</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.cloud.AWS.data_access.BaseDataLoader">
+<em class="property">class </em><code class="descclassname">AIToolbox.cloud.AWS.data_access.</code><code class="descname">BaseDataLoader</code><span class="sig-paren">(</span><em>bucket_name='dataset-store'</em>, <em>local_base_data_folder_path='~/project/data'</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.cloud.AWS.data_access.BaseDataLoader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="AIToolbox.cloud.AWS.data_access.BaseDataLoader.exists_local_data_folder">
+<code class="descname">exists_local_data_folder</code><span class="sig-paren">(</span><em>data_folder_name</em>, <em>protect_local_folder=True</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.cloud.AWS.data_access.BaseDataLoader.exists_local_data_folder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if a specific folder exists in the base data folder</p>
+<p>For example, Squad dataset folder inside /data folder, or pretrained_models folder inside /model_results folder</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data_folder_name</strong> (<em>str</em>) – </p></li>
+<li><p><strong>protect_local_folder</strong> (<em>bool</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.cloud.AWS.data_access.BaseDataLoader.load_file">
+<code class="descname">load_file</code><span class="sig-paren">(</span><em>cloud_file_path</em>, <em>local_file_path</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.cloud.AWS.data_access.BaseDataLoader.load_file" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cloud_file_path</strong> (<em>str</em>) – </p></li>
+<li><p><strong>local_file_path</strong> (<em>str</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.cloud.AWS.data_access.BaseDataLoader.preproc_dataset_available">
+<code class="descname">preproc_dataset_available</code><span class="sig-paren">(</span><em>preproc_dataset_name</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.cloud.AWS.data_access.BaseDataLoader.preproc_dataset_available" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="AIToolbox.cloud.AWS.data_access.BaseDataLoader.unzip_file">
+<em class="property">static </em><code class="descname">unzip_file</code><span class="sig-paren">(</span><em>file_path</em>, <em>target_dir_path</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.cloud.AWS.data_access.BaseDataLoader.unzip_file" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_path</strong> (<em>str</em>) – </p></li>
+<li><p><strong>target_dir_path</strong> (<em>str</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.cloud.AWS.data_access.BaseDataSaver">
+<em class="property">class </em><code class="descclassname">AIToolbox.cloud.AWS.data_access.</code><code class="descname">BaseDataSaver</code><span class="sig-paren">(</span><em>bucket_name='model-result'</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.cloud.AWS.data_access.BaseDataSaver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="AIToolbox.cloud.AWS.data_access.BaseDataSaver.save_file">
+<code class="descname">save_file</code><span class="sig-paren">(</span><em>local_file_path</em>, <em>cloud_file_path</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.cloud.AWS.data_access.BaseDataSaver.save_file" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>local_file_path</strong> (<em>str</em>) – </p></li>
+<li><p><strong>cloud_file_path</strong> (<em>str</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.cloud.AWS.data_access.CNNDailyMailDatasetFetcher">
+<em class="property">class </em><code class="descclassname">AIToolbox.cloud.AWS.data_access.</code><code class="descname">CNNDailyMailDatasetFetcher</code><span class="sig-paren">(</span><em>bucket_name='dataset-store'</em>, <em>local_dataset_folder_path='~/project/data'</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.cloud.AWS.data_access.CNNDailyMailDatasetFetcher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.cloud.AWS.data_access.AbstractDatasetFetcher" title="AIToolbox.cloud.AWS.data_access.AbstractDatasetFetcher"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.cloud.AWS.data_access.AbstractDatasetFetcher</span></code></a>, <a class="reference internal" href="#AIToolbox.cloud.AWS.data_access.BaseDataLoader" title="AIToolbox.cloud.AWS.data_access.BaseDataLoader"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.cloud.AWS.data_access.BaseDataLoader</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.cloud.AWS.data_access.CNNDailyMailDatasetFetcher.fetch_dataset">
+<code class="descname">fetch_dataset</code><span class="sig-paren">(</span><em>protect_local_folder=True</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.cloud.AWS.data_access.CNNDailyMailDatasetFetcher.fetch_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>protect_local_folder</strong> (<em>bool</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.cloud.AWS.data_access.CNNDailyMailDatasetFetcher.fetch_preprocessed_dataset">
+<code class="descname">fetch_preprocessed_dataset</code><span class="sig-paren">(</span><em>preprocess_name</em>, <em>protect_local_folder=True</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.cloud.AWS.data_access.CNNDailyMailDatasetFetcher.fetch_preprocessed_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>preprocess_name</strong> (<em>str</em>) – </p></li>
+<li><p><strong>protect_local_folder</strong> (<em>bool</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.cloud.AWS.data_access.HotpotQADatasetFetcher">
+<em class="property">class </em><code class="descclassname">AIToolbox.cloud.AWS.data_access.</code><code class="descname">HotpotQADatasetFetcher</code><span class="sig-paren">(</span><em>bucket_name='dataset-store'</em>, <em>local_dataset_folder_path='~/project/data'</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.cloud.AWS.data_access.HotpotQADatasetFetcher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.cloud.AWS.data_access.AbstractDatasetFetcher" title="AIToolbox.cloud.AWS.data_access.AbstractDatasetFetcher"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.cloud.AWS.data_access.AbstractDatasetFetcher</span></code></a>, <a class="reference internal" href="#AIToolbox.cloud.AWS.data_access.BaseDataLoader" title="AIToolbox.cloud.AWS.data_access.BaseDataLoader"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.cloud.AWS.data_access.BaseDataLoader</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.cloud.AWS.data_access.HotpotQADatasetFetcher.fetch_dataset">
+<code class="descname">fetch_dataset</code><span class="sig-paren">(</span><em>protect_local_folder=True</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.cloud.AWS.data_access.HotpotQADatasetFetcher.fetch_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>protect_local_folder</strong> (<em>bool</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.cloud.AWS.data_access.QAngarooDatasetFetcher">
+<em class="property">class </em><code class="descclassname">AIToolbox.cloud.AWS.data_access.</code><code class="descname">QAngarooDatasetFetcher</code><span class="sig-paren">(</span><em>bucket_name='dataset-store'</em>, <em>local_dataset_folder_path='~/project/data'</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.cloud.AWS.data_access.QAngarooDatasetFetcher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.cloud.AWS.data_access.AbstractDatasetFetcher" title="AIToolbox.cloud.AWS.data_access.AbstractDatasetFetcher"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.cloud.AWS.data_access.AbstractDatasetFetcher</span></code></a>, <a class="reference internal" href="#AIToolbox.cloud.AWS.data_access.BaseDataLoader" title="AIToolbox.cloud.AWS.data_access.BaseDataLoader"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.cloud.AWS.data_access.BaseDataLoader</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.cloud.AWS.data_access.QAngarooDatasetFetcher.fetch_dataset">
+<code class="descname">fetch_dataset</code><span class="sig-paren">(</span><em>protect_local_folder=True</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.cloud.AWS.data_access.QAngarooDatasetFetcher.fetch_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>protect_local_folder</strong> (<em>bool</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.cloud.AWS.data_access.SQuAD2DatasetFetcher">
+<em class="property">class </em><code class="descclassname">AIToolbox.cloud.AWS.data_access.</code><code class="descname">SQuAD2DatasetFetcher</code><span class="sig-paren">(</span><em>bucket_name='dataset-store'</em>, <em>local_dataset_folder_path='~/project/data'</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.cloud.AWS.data_access.SQuAD2DatasetFetcher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.cloud.AWS.data_access.AbstractDatasetFetcher" title="AIToolbox.cloud.AWS.data_access.AbstractDatasetFetcher"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.cloud.AWS.data_access.AbstractDatasetFetcher</span></code></a>, <a class="reference internal" href="#AIToolbox.cloud.AWS.data_access.BaseDataLoader" title="AIToolbox.cloud.AWS.data_access.BaseDataLoader"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.cloud.AWS.data_access.BaseDataLoader</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.cloud.AWS.data_access.SQuAD2DatasetFetcher.fetch_dataset">
+<code class="descname">fetch_dataset</code><span class="sig-paren">(</span><em>protect_local_folder=True</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.cloud.AWS.data_access.SQuAD2DatasetFetcher.fetch_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>protect_local_folder</strong> (<em>bool</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-AIToolbox.cloud.AWS.model_load">
+<span id="aitoolbox-cloud-aws-model-load-module"></span><h2>AIToolbox.cloud.AWS.model_load module<a class="headerlink" href="#module-AIToolbox.cloud.AWS.model_load" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="AIToolbox.cloud.AWS.model_load.BaseModelLoader">
+<em class="property">class </em><code class="descclassname">AIToolbox.cloud.AWS.model_load.</code><code class="descname">BaseModelLoader</code><span class="sig-paren">(</span><em>local_model_loader</em>, <em>project_name</em>, <em>experiment_folder</em>, <em>model_save_dir</em>, <em>local_model_result_folder_path</em>, <em>pretrained_model_dir='pretrained_models'</em>, <em>bucket_name='model-result'</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.cloud.AWS.model_load.BaseModelLoader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.cloud.AWS.data_access.BaseDataLoader" title="AIToolbox.cloud.AWS.data_access.BaseDataLoader"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.cloud.AWS.data_access.BaseDataLoader</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.cloud.AWS.model_load.BaseModelLoader.load_model">
+<code class="descname">load_model</code><span class="sig-paren">(</span><em>model_name</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.cloud.AWS.model_load.BaseModelLoader.load_model" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model_name</strong> (<em>str</em>) – </p></li>
+<li><p><strong>**kwargs</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.cloud.AWS.model_load.PyTorchS3ModelLoader">
+<em class="property">class </em><code class="descclassname">AIToolbox.cloud.AWS.model_load.</code><code class="descname">PyTorchS3ModelLoader</code><span class="sig-paren">(</span><em>project_name</em>, <em>experiment_folder</em>, <em>model_save_dir</em>, <em>local_model_result_folder_path</em>, <em>pretrained_model_dir='pretrained_models'</em>, <em>bucket_name='model-result'</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.cloud.AWS.model_load.PyTorchS3ModelLoader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.cloud.AWS.model_load.BaseModelLoader" title="AIToolbox.cloud.AWS.model_load.BaseModelLoader"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.cloud.AWS.model_load.BaseModelLoader</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-AIToolbox.cloud.AWS.model_save">
+<span id="aitoolbox-cloud-aws-model-save-module"></span><h2>AIToolbox.cloud.AWS.model_save module<a class="headerlink" href="#module-AIToolbox.cloud.AWS.model_save" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="AIToolbox.cloud.AWS.model_save.AbstractModelSaver">
+<em class="property">class </em><code class="descclassname">AIToolbox.cloud.AWS.model_save.</code><code class="descname">AbstractModelSaver</code><a class="headerlink" href="#AIToolbox.cloud.AWS.model_save.AbstractModelSaver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<dl class="method">
+<dt id="AIToolbox.cloud.AWS.model_save.AbstractModelSaver.save_model">
+<code class="descname">save_model</code><span class="sig-paren">(</span><em>model</em>, <em>project_name</em>, <em>experiment_name</em>, <em>experiment_timestamp=None</em>, <em>epoch=None</em>, <em>protect_existing_folder=True</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.cloud.AWS.model_save.AbstractModelSaver.save_model" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> – </p></li>
+<li><p><strong>project_name</strong> (<em>str</em>) – </p></li>
+<li><p><strong>experiment_name</strong> (<em>str</em>) – </p></li>
+<li><p><strong>experiment_timestamp</strong> (<em>str</em><em> or </em><em>None</em>) – </p></li>
+<li><p><strong>epoch</strong> (<em>int</em><em> or </em><em>None</em>) – </p></li>
+<li><p><strong>protect_existing_folder</strong> (<em>bool</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>model_s3_path, experiment_timestamp, model_local_path</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(str, str, str)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.cloud.AWS.model_save.BaseModelSaver">
+<em class="property">class </em><code class="descclassname">AIToolbox.cloud.AWS.model_save.</code><code class="descname">BaseModelSaver</code><span class="sig-paren">(</span><em>bucket_name='model-result'</em>, <em>cloud_dir_prefix=''</em>, <em>checkpoint_model=False</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.cloud.AWS.model_save.BaseModelSaver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.cloud.AWS.data_access.BaseDataSaver" title="AIToolbox.cloud.AWS.data_access.BaseDataSaver"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.cloud.AWS.data_access.BaseDataSaver</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.cloud.AWS.model_save.BaseModelSaver.create_experiment_cloud_storage_folder_structure">
+<code class="descname">create_experiment_cloud_storage_folder_structure</code><span class="sig-paren">(</span><em>project_name</em>, <em>experiment_name</em>, <em>experiment_timestamp</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.cloud.AWS.model_save.BaseModelSaver.create_experiment_cloud_storage_folder_structure" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>project_name</strong> (<em>str</em>) – </p></li>
+<li><p><strong>experiment_name</strong> (<em>str</em>) – </p></li>
+<li><p><strong>experiment_timestamp</strong> (<em>str</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.cloud.AWS.model_save.KerasS3ModelSaver">
+<em class="property">class </em><code class="descclassname">AIToolbox.cloud.AWS.model_save.</code><code class="descname">KerasS3ModelSaver</code><span class="sig-paren">(</span><em>bucket_name='model-result'</em>, <em>cloud_dir_prefix=''</em>, <em>local_model_result_folder_path='~/project/model_result'</em>, <em>checkpoint_model=False</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.cloud.AWS.model_save.KerasS3ModelSaver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.cloud.AWS.model_save.AbstractModelSaver" title="AIToolbox.cloud.AWS.model_save.AbstractModelSaver"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.cloud.AWS.model_save.AbstractModelSaver</span></code></a>, <a class="reference internal" href="#AIToolbox.cloud.AWS.model_save.BaseModelSaver" title="AIToolbox.cloud.AWS.model_save.BaseModelSaver"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.cloud.AWS.model_save.BaseModelSaver</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.cloud.AWS.model_save.KerasS3ModelSaver.save_model">
+<code class="descname">save_model</code><span class="sig-paren">(</span><em>model</em>, <em>project_name</em>, <em>experiment_name</em>, <em>experiment_timestamp=None</em>, <em>epoch=None</em>, <em>protect_existing_folder=True</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.cloud.AWS.model_save.KerasS3ModelSaver.save_model" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<em>keras.engine.training.Model</em>) – </p></li>
+<li><p><strong>project_name</strong> (<em>str</em>) – </p></li>
+<li><p><strong>experiment_name</strong> (<em>str</em>) – </p></li>
+<li><p><strong>experiment_timestamp</strong> (<em>str</em><em> or </em><em>None</em>) – </p></li>
+<li><p><strong>epoch</strong> (<em>int</em><em> or </em><em>None</em>) – </p></li>
+<li><p><strong>protect_existing_folder</strong> (<em>bool</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>model_s3_path, experiment_timestamp, model_local_path</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(str, str, str)</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>local_model_result_folder_path = ‘~/project/model_results’
+# local_model_result_folder_path = ‘~/PycharmProjects/MemoryNet/model_results’
+m_saver = KerasS3ModelSaver(local_model_result_folder_path=local_model_result_folder_path)
+m_saver.save_model(model=model,</p>
+<blockquote>
+<div><p>project_name=’QA_QAngaroo’, experiment_name=’FastQA_RNN_concat_model_GLOVE’,
+protect_existing_folder=False)</p>
+</div></blockquote>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.cloud.AWS.model_save.PyTorchS3ModelSaver">
+<em class="property">class </em><code class="descclassname">AIToolbox.cloud.AWS.model_save.</code><code class="descname">PyTorchS3ModelSaver</code><span class="sig-paren">(</span><em>bucket_name='model-result'</em>, <em>cloud_dir_prefix=''</em>, <em>local_model_result_folder_path='~/project/model_result'</em>, <em>checkpoint_model=False</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.cloud.AWS.model_save.PyTorchS3ModelSaver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.cloud.AWS.model_save.AbstractModelSaver" title="AIToolbox.cloud.AWS.model_save.AbstractModelSaver"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.cloud.AWS.model_save.AbstractModelSaver</span></code></a>, <a class="reference internal" href="#AIToolbox.cloud.AWS.model_save.BaseModelSaver" title="AIToolbox.cloud.AWS.model_save.BaseModelSaver"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.cloud.AWS.model_save.BaseModelSaver</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.cloud.AWS.model_save.PyTorchS3ModelSaver.save_model">
+<code class="descname">save_model</code><span class="sig-paren">(</span><em>model</em>, <em>project_name</em>, <em>experiment_name</em>, <em>experiment_timestamp=None</em>, <em>epoch=None</em>, <em>protect_existing_folder=True</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.cloud.AWS.model_save.PyTorchS3ModelSaver.save_model" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<em>dict</em>) – </p></li>
+<li><p><strong>project_name</strong> (<em>str</em>) – </p></li>
+<li><p><strong>experiment_name</strong> (<em>str</em>) – </p></li>
+<li><p><strong>experiment_timestamp</strong> (<em>str</em><em> or </em><em>None</em>) – </p></li>
+<li><p><strong>epoch</strong> (<em>int</em><em> or </em><em>None</em>) – </p></li>
+<li><p><strong>protect_existing_folder</strong> (<em>bool</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>model_s3_path, experiment_timestamp, model_local_path</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(str, str, str)</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>local_model_result_folder_path = ‘~/project/model_results’
+# local_model_result_folder_path = ‘~/PycharmProjects/MemoryNet/model_results’
+m_saver = PyTorchLocalModelSaver(local_model_result_folder_path=local_model_result_folder_path)
+m_saver.save_model(model=model,</p>
+<blockquote>
+<div><p>project_name=’QA_QAngaroo’, experiment_name=’FastQA_RNN_concat_model_GLOVE’,
+protect_existing_folder=False)</p>
+</div></blockquote>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.cloud.AWS.model_save.TensorFlowS3ModelSaver">
+<em class="property">class </em><code class="descclassname">AIToolbox.cloud.AWS.model_save.</code><code class="descname">TensorFlowS3ModelSaver</code><span class="sig-paren">(</span><em>bucket_name='model-result'</em>, <em>cloud_dir_prefix=''</em>, <em>local_model_result_folder_path='~/project/model_result'</em>, <em>checkpoint_model=False</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.cloud.AWS.model_save.TensorFlowS3ModelSaver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.cloud.AWS.model_save.AbstractModelSaver" title="AIToolbox.cloud.AWS.model_save.AbstractModelSaver"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.cloud.AWS.model_save.AbstractModelSaver</span></code></a>, <a class="reference internal" href="#AIToolbox.cloud.AWS.model_save.BaseModelSaver" title="AIToolbox.cloud.AWS.model_save.BaseModelSaver"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.cloud.AWS.model_save.BaseModelSaver</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.cloud.AWS.model_save.TensorFlowS3ModelSaver.save_model">
+<code class="descname">save_model</code><span class="sig-paren">(</span><em>model</em>, <em>project_name</em>, <em>experiment_name</em>, <em>experiment_timestamp=None</em>, <em>epoch=None</em>, <em>protect_existing_folder=True</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.cloud.AWS.model_save.TensorFlowS3ModelSaver.save_model" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> – </p></li>
+<li><p><strong>project_name</strong> (<em>str</em>) – </p></li>
+<li><p><strong>experiment_name</strong> (<em>str</em>) – </p></li>
+<li><p><strong>experiment_timestamp</strong> (<em>str</em><em> or </em><em>None</em>) – </p></li>
+<li><p><strong>epoch</strong> (<em>int</em><em> or </em><em>None</em>) – </p></li>
+<li><p><strong>protect_existing_folder</strong> (<em>bool</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>model_s3_path, experiment_timestamp, model_local_path</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(str, str, str)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-AIToolbox.cloud.AWS.results_save">
+<span id="aitoolbox-cloud-aws-results-save-module"></span><h2>AIToolbox.cloud.AWS.results_save module<a class="headerlink" href="#module-AIToolbox.cloud.AWS.results_save" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="AIToolbox.cloud.AWS.results_save.AbstractResultsSaver">
+<em class="property">class </em><code class="descclassname">AIToolbox.cloud.AWS.results_save.</code><code class="descname">AbstractResultsSaver</code><a class="headerlink" href="#AIToolbox.cloud.AWS.results_save.AbstractResultsSaver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<dl class="method">
+<dt id="AIToolbox.cloud.AWS.results_save.AbstractResultsSaver.save_experiment_results">
+<code class="descname">save_experiment_results</code><span class="sig-paren">(</span><em>result_package</em>, <em>project_name</em>, <em>experiment_name</em>, <em>experiment_timestamp=None</em>, <em>save_true_pred_labels=False</em>, <em>separate_files=False</em>, <em>protect_existing_folder=True</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.cloud.AWS.results_save.AbstractResultsSaver.save_experiment_results" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>result_package</strong> (<a class="reference internal" href="AIToolbox.experiment.result_package.html#AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage" title="AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage"><em>AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage</em></a>) – </p></li>
+<li><p><strong>project_name</strong> (<em>str</em>) – </p></li>
+<li><p><strong>experiment_name</strong> (<em>str</em>) – </p></li>
+<li><p><strong>experiment_timestamp</strong> (<em>str</em>) – </p></li>
+<li><p><strong>save_true_pred_labels</strong> (<em>bool</em>) – </p></li>
+<li><p><strong>separate_files</strong> (<em>bool</em>) – </p></li>
+<li><p><strong>protect_existing_folder</strong> (<em>bool</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>results_file_s3_path, experiment_timestamp</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(str, str)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.cloud.AWS.results_save.BaseResultsSaver">
+<em class="property">class </em><code class="descclassname">AIToolbox.cloud.AWS.results_save.</code><code class="descname">BaseResultsSaver</code><span class="sig-paren">(</span><em>bucket_name='model-result'</em>, <em>cloud_dir_prefix=''</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.cloud.AWS.results_save.BaseResultsSaver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.cloud.AWS.data_access.BaseDataSaver" title="AIToolbox.cloud.AWS.data_access.BaseDataSaver"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.cloud.AWS.data_access.BaseDataSaver</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.cloud.AWS.results_save.BaseResultsSaver.create_experiment_cloud_storage_folder_structure">
+<code class="descname">create_experiment_cloud_storage_folder_structure</code><span class="sig-paren">(</span><em>project_name</em>, <em>experiment_name</em>, <em>experiment_timestamp</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.cloud.AWS.results_save.BaseResultsSaver.create_experiment_cloud_storage_folder_structure" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>project_name</strong> (<em>str</em>) – </p></li>
+<li><p><strong>experiment_name</strong> (<em>str</em>) – </p></li>
+<li><p><strong>experiment_timestamp</strong> (<em>str</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.cloud.AWS.results_save.S3ResultsSaver">
+<em class="property">class </em><code class="descclassname">AIToolbox.cloud.AWS.results_save.</code><code class="descname">S3ResultsSaver</code><span class="sig-paren">(</span><em>bucket_name='model-result'</em>, <em>cloud_dir_prefix=''</em>, <em>local_model_result_folder_path='~/project/model_result'</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.cloud.AWS.results_save.S3ResultsSaver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.cloud.AWS.results_save.AbstractResultsSaver" title="AIToolbox.cloud.AWS.results_save.AbstractResultsSaver"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.cloud.AWS.results_save.AbstractResultsSaver</span></code></a>, <a class="reference internal" href="#AIToolbox.cloud.AWS.results_save.BaseResultsSaver" title="AIToolbox.cloud.AWS.results_save.BaseResultsSaver"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.cloud.AWS.results_save.BaseResultsSaver</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.cloud.AWS.results_save.S3ResultsSaver.save_experiment_results">
+<code class="descname">save_experiment_results</code><span class="sig-paren">(</span><em>result_package</em>, <em>project_name</em>, <em>experiment_name</em>, <em>experiment_timestamp=None</em>, <em>save_true_pred_labels=False</em>, <em>separate_files=False</em>, <em>protect_existing_folder=True</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.cloud.AWS.results_save.S3ResultsSaver.save_experiment_results" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>result_package</strong> (<a class="reference internal" href="AIToolbox.experiment.result_package.html#AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage" title="AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage"><em>AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage</em></a>) – </p></li>
+<li><p><strong>project_name</strong> (<em>str</em>) – </p></li>
+<li><p><strong>experiment_name</strong> (<em>str</em>) – </p></li>
+<li><p><strong>experiment_timestamp</strong> (<em>str</em>) – </p></li>
+<li><p><strong>save_true_pred_labels</strong> (<em>bool</em>) – </p></li>
+<li><p><strong>separate_files</strong> (<em>bool</em>) – </p></li>
+<li><p><strong>protect_existing_folder</strong> (<em>bool</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(str, str)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-AIToolbox.cloud.AWS.simple_email_service">
+<span id="aitoolbox-cloud-aws-simple-email-service-module"></span><h2>AIToolbox.cloud.AWS.simple_email_service module<a class="headerlink" href="#module-AIToolbox.cloud.AWS.simple_email_service" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="AIToolbox.cloud.AWS.simple_email_service.SESSender">
+<em class="property">class </em><code class="descclassname">AIToolbox.cloud.AWS.simple_email_service.</code><code class="descname">SESSender</code><span class="sig-paren">(</span><em>sender_name</em>, <em>sender_email</em>, <em>recipient_email</em>, <em>aws_region='eu-west-1'</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.cloud.AWS.simple_email_service.SESSender" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="AIToolbox.cloud.AWS.simple_email_service.SESSender.send_email">
+<code class="descname">send_email</code><span class="sig-paren">(</span><em>subject</em>, <em>body</em>, <em>attachment_file_paths=None</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.cloud.AWS.simple_email_service.SESSender.send_email" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>subject</strong> (<em>str</em>) – email subject</p></li>
+<li><p><strong>body</strong> (<em>str</em>) – HTML body of the email</p></li>
+<li><p><strong>attachment_file_paths</strong> (<em>list</em><em> or </em><em>None</em>) – list of local paths pointing to the email attachment files</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-AIToolbox.cloud.AWS">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-AIToolbox.cloud.AWS" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">AIToolbox</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Marko Vidoni.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/AIToolbox.cloud.AWS.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

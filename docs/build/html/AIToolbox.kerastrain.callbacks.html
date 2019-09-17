@@ -1,0 +1,210 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>AIToolbox.kerastrain.callbacks package &#8212; AIToolbox 0.3.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="aitoolbox-kerastrain-callbacks-package">
+<h1>AIToolbox.kerastrain.callbacks package<a class="headerlink" href="#aitoolbox-kerastrain-callbacks-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-AIToolbox.kerastrain.callbacks.callback_handler">
+<span id="aitoolbox-kerastrain-callbacks-callback-handler-module"></span><h2>AIToolbox.kerastrain.callbacks.callback_handler module<a class="headerlink" href="#module-AIToolbox.kerastrain.callbacks.callback_handler" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="AIToolbox.kerastrain.callbacks.callback_handler.CallbacksHandler">
+<em class="property">class </em><code class="descclassname">AIToolbox.kerastrain.callbacks.callback_handler.</code><code class="descname">CallbacksHandler</code><span class="sig-paren">(</span><em>train_loop_obj</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.kerastrain.callbacks.callback_handler.CallbacksHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="AIToolbox.kerastrain.callbacks.callback_handler.CallbacksHandler.execute_train_end_train_loop">
+<code class="descname">execute_train_end_train_loop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.kerastrain.callbacks.callback_handler.CallbacksHandler.execute_train_end_train_loop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.kerastrain.callbacks.callback_handler.CallbacksHandler.print_registered_callback_names">
+<code class="descname">print_registered_callback_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.kerastrain.callbacks.callback_handler.CallbacksHandler.print_registered_callback_names" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.kerastrain.callbacks.callback_handler.CallbacksHandler.register_callbacks">
+<code class="descname">register_callbacks</code><span class="sig-paren">(</span><em>callbacks</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.kerastrain.callbacks.callback_handler.CallbacksHandler.register_callbacks" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>callbacks</strong> (<em>list</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-AIToolbox.kerastrain.callbacks.callbacks">
+<span id="aitoolbox-kerastrain-callbacks-callbacks-module"></span><h2>AIToolbox.kerastrain.callbacks.callbacks module<a class="headerlink" href="#module-AIToolbox.kerastrain.callbacks.callbacks" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="AIToolbox.kerastrain.callbacks.callbacks.AbstractKerasCallback">
+<em class="property">class </em><code class="descclassname">AIToolbox.kerastrain.callbacks.callbacks.</code><code class="descname">AbstractKerasCallback</code><span class="sig-paren">(</span><em>callback_name</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.kerastrain.callbacks.callbacks.AbstractKerasCallback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">keras.callbacks.Callback</span></code></p>
+<dl class="method">
+<dt id="AIToolbox.kerastrain.callbacks.callbacks.AbstractKerasCallback.on_train_end_train_loop">
+<code class="descname">on_train_end_train_loop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.kerastrain.callbacks.callbacks.AbstractKerasCallback.on_train_end_train_loop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.kerastrain.callbacks.callbacks.AbstractKerasCallback.on_train_loop_registration">
+<code class="descname">on_train_loop_registration</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.kerastrain.callbacks.callbacks.AbstractKerasCallback.on_train_loop_registration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute callback initialization / preparation after the train_loop_object becomes available</p>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.kerastrain.callbacks.callbacks.AbstractKerasCallback.register_train_loop_object">
+<code class="descname">register_train_loop_object</code><span class="sig-paren">(</span><em>train_loop_obj</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.kerastrain.callbacks.callbacks.AbstractKerasCallback.register_train_loop_object" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>train_loop_obj</strong> (<a class="reference internal" href="AIToolbox.kerastrain.html#AIToolbox.kerastrain.train_loop.TrainLoop" title="AIToolbox.kerastrain.train_loop.TrainLoop"><em>AIToolbox.kerastrain.train_loop.TrainLoop</em></a>) – </p>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.kerastrain.callbacks.callbacks.ModelCheckpoint">
+<em class="property">class </em><code class="descclassname">AIToolbox.kerastrain.callbacks.callbacks.</code><code class="descname">ModelCheckpoint</code><span class="sig-paren">(</span><em>project_name</em>, <em>experiment_name</em>, <em>local_model_result_folder_path</em>, <em>cloud_save_mode='s3'</em>, <em>rm_subopt_local_models=False</em>, <em>num_best_checkpoints_kept=2</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.kerastrain.callbacks.callbacks.ModelCheckpoint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.kerastrain.callbacks.callbacks.AbstractKerasCallback" title="AIToolbox.kerastrain.callbacks.callbacks.AbstractKerasCallback"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.kerastrain.callbacks.callbacks.AbstractKerasCallback</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.kerastrain.callbacks.callbacks.ModelCheckpoint.on_epoch_end">
+<code class="descname">on_epoch_end</code><span class="sig-paren">(</span><em>epoch</em>, <em>logs=None</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.kerastrain.callbacks.callbacks.ModelCheckpoint.on_epoch_end" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.kerastrain.callbacks.callbacks.ModelTrainEndSave">
+<em class="property">class </em><code class="descclassname">AIToolbox.kerastrain.callbacks.callbacks.</code><code class="descname">ModelTrainEndSave</code><span class="sig-paren">(</span><em>project_name</em>, <em>experiment_name</em>, <em>local_model_result_folder_path</em>, <em>args</em>, <em>val_result_package</em>, <em>test_result_package</em>, <em>cloud_save_mode='s3'</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.kerastrain.callbacks.callbacks.ModelTrainEndSave" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.kerastrain.callbacks.callbacks.AbstractKerasCallback" title="AIToolbox.kerastrain.callbacks.callbacks.AbstractKerasCallback"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.kerastrain.callbacks.callbacks.AbstractKerasCallback</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.kerastrain.callbacks.callbacks.ModelTrainEndSave.check_result_packages">
+<code class="descname">check_result_packages</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.kerastrain.callbacks.callbacks.ModelTrainEndSave.check_result_packages" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.kerastrain.callbacks.callbacks.ModelTrainEndSave.on_train_end_train_loop">
+<code class="descname">on_train_end_train_loop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.kerastrain.callbacks.callbacks.ModelTrainEndSave.on_train_end_train_loop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.kerastrain.callbacks.callbacks.ModelTrainEndSave.on_train_loop_registration">
+<code class="descname">on_train_loop_registration</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.kerastrain.callbacks.callbacks.ModelTrainEndSave.on_train_loop_registration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute callback initialization / preparation after the train_loop_object becomes available</p>
+<p>Returns:</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-AIToolbox.kerastrain.callbacks">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-AIToolbox.kerastrain.callbacks" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">AIToolbox</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Marko Vidoni.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/AIToolbox.kerastrain.callbacks.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

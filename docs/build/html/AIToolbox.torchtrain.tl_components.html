@@ -1,0 +1,422 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>AIToolbox.torchtrain.tl_components package &#8212; AIToolbox 0.3.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="aitoolbox-torchtrain-tl-components-package">
+<h1>AIToolbox.torchtrain.tl_components package<a class="headerlink" href="#aitoolbox-torchtrain-tl-components-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-AIToolbox.torchtrain.tl_components.callback_handler">
+<span id="aitoolbox-torchtrain-tl-components-callback-handler-module"></span><h2>AIToolbox.torchtrain.tl_components.callback_handler module<a class="headerlink" href="#module-AIToolbox.torchtrain.tl_components.callback_handler" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="AIToolbox.torchtrain.tl_components.callback_handler.CallbacksHandler">
+<em class="property">class </em><code class="descclassname">AIToolbox.torchtrain.tl_components.callback_handler.</code><code class="descname">CallbacksHandler</code><span class="sig-paren">(</span><em>train_loop_obj</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.tl_components.callback_handler.CallbacksHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="staticmethod">
+<dt id="AIToolbox.torchtrain.tl_components.callback_handler.CallbacksHandler.enforce_callback_type">
+<em class="property">static </em><code class="descname">enforce_callback_type</code><span class="sig-paren">(</span><em>callbacks</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.tl_components.callback_handler.CallbacksHandler.enforce_callback_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.tl_components.callback_handler.CallbacksHandler.execute_batch_begin">
+<code class="descname">execute_batch_begin</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.tl_components.callback_handler.CallbacksHandler.execute_batch_begin" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.tl_components.callback_handler.CallbacksHandler.execute_batch_end">
+<code class="descname">execute_batch_end</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.tl_components.callback_handler.CallbacksHandler.execute_batch_end" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.tl_components.callback_handler.CallbacksHandler.execute_epoch_begin">
+<code class="descname">execute_epoch_begin</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.tl_components.callback_handler.CallbacksHandler.execute_epoch_begin" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.tl_components.callback_handler.CallbacksHandler.execute_epoch_end">
+<code class="descname">execute_epoch_end</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.tl_components.callback_handler.CallbacksHandler.execute_epoch_end" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.tl_components.callback_handler.CallbacksHandler.execute_gradient_update">
+<code class="descname">execute_gradient_update</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.tl_components.callback_handler.CallbacksHandler.execute_gradient_update" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.tl_components.callback_handler.CallbacksHandler.execute_optimizer_step">
+<code class="descname">execute_optimizer_step</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.tl_components.callback_handler.CallbacksHandler.execute_optimizer_step" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.tl_components.callback_handler.CallbacksHandler.execute_train_begin">
+<code class="descname">execute_train_begin</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.tl_components.callback_handler.CallbacksHandler.execute_train_begin" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.tl_components.callback_handler.CallbacksHandler.execute_train_end">
+<code class="descname">execute_train_end</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.tl_components.callback_handler.CallbacksHandler.execute_train_end" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.tl_components.callback_handler.CallbacksHandler.print_registered_callback_names">
+<code class="descname">print_registered_callback_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.tl_components.callback_handler.CallbacksHandler.print_registered_callback_names" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.tl_components.callback_handler.CallbacksHandler.register_callbacks">
+<code class="descname">register_callbacks</code><span class="sig-paren">(</span><em>callbacks</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.tl_components.callback_handler.CallbacksHandler.register_callbacks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Register TrainLoop object reference inside the listed callbacks when the TrainLoop is created</p>
+<p>Normally, this is called from inside of the train loop by the TrainLoop itself. Basically train loop “registers”
+itself.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>callbacks</strong> (<em>list</em>) – list of callbacks</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-AIToolbox.torchtrain.tl_components.message_passing">
+<span id="aitoolbox-torchtrain-tl-components-message-passing-module"></span><h2>AIToolbox.torchtrain.tl_components.message_passing module<a class="headerlink" href="#module-AIToolbox.torchtrain.tl_components.message_passing" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="AIToolbox.torchtrain.tl_components.message_passing.Message">
+<em class="property">class </em><code class="descclassname">AIToolbox.torchtrain.tl_components.message_passing.</code><code class="descname">Message</code><span class="sig-paren">(</span><em>key</em>, <em>value</em>, <em>msg_handling_settings</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.tl_components.message_passing.Message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.torchtrain.tl_components.message_passing.MessageService">
+<em class="property">class </em><code class="descclassname">AIToolbox.torchtrain.tl_components.message_passing.</code><code class="descname">MessageService</code><a class="headerlink" href="#AIToolbox.torchtrain.tl_components.message_passing.MessageService" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="AIToolbox.torchtrain.tl_components.message_passing.MessageService.end_of_epoch_trigger">
+<code class="descname">end_of_epoch_trigger</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.tl_components.message_passing.MessageService.end_of_epoch_trigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Purging of the message service at the end of the epoch</p>
+<p>Normally executed by the TrainLoop automatically after all the callbacks were executed at the end of every epoch</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.tl_components.message_passing.MessageService.read_messages">
+<code class="descname">read_messages</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.tl_components.message_passing.MessageService.read_messages" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read messages by key from the TrainLoop message service</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>key</strong> (<em>str</em>) – message key</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>if message key present return content, otherwise return None</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="AIToolbox.torchtrain.tl_components.message_passing.MessageService.validate_msg_handling_settings">
+<em class="property">static </em><code class="descname">validate_msg_handling_settings</code><span class="sig-paren">(</span><em>msg_handling_settings</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.tl_components.message_passing.MessageService.validate_msg_handling_settings" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.tl_components.message_passing.MessageService.write_message">
+<code class="descname">write_message</code><span class="sig-paren">(</span><em>key</em>, <em>value</em>, <em>msg_handling_settings='until_end_of_epoch'</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.tl_components.message_passing.MessageService.write_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a new message to the message service</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<em>str</em>) – message key</p></li>
+<li><p><strong>value</strong> – message content</p></li>
+<li><p><strong>msg_handling_settings</strong> (<em>str</em><em> or </em><em>list</em>) – setting how to handle the lifespan of the message</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-AIToolbox.torchtrain.tl_components.model_prediction_store">
+<span id="aitoolbox-torchtrain-tl-components-model-prediction-store-module"></span><h2>AIToolbox.torchtrain.tl_components.model_prediction_store module<a class="headerlink" href="#module-AIToolbox.torchtrain.tl_components.model_prediction_store" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="AIToolbox.torchtrain.tl_components.model_prediction_store.ModelPredictionStore">
+<em class="property">class </em><code class="descclassname">AIToolbox.torchtrain.tl_components.model_prediction_store.</code><code class="descname">ModelPredictionStore</code><span class="sig-paren">(</span><em>auto_purge=False</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.tl_components.model_prediction_store.ModelPredictionStore" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="AIToolbox.torchtrain.tl_components.model_prediction_store.ModelPredictionStore.auto_purge">
+<code class="descname">auto_purge</code><span class="sig-paren">(</span><em>epoch</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.tl_components.model_prediction_store.ModelPredictionStore.auto_purge" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>epoch</strong> (<em>int</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.tl_components.model_prediction_store.ModelPredictionStore.get_test_predictions">
+<code class="descname">get_test_predictions</code><span class="sig-paren">(</span><em>epoch</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.tl_components.model_prediction_store.ModelPredictionStore.get_test_predictions" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>epoch</strong> (<em>int</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.tl_components.model_prediction_store.ModelPredictionStore.get_train_predictions">
+<code class="descname">get_train_predictions</code><span class="sig-paren">(</span><em>epoch</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.tl_components.model_prediction_store.ModelPredictionStore.get_train_predictions" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>epoch</strong> (<em>int</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.tl_components.model_prediction_store.ModelPredictionStore.get_val_predictions">
+<code class="descname">get_val_predictions</code><span class="sig-paren">(</span><em>epoch</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.tl_components.model_prediction_store.ModelPredictionStore.get_val_predictions" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>epoch</strong> (<em>int</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.tl_components.model_prediction_store.ModelPredictionStore.has_test_predictions">
+<code class="descname">has_test_predictions</code><span class="sig-paren">(</span><em>epoch</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.tl_components.model_prediction_store.ModelPredictionStore.has_test_predictions" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>epoch</strong> (<em>int</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.tl_components.model_prediction_store.ModelPredictionStore.has_train_predictions">
+<code class="descname">has_train_predictions</code><span class="sig-paren">(</span><em>epoch</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.tl_components.model_prediction_store.ModelPredictionStore.has_train_predictions" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>epoch</strong> (<em>int</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.tl_components.model_prediction_store.ModelPredictionStore.has_val_predictions">
+<code class="descname">has_val_predictions</code><span class="sig-paren">(</span><em>epoch</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.tl_components.model_prediction_store.ModelPredictionStore.has_val_predictions" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>epoch</strong> (<em>int</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.tl_components.model_prediction_store.ModelPredictionStore.insert_test_predictions">
+<code class="descname">insert_test_predictions</code><span class="sig-paren">(</span><em>predictions</em>, <em>epoch</em>, <em>force_prediction=False</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.tl_components.model_prediction_store.ModelPredictionStore.insert_test_predictions" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>predictions</strong> (<em>tuple</em>) – </p></li>
+<li><p><strong>epoch</strong> (<em>int</em>) – </p></li>
+<li><p><strong>force_prediction</strong> (<em>bool</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.tl_components.model_prediction_store.ModelPredictionStore.insert_train_predictions">
+<code class="descname">insert_train_predictions</code><span class="sig-paren">(</span><em>predictions</em>, <em>epoch</em>, <em>force_prediction=False</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.tl_components.model_prediction_store.ModelPredictionStore.insert_train_predictions" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>predictions</strong> (<em>tuple</em>) – </p></li>
+<li><p><strong>epoch</strong> (<em>int</em>) – </p></li>
+<li><p><strong>force_prediction</strong> (<em>bool</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.tl_components.model_prediction_store.ModelPredictionStore.insert_val_predictions">
+<code class="descname">insert_val_predictions</code><span class="sig-paren">(</span><em>predictions</em>, <em>epoch</em>, <em>force_prediction=False</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.tl_components.model_prediction_store.ModelPredictionStore.insert_val_predictions" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>predictions</strong> (<em>tuple</em>) – </p></li>
+<li><p><strong>epoch</strong> (<em>int</em>) – </p></li>
+<li><p><strong>force_prediction</strong> (<em>bool</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.tl_components.model_prediction_store.ModelPredictionStore.purge_prediction_store">
+<code class="descname">purge_prediction_store</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.tl_components.model_prediction_store.ModelPredictionStore.purge_prediction_store" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-AIToolbox.torchtrain.tl_components">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-AIToolbox.torchtrain.tl_components" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">AIToolbox</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Marko Vidoni.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/AIToolbox.torchtrain.tl_components.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

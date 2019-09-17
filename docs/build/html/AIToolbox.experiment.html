@@ -1,0 +1,431 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>AIToolbox.experiment package &#8212; AIToolbox 0.3.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="aitoolbox-experiment-package">
+<h1>AIToolbox.experiment package<a class="headerlink" href="#aitoolbox-experiment-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="AIToolbox.experiment.core_metrics.html">AIToolbox.experiment.core_metrics package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="AIToolbox.experiment.core_metrics.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AIToolbox.experiment.core_metrics.html#module-AIToolbox.experiment.core_metrics.abstract_metric">AIToolbox.experiment.core_metrics.abstract_metric module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AIToolbox.experiment.core_metrics.html#module-AIToolbox.experiment.core_metrics.classification">AIToolbox.experiment.core_metrics.classification module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AIToolbox.experiment.core_metrics.html#module-AIToolbox.experiment.core_metrics.regression">AIToolbox.experiment.core_metrics.regression module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AIToolbox.experiment.core_metrics.html#module-AIToolbox.experiment.core_metrics">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="AIToolbox.experiment.local_load.html">AIToolbox.experiment.local_load package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="AIToolbox.experiment.local_load.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AIToolbox.experiment.local_load.html#module-AIToolbox.experiment.local_load.local_model_load">AIToolbox.experiment.local_load.local_model_load module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AIToolbox.experiment.local_load.html#module-AIToolbox.experiment.local_load">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="AIToolbox.experiment.local_save.html">AIToolbox.experiment.local_save package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="AIToolbox.experiment.local_save.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AIToolbox.experiment.local_save.html#module-AIToolbox.experiment.local_save.folder_create">AIToolbox.experiment.local_save.folder_create module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AIToolbox.experiment.local_save.html#module-AIToolbox.experiment.local_save.local_model_save">AIToolbox.experiment.local_save.local_model_save module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AIToolbox.experiment.local_save.html#module-AIToolbox.experiment.local_save.local_results_save">AIToolbox.experiment.local_save.local_results_save module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AIToolbox.experiment.local_save.html#module-AIToolbox.experiment.local_save">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="AIToolbox.experiment.result_package.html">AIToolbox.experiment.result_package package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="AIToolbox.experiment.result_package.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AIToolbox.experiment.result_package.html#module-AIToolbox.experiment.result_package.abstract_result_packages">AIToolbox.experiment.result_package.abstract_result_packages module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AIToolbox.experiment.result_package.html#module-AIToolbox.experiment.result_package.basic_packages">AIToolbox.experiment.result_package.basic_packages module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AIToolbox.experiment.result_package.html#module-AIToolbox.experiment.result_package">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="AIToolbox.experiment.result_reporting.html">AIToolbox.experiment.result_reporting package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="AIToolbox.experiment.result_reporting.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AIToolbox.experiment.result_reporting.html#module-AIToolbox.experiment.result_reporting.hyperparam_reporter">AIToolbox.experiment.result_reporting.hyperparam_reporter module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AIToolbox.experiment.result_reporting.html#module-AIToolbox.experiment.result_reporting.report_generator">AIToolbox.experiment.result_reporting.report_generator module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AIToolbox.experiment.result_reporting.html#module-AIToolbox.experiment.result_reporting">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-AIToolbox.experiment.experiment_saver">
+<span id="aitoolbox-experiment-experiment-saver-module"></span><h2>AIToolbox.experiment.experiment_saver module<a class="headerlink" href="#module-AIToolbox.experiment.experiment_saver" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="AIToolbox.experiment.experiment_saver.AbstractExperimentSaver">
+<em class="property">class </em><code class="descclassname">AIToolbox.experiment.experiment_saver.</code><code class="descname">AbstractExperimentSaver</code><a class="headerlink" href="#AIToolbox.experiment.experiment_saver.AbstractExperimentSaver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<dl class="method">
+<dt id="AIToolbox.experiment.experiment_saver.AbstractExperimentSaver.save_experiment">
+<code class="descname">save_experiment</code><span class="sig-paren">(</span><em>model</em>, <em>result_package</em>, <em>experiment_timestamp=None</em>, <em>save_true_pred_labels=False</em>, <em>separate_files=False</em>, <em>protect_existing_folder=True</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.experiment_saver.AbstractExperimentSaver.save_experiment" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> – </p></li>
+<li><p><strong>result_package</strong> (<em>AIToolbox.ExperimentSave.result_package.AbstractResultPackage</em>) – </p></li>
+<li><p><strong>experiment_timestamp</strong> (<em>str</em>) – time stamp of the training start</p></li>
+<li><p><strong>save_true_pred_labels</strong> (<em>bool</em>) – </p></li>
+<li><p><strong>separate_files</strong> (<em>bool</em>) – </p></li>
+<li><p><strong>protect_existing_folder</strong> (<em>bool</em>) – can override potentially already existing folder or not</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>string paths where the experiment files were saved</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.experiment.experiment_saver.BaseFullExperimentGoogleStorageSaver">
+<em class="property">class </em><code class="descclassname">AIToolbox.experiment.experiment_saver.</code><code class="descname">BaseFullExperimentGoogleStorageSaver</code><span class="sig-paren">(</span><em>model_saver</em>, <em>project_name</em>, <em>experiment_name</em>, <em>bucket_name='model-result'</em>, <em>cloud_dir_prefix=''</em>, <em>local_model_result_folder_path='~/project/model_result'</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.experiment_saver.BaseFullExperimentGoogleStorageSaver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.experiment.experiment_saver.BaseFullExperimentSaver" title="AIToolbox.experiment.experiment_saver.BaseFullExperimentSaver"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.experiment.experiment_saver.BaseFullExperimentSaver</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.experiment.experiment_saver.BaseFullExperimentS3Saver">
+<em class="property">class </em><code class="descclassname">AIToolbox.experiment.experiment_saver.</code><code class="descname">BaseFullExperimentS3Saver</code><span class="sig-paren">(</span><em>model_saver</em>, <em>project_name</em>, <em>experiment_name</em>, <em>bucket_name='model-result'</em>, <em>cloud_dir_prefix=''</em>, <em>local_model_result_folder_path='~/project/model_result'</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.experiment_saver.BaseFullExperimentS3Saver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.experiment.experiment_saver.BaseFullExperimentSaver" title="AIToolbox.experiment.experiment_saver.BaseFullExperimentSaver"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.experiment.experiment_saver.BaseFullExperimentSaver</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.experiment.experiment_saver.BaseFullExperimentSaver">
+<em class="property">class </em><code class="descclassname">AIToolbox.experiment.experiment_saver.</code><code class="descname">BaseFullExperimentSaver</code><span class="sig-paren">(</span><em>model_saver</em>, <em>results_saver</em>, <em>project_name</em>, <em>experiment_name</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.experiment_saver.BaseFullExperimentSaver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.experiment.experiment_saver.AbstractExperimentSaver" title="AIToolbox.experiment.experiment_saver.AbstractExperimentSaver"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.experiment.experiment_saver.AbstractExperimentSaver</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.experiment.experiment_saver.BaseFullExperimentSaver.save_experiment">
+<code class="descname">save_experiment</code><span class="sig-paren">(</span><em>model</em>, <em>result_package</em>, <em>experiment_timestamp=None</em>, <em>save_true_pred_labels=False</em>, <em>separate_files=False</em>, <em>protect_existing_folder=True</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.experiment_saver.BaseFullExperimentSaver.save_experiment" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<em>dict</em><em> or </em><em>keras.engine.training.Model</em>) – </p></li>
+<li><p><strong>result_package</strong> (<a class="reference internal" href="AIToolbox.experiment.result_package.html#AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage" title="AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage"><em>AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage</em></a>) – </p></li>
+<li><p><strong>experiment_timestamp</strong> (<em>str</em>) – time stamp at the start of training</p></li>
+<li><p><strong>save_true_pred_labels</strong> (<em>bool</em>) – </p></li>
+<li><p><strong>separate_files</strong> (<em>bool</em>) – </p></li>
+<li><p><strong>protect_existing_folder</strong> (<em>bool</em>) – can override potentially already existing folder or not</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>cloud_model_path, cloud_results_path</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(str, str)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.experiment.experiment_saver.FullKerasExperimentGoogleStorageSaver">
+<em class="property">class </em><code class="descclassname">AIToolbox.experiment.experiment_saver.</code><code class="descname">FullKerasExperimentGoogleStorageSaver</code><span class="sig-paren">(</span><em>project_name</em>, <em>experiment_name</em>, <em>bucket_name='model-result'</em>, <em>cloud_dir_prefix=''</em>, <em>local_model_result_folder_path='~/project/model_result'</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.experiment_saver.FullKerasExperimentGoogleStorageSaver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.experiment.experiment_saver.BaseFullExperimentGoogleStorageSaver" title="AIToolbox.experiment.experiment_saver.BaseFullExperimentGoogleStorageSaver"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.experiment.experiment_saver.BaseFullExperimentGoogleStorageSaver</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.experiment.experiment_saver.FullKerasExperimentS3Saver">
+<em class="property">class </em><code class="descclassname">AIToolbox.experiment.experiment_saver.</code><code class="descname">FullKerasExperimentS3Saver</code><span class="sig-paren">(</span><em>project_name</em>, <em>experiment_name</em>, <em>bucket_name='model-result'</em>, <em>cloud_dir_prefix=''</em>, <em>local_model_result_folder_path='~/project/model_result'</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.experiment_saver.FullKerasExperimentS3Saver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.experiment.experiment_saver.BaseFullExperimentS3Saver" title="AIToolbox.experiment.experiment_saver.BaseFullExperimentS3Saver"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.experiment.experiment_saver.BaseFullExperimentS3Saver</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.experiment.experiment_saver.FullPyTorchExperimentGoogleStorageSaver">
+<em class="property">class </em><code class="descclassname">AIToolbox.experiment.experiment_saver.</code><code class="descname">FullPyTorchExperimentGoogleStorageSaver</code><span class="sig-paren">(</span><em>project_name</em>, <em>experiment_name</em>, <em>bucket_name='model-result'</em>, <em>cloud_dir_prefix=''</em>, <em>local_model_result_folder_path='~/project/model_result'</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.experiment_saver.FullPyTorchExperimentGoogleStorageSaver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.experiment.experiment_saver.BaseFullExperimentGoogleStorageSaver" title="AIToolbox.experiment.experiment_saver.BaseFullExperimentGoogleStorageSaver"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.experiment.experiment_saver.BaseFullExperimentGoogleStorageSaver</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.experiment.experiment_saver.FullPyTorchExperimentS3Saver">
+<em class="property">class </em><code class="descclassname">AIToolbox.experiment.experiment_saver.</code><code class="descname">FullPyTorchExperimentS3Saver</code><span class="sig-paren">(</span><em>project_name</em>, <em>experiment_name</em>, <em>bucket_name='model-result'</em>, <em>cloud_dir_prefix=''</em>, <em>local_model_result_folder_path='~/project/model_result'</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.experiment_saver.FullPyTorchExperimentS3Saver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.experiment.experiment_saver.BaseFullExperimentS3Saver" title="AIToolbox.experiment.experiment_saver.BaseFullExperimentS3Saver"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.experiment.experiment_saver.BaseFullExperimentS3Saver</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.experiment.experiment_saver.FullTensorFlowExperimentGoogleStorageSaver">
+<em class="property">class </em><code class="descclassname">AIToolbox.experiment.experiment_saver.</code><code class="descname">FullTensorFlowExperimentGoogleStorageSaver</code><span class="sig-paren">(</span><em>project_name</em>, <em>experiment_name</em>, <em>bucket_name='model-result'</em>, <em>cloud_dir_prefix=''</em>, <em>local_model_result_folder_path='~/project/model_result'</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.experiment_saver.FullTensorFlowExperimentGoogleStorageSaver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.experiment.experiment_saver.BaseFullExperimentGoogleStorageSaver" title="AIToolbox.experiment.experiment_saver.BaseFullExperimentGoogleStorageSaver"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.experiment.experiment_saver.BaseFullExperimentGoogleStorageSaver</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.experiment.experiment_saver.FullTensorFlowExperimentS3Saver">
+<em class="property">class </em><code class="descclassname">AIToolbox.experiment.experiment_saver.</code><code class="descname">FullTensorFlowExperimentS3Saver</code><span class="sig-paren">(</span><em>project_name</em>, <em>experiment_name</em>, <em>bucket_name='model-result'</em>, <em>cloud_dir_prefix=''</em>, <em>local_model_result_folder_path='~/project/model_result'</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.experiment_saver.FullTensorFlowExperimentS3Saver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.experiment.experiment_saver.BaseFullExperimentS3Saver" title="AIToolbox.experiment.experiment_saver.BaseFullExperimentS3Saver"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.experiment.experiment_saver.BaseFullExperimentS3Saver</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-AIToolbox.experiment.local_experiment_saver">
+<span id="aitoolbox-experiment-local-experiment-saver-module"></span><h2>AIToolbox.experiment.local_experiment_saver module<a class="headerlink" href="#module-AIToolbox.experiment.local_experiment_saver" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="AIToolbox.experiment.local_experiment_saver.BaseFullExperimentLocalSaver">
+<em class="property">class </em><code class="descclassname">AIToolbox.experiment.local_experiment_saver.</code><code class="descname">BaseFullExperimentLocalSaver</code><span class="sig-paren">(</span><em>model_saver</em>, <em>project_name</em>, <em>experiment_name</em>, <em>local_model_result_folder_path='~/project/model_result'</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.local_experiment_saver.BaseFullExperimentLocalSaver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.experiment.experiment_saver.AbstractExperimentSaver" title="AIToolbox.experiment.experiment_saver.AbstractExperimentSaver"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.experiment.experiment_saver.AbstractExperimentSaver</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.experiment.local_experiment_saver.BaseFullExperimentLocalSaver.save_experiment">
+<code class="descname">save_experiment</code><span class="sig-paren">(</span><em>model</em>, <em>result_package</em>, <em>experiment_timestamp=None</em>, <em>save_true_pred_labels=False</em>, <em>separate_files=False</em>, <em>protect_existing_folder=True</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.local_experiment_saver.BaseFullExperimentLocalSaver.save_experiment" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<em>dict</em><em> or </em><em>keras.engine.training.Model</em>) – </p></li>
+<li><p><strong>result_package</strong> (<a class="reference internal" href="AIToolbox.experiment.result_package.html#AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage" title="AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage"><em>AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage</em></a>) – </p></li>
+<li><p><strong>experiment_timestamp</strong> (<em>str</em>) – time stamp at the start of training</p></li>
+<li><p><strong>save_true_pred_labels</strong> (<em>bool</em>) – </p></li>
+<li><p><strong>separate_files</strong> (<em>bool</em>) – </p></li>
+<li><p><strong>protect_existing_folder</strong> (<em>bool</em>) – can override potentially already existing folder or not</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.experiment.local_experiment_saver.FullKerasExperimentLocalSaver">
+<em class="property">class </em><code class="descclassname">AIToolbox.experiment.local_experiment_saver.</code><code class="descname">FullKerasExperimentLocalSaver</code><span class="sig-paren">(</span><em>project_name</em>, <em>experiment_name</em>, <em>local_model_result_folder_path='~/project/model_result'</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.local_experiment_saver.FullKerasExperimentLocalSaver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.experiment.local_experiment_saver.BaseFullExperimentLocalSaver" title="AIToolbox.experiment.local_experiment_saver.BaseFullExperimentLocalSaver"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.experiment.local_experiment_saver.BaseFullExperimentLocalSaver</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.experiment.local_experiment_saver.FullPyTorchExperimentLocalSaver">
+<em class="property">class </em><code class="descclassname">AIToolbox.experiment.local_experiment_saver.</code><code class="descname">FullPyTorchExperimentLocalSaver</code><span class="sig-paren">(</span><em>project_name</em>, <em>experiment_name</em>, <em>local_model_result_folder_path='~/project/model_result'</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.local_experiment_saver.FullPyTorchExperimentLocalSaver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.experiment.local_experiment_saver.BaseFullExperimentLocalSaver" title="AIToolbox.experiment.local_experiment_saver.BaseFullExperimentLocalSaver"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.experiment.local_experiment_saver.BaseFullExperimentLocalSaver</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-AIToolbox.experiment.training_history">
+<span id="aitoolbox-experiment-training-history-module"></span><h2>AIToolbox.experiment.training_history module<a class="headerlink" href="#module-AIToolbox.experiment.training_history" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="AIToolbox.experiment.training_history.TrainingHistory">
+<em class="property">class </em><code class="descclassname">AIToolbox.experiment.training_history.</code><code class="descname">TrainingHistory</code><span class="sig-paren">(</span><em>has_validation=True</em>, <em>strict_content_check=False</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.training_history.TrainingHistory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="AIToolbox.experiment.training_history.TrainingHistory.add_history_dict">
+<code class="descname">add_history_dict</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.training_history.TrainingHistory.add_history_dict" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>other</strong> (<em>dict</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.experiment.training_history.TrainingHistory.get_train_history">
+<code class="descname">get_train_history</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.training_history.TrainingHistory.get_train_history" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.experiment.training_history.TrainingHistory.get_train_history_dict">
+<code class="descname">get_train_history_dict</code><span class="sig-paren">(</span><em>flatten_dict=False</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.training_history.TrainingHistory.get_train_history_dict" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>flatten_dict</strong> (<em>bool</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.experiment.training_history.TrainingHistory.insert_single_result_into_history">
+<code class="descname">insert_single_result_into_history</code><span class="sig-paren">(</span><em>metric_name</em>, <em>metric_result</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.training_history.TrainingHistory.insert_single_result_into_history" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>metric_name</strong> (<em>str</em>) – name of the metric to be stored.</p></li>
+<li><p><strong>metric_result</strong> (<em>float</em><em> or </em><em>dict</em>) – metric performance result to be stored.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.experiment.training_history.TrainingHistory.items">
+<code class="descname">items</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.training_history.TrainingHistory.items" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.experiment.training_history.TrainingHistory.keys">
+<code class="descname">keys</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.training_history.TrainingHistory.keys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.experiment.training_history.TrainingHistory.qa_check_history_records">
+<code class="descname">qa_check_history_records</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.training_history.TrainingHistory.qa_check_history_records" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.experiment.training_history.TrainingHistory.warn_about_result_data_problem">
+<code class="descname">warn_about_result_data_problem</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.training_history.TrainingHistory.warn_about_result_data_problem" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>msg</strong> (<em>str</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.experiment.training_history.TrainingHistory.wrap_pre_prepared_history">
+<code class="descname">wrap_pre_prepared_history</code><span class="sig-paren">(</span><em>history</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.training_history.TrainingHistory.wrap_pre_prepared_history" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>history</strong> (<em>dict</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>self</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>train_history = model.fit(x_train, y_train, … )
+history = train_history.history</p>
+<dl>
+<dt># history = {‘val_loss’: [2.2513437271118164, 2.1482439041137695, 2.0187528133392334, 1.7953970432281494,</dt><dd><p>1.5492324829101562, 1.715561032295227, 1.631982684135437, 1.3721977472305298, 1.039527416229248,
+0.9796673059463501], ‘</p>
+<blockquote>
+<div><p>val_acc’: [0.25999999046325684, 0.36000001430511475, 0.5, 0.5400000214576721, 0.5400000214576721,</p>
+</div></blockquote>
+<dl class="simple">
+<dt>0.5799999833106995,  0.46000000834465027, 0.699999988079071, 0.7599999904632568, 0.7200000286102295],</dt><dd><p>‘loss’: [2.3088033199310303, 2.2141530513763428, 2.113713264465332, 1.912109375, 1.666761875152588,</p>
+</dd>
+<dt>1.460097312927246, 1.6031768321990967, 1.534214973449707, 1.1710081100463867, 0.8969314098358154],</dt><dd><p>‘acc’: [0.07999999821186066, 0.33000001311302185, 0.3100000023841858, 0.5299999713897705,</p>
+</dd>
+</dl>
+<p>0.5799999833106995, 0.6200000047683716, 0.4300000071525574, 0.5099999904632568, 0.6700000166893005,
+0.7599999904632568]}</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-AIToolbox.experiment">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-AIToolbox.experiment" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">AIToolbox</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Marko Vidoni.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/AIToolbox.experiment.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

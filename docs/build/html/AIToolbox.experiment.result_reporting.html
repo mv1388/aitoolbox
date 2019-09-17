@@ -1,0 +1,246 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>AIToolbox.experiment.result_reporting package &#8212; AIToolbox 0.3.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="aitoolbox-experiment-result-reporting-package">
+<h1>AIToolbox.experiment.result_reporting package<a class="headerlink" href="#aitoolbox-experiment-result-reporting-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-AIToolbox.experiment.result_reporting.hyperparam_reporter">
+<span id="aitoolbox-experiment-result-reporting-hyperparam-reporter-module"></span><h2>AIToolbox.experiment.result_reporting.hyperparam_reporter module<a class="headerlink" href="#module-AIToolbox.experiment.result_reporting.hyperparam_reporter" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="AIToolbox.experiment.result_reporting.hyperparam_reporter.HyperParameterReporter">
+<em class="property">class </em><code class="descclassname">AIToolbox.experiment.result_reporting.hyperparam_reporter.</code><code class="descname">HyperParameterReporter</code><span class="sig-paren">(</span><em>project_name</em>, <em>experiment_name</em>, <em>experiment_timestamp</em>, <em>local_model_result_folder_path</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.result_reporting.hyperparam_reporter.HyperParameterReporter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="AIToolbox.experiment.result_reporting.hyperparam_reporter.HyperParameterReporter.copy_to_cloud_storage">
+<code class="descname">copy_to_cloud_storage</code><span class="sig-paren">(</span><em>local_hyperparams_file_path</em>, <em>cloud_saver</em>, <em>file_name=None</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.result_reporting.hyperparam_reporter.HyperParameterReporter.copy_to_cloud_storage" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>local_hyperparams_file_path</strong> (<em>str</em>) – path to hyperparams file stored on local disk. File to be uploaded to cloud</p></li>
+<li><p><strong>cloud_saver</strong> (<a class="reference internal" href="AIToolbox.cloud.AWS.html#AIToolbox.cloud.AWS.model_save.BaseModelSaver" title="AIToolbox.cloud.AWS.model_save.BaseModelSaver"><em>BaseModelSaver</em></a><em> or </em><a class="reference internal" href="AIToolbox.cloud.AWS.html#AIToolbox.cloud.AWS.results_save.BaseResultsSaver" title="AIToolbox.cloud.AWS.results_save.BaseResultsSaver"><em>BaseResultsSaver</em></a><em> or </em><a class="reference internal" href="AIToolbox.cloud.GoogleCloud.html#AIToolbox.cloud.GoogleCloud.model_save.BaseModelGoogleStorageSaver" title="AIToolbox.cloud.GoogleCloud.model_save.BaseModelGoogleStorageSaver"><em>BaseModelGoogleStorageSaver</em></a><em> or </em><a class="reference internal" href="AIToolbox.cloud.GoogleCloud.html#AIToolbox.cloud.GoogleCloud.results_save.BaseResultsGoogleStorageSaver" title="AIToolbox.cloud.GoogleCloud.results_save.BaseResultsGoogleStorageSaver"><em>BaseResultsGoogleStorageSaver</em></a>) – </p></li>
+<li><p><strong>file_name</strong> (<em>str</em><em> or </em><em>None</em>) – manually specify the file name to be saved to the cloud instead of taking
+the default from self.file_name</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>path where the file was saved in the cloud storage</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.experiment.result_reporting.hyperparam_reporter.HyperParameterReporter.save_experiment_python_file">
+<code class="descname">save_experiment_python_file</code><span class="sig-paren">(</span><em>hyperparams</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.result_reporting.hyperparam_reporter.HyperParameterReporter.save_experiment_python_file" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>hyperparams</strong> (<em>dict</em>) – hyper-parameters listed in the dict</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>path to the saved hyper-param text file</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.experiment.result_reporting.hyperparam_reporter.HyperParameterReporter.save_hyperparams_to_text_file">
+<code class="descname">save_hyperparams_to_text_file</code><span class="sig-paren">(</span><em>hyperparams</em>, <em>sort_names=False</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.result_reporting.hyperparam_reporter.HyperParameterReporter.save_hyperparams_to_text_file" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>hyperparams</strong> (<em>dict</em>) – hyper-parameters listed in the dict</p></li>
+<li><p><strong>sort_names</strong> (<em>bool</em>) – should presented hyper-param names be listed alphabetically</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>path to the saved hyper-param text file</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-AIToolbox.experiment.result_reporting.report_generator">
+<span id="aitoolbox-experiment-result-reporting-report-generator-module"></span><h2>AIToolbox.experiment.result_reporting.report_generator module<a class="headerlink" href="#module-AIToolbox.experiment.result_reporting.report_generator" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="AIToolbox.experiment.result_reporting.report_generator.TrainingHistoryPlotter">
+<em class="property">class </em><code class="descclassname">AIToolbox.experiment.result_reporting.report_generator.</code><code class="descname">TrainingHistoryPlotter</code><span class="sig-paren">(</span><em>experiment_results_local_path</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.result_reporting.report_generator.TrainingHistoryPlotter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="AIToolbox.experiment.result_reporting.report_generator.TrainingHistoryPlotter.generate_report">
+<code class="descname">generate_report</code><span class="sig-paren">(</span><em>training_history</em>, <em>plots_folder_name='plots'</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.result_reporting.report_generator.TrainingHistoryPlotter.generate_report" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>training_history</strong> (<a class="reference internal" href="AIToolbox.experiment.html#AIToolbox.experiment.training_history.TrainingHistory" title="AIToolbox.experiment.training_history.TrainingHistory"><em>AIToolbox.experiment.training_history.TrainingHistory</em></a>) – </p></li>
+<li><p><strong>plots_folder_name</strong> (<em>str</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="AIToolbox.experiment.result_reporting.report_generator.TrainingHistoryPlotter.plot_performance_curve">
+<em class="property">static </em><code class="descname">plot_performance_curve</code><span class="sig-paren">(</span><em>metric_name</em>, <em>result_history</em>, <em>results_local_folder_path</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.result_reporting.report_generator.TrainingHistoryPlotter.plot_performance_curve" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>metric_name</strong> – </p></li>
+<li><p><strong>result_history</strong> – </p></li>
+<li><p><strong>results_local_folder_path</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>file_name, file_path</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(str, str)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.experiment.result_reporting.report_generator.TrainingHistoryWriter">
+<em class="property">class </em><code class="descclassname">AIToolbox.experiment.result_reporting.report_generator.</code><code class="descname">TrainingHistoryWriter</code><span class="sig-paren">(</span><em>experiment_results_local_path</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.result_reporting.report_generator.TrainingHistoryWriter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="AIToolbox.experiment.result_reporting.report_generator.TrainingHistoryWriter.generate_report">
+<code class="descname">generate_report</code><span class="sig-paren">(</span><em>training_history</em>, <em>epoch</em>, <em>file_name</em>, <em>results_folder_name=None</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.result_reporting.report_generator.TrainingHistoryWriter.generate_report" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>training_history</strong> (<a class="reference internal" href="AIToolbox.experiment.html#AIToolbox.experiment.training_history.TrainingHistory" title="AIToolbox.experiment.training_history.TrainingHistory"><em>AIToolbox.experiment.training_history.TrainingHistory</em></a>) – </p></li>
+<li><p><strong>epoch</strong> (<em>int</em>) – </p></li>
+<li><p><strong>file_name</strong> (<em>str</em>) – </p></li>
+<li><p><strong>results_folder_name</strong> (<em>str</em><em> or </em><em>None</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>file name/path inside the experiment folder, local file_path</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str, str</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-AIToolbox.experiment.result_reporting">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-AIToolbox.experiment.result_reporting" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">AIToolbox</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Marko Vidoni.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/AIToolbox.experiment.result_reporting.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

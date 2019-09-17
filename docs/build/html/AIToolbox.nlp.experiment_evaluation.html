@@ -1,0 +1,532 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>AIToolbox.nlp.experiment_evaluation package &#8212; AIToolbox 0.3.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="aitoolbox-nlp-experiment-evaluation-package">
+<h1>AIToolbox.nlp.experiment_evaluation package<a class="headerlink" href="#aitoolbox-nlp-experiment-evaluation-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-AIToolbox.nlp.experiment_evaluation.NLP_metrics">
+<span id="aitoolbox-nlp-experiment-evaluation-nlp-metrics-module"></span><h2>AIToolbox.nlp.experiment_evaluation.NLP_metrics module<a class="headerlink" href="#module-AIToolbox.nlp.experiment_evaluation.NLP_metrics" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="AIToolbox.nlp.experiment_evaluation.NLP_metrics.BLEUCorpusScoreMetric">
+<em class="property">class </em><code class="descclassname">AIToolbox.nlp.experiment_evaluation.NLP_metrics.</code><code class="descname">BLEUCorpusScoreMetric</code><span class="sig-paren">(</span><em>y_true</em>, <em>y_predicted</em>, <em>source_sents=None</em>, <em>output_text_dir=None</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.experiment_evaluation.NLP_metrics.BLEUCorpusScoreMetric" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="AIToolbox.experiment.core_metrics.html#AIToolbox.experiment.core_metrics.abstract_metric.AbstractBaseMetric" title="AIToolbox.experiment.core_metrics.abstract_metric.AbstractBaseMetric"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.experiment.core_metrics.abstract_metric.AbstractBaseMetric</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.nlp.experiment_evaluation.NLP_metrics.BLEUCorpusScoreMetric.calculate_metric">
+<code class="descname">calculate_metric</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.experiment_evaluation.NLP_metrics.BLEUCorpusScoreMetric.calculate_metric" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform metric calculation and save the result into self.metric_result</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.nlp.experiment_evaluation.NLP_metrics.BLEUScoreStrTorchNLPMetric">
+<em class="property">class </em><code class="descclassname">AIToolbox.nlp.experiment_evaluation.NLP_metrics.</code><code class="descname">BLEUScoreStrTorchNLPMetric</code><span class="sig-paren">(</span><em>y_true</em>, <em>y_predicted</em>, <em>lowercase=False</em>, <em>source_sents=None</em>, <em>output_text_dir=None</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.experiment_evaluation.NLP_metrics.BLEUScoreStrTorchNLPMetric" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="AIToolbox.experiment.core_metrics.html#AIToolbox.experiment.core_metrics.abstract_metric.AbstractBaseMetric" title="AIToolbox.experiment.core_metrics.abstract_metric.AbstractBaseMetric"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.experiment.core_metrics.abstract_metric.AbstractBaseMetric</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.nlp.experiment_evaluation.NLP_metrics.BLEUScoreStrTorchNLPMetric.calculate_metric">
+<code class="descname">calculate_metric</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.experiment_evaluation.NLP_metrics.BLEUScoreStrTorchNLPMetric.calculate_metric" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform metric calculation and save the result into self.metric_result</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.nlp.experiment_evaluation.NLP_metrics.BLEUSentenceScoreMetric">
+<em class="property">class </em><code class="descclassname">AIToolbox.nlp.experiment_evaluation.NLP_metrics.</code><code class="descname">BLEUSentenceScoreMetric</code><span class="sig-paren">(</span><em>y_true</em>, <em>y_predicted</em>, <em>source_sents=None</em>, <em>output_text_dir=None</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.experiment_evaluation.NLP_metrics.BLEUSentenceScoreMetric" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="AIToolbox.experiment.core_metrics.html#AIToolbox.experiment.core_metrics.abstract_metric.AbstractBaseMetric" title="AIToolbox.experiment.core_metrics.abstract_metric.AbstractBaseMetric"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.experiment.core_metrics.abstract_metric.AbstractBaseMetric</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.nlp.experiment_evaluation.NLP_metrics.BLEUSentenceScoreMetric.calculate_metric">
+<code class="descname">calculate_metric</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.experiment_evaluation.NLP_metrics.BLEUSentenceScoreMetric.calculate_metric" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform metric calculation and save the result into self.metric_result</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="AIToolbox.nlp.experiment_evaluation.NLP_metrics.BLEUSentenceScoreMetric.check_transl_sent_num_match">
+<em class="property">static </em><code class="descname">check_transl_sent_num_match</code><span class="sig-paren">(</span><em>sent_types</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.experiment_evaluation.NLP_metrics.BLEUSentenceScoreMetric.check_transl_sent_num_match" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>sent_types</strong> (<em>list</em>) – list of lists</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="AIToolbox.nlp.experiment_evaluation.NLP_metrics.BLEUSentenceScoreMetric.dump_translation_text_to_disk">
+<em class="property">static </em><code class="descname">dump_translation_text_to_disk</code><span class="sig-paren">(</span><em>source_sents</em>, <em>pred_translations</em>, <em>true_translations</em>, <em>sentence_bleu_results</em>, <em>output_text_dir</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.experiment_evaluation.NLP_metrics.BLEUSentenceScoreMetric.dump_translation_text_to_disk" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>source_sents</strong> (<em>list</em>) – </p></li>
+<li><p><strong>pred_translations</strong> (<em>list</em>) – </p></li>
+<li><p><strong>true_translations</strong> (<em>list</em>) – </p></li>
+<li><p><strong>sentence_bleu_results</strong> (<em>list</em>) – </p></li>
+<li><p><strong>output_text_dir</strong> (<em>str</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.nlp.experiment_evaluation.NLP_metrics.PerplexityMetric">
+<em class="property">class </em><code class="descclassname">AIToolbox.nlp.experiment_evaluation.NLP_metrics.</code><code class="descname">PerplexityMetric</code><span class="sig-paren">(</span><em>y_true</em>, <em>y_predicted</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.experiment_evaluation.NLP_metrics.PerplexityMetric" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="AIToolbox.experiment.core_metrics.html#AIToolbox.experiment.core_metrics.abstract_metric.AbstractBaseMetric" title="AIToolbox.experiment.core_metrics.abstract_metric.AbstractBaseMetric"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.experiment.core_metrics.abstract_metric.AbstractBaseMetric</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.nlp.experiment_evaluation.NLP_metrics.PerplexityMetric.calculate_metric">
+<code class="descname">calculate_metric</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.experiment_evaluation.NLP_metrics.PerplexityMetric.calculate_metric" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform metric calculation and save the result into self.metric_result</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.nlp.experiment_evaluation.NLP_metrics.ROUGEMetric">
+<em class="property">class </em><code class="descclassname">AIToolbox.nlp.experiment_evaluation.NLP_metrics.</code><code class="descname">ROUGEMetric</code><span class="sig-paren">(</span><em>y_true</em>, <em>y_predicted</em>, <em>target_actual_text=False</em>, <em>output_text_dir=None</em>, <em>output_text_cleaning_regex=('&lt;.*?&gt;'</em>, <em>'[^a-zA-Z0-9.?! ]+')</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.experiment_evaluation.NLP_metrics.ROUGEMetric" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="AIToolbox.experiment.core_metrics.html#AIToolbox.experiment.core_metrics.abstract_metric.AbstractBaseMetric" title="AIToolbox.experiment.core_metrics.abstract_metric.AbstractBaseMetric"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.experiment.core_metrics.abstract_metric.AbstractBaseMetric</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.nlp.experiment_evaluation.NLP_metrics.ROUGEMetric.calculate_metric">
+<code class="descname">calculate_metric</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.experiment_evaluation.NLP_metrics.ROUGEMetric.calculate_metric" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform metric calculation and save the result into self.metric_result</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.nlp.experiment_evaluation.NLP_metrics.ROUGEMetric.prepare_text">
+<code class="descname">prepare_text</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.experiment_evaluation.NLP_metrics.ROUGEMetric.prepare_text" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.nlp.experiment_evaluation.NLP_metrics.ROUGEPerlMetric">
+<em class="property">class </em><code class="descclassname">AIToolbox.nlp.experiment_evaluation.NLP_metrics.</code><code class="descname">ROUGEPerlMetric</code><span class="sig-paren">(</span><em>y_true</em>, <em>y_predicted</em>, <em>output_text_dir</em>, <em>output_text_cleaning_regex=('&lt;.*?&gt;'</em>, <em>'[^a-zA-Z0-9.?! ]+')</em>, <em>target_actual_text=False</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.experiment_evaluation.NLP_metrics.ROUGEPerlMetric" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="AIToolbox.experiment.core_metrics.html#AIToolbox.experiment.core_metrics.abstract_metric.AbstractBaseMetric" title="AIToolbox.experiment.core_metrics.abstract_metric.AbstractBaseMetric"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.experiment.core_metrics.abstract_metric.AbstractBaseMetric</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.nlp.experiment_evaluation.NLP_metrics.ROUGEPerlMetric.calculate_metric">
+<code class="descname">calculate_metric</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.experiment_evaluation.NLP_metrics.ROUGEPerlMetric.calculate_metric" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform metric calculation and save the result into self.metric_result</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="AIToolbox.nlp.experiment_evaluation.NLP_metrics.ROUGEPerlMetric.dump_answer_text_to_disk">
+<em class="property">static </em><code class="descname">dump_answer_text_to_disk</code><span class="sig-paren">(</span><em>true_text</em>, <em>pred_text</em>, <em>output_text_dir</em>, <em>output_text_cleaning_regex</em>, <em>target_actual_text</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.experiment_evaluation.NLP_metrics.ROUGEPerlMetric.dump_answer_text_to_disk" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Problems:</dt><dd><p>Defined regex text cleaning to deal with Illegal division by zero
+<a class="reference external" href="https://ireneli.eu/2018/01/11/working-with-rouge-1-5-5-evaluation-metric-in-python/">https://ireneli.eu/2018/01/11/working-with-rouge-1-5-5-evaluation-metric-in-python/</a></p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>true_text</strong> (<em>list</em>) – </p></li>
+<li><p><strong>pred_text</strong> (<em>list</em>) – </p></li>
+<li><p><strong>output_text_dir</strong> (<em>str</em>) – </p></li>
+<li><p><strong>output_text_cleaning_regex</strong> (<em>list</em>) – </p></li>
+<li><p><strong>target_actual_text</strong> (<em>bool</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="AIToolbox.nlp.experiment_evaluation.NLP_metrics.ROUGEPerlMetric.regex_clean_text">
+<em class="property">static </em><code class="descname">regex_clean_text</code><span class="sig-paren">(</span><em>text</em>, <em>cleaning_regex_list</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.experiment_evaluation.NLP_metrics.ROUGEPerlMetric.regex_clean_text" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text</strong> (<em>list</em>) – </p></li>
+<li><p><strong>cleaning_regex_list</strong> (<em>list</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-AIToolbox.nlp.experiment_evaluation.NLP_result_package">
+<span id="aitoolbox-nlp-experiment-evaluation-nlp-result-package-module"></span><h2>AIToolbox.nlp.experiment_evaluation.NLP_result_package module<a class="headerlink" href="#module-AIToolbox.nlp.experiment_evaluation.NLP_result_package" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="AIToolbox.nlp.experiment_evaluation.NLP_result_package.MachineTranslationResultPackage">
+<em class="property">class </em><code class="descclassname">AIToolbox.nlp.experiment_evaluation.NLP_result_package.</code><code class="descname">MachineTranslationResultPackage</code><span class="sig-paren">(</span><em>target_vocab</em>, <em>source_vocab=None</em>, <em>source_sents=None</em>, <em>output_text_dir=None</em>, <em>output_attn_heatmap_dir=None</em>, <em>strict_content_check=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.experiment_evaluation.NLP_result_package.MachineTranslationResultPackage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="AIToolbox.experiment.result_package.html#AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage" title="AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.nlp.experiment_evaluation.NLP_result_package.MachineTranslationResultPackage.list_additional_results_dump_paths">
+<code class="descname">list_additional_results_dump_paths</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.experiment_evaluation.NLP_result_package.MachineTranslationResultPackage.list_additional_results_dump_paths" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specify the list of meta data files you also want to save &amp; upload to s3 during the experiment saving procedure</p>
+<p>By default there are no additional files that are saved as the return is None. If you want to save your
+specific additional files produced during the training procedure, then override this method specifying
+the file paths.</p>
+<p>If you want to save a whole folder of files, use zip_additional_results_dump() function to zip it into a single
+file and save this zip instead.</p>
+<p>The specified files are any additional data you would want to include into the experiment folder in addition to
+the model save files and performance evaluation report files. For example a zip of attention heatmap pictures
+in the machine translation projects.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>list of lists of string paths if it is not None.</dt><dd><p>Each element of the list should be list of: [[results_file_name, results_file_local_path], … [,]]</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.nlp.experiment_evaluation.NLP_result_package.MachineTranslationResultPackage.prepare_results_dict">
+<code class="descname">prepare_results_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.experiment_evaluation.NLP_result_package.MachineTranslationResultPackage.prepare_results_dict" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>result dict which is combination of different BLEU metric calculations and possibly</dt><dd><p>saved attention heatmap plot files and perplexity</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.nlp.experiment_evaluation.NLP_result_package.MachineTranslationResultPackage.set_experiment_dir_path_for_additional_results">
+<code class="descname">set_experiment_dir_path_for_additional_results</code><span class="sig-paren">(</span><em>project_name</em>, <em>experiment_name</em>, <em>experiment_timestamp</em>, <em>local_model_result_folder_path</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.experiment_evaluation.NLP_result_package.MachineTranslationResultPackage.set_experiment_dir_path_for_additional_results" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set experiment folder path after potential timestamps have already been generated.</p>
+<p>Experiment folder setting for additional metadata results output is needed only in certain result packages,
+for example in QuestionAnswerResultPackage where the self.output_text_dir initially has only the name of
+the folder where the results text predictions for each example should be stored. This function when implemented
+reforms the folder name so that it becomes a full path placing the folder inside the experiment folder (for
+which the timestamp at the start of train loop is needed).</p>
+<p>Another use of this function is in MachineTranslationResultPackage where the attention heatmap pictures are
+stored as additional metadata results.</p>
+<p>As can be seen from the fact that the train loop mechanism is mentioned, this method’s functionality is
+primarily used for PyTorch experiments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>project_name</strong> (<em>str</em>) – </p></li>
+<li><p><strong>experiment_name</strong> (<em>str</em>) – </p></li>
+<li><p><strong>experiment_timestamp</strong> (<em>str</em>) – </p></li>
+<li><p><strong>local_model_result_folder_path</strong> (<em>str</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.nlp.experiment_evaluation.NLP_result_package.QuestionAnswerResultPackage">
+<em class="property">class </em><code class="descclassname">AIToolbox.nlp.experiment_evaluation.NLP_result_package.</code><code class="descname">QuestionAnswerResultPackage</code><span class="sig-paren">(</span><em>paragraph_text_tokens</em>, <em>target_actual_text=None</em>, <em>output_text_dir=None</em>, <em>use_perl_rouge=False</em>, <em>flatten_result_dict=False</em>, <em>strict_content_check=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.experiment_evaluation.NLP_result_package.QuestionAnswerResultPackage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="AIToolbox.experiment.result_package.html#AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage" title="AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.nlp.experiment_evaluation.NLP_result_package.QuestionAnswerResultPackage.list_additional_results_dump_paths">
+<code class="descname">list_additional_results_dump_paths</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.experiment_evaluation.NLP_result_package.QuestionAnswerResultPackage.list_additional_results_dump_paths" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specify the list of meta data files you also want to save &amp; upload to s3 during the experiment saving procedure</p>
+<p>By default there are no additional files that are saved as the return is None. If you want to save your
+specific additional files produced during the training procedure, then override this method specifying
+the file paths.</p>
+<p>If you want to save a whole folder of files, use zip_additional_results_dump() function to zip it into a single
+file and save this zip instead.</p>
+<p>The specified files are any additional data you would want to include into the experiment folder in addition to
+the model save files and performance evaluation report files. For example a zip of attention heatmap pictures
+in the machine translation projects.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>list of lists of string paths if it is not None.</dt><dd><p>Each element of the list should be list of: [[results_file_name, results_file_local_path], … [,]]</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.nlp.experiment_evaluation.NLP_result_package.QuestionAnswerResultPackage.prepare_results_dict">
+<code class="descname">prepare_results_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.experiment_evaluation.NLP_result_package.QuestionAnswerResultPackage.prepare_results_dict" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.nlp.experiment_evaluation.NLP_result_package.QuestionAnswerResultPackage.set_experiment_dir_path_for_additional_results">
+<code class="descname">set_experiment_dir_path_for_additional_results</code><span class="sig-paren">(</span><em>project_name</em>, <em>experiment_name</em>, <em>experiment_timestamp</em>, <em>local_model_result_folder_path</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.experiment_evaluation.NLP_result_package.QuestionAnswerResultPackage.set_experiment_dir_path_for_additional_results" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set experiment folder path after potential timestamps have already been generated.</p>
+<p>Experiment folder setting for additional metadata results output is needed only in certain result packages,
+for example in QuestionAnswerResultPackage where the self.output_text_dir initially has only the name of
+the folder where the results text predictions for each example should be stored. This function when implemented
+reforms the folder name so that it becomes a full path placing the folder inside the experiment folder (for
+which the timestamp at the start of train loop is needed).</p>
+<p>Another use of this function is in MachineTranslationResultPackage where the attention heatmap pictures are
+stored as additional metadata results.</p>
+<p>As can be seen from the fact that the train loop mechanism is mentioned, this method’s functionality is
+primarily used for PyTorch experiments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>project_name</strong> (<em>str</em>) – </p></li>
+<li><p><strong>experiment_name</strong> (<em>str</em>) – </p></li>
+<li><p><strong>experiment_timestamp</strong> (<em>str</em>) – </p></li>
+<li><p><strong>local_model_result_folder_path</strong> (<em>str</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.nlp.experiment_evaluation.NLP_result_package.QuestionAnswerSpanClassificationResultPackage">
+<em class="property">class </em><code class="descclassname">AIToolbox.nlp.experiment_evaluation.NLP_result_package.</code><code class="descname">QuestionAnswerSpanClassificationResultPackage</code><span class="sig-paren">(</span><em>strict_content_check=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.experiment_evaluation.NLP_result_package.QuestionAnswerSpanClassificationResultPackage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="AIToolbox.experiment.result_package.html#AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage" title="AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.nlp.experiment_evaluation.NLP_result_package.QuestionAnswerSpanClassificationResultPackage.prepare_results_dict">
+<code class="descname">prepare_results_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.experiment_evaluation.NLP_result_package.QuestionAnswerSpanClassificationResultPackage.prepare_results_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Available general data:</p>
+<p>y_span_start_true (numpy.array or list):
+y_span_start_predicted (numpy.array or list):
+y_span_end_true (numpy.array or list):
+y_span_end_predicted (numpy.array or list):
+strict_content_check (bool):
+<a href="#id1"><span class="problematic" id="id2">**</span></a>kwargs (dict):</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.nlp.experiment_evaluation.NLP_result_package.TextSummarizationResultPackage">
+<em class="property">class </em><code class="descclassname">AIToolbox.nlp.experiment_evaluation.NLP_result_package.</code><code class="descname">TextSummarizationResultPackage</code><span class="sig-paren">(</span><em>strict_content_check=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.experiment_evaluation.NLP_result_package.TextSummarizationResultPackage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="AIToolbox.experiment.result_package.html#AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage" title="AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.nlp.experiment_evaluation.NLP_result_package.TextSummarizationResultPackage.prepare_results_dict">
+<code class="descname">prepare_results_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.experiment_evaluation.NLP_result_package.TextSummarizationResultPackage.prepare_results_dict" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-AIToolbox.nlp.experiment_evaluation.attention_heatmap">
+<span id="aitoolbox-nlp-experiment-evaluation-attention-heatmap-module"></span><h2>AIToolbox.nlp.experiment_evaluation.attention_heatmap module<a class="headerlink" href="#module-AIToolbox.nlp.experiment_evaluation.attention_heatmap" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="AIToolbox.nlp.experiment_evaluation.attention_heatmap.AttentionHeatMap">
+<em class="property">class </em><code class="descclassname">AIToolbox.nlp.experiment_evaluation.attention_heatmap.</code><code class="descname">AttentionHeatMap</code><span class="sig-paren">(</span><em>attention_matrices</em>, <em>source_sentences</em>, <em>target_sentences</em>, <em>plot_save_dir</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.experiment_evaluation.attention_heatmap.AttentionHeatMap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="AIToolbox.experiment.core_metrics.html#AIToolbox.experiment.core_metrics.abstract_metric.AbstractBaseMetric" title="AIToolbox.experiment.core_metrics.abstract_metric.AbstractBaseMetric"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.experiment.core_metrics.abstract_metric.AbstractBaseMetric</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.nlp.experiment_evaluation.attention_heatmap.AttentionHeatMap.calculate_metric">
+<code class="descname">calculate_metric</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.experiment_evaluation.attention_heatmap.AttentionHeatMap.calculate_metric" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="AIToolbox.nlp.experiment_evaluation.attention_heatmap.AttentionHeatMap.plot_sentence_attention">
+<em class="property">static </em><code class="descname">plot_sentence_attention</code><span class="sig-paren">(</span><em>attention_matrix</em>, <em>sentence_source</em>, <em>sentence_target</em>, <em>plot_file_path=None</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.experiment_evaluation.attention_heatmap.AttentionHeatMap.plot_sentence_attention" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>attention_matrix</strong> (<em>np.array</em>) – </p></li>
+<li><p><strong>sentence_source</strong> (<em>list</em>) – </p></li>
+<li><p><strong>sentence_target</strong> (<em>list</em>) – </p></li>
+<li><p><strong>plot_file_path</strong> (<em>str</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="AIToolbox.nlp.experiment_evaluation.attention_heatmap.AttentionHeatMap.prepare_folder_for_saving">
+<em class="property">static </em><code class="descname">prepare_folder_for_saving</code><span class="sig-paren">(</span><em>output_plot_dir</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.experiment_evaluation.attention_heatmap.AttentionHeatMap.prepare_folder_for_saving" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>output_plot_dir</strong> (<em>str</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-AIToolbox.nlp.experiment_evaluation">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-AIToolbox.nlp.experiment_evaluation" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">AIToolbox</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Marko Vidoni.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/AIToolbox.nlp.experiment_evaluation.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

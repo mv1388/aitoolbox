@@ -1,0 +1,231 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>AIToolbox.nlp.models.torch package &#8212; AIToolbox 0.3.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="aitoolbox-nlp-models-torch-package">
+<h1>AIToolbox.nlp.models.torch package<a class="headerlink" href="#aitoolbox-nlp-models-torch-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-AIToolbox.nlp.models.torch.attention">
+<span id="aitoolbox-nlp-models-torch-attention-module"></span><h2>AIToolbox.nlp.models.torch.attention module<a class="headerlink" href="#module-AIToolbox.nlp.models.torch.attention" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="AIToolbox.nlp.models.torch.attention.AttentionLuong">
+<em class="property">class </em><code class="descclassname">AIToolbox.nlp.models.torch.attention.</code><code class="descname">AttentionLuong</code><span class="sig-paren">(</span><em>attn_method</em>, <em>hidden_size</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.models.torch.attention.AttentionLuong" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<p>Luong attention layer</p>
+<dl class="method">
+<dt id="AIToolbox.nlp.models.torch.attention.AttentionLuong.concat_score">
+<code class="descname">concat_score</code><span class="sig-paren">(</span><em>hidden</em>, <em>encoder_output</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.models.torch.attention.AttentionLuong.concat_score" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.nlp.models.torch.attention.AttentionLuong.dot_score">
+<code class="descname">dot_score</code><span class="sig-paren">(</span><em>hidden</em>, <em>encoder_output</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.models.torch.attention.AttentionLuong.dot_score" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.nlp.models.torch.attention.AttentionLuong.forward">
+<code class="descname">forward</code><span class="sig-paren">(</span><em>hidden</em>, <em>encoder_outputs</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.models.torch.attention.AttentionLuong.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.nlp.models.torch.attention.AttentionLuong.general_score">
+<code class="descname">general_score</code><span class="sig-paren">(</span><em>hidden</em>, <em>encoder_output</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.models.torch.attention.AttentionLuong.general_score" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-AIToolbox.nlp.models.torch.encoders">
+<span id="aitoolbox-nlp-models-torch-encoders-module"></span><h2>AIToolbox.nlp.models.torch.encoders module<a class="headerlink" href="#module-AIToolbox.nlp.models.torch.encoders" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="AIToolbox.nlp.models.torch.encoders.EncoderRNN">
+<em class="property">class </em><code class="descclassname">AIToolbox.nlp.models.torch.encoders.</code><code class="descname">EncoderRNN</code><span class="sig-paren">(</span><em>rnn_type</em>, <em>hidden_size</em>, <em>embedding</em>, <em>n_layers=1</em>, <em>dropout=0</em>, <em>bidirectional=False</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.models.torch.encoders.EncoderRNN" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<dl class="method">
+<dt id="AIToolbox.nlp.models.torch.encoders.EncoderRNN.forward">
+<code class="descname">forward</code><span class="sig-paren">(</span><em>input_seq</em>, <em>input_lengths</em>, <em>hidden=None</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.models.torch.encoders.EncoderRNN.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-AIToolbox.nlp.models.torch.unified_qa_model">
+<span id="aitoolbox-nlp-models-torch-unified-qa-model-module"></span><h2>AIToolbox.nlp.models.torch.unified_qa_model module<a class="headerlink" href="#module-AIToolbox.nlp.models.torch.unified_qa_model" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="AIToolbox.nlp.models.torch.unified_qa_model.UnifiedQABasicRNN">
+<em class="property">class </em><code class="descclassname">AIToolbox.nlp.models.torch.unified_qa_model.</code><code class="descname">UnifiedQABasicRNN</code><span class="sig-paren">(</span><em>hidden_size</em>, <em>output_size</em>, <em>embedding_dim</em>, <em>vocab_size</em>, <em>ctx_n_layers=1</em>, <em>qus_n_layers=1</em>, <em>dropout=0.0</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.models.torch.unified_qa_model.UnifiedQABasicRNN" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="AIToolbox.torchtrain.html#AIToolbox.torchtrain.model.TTModel" title="AIToolbox.torchtrain.model.TTModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.torchtrain.model.TTModel</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.nlp.models.torch.unified_qa_model.UnifiedQABasicRNN.forward">
+<code class="descname">forward</code><span class="sig-paren">(</span><em>context_input</em>, <em>question_input</em>, <em>context_input_lengths</em>, <em>question_input_lengths</em>, <em>context_hidden=None</em>, <em>question_hidden=None</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.models.torch.unified_qa_model.UnifiedQABasicRNN.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.nlp.models.torch.unified_qa_model.UnifiedQABasicRNN.get_loss">
+<code class="descname">get_loss</code><span class="sig-paren">(</span><em>batch_data</em>, <em>criterion</em>, <em>device</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.models.torch.unified_qa_model.UnifiedQABasicRNN.get_loss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get loss during training stage</p>
+<p>Called from fit() in TrainLoop</p>
+<p>Executed during training stage where model weights are updated based on the loss returned from this function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch_data</strong> – </p></li>
+<li><p><strong>criterion</strong> – </p></li>
+<li><p><strong>device</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>PyTorch loss</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.nlp.models.torch.unified_qa_model.UnifiedQABasicRNN.get_predictions">
+<code class="descname">get_predictions</code><span class="sig-paren">(</span><em>batch_data</em>, <em>device</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.models.torch.unified_qa_model.UnifiedQABasicRNN.get_predictions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get predictions during evaluation stage</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch_data</strong> – </p></li>
+<li><p><strong>device</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>y_test.cpu(), y_pred.cpu(), metadata</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.array, np.array, dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-AIToolbox.nlp.models.torch">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-AIToolbox.nlp.models.torch" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">AIToolbox</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Marko Vidoni.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/AIToolbox.nlp.models.torch.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

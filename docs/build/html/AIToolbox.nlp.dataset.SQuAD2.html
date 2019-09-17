@@ -1,0 +1,230 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>AIToolbox.nlp.dataset.SQuAD2 package &#8212; AIToolbox 0.3.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="aitoolbox-nlp-dataset-squad2-package">
+<h1>AIToolbox.nlp.dataset.SQuAD2 package<a class="headerlink" href="#aitoolbox-nlp-dataset-squad2-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="AIToolbox.nlp.dataset.SQuAD2.deprecated.html">AIToolbox.nlp.dataset.SQuAD2.deprecated package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="AIToolbox.nlp.dataset.SQuAD2.deprecated.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AIToolbox.nlp.dataset.SQuAD2.deprecated.html#module-AIToolbox.nlp.dataset.SQuAD2.deprecated.manual_SQuAD2">AIToolbox.nlp.dataset.SQuAD2.deprecated.manual_SQuAD2 module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AIToolbox.nlp.dataset.SQuAD2.deprecated.html#module-AIToolbox.nlp.dataset.SQuAD2.deprecated">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-AIToolbox.nlp.dataset.SQuAD2.SQuAD2DataReader">
+<span id="aitoolbox-nlp-dataset-squad2-squad2datareader-module"></span><h2>AIToolbox.nlp.dataset.SQuAD2.SQuAD2DataReader module<a class="headerlink" href="#module-AIToolbox.nlp.dataset.SQuAD2.SQuAD2DataReader" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="AIToolbox.nlp.dataset.SQuAD2.SQuAD2DataReader.GeneratorSQuAD2ConcatContextDatasetReader">
+<em class="property">class </em><code class="descclassname">AIToolbox.nlp.dataset.SQuAD2.SQuAD2DataReader.</code><code class="descname">GeneratorSQuAD2ConcatContextDatasetReader</code><span class="sig-paren">(</span><em>file_path</em>, <em>tokenizer=None</em>, <em>is_train=True</em>, <em>dev_mode_size=None</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.dataset.SQuAD2.SQuAD2DataReader.GeneratorSQuAD2ConcatContextDatasetReader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.nlp.dataset.SQuAD2.SQuAD2DataReader.SQuAD2ConcatContextDatasetReader" title="AIToolbox.nlp.dataset.SQuAD2.SQuAD2DataReader.SQuAD2ConcatContextDatasetReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.nlp.dataset.SQuAD2.SQuAD2DataReader.SQuAD2ConcatContextDatasetReader</span></code></a></p>
+<p>This implementation with the generator has not been tested yet.</p>
+<p>Check especially in the read() if calling list(self.read_generator()) also in turn fills the self.vocab,
+thus you get returned a complete vocabulary</p>
+<dl class="method">
+<dt id="AIToolbox.nlp.dataset.SQuAD2.SQuAD2DataReader.GeneratorSQuAD2ConcatContextDatasetReader.read">
+<code class="descname">read</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.dataset.SQuAD2.SQuAD2DataReader.GeneratorSQuAD2ConcatContextDatasetReader.read" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.nlp.dataset.SQuAD2.SQuAD2DataReader.GeneratorSQuAD2ConcatContextDatasetReader.read_generator">
+<code class="descname">read_generator</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.dataset.SQuAD2.SQuAD2DataReader.GeneratorSQuAD2ConcatContextDatasetReader.read_generator" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Yields</dt>
+<dd class="field-odd"><p><em>list</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.nlp.dataset.SQuAD2.SQuAD2DataReader.SQuAD2ConcatContextDatasetReader">
+<em class="property">class </em><code class="descclassname">AIToolbox.nlp.dataset.SQuAD2.SQuAD2DataReader.</code><code class="descname">SQuAD2ConcatContextDatasetReader</code><span class="sig-paren">(</span><em>file_path</em>, <em>tokenizer=None</em>, <em>is_train=True</em>, <em>dev_mode_size=None</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.dataset.SQuAD2.SQuAD2DataReader.SQuAD2ConcatContextDatasetReader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="AIToolbox.nlp.dataset.SQuAD2.SQuAD2DataReader.SQuAD2ConcatContextDatasetReader.process_example">
+<code class="descname">process_example</code><span class="sig-paren">(</span><em>paragraph_tokens</em>, <em>question_tokens</em>, <em>char_spans</em>, <em>answer_texts</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.dataset.SQuAD2.SQuAD2DataReader.SQuAD2ConcatContextDatasetReader.process_example" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>paragraph_tokens</strong> – </p></li>
+<li><p><strong>question_tokens</strong> – </p></li>
+<li><p><strong>char_spans</strong> – </p></li>
+<li><p><strong>answer_texts</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.nlp.dataset.SQuAD2.SQuAD2DataReader.SQuAD2ConcatContextDatasetReader.read">
+<code class="descname">read</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.dataset.SQuAD2.SQuAD2DataReader.SQuAD2ConcatContextDatasetReader.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read SQuAD data. Tested and it works</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list, <a class="reference internal" href="AIToolbox.nlp.core.html#AIToolbox.nlp.core.vocabulary.Vocabulary" title="AIToolbox.nlp.core.vocabulary.Vocabulary">AIToolbox.nlp.core.vocabulary.Vocabulary</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.nlp.dataset.SQuAD2.SQuAD2DataReader.SQuAD2ConcatContextDatasetReader.tokenize_process_paragraph">
+<code class="descname">tokenize_process_paragraph</code><span class="sig-paren">(</span><em>paragraph_text</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.dataset.SQuAD2.SQuAD2DataReader.SQuAD2ConcatContextDatasetReader.tokenize_process_paragraph" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>paragraph_text</strong> – </p>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.nlp.dataset.SQuAD2.SQuAD2DataReader.SQuAD2ConcatContextDatasetReader.tokenize_process_question">
+<code class="descname">tokenize_process_question</code><span class="sig-paren">(</span><em>question_text</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.dataset.SQuAD2.SQuAD2DataReader.SQuAD2ConcatContextDatasetReader.tokenize_process_question" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>question_text</strong> – </p>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="AIToolbox.nlp.dataset.SQuAD2.SQuAD2DataReader.get_dataset_local_copy">
+<code class="descclassname">AIToolbox.nlp.dataset.SQuAD2.SQuAD2DataReader.</code><code class="descname">get_dataset_local_copy</code><span class="sig-paren">(</span><em>local_dataset_folder_path</em>, <em>protect_local_folder=True</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.dataset.SQuAD2.SQuAD2DataReader.get_dataset_local_copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Interface method for getting a local copy of SQuAD2 dataset</p>
+<p>If a local copy is not found, dataset is automatically downloaded from S3.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>local_dataset_folder_path</strong> (<em>str</em>) – </p></li>
+<li><p><strong>protect_local_folder</strong> (<em>bool</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-AIToolbox.nlp.dataset.SQuAD2">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-AIToolbox.nlp.dataset.SQuAD2" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">AIToolbox</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Marko Vidoni.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/AIToolbox.nlp.dataset.SQuAD2.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

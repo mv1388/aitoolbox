@@ -1,0 +1,191 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>AIToolbox.nlp.core.deprecated package &#8212; AIToolbox 0.3.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="aitoolbox-nlp-core-deprecated-package">
+<h1>AIToolbox.nlp.core.deprecated package<a class="headerlink" href="#aitoolbox-nlp-core-deprecated-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-AIToolbox.nlp.core.deprecated.d_core">
+<span id="aitoolbox-nlp-core-deprecated-d-core-module"></span><h2>AIToolbox.nlp.core.deprecated.d_core module<a class="headerlink" href="#module-AIToolbox.nlp.core.deprecated.d_core" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="AIToolbox.nlp.core.deprecated.d_core.basic_tokenize">
+<code class="descclassname">AIToolbox.nlp.core.deprecated.d_core.</code><code class="descname">basic_tokenize</code><span class="sig-paren">(</span><em>text</em>, <em>use_word_tokenize=True</em>, <em>rm_non_alphanum=True</em>, <em>start_label='START'</em>, <em>end_label='END'</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.core.deprecated.d_core.basic_tokenize" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text</strong> (<em>str</em>) – </p></li>
+<li><p><strong>use_word_tokenize</strong> (<em>bool</em>) – </p></li>
+<li><p><strong>rm_non_alphanum</strong> (<em>bool</em>) – </p></li>
+<li><p><strong>start_label</strong> (<em>str</em>) – </p></li>
+<li><p><strong>end_label</strong> (<em>str</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="AIToolbox.nlp.core.deprecated.d_core.prepare_vocab_mapping">
+<code class="descclassname">AIToolbox.nlp.core.deprecated.d_core.</code><code class="descname">prepare_vocab_mapping</code><span class="sig-paren">(</span><em>vocab</em>, <em>padding=True</em>, <em>special_labels=('&lt;OOV&gt;'</em>, <em>)</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.core.deprecated.d_core.prepare_vocab_mapping" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vocab</strong> (<em>list</em><em> or </em><em>set</em>) – </p></li>
+<li><p><strong>padding</strong> (<em>bool</em>) – </p></li>
+<li><p><strong>special_labels</strong> (<em>list</em><em> or </em><em>tuple</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(dict, int)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="AIToolbox.nlp.core.deprecated.d_core.vectorize_one_text">
+<code class="descclassname">AIToolbox.nlp.core.deprecated.d_core.</code><code class="descname">vectorize_one_text</code><span class="sig-paren">(</span><em>text_tokens</em>, <em>word_idx</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.core.deprecated.d_core.vectorize_one_text" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text_tokens</strong> (<em>list</em>) – </p></li>
+<li><p><strong>word_idx</strong> (<em>dict</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>text tokens converted into idx numbers</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="AIToolbox.nlp.core.deprecated.d_core.vectorize_text">
+<code class="descclassname">AIToolbox.nlp.core.deprecated.d_core.</code><code class="descname">vectorize_text</code><span class="sig-paren">(</span><em>text_tokens_lists</em>, <em>word_idx</em>, <em>text_maxlen=None</em>, <em>shorten_text_mode='end'</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.nlp.core.deprecated.d_core.vectorize_text" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text_tokens_lists</strong> (<em>list</em>) – </p></li>
+<li><p><strong>word_idx</strong> (<em>dict</em>) – </p></li>
+<li><p><strong>text_maxlen</strong> (<em>int</em><em> or </em><em>None</em>) – </p></li>
+<li><p><strong>shorten_text_mode</strong> (<em>str</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-AIToolbox.nlp.core.deprecated">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-AIToolbox.nlp.core.deprecated" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">AIToolbox</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Marko Vidoni.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/AIToolbox.nlp.core.deprecated.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

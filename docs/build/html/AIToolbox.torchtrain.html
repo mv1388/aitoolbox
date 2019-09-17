@@ -1,0 +1,651 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>AIToolbox.torchtrain package &#8212; AIToolbox 0.3.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="aitoolbox-torchtrain-package">
+<h1>AIToolbox.torchtrain package<a class="headerlink" href="#aitoolbox-torchtrain-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="AIToolbox.torchtrain.callbacks.html">AIToolbox.torchtrain.callbacks package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="AIToolbox.torchtrain.callbacks.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AIToolbox.torchtrain.callbacks.html#module-AIToolbox.torchtrain.callbacks.callbacks">AIToolbox.torchtrain.callbacks.callbacks module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AIToolbox.torchtrain.callbacks.html#module-AIToolbox.torchtrain.callbacks.gradient_callbacks">AIToolbox.torchtrain.callbacks.gradient_callbacks module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AIToolbox.torchtrain.callbacks.html#module-AIToolbox.torchtrain.callbacks.model_save_callbacks">AIToolbox.torchtrain.callbacks.model_save_callbacks module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AIToolbox.torchtrain.callbacks.html#module-AIToolbox.torchtrain.callbacks.performance_eval_callbacks">AIToolbox.torchtrain.callbacks.performance_eval_callbacks module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AIToolbox.torchtrain.callbacks.html#module-AIToolbox.torchtrain.callbacks.tensorboard">AIToolbox.torchtrain.callbacks.tensorboard module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AIToolbox.torchtrain.callbacks.html#module-AIToolbox.torchtrain.callbacks.train_schedule_callbacks">AIToolbox.torchtrain.callbacks.train_schedule_callbacks module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AIToolbox.torchtrain.callbacks.html#module-AIToolbox.torchtrain.callbacks">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="AIToolbox.torchtrain.data.html">AIToolbox.torchtrain.data package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="AIToolbox.torchtrain.data.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AIToolbox.torchtrain.data.html#module-AIToolbox.torchtrain.data.batch_model_feed_defs">AIToolbox.torchtrain.data.batch_model_feed_defs module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AIToolbox.torchtrain.data.html#module-AIToolbox.torchtrain.data.dataset">AIToolbox.torchtrain.data.dataset module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AIToolbox.torchtrain.data.html#module-AIToolbox.torchtrain.data">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="AIToolbox.torchtrain.tl_components.html">AIToolbox.torchtrain.tl_components package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="AIToolbox.torchtrain.tl_components.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AIToolbox.torchtrain.tl_components.html#module-AIToolbox.torchtrain.tl_components.callback_handler">AIToolbox.torchtrain.tl_components.callback_handler module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AIToolbox.torchtrain.tl_components.html#module-AIToolbox.torchtrain.tl_components.message_passing">AIToolbox.torchtrain.tl_components.message_passing module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AIToolbox.torchtrain.tl_components.html#module-AIToolbox.torchtrain.tl_components.model_prediction_store">AIToolbox.torchtrain.tl_components.model_prediction_store module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AIToolbox.torchtrain.tl_components.html#module-AIToolbox.torchtrain.tl_components">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-AIToolbox.torchtrain.model">
+<span id="aitoolbox-torchtrain-model-module"></span><h2>AIToolbox.torchtrain.model module<a class="headerlink" href="#module-AIToolbox.torchtrain.model" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="AIToolbox.torchtrain.model.ModelWrap">
+<em class="property">class </em><code class="descclassname">AIToolbox.torchtrain.model.</code><code class="descname">ModelWrap</code><span class="sig-paren">(</span><em>model</em>, <em>batch_model_feed_def</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.model.ModelWrap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="AIToolbox.torchtrain.model.TTFullModel">
+<code class="descclassname">AIToolbox.torchtrain.model.</code><code class="descname">TTFullModel</code><a class="headerlink" href="#AIToolbox.torchtrain.model.TTFullModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#AIToolbox.torchtrain.model.TTModel" title="AIToolbox.torchtrain.model.TTModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.torchtrain.model.TTModel</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.torchtrain.model.TTModel">
+<em class="property">class </em><code class="descclassname">AIToolbox.torchtrain.model.</code><code class="descname">TTModel</code><a class="headerlink" href="#AIToolbox.torchtrain.model.TTModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<p>TT in TTModel –&gt; TorchTrain Model</p>
+<p>User also needs to implement forward() method according to the nn.Module inheritance</p>
+<dl class="method">
+<dt id="AIToolbox.torchtrain.model.TTModel.get_loss">
+<code class="descname">get_loss</code><span class="sig-paren">(</span><em>batch_data</em>, <em>criterion</em>, <em>device</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.model.TTModel.get_loss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get loss during training stage</p>
+<p>Called from fit() in TrainLoop</p>
+<p>Executed during training stage where model weights are updated based on the loss returned from this function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch_data</strong> – </p></li>
+<li><p><strong>criterion</strong> – </p></li>
+<li><p><strong>device</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>PyTorch loss</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.model.TTModel.get_loss_eval">
+<code class="descname">get_loss_eval</code><span class="sig-paren">(</span><em>batch_data</em>, <em>criterion</em>, <em>device</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.model.TTModel.get_loss_eval" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get loss during evaluation stage</p>
+<p>Called from evaluate_model_loss() in TrainLoop.</p>
+<p>The difference compared with get_loss() is that here the backprop weight update is not done.
+This function is executed in the evaluation stage not training.</p>
+<p>For simple examples this function can just call the get_loss() and return its result.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch_data</strong> – </p></li>
+<li><p><strong>criterion</strong> – </p></li>
+<li><p><strong>device</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.model.TTModel.get_predictions">
+<code class="descname">get_predictions</code><span class="sig-paren">(</span><em>batch_data</em>, <em>device</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.model.TTModel.get_predictions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get predictions during evaluation stage</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch_data</strong> – </p></li>
+<li><p><strong>device</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>y_test.cpu(), y_pred.cpu(), metadata</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.array, np.array, dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-AIToolbox.torchtrain.model_predict">
+<span id="aitoolbox-torchtrain-model-predict-module"></span><h2>AIToolbox.torchtrain.model_predict module<a class="headerlink" href="#module-AIToolbox.torchtrain.model_predict" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="AIToolbox.torchtrain.model_predict.AbstractModelPredictor">
+<em class="property">class </em><code class="descclassname">AIToolbox.torchtrain.model_predict.</code><code class="descname">AbstractModelPredictor</code><span class="sig-paren">(</span><em>model</em>, <em>data_loader</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.model_predict.AbstractModelPredictor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<dl class="method">
+<dt id="AIToolbox.torchtrain.model_predict.AbstractModelPredictor.evaluate_model">
+<code class="descname">evaluate_model</code><span class="sig-paren">(</span><em>result_package</em>, <em>project_name</em>, <em>experiment_name</em>, <em>local_model_result_folder_path</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.model_predict.AbstractModelPredictor.evaluate_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.model_predict.AbstractModelPredictor.evaluate_result_package">
+<code class="descname">evaluate_result_package</code><span class="sig-paren">(</span><em>result_package</em>, <em>return_result_package=True</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.model_predict.AbstractModelPredictor.evaluate_result_package" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.model_predict.AbstractModelPredictor.execute_batch_end_callbacks">
+<code class="descname">execute_batch_end_callbacks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.model_predict.AbstractModelPredictor.execute_batch_end_callbacks" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.model_predict.AbstractModelPredictor.execute_epoch_end_callbacks">
+<code class="descname">execute_epoch_end_callbacks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.model_predict.AbstractModelPredictor.execute_epoch_end_callbacks" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.model_predict.AbstractModelPredictor.model_get_loss">
+<code class="descname">model_get_loss</code><span class="sig-paren">(</span><em>loss_criterion</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.model_predict.AbstractModelPredictor.model_get_loss" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.model_predict.AbstractModelPredictor.model_predict">
+<code class="descname">model_predict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.model_predict.AbstractModelPredictor.model_predict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.torchtrain.model_predict.PyTorchModelPredictor">
+<em class="property">class </em><code class="descclassname">AIToolbox.torchtrain.model_predict.</code><code class="descname">PyTorchModelPredictor</code><span class="sig-paren">(</span><em>model</em>, <em>data_loader</em>, <em>callbacks=None</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.model_predict.PyTorchModelPredictor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.torchtrain.model_predict.AbstractModelPredictor" title="AIToolbox.torchtrain.model_predict.AbstractModelPredictor"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.torchtrain.model_predict.AbstractModelPredictor</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.torchtrain.model_predict.PyTorchModelPredictor.evaluate_metric">
+<code class="descname">evaluate_metric</code><span class="sig-paren">(</span><em>metric_class</em>, <em>return_metric=True</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.model_predict.PyTorchModelPredictor.evaluate_metric" title="Permalink to this definition">¶</a></dt>
+<dd><p>Only for really simple cases where the output from the network can be directly used for metric calculation.
+For more advanced cases where the network output needs to be preprocessed before the metric evaluation,
+the use of the result package is preferred.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>metric_class</strong> (<a class="reference internal" href="AIToolbox.experiment.core_metrics.html#AIToolbox.experiment.core_metrics.abstract_metric.AbstractBaseMetric" title="AIToolbox.experiment.core_metrics.abstract_metric.AbstractBaseMetric"><em>AIToolbox.experiment.core_metrics.abstract_metric.AbstractBaseMetric</em></a>) – metric class not the object</p></li>
+<li><p><strong>return_metric</strong> (<em>bool</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="AIToolbox.experiment.core_metrics.html#AIToolbox.experiment.core_metrics.abstract_metric.AbstractBaseMetric" title="AIToolbox.experiment.core_metrics.abstract_metric.AbstractBaseMetric">AIToolbox.experiment.core_metrics.abstract_metric.AbstractBaseMetric</a> or dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.model_predict.PyTorchModelPredictor.evaluate_metric_list">
+<code class="descname">evaluate_metric_list</code><span class="sig-paren">(</span><em>metrics_class_list</em>, <em>return_metric_list=True</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.model_predict.PyTorchModelPredictor.evaluate_metric_list" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>metrics_class_list</strong> (<em>list</em>) – list of metric classes not the objects</p></li>
+<li><p><strong>return_metric_list</strong> (<em>bool</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list or dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.model_predict.PyTorchModelPredictor.evaluate_model">
+<code class="descname">evaluate_model</code><span class="sig-paren">(</span><em>result_package</em>, <em>project_name</em>, <em>experiment_name</em>, <em>local_model_result_folder_path</em>, <em>cloud_save_mode='s3'</em>, <em>bucket_name='model-result'</em>, <em>save_true_pred_labels=False</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.model_predict.PyTorchModelPredictor.evaluate_model" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>result_package</strong> (<a class="reference internal" href="AIToolbox.experiment.result_package.html#AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage" title="AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage"><em>AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage</em></a>) – </p></li>
+<li><p><strong>project_name</strong> (<em>str</em>) – </p></li>
+<li><p><strong>experiment_name</strong> (<em>str</em>) – </p></li>
+<li><p><strong>local_model_result_folder_path</strong> (<em>str</em>) – </p></li>
+<li><p><strong>cloud_save_mode</strong> (<em>str</em>) – </p></li>
+<li><p><strong>bucket_name</strong> (<em>str</em>) – </p></li>
+<li><p><strong>save_true_pred_labels</strong> (<em>bool</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.model_predict.PyTorchModelPredictor.evaluate_result_package">
+<code class="descname">evaluate_result_package</code><span class="sig-paren">(</span><em>result_package</em>, <em>return_result_package=True</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.model_predict.PyTorchModelPredictor.evaluate_result_package" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>result_package</strong> (<a class="reference internal" href="AIToolbox.experiment.result_package.html#AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage" title="AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage"><em>AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage</em></a>) – </p></li>
+<li><p><strong>return_result_package</strong> (<em>bool</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="AIToolbox.experiment.result_package.html#AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage" title="AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage">AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage</a> or dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.model_predict.PyTorchModelPredictor.execute_batch_end_callbacks">
+<code class="descname">execute_batch_end_callbacks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.model_predict.PyTorchModelPredictor.execute_batch_end_callbacks" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.model_predict.PyTorchModelPredictor.execute_epoch_end_callbacks">
+<code class="descname">execute_epoch_end_callbacks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.model_predict.PyTorchModelPredictor.execute_epoch_end_callbacks" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.model_predict.PyTorchModelPredictor.model_get_loss">
+<code class="descname">model_get_loss</code><span class="sig-paren">(</span><em>loss_criterion</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.model_predict.PyTorchModelPredictor.model_get_loss" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>loss_criterion</strong> (<em>torch.nn.modules.loss._Loss</em>) – criterion criterion during the training procedure.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>loss</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.model_predict.PyTorchModelPredictor.model_predict">
+<code class="descname">model_predict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.model_predict.PyTorchModelPredictor.model_predict" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>(torch.Tensor, torch.Tensor, dict)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-AIToolbox.torchtrain.multi_loss">
+<span id="aitoolbox-torchtrain-multi-loss-module"></span><h2>AIToolbox.torchtrain.multi_loss module<a class="headerlink" href="#module-AIToolbox.torchtrain.multi_loss" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="AIToolbox.torchtrain.multi_loss.MultiLoss">
+<em class="property">class </em><code class="descclassname">AIToolbox.torchtrain.multi_loss.</code><code class="descname">MultiLoss</code><span class="sig-paren">(</span><em>loss_list</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.multi_loss.MultiLoss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="AIToolbox.torchtrain.multi_loss.MultiLoss.backward">
+<code class="descname">backward</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.multi_loss.MultiLoss.backward" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.multi_loss.MultiLoss.item">
+<code class="descname">item</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.multi_loss.MultiLoss.item" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.torchtrain.multi_loss.MultiOptimizer">
+<em class="property">class </em><code class="descclassname">AIToolbox.torchtrain.multi_loss.</code><code class="descname">MultiOptimizer</code><span class="sig-paren">(</span><em>optimizer_list</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.multi_loss.MultiOptimizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="AIToolbox.torchtrain.multi_loss.MultiOptimizer.state_dict">
+<code class="descname">state_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.multi_loss.MultiOptimizer.state_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.multi_loss.MultiOptimizer.step">
+<code class="descname">step</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.multi_loss.MultiOptimizer.step" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.multi_loss.MultiOptimizer.zero_grad">
+<code class="descname">zero_grad</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.multi_loss.MultiOptimizer.zero_grad" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-AIToolbox.torchtrain.train_loop">
+<span id="aitoolbox-torchtrain-train-loop-module"></span><h2>AIToolbox.torchtrain.train_loop module<a class="headerlink" href="#module-AIToolbox.torchtrain.train_loop" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="AIToolbox.torchtrain.train_loop.TrainLoop">
+<em class="property">class </em><code class="descclassname">AIToolbox.torchtrain.train_loop.</code><code class="descname">TrainLoop</code><span class="sig-paren">(</span><em>model</em>, <em>train_loader</em>, <em>validation_loader</em>, <em>test_loader</em>, <em>optimizer</em>, <em>criterion</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.train_loop.TrainLoop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="AIToolbox.torchtrain.train_loop.TrainLoop.auto_execute_end_of_epoch">
+<code class="descname">auto_execute_end_of_epoch</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.train_loop.TrainLoop.auto_execute_end_of_epoch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Basic performance evaluation executed by default at the end of each epoch</p>
+<p>Mainly evaluation of the loss functions which are always present as part of the training loop.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.train_loop.TrainLoop.auto_execute_end_of_training">
+<code class="descname">auto_execute_end_of_training</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.train_loop.TrainLoop.auto_execute_end_of_training" title="Permalink to this definition">¶</a></dt>
+<dd><p>Basic performance evaluation executed by default at the end of the training process</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.train_loop.TrainLoop.evaluate_loss_on_test_set">
+<code class="descname">evaluate_loss_on_test_set</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.train_loop.TrainLoop.evaluate_loss_on_test_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run test dataset through the network without updating the weights and return the loss</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>loss</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.train_loop.TrainLoop.evaluate_loss_on_train_set">
+<code class="descname">evaluate_loss_on_train_set</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.train_loop.TrainLoop.evaluate_loss_on_train_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run train dataset through the network without updating the weights and return the loss</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>loss</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.train_loop.TrainLoop.evaluate_loss_on_validation_set">
+<code class="descname">evaluate_loss_on_validation_set</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.train_loop.TrainLoop.evaluate_loss_on_validation_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run validation dataset through the network without updating the weights and return the loss</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>loss</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.train_loop.TrainLoop.evaluate_model_loss">
+<code class="descname">evaluate_model_loss</code><span class="sig-paren">(</span><em>data_loader</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.train_loop.TrainLoop.evaluate_model_loss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run given dataset through the network without updating the weights and return the loss</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>data_loader</strong> (<em>torch.utils.data.DataLoader</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>loss</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.train_loop.TrainLoop.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>num_epoch</em>, <em>callbacks=None</em>, <em>grad_cb=False</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.train_loop.TrainLoop.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Train the model using the train loop</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_epoch</strong> (<em>int</em>) – how many epochs the network will be trained</p></li>
+<li><p><strong>callbacks</strong> (<em>list</em>) – callbacks that are executed during the training run</p></li>
+<li><p><strong>grad_cb</strong> (<em>bool</em>) – should the callbacks related to gradient updating be executed. If you don’t intend to
+use such callbacks disabling this option might make the loop run faster</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>trained model</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.nn.modules.Module</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.train_loop.TrainLoop.insert_metric_result_into_history">
+<code class="descname">insert_metric_result_into_history</code><span class="sig-paren">(</span><em>metric_name</em>, <em>metric_result</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.train_loop.TrainLoop.insert_metric_result_into_history" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert a metric result into the train history</p>
+<p>This is the main and preferred API function for metric insertion as part of the train loop.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>metric_name</strong> (<em>str</em>) – name of the metric to be inserted</p></li>
+<li><p><strong>metric_result</strong> (<em>float</em><em> or </em><em>dict</em>) – new result for the corresponding metric</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.train_loop.TrainLoop.predict_on_test_set">
+<code class="descname">predict_on_test_set</code><span class="sig-paren">(</span><em>force_prediction=False</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.train_loop.TrainLoop.predict_on_test_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run test dataset through the network and return true target values, target predictions and metadata</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>force_prediction</strong> (<em>bool</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>y_true, y_pred, metadata</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(torch.Tensor, torch.Tensor, dict)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.train_loop.TrainLoop.predict_on_train_set">
+<code class="descname">predict_on_train_set</code><span class="sig-paren">(</span><em>force_prediction=False</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.train_loop.TrainLoop.predict_on_train_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run train dataset through the network and return true target values, target predictions and metadata</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>force_prediction</strong> (<em>bool</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>y_true, y_pred, metadata</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(torch.Tensor, torch.Tensor, dict)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.train_loop.TrainLoop.predict_on_validation_set">
+<code class="descname">predict_on_validation_set</code><span class="sig-paren">(</span><em>force_prediction=False</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.train_loop.TrainLoop.predict_on_validation_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run validation dataset through the network and return true target values, target predictions and metadata</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>force_prediction</strong> (<em>bool</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>y_true, y_pred, metadata</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(torch.Tensor, torch.Tensor, dict)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.torchtrain.train_loop.TrainLoop.predict_with_model">
+<code class="descname">predict_with_model</code><span class="sig-paren">(</span><em>data_loader</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.train_loop.TrainLoop.predict_with_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run given dataset through the network and return true target values, target predictions and metadata</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>data_loader</strong> (<em>torch.utils.data.DataLoader</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>y_true, y_pred, metadata</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(torch.Tensor, torch.Tensor, dict)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.torchtrain.train_loop.TrainLoopModelCheckpoint">
+<em class="property">class </em><code class="descclassname">AIToolbox.torchtrain.train_loop.</code><code class="descname">TrainLoopModelCheckpoint</code><span class="sig-paren">(</span><em>model</em>, <em>train_loader</em>, <em>validation_loader</em>, <em>test_loader</em>, <em>optimizer</em>, <em>criterion</em>, <em>project_name</em>, <em>experiment_name</em>, <em>local_model_result_folder_path</em>, <em>hyperparams</em>, <em>cloud_save_mode='s3'</em>, <em>bucket_name='model-result'</em>, <em>cloud_dir_prefix=''</em>, <em>rm_subopt_local_models=False</em>, <em>num_best_checkpoints_kept=2</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.train_loop.TrainLoopModelCheckpoint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.torchtrain.train_loop.TrainLoop" title="AIToolbox.torchtrain.train_loop.TrainLoop"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.torchtrain.train_loop.TrainLoop</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.torchtrain.train_loop.TrainLoopModelCheckpointEndSave">
+<em class="property">class </em><code class="descclassname">AIToolbox.torchtrain.train_loop.</code><code class="descname">TrainLoopModelCheckpointEndSave</code><span class="sig-paren">(</span><em>model</em>, <em>train_loader</em>, <em>validation_loader</em>, <em>test_loader</em>, <em>optimizer</em>, <em>criterion</em>, <em>project_name</em>, <em>experiment_name</em>, <em>local_model_result_folder_path</em>, <em>hyperparams</em>, <em>val_result_package=None</em>, <em>test_result_package=None</em>, <em>cloud_save_mode='s3'</em>, <em>bucket_name='model-result'</em>, <em>cloud_dir_prefix=''</em>, <em>rm_subopt_local_models=False</em>, <em>num_best_checkpoints_kept=2</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.train_loop.TrainLoopModelCheckpointEndSave" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.torchtrain.train_loop.TrainLoopModelEndSave" title="AIToolbox.torchtrain.train_loop.TrainLoopModelEndSave"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.torchtrain.train_loop.TrainLoopModelEndSave</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.torchtrain.train_loop.TrainLoopModelEndSave">
+<em class="property">class </em><code class="descclassname">AIToolbox.torchtrain.train_loop.</code><code class="descname">TrainLoopModelEndSave</code><span class="sig-paren">(</span><em>model</em>, <em>train_loader</em>, <em>validation_loader</em>, <em>test_loader</em>, <em>optimizer</em>, <em>criterion</em>, <em>project_name</em>, <em>experiment_name</em>, <em>local_model_result_folder_path</em>, <em>hyperparams</em>, <em>val_result_package=None</em>, <em>test_result_package=None</em>, <em>cloud_save_mode='s3'</em>, <em>bucket_name='model-result'</em>, <em>cloud_dir_prefix=''</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.train_loop.TrainLoopModelEndSave" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.torchtrain.train_loop.TrainLoop" title="AIToolbox.torchtrain.train_loop.TrainLoop"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.torchtrain.train_loop.TrainLoop</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.torchtrain.train_loop.TrainLoopModelEndSave.check_if_result_packages_possible">
+<code class="descname">check_if_result_packages_possible</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.torchtrain.train_loop.TrainLoopModelEndSave.check_if_result_packages_possible" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-AIToolbox.torchtrain">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-AIToolbox.torchtrain" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">AIToolbox</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Marko Vidoni.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/AIToolbox.torchtrain.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

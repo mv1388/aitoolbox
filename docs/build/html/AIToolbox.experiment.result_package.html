@@ -1,0 +1,607 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>AIToolbox.experiment.result_package package &#8212; AIToolbox 0.3.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="aitoolbox-experiment-result-package-package">
+<h1>AIToolbox.experiment.result_package package<a class="headerlink" href="#aitoolbox-experiment-result-package-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-AIToolbox.experiment.result_package.abstract_result_packages">
+<span id="aitoolbox-experiment-result-package-abstract-result-packages-module"></span><h2>AIToolbox.experiment.result_package.abstract_result_packages module<a class="headerlink" href="#module-AIToolbox.experiment.result_package.abstract_result_packages" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage">
+<em class="property">class </em><code class="descclassname">AIToolbox.experiment.result_package.abstract_result_packages.</code><code class="descname">AbstractResultPackage</code><span class="sig-paren">(</span><em>pkg_name=None</em>, <em>strict_content_check=False</em>, <em>np_array=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<dl class="method">
+<dt id="AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.add_merge_dicts">
+<code class="descname">add_merge_dicts</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.add_merge_dicts" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>other</strong> (<a class="reference internal" href="#AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage" title="AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage"><em>AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage</em></a><em> or </em><em>dict</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage" title="AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage">AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.add_merge_multi_pkg_wrap">
+<code class="descname">add_merge_multi_pkg_wrap</code><span class="sig-paren">(</span><em>other_object</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.add_merge_multi_pkg_wrap" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>other_object</strong> (<a class="reference internal" href="#AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage" title="AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage"><em>AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage</em></a><em> or </em><em>dict</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#AIToolbox.experiment.result_package.abstract_result_packages.MultipleResultPackageWrapper" title="AIToolbox.experiment.result_package.abstract_result_packages.MultipleResultPackageWrapper">AIToolbox.experiment.result_package.abstract_result_packages.MultipleResultPackageWrapper</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.auto_y_input_array_convert">
+<em class="property">static </em><code class="descname">auto_y_input_array_convert</code><span class="sig-paren">(</span><em>y_array</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.auto_y_input_array_convert" title="Permalink to this definition">¶</a></dt>
+<dd><p>Try to automatically decide if array should be left as it is or convert to np.array</p>
+<p>Not working in all the situations so relying on it at all times is not recommended.
+Especially for costly experiments rely rather on your own judgement and explicitly define
+if np.array conversion is needed.</p>
+<p>TODO: make it smarter so ‘auto’ option can be used more often</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>y_array</strong> (<em>list</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list or numpy.array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.create_other_object_pkg">
+<em class="property">static </em><code class="descname">create_other_object_pkg</code><span class="sig-paren">(</span><em>other_object</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.create_other_object_pkg" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>other_object</strong> (<a class="reference internal" href="#AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage" title="AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage"><em>AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage</em></a><em> or </em><em>dict</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>AbstractResultPackage | MultipleResultPackageWrapper</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.get_additional_results_dump_paths">
+<code class="descname">get_additional_results_dump_paths</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.get_additional_results_dump_paths" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>list of lists of string paths if it is not None.</dt><dd><p>Each element of the list should be list of: [[results_file_name, results_file_local_path], … [,]]</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.get_hyperparameters">
+<code class="descname">get_hyperparameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.get_hyperparameters" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.get_results">
+<code class="descname">get_results</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.get_results" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.get_training_history">
+<code class="descname">get_training_history</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.get_training_history" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract training history dict from the training history object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.get_training_history_object">
+<code class="descname">get_training_history_object</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.get_training_history_object" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>training history object</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="AIToolbox.experiment.html#AIToolbox.experiment.training_history.TrainingHistory" title="AIToolbox.experiment.training_history.TrainingHistory">AIToolbox.experiment.training_history.TrainingHistory</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.list_additional_results_dump_paths">
+<code class="descname">list_additional_results_dump_paths</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.list_additional_results_dump_paths" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specify the list of meta data files you also want to save &amp; upload to s3 during the experiment saving procedure</p>
+<p>By default there are no additional files that are saved as the return is None. If you want to save your
+specific additional files produced during the training procedure, then override this method specifying
+the file paths.</p>
+<p>If you want to save a whole folder of files, use zip_additional_results_dump() function to zip it into a single
+file and save this zip instead.</p>
+<p>The specified files are any additional data you would want to include into the experiment folder in addition to
+the model save files and performance evaluation report files. For example a zip of attention heatmap pictures
+in the machine translation projects.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>list of lists of string paths if it is not None.</dt><dd><p>Each element of the list should be list of: [[results_file_name, results_file_local_path], … [,]]</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.merge_dicts">
+<code class="descname">merge_dicts</code><span class="sig-paren">(</span><em>other_results_dict</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.merge_dicts" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>other_results_dict</strong> (<em>dict</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage" title="AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage">AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.prepare_result_package">
+<code class="descname">prepare_result_package</code><span class="sig-paren">(</span><em>y_true</em>, <em>y_predicted</em>, <em>hyperparameters=None</em>, <em>training_history=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.prepare_result_package" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y_true</strong> (<em>numpy.array</em><em> or </em><em>list</em>) – ground truth targets</p></li>
+<li><p><strong>y_predicted</strong> (<em>numpy.array</em><em> or </em><em>list</em>) – predicted targets</p></li>
+<li><p><strong>hyperparameters</strong> (<em>dict</em><em> or </em><em>None</em>) – dictionary filled with the set hyperparameters</p></li>
+<li><p><strong>training_history</strong> (<a class="reference internal" href="AIToolbox.experiment.html#AIToolbox.experiment.training_history.TrainingHistory" title="AIToolbox.experiment.training_history.TrainingHistory"><em>AIToolbox.experiment.training_history.TrainingHistory</em></a>) – </p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.prepare_results_dict">
+<code class="descname">prepare_results_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.prepare_results_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform result package building</p>
+<p>Mostly this consists of executing calculation of selected performance metrics and returning their result dicts.
+If you want to use multiple performance metrics you have to combine them in the single self.results_dict
+at the end by doing this:</p>
+<blockquote>
+<div><p>self.results_dict = {<a href="#id1"><span class="problematic" id="id2">**</span></a>metric_dict_1, <a href="#id3"><span class="problematic" id="id4">**</span></a>metric_dict_2}</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>calculated result dict</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.qa_check_additional_results_dump_paths">
+<code class="descname">qa_check_additional_results_dump_paths</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.qa_check_additional_results_dump_paths" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.qa_check_hyperparameters_dict">
+<code class="descname">qa_check_hyperparameters_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.qa_check_hyperparameters_dict" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.set_experiment_dir_path_for_additional_results">
+<code class="descname">set_experiment_dir_path_for_additional_results</code><span class="sig-paren">(</span><em>project_name</em>, <em>experiment_name</em>, <em>experiment_timestamp</em>, <em>local_model_result_folder_path</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.set_experiment_dir_path_for_additional_results" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set experiment folder path after potential timestamps have already been generated.</p>
+<p>Experiment folder setting for additional metadata results output is needed only in certain result packages,
+for example in QuestionAnswerResultPackage where the self.output_text_dir initially has only the name of
+the folder where the results text predictions for each example should be stored. This function when implemented
+reforms the folder name so that it becomes a full path placing the folder inside the experiment folder (for
+which the timestamp at the start of train loop is needed).</p>
+<p>Another use of this function is in MachineTranslationResultPackage where the attention heatmap pictures are
+stored as additional metadata results.</p>
+<p>As can be seen from the fact that the train loop mechanism is mentioned, this method’s functionality is
+primarily used for PyTorch experiments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>project_name</strong> (<em>str</em>) – </p></li>
+<li><p><strong>experiment_name</strong> (<em>str</em>) – </p></li>
+<li><p><strong>experiment_timestamp</strong> (<em>str</em>) – </p></li>
+<li><p><strong>local_model_result_folder_path</strong> (<em>str</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.warn_about_result_data_problem">
+<code class="descname">warn_about_result_data_problem</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.warn_about_result_data_problem" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>msg</strong> (<em>str</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.warn_if_results_dict_not_defined">
+<code class="descname">warn_if_results_dict_not_defined</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.warn_if_results_dict_not_defined" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.zip_additional_results_dump">
+<em class="property">static </em><code class="descname">zip_additional_results_dump</code><span class="sig-paren">(</span><em>source_dir_path</em>, <em>zip_path</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.zip_additional_results_dump" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>source_dir_path</strong> (<em>str</em>) – </p></li>
+<li><p><strong>zip_path</strong> (<em>str</em>) – specify the path with the zip name but without the ‘.zip’ at the end</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the full path to the produced zip file (with the .zip extension appended)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.experiment.result_package.abstract_result_packages.MultipleResultPackageWrapper">
+<em class="property">class </em><code class="descclassname">AIToolbox.experiment.result_package.abstract_result_packages.</code><code class="descname">MultipleResultPackageWrapper</code><span class="sig-paren">(</span><em>strict_content_check=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.result_package.abstract_result_packages.MultipleResultPackageWrapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage" title="AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.experiment.result_package.abstract_result_packages.MultipleResultPackageWrapper.add_merge_multi_pkg_wrap">
+<code class="descname">add_merge_multi_pkg_wrap</code><span class="sig-paren">(</span><em>other_object</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.result_package.abstract_result_packages.MultipleResultPackageWrapper.add_merge_multi_pkg_wrap" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>other_object</strong> (<a class="reference internal" href="#AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage" title="AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage"><em>AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage</em></a><em> or </em><em>dict</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#AIToolbox.experiment.result_package.abstract_result_packages.MultipleResultPackageWrapper" title="AIToolbox.experiment.result_package.abstract_result_packages.MultipleResultPackageWrapper">AIToolbox.experiment.result_package.abstract_result_packages.MultipleResultPackageWrapper</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.experiment.result_package.abstract_result_packages.MultipleResultPackageWrapper.get_additional_results_dump_paths">
+<code class="descname">get_additional_results_dump_paths</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.result_package.abstract_result_packages.MultipleResultPackageWrapper.get_additional_results_dump_paths" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>list of lists of string paths if it is not None.</dt><dd><p>Each element of the list should be list of: [[results_file_name, results_file_local_path], … [,]]</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.experiment.result_package.abstract_result_packages.MultipleResultPackageWrapper.prepare_result_package">
+<code class="descname">prepare_result_package</code><span class="sig-paren">(</span><em>result_packages</em>, <em>hyperparameters=None</em>, <em>training_history=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.result_package.abstract_result_packages.MultipleResultPackageWrapper.prepare_result_package" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>result_packages</strong> (<em>list</em>) – list of result packages where each of them is object inherited from
+AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.
+If you want to add raw results in dict form, this dict first needs to be wrapped into
+AIToolbox.experiment.result_package.abstract_result_packages.PreCalculatedResultPackage to satisfy
+the result package object requirement.</p></li>
+<li><p><strong>hyperparameters</strong> (<em>dict</em><em> or </em><em>None</em>) – </p></li>
+<li><p><strong>training_history</strong> (<em>AIToolbox.ExperimentSave.training_history.TrainingHistory</em>) – </p></li>
+<li><p><strong>**kwargs</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.experiment.result_package.abstract_result_packages.MultipleResultPackageWrapper.prepare_results_dict">
+<code class="descname">prepare_results_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.result_package.abstract_result_packages.MultipleResultPackageWrapper.prepare_results_dict" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.experiment.result_package.abstract_result_packages.PreCalculatedResultPackage">
+<em class="property">class </em><code class="descclassname">AIToolbox.experiment.result_package.abstract_result_packages.</code><code class="descname">PreCalculatedResultPackage</code><span class="sig-paren">(</span><em>results_dict</em>, <em>strict_content_check=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.result_package.abstract_result_packages.PreCalculatedResultPackage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage" title="AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.experiment.result_package.abstract_result_packages.PreCalculatedResultPackage.prepare_results_dict">
+<code class="descname">prepare_results_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.result_package.abstract_result_packages.PreCalculatedResultPackage.prepare_results_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform result package building</p>
+<p>Mostly this consists of executing calculation of selected performance metrics and returning their result dicts.
+If you want to use multiple performance metrics you have to combine them in the single self.results_dict
+at the end by doing this:</p>
+<blockquote>
+<div><p>self.results_dict = {<a href="#id5"><span class="problematic" id="id6">**</span></a>metric_dict_1, <a href="#id7"><span class="problematic" id="id8">**</span></a>metric_dict_2}</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>calculated result dict</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-AIToolbox.experiment.result_package.basic_packages">
+<span id="aitoolbox-experiment-result-package-basic-packages-module"></span><h2>AIToolbox.experiment.result_package.basic_packages module<a class="headerlink" href="#module-AIToolbox.experiment.result_package.basic_packages" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="AIToolbox.experiment.result_package.basic_packages.BinaryClassificationResultPackage">
+<em class="property">class </em><code class="descclassname">AIToolbox.experiment.result_package.basic_packages.</code><code class="descname">BinaryClassificationResultPackage</code><span class="sig-paren">(</span><em>strict_content_check=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.result_package.basic_packages.BinaryClassificationResultPackage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage" title="AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.experiment.result_package.basic_packages.BinaryClassificationResultPackage.prepare_results_dict">
+<code class="descname">prepare_results_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.result_package.basic_packages.BinaryClassificationResultPackage.prepare_results_dict" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.experiment.result_package.basic_packages.ClassificationResultPackage">
+<em class="property">class </em><code class="descclassname">AIToolbox.experiment.result_package.basic_packages.</code><code class="descname">ClassificationResultPackage</code><span class="sig-paren">(</span><em>strict_content_check=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.result_package.basic_packages.ClassificationResultPackage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage" title="AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.experiment.result_package.basic_packages.ClassificationResultPackage.prepare_results_dict">
+<code class="descname">prepare_results_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.result_package.basic_packages.ClassificationResultPackage.prepare_results_dict" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.experiment.result_package.basic_packages.GeneralResultPackage">
+<em class="property">class </em><code class="descclassname">AIToolbox.experiment.result_package.basic_packages.</code><code class="descname">GeneralResultPackage</code><span class="sig-paren">(</span><em>metrics_list</em>, <em>strict_content_check=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.result_package.basic_packages.GeneralResultPackage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage" title="AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.experiment.result_package.basic_packages.GeneralResultPackage.prepare_results_dict">
+<code class="descname">prepare_results_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.result_package.basic_packages.GeneralResultPackage.prepare_results_dict" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="AIToolbox.experiment.result_package.basic_packages.GeneralResultPackage.qa_check_metrics_list">
+<code class="descname">qa_check_metrics_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.result_package.basic_packages.GeneralResultPackage.qa_check_metrics_list" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="AIToolbox.experiment.result_package.basic_packages.RegressionResultPackage">
+<em class="property">class </em><code class="descclassname">AIToolbox.experiment.result_package.basic_packages.</code><code class="descname">RegressionResultPackage</code><span class="sig-paren">(</span><em>strict_content_check=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.result_package.basic_packages.RegressionResultPackage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage" title="AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage"><code class="xref py py-class docutils literal notranslate"><span class="pre">AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage</span></code></a></p>
+<dl class="method">
+<dt id="AIToolbox.experiment.result_package.basic_packages.RegressionResultPackage.prepare_results_dict">
+<code class="descname">prepare_results_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.experiment.result_package.basic_packages.RegressionResultPackage.prepare_results_dict" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-AIToolbox.experiment.result_package">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-AIToolbox.experiment.result_package" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">AIToolbox</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Marko Vidoni.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/AIToolbox.experiment.result_package.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

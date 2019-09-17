@@ -1,0 +1,246 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>AIToolbox.utils package &#8212; AIToolbox 0.3.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="aitoolbox-utils-package">
+<h1>AIToolbox.utils package<a class="headerlink" href="#aitoolbox-utils-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-AIToolbox.utils.dict_util">
+<span id="aitoolbox-utils-dict-util-module"></span><h2>AIToolbox.utils.dict_util module<a class="headerlink" href="#module-AIToolbox.utils.dict_util" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="AIToolbox.utils.dict_util.combine_dict_elements">
+<code class="descclassname">AIToolbox.utils.dict_util.</code><code class="descname">combine_dict_elements</code><span class="sig-paren">(</span><em>list_of_dicts</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.utils.dict_util.combine_dict_elements" title="Permalink to this definition">¶</a></dt>
+<dd><p>Combine into single list the elements with the same key across several dicts</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>list_of_dicts</strong> (<em>list</em>) – list of dicts with matching keys</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>combined single dict</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="AIToolbox.utils.dict_util.combine_prediction_metadata_batches">
+<code class="descclassname">AIToolbox.utils.dict_util.</code><code class="descname">combine_prediction_metadata_batches</code><span class="sig-paren">(</span><em>metadata_list</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.utils.dict_util.combine_prediction_metadata_batches" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Combines a list of dicts with the same keys and lists as values into a single dict with concatenated lists</dt><dd><p>for each corresponding key</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>metadata_list</strong> (<em>list</em>) – list of dicts with matching keys and lists for values</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>combined single dict</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="AIToolbox.utils.dict_util.flatten_combine_dict">
+<code class="descclassname">AIToolbox.utils.dict_util.</code><code class="descname">flatten_combine_dict</code><span class="sig-paren">(</span><em>train_history</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.utils.dict_util.flatten_combine_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flatten all dict of dicts and combine elements with the same key into a single list in the dict</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>train_history</strong> (<em>dict</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="AIToolbox.utils.dict_util.flatten_dict">
+<code class="descclassname">AIToolbox.utils.dict_util.</code><code class="descname">flatten_dict</code><span class="sig-paren">(</span><em>d</em>, <em>parent_key=''</em>, <em>sep='_'</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.utils.dict_util.flatten_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flatten the nested dict of dicts of …</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>d</strong> (<em>dict</em>) – input dict</p></li>
+<li><p><strong>parent_key</strong> (<em>str</em>) – </p></li>
+<li><p><strong>sep</strong> (<em>str</em>) – separator when flattening the category</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>flattened dict</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-AIToolbox.utils.file_system">
+<span id="aitoolbox-utils-file-system-module"></span><h2>AIToolbox.utils.file_system module<a class="headerlink" href="#module-AIToolbox.utils.file_system" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="AIToolbox.utils.file_system.create_folder_hierarchy">
+<code class="descclassname">AIToolbox.utils.file_system.</code><code class="descname">create_folder_hierarchy</code><span class="sig-paren">(</span><em>base_folder_path</em>, <em>folder_names</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.utils.file_system.create_folder_hierarchy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create nested folder hierarchy</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base_folder_path</strong> (<em>str</em>) – folder from which the created folder hierarchy will go into further depth</p></li>
+<li><p><strong>folder_names</strong> (<em>list</em>) – names of folders to be created one inside the previous</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>path to final folder in hierarchy, all the folder paths in the created hierarchy</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str, list</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-AIToolbox.utils.util">
+<span id="aitoolbox-utils-util-module"></span><h2>AIToolbox.utils.util module<a class="headerlink" href="#module-AIToolbox.utils.util" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="AIToolbox.utils.util.flatten_list_of_lists">
+<code class="descclassname">AIToolbox.utils.util.</code><code class="descname">flatten_list_of_lists</code><span class="sig-paren">(</span><em>l</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.utils.util.flatten_list_of_lists" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>l</strong> (<em>list</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="AIToolbox.utils.util.function_exists">
+<code class="descclassname">AIToolbox.utils.util.</code><code class="descname">function_exists</code><span class="sig-paren">(</span><em>object_to_check</em>, <em>fn_name</em><span class="sig-paren">)</span><a class="headerlink" href="#AIToolbox.utils.util.function_exists" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if function exists in the object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>object_to_check</strong> – object to be searched for the existence of the function</p></li>
+<li><p><strong>fn_name</strong> (<em>str</em>) – name of the function</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>if function is present in the provided object</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-AIToolbox.utils">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-AIToolbox.utils" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">AIToolbox</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Marko Vidoni.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/AIToolbox.utils.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
