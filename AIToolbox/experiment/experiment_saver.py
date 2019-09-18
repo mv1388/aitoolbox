@@ -14,14 +14,15 @@ class AbstractExperimentSaver(ABC):
     def save_experiment(self, model, result_package, experiment_timestamp=None,
                         save_true_pred_labels=False, separate_files=False,
                         protect_existing_folder=True):
-        """
+        """Method which all the experiment savers need to implement which instructs how the experiment should be saved
 
         Args:
             model:
             result_package (AIToolbox.ExperimentSave.result_package.AbstractResultPackage):
             experiment_timestamp (str): time stamp of the training start
-            save_true_pred_labels (bool):
-            separate_files (bool):
+            save_true_pred_labels (bool): should ground truth labels also be saved
+            separate_files (bool): should the results be saved in separate pickle files or should all of the results
+                be batched together in a single results file
             protect_existing_folder (bool): can override potentially already existing folder or not
 
         Returns:
@@ -32,11 +33,11 @@ class AbstractExperimentSaver(ABC):
 
 class BaseFullExperimentSaver(AbstractExperimentSaver):
     def __init__(self, model_saver, results_saver, project_name, experiment_name):
-        """
+        """Base full experiment saver functionality used by the underlying experiment saver derivations
 
         Args:
-            model_saver (AIToolbox.cloud.AWS.model_save.AbstractModelSaver):
-            results_saver (AIToolbox.cloud.AWS.results_save.AbstractResultsSaver):
+            model_saver (AIToolbox.cloud.AWS.model_save.AbstractModelSaver): selected saver used for model saving
+            results_saver (AIToolbox.cloud.AWS.results_save.AbstractResultsSaver): selected saver used for results save
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
         """
@@ -49,14 +50,15 @@ class BaseFullExperimentSaver(AbstractExperimentSaver):
     def save_experiment(self, model, result_package, experiment_timestamp=None,
                         save_true_pred_labels=False, separate_files=False,
                         protect_existing_folder=True):
-        """
+        """Save the experiment snapshot formed out of the model and model's results
 
         Args:
             model (dict or keras.engine.training.Model):
             result_package (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
             experiment_timestamp (str): time stamp at the start of training
-            save_true_pred_labels (bool):
-            separate_files (bool):
+            save_true_pred_labels (bool): should ground truth labels also be saved
+            separate_files (bool): should the results be saved in separate pickle files or should all of the results
+                be batched together in a single results file
             protect_existing_folder (bool): can override potentially already existing folder or not
 
         Returns:
@@ -85,7 +87,9 @@ class BaseFullExperimentS3Saver(BaseFullExperimentSaver):
     def __init__(self, model_saver, project_name, experiment_name,
                  bucket_name='model-result', cloud_dir_prefix='',
                  local_model_result_folder_path='~/project/model_result'):
-        """
+        """Base experiment saver implementing the S3 saving functionality
+
+        This is used by the underlying experiment S3 saver derivations
 
         Args:
             model_saver (AIToolbox.cloud.AWS.model_save.AbstractModelSaver):
@@ -105,7 +109,7 @@ class FullKerasExperimentS3Saver(BaseFullExperimentS3Saver):
     def __init__(self, project_name, experiment_name,
                  bucket_name='model-result', cloud_dir_prefix='',
                  local_model_result_folder_path='~/project/model_result'):
-        """
+        """S3 saver for Keras experiments
 
         Args:
             project_name (str): root name of the project
@@ -126,7 +130,7 @@ class FullTensorFlowExperimentS3Saver(BaseFullExperimentS3Saver):
     def __init__(self, project_name, experiment_name,
                  bucket_name='model-result', cloud_dir_prefix='',
                  local_model_result_folder_path='~/project/model_result'):
-        """
+        """S3 saver for TensorFlow experiments
 
         Args:
             project_name (str): root name of the project
@@ -149,7 +153,7 @@ class FullPyTorchExperimentS3Saver(BaseFullExperimentS3Saver):
     def __init__(self, project_name, experiment_name,
                  bucket_name='model-result', cloud_dir_prefix='',
                  local_model_result_folder_path='~/project/model_result'):
-        """
+        """S3 saver for PyTorch experiments
 
         Args:
             project_name (str): root name of the project
@@ -170,7 +174,9 @@ class BaseFullExperimentGoogleStorageSaver(BaseFullExperimentSaver):
     def __init__(self, model_saver, project_name, experiment_name,
                  bucket_name='model-result', cloud_dir_prefix='',
                  local_model_result_folder_path='~/project/model_result'):
-        """
+        """Base experiment saver implementing the Google Storage saving functionality
+
+        This is used by the underlying experiment Google Storage saver derivations
 
         Args:
             model_saver (AIToolbox.cloud.AWS.model_save.AbstractModelSaver):
@@ -190,7 +196,7 @@ class FullKerasExperimentGoogleStorageSaver(BaseFullExperimentGoogleStorageSaver
     def __init__(self, project_name, experiment_name,
                  bucket_name='model-result',  cloud_dir_prefix='',
                  local_model_result_folder_path='~/project/model_result'):
-        """
+        """Google Storage saver for Keras experiments
 
         Args:
             project_name (str): root name of the project
@@ -211,7 +217,7 @@ class FullTensorFlowExperimentGoogleStorageSaver(BaseFullExperimentGoogleStorage
     def __init__(self, project_name, experiment_name,
                  bucket_name='model-result',  cloud_dir_prefix='',
                  local_model_result_folder_path='~/project/model_result'):
-        """
+        """Google Storage saver for TensorFlow experiments
 
         Args:
             project_name (str): root name of the project
@@ -234,7 +240,7 @@ class FullPyTorchExperimentGoogleStorageSaver(BaseFullExperimentGoogleStorageSav
     def __init__(self, project_name, experiment_name,
                  bucket_name='model-result',  cloud_dir_prefix='',
                  local_model_result_folder_path='~/project/model_result'):
-        """
+        """Google Storage saver for PyTorch experiments
 
         Args:
             project_name (str): root name of the project

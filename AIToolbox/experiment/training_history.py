@@ -4,7 +4,11 @@ from AIToolbox.utils import dict_util
 
 class TrainingHistory:
     def __init__(self, has_validation=True, strict_content_check=False):
-        """
+        """Training history abstraction adding specific functionality to the simple dict
+
+        In many ways the object can be used with the same API as a normal python dict. However, for the need of
+        tracking performance in the TrainLoop TrainingHistory offers additional functions handling the input, output
+        and quality assurance of the stored results.
         
         Args:
             has_validation: if train history should by default include 'val_loss'. This is needed when train loops
@@ -19,7 +23,7 @@ class TrainingHistory:
             else {'loss': [], 'accumulated_loss': []}
         
     def insert_single_result_into_history(self, metric_name, metric_result):
-        """
+        """Insert a key-value formatted result into the training history
 
         Args:
             metric_name (str): name of the metric to be stored.
@@ -30,21 +34,22 @@ class TrainingHistory:
         self.train_history[metric_name].append(metric_result)
         
     def get_train_history(self):
-        """
+        """Returns the whole train history dict in its original form without any transformations
 
         Returns:
-            dict:
+            dict: training history dict
         """
         return self.train_history
 
     def get_train_history_dict(self, flatten_dict=False):
-        """
+        """Returns QA-ed and optionally flattened training history dict
 
         Args:
-            flatten_dict (bool):
+            flatten_dict (bool): should the returnd training history dict be flattened. So no nested dicts of dicts.
+                The keys of the nested dicts will we "_" concatenated and moved into the single level dict.
 
         Returns:
-            dict:
+            dict: training history dict
         """
         if self.train_history == self.empty_train_history:
             self.warn_about_result_data_problem('Train History dict is empty')
