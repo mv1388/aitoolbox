@@ -10,13 +10,13 @@ from AIToolbox.experiment.core_metrics.abstract_metric import AbstractBaseMetric
 
 class AttentionHeatMap(AbstractBaseMetric):
     def __init__(self, attention_matrices, source_sentences, target_sentences, plot_save_dir):
-        """
+        """Neural attention heatmap plotting
 
         Args:
-            attention_matrices (numpy.array or list):
-            source_sentences (list):
-            target_sentences (list):
-            plot_save_dir (str):
+            attention_matrices (numpy.array or list): list of attention 2D matrices
+            source_sentences (list): list of corresponding source sentence text tokens
+            target_sentences (list): list of corresponding target sentence text tokens
+            plot_save_dir (str): folder path on local drive where the plots should be saved
 
         """
         if len(attention_matrices) != len(source_sentences) != len(target_sentences):
@@ -51,16 +51,16 @@ class AttentionHeatMap(AbstractBaseMetric):
 
     @staticmethod
     def plot_sentence_attention(attention_matrix, sentence_source, sentence_target, plot_file_path=None):
-        """
+        """Plot the provided attention matrix
 
         Args:
-            attention_matrix (np.array):
-            sentence_source (list):
-            sentence_target (list):
-            plot_file_path (str):
+            attention_matrix (np.array): 2D attention matrix
+            sentence_source (list): corresponding source sentence text tokens
+            sentence_target (list): corresponding target sentence text tokens
+            plot_file_path (str): local drive file path where to save the plotted attention matrix heatmap
 
         Returns:
-
+            None
         """
         # alpha_arr /= np.max(np.abs(alpha_arr),axis=0)
         fig = plt.figure()
@@ -99,14 +99,13 @@ class AttentionHeatMap(AbstractBaseMetric):
 
     @staticmethod
     def prepare_folder_for_saving(output_plot_dir):
-        """
+        """Create attention heatmaps local folder where the heatmaps will be saved
 
         Args:
             output_plot_dir (str):
 
         Returns:
-            str:
-
+            str: path to the created folder
         """
         if os.path.exists(output_plot_dir):
             shutil.rmtree(output_plot_dir)

@@ -14,7 +14,7 @@ class ROUGEMetric(AbstractBaseMetric):
     def __init__(self, y_true, y_predicted,
                  target_actual_text=False, output_text_dir=None,
                  output_text_cleaning_regex=(r'<.*?>', r'[^a-zA-Z0-9.?! ]+')):
-        """
+        """ROGUE score calculation
 
         From this package:
             https://github.com/pltrdy/rouge
@@ -67,7 +67,7 @@ class ROUGEPerlMetric(AbstractBaseMetric):
     def __init__(self, y_true, y_predicted,
                  output_text_dir, output_text_cleaning_regex=(r'<.*?>', r'[^a-zA-Z0-9.?! ]+'),
                  target_actual_text=False):
-        """
+        """ROGUE score calculation using the Perl implementation
 
         Use this package:
             https://pypi.org/project/pyrouge/
@@ -172,7 +172,7 @@ class ROUGEPerlMetric(AbstractBaseMetric):
 
 class BLEUSentenceScoreMetric(AbstractBaseMetric):
     def __init__(self, y_true, y_predicted, source_sents=None, output_text_dir=None):
-        """
+        """BLEU score calculation
 
         NLTK provides the sentence_bleu() function for evaluating a candidate sentence
         against one or more reference sentences.
@@ -264,7 +264,7 @@ class BLEUSentenceScoreMetric(AbstractBaseMetric):
 
 class BLEUCorpusScoreMetric(AbstractBaseMetric):
     def __init__(self, y_true, y_predicted, source_sents=None, output_text_dir=None):
-        """
+        """BLEU corpus score calculation
 
         Function called corpus_bleu() for calculating the BLEU score for multiple sentences such as a paragraph or
         a document.
@@ -304,7 +304,7 @@ class BLEUCorpusScoreMetric(AbstractBaseMetric):
 
 class BLEUScoreStrTorchNLPMetric(AbstractBaseMetric):
     def __init__(self, y_true, y_predicted, lowercase=False, source_sents=None, output_text_dir=None):
-        """
+        """BLEU score calculation using the TorchNLP implementation
 
         Example:
             hypotheses = [
