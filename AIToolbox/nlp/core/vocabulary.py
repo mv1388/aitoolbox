@@ -1,11 +1,13 @@
 
 class Vocabulary:
     def __init__(self, name, document_level=False):
-        """
+        """Vocabulary used for storing the tokens and converting between the indices and the tokens
 
         Args:
-            name (str):
-            document_level (bool):
+            name (str): name of the vocabulary / type of vocabulary. Needed just for tracking purposes
+            document_level (bool): If the vocabulary is on the sentence level or on the document level. Document
+                consists of multiple sentences. This in effect means that we are adding additional tokens for
+                start and the end of the doc.
         """
         # Default word tokens
         self.PAD_token = 0  # Used for padding short sentences
@@ -33,10 +35,10 @@ class Vocabulary:
                                    self.SOD_token, self.EOD_token]
 
     def add_sentence(self, sentence_tokens):
-        """
+        """Add tokenized sentence to the vocabulary
 
         Args:
-            sentence_tokens (list):
+            sentence_tokens (list): sentence tokens, e.g. list of words representing the sentence
 
         Returns:
             None
@@ -45,10 +47,10 @@ class Vocabulary:
             self.add_word(str(word))
 
     def add_word(self, word):
-        """
+        """Add the single word to the vocabulary
 
         Args:
-            word (str):
+            word (str): single word string
 
         Returns:
             None
@@ -99,14 +101,14 @@ class Vocabulary:
             self.add_word(word)
 
     def convert_sent2idx_sent(self, sent_tokens, start_end_token=True):
-        """
+        """Convert the given tokenized string sentence into the indices
 
         Args:
             sent_tokens (list):
-            start_end_token (bool):
+            start_end_token (bool): string tokens forming a sentence
 
         Returns:
-            list:
+            list: sentence tokens converted into the corresponding indices
         """
         if len(self.word2index) == 0:
             raise ValueError('word2index is empty')
@@ -116,14 +118,15 @@ class Vocabulary:
                ([self.EOS_token] if start_end_token else [])
 
     def convert_idx_sent2sent(self, idx_sent, rm_default_tokens=False):
-        """
+        """Convert from token indices back to the human-readable string tokens
 
         Args:
-            idx_sent:
-            rm_default_tokens (bool):
+            idx_sent: index tokens forming the sentence
+            rm_default_tokens (bool): should the default tokens such as padding and start/end sentence tokens be
+                removed from the result.
 
         Returns:
-            list:
+            list: sentence represented as a sequence of the string tokens
         """
         if len(self.index2word) == 0:
             raise ValueError('word2index is empty')
