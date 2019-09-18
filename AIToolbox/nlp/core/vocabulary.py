@@ -98,11 +98,12 @@ class Vocabulary:
         for word in keep_words:
             self.add_word(word)
 
-    def convert_sent2idx_sent(self, sent_tokens):
+    def convert_sent2idx_sent(self, sent_tokens, start_end_token=True):
         """
 
         Args:
-            sent_tokens:
+            sent_tokens (list):
+            start_end_token (bool):
 
         Returns:
             list:
@@ -110,9 +111,9 @@ class Vocabulary:
         if len(self.word2index) == 0:
             raise ValueError('word2index is empty')
 
-        return [self.SOS_token] + \
+        return [self.SOS_token] if start_end_token else [] + \
                [self.word2index[word] if word in self.word2index else self.OOV_token for word in sent_tokens] + \
-               [self.EOS_token]
+               [self.EOS_token] if start_end_token else []
 
     def convert_idx_sent2sent(self, idx_sent, rm_default_tokens=False):
         """
