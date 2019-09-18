@@ -13,7 +13,7 @@ class QuestionAnswerResultPackage(AbstractResultPackage):
     def __init__(self, paragraph_text_tokens, target_actual_text=None, output_text_dir=None,
                  use_perl_rouge=False, flatten_result_dict=False,
                  strict_content_check=False, **kwargs):
-        """
+        """Question Answering task performance evaluation result package
 
         Args:
             paragraph_text_tokens (list):
@@ -96,7 +96,9 @@ class QuestionAnswerResultPackage(AbstractResultPackage):
 
 class QuestionAnswerSpanClassificationResultPackage(AbstractResultPackage):
     def __init__(self, strict_content_check=False, **kwargs):
-        """
+        """Extractive Question Answering task performance evaluation result package
+
+        Evaluates the classification of the correct answer start and end points.
 
         Args:
             strict_content_check (bool):
@@ -137,7 +139,7 @@ class QuestionAnswerSpanClassificationResultPackage(AbstractResultPackage):
 
 class TextSummarizationResultPackage(AbstractResultPackage):
     def __init__(self, strict_content_check=False, **kwargs):
-        """
+        """Text summarization task performance evaluation package
 
         Args:
             strict_content_check (bool):
@@ -162,7 +164,7 @@ class TextSummarizationResultPackage(AbstractResultPackage):
 class MachineTranslationResultPackage(AbstractResultPackage):
     def __init__(self, target_vocab, source_vocab=None, source_sents=None, output_text_dir=None, output_attn_heatmap_dir=None,
                  strict_content_check=False, **kwargs):
-        """
+        """Machine Translation task performance evaluation package
 
         Args:
             target_vocab (AIToolbox.nlp.core.vocabulary.Vocabulary):
