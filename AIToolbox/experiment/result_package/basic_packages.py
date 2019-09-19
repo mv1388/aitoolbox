@@ -7,7 +7,7 @@ from AIToolbox.experiment.core_metrics.regression import MeanSquaredErrorMetric,
 
 class GeneralResultPackage(AbstractResultPackage):
     def __init__(self, metrics_list, strict_content_check=False, **kwargs):
-        """
+        """Result package executing given list of metrics
 
         Args:
             metrics_list (list): List of objects which are inherited from
@@ -50,7 +50,9 @@ class GeneralResultPackage(AbstractResultPackage):
 
 class BinaryClassificationResultPackage(AbstractResultPackage):
     def __init__(self, strict_content_check=False, **kwargs):
-        """
+        """Binary classification task result package
+
+        Evaluates the following metrics: accuracy, ROC-AUC, PR-AUC and F1 score
 
         Args:
             strict_content_check (bool):
@@ -75,8 +77,9 @@ class BinaryClassificationResultPackage(AbstractResultPackage):
 
 class ClassificationResultPackage(AbstractResultPackage):
     def __init__(self, strict_content_check=False, **kwargs):
-        """
+        """Multi-class classification result package
 
+        Evaluates the accuracy of the predictions.
         Without Precision-Recall metric which is available only for binary classification problems.
 
         Args:
@@ -103,7 +106,9 @@ class ClassificationResultPackage(AbstractResultPackage):
         
 class RegressionResultPackage(AbstractResultPackage):
     def __init__(self, strict_content_check=False, **kwargs):
-        """
+        """Regression task result package
+
+        Evaluates MSE and MAE metrics.
 
         Args:
             strict_content_check (bool):

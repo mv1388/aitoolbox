@@ -10,7 +10,7 @@ from AIToolbox.cloud.GoogleCloud.results_save import BaseResultsGoogleStorageSav
 
 class HyperParameterReporter:
     def __init__(self, project_name, experiment_name, experiment_timestamp, local_model_result_folder_path):
-        """
+        """Writer of selected hyperparameters to human-readable text file on disk
 
         Args:
             project_name (str): root name of the project
@@ -31,7 +31,7 @@ class HyperParameterReporter:
         self.local_hyperparams_file_path = os.path.join(self.experiment_dir_path, self.file_name)
 
     def save_hyperparams_to_text_file(self, hyperparams, sort_names=False):
-        """
+        """Save hyperparameters dict into text file on disk
 
         Args:
             hyperparams (dict): hyper-parameters listed in the dict
@@ -49,7 +49,7 @@ class HyperParameterReporter:
         return self.local_hyperparams_file_path
 
     def copy_to_cloud_storage(self, local_hyperparams_file_path, cloud_saver, file_name=None):
-        """
+        """Copy saved text local file into cloud storage
 
         Args:
             local_hyperparams_file_path (str): path to hyperparams file stored on local disk. File to be uploaded to cloud
@@ -70,7 +70,10 @@ class HyperParameterReporter:
         return cloud_file_path
 
     def save_experiment_python_file(self, hyperparams):
-        """
+        """Saves the python experiment file to the project folder
+
+        Python experiment file is file in which the main training procedure is defined. File from which the TrainLoop
+        is executed
 
         Args:
             hyperparams (dict): hyper-parameters listed in the dict
