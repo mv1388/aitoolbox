@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 import os
+from collections import OrderedDict
 
 import torch
 
@@ -54,18 +55,27 @@ class PyTorchLocalModelLoader(AbstractLocalModelLoader):
         if self.model_load is None:
             raise ValueError('Model has not yet been loaded. Please call load_model() first.')
 
-    def init_model(self, model):
+    def init_model(self, model, used_data_parallel=False):
         """
 
         Args:
-            model:
+            model: PyTorch model
+            used_data_parallel: if the saved model was nn.DataParallel or normal model
 
         Returns:
 
         """
         self.check_if_model_loaded()
 
-        model.load_state_dict(self.model_load['model_state_dict'])
+        state_dict = self.model_load['model_state_dict']
+
+        if used_data_parallel:
+            state_dict = OrderedDict()
+            for k, v in self.model_load['model_state_dict'].items():
+                name = k[7:]  # remove `module.`
+                state_dict[name] = v
+
+        model.load_state_dict(state_dict)
         return model
 
     def init_optimizer(self, optimizer, device='cuda'):
