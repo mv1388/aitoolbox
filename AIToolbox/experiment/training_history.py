@@ -57,13 +57,13 @@ class TrainingHistory:
         return dict_util.flatten_combine_dict(self.train_history) if flatten_dict else self.train_history
 
     def wrap_pre_prepared_history(self, history):
-        """
+        """Wrap existing history dict into the TrainingHistory object
 
         Args:
-            history (dict):
+            history (dict): training history base dict
 
         Returns:
-            self
+            TrainingHistory: self
             
         Examples:
             train_history = model.fit(x_train, y_train, ... )

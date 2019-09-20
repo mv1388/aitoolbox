@@ -92,7 +92,8 @@ class BaseFullExperimentS3Saver(BaseFullExperimentSaver):
         This is used by the underlying experiment S3 saver derivations
 
         Args:
-            model_saver (AIToolbox.cloud.AWS.model_save.AbstractModelSaver):
+            model_saver (AIToolbox.cloud.AWS.model_save.AbstractModelSaver): selected cloud model saver implementing
+                the saving logic for the desired cloud storage provider file saving
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             bucket_name (str): name of the bucket in the cloud storage
@@ -179,7 +180,8 @@ class BaseFullExperimentGoogleStorageSaver(BaseFullExperimentSaver):
         This is used by the underlying experiment Google Storage saver derivations
 
         Args:
-            model_saver (AIToolbox.cloud.AWS.model_save.AbstractModelSaver):
+            model_saver (AIToolbox.cloud.AWS.model_save.AbstractModelSaver): selected cloud model saver implementing
+                the saving logic for the desired cloud storage provider file saving
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             bucket_name (str): name of the bucket in the cloud storage

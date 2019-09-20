@@ -5,7 +5,7 @@ class ExperimentFolderCreator:
     @staticmethod
     def create_experiment_base_folder(project_name, experiment_name, experiment_timestamp,
                                       local_model_result_folder_path):
-        """
+        """Create local folder hierarchy for the experiment tracking
 
         Args:
             project_name (str): root name of the project
@@ -31,7 +31,9 @@ class ExperimentFolderCreator:
     @staticmethod
     def get_experiment_base_folder_paths(project_name, experiment_name, experiment_timestamp,
                                          local_model_result_folder_path):
-        """
+        """Generate local folder hierarchy paths for the experiment tracking
+
+        Does not actually create the folders, just generates the folder paths
 
         Args:
             project_name (str): root name of the project

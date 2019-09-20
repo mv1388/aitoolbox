@@ -11,7 +11,8 @@ class BaseFullExperimentLocalSaver(AbstractExperimentSaver):
         """Base functionality class common to all the full experiment local saver derivations
 
         Args:
-            model_saver (AIToolbox.experiment.local_save.local_model_save.AbstractLocalModelSaver)
+            model_saver (AIToolbox.experiment.local_save.local_model_save.AbstractLocalModelSaver): selected model
+                saver implementing the saving logic for the desired framework
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             local_model_result_folder_path (str): root local path where project folder will be created
@@ -32,8 +33,10 @@ class BaseFullExperimentLocalSaver(AbstractExperimentSaver):
         """Save the experiment with the provided model saver
 
         Args:
-            model (dict or keras.engine.training.Model):
+            model (dict or keras.engine.training.Model): model representation. If used with PyTorch it is a simple
+                dict under the hood. In the case of Keras training this would be the keras Model.
             result_package (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
+                selected result package which will be evaluated to produce the performance results
             experiment_timestamp (str): time stamp at the start of training
             save_true_pred_labels (bool): should ground truth labels also be saved
             separate_files (bool): should the results be saved in separate pickle files or should all of the results
@@ -41,7 +44,7 @@ class BaseFullExperimentLocalSaver(AbstractExperimentSaver):
             protect_existing_folder (bool): can override potentially already existing folder or not
 
         Returns:
-            list:
+            list: local model and results paths
         """
         if experiment_timestamp is None:
             experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')

@@ -16,8 +16,8 @@ class AbstractResultPackage(ABC):
             - set_experiment_dir_path_for_additional_results()
 
         Args:
-            pkg_name (str or None):
-            strict_content_check (bool):
+            pkg_name (str or None): result package name used just for clarity
+            strict_content_check (bool): should just print warning or raise the error and crash
             np_array (bool or str): how the inputs should be handled. Should the package try to automatically guess or
                 you want to manually decide whether to leave the inputs as they are or convert them to np.array.
                 Possible options: True, False, 'auto'
@@ -205,10 +205,10 @@ class AbstractResultPackage(ABC):
         primarily used for PyTorch experiments.
 
         Args:
-            project_name (str):
-            experiment_name (str):
-            experiment_timestamp (str):
-            local_model_result_folder_path (str):
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            experiment_timestamp (str): time stamp at the start of training
+            local_model_result_folder_path (str): root local path where project folder will be created
 
         Returns:
 
@@ -262,7 +262,10 @@ class AbstractResultPackage(ABC):
         Either just printing out the warning or throw the error exception.
 
         Args:
-            msg (str):
+            msg (str): warning message either printed or written in the raised error
+
+        Raises:
+            ValueError
 
         Returns:
             None
@@ -438,7 +441,7 @@ class PreCalculatedResultPackage(AbstractResultPackage):
 
         Args:
             results_dict (dict): pre-calculated results dict
-            strict_content_check (bool):
+            strict_content_check (bool): should just print warning or raise the error and crash
             **kwargs (dict):
         """
         AbstractResultPackage.__init__(self, pkg_name='PreCalculatedResult',
@@ -456,7 +459,7 @@ class MultipleResultPackageWrapper(AbstractResultPackage):
         """Wrapper result package which combines multiple evaluated result packages into a single result package
 
         Args:
-            strict_content_check (bool):
+            strict_content_check (bool): should just print warning or raise the error and crash
             **kwargs (dict):
         """
         AbstractResultPackage.__init__(self, pkg_name='MultipleResultWrapper',

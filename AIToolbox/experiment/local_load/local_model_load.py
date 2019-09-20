@@ -8,7 +8,7 @@ import torch
 class AbstractLocalModelLoader(ABC):
     @abstractmethod
     def load_model(self, model_name, project_name, experiment_name, **kwargs):
-        """
+        """Model loading method all the model loaders need to implement
 
         Args:
             model_name (str): model file name
