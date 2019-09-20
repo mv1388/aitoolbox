@@ -7,22 +7,24 @@ style.use('ggplot')
 
 class TrainingHistoryPlotter:
     def __init__(self, experiment_results_local_path):
-        """
+        """Plot the calculated performance metrics in the training history
 
         Args:
-            experiment_results_local_path (str):
+            experiment_results_local_path (str): path to the main experiment results folder on the local drive
         """
         self.experiment_results_local_path = experiment_results_local_path
 
     def generate_report(self, training_history, plots_folder_name='plots'):
-        """
+        """Plot all the currently present performance result in the training history
+
+        Every plot shows the progression of a single performance metric over the epochs.
 
         Args:
-            training_history (AIToolbox.experiment.training_history.TrainingHistory):
-            plots_folder_name (str):
+            training_history (AIToolbox.experiment.training_history.TrainingHistory): TrainLoop training history
+            plots_folder_name (str): local dir name where the plots should be saved
 
         Returns:
-            list:
+            list: list of saved plot paths
         """
         plots_local_folder_path = os.path.join(self.experiment_results_local_path, plots_folder_name)
         if not os.path.exists(plots_local_folder_path):
@@ -39,12 +41,12 @@ class TrainingHistoryPlotter:
 
     @staticmethod
     def plot_performance_curve(metric_name, result_history, results_local_folder_path):
-        """
+        """Plot the performance of a selected calculated metric over the epochs
 
         Args:
-            metric_name:
-            result_history:
-            results_local_folder_path:
+            metric_name: name of plotted metric
+            result_history: results history for the selected metric
+            results_local_folder_path: folder where the plot should be saved
 
         Returns:
             (str, str): file_name, file_path
@@ -69,22 +71,22 @@ class TrainingHistoryPlotter:
 
 class TrainingHistoryWriter:
     def __init__(self, experiment_results_local_path):
-        """
+        """Write the calculated performance metrics in the training history into human-readable text file
 
         Args:
-            experiment_results_local_path (str):
+            experiment_results_local_path (str): path to the main experiment results folder on the local drive
         """
         self.experiment_results_local_path = experiment_results_local_path
         self.plots_local_folder_path = experiment_results_local_path
 
     def generate_report(self, training_history, epoch, file_name, results_folder_name=None):
-        """
+        """Write all the currently present performance result in the training history into the text file
 
         Args:
             training_history (AIToolbox.experiment.training_history.TrainingHistory):
-            epoch (int):
-            file_name (str):
-            results_folder_name (str or None):
+            epoch (int): current epoch
+            file_name (str): output text file name
+            results_folder_name (str or None): results folder path where the report file will be located
 
         Returns:
             str, str: file name/path inside the experiment folder, local file_path

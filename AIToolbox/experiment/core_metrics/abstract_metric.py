@@ -5,7 +5,7 @@ import numpy as np
 
 class AbstractBaseMetric(ABC):
     def __init__(self, y_true, y_predicted, metric_name=None, np_array=True):
-        """
+        """Base metric with core metric functionality needed by all the derived actual performance metrics
 
         Args:
             y_true (numpy.array or list or str): ground truth targets
@@ -21,7 +21,7 @@ class AbstractBaseMetric(ABC):
 
     @abstractmethod
     def calculate_metric(self):
-        """ Perform metric calculation and save the result into self.metric_result 
+        """Perform metric calculation and save the result into self.metric_result
         
         Returns:
             None
@@ -29,7 +29,7 @@ class AbstractBaseMetric(ABC):
         pass
 
     def get_metric(self):
-        """
+        """Returns metric result
 
         Returns:
             float or dict: return metric_result
@@ -37,10 +37,10 @@ class AbstractBaseMetric(ABC):
         return self.metric_result
 
     def get_metric_dict(self):
-        """
+        """Creates and return metric result key-value dict
 
         Returns:
-            dict:
+            dict: metric dict
         """
         return {self.metric_name: self.metric_result}
 

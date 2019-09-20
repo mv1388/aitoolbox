@@ -6,7 +6,7 @@ from AIToolbox.experiment.core_metrics.abstract_metric import AbstractBaseMetric
 
 class AccuracyMetric(AbstractBaseMetric):
     def __init__(self, y_true, y_predicted):
-        """
+        """Model prediction accuracy
 
         Args:
             y_true (numpy.array or list): ground truth targets
@@ -31,7 +31,7 @@ class AccuracyMetric(AbstractBaseMetric):
 
 class ROCAUCMetric(AbstractBaseMetric):
     def __init__(self, y_true, y_predicted):
-        """
+        """Model prediction ROC-AUC
 
         Args:
             y_true (numpy.array or list): ground truth targets
@@ -45,7 +45,7 @@ class ROCAUCMetric(AbstractBaseMetric):
 
 class PrecisionRecallCurveAUCMetric(AbstractBaseMetric):
     def __init__(self, y_true, y_predicted):
-        """
+        """Model prediction PR-AUC
 
         Args:
             y_true (numpy.array or list): ground truth targets
@@ -60,7 +60,7 @@ class PrecisionRecallCurveAUCMetric(AbstractBaseMetric):
 
 class F1ScoreMetric(AbstractBaseMetric):
     def __init__(self, y_true, y_predicted, y_predicted_label_thresh=0.5):
-        """
+        """Model prediction F1 score
 
         Args:
             y_true (numpy.array or list): ground truth targets
@@ -76,7 +76,7 @@ class F1ScoreMetric(AbstractBaseMetric):
 
 class PrecisionMetric(AbstractBaseMetric):
     def __init__(self, y_true, y_predicted, y_predicted_label_thresh=0.5):
-        """
+        """Model prediction precision
 
         Args:
             y_true (numpy.array or list): ground truth targets
@@ -92,7 +92,7 @@ class PrecisionMetric(AbstractBaseMetric):
 
 class RecallMetric(AbstractBaseMetric):
     def __init__(self, y_true, y_predicted, y_predicted_label_thresh=0.5):
-        """
+        """Model prediction recall score
 
         Args:
             y_true (numpy.array or list): ground truth targets

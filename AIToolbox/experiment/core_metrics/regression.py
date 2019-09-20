@@ -5,7 +5,7 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error
 
 class MeanSquaredErrorMetric(AbstractBaseMetric):
     def __init__(self, y_true, y_predicted):
-        """
+        """Model prediction MSE
 
         Args:
             y_true (numpy.array or list): ground truth targets
@@ -19,7 +19,7 @@ class MeanSquaredErrorMetric(AbstractBaseMetric):
 
 class MeanAbsoluteErrorMetric(AbstractBaseMetric):
     def __init__(self, y_true, y_predicted):
-        """
+        """Model prediction MAE
 
         Args:
             y_true (numpy.array or list): ground truth targets

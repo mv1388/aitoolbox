@@ -9,10 +9,11 @@ from AIToolbox.experiment.local_save.folder_create import ExperimentFolderCreato
 class AbstractLocalModelSaver(ABC):
     @abstractmethod
     def save_model(self, model, project_name, experiment_name, experiment_timestamp=None, epoch=None, protect_existing_folder=True):
-        """
+        """Model saving method which all the model savers have to implement to give an expected API to other components
         
         Args:
-            model (keras.engine.training.Model or dict):
+            model (keras.engine.training.Model or dict): model representation. If used with PyTorch it is a simple
+                dict under the hood. In the case of Keras training this would be the keras Model.
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             experiment_timestamp (str or None): time stamp at the start of training
@@ -28,7 +29,7 @@ class AbstractLocalModelSaver(ABC):
 class BaseLocalModelSaver:
     def __init__(self, local_model_result_folder_path='~/project/model_result',
                  checkpoint_model=False):
-        """
+        """Base functionality for all the local model savers
 
         Args:
             local_model_result_folder_path (str): root local path where project folder will be created
@@ -38,7 +39,7 @@ class BaseLocalModelSaver:
         self.checkpoint_model = checkpoint_model
 
     def create_experiment_local_models_folder(self, project_name, experiment_name, experiment_timestamp):
-        """
+        """Creates experiment local folder hierarchy and place the 'models' folder in it
 
         Args:
             project_name (str): root name of the project
@@ -63,7 +64,7 @@ class BaseLocalModelSaver:
 class KerasLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
     def __init__(self, local_model_result_folder_path='~/project/model_result',
                  checkpoint_model=False):
-        """
+        """Keras experiment local model saver
 
         Args:
             local_model_result_folder_path (str): root local path where project folder will be created
@@ -72,10 +73,10 @@ class KerasLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
         BaseLocalModelSaver.__init__(self, local_model_result_folder_path, checkpoint_model)
 
     def save_model(self, model, project_name, experiment_name, experiment_timestamp=None, epoch=None, protect_existing_folder=True):
-        """
+        """Save the Keras model to the local drive
 
         Args:
-            model (keras.engine.training.Model):
+            model (keras.engine.training.Model): Keras model
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             experiment_timestamp (str or None): time stamp at the start of training
@@ -106,7 +107,7 @@ class KerasLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
 class TensorFlowLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
     def __init__(self, local_model_result_folder_path='~/project/model_result',
                  checkpoint_model=False):
-        """
+        """TensorFlow experiment local model saver
 
         Args:
             local_model_result_folder_path (str): root local path where project folder will be created
@@ -123,7 +124,7 @@ class TensorFlowLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
 class PyTorchLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
     def __init__(self, local_model_result_folder_path='~/project/model_result',
                  checkpoint_model=False):
-        """
+        """PyTorch experiment local model saver
 
         Args:
             local_model_result_folder_path (str): root local path where project folder will be created
@@ -132,7 +133,7 @@ class PyTorchLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
         BaseLocalModelSaver.__init__(self, local_model_result_folder_path, checkpoint_model)
 
     def save_model(self, model, project_name, experiment_name, experiment_timestamp=None, epoch=None, protect_existing_folder=True):
-        """
+        """Save the PyTorch model representation dict to the local drive
 
         Args:
             model (dict): PyTorch model represented as a dict of weights, optimizer state and other necessary info
@@ -184,7 +185,10 @@ class PyTorchLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
 
 class LocalSubOptimalModelRemover:
     def __init__(self, metric_name, num_best_kept=2):
-        """
+        """Removes the tracked saved models which become suboptimal when new models are trained in subsequent epochs
+
+        Useful when interested in saving the limited local disk space, especially when dealing with large model which
+        take a lot of disk space.
 
         Args:
             metric_name (str): one of the metric names that will be calculated and will appear in the train_history dict
@@ -204,11 +208,11 @@ class LocalSubOptimalModelRemover:
         self.model_save_history = []
         
     def decide_if_remove_suboptimal_model(self, history, new_model_dump_paths):
-        """
+        """Make decision if suboptimal model should be removed due to the introduction of the new and better model
 
         Args:
-            history (AIToolbox.experiment.training_history.TrainingHistory):
-            new_model_dump_paths (list):
+            history (AIToolbox.experiment.training_history.TrainingHistory): training performance history
+            new_model_dump_paths (list): new saved models paths which will begin to be tracked
             
         Returns:
             None
@@ -234,7 +238,7 @@ class LocalSubOptimalModelRemover:
 
     @staticmethod
     def rm_suboptimal_model(rm_model_paths):
-        """
+        """Utility to remove the file
 
         Args:
             rm_model_paths (list): list of string paths

@@ -8,7 +8,7 @@ from AIToolbox.experiment.training_history import TrainingHistory
 
 class AbstractResultPackage(ABC):
     def __init__(self, pkg_name=None, strict_content_check=False, np_array=True, **kwargs):
-        """
+        """Base Result package used to derive specific result packages from
 
         Functions which the user should potentially override in a specific result package:
             - prepare_results_dict()
@@ -16,8 +16,8 @@ class AbstractResultPackage(ABC):
             - set_experiment_dir_path_for_additional_results()
 
         Args:
-            pkg_name (str or None):
-            strict_content_check (bool):
+            pkg_name (str or None): result package name used just for clarity
+            strict_content_check (bool): should just print warning or raise the error and crash
             np_array (bool or str): how the inputs should be handled. Should the package try to automatically guess or
                 you want to manually decide whether to leave the inputs as they are or convert them to np.array.
                 Possible options: True, False, 'auto'
@@ -53,7 +53,11 @@ class AbstractResultPackage(ABC):
         pass
 
     def prepare_result_package(self, y_true, y_predicted, hyperparameters=None, training_history=None, **kwargs):
-        """
+        """Prepares the result package by taking labels and running them through the specified metrics
+
+        This function is automatically called from the torchtrain callbacks to evaluate the provided callback.
+        The main feature of this function is the call to the user-derived prepare_results_dict() function of
+        the implemented result package where the metrics evaluation logic is implemented.
 
         Args:
             y_true (numpy.array or list): ground truth targets
@@ -113,10 +117,10 @@ class AbstractResultPackage(ABC):
             return y_array
 
     def get_results(self):
-        """
+        """Get calculated results dict
 
         Returns:
-            dict:
+            dict: results dict
         """
         if self.results_dict is None:
             self.warn_about_result_data_problem('Warning: Results dict missing')
@@ -124,10 +128,10 @@ class AbstractResultPackage(ABC):
         return self.results_dict
 
     def get_hyperparameters(self):
-        """
+        """Get hyperparameters in a dict form
 
         Returns:
-            dict:
+            dict: hyperparameters dict
         """
         self.qa_check_hyperparameters_dict()
         return self.hyperparameters
@@ -136,13 +140,13 @@ class AbstractResultPackage(ABC):
         """Extract training history dict from the training history object
 
         Returns:
-            dict:
+            dict: training history dict
         """
         # History QA check is (automatically) done in the history object and not here in the result package
         return self.training_history.get_train_history()
 
     def get_training_history_object(self):
-        """
+        """Return training history object wrapping the training history dict
 
         Returns:
             AIToolbox.experiment.training_history.TrainingHistory: training history object
@@ -150,7 +154,11 @@ class AbstractResultPackage(ABC):
         return self.training_history
 
     def get_additional_results_dump_paths(self):
-        """
+        """Return paths to the additional results which are stored to local drive when the package is evaluated
+
+        For example if package plots attention heatmaps and saves pictures to disk, this function will return
+        paths to these picture files. This is achieved via the call to the use implemented function
+        list_additional_results_dump_paths().
 
         Returns:
             list or None: list of lists of string paths if it is not None.
@@ -197,10 +205,10 @@ class AbstractResultPackage(ABC):
         primarily used for PyTorch experiments.
 
         Args:
-            project_name (str):
-            experiment_name (str):
-            experiment_timestamp (str):
-            local_model_result_folder_path (str):
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            experiment_timestamp (str): time stamp at the start of training
+            local_model_result_folder_path (str): root local path where project folder will be created
 
         Returns:
 
@@ -208,7 +216,7 @@ class AbstractResultPackage(ABC):
         pass
 
     def qa_check_hyperparameters_dict(self):
-        """
+        """Quality check the hyperparams dict
 
         Returns:
             None
@@ -230,7 +238,7 @@ class AbstractResultPackage(ABC):
                                                 'with argparser.')
 
     def qa_check_additional_results_dump_paths(self):
-        """
+        """Quality check the additional results path
 
         Returns:
             None
@@ -249,10 +257,15 @@ class AbstractResultPackage(ABC):
                     raise ValueError(f'One of the path elements is not string. Element is : {el}')
 
     def warn_about_result_data_problem(self, msg):
-        """
+        """Generic function for writing out warnings
+
+        Either just printing out the warning or throw the error exception.
 
         Args:
-            msg (str):
+            msg (str): warning message either printed or written in the raised error
+
+        Raises:
+            ValueError
 
         Returns:
             None
@@ -264,10 +277,10 @@ class AbstractResultPackage(ABC):
 
     @staticmethod
     def zip_additional_results_dump(source_dir_path, zip_path):
-        """
+        """Utility function for zipping a folder into .zip archive
 
         Args:
-            source_dir_path (str):
+            source_dir_path (str): path to the folder that is going to be zipped
             zip_path (str): specify the path with the zip name but without the '.zip' at the end
 
         Returns:
@@ -424,11 +437,11 @@ class AbstractResultPackage(ABC):
 
 class PreCalculatedResultPackage(AbstractResultPackage):
     def __init__(self, results_dict, strict_content_check=False, **kwargs):
-        """
+        """Result package which doesn't have any evaluation logic but just accepts pre-calculated results dict
 
         Args:
-            results_dict (dict):
-            strict_content_check (bool):
+            results_dict (dict): pre-calculated results dict
+            strict_content_check (bool): should just print warning or raise the error and crash
             **kwargs (dict):
         """
         AbstractResultPackage.__init__(self, pkg_name='PreCalculatedResult',
@@ -443,10 +456,10 @@ class PreCalculatedResultPackage(AbstractResultPackage):
 
 class MultipleResultPackageWrapper(AbstractResultPackage):
     def __init__(self, strict_content_check=False, **kwargs):
-        """
+        """Wrapper result package which combines multiple evaluated result packages into a single result package
 
         Args:
-            strict_content_check (bool):
+            strict_content_check (bool): should just print warning or raise the error and crash
             **kwargs (dict):
         """
         AbstractResultPackage.__init__(self, pkg_name='MultipleResultWrapper',
