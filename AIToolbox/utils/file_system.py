@@ -36,11 +36,14 @@ def zip_folder(source_dir_path, zip_path):
 
     Args:
         source_dir_path (str): path to the folder that is going to be zipped
-        zip_path (str): specify the path with the zip name but without the '.zip' at the end
+        zip_path (str): specify the path of the zip file which will be created
 
     Returns:
         str: the full path to the produced zip file (with the .zip extension appended)
     """
+    if zip_path[-4:] == '.zip':
+        zip_path = zip_path[:-4]
+
     shutil.make_archive(zip_path, 'zip', source_dir_path)
     return zip_path + '.zip'
 

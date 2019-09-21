@@ -3,8 +3,8 @@ import boto3
 import botocore
 import os
 import shutil
-import zipfile
-import tarfile
+
+from AIToolbox.utils import file_system
 
 
 class BaseDataSaver:
@@ -96,21 +96,6 @@ class BaseDataLoader:
     def preproc_dataset_available(self, preproc_dataset_name):
         return preproc_dataset_name in self.available_prepocessed_datasets
 
-    @staticmethod
-    def unzip_file(file_path, target_dir_path):
-        """Util function for zip file unzipping
-
-        Args:
-            file_path (str): path to the zip file
-            target_dir_path (str): destination where unzipped content is stored
-        """
-        if file_path[-4:] == '.zip':
-            with zipfile.ZipFile(file_path, 'r') as zip_ref:
-                zip_ref.extractall(target_dir_path)
-        elif file_path[-7:] == '.tar.gz':
-            with tarfile.open(file_path, 'r') as zip_ref:
-                zip_ref.extractall(target_dir_path)
-
 
 class AbstractDatasetFetcher(ABC):
     @abstractmethod
@@ -180,8 +165,8 @@ class QAngarooDatasetFetcher(AbstractDatasetFetcher, BaseDataLoader):
                            local_file_path=medhop_local_file_path)
             self.load_file(cloud_file_path='qangaroo_v1/wikihop.zip',
                            local_file_path=wikihop_local_file_path)
-            self.unzip_file(medhop_local_file_path, medhop_local_folder_path)
-            self.unzip_file(wikihop_local_file_path, wikihop_local_folder_path)
+            file_system.unzip_file(medhop_local_file_path, medhop_local_folder_path)
+            file_system.unzip_file(wikihop_local_file_path, wikihop_local_folder_path)
 
 
 class CNNDailyMailDatasetFetcher(AbstractDatasetFetcher, BaseDataLoader):
@@ -232,8 +217,8 @@ class CNNDailyMailDatasetFetcher(AbstractDatasetFetcher, BaseDataLoader):
                                local_file_path=cnn_local_file_path)
                 self.load_file(cloud_file_path='cnn-dailymail/preproc/abisee/dm_stories_tokenized.zip',
                                local_file_path=dm_local_file_path)
-                self.unzip_file(cnn_local_file_path, cnn_local_folder_path)
-                self.unzip_file(dm_local_file_path, dm_local_folder_path)
+                file_system.unzip_file(cnn_local_file_path, cnn_local_folder_path)
+                file_system.unzip_file(dm_local_file_path, dm_local_folder_path)
 
         elif preprocess_name == 'danqi':
             if not self.exists_local_data_folder('cnn-dailymail-danqi', protect_local_folder):
@@ -246,8 +231,8 @@ class CNNDailyMailDatasetFetcher(AbstractDatasetFetcher, BaseDataLoader):
                                local_file_path=cnn_local_file_path)
                 self.load_file(cloud_file_path='cnn-dailymail/preproc/danqi/dailymail.tar.gz',
                                local_file_path=dm_local_file_path)
-                self.unzip_file(cnn_local_file_path, cnn_local_folder_path)
-                self.unzip_file(dm_local_file_path, dm_local_folder_path)
+                file_system.unzip_file(cnn_local_file_path, cnn_local_folder_path)
+                file_system.unzip_file(dm_local_file_path, dm_local_folder_path)
 
 
 class HotpotQADatasetFetcher(AbstractDatasetFetcher, BaseDataLoader):
@@ -280,4 +265,4 @@ class HotpotQADatasetFetcher(AbstractDatasetFetcher, BaseDataLoader):
             hotpotqa_local_file_path = os.path.join(hotpotqa_local_folder_path, 'HotpotQA.zip')
             self.load_file(cloud_file_path='HotpotQA/HotpotQA.zip',
                            local_file_path=hotpotqa_local_file_path)
-            self.unzip_file(hotpotqa_local_file_path, hotpotqa_local_folder_path)
+            file_system.unzip_file(hotpotqa_local_file_path, hotpotqa_local_folder_path)

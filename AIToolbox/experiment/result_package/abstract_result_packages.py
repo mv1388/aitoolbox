@@ -1,8 +1,8 @@
 import copy
 from abc import ABC, abstractmethod
-import shutil
 import numpy as np
 
+from AIToolbox.utils import file_system
 from AIToolbox.experiment.training_history import TrainingHistory
 
 
@@ -281,13 +281,12 @@ class AbstractResultPackage(ABC):
 
         Args:
             source_dir_path (str): path to the folder that is going to be zipped
-            zip_path (str): specify the path with the zip name but without the '.zip' at the end
+            zip_path (str): specify the path of the zip file which will be created
 
         Returns:
             str: the full path to the produced zip file (with the .zip extension appended)
         """
-        shutil.make_archive(zip_path, 'zip', source_dir_path)
-        return zip_path + '.zip'
+        return file_system.zip_folder(source_dir_path, zip_path)
 
     def __str__(self):
         self.warn_if_results_dict_not_defined()
