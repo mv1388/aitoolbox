@@ -1,11 +1,11 @@
 # AI Toolbox
 
-[![Build Status](https://travis-ci.org/mv1388/AIToolbox.svg?branch=master)](https://travis-ci.org/mv1388/AIToolbox)
-[![CircleCI](https://circleci.com/gh/mv1388/AIToolbox/tree/master.svg?style=svg)](https://circleci.com/gh/mv1388/AIToolbox/tree/master)
-&nbsp; &nbsp;
-[![codebeat badge](https://codebeat.co/badges/04217a3f-a838-418f-8f14-66cf6ae1b03d)](https://codebeat.co/projects/github-com-mv1388-aitoolbox-master)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/8349596c31a948d8916814a2037ffdf3)](https://www.codacy.com/manual/mv1388/AIToolbox?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=mv1388/AIToolbox&amp;utm_campaign=Badge_Grade)
-[![CodeFactor](https://www.codefactor.io/repository/github/mv1388/aitoolbox/badge)](https://www.codefactor.io/repository/github/mv1388/aitoolbox)
+<!--[![Build Status](https://travis-ci.org/mv1388/AIToolbox.svg?branch=master)](https://travis-ci.org/mv1388/AIToolbox)-->
+<!--[![CircleCI](https://circleci.com/gh/mv1388/AIToolbox/tree/master.svg?style=svg)](https://circleci.com/gh/mv1388/AIToolbox/tree/master)-->
+<!--&nbsp; &nbsp;-->
+<!--[![codebeat badge](https://codebeat.co/badges/04217a3f-a838-418f-8f14-66cf6ae1b03d)](https://codebeat.co/projects/github-com-mv1388-aitoolbox-master)-->
+<!--[![Codacy Badge](https://api.codacy.com/project/badge/Grade/8349596c31a948d8916814a2037ffdf3)](https://www.codacy.com/manual/mv1388/AIToolbox?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=mv1388/AIToolbox&amp;utm_campaign=Badge_Grade)-->
+<!--[![CodeFactor](https://www.codefactor.io/repository/github/mv1388/aitoolbox/badge)](https://www.codefactor.io/repository/github/mv1388/aitoolbox)-->
 
 
 A framework which helps you train deep learning models in PyTorch and quickly iterate experiments. 
@@ -180,10 +180,14 @@ creates attention heatmap plots for every validation example and saves them as p
 Lastly, the nlp module also provides several rudimentary NLP data processing functions.
 
 
-## kerastrain
+## AWS GPU instance prep and management bash scripts
 
-Beta version of TrainLoop framework which is mainly developed for PyTorch but ported here to Keras
+As some of the tasks when training models on the cloud GPU are quite repetitive, the package
+also includes several useful bash scripts to automatize tasks such as instance init preparation,
+experiment file updating, remote AIToolbox installation updating, etc.
 
+For further information look into the [`/bin/AWS`](/bin/AWS/) folder and read 
+the provided [README](/bin/AWS/README.md).
 
 # Examples of package usage
 
