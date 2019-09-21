@@ -9,7 +9,7 @@ from torch.nn.modules import Module
 
 from AIToolbox.utils import dict_util
 from AIToolbox.torchtrain.model import TTModel, ModelWrap
-from AIToolbox.torchtrain.multi_loss import MultiOptimizer
+from AIToolbox.torchtrain.multi_loss import MultiLoss, MultiOptimizer
 from AIToolbox.torchtrain.data.batch_model_feed_defs import AbstractModelFeedDefinition
 from AIToolbox.torchtrain.tl_components.callback_handler import CallbacksHandler
 from AIToolbox.torchtrain.callbacks.model_save_callbacks import ModelCheckpoint, ModelTrainEndSave
@@ -36,7 +36,7 @@ class TrainLoop:
             validation_loader (torch.utils.data.DataLoader): data loader for validation data set
             test_loader (torch.utils.data.DataLoader): data loader for test data set
             optimizer (torch.optim.optimizer.Optimizer or MultiOptimizer): optimizer algorithm.
-            criterion (torch.nn.modules.loss._Loss): criterion criterion during the training procedure.
+            criterion (torch.nn.modules.loss._Loss or MultiLoss): criterion criterion during the training procedure.
         """
         if isinstance(model, TTModel):
             self.model = model
@@ -367,7 +367,7 @@ class TrainLoopModelCheckpoint(TrainLoop):
             validation_loader (torch.utils.data.DataLoader):
             test_loader (torch.utils.data.DataLoader):
             optimizer (torch.optim.optimizer.Optimizer or MultiOptimizer): optimizer algorithm.
-            criterion (torch.nn.modules.loss._Loss): criterion criterion during the training procedure.
+            criterion (torch.nn.modules.loss._Loss or MultiLoss): criterion criterion during the training procedure.
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             local_model_result_folder_path (str): root local path where project folder will be created
@@ -422,7 +422,7 @@ class TrainLoopModelEndSave(TrainLoop):
             validation_loader (torch.utils.data.DataLoader or None):
             test_loader (torch.utils.data.DataLoader or None):
             optimizer (torch.optim.optimizer.Optimizer or MultiOptimizer): optimizer algorithm.
-            criterion (torch.nn.modules.loss._Loss): criterion criterion during the training procedure.
+            criterion (torch.nn.modules.loss._Loss or MultiLoss): criterion criterion during the training procedure.
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             local_model_result_folder_path (str): root local path where project folder will be created
@@ -495,7 +495,7 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
             validation_loader (torch.utils.data.DataLoader or None):
             test_loader (torch.utils.data.DataLoader or None):
             optimizer (torch.optim.optimizer.Optimizer or MultiOptimizer): optimizer algorithm.
-            criterion (torch.nn.modules.loss._Loss): criterion criterion during the training procedure.
+            criterion (torch.nn.modules.loss._Loss or MultiLoss): criterion criterion during the training procedure.
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             local_model_result_folder_path (str): root local path where project folder will be created

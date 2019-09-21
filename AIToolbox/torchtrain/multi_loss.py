@@ -1,10 +1,10 @@
 
 class MultiLoss:
     def __init__(self, loss_list):
-        """
+        """Multiple loss wrapper for TrainLoop based training
 
         Args:
-            loss_list (list):
+            loss_list (list): list of loss objects which are used to calculate losses in the TrainLoop
         """
         self.loss_list = loss_list
 
@@ -18,10 +18,10 @@ class MultiLoss:
 
 class MultiOptimizer:
     def __init__(self, optimizer_list):
-        """
+        """Multiple optimizer wrapper for TrainLoop based training
 
         Args:
-            optimizer_list (list):
+            optimizer_list (list): list of optimizer objects which are used in the TrainLoop
         """
         self.optimizer_list = optimizer_list
 
