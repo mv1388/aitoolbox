@@ -104,7 +104,9 @@ class MyNeuralModel(TTModel):
 ### Callbacks
 
 For advanced applications the basic logic offered in different default TrainLoops might not be enough.
-Additional needed logic can be injected into the training procedure by using [`callbacks`](/AIToolbox/torchtrain/callbacks). 
+Additional needed logic can be injected into the training procedure by using [`callbacks`](/AIToolbox/torchtrain/callbacks)
+and providing them as a parameter list to TrainLoop's `fit(callbacks=[callback_1, callback_2, ...])` function. 
+
 AIToolbox by default already offers a wide selection of different useful callbacks. However when
 some completely new functionality is desired the user can also implement their own callbacks by 
 inheriting from the base callback object [`AbstractCallback`](/AIToolbox/torchtrain/callbacks/callbacks.py). 
