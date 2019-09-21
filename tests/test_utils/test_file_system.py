@@ -59,7 +59,8 @@ class TestFileSystem(unittest.TestCase):
         if os.path.exists(dummy_dir_path + '.zip'):
             os.remove(dummy_dir_path + '.zip')
 
-    def prepare_dummy_folder(self):
+    @staticmethod
+    def prepare_dummy_folder():
         dummy_dir_path = os.path.join(THIS_DIR, 'dummy_dir')
         os.mkdir(dummy_dir_path)
 
