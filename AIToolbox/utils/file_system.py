@@ -1,5 +1,8 @@
 import os
 from os import path
+import shutil
+import zipfile
+import tarfile
 
 
 def create_folder_hierarchy(base_folder_path, folder_names):
@@ -26,3 +29,32 @@ def create_folder_hierarchy(base_folder_path, folder_names):
             os.mkdir(folder_path)
 
     return folder_path, all_created_folder_paths
+
+
+def zip_folder(source_dir_path, zip_path):
+    """Utility function for zipping a folder into .zip archive
+
+    Args:
+        source_dir_path (str): path to the folder that is going to be zipped
+        zip_path (str): specify the path with the zip name but without the '.zip' at the end
+
+    Returns:
+        str: the full path to the produced zip file (with the .zip extension appended)
+    """
+    shutil.make_archive(zip_path, 'zip', source_dir_path)
+    return zip_path + '.zip'
+
+
+def unzip_file(file_path, target_dir_path):
+    """Util function for zip file unzipping
+
+    Args:
+        file_path (str): path to the zip file
+        target_dir_path (str): destination where unzipped content is stored
+    """
+    if file_path[-4:] == '.zip':
+        with zipfile.ZipFile(file_path, 'r') as zip_ref:
+            zip_ref.extractall(target_dir_path)
+    elif file_path[-7:] == '.tar.gz':
+        with tarfile.open(file_path, 'r') as zip_ref:
+            zip_ref.extractall(target_dir_path)
