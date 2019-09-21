@@ -28,12 +28,12 @@ class AbstractModelSaver(ABC):
 
 class BaseModelSaver(BaseDataSaver):
     def __init__(self, bucket_name='model-result', cloud_dir_prefix='', checkpoint_model=False):
-        """
+        """Base model saving to AWS S3 functionality
 
         Args:
-            bucket_name (str):
-            cloud_dir_prefix (str):
-            checkpoint_model (bool):
+            bucket_name (str): S3 bucket into which the files will be saved
+            cloud_dir_prefix (str): destination folder path inside selected bucket
+            checkpoint_model (bool): if the model that is going to be saved is final model or mid-training checkpoint
         """
         BaseDataSaver.__init__(self, bucket_name)
         self.cloud_dir_prefix = cloud_dir_prefix
@@ -43,12 +43,12 @@ class BaseModelSaver(BaseDataSaver):
         """
 
         Args:
-            project_name (str):
-            experiment_name (str):
-            experiment_timestamp (str):
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            experiment_timestamp (str): time stamp at the start of training
 
         Returns:
-            str:
+            str: experiment cloud path
         """
         experiment_cloud_path = os.path.join(self.cloud_dir_prefix,
                                              project_name,
@@ -60,27 +60,27 @@ class BaseModelSaver(BaseDataSaver):
 class KerasS3ModelSaver(AbstractModelSaver, BaseModelSaver):
     def __init__(self, bucket_name='model-result', cloud_dir_prefix='',
                  local_model_result_folder_path='~/project/model_result', checkpoint_model=False):
-        """
+        """Keras AWS S3 model saving
 
         Args:
-            bucket_name (str):
-            cloud_dir_prefix (str):
-            local_model_result_folder_path (str):
-            checkpoint_model (bool):
+            bucket_name (str): name of the bucket in the S3 to which the models will be saved
+            cloud_dir_prefix (str): destination folder path inside selected bucket
+            local_model_result_folder_path (str): root local path where project folder will be created
+            checkpoint_model (bool): if the model being saved is checkpoint model or final end of training model
         """
         BaseModelSaver.__init__(self, bucket_name, cloud_dir_prefix, checkpoint_model)
         self.keras_local_saver = KerasLocalModelSaver(local_model_result_folder_path, checkpoint_model)
 
     def save_model(self, model, project_name, experiment_name, experiment_timestamp=None, epoch=None, protect_existing_folder=True):
-        """
+        """Save Keras model to AWS S3
 
         Args:
             model (keras.engine.training.Model):
-            project_name (str):
-            experiment_name (str):
-            experiment_timestamp (str or None):
-            epoch (int or None):
-            protect_existing_folder (bool):
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            experiment_timestamp (str or None): time stamp at the start of training
+            epoch (int or None): epoch number
+            protect_existing_folder (bool): can override potentially already existing folder or not
 
         Returns:
             (str, str, str): model_s3_path, experiment_timestamp, model_local_path
@@ -113,13 +113,15 @@ class KerasS3ModelSaver(AbstractModelSaver, BaseModelSaver):
 class TensorFlowS3ModelSaver(AbstractModelSaver, BaseModelSaver):
     def __init__(self, bucket_name='model-result', cloud_dir_prefix='',
                  local_model_result_folder_path='~/project/model_result', checkpoint_model=False):
-        """
+        """TensorFlow S3 model saving
+
+        Not implemented yet, just a placeholder
 
         Args:
-            bucket_name (str):
-            cloud_dir_prefix (str):
-            local_model_result_folder_path (str):
-            checkpoint_model (bool):
+            bucket_name (str): name of the bucket in the S3 to which the models will be saved
+            cloud_dir_prefix (str): destination folder path inside selected bucket
+            local_model_result_folder_path (str): root local path where project folder will be created
+            checkpoint_model (bool): if the model being saved is checkpoint model or final end of training model
         """
         BaseModelSaver.__init__(self, bucket_name, cloud_dir_prefix, checkpoint_model)
         self.tf_local_saver = TensorFlowLocalModelSaver(local_model_result_folder_path, checkpoint_model)
@@ -134,27 +136,27 @@ class TensorFlowS3ModelSaver(AbstractModelSaver, BaseModelSaver):
 class PyTorchS3ModelSaver(AbstractModelSaver, BaseModelSaver):
     def __init__(self, bucket_name='model-result', cloud_dir_prefix='',
                  local_model_result_folder_path='~/project/model_result', checkpoint_model=False):
-        """
+        """PyTorch AWS S3 model saving
 
         Args:
-            bucket_name (str):
-            cloud_dir_prefix (str):
-            local_model_result_folder_path (str):
-            checkpoint_model (bool):
+            bucket_name (str): name of the bucket in the S3 to which the models will be saved
+            cloud_dir_prefix (str): destination folder path inside selected bucket
+            local_model_result_folder_path (str): root local path where project folder will be created
+            checkpoint_model (bool): if the model being saved is checkpoint model or final end of training model
         """
         BaseModelSaver.__init__(self, bucket_name, cloud_dir_prefix, checkpoint_model)
         self.pytorch_local_saver = PyTorchLocalModelSaver(local_model_result_folder_path, checkpoint_model)
 
     def save_model(self, model, project_name, experiment_name, experiment_timestamp=None, epoch=None, protect_existing_folder=True):
-        """
+        """Save PyTorch model representation to AWS S3
 
         Args:
-            model (dict):
-            project_name (str):
-            experiment_name (str):
-            experiment_timestamp (str or None):
-            epoch (int or None):
-            protect_existing_folder (bool):
+            model (dict): PyTorch model representation dict
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            experiment_timestamp (str or None): time stamp at the start of training
+            epoch (int or None): epoch number
+            protect_existing_folder (bool): can override potentially already existing folder or not
 
         Returns:
             (str, str, str): model_s3_path, experiment_timestamp, model_local_path

@@ -9,7 +9,9 @@ from email.mime.multipart import MIMEMultipart
 class SESSender:
     def __init__(self, sender_name, sender_email, recipient_email,
                  aws_region='eu-west-1'):
-        """
+        """AWS Simple Email Service sender
+
+        Used for sending email notifications about the progression of the training.
 
         Args:
             sender_name (str): Name of the email sender
@@ -30,7 +32,7 @@ class SESSender:
         self.client = boto3.client('ses', region_name=self.aws_region)
 
     def send_email(self, subject, body, attachment_file_paths=None):
-        """
+        """Send email text with optional attachments
 
         Args:
             subject (str): email subject
