@@ -9,21 +9,21 @@ import tarfile
 
 class BaseDataSaver:
     def __init__(self, bucket_name='model-result'):
-        """
+        """Base class implementing S3 file saving logic
 
         Args:
-            bucket_name (str):
+            bucket_name (str): S3 bucket into which the files will be saved
         """
         self.bucket_name = bucket_name
         self.s3_client = boto3.client('s3')
         self.s3_resource = boto3.resource('s3')
 
     def save_file(self, local_file_path, cloud_file_path):
-        """
+        """Save file on local drive to the AWS S3
 
         Args:
-            local_file_path (str):
-            cloud_file_path (str):
+            local_file_path (str): path to the file on the local drive
+            cloud_file_path (str): destination where the file will be saved on S3 inside the specified bucket
 
         Returns:
             None
@@ -34,11 +34,11 @@ class BaseDataSaver:
 
 class BaseDataLoader:
     def __init__(self, bucket_name='dataset-store', local_base_data_folder_path='~/project/data'):
-        """
+        """Base class implementing S3 file downloading logic
 
         Args:
-            bucket_name (str):
-            local_base_data_folder_path (str):
+            bucket_name (str): S3 bucket from which the files will be downloaded
+            local_base_data_folder_path (str): local main experiment saving folder
         """
         self.bucket_name = bucket_name
         self.s3 = boto3.resource('s3')
@@ -47,11 +47,11 @@ class BaseDataLoader:
         self.available_prepocessed_datasets = []
 
     def load_file(self, cloud_file_path, local_file_path):
-        """
+        """Download the file AWS S3 to the local drive
 
         Args:
-            cloud_file_path (str):
-            local_file_path (str):
+            cloud_file_path (str): location where the file is saved on S3 inside the specified bucket
+            local_file_path (str): destination path where the file will be downloaded to the local drive
 
         Returns:
             None
@@ -98,11 +98,11 @@ class BaseDataLoader:
 
     @staticmethod
     def unzip_file(file_path, target_dir_path):
-        """
+        """Util function for zip file unzipping
 
         Args:
-            file_path (str):
-            target_dir_path (str):
+            file_path (str): path to the zip file
+            target_dir_path (str): destination where unzipped content is stored
         """
         if file_path[-4:] == '.zip':
             with zipfile.ZipFile(file_path, 'r') as zip_ref:

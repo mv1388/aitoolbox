@@ -30,11 +30,11 @@ class AbstractResultsSaver(ABC):
 
 class BaseResultsSaver(BaseDataSaver):
     def __init__(self, bucket_name='model-result', cloud_dir_prefix=''):
-        """
+        """Base experiment results saving to AWS S3 functionality
 
         Args:
-            bucket_name (str):
-            cloud_dir_prefix (str):
+            bucket_name (str): S3 bucket into which the files will be saved
+            cloud_dir_prefix (str): destination folder path inside selected bucket
         """
         BaseDataSaver.__init__(self, bucket_name)
         self.cloud_dir_prefix = cloud_dir_prefix
@@ -43,12 +43,12 @@ class BaseResultsSaver(BaseDataSaver):
         """
 
         Args:
-            project_name (str):
-            experiment_name (str):
-            experiment_timestamp (str):
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            experiment_timestamp (str): time stamp at the start of training
 
         Returns:
-            str:
+            str: experiment cloud path
         """
         experiment_cloud_path = os.path.join(self.cloud_dir_prefix,
                                              project_name,
@@ -60,31 +60,35 @@ class BaseResultsSaver(BaseDataSaver):
 class S3ResultsSaver(AbstractResultsSaver, BaseResultsSaver):
     def __init__(self, bucket_name='model-result', cloud_dir_prefix='',
                  local_model_result_folder_path='~/project/model_result'):
-        """
+        """AWS S3 results saver
+
+        It first saves the results files to local drive and then uploads them to S3
 
         Args:
-            bucket_name (str):
-            cloud_dir_prefix (str):
-            local_model_result_folder_path (str):
+            bucket_name (str): name of the bucket in the S3 to which the results files will be saved
+            cloud_dir_prefix (str): destination folder path inside selected bucket
+            local_model_result_folder_path (str): root local path where project folder will be created
         """
         BaseResultsSaver.__init__(self, bucket_name, cloud_dir_prefix)
         self.local_results_saver = LocalResultsSaver(local_model_result_folder_path)
 
     def save_experiment_results(self, result_package, project_name, experiment_name, experiment_timestamp=None,
                                 save_true_pred_labels=False, separate_files=False, protect_existing_folder=True):
-        """
+        """Save produced experiment results recorded in the result package to the results file on local drive and upload
+            them to S3
 
         Args:
             result_package (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
-            project_name (str):
-            experiment_name (str):
-            experiment_timestamp (str):
-            save_true_pred_labels (bool):
-            separate_files (bool):
-            protect_existing_folder (bool):
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            experiment_timestamp (str or None): time stamp at the start of training
+            save_true_pred_labels (bool): should ground truth labels also be saved
+            separate_files (bool): should the results be saved in separate pickle files or should all of the results
+                be batched together in a single results file
+            protect_existing_folder (bool): can override potentially already existing folder or not
 
         Returns:
-            (str, str):
+            (str, str): results file path on S3, experiment timestamp
         """
         if experiment_timestamp is None:
             experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
