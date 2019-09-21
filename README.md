@@ -17,7 +17,7 @@ level when desired.
 
 In addition to orchestrating the model training loop the framework also helps you keep track of different 
 experiments by automatically saving models in a structured traceable way and creating performance reports. 
-These can be stored both locally or on AWS S3 (Google Cloud in beta) which makes the library 
+These can be stored both locally or on AWS S3 (Google Cloud Storage in beta) which makes the library 
 very useful when training on the GPU instance on AWS. Instance can be 
 automatically shut down when training is finished and all the results 
 are safely stored on S3.
@@ -180,9 +180,14 @@ creates attention heatmap plots for every validation example and saves them as p
 Lastly, the nlp module also provides several rudimentary NLP data processing functions.
 
 
-## kerastrain
+## AWS GPU instance prep and management bash scripts
 
-Beta version of TrainLoop framework which is mainly developed for PyTorch but ported here to Keras
+As some of the tasks when training models on the cloud GPU are quite repetitive, the package
+also includes several useful bash scripts to automatize tasks such as instance init preparation,
+experiment file updating, remote AIToolbox installation updating, etc.
+
+For further information look into the [`/bin/AWS`](/bin/AWS/) folder and read 
+the provided [README](/bin/AWS/README.md).
 
 
 # Examples of package usage
