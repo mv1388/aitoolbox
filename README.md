@@ -17,7 +17,7 @@ level when desired.
 
 In addition to orchestrating the model training loop the framework also helps you keep track of different 
 experiments by automatically saving models in a structured traceable way and creating performance reports. 
-These can be stored both locally or on AWS S3 (Google Cloud in beta) which makes the library 
+These can be stored both locally or on AWS S3 (Google Cloud Storage in beta) which makes the library 
 very useful when training on the GPU instance on AWS. Instance can be 
 automatically shut down when training is finished and all the results 
 are safely stored on S3.
