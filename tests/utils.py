@@ -89,6 +89,8 @@ class CallbackTracker(AbstractCallback):
                          'on_after_gradient_update': 0, 'on_after_optimizer_step': 0}
 
     def on_train_loop_registration(self):
+        self.train_loop_obj.grad_cb_used = True
+
         self.callback_calls.append('on_train_loop_registration')
         self.call_ctr['on_train_loop_registration'] += 1
 
@@ -132,6 +134,9 @@ class CallbackTrackerShort(AbstractCallback):
         self.call_ctr = {'on_train_loop_registration': 0, 'on_epoch_begin': 0, 'on_epoch_end': 0, 'on_train_begin': 0,
                          'on_train_end': 0, 'on_batch_begin': 0, 'on_batch_end': 0,
                          'on_after_gradient_update': 0, 'on_after_optimizer_step': 0}
+
+    def on_train_loop_registration(self):
+        self.train_loop_obj.grad_cb_used = True
 
     def on_epoch_begin(self):
         self.callback_calls.append('on_epoch_begin')
