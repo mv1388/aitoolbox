@@ -102,8 +102,8 @@ class AbstractCallback:
     def on_after_gradient_update(self):
         """Logic executed after the model gradients are updated
 
-        To ensure the execution of this callback enable the grad_cb=True option in the fit() function of TrainLoop.
-        Otherwise logic implemented here will not be executed.
+        To ensure the execution of this callback enable the `self.train_loop_obj.grad_cb_used = True` option in the
+        on_train_loop_registration(). Otherwise logic implemented here will not be executed by the TrainLoop.
 
         Returns:
 
@@ -113,8 +113,8 @@ class AbstractCallback:
     def on_after_optimizer_step(self):
         """Logic executed after the optimizer does a new step and updates the model weights
 
-        To ensure the execution of this callback enable the grad_cb=True option in the fit() function of TrainLoop.
-        Otherwise logic implemented here will not be executed.
+        To ensure the execution of this callback enable the `self.train_loop_obj.grad_cb_used = True` option in the
+        on_train_loop_registration(). Otherwise logic implemented here will not be executed by the TrainLoop.
 
         Returns:
 

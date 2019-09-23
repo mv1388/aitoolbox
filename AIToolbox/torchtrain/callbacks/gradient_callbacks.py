@@ -15,5 +15,8 @@ class GradNormClipCallback(AbstractCallback):
         self.max_norm = max_norm
         self.kwargs = kwargs
 
+    def on_train_loop_registration(self):
+        self.train_loop_obj.grad_cb_used = True
+
     def on_after_gradient_update(self):
         torch.nn.utils.clip_grad_norm_(self.train_loop_obj.model.parameters(), self.max_norm, **self.kwargs)
