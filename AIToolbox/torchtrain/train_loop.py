@@ -69,34 +69,32 @@ class TrainLoop:
         self.callbacks = []
         self.early_stop = False
 
+        self.grad_cb_used = False
+
         if not isinstance(self.model, TTModel) and not isinstance(self.model, Module):
             raise TypeError('Provided model is not inherited from TTModel or base PyTorch Module')
         if not isinstance(self.model, TTModel) and \
                 isinstance(self.model, Module) and not isinstance(self.batch_model_feed_def, AbstractModelFeedDefinition):
             raise TypeError('Provided the base PyTorch model but did not give the batch_model_feed_def')
 
-    def __call__(self, num_epoch, callbacks=None, grad_cb=False):
+    def __call__(self, num_epoch, callbacks=None):
         """Train the model using the train loop
 
         Args:
             num_epoch (int): how many epochs the network will be trained
             callbacks (list): callbacks that are executed during the training run
-            grad_cb (bool): should the callbacks related to gradient updating be executed. If you don't intend to
-                use such callbacks disabling this option might make the loop run faster
 
         Returns:
             torch.nn.modules.Module: trained model
         """
-        return self.fit(num_epoch, callbacks, grad_cb)
+        return self.fit(num_epoch, callbacks)
 
-    def fit(self, num_epoch, callbacks=None, grad_cb=False):
+    def fit(self, num_epoch, callbacks=None):
         """Train the model using the train loop
 
         Args:
             num_epoch (int): how many epochs the network will be trained
             callbacks (list): callbacks that are executed during the training run
-            grad_cb (bool): should the callbacks related to gradient updating be executed. If you don't intend to
-                use such callbacks disabling this option might make the loop run faster
 
         Returns:
             torch.nn.modules.Module: trained model
@@ -127,10 +125,10 @@ class TrainLoop:
 
                 self.optimizer.zero_grad()
                 loss_batch.backward()
-                if grad_cb:
+                if self.grad_cb_used:
                     self.callbacks_handler.execute_gradient_update()
                 self.optimizer.step()
-                if grad_cb:
+                if self.grad_cb_used:
                     self.callbacks_handler.execute_optimizer_step()
 
                 self.callbacks_handler.execute_batch_end()
