@@ -369,7 +369,10 @@ class TrainLoopModelCheckpoint(TrainLoop):
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             local_model_result_folder_path (str): root local path where project folder will be created
-            hyperparams (dict): used hyper-parameters
+            hyperparams (dict): used hyper-parameters. When running the TrainLoop from jupyter notebook in order to
+                ensure the python experiment file copying to the experiment folder, the user needs to manually
+                specify the python file path as the value for the `experiment_file_path` key. If running the training
+                directly from the terminal the path deduction is done automatically.
             cloud_save_mode (str or None): Storage destination selector.
                 For AWS S3: 's3' / 'aws_s3' / 'aws'
                 For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
@@ -392,7 +395,8 @@ class TrainLoopModelCheckpoint(TrainLoop):
         self.cloud_dir_prefix = cloud_dir_prefix
         self.rm_subopt_local_models = rm_subopt_local_models
 
-        self.hyperparams['experiment_file_path'] = inspect.getframeinfo(inspect.currentframe().f_back).filename
+        if 'experiment_file_path' not in self.hyperparams:
+            self.hyperparams['experiment_file_path'] = inspect.getframeinfo(inspect.currentframe().f_back).filename
 
         self.callbacks_handler.register_callbacks([
             ModelCheckpoint(self.project_name, self.experiment_name, self.local_model_result_folder_path,
@@ -424,7 +428,10 @@ class TrainLoopModelEndSave(TrainLoop):
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             local_model_result_folder_path (str): root local path where project folder will be created
-            hyperparams (dict): used hyper-parameters
+            hyperparams (dict): used hyper-parameters. When running the TrainLoop from jupyter notebook in order to
+                ensure the python experiment file copying to the experiment folder, the user needs to manually
+                specify the python file path as the value for the `experiment_file_path` key. If running the training
+                directly from the terminal the path deduction is done automatically.
             val_result_package (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or None):
             test_result_package (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or None):
             cloud_save_mode (str or None): Storage destination selector.
@@ -445,7 +452,8 @@ class TrainLoopModelEndSave(TrainLoop):
         self.bucket_name = bucket_name
         self.cloud_dir_prefix = cloud_dir_prefix
 
-        self.hyperparams['experiment_file_path'] = inspect.getframeinfo(inspect.currentframe().f_back).filename
+        if 'experiment_file_path' not in self.hyperparams:
+            self.hyperparams['experiment_file_path'] = inspect.getframeinfo(inspect.currentframe().f_back).filename
         self.check_if_result_packages_possible()
 
         self.callbacks_handler.register_callbacks([
@@ -497,7 +505,10 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             local_model_result_folder_path (str): root local path where project folder will be created
-            hyperparams (dict): used hyper-parameters
+            hyperparams (dict): used hyper-parameters. When running the TrainLoop from jupyter notebook in order to
+                ensure the python experiment file copying to the experiment folder, the user needs to manually
+                specify the python file path as the value for the `experiment_file_path` key. If running the training
+                directly from the terminal the path deduction is done automatically.
             val_result_package (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or None):
             test_result_package (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or None):
             cloud_save_mode (str or None): Storage destination selector.
@@ -518,7 +529,8 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
                                        hyperparams, val_result_package, test_result_package,
                                        cloud_save_mode, bucket_name, cloud_dir_prefix)
         self.rm_subopt_local_models = rm_subopt_local_models
-        self.hyperparams['experiment_file_path'] = inspect.getframeinfo(inspect.currentframe().f_back).filename
+        if 'experiment_file_path' not in self.hyperparams:
+            self.hyperparams['experiment_file_path'] = inspect.getframeinfo(inspect.currentframe().f_back).filename
 
         self.callbacks_handler.register_callbacks([
             ModelCheckpoint(self.project_name, self.experiment_name, self.local_model_result_folder_path,

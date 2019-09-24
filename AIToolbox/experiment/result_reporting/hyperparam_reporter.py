@@ -82,10 +82,16 @@ class HyperParameterReporter:
             str: path to the saved hyper-param text file
         """
         if 'experiment_file_path' in hyperparams:
-            destination_file_path = os.path.join(self.experiment_dir_path,
-                                                 os.path.basename(hyperparams['experiment_file_path']))
-            copyfile(hyperparams['experiment_file_path'], destination_file_path)
-            return destination_file_path
+            try:
+                destination_file_path = os.path.join(self.experiment_dir_path,
+                                                     os.path.basename(hyperparams['experiment_file_path']))
+                copyfile(hyperparams['experiment_file_path'], destination_file_path)
+                return destination_file_path
+            except FileNotFoundError:
+                print('experiment_file_path leading to the non-existent file. Possibly this error is related to'
+                      'problematic automatic experiment python file path deduction when running the TrainLoop from'
+                      'jupyter notebook. When using jupyter notebook you should manually specify the experiment'
+                      'python file path as the value for experiment_file_path in hyperparams dict.')
         else:
             print('experiment_file_path experiment execution file path missing in the hyperparams dict. '
                   'Consequently not copying the file to the experiment dir.')
