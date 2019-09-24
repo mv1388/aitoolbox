@@ -369,7 +369,10 @@ class TrainLoopModelCheckpoint(TrainLoop):
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             local_model_result_folder_path (str): root local path where project folder will be created
-            hyperparams (dict): used hyper-parameters
+            hyperparams (dict): used hyper-parameters. When running the TrainLoop from jupyter notebook in order to
+                ensure the python experiment file copying to the experiment folder, the user needs to manually
+                specify the python file path as the value for the `experiment_file_path` key. If running the training
+                directly from the terminal the path deduction is done automatically.
             cloud_save_mode (str or None): Storage destination selector.
                 For AWS S3: 's3' / 'aws_s3' / 'aws'
                 For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
@@ -425,7 +428,10 @@ class TrainLoopModelEndSave(TrainLoop):
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             local_model_result_folder_path (str): root local path where project folder will be created
-            hyperparams (dict): used hyper-parameters
+            hyperparams (dict): used hyper-parameters. When running the TrainLoop from jupyter notebook in order to
+                ensure the python experiment file copying to the experiment folder, the user needs to manually
+                specify the python file path as the value for the `experiment_file_path` key. If running the training
+                directly from the terminal the path deduction is done automatically.
             val_result_package (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or None):
             test_result_package (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or None):
             cloud_save_mode (str or None): Storage destination selector.
@@ -499,7 +505,10 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             local_model_result_folder_path (str): root local path where project folder will be created
-            hyperparams (dict): used hyper-parameters
+            hyperparams (dict): used hyper-parameters. When running the TrainLoop from jupyter notebook in order to
+                ensure the python experiment file copying to the experiment folder, the user needs to manually
+                specify the python file path as the value for the `experiment_file_path` key. If running the training
+                directly from the terminal the path deduction is done automatically.
             val_result_package (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or None):
             test_result_package (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or None):
             cloud_save_mode (str or None): Storage destination selector.
