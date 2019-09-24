@@ -42,6 +42,9 @@ class MNISTModelFeedDefinition(AbstractModelFeedDefinition):
 
         return loss
 
+    def get_loss_eval(self, model, batch_data, criterion, device):
+        return self.get_loss(self, model, batch_data, criterion, device)
+
     def get_predictions(self, model, batch_data, device):
         data, y_test = batch_data
         data = data.to(device)
@@ -49,7 +52,7 @@ class MNISTModelFeedDefinition(AbstractModelFeedDefinition):
         output = model(data)
         y_pred = output.argmax(dim=1, keepdim=False)  # get the index of the max log-probability
 
-        return y_test, y_pred.cpu()
+        return y_test, y_pred.cpu(), {}
 
 
 ################################################################################################
@@ -101,7 +104,7 @@ criterion = F.nll_loss
 
 callbacks = [ModelPerformanceEvaluation(ClassificationResultPackage(), args.__dict__,
                                         on_train_data=True, on_val_data=True),
-             ModelPerformancePrintReport(['loss', 'train_Accuracy', 'val_Accuracy'], strict_metric_reporting=True)]
+             ModelPerformancePrintReport(['train_Accuracy', 'val_Accuracy'], strict_metric_reporting=True)]
 
 
 TrainLoop(ModelWrap(model, MNISTModelFeedDefinition()),
