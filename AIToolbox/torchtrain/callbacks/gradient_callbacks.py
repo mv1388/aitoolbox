@@ -25,11 +25,13 @@ class GradNormClipCallback(AbstractCallback):
 
 class GradientStatsPrintCallback(AbstractCallback):
     def __init__(self, model_layers_extract_def, on_every_grad_update=False):
-        """
+        """Model gradients statistics reporting
 
         Args:
-            model_layers_extract_def:
-            on_every_grad_update:
+            model_layers_extract_def: function/lambda accepting model as the input and returning a list of all
+                the layers in the model for which the gradient stats should be calculated
+            on_every_grad_update (bool): should the gradient stats be calculated on every gradient update, e.g. after
+                every batch or only at the end of the epoch
         """
         AbstractCallback.__init__(self, 'Print model gradient stats')
         self.model_layers_extract_def = model_layers_extract_def
