@@ -66,6 +66,30 @@ class NetUnifiedBatchFeed(TTModel):
         self.prediction_count += 1
         return torch.FloatTensor([self.prediction_count] * 64).cpu(), \
                torch.FloatTensor([self.prediction_count + 100] * 64).cpu(), {'bla': [self.prediction_count + 200] * 64}
+
+
+class SmallFFNet(TTModel):
+    def __init__(self):
+        super().__init__()
+        self.l1 = nn.Linear(10, 10)
+        self.l2 = nn.Linear(10, 1)
+        self.out_act = nn.Sigmoid()
+
+    def forward(self, x):
+        out = F.relu(self.l1(x.float()))
+        out = self.l2(out)
+        return self.out_act(out)
+
+    def get_loss(self, batch_data, criterion, device):
+        x, y = batch_data
+        pred_y = self(x)
+        loss = criterion(pred_y, y)
+        return loss
+
+    def get_predictions(self, batch_data, device):
+        x, y = batch_data
+        pred_y = self(x)
+        return y, pred_y, {}
     
     
 def keras_dummy_model():
