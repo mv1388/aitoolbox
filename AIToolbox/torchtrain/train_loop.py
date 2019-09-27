@@ -57,7 +57,7 @@ class TrainLoop:
         USE_CUDA = torch.cuda.is_available()
         self.device = torch.device("cuda" if USE_CUDA else "cpu")
 
-        self.experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
+        self.experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
         self.loss_batch_accum = []
         self.epoch = 0
 

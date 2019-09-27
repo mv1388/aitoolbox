@@ -87,7 +87,7 @@ class KerasLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
             (str, str): model_name, model_local_path
         """
         if experiment_timestamp is None:
-            experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
+            experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
 
         experiment_model_local_path = self.create_experiment_local_models_folder(project_name, experiment_name,
                                                                                  experiment_timestamp)
@@ -149,7 +149,7 @@ class PyTorchLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
         self.check_model_dict_contents(model)
 
         if experiment_timestamp is None:
-            experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
+            experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
 
         experiment_model_local_path = self.create_experiment_local_models_folder(project_name, experiment_name,
                                                                                  experiment_timestamp)

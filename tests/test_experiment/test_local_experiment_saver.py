@@ -59,7 +59,7 @@ class TestFullPyTorchExperimentLocalSaver(unittest.TestCase):
         model = Net()
         project_dir_name = 'projectPyTorchLocalModelSaver'
         exp_dir_name = 'experimentSubDirPT'
-        current_time = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
+        current_time = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
 
         project_path = os.path.join(THIS_DIR, project_dir_name)
         exp_path = os.path.join(project_path, f'{exp_dir_name}_{current_time}')
@@ -120,7 +120,7 @@ class TestFullKerasExperimentLocalSaver(unittest.TestCase):
         model = keras_dummy_model()
         project_dir_name = 'projectKerasLocalModelSaver'
         exp_dir_name = 'experimentSubDirPT'
-        current_time = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
+        current_time = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
 
         project_path = os.path.join(THIS_DIR, project_dir_name)
         exp_path = os.path.join(project_path, f'{exp_dir_name}_{current_time}')
