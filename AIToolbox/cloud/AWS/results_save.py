@@ -91,7 +91,7 @@ class S3ResultsSaver(AbstractResultsSaver, BaseResultsSaver):
             (str, str): results file path on S3, experiment timestamp
         """
         if experiment_timestamp is None:
-            experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
+            experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
 
         if not separate_files:
             saved_local_results_details = self.local_results_saver.save_experiment_results(result_package,

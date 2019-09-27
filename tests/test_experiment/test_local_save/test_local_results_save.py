@@ -60,7 +60,7 @@ class TestBaseLocalResultsSaver(unittest.TestCase):
     def test_create_experiment_local_folder_structure(self):
         project_dir_name = 'projectDir'
         exp_dir_name = 'experimentSubDir'
-        current_time = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
+        current_time = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
 
         base_final = BaseLocalResultsSaver(local_model_result_folder_path=THIS_DIR)
         path = base_final.create_experiment_local_folder_structure(project_dir_name, exp_dir_name, current_time)
@@ -81,7 +81,7 @@ class TestBaseLocalResultsSaver(unittest.TestCase):
     def test_create_experiment_local_folder_structure_calls_paths_sub_fn(self):
         project_dir_name = 'projectDir'
         exp_dir_name = 'experimentSubDir'
-        current_time = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
+        current_time = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
         project_path = os.path.join(THIS_DIR, project_dir_name)
 
         base_final = BaseLocalResultsSaver(local_model_result_folder_path=THIS_DIR)
@@ -101,7 +101,7 @@ class TestBaseLocalResultsSaver(unittest.TestCase):
     def test_form_experiment_local_folders_paths(self):
         project_dir_name = 'projectDir'
         exp_dir_name = 'experimentSubDir'
-        current_time = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
+        current_time = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
 
         project_dir_path_true = os.path.join(THIS_DIR, project_dir_name)
         experiment_dir_path_true = os.path.join(project_dir_path_true, f'{exp_dir_name}_{current_time}')
@@ -128,7 +128,7 @@ class TestBaseLocalResultsSaver(unittest.TestCase):
     def save_file_result(self, file_format, expected_extension):
         project_dir_name = 'projectDir'
         exp_dir_name = 'experimentSubDir'
-        current_time = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
+        current_time = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
         file_name = 'test_dump'
 
         project_dir_path_true = os.path.join(THIS_DIR, project_dir_name)
@@ -173,7 +173,7 @@ class TestLocalResultsSaverSingleFile(unittest.TestCase):
     def save_experiment_results(self, file_format, expected_extension, save_true_pred_labels):
         project_dir_name = 'projectDir'
         exp_dir_name = 'experimentSubDir'
-        current_time = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
+        current_time = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
         result_pkg = DummyFullResultPackage({'metric1': 33434, 'acc1': 223.43, 'loss': 4455.6},
                                             {'epoch': 20, 'lr': 0.334}, {})
         result_file_name_true = f'results_hyperParams_hist_{exp_dir_name}_{current_time}{expected_extension}'
@@ -236,7 +236,7 @@ class TestLocalResultsSaverSeparateFiles(unittest.TestCase):
     def save_experiment_results(self, file_format, expected_extension, save_true_pred_labels):
         project_dir_name = 'projectDir'
         exp_dir_name = 'experimentSubDir'
-        current_time = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
+        current_time = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
         result_pkg = DummyFullResultPackage({'metric1': 33434, 'acc1': 223.43, 'loss': 4455.6},
                                             {'epoch': 20, 'lr': 0.334}, {})
         result_file_name_true = f'results_{exp_dir_name}_{current_time}{expected_extension}'
