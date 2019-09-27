@@ -51,9 +51,15 @@ class GradientStatsPrintCallback(AbstractCallback):
 
         print('---> Model layers gradients stats')
         for i, layer in enumerate(model_layers_list):
-            gradients = layer.weight.grad.cpu().numpy()
-            mu = np.mean(gradients)
-            std = np.std(gradients)
+            gradients = layer.weight.grad
 
-            print(f'Layer {i} grads: Mean: {mu}; Std {std}')
-            print(f'\tRatio of zero gradients: {float(np.count_nonzero(gradients == 0)) / gradients.size}')
+            if gradients is not None:
+                gradients = gradients.cpu().numpy()
+
+                mu = np.mean(gradients)
+                std = np.std(gradients)
+
+                print(f'Layer {i} grads: Mean: {mu}; Std {std}')
+                print(f'\tRatio of zero gradients: {float(np.count_nonzero(gradients == 0)) / gradients.size}')
+            else:
+                print(f'Layer {i} grad are None')
