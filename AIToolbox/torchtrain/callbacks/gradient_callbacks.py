@@ -4,7 +4,7 @@ import torch
 from AIToolbox.torchtrain.callbacks.callbacks import AbstractCallback
 
 
-class GradNormClipCallback(AbstractCallback):
+class GradNormClip(AbstractCallback):
     def __init__(self, max_norm, **kwargs):
         """Gradient norm clipping
 
@@ -23,7 +23,7 @@ class GradNormClipCallback(AbstractCallback):
         torch.nn.utils.clip_grad_norm_(self.train_loop_obj.model.parameters(), self.max_norm, **self.kwargs)
 
 
-class GradientStatsPrintCallback(AbstractCallback):
+class GradientStatsPrint(AbstractCallback):
     def __init__(self, model_layers_extract_def, on_every_grad_update=False):
         """Model gradients statistics reporting
 
