@@ -105,7 +105,6 @@ class TestModelPerformanceEvaluationCallback(unittest.TestCase):
         train_loop.callbacks_handler.register_callbacks([callback])
 
         callback.evaluate_model_performance()
-        callback.store_evaluated_metrics_to_history()
 
         self.assertEqual(train_loop.train_history.train_history,
                          {'loss': [], 'accumulated_loss': [], 'val_loss': [], 'val_dummy': [111]})
@@ -126,7 +125,6 @@ class TestModelPerformanceEvaluationCallback(unittest.TestCase):
         train_loop.insert_metric_result_into_history('dummy_acc', 55.)
 
         callback.evaluate_model_performance()
-        callback.store_evaluated_metrics_to_history()
 
         self.assertEqual(train_loop.train_history.train_history,
                          {'loss': [], 'accumulated_loss': [], 'val_loss': [], 'dummy_loss': [10.0], 'dummy_acc': [55.0],
@@ -146,7 +144,6 @@ class TestModelPerformanceEvaluationCallback(unittest.TestCase):
         train_loop.callbacks_handler.register_callbacks([callback])
 
         callback.evaluate_model_performance()
-        callback.store_evaluated_metrics_to_history()
 
         self.assertEqual(train_loop.train_history.train_history,
                          {'loss': [], 'accumulated_loss': [], 'val_loss': [], 'val_dummy': [111],
@@ -167,21 +164,18 @@ class TestModelPerformanceEvaluationCallback(unittest.TestCase):
 
         # Epoch 1
         callback.evaluate_model_performance()
-        callback.store_evaluated_metrics_to_history()
         self.assertEqual(train_loop.train_history.train_history,
                          {'loss': [], 'accumulated_loss': [], 'val_loss': [], 'val_dummy': [111],
                           'val_extended_dummy': [1323123.44]})
 
         # Epoch 2
         callback.evaluate_model_performance()
-        callback.store_evaluated_metrics_to_history()
         self.assertEqual(train_loop.train_history.train_history,
                          {'loss': [], 'accumulated_loss': [], 'val_loss': [], 'val_dummy': [111.0, 123.0],
                           'val_extended_dummy': [1323123.44, 1323135.44]})
 
         # Epoch 3
         callback.evaluate_model_performance()
-        callback.store_evaluated_metrics_to_history()
         self.assertEqual(train_loop.train_history.train_history,
                          {'loss': [], 'accumulated_loss': [], 'val_loss': [], 'val_dummy': [111.0, 123.0, 135.0],
                           'val_extended_dummy': [1323123.44, 1323135.44, 1323147.44]})
@@ -253,7 +247,6 @@ class TestMetricHistoryRename(unittest.TestCase):
         train_loop.callbacks_handler.register_callbacks([callback, rename_callback])
 
         callback.evaluate_model_performance()
-        callback.store_evaluated_metrics_to_history()
         rename_callback.on_epoch_end()
 
         self.assertEqual(train_loop.train_history.train_history,
@@ -278,7 +271,6 @@ class TestMetricHistoryRename(unittest.TestCase):
 
         # Epoch 1
         callback.evaluate_model_performance()
-        callback.store_evaluated_metrics_to_history()
         rename_callback.on_epoch_end()
         self.assertEqual(train_loop.train_history.train_history,
                          {'loss': [], 'accumulated_loss': [], 'val_loss': [], 'val_dummy': [111.0],
@@ -287,7 +279,6 @@ class TestMetricHistoryRename(unittest.TestCase):
 
         # Epoch 2
         callback.evaluate_model_performance()
-        callback.store_evaluated_metrics_to_history()
         rename_callback.on_epoch_end()
         self.assertEqual(train_loop.train_history.train_history,
                          {'loss': [], 'accumulated_loss': [], 'val_loss': [], 'val_dummy': [111.0, 123.0],
@@ -296,7 +287,6 @@ class TestMetricHistoryRename(unittest.TestCase):
 
         # Epoch 3
         callback.evaluate_model_performance()
-        callback.store_evaluated_metrics_to_history()
         rename_callback.on_epoch_end()
         self.assertEqual(train_loop.train_history.train_history,
                          {'loss': [], 'accumulated_loss': [], 'val_loss': [], 'val_dummy': [111.0, 123.0, 135.0],
@@ -319,12 +309,10 @@ class TestMetricHistoryRename(unittest.TestCase):
         train_loop.callbacks_handler.register_callbacks([callback, rename_callback])
 
         callback.evaluate_model_performance()
-        callback.store_evaluated_metrics_to_history()
         rename_callback.on_epoch_end()
 
         # Don't increment epoch count in the train loop to ensure that the history updated check fails
         callback.evaluate_model_performance()
-        callback.store_evaluated_metrics_to_history()
 
         with self.assertRaises(ValueError):
             rename_callback.on_epoch_end()

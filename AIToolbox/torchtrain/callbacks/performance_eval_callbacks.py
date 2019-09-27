@@ -55,21 +55,22 @@ class ModelPerformanceEvaluation(AbstractCallback):
             self.train_result_package = copy.deepcopy(result_package)
 
     def on_train_end(self):
-        self.evaluate_model_performance()
-        self.store_evaluated_metrics_to_history(prefix='train_end_')
+        self.evaluate_model_performance(prefix='train_end_')
 
     def on_epoch_end(self):
         if self.on_each_epoch:
             if self.eval_frequency is None or \
                     (self.eval_frequency is not None and self.train_loop_obj.epoch % self.eval_frequency == 0):
                 self.evaluate_model_performance()
-                self.store_evaluated_metrics_to_history()
             else:
                 print(f'Skipping performance evaluation on this epoch ({self.train_loop_obj.epoch}). '
                       f'Evaluating every {self.eval_frequency} epochs.')
 
-    def evaluate_model_performance(self):
+    def evaluate_model_performance(self, prefix=''):
         """Calculate performance based on the provided result packages
+
+        Args:
+            prefix (str): additional prefix for metric names that will get saved into the training history
 
         Returns:
             None
@@ -87,6 +88,8 @@ class ModelPerformanceEvaluation(AbstractCallback):
                                                        hyperparameters=self.args,
                                                        training_history=self.train_loop_obj.train_history,
                                                        additional_results=additional_results)
+
+        self.store_evaluated_metrics_to_history(prefix=prefix)
 
     def store_evaluated_metrics_to_history(self, prefix=''):
         """Save the calculated performance results into the training history
