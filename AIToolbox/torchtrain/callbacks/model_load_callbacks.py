@@ -27,7 +27,7 @@ class ModelLoadContinueTraining(AbstractCallback):
                 Everything else results just in local storage to disk
             bucket_name (str): name of the bucket in the cloud storage
             cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
-            **kwargs: define used_data_parallel (bool)
+            **kwargs: additional parameters for the local model loader load_model() function
         """
         AbstractCallback.__init__(self, 'Model loading and initialization from checkpoint before training',
                                   execution_order=0)
