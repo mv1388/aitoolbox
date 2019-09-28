@@ -65,7 +65,7 @@ class BaseFullExperimentSaver(AbstractExperimentSaver):
             (str, str): cloud_model_path, cloud_results_path
         """
         if experiment_timestamp is None:
-            experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
+            experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
 
         cloud_model_path, _, _ = self.model_saver.save_model(model=model,
                                                              project_name=self.project_name,
