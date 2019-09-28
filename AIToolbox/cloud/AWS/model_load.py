@@ -94,6 +94,18 @@ class PyTorchS3ModelLoader(BaseModelLoader):
             used_data_parallel: if the saved model was nn.DataParallel or normal model
 
         Returns:
-
+            initialized model
         """
         return self.local_model_loader.init_model(model, used_data_parallel)
+
+    def init_optimizer(self, optimizer, device='cuda'):
+        """
+
+        Args:
+            optimizer:
+            device (str):
+
+        Returns:
+            initialized optimizer
+        """
+        return self.local_model_loader.init_optimizer(optimizer, device)
