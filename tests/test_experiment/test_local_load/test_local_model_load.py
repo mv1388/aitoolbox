@@ -15,15 +15,15 @@ THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 class TestPyTorchLocalModelLoader(unittest.TestCase):
     def test_init(self):
         model_loader = PyTorchLocalModelLoader(THIS_DIR)
-        self.assertIsNone(model_loader.model_load)
+        self.assertIsNone(model_loader.model_representation)
 
     def test_load_model(self):
         model_checkpoint = self.save_dummy_model()
 
-        model_loader = PyTorchLocalModelLoader(os.path.join(THIS_DIR, 'project', 'exp_12', 'model'))
-        model_return = model_loader.load_model('model_exp_12_E3.pth', 'project', 'exp')
+        model_loader = PyTorchLocalModelLoader(THIS_DIR)
+        model_return = model_loader.load_model('project', 'exp', '12', 'model', 3)
 
-        self.assertEqual(sorted(model_checkpoint.keys()), sorted(model_loader.model_load.keys()))
+        self.assertEqual(sorted(model_checkpoint.keys()), sorted(model_loader.model_representation.keys()))
         self.assertEqual(sorted(model_checkpoint.keys()), sorted(model_return.keys()))
 
         if os.path.exists(os.path.join(THIS_DIR, 'project')):
@@ -43,8 +43,8 @@ class TestPyTorchLocalModelLoader(unittest.TestCase):
         state_dict_fixed = self.save_dummy_data_parallel_model()
 
         model = Net()
-        model_loader = PyTorchLocalModelLoader(os.path.join(THIS_DIR, 'project', 'exp_12', 'model'))
-        model_snapshot = model_loader.load_model('model_exp_12_E3.pth', 'project', 'exp')
+        model_loader = PyTorchLocalModelLoader(THIS_DIR)
+        model_snapshot = model_loader.load_model('project', 'exp', '12', 'model', 3)
         model_init = model_loader.init_model(model, used_data_parallel=True)
 
         self.assertEqual(sorted(state_dict_fixed.keys()), sorted(model_init.state_dict().keys()))
