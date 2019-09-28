@@ -2,6 +2,7 @@ import os
 
 from AIToolbox.torchtrain.callbacks.callbacks import AbstractCallback
 from AIToolbox.cloud.AWS.model_load import PyTorchS3ModelLoader
+from AIToolbox.cloud.GoogleCloud.model_load import PyTorchGoogleStorageModelLoader
 from AIToolbox.experiment.local_load.local_model_load import PyTorchLocalModelLoader
 
 
@@ -55,7 +56,8 @@ class ModelLoadContinueTraining(AbstractCallback):
             self.model_loader = PyTorchS3ModelLoader(self.local_model_result_folder_path,
                                                      self.bucket_name, self.cloud_dir_prefix)
         elif self.cloud_save_mode == 'gcs' or self.cloud_save_mode == 'google_storage' or self.cloud_save_mode == 'google storage':
-            raise NotImplementedError
+            self.model_loader = PyTorchGoogleStorageModelLoader(self.local_model_result_folder_path,
+                                                                self.bucket_name, self.cloud_dir_prefix)
         else:
             self.model_loader = PyTorchLocalModelLoader(self.local_model_result_folder_path)
 
