@@ -1,6 +1,7 @@
 import os
 
 from AIToolbox.torchtrain.callbacks.callbacks import AbstractCallback
+from AIToolbox.experiment.local_load.local_model_load import AbstractLocalModelLoader
 from AIToolbox.cloud.AWS.model_load import PyTorchS3ModelLoader
 from AIToolbox.cloud.GoogleCloud.model_load import PyTorchGoogleStorageModelLoader
 from AIToolbox.experiment.local_load.local_model_load import PyTorchLocalModelLoader
@@ -8,7 +9,8 @@ from AIToolbox.experiment.local_load.local_model_load import PyTorchLocalModelLo
 
 class ModelLoadContinueTraining(AbstractCallback):
     def __init__(self,
-                 saved_experiment_timestamp, saved_model_dir='checkpoint_model', epoch_num=None, used_data_parallel=False,
+                 saved_experiment_timestamp, saved_model_dir='checkpoint_model', epoch_num=None,
+                 used_data_parallel=False, custom_local_loader_class=None,
                  project_name=None, experiment_name=None, local_model_result_folder_path=None,
                  cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix='', **kwargs):
         """(Down)load previously trained and saved model and continue training from this snapshot instead from beginning
@@ -18,7 +20,10 @@ class ModelLoadContinueTraining(AbstractCallback):
             saved_model_dir (str): folder where saved model file is inside main experiment folder
             epoch_num (int or None): if loading checkpoint model instead of final model this parameter indicates
                 from which epoch of training the model will be loaded
-            used_data_parallel: if the saved model was nn.DataParallel or normal model
+            used_data_parallel (bool): if the saved model was nn.DataParallel or normal model
+            custom_local_loader_class (AbstractLocalModelLoader class or None): provide a custom local PyTorch model
+                loader definition in case the default one is not suitable for particular use case. For example,
+                in the case of complex custom optimizer initialization.
             project_name (str or None): root name of the project
             experiment_name (str or None): name of the particular experiment
             local_model_result_folder_path (str or None): root local path where project folder will be created
@@ -45,6 +50,7 @@ class ModelLoadContinueTraining(AbstractCallback):
         self.saved_model_dir = saved_model_dir
         self.epoch_num = epoch_num
         self.used_data_parallel = used_data_parallel
+        self.custom_local_loader_class = custom_local_loader_class
         self.local_loader_kwargs = kwargs
 
         self.model_loader = None
@@ -55,11 +61,20 @@ class ModelLoadContinueTraining(AbstractCallback):
         if self.cloud_save_mode == 's3' or self.cloud_save_mode == 'aws_s3' or self.cloud_save_mode == 'aws':
             self.model_loader = PyTorchS3ModelLoader(self.local_model_result_folder_path,
                                                      self.bucket_name, self.cloud_dir_prefix)
+            if self.custom_local_loader_class is not None:
+                self.model_loader.local_model_loader = self.custom_local_loader_class(self.local_model_result_folder_path)
+
         elif self.cloud_save_mode == 'gcs' or self.cloud_save_mode == 'google_storage' or self.cloud_save_mode == 'google storage':
             self.model_loader = PyTorchGoogleStorageModelLoader(self.local_model_result_folder_path,
                                                                 self.bucket_name, self.cloud_dir_prefix)
+            if self.custom_local_loader_class is not None:
+                self.model_loader.local_model_loader = self.custom_local_loader_class(self.local_model_result_folder_path)
+
         else:
-            self.model_loader = PyTorchLocalModelLoader(self.local_model_result_folder_path)
+            if self.custom_local_loader_class is None:
+                self.model_loader = PyTorchLocalModelLoader(self.local_model_result_folder_path)
+            else:
+                self.model_loader = self.custom_local_loader_class(self.local_model_result_folder_path)
 
         model_representation = self.model_loader.load_model(self.project_name, self.experiment_name,
                                                             self.saved_experiment_timestamp, self.saved_model_dir,
