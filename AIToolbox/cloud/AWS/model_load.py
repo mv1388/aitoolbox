@@ -91,7 +91,7 @@ class PyTorchS3ModelLoader(BaseModelLoader):
 
         Args:
             model: PyTorch model
-            used_data_parallel: if the saved model was nn.DataParallel or normal model
+            used_data_parallel (bool): if the saved model was nn.DataParallel or normal model
 
         Returns:
             initialized model
