@@ -6,7 +6,7 @@ from AIToolbox.experiment.local_load.local_model_load import AbstractLocalModelL
 
 class TestPyTorchS3ModelLoader(unittest.TestCase):
     def test_init(self):
-        s3_model_loader = PyTorchS3ModelLoader('', '', '', '')
+        s3_model_loader = PyTorchS3ModelLoader('', '', '')
 
         self.assertEqual(type(s3_model_loader.local_model_loader), PyTorchLocalModelLoader)
         self.assertIsInstance(s3_model_loader.local_model_loader, AbstractLocalModelLoader)

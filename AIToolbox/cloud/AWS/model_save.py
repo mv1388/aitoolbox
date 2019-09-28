@@ -94,7 +94,7 @@ class KerasS3ModelSaver(AbstractModelSaver, BaseModelSaver):
                                protect_existing_folder=False)
         """
         if experiment_timestamp is None:
-            experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
+            experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
 
         model_name, model_local_path = self.keras_local_saver.save_model(model, project_name, experiment_name,
                                                                          experiment_timestamp, epoch,
@@ -172,7 +172,7 @@ class PyTorchS3ModelSaver(AbstractModelSaver, BaseModelSaver):
         PyTorchLocalModelSaver.check_model_dict_contents(model)
 
         if experiment_timestamp is None:
-            experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
+            experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
 
         model_name, model_local_path = self.pytorch_local_saver.save_model(model, project_name, experiment_name,
                                                                            experiment_timestamp, epoch,

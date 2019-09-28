@@ -47,7 +47,7 @@ class BaseFullExperimentLocalSaver(AbstractExperimentSaver):
             list: local model and results paths
         """
         if experiment_timestamp is None:
-            experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
+            experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
 
         _, model_local_path = self.model_saver.save_model(model=model,
                                                           project_name=self.project_name,

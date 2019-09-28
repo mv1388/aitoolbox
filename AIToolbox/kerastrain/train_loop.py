@@ -45,7 +45,7 @@ class TrainLoop:
         self.callbacks = []
         self.train_history = None
 
-        self.experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
+        self.experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
 
     def __call__(self, num_epoch, batch_size, callbacks=None, **kwargs):
         """

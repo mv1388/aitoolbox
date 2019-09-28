@@ -178,7 +178,7 @@ class TestBaseLocalModelSaver(unittest.TestCase):
     def prepare_folder_structure(self, checkpoint_model):
         project_dir_name = 'projectDir'
         exp_dir_name = 'experimentSubDir'
-        current_time = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
+        current_time = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
 
         base_final = BaseLocalModelSaver(local_model_result_folder_path=THIS_DIR, checkpoint_model=checkpoint_model)
         path = base_final.create_experiment_local_models_folder(project_dir_name, exp_dir_name, current_time)
@@ -212,7 +212,7 @@ class TestPyTorchLocalModelSaver(unittest.TestCase):
         model = Net()
         project_dir_name = 'projectPyTorchLocalModelSaver'
         exp_dir_name = 'experimentSubDirPT'
-        current_time = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
+        current_time = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
         model_name_true = f'model_{exp_dir_name}_{current_time}_E{epoch}.pth'
         
         project_path = os.path.join(THIS_DIR, project_dir_name)
@@ -255,7 +255,7 @@ class TestKerasLocalModelSaver(unittest.TestCase):
         model = keras_dummy_model()
         project_dir_name = 'projectKerasLocalModelSaver'
         exp_dir_name = 'experimentSubDirPT'
-        current_time = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
+        current_time = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
         model_name_true = f'model_{exp_dir_name}_{current_time}_E{epoch}.h5'
 
         project_path = os.path.join(THIS_DIR, project_dir_name)
