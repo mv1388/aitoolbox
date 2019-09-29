@@ -57,13 +57,13 @@ class ModelLoadContinueTraining(AbstractCallback):
     def on_train_loop_registration(self):
         self.try_infer_experiment_details()
 
-        if self.cloud_save_mode == 's3' or self.cloud_save_mode == 'aws_s3' or self.cloud_save_mode == 'aws':
+        if self.cloud_save_mode in ['s3', 'aws_s3', 'aws']:
             self.model_loader = PyTorchS3ModelLoader(self.local_model_result_folder_path,
                                                      self.bucket_name, self.cloud_dir_prefix)
             if self.custom_local_loader_class is not None:
                 self.model_loader.local_model_loader = self.custom_local_loader_class(self.local_model_result_folder_path)
 
-        elif self.cloud_save_mode == 'gcs' or self.cloud_save_mode == 'google_storage' or self.cloud_save_mode == 'google storage':
+        elif self.cloud_save_mode in ['gcs', 'google_storage', 'google storage']:
             self.model_loader = PyTorchGoogleStorageModelLoader(self.local_model_result_folder_path,
                                                                 self.bucket_name, self.cloud_dir_prefix)
             if self.custom_local_loader_class is not None:
