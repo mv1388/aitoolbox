@@ -53,13 +53,13 @@ class ModelCheckpoint(AbstractCallback):
             self.subopt_model_remover = LocalSubOptimalModelRemover(metric_name,
                                                                     num_best_checkpoints_kept)
 
-        if cloud_save_mode == 's3' or cloud_save_mode == 'aws_s3' or cloud_save_mode == 'aws':
+        if cloud_save_mode in ['s3', 'aws_s3', 'aws']:
             self.model_checkpointer = PyTorchS3ModelSaver(
                 bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
                 local_model_result_folder_path=self.local_model_result_folder_path,
                 checkpoint_model=True
             )
-        elif cloud_save_mode == 'gcs' or cloud_save_mode == 'google_storage' or cloud_save_mode == 'google storage':
+        elif cloud_save_mode in ['gcs', 'google_storage', 'google storage']:
             self.model_checkpointer = PyTorchGoogleStorageModelSaver(
                 bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
                 local_model_result_folder_path=self.local_model_result_folder_path,
@@ -154,12 +154,12 @@ class ModelTrainEndSave(AbstractCallback):
         self.check_result_packages()
         self._hyperparams_already_saved = False
 
-        if cloud_save_mode == 's3' or cloud_save_mode == 'aws_s3' or cloud_save_mode == 'aws':
+        if cloud_save_mode in ['s3', 'aws_s3', 'aws']:
             self.results_saver = FullPyTorchExperimentS3Saver(self.project_name, self.experiment_name,
                                                               bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
                                                               local_model_result_folder_path=self.local_model_result_folder_path)
 
-        elif cloud_save_mode == 'gcs' or cloud_save_mode == 'google_storage' or cloud_save_mode == 'google storage':
+        elif cloud_save_mode in ['gcs', 'google_storage', 'google storage']:
             self.results_saver = FullPyTorchExperimentGoogleStorageSaver(self.project_name, self.experiment_name,
                                                                          bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
                                                                          local_model_result_folder_path=self.local_model_result_folder_path)
