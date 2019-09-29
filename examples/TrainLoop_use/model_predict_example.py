@@ -18,7 +18,6 @@ device = torch.device("cuda" if USE_CUDA else "cpu")
 
 
 project_folder_prefix = '~/PycharmProjects/RNN_QANet'
-# project_folder_prefix = '~/project'
 
 
 reader_train = SQuAD2ConcatContextDatasetReader(f'{project_folder_prefix}/data/SQuAD2/train-v2.0.json',
