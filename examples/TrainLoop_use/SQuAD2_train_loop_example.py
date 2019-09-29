@@ -8,9 +8,9 @@ from AIToolbox.torchtrain.data.dataset import BasicDataset as SQuAD2Dataset
 from AIToolbox.nlp.dataset.torch_collate_fns import qa_concat_ctx_span_collate_fn
 
 from AIToolbox.torchtrain.train_loop import TrainLoopModelCheckpointEndSave
-from AIToolbox.torchtrain.callbacks.performance_eval_callbacks import ModelPerformanceEvaluation, \
+from AIToolbox.torchtrain.callbacks.performance_eval import ModelPerformanceEvaluation, \
     ModelPerformancePrintReport, ModelTrainHistoryPlot
-from AIToolbox.torchtrain.callbacks.train_schedule_callbacks import ReduceLROnPlateauScheduler
+from AIToolbox.torchtrain.callbacks.train_schedule import ReduceLROnPlateauScheduler
 from AIToolbox.nlp.experiment_evaluation.NLP_result_package import QuestionAnswerResultPackage
 
 from AIToolbox.nlp.models.torch.unified_qa_model import UnifiedQABasicRNN
