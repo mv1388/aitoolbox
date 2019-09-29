@@ -119,4 +119,5 @@ TrainLoop(ModelWrap(model, MNISTModelFeedDefinition()),
 #                                 experiment_name='CNN_MNIST_test',
 #                                 local_model_result_folder_path='~/MemoryNet/model_results',
 #                                 hyperparams=args.__dict__,
-#                                 test_result_package=ClassificationResultPackage())(num_epoch=5, callbacks=callbacks)
+#                                 test_result_package=ClassificationResultPackage(),
+#                                 cloud_save_mode=None)(num_epoch=5, callbacks=callbacks)
