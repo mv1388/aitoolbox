@@ -523,14 +523,15 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
             num_best_checkpoints_kept (int): number of best performing models which are kept when removing suboptimal
                 model checkpoints
         """
+        if 'experiment_file_path' not in hyperparams:
+            hyperparams['experiment_file_path'] = inspect.getframeinfo(inspect.currentframe().f_back).filename
+
         TrainLoopModelEndSave.__init__(self, model, train_loader, validation_loader, test_loader,
                                        optimizer, criterion,
                                        project_name, experiment_name, os.path.expanduser(local_model_result_folder_path),
                                        hyperparams, val_result_package, test_result_package,
                                        cloud_save_mode, bucket_name, cloud_dir_prefix)
         self.rm_subopt_local_models = rm_subopt_local_models
-        if 'experiment_file_path' not in self.hyperparams:
-            self.hyperparams['experiment_file_path'] = inspect.getframeinfo(inspect.currentframe().f_back).filename
 
         self.callbacks_handler.register_callbacks([
             ModelCheckpoint(self.project_name, self.experiment_name, self.local_model_result_folder_path,
