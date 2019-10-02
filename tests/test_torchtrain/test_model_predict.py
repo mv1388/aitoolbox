@@ -22,7 +22,7 @@ class TestAbstractModelPredictor(unittest.TestCase):
         dummy_val_loader = list(range(2))
         re_runner = PyTorchModelPredictor(model, dummy_val_loader)
 
-        y_test, y_pred, metadata = re_runner.model_predict()
+        y_pred, y_test, metadata = re_runner.model_predict()
 
         r = []
         for i in range(1, len(dummy_val_loader) + 1):
@@ -46,7 +46,7 @@ class TestAbstractModelPredictor(unittest.TestCase):
         dummy_val_loader = list(range(2))
         re_runner = PyTorchModelPredictor(model_wrap, dummy_val_loader)
 
-        y_test, y_pred, metadata = re_runner.model_predict()
+        y_pred, y_test, metadata = re_runner.model_predict()
 
         r = []
         for i in range(1, len(dummy_val_loader) + 1):

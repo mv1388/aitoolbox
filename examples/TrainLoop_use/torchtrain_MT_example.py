@@ -392,7 +392,7 @@ class MachineTranslationFeedDefinition(AbstractModelFeedDefinition):
         metadata_dict = {'attention_matrices': attention_l,
                          'source_sent_text': source_sent_l}
 
-        return translation_true_l, translation_l, metadata_dict
+        return translation_l, translation_true_l, metadata_dict
 
 
 vocab_trg = Vocabulary('vocab')

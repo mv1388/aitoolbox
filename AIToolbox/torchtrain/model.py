@@ -58,7 +58,7 @@ class TTModel(nn.Module, ABC):
             device:
 
         Returns:
-            np.array, np.array, dict: y_test.cpu(), y_pred.cpu(), metadata
+            np.array, np.array, dict: y_pred.cpu(), y_test.cpu(), metadata
         """
         pass
 

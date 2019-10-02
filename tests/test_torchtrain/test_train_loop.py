@@ -231,13 +231,13 @@ class TestTrainLoop(unittest.TestCase):
         train_loop.fit(num_epoch=num_epochs)
 
         if eval_mode == 'train':
-            y_test, y_pred, metadata = train_loop.predict_on_train_set()
+            y_pred, y_test, metadata = train_loop.predict_on_train_set()
             data_loader = dummy_train_loader
         elif eval_mode == 'val':
-            y_test, y_pred, metadata = train_loop.predict_on_validation_set()
+            y_pred, y_test, metadata = train_loop.predict_on_validation_set()
             data_loader = dummy_val_loader
         else:
-            y_test, y_pred, metadata = train_loop.predict_on_test_set()
+            y_pred, y_test, metadata = train_loop.predict_on_test_set()
             data_loader = dummy_test_loader
 
         r = []
@@ -273,13 +273,13 @@ class TestTrainLoop(unittest.TestCase):
         train_loop.fit(num_epoch=num_epochs)
 
         if eval_mode == 'train':
-            y_test, y_pred, metadata = train_loop.predict_on_train_set()
+            y_pred, y_test, metadata = train_loop.predict_on_train_set()
             data_loader = dummy_train_loader
         elif eval_mode == 'val':
-            y_test, y_pred, metadata = train_loop.predict_on_validation_set()
+            y_pred, y_test, metadata = train_loop.predict_on_validation_set()
             data_loader = dummy_val_loader
         else:
-            y_test, y_pred, metadata = train_loop.predict_on_test_set()
+            y_pred, y_test, metadata = train_loop.predict_on_test_set()
             data_loader = dummy_test_loader
 
         r = []
@@ -352,19 +352,19 @@ class TestTrainLoop(unittest.TestCase):
         train_loop = TrainLoop(model_wrap, dummy_train_loader, dummy_val_loader, dummy_test_loader,
                                dummy_optimizer, None)
 
-        y_test, y_pred, metadata = train_loop.predict_on_train_set()
+        y_pred, y_test, metadata = train_loop.predict_on_train_set()
         eval_predictions(dummy_train_loader, y_test, y_pred, metadata)
 
         # even though we changed to test loader we still get the predictions from the train loader as the predictions
         # are not calculated again but are taken from the store.
         train_loop.train_loader = dummy_test_loader
-        y_test_store, y_pred_store, metadata_store = train_loop.predict_on_train_set()
+        y_pred_store, y_test_store, metadata_store = train_loop.predict_on_train_set()
         eval_predictions(dummy_train_loader, y_test_store, y_pred_store, metadata_store)
 
-        y_test_store, y_pred_store, metadata_store = train_loop.predict_on_train_set(force_prediction=True)
+        y_pred_store, y_test_store, metadata_store = train_loop.predict_on_train_set(force_prediction=True)
         eval_predictions(dummy_test_loader, y_test_store, y_pred_store, metadata_store, offset=3+1)
 
-        y_test_test, y_pred_test, metadata = train_loop.predict_on_test_set()
+        y_pred_test, y_test_test, metadata = train_loop.predict_on_test_set()
         eval_predictions(dummy_test_loader, y_test_test, y_pred_test, metadata, offset=4+2)
 
         self.assertEqual(list(train_loop.prediction_store.prediction_store.keys()),
@@ -373,7 +373,7 @@ class TestTrainLoop(unittest.TestCase):
 
         # Test store purge
         train_loop.epoch += 1
-        y_test, y_pred, metadata = train_loop.predict_on_validation_set()
+        y_pred, y_test, metadata = train_loop.predict_on_validation_set()
         self.assertEqual(train_loop.prediction_store.prediction_store['epoch'], 1)
         self.assertEqual(list(train_loop.prediction_store.prediction_store.keys()), ['epoch', 'val_pred'])
 

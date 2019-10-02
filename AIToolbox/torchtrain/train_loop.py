@@ -244,7 +244,7 @@ class TrainLoop:
             force_prediction (bool):
 
         Returns:
-            (torch.Tensor, torch.Tensor, dict): y_true, y_pred, metadata
+            (torch.Tensor, torch.Tensor, dict): y_pred, y_true, metadata
         """
         if not self.prediction_store.has_train_predictions(self.epoch) or force_prediction:
             predictions = self.predict_with_model(self.train_loader)
@@ -261,7 +261,7 @@ class TrainLoop:
             force_prediction (bool):
 
         Returns:
-            (torch.Tensor, torch.Tensor, dict): y_true, y_pred, metadata
+            (torch.Tensor, torch.Tensor, dict): y_pred, y_true, metadata
         """
         if not self.prediction_store.has_val_predictions(self.epoch) or force_prediction:
             predictions = self.predict_with_model(self.validation_loader)
@@ -278,7 +278,7 @@ class TrainLoop:
             force_prediction (bool):
 
         Returns:
-            (torch.Tensor, torch.Tensor, dict): y_true, y_pred, metadata
+            (torch.Tensor, torch.Tensor, dict): y_pred, y_true, metadata
         """
         if not self.prediction_store.has_test_predictions(self.epoch) or force_prediction:
             predictions = self.predict_with_model(self.test_loader)
@@ -295,18 +295,18 @@ class TrainLoop:
             data_loader (torch.utils.data.DataLoader):
 
         Returns:
-            (torch.Tensor, torch.Tensor, dict): y_true, y_pred, metadata
+            (torch.Tensor, torch.Tensor, dict): y_pred, y_true, metadata
         """
-        y_test, y_pred, metadata_list = [], [], []
+        y_pred, y_test, metadata_list = [], [], []
 
         self.model.eval()
 
         with torch.no_grad():
             for batch_data in tqdm(data_loader):
                 if isinstance(self.model, TTModel):
-                    y_test_batch, y_pred_batch, metadata_batch = self.model.get_predictions(batch_data, self.device)
+                    y_pred_batch, y_test_batch, metadata_batch = self.model.get_predictions(batch_data, self.device)
                 else:
-                    y_test_batch, y_pred_batch, metadata_batch = \
+                    y_pred_batch, y_test_batch, metadata_batch = \
                         self.batch_model_feed_def.get_predictions(self.model, batch_data, self.device)
 
                 # TODO: check if it is the best idea to append predictions to the list and not to some torch tensor
@@ -334,7 +334,7 @@ class TrainLoop:
 
         self.model.train()
 
-        return y_test, y_pred, metadata
+        return y_pred, y_test, metadata
 
     def insert_metric_result_into_history(self, metric_name, metric_result):
         """Insert a metric result into the train history

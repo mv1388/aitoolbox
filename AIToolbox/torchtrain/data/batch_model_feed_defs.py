@@ -59,7 +59,7 @@ class AbstractModelFeedDefinition(ABC):
             device:
 
         Returns:
-            np.array, np.array, dict: y_test.cpu(), y_pred.cpu(), metadata
+            np.array, np.array, dict: y_pred.cpu(), y_test.cpu(), metadata
         """
         pass
 
@@ -106,7 +106,7 @@ class QASpanSQuADModelFeedDefinition(AbstractModelFeedDefinition):
 
         metadata = None
 
-        return y_test.cpu(), y_pred.cpu(), metadata
+        return y_pred.cpu(), y_test.cpu(), metadata
 
 
 class MachineTranslationFeedDefinition(AbstractModelFeedDefinition):
@@ -151,4 +151,4 @@ class ImageClassificationFeedDefinition(AbstractModelFeedDefinition):
         output = model(data)
         y_pred = output.argmax(dim=1, keepdim=False)  # get the index of the max log-probability
 
-        return y_test, y_pred.cpu()
+        return y_pred.cpu(), y_test, {}
