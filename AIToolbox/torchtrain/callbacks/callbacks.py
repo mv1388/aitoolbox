@@ -217,7 +217,7 @@ class AllPredictionsSame(AbstractCallback):
         self.verbose = verbose
 
     def on_epoch_end(self):
-        _, predictions, _ = self.train_loop_obj.predict_on_validation_set()
+        predictions, _, _ = self.train_loop_obj.predict_on_validation_set()
 
         all_values_same = all(el == self.value for el in predictions)
 

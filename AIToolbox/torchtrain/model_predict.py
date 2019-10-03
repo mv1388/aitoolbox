@@ -123,7 +123,7 @@ class PyTorchModelPredictor(AbstractModelPredictor):
         Returns:
             AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or dict:
         """
-        y_test, y_pred, additional_results = self.train_loop.predict_on_test_set()
+        y_pred, y_test, additional_results = self.train_loop.predict_on_test_set()
 
         result_package.prepare_result_package(y_test, y_pred,
                                               hyperparameters={}, training_history=self.train_loop.train_history,
@@ -168,7 +168,7 @@ class PyTorchModelPredictor(AbstractModelPredictor):
         Returns:
             AIToolbox.experiment.core_metrics.abstract_metric.AbstractBaseMetric or dict:
         """
-        y_test, y_pred, additional_results = self.train_loop.predict_on_test_set()
+        y_pred, y_test, additional_results = self.train_loop.predict_on_test_set()
 
         metric_result = metric_class(y_test, y_pred)
 
@@ -187,7 +187,7 @@ class PyTorchModelPredictor(AbstractModelPredictor):
         Returns:
             list or dict
         """
-        y_test, y_pred, additional_results = self.train_loop.predict_on_test_set()
+        y_pred, y_test, additional_results = self.train_loop.predict_on_test_set()
 
         metric_final_results = [] if return_metric_list else {}
 

@@ -64,8 +64,8 @@ class NetUnifiedBatchFeed(TTModel):
 
     def get_predictions(self, batch_data, device):
         self.prediction_count += 1
-        return torch.FloatTensor([self.prediction_count] * 64).cpu(), \
-               torch.FloatTensor([self.prediction_count + 100] * 64).cpu(), {'bla': [self.prediction_count + 200] * 64}
+        return torch.FloatTensor([self.prediction_count + 100] * 64).cpu(), \
+               torch.FloatTensor([self.prediction_count] * 64).cpu(), {'bla': [self.prediction_count + 200] * 64}
 
 
 class SmallFFNet(TTModel):
@@ -89,7 +89,7 @@ class SmallFFNet(TTModel):
     def get_predictions(self, batch_data, device):
         x, y = batch_data
         pred_y = self(x)
-        return y, pred_y, {}
+        return pred_y, y, {}
     
     
 def keras_dummy_model():
@@ -221,8 +221,8 @@ class DeactivateModelFeedDefinition(AbstractModelFeedDefinition):
             np.array, np.array, dict: y_test.cpu(), y_pred.cpu(), metadata
         """
         self.prediction_count += 1
-        return torch.FloatTensor([self.prediction_count] * 64).cpu(), \
-               torch.FloatTensor([self.prediction_count + 100] * 64).cpu(), {'bla': [self.prediction_count + 200] * 64}
+        return torch.FloatTensor([self.prediction_count + 100] * 64).cpu(), \
+               torch.FloatTensor([self.prediction_count] * 64).cpu(), {'bla': [self.prediction_count + 200] * 64}
 
 
 class DummyBatch:

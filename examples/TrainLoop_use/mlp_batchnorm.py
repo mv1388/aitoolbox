@@ -135,7 +135,7 @@ class MultilayerPerceptron(TTModel):
 
         _, predicted_labels = torch.max(probas, 1)
 
-        return targets.cpu(), predicted_labels.cpu(), {}
+        return predicted_labels.cpu(), targets.cpu(), {}
 
 
 torch.manual_seed(random_seed)
