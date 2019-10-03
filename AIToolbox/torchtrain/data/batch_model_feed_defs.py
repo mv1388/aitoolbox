@@ -27,7 +27,6 @@ class AbstractModelFeedDefinition(ABC):
         """
         pass
 
-    @abstractmethod
     def get_loss_eval(self, model, batch_data, criterion, device):
         """Get loss during evaluation stage
 
@@ -47,7 +46,7 @@ class AbstractModelFeedDefinition(ABC):
         Returns:
 
         """
-        pass
+        return self.get_loss(model, batch_data, criterion, device)
 
     @abstractmethod
     def get_predictions(self, model, batch_data, device):
