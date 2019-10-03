@@ -36,6 +36,7 @@ After the model is created, the simplest way to train it via the TrainLoop abstr
 tl = TrainLoop(model,
                train_loader, val_loader, test_loader,
                optimizer, criterion)
+
 model = tl.fit(num_epoch=10)
 ```
 
