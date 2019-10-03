@@ -44,7 +44,7 @@ class AbstractModelFeedDefinition(ABC):
             device:
 
         Returns:
-
+            PyTorch loss
         """
         return self.get_loss(model, batch_data, criterion, device)
 
