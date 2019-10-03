@@ -27,7 +27,6 @@ class AbstractModelFeedDefinition(ABC):
         """
         pass
 
-    @abstractmethod
     def get_loss_eval(self, model, batch_data, criterion, device):
         """Get loss during evaluation stage
 
@@ -47,7 +46,7 @@ class AbstractModelFeedDefinition(ABC):
         Returns:
 
         """
-        pass
+        return self.get_loss(model, batch_data, criterion, device)
 
     @abstractmethod
     def get_predictions(self, model, batch_data, device):
@@ -59,7 +58,7 @@ class AbstractModelFeedDefinition(ABC):
             device:
 
         Returns:
-            np.array, np.array, dict: y_test.cpu(), y_pred.cpu(), metadata
+            np.array, np.array, dict: y_pred.cpu(), y_test.cpu(), metadata
         """
         pass
 
@@ -106,7 +105,7 @@ class QASpanSQuADModelFeedDefinition(AbstractModelFeedDefinition):
 
         metadata = None
 
-        return y_test.cpu(), y_pred.cpu(), metadata
+        return y_pred.cpu(), y_test.cpu(), metadata
 
 
 class MachineTranslationFeedDefinition(AbstractModelFeedDefinition):
@@ -151,4 +150,4 @@ class ImageClassificationFeedDefinition(AbstractModelFeedDefinition):
         output = model(data)
         y_pred = output.argmax(dim=1, keepdim=False)  # get the index of the max log-probability
 
-        return y_test, y_pred.cpu()
+        return y_pred.cpu(), y_test, {}

@@ -98,7 +98,7 @@ class MyNeuralModel(TTModel):
         # Get predictions during evaluation stage 
         # + return any metadata potentially needed for evaluation
         ...
-        # return true_targets, predictions, metadata
+        # return predictions, true_targets, metadata
 ```
 
 ### Callbacks

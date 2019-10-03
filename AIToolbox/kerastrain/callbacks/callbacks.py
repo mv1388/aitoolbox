@@ -150,7 +150,7 @@ class ModelTrainEndSave(AbstractKerasCallback):
         train_hist_pkg = TrainingHistory().wrap_pre_prepared_history(train_history)
 
         if self.val_result_package is not None:
-            y_test, y_pred, additional_results = self.train_loop_obj.predict_on_validation_set()
+            y_pred, y_test, additional_results = self.train_loop_obj.predict_on_validation_set()
             self.val_result_package.pkg_name += '_VAL'
             self.val_result_package.prepare_result_package(y_test, y_pred,
                                                            hyperparameters=self.args, training_history=train_hist_pkg,
@@ -158,7 +158,7 @@ class ModelTrainEndSave(AbstractKerasCallback):
             self.result_package = self.val_result_package
 
         if self.test_result_package is not None:
-            y_test_test, y_pred_test, additional_results_test = self.train_loop_obj.predict_on_test_set()
+            y_pred_test, y_test_test, additional_results_test = self.train_loop_obj.predict_on_test_set()
             self.test_result_package.pkg_name += '_TEST'
             self.test_result_package.prepare_result_package(y_test_test, y_pred_test,
                                                             hyperparameters=self.args, training_history=train_hist_pkg,

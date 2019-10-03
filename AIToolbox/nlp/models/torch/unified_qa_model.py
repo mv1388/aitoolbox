@@ -111,4 +111,4 @@ class UnifiedQABasicRNN(TTModel):
 
         metadata = None
 
-        return y_test.cpu(), y_pred.cpu(), metadata
+        return y_pred.cpu(), y_test.cpu(), metadata
