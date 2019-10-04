@@ -42,7 +42,7 @@ class TrainLoop:
             test_loader (torch.utils.data.DataLoader): data loader for test data set
             optimizer (torch.optim.optimizer.Optimizer or MultiOptimizer): optimizer algorithm.
             criterion (torch.nn.modules.loss._Loss or MultiLoss): criterion criterion during the training procedure.
-            use_amp (bool): use Nvidia Apex 16-bit AMP
+            use_amp (bool): use Nvidia Apex 16-bit Automatic Mixed Precision (AMP)
         """
         if isinstance(model, TTModel):
             self.model = model
@@ -83,7 +83,7 @@ class TrainLoop:
         if not isinstance(self.model, TTModel) and \
                 isinstance(self.model, Module) and not isinstance(self.batch_model_feed_def, AbstractModelFeedDefinition):
             raise TypeError('Provided the base PyTorch model but did not give the batch_model_feed_def')
-        if use_amp and not APEX_AVAILABLE:
+        if self.use_amp and not APEX_AVAILABLE:
             raise ValueError('Trying to use Nvidia Apex AMP for 16-bit mixed precision. However, Nvidia Apex is not'
                              'installed.')
 
@@ -119,7 +119,6 @@ class TrainLoop:
         for self.epoch in range(self.epoch, num_epoch):
             print('\n\n========================================================================')
             print('========================================================================')
-            # print(self.train_history)
             print(f'Epoch: {self.epoch}')
             self.callbacks_handler.execute_epoch_begin()
 
@@ -141,6 +140,7 @@ class TrainLoop:
                         scaled_loss.backward()
                 if self.grad_cb_used:
                     self.callbacks_handler.execute_gradient_update()
+
                 self.optimizer.step()
                 if self.grad_cb_used:
                     self.callbacks_handler.execute_optimizer_step()
@@ -399,7 +399,7 @@ class TrainLoopModelCheckpoint(TrainLoop):
                 the metric minimization is done otherwise metric maximization is done
             num_best_checkpoints_kept (int): number of best performing models which are kept when removing suboptimal
                 model checkpoints
-            use_amp (bool): use Nvidia Apex 16-bit AMP
+            use_amp (bool): use Nvidia Apex 16-bit Automatic Mixed Precision (AMP)
         """
         TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion, use_amp)
         self.project_name = project_name
@@ -457,7 +457,7 @@ class TrainLoopModelEndSave(TrainLoop):
                 Everything else results just in local storage to disk
             bucket_name (str): name of the bucket in the cloud storage
             cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
-            use_amp (bool): use Nvidia Apex 16-bit AMP
+            use_amp (bool): use Nvidia Apex 16-bit Automatic Mixed Precision (AMP)
         """
         TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion, use_amp)
         self.project_name = project_name
@@ -541,7 +541,7 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
                 the metric minimization is done otherwise metric maximization is done
             num_best_checkpoints_kept (int): number of best performing models which are kept when removing suboptimal
                 model checkpoints
-            use_amp (bool): use Nvidia Apex 16-bit AMP
+            use_amp (bool): use Nvidia Apex 16-bit Automatic Mixed Precision (AMP)
         """
         if 'experiment_file_path' not in hyperparams:
             hyperparams['experiment_file_path'] = inspect.getframeinfo(inspect.currentframe().f_back).filename
