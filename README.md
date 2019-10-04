@@ -35,7 +35,7 @@ After the model is created, the simplest way to train it via the TrainLoop abstr
 ```python
 tl = TrainLoop(model,
                train_loader, val_loader, test_loader,
-               optimizer, criterion)
+               optimizer, criterion, use_amp=False)
 
 model = tl.fit(num_epoch=10)
 ```
@@ -57,8 +57,25 @@ TrainLoopModelCheckpointEndSave(model,
                                 project_name, experiment_name, local_model_result_folder_path,
                                 hyperparams, val_result_package=None, test_result_package=None,
                                 cloud_save_mode='s3', bucket_name='models', cloud_dir_prefix='',
-                                rm_subopt_local_models=False, num_best_checkpoints_kept=2)
+                                rm_subopt_local_models=False, num_best_checkpoints_kept=2,
+                                use_amp=False)
 ```
+
+Lastly, all the TrainingLoop versions also support training with **16-bit Automatic Mixed Precision **
+using the [Nvidia apex](https://github.com/NVIDIA/apex) extension. To use this feature the user first
+has to install the Nvidia apex library ([installation instructions](https://github.com/NVIDIA/apex#linux)). 
+After that, the user only has to properly amp initialize the model and optimizer and set the TrainLoop parameter to `use_amp=False`.
+All other training related steps are handled automatically by the TrainLoop. Example of initialization
+is shown bellow and more can be read in the official 
+[Nvidia apex documentation](https://nvidia.github.io/apex/amp.html#opt-levels-and-properties).
+```python
+from apex import amp
+
+model, optimizer = amp.initialize(model, optimizer, opt_level="O1")
+
+TrainLoop(model, ...,
+          optimizer, criterion, use_amp=True).fit(10)
+``` 
 
 ### Model
 
