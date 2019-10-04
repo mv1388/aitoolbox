@@ -2,6 +2,13 @@ from abc import ABC, abstractmethod
 import os
 from collections import OrderedDict
 import torch
+try:
+    from apex import amp
+    APEX_AVAILABLE = True
+except ModuleNotFoundError:
+    APEX_AVAILABLE = False
+except AttributeError:
+    APEX_AVAILABLE = False
 
 from AIToolbox.experiment.local_save.folder_create import ExperimentFolderCreator
 
@@ -125,3 +132,14 @@ class PyTorchLocalModelLoader(AbstractLocalModelLoader):
         #             state[k] = v.to(device)
 
         return optimizer
+
+    def init_amp(self):
+        """Initialize
+
+        Returns:
+            None
+        """
+        if APEX_AVAILABLE:
+            amp.load_state_dict(self.model_representation['amp'])
+        else:
+            print('Trying to use Nvidia Apex AMP for 16-bit mixed precision. However, Nvidia Apex is not installed.')

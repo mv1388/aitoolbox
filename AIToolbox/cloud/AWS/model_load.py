@@ -109,3 +109,11 @@ class PyTorchS3ModelLoader(BaseModelLoader):
             initialized optimizer
         """
         return self.local_model_loader.init_optimizer(optimizer, device)
+
+    def init_amp(self):
+        """
+
+        Returns:
+            None
+        """
+        self.local_model_loader.init_amp()

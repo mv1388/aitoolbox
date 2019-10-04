@@ -1,3 +1,11 @@
+try:
+    from apex import amp
+    APEX_AVAILABLE = True
+except ModuleNotFoundError:
+    APEX_AVAILABLE = False
+except AttributeError:
+    APEX_AVAILABLE = False
+
 
 class MultiLoss:
     def __init__(self, loss_list):
@@ -11,6 +19,11 @@ class MultiLoss:
     def backward(self):
         for loss in self.loss_list:
             loss.backward()
+
+    def backward_amp(self, optimizer):
+        for loss in self.loss_list:
+            with amp.scale_loss(loss, optimizer) as scaled_loss:
+                scaled_loss.backward()
 
     def item(self):
         return [loss.item() for loss in self.loss_list]

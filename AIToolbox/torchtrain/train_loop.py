@@ -11,6 +11,8 @@ try:
     APEX_AVAILABLE = True
 except ModuleNotFoundError:
     APEX_AVAILABLE = False
+except AttributeError:
+    APEX_AVAILABLE = False
 
 from AIToolbox.utils import dict_util
 from AIToolbox.torchtrain.model import TTModel, ModelWrap
@@ -133,14 +135,18 @@ class TrainLoop:
                 self.loss_batch_accum.append(loss_batch.item())
 
                 self.optimizer.zero_grad()
+
                 if not self.use_amp:
                     loss_batch.backward()
                 else:
-                    with amp.scale_loss(loss_batch, self.optimizer) as scaled_loss:
-                        scaled_loss.backward()
+                    if not isinstance(loss_batch, MultiLoss):
+                        with amp.scale_loss(loss_batch, self.optimizer) as scaled_loss:
+                            scaled_loss.backward()
+                    else:
+                        loss_batch.backward_amp(self.optimizer)
+
                 if self.grad_cb_used:
                     self.callbacks_handler.execute_gradient_update()
-
                 self.optimizer.step()
                 if self.grad_cb_used:
                     self.callbacks_handler.execute_optimizer_step()
