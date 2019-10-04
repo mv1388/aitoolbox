@@ -20,9 +20,17 @@ class MultiLoss:
         for loss in self.loss_list:
             loss.backward()
 
-    def backward_amp(self, optimizer):
-        for loss in self.loss_list:
-            with amp.scale_loss(loss, optimizer) as scaled_loss:
+    def backward_amp(self, optimizers):
+        """Executes backward() over all the losses using the list o optimizers
+
+        Args:
+            optimizers (list): list of optimizers. Positions in the list correspond to the ordering of the losses
+
+        Returns:
+            None
+        """
+        for i, (loss, optimizer) in enumerate(zip(self.loss_list, optimizers)):
+            with amp.scale_loss(loss, optimizer, loss_id=i) as scaled_loss:
                 scaled_loss.backward()
 
     def item(self):

@@ -145,7 +145,7 @@ class TrainLoop:
                             scaled_loss.backward()
                     else:
                         # Multi-loss Apex AMP calculation
-                        loss_batch.backward_amp(self.optimizer)
+                        loss_batch.backward_amp(self.optimizer.optimizer_list)
 
                 if self.grad_cb_used:
                     self.callbacks_handler.execute_gradient_update()
