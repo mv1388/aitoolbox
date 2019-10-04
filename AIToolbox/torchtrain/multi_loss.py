@@ -13,9 +13,9 @@ class MultiLoss:
 
         Args:
             loss_list (list): list of loss objects which are used to calculate losses in the TrainLoop
-            amp_optimizer_order (lambda or None): when using Nvidia Apex AMP, construct a list of optimizers
-                where the optimizer's position matches the position of the corresponding loss in the loss_list.
-                This is useful in cases similar to this:
+            amp_optimizer_order (callable or lambda or function or None): when using Nvidia Apex AMP, construct
+                a list of optimizers where the optimizer's position matches the position of the corresponding loss
+                in the loss_list. This is useful in cases similar to this:
                 https://github.com/NVIDIA/apex/tree/master/examples/dcgan#mixed-precision-dcgan-training-in-pytorch
 
                 When not using Nvidia Apex AMP this can be ignored as losses and optimizers don't need to be
@@ -23,6 +23,12 @@ class MultiLoss:
         """
         self.loss_list = loss_list
         self.amp_optimizer_order = amp_optimizer_order
+
+        if self.amp_optimizer_order is not None:
+            if not callable(self.amp_optimizer_order):
+                raise TypeError('Provided amp_optimizer_order is not callable. When providing amp_optimizer_order '
+                                'it should be a callable function taking the optimizer list and returning '
+                                'the ordered list of loss-matching optimizers.')
 
     def backward(self):
         for loss in self.loss_list:
