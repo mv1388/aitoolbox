@@ -64,7 +64,7 @@ TrainLoopModelCheckpointEndSave(model,
 Lastly, all the TrainingLoop versions also support training with **16-bit Automatic Mixed Precision **
 using the [Nvidia apex](https://github.com/NVIDIA/apex) extension. To use this feature the user first
 has to install the Nvidia apex library ([installation instructions](https://github.com/NVIDIA/apex#linux)). 
-After that, the user only has to properly amp initialize the model and optimizer and set the TrainLoop parameter to `use_amp=False`.
+After that, the user only has to properly amp initialize the model and optimizer and finally set the TrainLoop parameter to `use_amp=True`.
 All other training related steps are handled automatically by the TrainLoop. Example of initialization
 is shown bellow and more can be read in the official 
 [Nvidia apex documentation](https://nvidia.github.io/apex/amp.html#opt-levels-and-properties).
