@@ -1,4 +1,11 @@
 import os
+try:
+    from apex import amp
+    APEX_AVAILABLE = True
+except ModuleNotFoundError:
+    APEX_AVAILABLE = False
+except AttributeError:
+    APEX_AVAILABLE = False
 
 from AIToolbox.cloud.AWS.model_save import PyTorchS3ModelSaver
 from AIToolbox.cloud.GoogleCloud.model_save import PyTorchGoogleStorageModelSaver
@@ -76,6 +83,9 @@ class ModelCheckpoint(AbstractCallback):
                             'optimizer_state_dict': self.train_loop_obj.optimizer.state_dict(),
                             'epoch': self.train_loop_obj.epoch,
                             'hyperparams': self.hyperparams}
+        # If Nvidia apex amp is used
+        if self.train_loop_obj.use_amp:
+            model_checkpoint['amp'] = amp.state_dict()
 
         model_paths = self.model_checkpointer.save_model(model=model_checkpoint,
                                                          project_name=self.project_name,
@@ -173,6 +183,9 @@ class ModelTrainEndSave(AbstractCallback):
                              'optimizer_state_dict': self.train_loop_obj.optimizer.state_dict(),
                              'epoch': self.train_loop_obj.epoch,
                              'hyperparams': self.hyperparams}
+        # If Nvidia apex amp is used
+        if self.train_loop_obj.use_amp:
+            model_final_state['amp'] = amp.state_dict()
 
         if self.val_result_package is not None:
             y_pred, y_test, additional_results = self.train_loop_obj.predict_on_validation_set()

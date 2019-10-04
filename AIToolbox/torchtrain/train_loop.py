@@ -6,6 +6,13 @@ import inspect
 import numpy as np
 import torch
 from torch.nn.modules import Module
+try:
+    from apex import amp
+    APEX_AVAILABLE = True
+except ModuleNotFoundError:
+    APEX_AVAILABLE = False
+except AttributeError:
+    APEX_AVAILABLE = False
 
 from AIToolbox.utils import dict_util
 from AIToolbox.torchtrain.model import TTModel, ModelWrap
@@ -22,7 +29,7 @@ from AIToolbox.experiment.result_package.abstract_result_packages import Abstrac
 class TrainLoop:
     def __init__(self, model,
                  train_loader, validation_loader, test_loader,
-                 optimizer, criterion):
+                 optimizer, criterion, use_amp=False):
         """Core PyTorch TrainLoop supporting the model training and target prediction
 
         Implements core training procedures: batch feeding into the network as part of (multi)epoch train loop,
@@ -37,6 +44,7 @@ class TrainLoop:
             test_loader (torch.utils.data.DataLoader): data loader for test data set
             optimizer (torch.optim.optimizer.Optimizer or MultiOptimizer): optimizer algorithm.
             criterion (torch.nn.modules.loss._Loss or MultiLoss): criterion criterion during the training procedure.
+            use_amp (bool): use Nvidia Apex 16-bit Automatic Mixed Precision (AMP)
         """
         if isinstance(model, TTModel):
             self.model = model
@@ -53,6 +61,7 @@ class TrainLoop:
         self.test_loader = test_loader
         self.optimizer = optimizer
         self.criterion = criterion
+        self.use_amp = use_amp
 
         USE_CUDA = torch.cuda.is_available()
         self.device = torch.device("cuda" if USE_CUDA else "cpu")
@@ -76,6 +85,9 @@ class TrainLoop:
         if not isinstance(self.model, TTModel) and \
                 isinstance(self.model, Module) and not isinstance(self.batch_model_feed_def, AbstractModelFeedDefinition):
             raise TypeError('Provided the base PyTorch model but did not give the batch_model_feed_def')
+        if self.use_amp and not APEX_AVAILABLE:
+            raise ValueError('Trying to use Nvidia Apex AMP for 16-bit mixed precision. However, Nvidia Apex is not'
+                             'installed.')
 
     def __call__(self, num_epoch, callbacks=None):
         """Train the model using the train loop
@@ -109,7 +121,6 @@ class TrainLoop:
         for self.epoch in range(self.epoch, num_epoch):
             print('\n\n========================================================================')
             print('========================================================================')
-            # print(self.train_history)
             print(f'Epoch: {self.epoch}')
             self.callbacks_handler.execute_epoch_begin()
 
@@ -124,7 +135,18 @@ class TrainLoop:
                 self.loss_batch_accum.append(loss_batch.item())
 
                 self.optimizer.zero_grad()
-                loss_batch.backward()
+
+                if not self.use_amp:
+                    loss_batch.backward()
+                else:
+                    if not isinstance(loss_batch, MultiLoss):
+                        # Single loss Apex AMP calculation
+                        with amp.scale_loss(loss_batch, self.optimizer) as scaled_loss:
+                            scaled_loss.backward()
+                    else:
+                        # Multi-loss Apex AMP calculation
+                        loss_batch.backward_amp(self.optimizer.optimizer_list)
+
                 if self.grad_cb_used:
                     self.callbacks_handler.execute_gradient_update()
                 self.optimizer.step()
@@ -355,7 +377,8 @@ class TrainLoopModelCheckpoint(TrainLoop):
                  project_name, experiment_name, local_model_result_folder_path,
                  hyperparams,
                  cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix='',
-                 rm_subopt_local_models=False, num_best_checkpoints_kept=2):
+                 rm_subopt_local_models=False, num_best_checkpoints_kept=2,
+                 use_amp=False):
         """TrainLoop with the automatic model check-pointing at the end of each epoch
 
         Args:
@@ -384,8 +407,9 @@ class TrainLoopModelCheckpoint(TrainLoop):
                 the metric minimization is done otherwise metric maximization is done
             num_best_checkpoints_kept (int): number of best performing models which are kept when removing suboptimal
                 model checkpoints
+            use_amp (bool): use Nvidia Apex 16-bit Automatic Mixed Precision (AMP)
         """
-        TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion)
+        TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion, use_amp)
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
@@ -414,7 +438,8 @@ class TrainLoopModelEndSave(TrainLoop):
                  optimizer, criterion,
                  project_name, experiment_name, local_model_result_folder_path,
                  hyperparams, val_result_package=None, test_result_package=None,
-                 cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix=''):
+                 cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix='',
+                 use_amp=False):
         """TrainLoop with the model performance evaluation and final model saving at the end of the training process
 
         Args:
@@ -440,8 +465,9 @@ class TrainLoopModelEndSave(TrainLoop):
                 Everything else results just in local storage to disk
             bucket_name (str): name of the bucket in the cloud storage
             cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
+            use_amp (bool): use Nvidia Apex 16-bit Automatic Mixed Precision (AMP)
         """
-        TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion)
+        TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion, use_amp)
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
@@ -490,7 +516,8 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
                  project_name, experiment_name, local_model_result_folder_path,
                  hyperparams, val_result_package=None, test_result_package=None,
                  cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix='',
-                 rm_subopt_local_models=False, num_best_checkpoints_kept=2):
+                 rm_subopt_local_models=False, num_best_checkpoints_kept=2,
+                 use_amp=False):
         """TrainLoop both saving model check-pointing at the end of each epoch and model performance reporting
             and model saving at the end of the training process
 
@@ -522,6 +549,7 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
                 the metric minimization is done otherwise metric maximization is done
             num_best_checkpoints_kept (int): number of best performing models which are kept when removing suboptimal
                 model checkpoints
+            use_amp (bool): use Nvidia Apex 16-bit Automatic Mixed Precision (AMP)
         """
         if 'experiment_file_path' not in hyperparams:
             hyperparams['experiment_file_path'] = inspect.getframeinfo(inspect.currentframe().f_back).filename
@@ -530,7 +558,8 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
                                        optimizer, criterion,
                                        project_name, experiment_name, os.path.expanduser(local_model_result_folder_path),
                                        hyperparams, val_result_package, test_result_package,
-                                       cloud_save_mode, bucket_name, cloud_dir_prefix)
+                                       cloud_save_mode, bucket_name, cloud_dir_prefix,
+                                       use_amp)
         self.rm_subopt_local_models = rm_subopt_local_models
 
         self.callbacks_handler.register_callbacks([
