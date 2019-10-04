@@ -24,6 +24,12 @@ class MultiLoss:
         self.loss_list = loss_list
         self.amp_optimizer_order = amp_optimizer_order
 
+        if self.amp_optimizer_order is not None:
+            if not callable(self.amp_optimizer_order):
+                raise TypeError('Provided amp_optimizer_order is not callable. When providing amp_optimizer_order '
+                                'it should be a callable function taking the optimizer list and returning '
+                                'the ordered list of loss-matching optimizers.')
+
     def backward(self):
         for loss in self.loss_list:
             loss.backward()
