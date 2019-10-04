@@ -140,9 +140,11 @@ class TrainLoop:
                     loss_batch.backward()
                 else:
                     if not isinstance(loss_batch, MultiLoss):
+                        # Single loss Apex AMP calculation
                         with amp.scale_loss(loss_batch, self.optimizer) as scaled_loss:
                             scaled_loss.backward()
                     else:
+                        # Multi-loss Apex AMP calculation
                         loss_batch.backward_amp(self.optimizer)
 
                 if self.grad_cb_used:
