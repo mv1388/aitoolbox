@@ -134,7 +134,7 @@ class PyTorchLocalModelLoader(AbstractLocalModelLoader):
         return optimizer
 
     def init_amp(self):
-        """Initialize
+        """Initialize Nvidia Apex 16 AMP
 
         Returns:
             None
