@@ -61,8 +61,8 @@ class TestMultiOptimizer(unittest.TestCase):
             self.assertEqual(opti_3.step_ctr, i)
 
     def test_state_dict(self):
-        opti_1, opti_2, opti_3, multi_opti = self.build_optimizers()
-        for i in range(1, 100):
+        _, _, _, multi_opti = self.build_optimizers()
+        for _ in range(1, 100):
             multi_opti.zero_grad()
             multi_opti.step()
 
