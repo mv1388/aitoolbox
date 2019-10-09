@@ -1,7 +1,7 @@
 import unittest
 
 from tests.utils import *
-from AIToolbox.experiment.core_metrics.classification import AccuracyMetric
+from aitoolbox.experiment.core_metrics.classification import AccuracyMetric
 
 
 class TestAccuracyMetric(unittest.TestCase):

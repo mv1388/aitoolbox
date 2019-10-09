@@ -27,7 +27,7 @@ are safely stored on S3.
 
 ### TrainLoop
 
-[`TrainLoop`](/AIToolbox/torchtrain/train_loop.py) is the main abstraction for PyTorch neural net training. At its core
+[`TrainLoop`](/aitoolbox/torchtrain/train_loop.py) is the main abstraction for PyTorch neural net training. At its core
 it handles the batch feeding of data into the model, calculating loss and updating parameters for a specified number of epochs.
 To learn how to define the TrainLoop supported PyTorch model please look at the [Model](#model) section bellow.
 
@@ -44,7 +44,7 @@ AIToolbox includes a few more advanced derivations of the basic TrainLoop
 which automatically handle the experiment tracking by creating model
 checkpoints, performance reports, example predictions, etc. All of this can be saved just on the local drive
 or can also be automatically also stored on AWS S3.  Currently implemented advanced 
-[`TrainLoops`](/AIToolbox/torchtrain/train_loop.py) are `TrainLoopModelCheckpoint`, `TrainLoopModelEndSave` and `TrainLoopModelCheckpointEndSave`.
+[`TrainLoops`](/aitoolbox/torchtrain/train_loop.py) are `TrainLoopModelCheckpoint`, `TrainLoopModelEndSave` and `TrainLoopModelCheckpointEndSave`.
 Here, 'Checkpoint' stands for checkpointing after each epoch, while 'EndSave' will only persist and evaluate at the very end of the training. 
 
 For the most complete experiment tracking it is recommended to use the `TrainLoopModelCheckpointEndSave` option. 
@@ -81,7 +81,7 @@ TrainLoop(model, ...,
 
 To take advantage of the TrainLoop abstraction the user has to define their model as a class which is a standard way
 in core PyTorch as well. The only difference is that for TrainLoop supported training the model class has 
-to be inherited from the AIToolbox specific [`TTModel`](/AIToolbox/torchtrain/model.py) base class instead of PyTorch `nn.Module`.
+to be inherited from the AIToolbox specific [`TTModel`](/aitoolbox/torchtrain/model.py) base class instead of PyTorch `nn.Module`.
 
 `TTModel` itself inherits from the normally used `nn.Module` class thus our models still
 retain all the expected PyTorch enabled functionality. The reason for using the TTModel super class is that
@@ -92,7 +92,7 @@ evaluation mode.
 The code below shows the general skeleton all the TTModels have to follow to enable them to be trained 
 with the TrainLoop:
 ```python
-from AIToolbox.torchtrain.model import TTModel
+from aitoolbox.torchtrain.model import TTModel
 
 class MyNeuralModel(TTModel):
     def __init__(self):
@@ -122,12 +122,12 @@ class MyNeuralModel(TTModel):
 ### Callbacks
 
 For advanced applications the basic logic offered in different default TrainLoops might not be enough.
-Additional needed logic can be injected into the training procedure by using [`callbacks`](/AIToolbox/torchtrain/callbacks)
+Additional needed logic can be injected into the training procedure by using [`callbacks`](/aitoolbox/torchtrain/callbacks)
 and providing them as a parameter list to TrainLoop's `fit(callbacks=[callback_1, callback_2, ...])` function. 
 
 AIToolbox by default already offers a wide selection of different useful callbacks. However when
 some completely new functionality is desired the user can also implement their own callbacks by 
-inheriting from the base callback object [`AbstractCallback`](/AIToolbox/torchtrain/callbacks/callbacks.py). 
+inheriting from the base callback object [`AbstractCallback`](/aitoolbox/torchtrain/callbacks/callbacks.py). 
 All that the user has to do is to implement corresponding methods to execute the new callback 
 at the desired point in the train loop, such as: start/end of batch, epoch, training.
 
@@ -137,16 +137,16 @@ at the desired point in the train loop, such as: start/end of batch, epoch, trai
 ### Result Package
 
 This is the definition of the model evaluation procedure on the task we are experimenting with.
-Result packages available out of the box can be found in the [`result_package` module](/AIToolbox/experiment/result_package/)
-where we have implemented several [basic, general result packages](/AIToolbox/experiment/result_package/basic_packages.py). 
+Result packages available out of the box can be found in the [`result_package` module](/aitoolbox/experiment/result_package/)
+where we have implemented several [basic, general result packages](/aitoolbox/experiment/result_package/basic_packages.py). 
 Furthermore, for those dealing with NLP, result packages for
 several widely researched NLP tasks such as translation, QA can be found as part of the 
-[`NLP` module](/AIToolbox/nlp/experiment_evaluation/NLP_result_package.py)
+[`NLP` module](/aitoolbox/nlp/experiment_evaluation/NLP_result_package.py)
 module. Last but not least, as the framework was built with extensibility in mind and thus 
 if needed the users can easily define their own result packages with custom evaluations by extending the base
-[`AbstractResultPackage`](/AIToolbox/experiment/result_package/abstract_result_packages.py). 
+[`AbstractResultPackage`](/aitoolbox/experiment/result_package/abstract_result_packages.py). 
  
-Under the hood the result package executes one or more [`metrics`](/AIToolbox/experiment/core_metrics) objects which actually 
+Under the hood the result package executes one or more [`metrics`](/aitoolbox/experiment/core_metrics) objects which actually 
 calculate the performance metric calculation. Result package object is thus used as a wrapper 
 around potentially multiple performance calculations which are needed for our task. The metrics
 which are part of the specified result package are calculated by calling the `prepare_result_package()` method 
@@ -160,7 +160,7 @@ This can be done at the end of each epoch as a model checkpointing or at the end
 Normally not really a point of great interest when using the TrainLoop interface as it is hidden under the hood.
 However as AIToolbox was designed to be modular one can decide to write their own training loop logic but
 just use the provided experiment saver module to help with the experiment tracking and model saving.
-For PyTorch users we recommend using the [`FullPyTorchExperimentS3Saver`](/AIToolbox/experiment/experiment_saver.py) 
+For PyTorch users we recommend using the [`FullPyTorchExperimentS3Saver`](/aitoolbox/experiment/experiment_saver.py) 
 which has also been most thoroughly tested. 
 The experiment is saved by calling the `save_experiment()` function from the selected experiment saver and 
 providing the trained model and the evaluated result package containing the calculated performance results.
@@ -189,10 +189,10 @@ Implemented, however, not yet tested in practice.
 
 *Still work in progress...* 
 
-Currently, mainly used for the performance evaluation [`result packages`](/AIToolbox/nlp/experiment_evaluation/NLP_result_package.py) 
+Currently, mainly used for the performance evaluation [`result packages`](/aitoolbox/nlp/experiment_evaluation/NLP_result_package.py) 
 needed for different NLP tasks, such as Q&A, summarization, machine translation. 
 
-For the case of e.g. NMT the module also provides [attention heatmap plotting](/AIToolbox/nlp/experiment_evaluation/attention_heatmap.py)
+For the case of e.g. NMT the module also provides [attention heatmap plotting](/aitoolbox/nlp/experiment_evaluation/attention_heatmap.py)
 which is often helpful for gaining addition insights into the seq2seq model. The heatmap plotter
 creates attention heatmap plots for every validation example and saves them as pictures to disk 
 (potentially also to cloud).

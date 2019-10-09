@@ -7,8 +7,8 @@ from keras.layers import Dense, Dropout, Activation, Flatten
 from keras.layers import Conv2D, MaxPooling2D
 import os
 
-from AIToolbox.kerastrain.train_loop import TrainLoop, TrainLoopModelCheckpointEndSave
-from AIToolbox.experiment.result_package.basic_packages import ClassificationResultPackage
+from aitoolbox.kerastrain.train_loop import TrainLoop, TrainLoopModelCheckpointEndSave
+from aitoolbox.experiment.result_package.basic_packages import ClassificationResultPackage
 
 
 batch_size = 32

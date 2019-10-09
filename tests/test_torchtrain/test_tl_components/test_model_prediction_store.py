@@ -1,6 +1,6 @@
 import unittest
 
-from AIToolbox.torchtrain.tl_components.model_prediction_store import ModelPredictionStore
+from aitoolbox.torchtrain.tl_components.model_prediction_store import ModelPredictionStore
 
 
 class TestModelPredictionStore(unittest.TestCase):

@@ -1,5 +1,5 @@
 import unittest
-from AIToolbox.nlp.experiment_evaluation.NLP_metrics import *
+from aitoolbox.nlp.experiment_evaluation.NLP_metrics import *
 
 
 class TestROUGEMetric(unittest.TestCase):

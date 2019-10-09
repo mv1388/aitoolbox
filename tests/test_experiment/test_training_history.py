@@ -1,6 +1,6 @@
 import unittest
 
-from AIToolbox.experiment.training_history import TrainingHistory
+from aitoolbox.experiment.training_history import TrainingHistory
 
 
 class TestWrapPrePreparedTrainingHistory(unittest.TestCase):

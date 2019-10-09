@@ -3,17 +3,17 @@ from torch import optim
 import torch
 import torch.nn as nn
 
-from AIToolbox.nlp.dataset.SQuAD2.SQuAD2DataReader import SQuAD2ConcatContextDatasetReader
-from AIToolbox.torchtrain.data.dataset import BasicDataset as SQuAD2Dataset
-from AIToolbox.nlp.dataset.torch_collate_fns import qa_concat_ctx_span_collate_fn
+from aitoolbox.nlp.dataset.SQuAD2.SQuAD2DataReader import SQuAD2ConcatContextDatasetReader
+from aitoolbox.torchtrain.data.dataset import BasicDataset as SQuAD2Dataset
+from aitoolbox.nlp.dataset.torch_collate_fns import qa_concat_ctx_span_collate_fn
 
-from AIToolbox.torchtrain.train_loop import TrainLoop, TrainLoopModelCheckpointEndSave
-from AIToolbox.torchtrain.callbacks.performance_eval_callbacks import ModelPerformanceEvaluation, \
+from aitoolbox.torchtrain.train_loop import TrainLoop, TrainLoopModelCheckpointEndSave
+from aitoolbox.torchtrain.callbacks.performance_eval_callbacks import ModelPerformanceEvaluation, \
     ModelPerformancePrintReport, ModelTrainHistoryPlot
-from AIToolbox.torchtrain.callbacks.train_schedule_callbacks import ReduceLROnPlateauScheduler
-from AIToolbox.nlp.experiment_evaluation.NLP_result_package import QuestionAnswerResultPackage
+from aitoolbox.torchtrain.callbacks.train_schedule_callbacks import ReduceLROnPlateauScheduler
+from aitoolbox.nlp.experiment_evaluation.NLP_result_package import QuestionAnswerResultPackage
 
-from AIToolbox.nlp.models.torch.unified_qa_model import UnifiedQABasicRNN
+from aitoolbox.nlp.models.torch.unified_qa_model import UnifiedQABasicRNN
 
 
 USE_CUDA = torch.cuda.is_available()

@@ -11,7 +11,7 @@ uninstallPrevious=$2
 source activate py36
 
 if [ $uninstallPrevious == "--uninstall" ]; then
-    sudo pip uninstall AIToolbox
+    sudo pip uninstall aitoolbox
 fi
 
-sudo pip install dist/AIToolbox-$pkgversion.tar.gz
+sudo pip install dist/aitoolbox-$pkgversion.tar.gz

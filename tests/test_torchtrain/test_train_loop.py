@@ -2,10 +2,10 @@ import unittest
 
 from tests.utils import *
 
-from AIToolbox.torchtrain.train_loop import TrainLoop, TrainLoopModelCheckpoint, TrainLoopModelEndSave, TrainLoopModelCheckpointEndSave
-from AIToolbox.torchtrain.model import ModelWrap
-from AIToolbox.torchtrain.tl_components.callback_handler import CallbacksHandler
-from AIToolbox.torchtrain.callbacks.model_save_callbacks import ModelCheckpoint, ModelTrainEndSave
+from aitoolbox.torchtrain.train_loop import TrainLoop, TrainLoopModelCheckpoint, TrainLoopModelEndSave, TrainLoopModelCheckpointEndSave
+from aitoolbox.torchtrain.model import ModelWrap
+from aitoolbox.torchtrain.tl_components.callback_handler import CallbacksHandler
+from aitoolbox.torchtrain.callbacks.model_save_callbacks import ModelCheckpoint, ModelTrainEndSave
 
 
 class TestTrainLoop(unittest.TestCase):

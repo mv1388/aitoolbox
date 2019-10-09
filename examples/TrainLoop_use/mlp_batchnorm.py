@@ -7,10 +7,10 @@ import torch.nn.functional as F
 import torch
 import torch.nn as nn
 
-from AIToolbox.torchtrain.model import TTModel
-from AIToolbox.torchtrain.train_loop import TrainLoop
-from AIToolbox.torchtrain.callbacks.performance_eval_callbacks import ModelPerformanceEvaluation, ModelPerformancePrintReport
-from AIToolbox.experiment.result_package.basic_packages import ClassificationResultPackage
+from aitoolbox.torchtrain.model import TTModel
+from aitoolbox.torchtrain.train_loop import TrainLoop
+from aitoolbox.torchtrain.callbacks.performance_eval_callbacks import ModelPerformanceEvaluation, ModelPerformancePrintReport
+from aitoolbox.experiment.result_package.basic_packages import ClassificationResultPackage
 
 
 if torch.cuda.is_available():
