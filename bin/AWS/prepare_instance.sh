@@ -137,6 +137,11 @@ pip install --ignore-installed greenlet
 conda install -y -c conda-forge jsonnet
 conda install -y -c anaconda seaborn=0.9.0
 
+git clone https://github.com/NVIDIA/apex
+cd apex
+pip install -v --no-cache-dir --global-option=\"--cpp_ext\" --global-option=\"--cuda_ext\" ./
+cd ..
+
 pip install AIToolbox-$AIToolbox_version.tar.gz
 
 #./pyrouge_set_rouge_path ~/project/ROUGE-1.5.5

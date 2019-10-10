@@ -45,7 +45,7 @@ class TTModel(nn.Module, ABC):
             device:
 
         Returns:
-
+            PyTorch loss
         """
         return self.get_loss(batch_data, criterion, device)
 

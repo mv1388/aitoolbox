@@ -99,7 +99,7 @@ class PyTorchS3ModelLoader(BaseModelLoader):
         return self.local_model_loader.init_model(model, used_data_parallel)
 
     def init_optimizer(self, optimizer, device='cuda'):
-        """
+        """Initialize PyTorch optimizer
 
         Args:
             optimizer:
@@ -109,3 +109,11 @@ class PyTorchS3ModelLoader(BaseModelLoader):
             initialized optimizer
         """
         return self.local_model_loader.init_optimizer(optimizer, device)
+
+    def init_amp(self):
+        """Initialize Nvidia Apex 16 AMP
+
+        Returns:
+            None
+        """
+        self.local_model_loader.init_amp()
