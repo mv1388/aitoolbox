@@ -3,7 +3,7 @@ import os
 import shutil
 from tests.utils import *
 
-from AIToolbox.torchtrain.callbacks.performance_eval_callbacks import ModelPerformanceEvaluation, \
+from AIToolbox.torchtrain.callbacks.performance_eval import ModelPerformanceEvaluation, \
     ModelTrainHistoryFileWriter, MetricHistoryRename
 from AIToolbox.torchtrain.train_loop import TrainLoop, TrainLoopModelCheckpoint
 from AIToolbox.experiment.training_history import TrainingHistory

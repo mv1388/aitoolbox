@@ -6,7 +6,7 @@ from AIToolbox.cloud.AWS.model_save import PyTorchS3ModelSaver
 from AIToolbox.experiment.experiment_saver import FullPyTorchExperimentS3Saver
 from AIToolbox.experiment.local_experiment_saver import FullPyTorchExperimentLocalSaver
 from AIToolbox.experiment.local_save.local_model_save import PyTorchLocalModelSaver
-from AIToolbox.torchtrain.callbacks.model_save_callbacks import ModelCheckpoint, ModelTrainEndSave
+from AIToolbox.torchtrain.callbacks.model_save import ModelCheckpoint, ModelTrainEndSave
 from AIToolbox.torchtrain.train_loop import TrainLoop
 from tests.utils import NetUnifiedBatchFeed, MiniDummyOptimizer, DummyResultPackage, DummyOptimizer
 

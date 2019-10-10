@@ -7,7 +7,7 @@ from tests.utils import *
 from torch.utils.data import DataLoader
 import torch.optim as optim
 
-from AIToolbox.torchtrain.callbacks.gradient_callbacks import GradNormClip, GradientStatsPrint
+from AIToolbox.torchtrain.callbacks.gradient import GradNormClip, GradientStatsPrint
 from AIToolbox.torchtrain.train_loop import TrainLoop
 from AIToolbox.torchtrain.data.dataset import BasicDataset
 

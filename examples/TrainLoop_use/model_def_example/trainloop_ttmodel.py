@@ -8,7 +8,7 @@ from torchvision import datasets, transforms
 
 from AIToolbox.torchtrain.train_loop import TrainLoop, TrainLoopModelCheckpointEndSave
 from AIToolbox.torchtrain.model import TTModel
-from AIToolbox.torchtrain.callbacks.performance_eval_callbacks import ModelPerformanceEvaluation, ModelPerformancePrintReport
+from AIToolbox.torchtrain.callbacks.performance_eval import ModelPerformanceEvaluation, ModelPerformancePrintReport
 from AIToolbox.experiment.result_package.basic_packages import ClassificationResultPackage
 
 

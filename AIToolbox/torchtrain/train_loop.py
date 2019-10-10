@@ -19,7 +19,7 @@ from AIToolbox.torchtrain.model import TTModel, ModelWrap
 from AIToolbox.torchtrain.multi_loss_optim import MultiLoss, MultiOptimizer
 from AIToolbox.torchtrain.data.batch_model_feed_defs import AbstractModelFeedDefinition
 from AIToolbox.torchtrain.tl_components.callback_handler import CallbacksHandler
-from AIToolbox.torchtrain.callbacks.model_save_callbacks import ModelCheckpoint, ModelTrainEndSave
+from AIToolbox.torchtrain.callbacks.model_save import ModelCheckpoint, ModelTrainEndSave
 from AIToolbox.experiment.training_history import TrainingHistory
 from AIToolbox.torchtrain.tl_components.model_prediction_store import ModelPredictionStore
 from AIToolbox.torchtrain.tl_components.message_passing import MessageService
