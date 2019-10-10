@@ -1,7 +1,7 @@
 import unittest
 from tests.utils import DummyOptimizer, DummyBatch as DummyLoss
 
-from AIToolbox.torchtrain.multi_loss_optim import MultiLoss, MultiOptimizer
+from aitoolbox.torchtrain.multi_loss_optim import MultiLoss, MultiOptimizer
 
 
 class TestMultiLoss(unittest.TestCase):

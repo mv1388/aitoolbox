@@ -4,8 +4,8 @@ import shutil
 
 from tests.utils import *
 
-from AIToolbox.experiment.local_save.local_model_save import *
-from AIToolbox.torchtrain.train_loop import TrainLoop
+from aitoolbox.experiment.local_save.local_model_save import *
+from aitoolbox.torchtrain.train_loop import TrainLoop
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 

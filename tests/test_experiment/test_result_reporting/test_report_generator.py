@@ -2,8 +2,8 @@ import unittest
 import os
 import shutil
 
-from AIToolbox.experiment.result_reporting.report_generator import TrainingHistoryWriter
-from AIToolbox.experiment.training_history import TrainingHistory
+from aitoolbox.experiment.result_reporting.report_generator import TrainingHistoryWriter
+from aitoolbox.experiment.training_history import TrainingHistory
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 

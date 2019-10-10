@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 
-setup(name='AIToolbox',
+setup(name='aitoolbox',
       version='0.3',
       author='Marko Vidoni',
       author_email='',

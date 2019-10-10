@@ -1,6 +1,6 @@
 import unittest
 
-from AIToolbox.torchtrain.tl_components import message_passing as msg_pass
+from aitoolbox.torchtrain.tl_components import message_passing as msg_pass
 
 
 class TestMessageService(unittest.TestCase):

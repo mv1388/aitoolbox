@@ -3,11 +3,11 @@ import os
 
 from tests.utils import *
 
-from AIToolbox.experiment.experiment_saver import *
-from AIToolbox.cloud.AWS.model_save import KerasS3ModelSaver, TensorFlowS3ModelSaver, PyTorchS3ModelSaver
-from AIToolbox.cloud.GoogleCloud.model_save import KerasGoogleStorageModelSaver, PyTorchGoogleStorageModelSaver
-from AIToolbox.cloud.AWS.results_save import S3ResultsSaver
-from AIToolbox.cloud.GoogleCloud.results_save import GoogleStorageResultsSaver
+from aitoolbox.experiment.experiment_saver import *
+from aitoolbox.cloud.AWS.model_save import KerasS3ModelSaver, TensorFlowS3ModelSaver, PyTorchS3ModelSaver
+from aitoolbox.cloud.GoogleCloud.model_save import KerasGoogleStorageModelSaver, PyTorchGoogleStorageModelSaver
+from aitoolbox.cloud.AWS.results_save import S3ResultsSaver
+from aitoolbox.cloud.GoogleCloud.results_save import GoogleStorageResultsSaver
 
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))

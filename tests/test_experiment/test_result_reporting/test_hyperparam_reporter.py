@@ -2,7 +2,7 @@ import unittest
 import os
 import shutil
 
-from AIToolbox.experiment.result_reporting.hyperparam_reporter import HyperParameterReporter
+from aitoolbox.experiment.result_reporting.hyperparam_reporter import HyperParameterReporter
 
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))

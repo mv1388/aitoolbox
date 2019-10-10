@@ -10,11 +10,11 @@ import spacy
 
 import random
 
-from AIToolbox.torchtrain.train_loop import TrainLoopModelCheckpointEndSave
-from AIToolbox.torchtrain.model import ModelWrap
-from AIToolbox.torchtrain.data.batch_model_feed_defs import AbstractModelFeedDefinition
-from AIToolbox.nlp.experiment_evaluation.NLP_result_package import MachineTranslationResultPackage
-from AIToolbox.nlp.core.vocabulary import Vocabulary
+from aitoolbox.torchtrain.train_loop import TrainLoopModelCheckpointEndSave
+from aitoolbox.torchtrain.model import ModelWrap
+from aitoolbox.torchtrain.data.batch_model_feed_defs import AbstractModelFeedDefinition
+from aitoolbox.nlp.experiment_evaluation.NLP_result_package import MachineTranslationResultPackage
+from aitoolbox.nlp.core.vocabulary import Vocabulary
 
 
 """
