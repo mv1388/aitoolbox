@@ -142,7 +142,7 @@ cd apex
 pip install -v --no-cache-dir --global-option=\"--cpp_ext\" --global-option=\"--cuda_ext\" ./
 cd ..
 
-pip install AIToolbox-$AIToolbox_version.tar.gz
+pip install aitoolbox-$AIToolbox_version.tar.gz
 
 #./pyrouge_set_rouge_path ~/project/ROUGE-1.5.5
 #
