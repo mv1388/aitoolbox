@@ -14,7 +14,7 @@ class AbstractResultsSaver(ABC):
         """
         
         Args:
-            result_package (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
+            result_package (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
             project_name (str):
             experiment_name (str):
             experiment_timestamp (str):
@@ -78,7 +78,7 @@ class S3ResultsSaver(AbstractResultsSaver, BaseResultsSaver):
             them to S3
 
         Args:
-            result_package (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
+            result_package (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             experiment_timestamp (str or None): time stamp at the start of training

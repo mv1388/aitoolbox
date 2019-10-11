@@ -63,7 +63,7 @@ class AbstractResultPackage(ABC):
             y_true (numpy.array or list): ground truth targets
             y_predicted (numpy.array or list): predicted targets
             hyperparameters (dict or None): dictionary filled with the set hyperparameters
-            training_history (AIToolbox.experiment.training_history.TrainingHistory):
+            training_history (aitoolbox.experiment.training_history.TrainingHistory):
             **kwargs (dict):
 
         Returns:
@@ -149,7 +149,7 @@ class AbstractResultPackage(ABC):
         """Return training history object wrapping the training history dict
 
         Returns:
-            AIToolbox.experiment.training_history.TrainingHistory: training history object
+            aitoolbox.experiment.training_history.TrainingHistory: training history object
         """
         return self.training_history
 
@@ -301,7 +301,7 @@ class AbstractResultPackage(ABC):
         """
 
         Args:
-            other (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or dict):
+            other (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or dict):
 
         Returns:
             aitoolbox.experiment.result_package.MultipleResultPackageWrapper:
@@ -312,7 +312,7 @@ class AbstractResultPackage(ABC):
         """
 
         Args:
-            other (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or dict):
+            other (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or dict):
 
         Returns:
             aitoolbox.experiment.result_package.MultipleResultPackageWrapper:
@@ -323,10 +323,10 @@ class AbstractResultPackage(ABC):
         """
 
         Args:
-            other_object (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or dict):
+            other_object (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or dict):
 
         Returns:
-            AIToolbox.experiment.result_package.abstract_result_packages.MultipleResultPackageWrapper:
+            aitoolbox.experiment.result_package.abstract_result_packages.MultipleResultPackageWrapper:
         """
         self.warn_if_results_dict_not_defined()
         other_object_pkg = self.create_other_object_pkg(other_object)
@@ -344,7 +344,7 @@ class AbstractResultPackage(ABC):
         """
 
         Args:
-            other_object (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or dict):
+            other_object (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or dict):
 
         Returns:
             AbstractResultPackage | MultipleResultPackageWrapper:
@@ -365,10 +365,10 @@ class AbstractResultPackage(ABC):
         """
 
         Args:
-            other (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or dict):
+            other (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or dict):
 
         Returns:
-            AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage:
+            aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage:
         """
         return self.add_merge_dicts(other)
 
@@ -376,10 +376,10 @@ class AbstractResultPackage(ABC):
         """
 
         Args:
-            other (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or dict):
+            other (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or dict):
 
         Returns:
-            AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage:
+            aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage:
         """
         self.warn_if_results_dict_not_defined()
 
@@ -398,7 +398,7 @@ class AbstractResultPackage(ABC):
             other_results_dict (dict):
 
         Returns:
-            AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage:
+            aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage:
         """
         def results_duplicated(self_results_dict, other_results_dict_dup):
             for result_name in other_results_dict_dup:
@@ -552,10 +552,10 @@ class MultipleResultPackageWrapper(AbstractResultPackage):
         """
 
         Args:
-            other_object (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or dict):
+            other_object (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or dict):
 
         Returns:
-            AIToolbox.experiment.result_package.abstract_result_packages.MultipleResultPackageWrapper:
+            aitoolbox.experiment.result_package.abstract_result_packages.MultipleResultPackageWrapper:
         """
         self.warn_if_results_dict_not_defined()
         other_object_pkg = self.create_other_object_pkg(other_object)
@@ -574,10 +574,10 @@ class MultipleResultPackageWrapper(AbstractResultPackage):
         """
 
         Args:
-            other (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or dict):
+            other (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or dict):
 
         Returns:
-            AIToolbox.experiment.result_package.abstract_result_packages.MultipleResultPackageWrapper:
+            aitoolbox.experiment.result_package.abstract_result_packages.MultipleResultPackageWrapper:
         """
         self.warn_if_results_dict_not_defined()
         other_object_pkg = self.create_other_object_pkg(other)

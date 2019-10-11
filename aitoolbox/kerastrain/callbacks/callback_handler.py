@@ -6,7 +6,7 @@ class CallbacksHandler:
         """
 
         Args:
-            train_loop_obj (AIToolbox.kerastrain.train_loop.TrainLoop):
+            train_loop_obj (aitoolbox.kerastrain.train_loop.TrainLoop):
         """
         self.train_loop_obj = train_loop_obj
 

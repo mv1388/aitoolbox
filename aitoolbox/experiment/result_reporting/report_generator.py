@@ -20,7 +20,7 @@ class TrainingHistoryPlotter:
         Every plot shows the progression of a single performance metric over the epochs.
 
         Args:
-            training_history (AIToolbox.experiment.training_history.TrainingHistory): TrainLoop training history
+            training_history (aitoolbox.experiment.training_history.TrainingHistory): TrainLoop training history
             plots_folder_name (str): local dir name where the plots should be saved
 
         Returns:
@@ -83,7 +83,7 @@ class TrainingHistoryWriter:
         """Write all the currently present performance result in the training history into the text file
 
         Args:
-            training_history (AIToolbox.experiment.training_history.TrainingHistory):
+            training_history (aitoolbox.experiment.training_history.TrainingHistory):
             epoch (int): current epoch
             file_name (str): output text file name
             results_folder_name (str or None): results folder path where the report file will be located

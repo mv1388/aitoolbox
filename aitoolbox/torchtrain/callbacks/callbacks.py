@@ -33,7 +33,7 @@ class AbstractCallback:
         responsible for all the callback orchestration of the callbacks inside the trainloops.
 
         Args:
-            train_loop_obj (AIToolbox.torchtrain.train_loop.TrainLoop): reference to the encapsulating trainloop
+            train_loop_obj (aitoolbox.torchtrain.train_loop.TrainLoop): reference to the encapsulating trainloop
 
         Returns:
             AbstractCallback: return the reference to the callback after it is registered

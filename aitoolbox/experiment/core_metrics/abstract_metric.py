@@ -79,7 +79,7 @@ class AbstractBaseMetric(ABC):
         """
 
         Args:
-            other (AIToolbox.experiment.core_metrics.abstract_metric.AbstractBaseMetric or float or int):
+            other (aitoolbox.experiment.core_metrics.abstract_metric.AbstractBaseMetric or float or int):
 
         Returns:
             float or int:

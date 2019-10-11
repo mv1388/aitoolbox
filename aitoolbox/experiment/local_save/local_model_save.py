@@ -211,7 +211,7 @@ class LocalSubOptimalModelRemover:
         """Make decision if suboptimal model should be removed due to the introduction of the new and better model
 
         Args:
-            history (AIToolbox.experiment.training_history.TrainingHistory): training performance history
+            history (aitoolbox.experiment.training_history.TrainingHistory): training performance history
             new_model_dump_paths (list): new saved models paths which will begin to be tracked
             
         Returns:

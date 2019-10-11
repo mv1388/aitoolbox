@@ -9,7 +9,7 @@ class CallbacksHandler:
         process. Thus execute desired callbacks' functionality at the desired point of the training process.
 
         Args:
-            train_loop_obj (AIToolbox.torchtrain.train_loop.TrainLoop): reference to the encapsulating TrainLoop
+            train_loop_obj (aitoolbox.torchtrain.train_loop.TrainLoop): reference to the encapsulating TrainLoop
         """
         self.train_loop_obj = train_loop_obj
 

@@ -19,7 +19,7 @@ class AbstractKerasCallback(Callback):
         """
 
         Args:
-            train_loop_obj (AIToolbox.kerastrain.train_loop.TrainLoop):
+            train_loop_obj (aitoolbox.kerastrain.train_loop.TrainLoop):
 
         Returns:
 
@@ -110,8 +110,8 @@ class ModelTrainEndSave(AbstractKerasCallback):
             experiment_name (str):
             local_model_result_folder_path (str):
             args (dict):
-            val_result_package (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
-            test_result_package (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
+            val_result_package (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
+            test_result_package (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
             cloud_save_mode (str or None): Storage destination selector.
                 For AWS S3: 's3' / 'aws_s3' / 'aws'
                 For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'

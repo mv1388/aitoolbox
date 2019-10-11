@@ -259,8 +259,8 @@ class TrainLoopModelEndSave(TrainLoop):
             experiment_name (str):
             local_model_result_folder_path (str):
             args (dict):
-            val_result_package (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or None):
-            test_result_package (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or None):
+            val_result_package (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or None):
+            test_result_package (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or None):
             cloud_save_mode (str or None): Storage destination selector.
                 For AWS S3: 's3' / 'aws_s3' / 'aws'
                 For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
@@ -325,8 +325,8 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
             experiment_name (str):
             local_model_result_folder_path (str):
             args (dict):
-            val_result_package (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or None):
-            test_result_package (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or None):
+            val_result_package (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or None):
+            test_result_package (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or None):
             cloud_save_mode (str or None): Storage destination selector.
                 For AWS S3: 's3' / 'aws_s3' / 'aws'
                 For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'

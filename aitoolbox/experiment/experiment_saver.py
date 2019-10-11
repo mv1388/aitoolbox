@@ -36,8 +36,8 @@ class BaseFullExperimentSaver(AbstractExperimentSaver):
         """Base full experiment saver functionality used by the underlying experiment saver derivations
 
         Args:
-            model_saver (AIToolbox.cloud.AWS.model_save.AbstractModelSaver): selected saver used for model saving
-            results_saver (AIToolbox.cloud.AWS.results_save.AbstractResultsSaver): selected saver used for results save
+            model_saver (aitoolbox.cloud.AWS.model_save.AbstractModelSaver): selected saver used for model saving
+            results_saver (aitoolbox.cloud.AWS.results_save.AbstractResultsSaver): selected saver used for results save
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
         """
@@ -54,7 +54,7 @@ class BaseFullExperimentSaver(AbstractExperimentSaver):
 
         Args:
             model (dict or keras.engine.training.Model):
-            result_package (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
+            result_package (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
             experiment_timestamp (str): time stamp at the start of training
             save_true_pred_labels (bool): should ground truth labels also be saved
             separate_files (bool): should the results be saved in separate pickle files or should all of the results
@@ -92,7 +92,7 @@ class BaseFullExperimentS3Saver(BaseFullExperimentSaver):
         This is used by the underlying experiment S3 saver derivations
 
         Args:
-            model_saver (AIToolbox.cloud.AWS.model_save.AbstractModelSaver): selected cloud model saver implementing
+            model_saver (aitoolbox.cloud.AWS.model_save.AbstractModelSaver): selected cloud model saver implementing
                 the saving logic for the desired cloud storage provider file saving
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
@@ -180,7 +180,7 @@ class BaseFullExperimentGoogleStorageSaver(BaseFullExperimentSaver):
         This is used by the underlying experiment Google Storage saver derivations
 
         Args:
-            model_saver (AIToolbox.cloud.AWS.model_save.AbstractModelSaver): selected cloud model saver implementing
+            model_saver (aitoolbox.cloud.AWS.model_save.AbstractModelSaver): selected cloud model saver implementing
                 the saving logic for the desired cloud storage provider file saving
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment

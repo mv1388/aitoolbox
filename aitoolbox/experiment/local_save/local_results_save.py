@@ -16,7 +16,7 @@ class AbstractLocalResultsSaver(ABC):
         """Single file results saving method which all the result savers have to implement to give an expected API
         
         Args:
-            result_package (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
+            result_package (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             experiment_timestamp (str or None): time stamp at the start of training
@@ -37,7 +37,7 @@ class AbstractLocalResultsSaver(ABC):
         """Separate file results saving method which all the result savers have to implement to give an expected API
         
         Args:
-            result_package (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
+            result_package (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             experiment_timestamp (str or None): time stamp at the start of training
@@ -171,7 +171,7 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
         """Saves all the experiment results into single local file
 
         Args:
-            result_package (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
+            result_package (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             experiment_timestamp (str or None): time stamp at the start of training
@@ -232,7 +232,7 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
         """Saves the experiment results into separate local files
 
         Args:
-            result_package (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
+            result_package (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             experiment_timestamp (str or None): time stamp at the start of training

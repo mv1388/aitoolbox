@@ -37,7 +37,7 @@ class TrainLoop:
         the logic needed for prediction of target variables.
 
         Args:
-            model (AIToolbox.torchtrain.model.TTModel or AIToolbox.torchtrain.model.ModelWrap): neural
+            model (aitoolbox.torchtrain.model.TTModel or aitoolbox.torchtrain.model.ModelWrap): neural
                 network model
             train_loader (torch.utils.data.DataLoader): data loader for train data set
             validation_loader (torch.utils.data.DataLoader): data loader for validation data set
@@ -382,7 +382,7 @@ class TrainLoopModelCheckpoint(TrainLoop):
         """TrainLoop with the automatic model check-pointing at the end of each epoch
 
         Args:
-            model (AIToolbox.torchtrain.model.TTModel or AIToolbox.torchtrain.model.ModelWrap): neural
+            model (aitoolbox.torchtrain.model.TTModel or aitoolbox.torchtrain.model.ModelWrap): neural
                 network model
             train_loader (torch.utils.data.DataLoader):
             validation_loader (torch.utils.data.DataLoader):
@@ -443,7 +443,7 @@ class TrainLoopModelEndSave(TrainLoop):
         """TrainLoop with the model performance evaluation and final model saving at the end of the training process
 
         Args:
-            model (AIToolbox.torchtrain.model.TTModel or AIToolbox.torchtrain.model.ModelWrap): neural
+            model (aitoolbox.torchtrain.model.TTModel or aitoolbox.torchtrain.model.ModelWrap): neural
                 network model
             train_loader (torch.utils.data.DataLoader):
             validation_loader (torch.utils.data.DataLoader or None):
@@ -457,8 +457,8 @@ class TrainLoopModelEndSave(TrainLoop):
                 ensure the python experiment file copying to the experiment folder, the user needs to manually
                 specify the python file path as the value for the `experiment_file_path` key. If running the training
                 directly from the terminal the path deduction is done automatically.
-            val_result_package (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or None):
-            test_result_package (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or None):
+            val_result_package (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or None):
+            test_result_package (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or None):
             cloud_save_mode (str or None): Storage destination selector.
                 For AWS S3: 's3' / 'aws_s3' / 'aws'
                 For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
@@ -522,7 +522,7 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
             and model saving at the end of the training process
 
         Args:
-            model (AIToolbox.torchtrain.model.TTModel or AIToolbox.torchtrain.model.ModelWrap): neural
+            model (aitoolbox.torchtrain.model.TTModel or aitoolbox.torchtrain.model.ModelWrap): neural
                 network model
             train_loader (torch.utils.data.DataLoader):
             validation_loader (torch.utils.data.DataLoader or None):
@@ -536,8 +536,8 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
                 ensure the python experiment file copying to the experiment folder, the user needs to manually
                 specify the python file path as the value for the `experiment_file_path` key. If running the training
                 directly from the terminal the path deduction is done automatically.
-            val_result_package (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or None):
-            test_result_package (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or None):
+            val_result_package (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or None):
+            test_result_package (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or None):
             cloud_save_mode (str or None): Storage destination selector.
                 For AWS S3: 's3' / 'aws_s3' / 'aws'
                 For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'

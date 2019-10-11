@@ -11,7 +11,7 @@ class BaseFullExperimentLocalSaver(AbstractExperimentSaver):
         """Base functionality class common to all the full experiment local saver derivations
 
         Args:
-            model_saver (AIToolbox.experiment.local_save.local_model_save.AbstractLocalModelSaver): selected model
+            model_saver (aitoolbox.experiment.local_save.local_model_save.AbstractLocalModelSaver): selected model
                 saver implementing the saving logic for the desired framework
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
@@ -35,7 +35,7 @@ class BaseFullExperimentLocalSaver(AbstractExperimentSaver):
         Args:
             model (dict or keras.engine.training.Model): model representation. If used with PyTorch it is a simple
                 dict under the hood. In the case of Keras training this would be the keras Model.
-            result_package (AIToolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
+            result_package (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
                 selected result package which will be evaluated to produce the performance results
             experiment_timestamp (str): time stamp at the start of training
             save_true_pred_labels (bool): should ground truth labels also be saved

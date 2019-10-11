@@ -20,7 +20,7 @@ class GeneralLRScheduler(AbstractCallback):
         """
 
         Args:
-            train_loop_obj (AIToolbox.torchtrain.train_loop.TrainLoop):
+            train_loop_obj (aitoolbox.torchtrain.train_loop.TrainLoop):
 
         Returns:
 

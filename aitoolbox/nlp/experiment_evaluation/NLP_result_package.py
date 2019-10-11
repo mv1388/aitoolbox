@@ -167,8 +167,8 @@ class MachineTranslationResultPackage(AbstractResultPackage):
         """Machine Translation task performance evaluation package
 
         Args:
-            target_vocab (AIToolbox.nlp.core.vocabulary.Vocabulary):
-            source_vocab (AIToolbox.nlp.core.vocabulary.Vocabulary or None):
+            target_vocab (aitoolbox.nlp.core.vocabulary.Vocabulary):
+            source_vocab (aitoolbox.nlp.core.vocabulary.Vocabulary or None):
             source_sents (list or None):
             output_text_dir (str or None):
             output_attn_heatmap_dir (str or None):
