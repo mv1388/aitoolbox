@@ -29,7 +29,7 @@ from aitoolbox.experiment.result_package.abstract_result_packages import Abstrac
 class TrainLoop:
     def __init__(self, model,
                  train_loader, validation_loader, test_loader,
-                 optimizer, criterion, use_amp=False):
+                 optimizer, criterion, end_auto_eval=True, use_amp=False):
         """Core PyTorch TrainLoop supporting the model training and target prediction
 
         Implements core training procedures: batch feeding into the network as part of (multi)epoch train loop,
@@ -44,6 +44,10 @@ class TrainLoop:
             test_loader (torch.utils.data.DataLoader): data loader for test data set
             optimizer (torch.optim.optimizer.Optimizer or MultiOptimizer): optimizer algorithm.
             criterion (torch.nn.modules.loss._Loss or MultiLoss): criterion criterion during the training procedure.
+            end_auto_eval (bool or int): used to optionally disable otherwise automatic end of epoch/training val/test
+                loss calculations. This is useful when conducting very costly experiments to save on compute time.
+                Specify either True/False boolean to always run or never run after each epoch or specify an int to
+                execute only every specified number of epochs.
             use_amp (bool): use Nvidia Apex 16-bit Automatic Mixed Precision (AMP)
         """
         if isinstance(model, TTModel):
@@ -61,6 +65,7 @@ class TrainLoop:
         self.test_loader = test_loader
         self.optimizer = optimizer
         self.criterion = criterion
+        self.end_auto_eval = end_auto_eval
         self.use_amp = use_amp
 
         USE_CUDA = torch.cuda.is_available()
@@ -187,14 +192,16 @@ class TrainLoop:
         self.insert_metric_result_into_history('accumulated_loss', train_loss_batch_accum_avg)
         self.loss_batch_accum = []
 
-        train_loss = self.evaluate_loss_on_train_set()
-        print(f'TRAIN LOSS: {train_loss}')
-        self.insert_metric_result_into_history('loss', train_loss)
+        if (type(self.end_auto_eval) is bool and self.end_auto_eval) or \
+                (type(self.end_auto_eval) is int and self.epoch % self.end_auto_eval == 0):
+            train_loss = self.evaluate_loss_on_train_set()
+            print(f'TRAIN LOSS: {train_loss}')
+            self.insert_metric_result_into_history('loss', train_loss)
 
-        if self.validation_loader is not None:
-            val_loss = self.evaluate_loss_on_validation_set()
-            print(f'VAL LOSS: {val_loss}')
-            self.insert_metric_result_into_history('val_loss', val_loss)
+            if self.validation_loader is not None:
+                val_loss = self.evaluate_loss_on_validation_set()
+                print(f'VAL LOSS: {val_loss}')
+                self.insert_metric_result_into_history('val_loss', val_loss)
 
     def auto_execute_end_of_training(self):
         """Basic performance evaluation executed by default at the end of the training process
@@ -202,7 +209,9 @@ class TrainLoop:
         Returns:
             None
         """
-        if self.test_loader is not None:
+        if self.test_loader is not None and \
+                ((type(self.end_auto_eval) is bool and self.end_auto_eval) or
+                 (type(self.end_auto_eval) is int and self.epoch % self.end_auto_eval == 0)):
             test_loss = self.evaluate_loss_on_test_set()
             print(f'TEST LOSS: {test_loss}')
             # To keep TrainingHistory from complaining due to the non-matching metric result lengths the checking
@@ -378,7 +387,7 @@ class TrainLoopModelCheckpoint(TrainLoop):
                  hyperparams,
                  cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix='',
                  rm_subopt_local_models=False, num_best_checkpoints_kept=2,
-                 use_amp=False):
+                 end_auto_eval=True, use_amp=False):
         """TrainLoop with the automatic model check-pointing at the end of each epoch
 
         Args:
@@ -407,9 +416,14 @@ class TrainLoopModelCheckpoint(TrainLoop):
                 the metric minimization is done otherwise metric maximization is done
             num_best_checkpoints_kept (int): number of best performing models which are kept when removing suboptimal
                 model checkpoints
+            end_auto_eval (bool or int): used to optionally disable otherwise automatic end of epoch/training val/test
+                loss calculations. This is useful when conducting very costly experiments to save on compute time.
+                Specify either True/False boolean to always run or never run after each epoch or specify an int to
+                execute only every specified number of epochs.
             use_amp (bool): use Nvidia Apex 16-bit Automatic Mixed Precision (AMP)
         """
-        TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion, use_amp)
+        TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion,
+                           end_auto_eval, use_amp)
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
@@ -439,7 +453,7 @@ class TrainLoopModelEndSave(TrainLoop):
                  project_name, experiment_name, local_model_result_folder_path,
                  hyperparams, val_result_package=None, test_result_package=None,
                  cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix='',
-                 use_amp=False):
+                 end_auto_eval=True, use_amp=False):
         """TrainLoop with the model performance evaluation and final model saving at the end of the training process
 
         Args:
@@ -465,9 +479,14 @@ class TrainLoopModelEndSave(TrainLoop):
                 Everything else results just in local storage to disk
             bucket_name (str): name of the bucket in the cloud storage
             cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
+            end_auto_eval (bool or int): used to optionally disable otherwise automatic end of epoch/training val/test
+                loss calculations. This is useful when conducting very costly experiments to save on compute time.
+                Specify either True/False boolean to always run or never run after each epoch or specify an int to
+                execute only every specified number of epochs.
             use_amp (bool): use Nvidia Apex 16-bit Automatic Mixed Precision (AMP)
         """
-        TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion, use_amp)
+        TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion,
+                           end_auto_eval, use_amp)
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
@@ -517,7 +536,7 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
                  hyperparams, val_result_package=None, test_result_package=None,
                  cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix='',
                  rm_subopt_local_models=False, num_best_checkpoints_kept=2,
-                 use_amp=False):
+                 end_auto_eval=True, use_amp=False):
         """TrainLoop both saving model check-pointing at the end of each epoch and model performance reporting
             and model saving at the end of the training process
 
@@ -549,6 +568,10 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
                 the metric minimization is done otherwise metric maximization is done
             num_best_checkpoints_kept (int): number of best performing models which are kept when removing suboptimal
                 model checkpoints
+            end_auto_eval (bool or int): used to optionally disable otherwise automatic end of epoch/training val/test
+                loss calculations. This is useful when conducting very costly experiments to save on compute time.
+                Specify either True/False boolean to always run or never run after each epoch or specify an int to
+                execute only every specified number of epochs.
             use_amp (bool): use Nvidia Apex 16-bit Automatic Mixed Precision (AMP)
         """
         if 'experiment_file_path' not in hyperparams:
@@ -559,7 +582,7 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
                                        project_name, experiment_name, os.path.expanduser(local_model_result_folder_path),
                                        hyperparams, val_result_package, test_result_package,
                                        cloud_save_mode, bucket_name, cloud_dir_prefix,
-                                       use_amp)
+                                       end_auto_eval, use_amp)
         self.rm_subopt_local_models = rm_subopt_local_models
 
         self.callbacks_handler.register_callbacks([
