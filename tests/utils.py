@@ -2,11 +2,11 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from AIToolbox.torchtrain.data.batch_model_feed_defs import AbstractModelFeedDefinition
-from AIToolbox.torchtrain.callbacks.callbacks import AbstractCallback
-from AIToolbox.experiment.result_package.abstract_result_packages import AbstractResultPackage
-from AIToolbox.experiment.core_metrics.abstract_metric import AbstractBaseMetric
-from AIToolbox.torchtrain.model import TTModel
+from aitoolbox.torchtrain.data.batch_model_feed_defs import AbstractModelFeedDefinition
+from aitoolbox.torchtrain.callbacks.callbacks import AbstractCallback
+from aitoolbox.experiment.result_package.abstract_result_packages import AbstractResultPackage
+from aitoolbox.experiment.core_metrics.abstract_metric import AbstractBaseMetric
+from aitoolbox.torchtrain.model import TTModel
 
 
 def function_exists(object_to_check, fn_name):

@@ -3,10 +3,10 @@ import os
 import shutil
 from tests.utils import *
 
-from AIToolbox.torchtrain.callbacks.performance_eval import ModelPerformanceEvaluation, \
+from aitoolbox.torchtrain.callbacks.performance_eval import ModelPerformanceEvaluation, \
     ModelTrainHistoryFileWriter, MetricHistoryRename
-from AIToolbox.torchtrain.train_loop import TrainLoop, TrainLoopModelCheckpoint
-from AIToolbox.experiment.training_history import TrainingHistory
+from aitoolbox.torchtrain.train_loop import TrainLoop, TrainLoopModelCheckpoint
+from aitoolbox.experiment.training_history import TrainingHistory
 
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))

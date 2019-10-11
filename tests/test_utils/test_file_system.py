@@ -3,7 +3,7 @@ import os
 import shutil
 import zipfile
 
-from AIToolbox.utils import file_system
+from aitoolbox.utils import file_system
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 

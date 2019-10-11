@@ -108,7 +108,7 @@ fi
 
 ssh -i "$key_path" ec2-user@"$ec2_instance_address" 'mkdir ~/project ; mkdir ~/project/data ; mkdir ~/project/model_results'
 
-scp -i $key_path ../../dist/AIToolbox-$AIToolbox_version.tar.gz  ec2-user@$ec2_instance_address:~/project
+scp -i $key_path ../../dist/aitoolbox-$AIToolbox_version.tar.gz  ec2-user@$ec2_instance_address:~/project
 scp -i $key_path download_data.sh  ec2-user@$ec2_instance_address:~/project
 scp -i $key_path run_experiment.sh  ec2-user@$ec2_instance_address:~/project
 
@@ -142,7 +142,7 @@ cd apex
 pip install -v --no-cache-dir --global-option=\"--cpp_ext\" --global-option=\"--cuda_ext\" ./
 cd ..
 
-pip install AIToolbox-$AIToolbox_version.tar.gz
+pip install aitoolbox-$AIToolbox_version.tar.gz
 
 #./pyrouge_set_rouge_path ~/project/ROUGE-1.5.5
 #

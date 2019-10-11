@@ -70,6 +70,6 @@ else
 fi
 
 
-scp -i $key_path ../../dist/AIToolbox-$AIToolbox_version.tar.gz  ec2-user@$ec2_instance_address:~/project
+scp -i $key_path ../../dist/aitoolbox-$AIToolbox_version.tar.gz  ec2-user@$ec2_instance_address:~/project
 
-ssh -i $key_path ec2-user@$ec2_instance_address "source activate $py_env ; pip uninstall AIToolbox ; pip install ~/project/AIToolbox-$AIToolbox_version.tar.gz"
+ssh -i $key_path ec2-user@$ec2_instance_address "source activate $py_env ; pip uninstall aitoolbox ; pip install ~/project/aitoolbox-$AIToolbox_version.tar.gz"

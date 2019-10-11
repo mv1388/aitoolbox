@@ -1,8 +1,8 @@
 import unittest
 from torch import nn
 
-from AIToolbox.torchtrain.model import TTModel
-from AIToolbox.utils.util import function_exists
+from aitoolbox.torchtrain.model import TTModel
+from aitoolbox.utils.util import function_exists
 
 
 class TestTTModel(unittest.TestCase):

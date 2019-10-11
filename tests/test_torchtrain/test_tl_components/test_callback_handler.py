@@ -1,8 +1,8 @@
 import unittest
 
 from tests.utils import *
-from AIToolbox.torchtrain.tl_components.callback_handler import CallbacksHandler
-from AIToolbox.torchtrain.train_loop import TrainLoop
+from aitoolbox.torchtrain.tl_components.callback_handler import CallbacksHandler
+from aitoolbox.torchtrain.train_loop import TrainLoop
 
 
 class TestCallbacksHandler(unittest.TestCase):

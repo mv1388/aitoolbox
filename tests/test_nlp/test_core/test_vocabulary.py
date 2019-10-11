@@ -1,5 +1,5 @@
 import unittest
-from AIToolbox.nlp.core.vocabulary import *
+from aitoolbox.nlp.core.vocabulary import *
 
 
 class TestVocabulary(unittest.TestCase):
