@@ -1,6 +1,6 @@
 import unittest
 
-from AIToolbox.utils import util
+from aitoolbox.utils import util
 from tests.utils import DummyOptimizer
 
 

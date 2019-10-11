@@ -1,5 +1,5 @@
 import unittest
-from AIToolbox.nlp.dataset.SQuAD2.SQuAD2DataReader import *
+from aitoolbox.nlp.dataset.SQuAD2.SQuAD2DataReader import *
 
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))

@@ -1,7 +1,7 @@
 import unittest
 
-from AIToolbox.cloud.AWS.model_load import PyTorchS3ModelLoader
-from AIToolbox.experiment.local_load.local_model_load import AbstractLocalModelLoader, PyTorchLocalModelLoader
+from aitoolbox.cloud.AWS.model_load import PyTorchS3ModelLoader
+from aitoolbox.experiment.local_load.local_model_load import AbstractLocalModelLoader, PyTorchLocalModelLoader
 
 
 class TestPyTorchS3ModelLoader(unittest.TestCase):

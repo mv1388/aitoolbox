@@ -6,10 +6,10 @@ import torch.nn.functional as F
 import torch.optim as optim
 from torchvision import datasets, transforms
 
-from AIToolbox.torchtrain.train_loop import TrainLoop, TrainLoopModelCheckpointEndSave
-from AIToolbox.torchtrain.model import TTModel
-from AIToolbox.torchtrain.callbacks.performance_eval import ModelPerformanceEvaluation, ModelPerformancePrintReport
-from AIToolbox.experiment.result_package.basic_packages import ClassificationResultPackage
+from aitoolbox.torchtrain.train_loop import TrainLoop, TrainLoopModelCheckpointEndSave
+from aitoolbox.torchtrain.model import TTModel
+from aitoolbox.torchtrain.callbacks.performance_eval import ModelPerformanceEvaluation, ModelPerformancePrintReport
+from aitoolbox.experiment.result_package.basic_packages import ClassificationResultPackage
 
 
 class Net(TTModel):

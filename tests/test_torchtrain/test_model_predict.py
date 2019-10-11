@@ -3,8 +3,8 @@ import torch.nn as nn
 
 from tests.utils import *
 
-from AIToolbox.torchtrain.model import ModelWrap
-from AIToolbox.torchtrain.model_predict import PyTorchModelPredictor
+from aitoolbox.torchtrain.model import ModelWrap
+from aitoolbox.torchtrain.model_predict import PyTorchModelPredictor
 
 
 class TestAbstractModelPredictor(unittest.TestCase):
