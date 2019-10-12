@@ -7,7 +7,7 @@ def append_predictions(y_batch, predictions):
 
 
 def append_concat_predictions(y_batch, predictions):
-    if type(y_batch) is list:
+    if isinstance(y_batch, list):
         predictions += y_batch
     else:
         predictions.append(y_batch)
@@ -20,4 +20,4 @@ def torch_cat_transf(predictions):
 
 
 def not_list_torch_cat_transf(predictions):
-    return torch.cat(predictions) if type(predictions) is not list else predictions
+    return torch.cat(predictions) if not isinstance(predictions, list) else predictions
