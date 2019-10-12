@@ -26,12 +26,12 @@ class TestBatchPredCollateFns(unittest.TestCase):
         self.assertEqual([preds_ep_1, preds_ep_2], preds)
 
         preds_list = []
-        preds_list_ep_1 = np.random.rand(100, 1).tolist()
-        preds_list = append_predictions(preds_list_ep_1, preds_list)
+        preds_list_ep_1 = np.random.rand(100).tolist()
+        preds_list = append_concat_predictions(preds_list_ep_1, preds_list)
         self.assertEqual(preds_list_ep_1, preds_list)
 
         preds_list_ep_2 = np.random.rand(45, 1).tolist()
-        preds_list = append_predictions(preds_list_ep_2, preds_list)
+        preds_list = append_concat_predictions(preds_list_ep_2, preds_list)
         self.assertEqual(preds_list_ep_1 + preds_list_ep_2, preds_list)
 
 
