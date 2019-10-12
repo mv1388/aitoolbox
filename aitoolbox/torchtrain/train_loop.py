@@ -23,13 +23,16 @@ from aitoolbox.torchtrain.callbacks.model_save import ModelCheckpoint, ModelTrai
 from aitoolbox.experiment.training_history import TrainingHistory
 from aitoolbox.torchtrain.tl_components.model_prediction_store import ModelPredictionStore
 from aitoolbox.torchtrain.tl_components.message_passing import MessageService
+from aitoolbox.torchtrain.tl_components.pred_collate_fns import append_predictions, torch_cat_transf
 from aitoolbox.experiment.result_package.abstract_result_packages import AbstractResultPackage
 
 
 class TrainLoop:
     def __init__(self, model,
                  train_loader, validation_loader, test_loader,
-                 optimizer, criterion, end_auto_eval=True, use_amp=False):
+                 optimizer, criterion,
+                 collate_batch_pred_fn=append_predictions, pred_transform_fn=torch_cat_transf,
+                 end_auto_eval=True, use_amp=False):
         """Core PyTorch TrainLoop supporting the model training and target prediction
 
         Implements core training procedures: batch feeding into the network as part of (multi)epoch train loop,
@@ -44,6 +47,10 @@ class TrainLoop:
             test_loader (torch.utils.data.DataLoader): data loader for test data set
             optimizer (torch.optim.optimizer.Optimizer or MultiOptimizer): optimizer algorithm.
             criterion (torch.nn.modules.loss._Loss or MultiLoss): criterion criterion during the training procedure.
+            collate_batch_pred_fn (callable): collate function transforming batch predictions as they come out from the
+                model
+            pred_transform_fn (callable): function transforming all the produced predictions after all the batches have
+                been run through the model
             end_auto_eval (bool or int): used to optionally disable otherwise automatic end of epoch/training val/test
                 loss calculations. This is useful when conducting very costly experiments to save on compute time.
                 Specify either True/False boolean to always run or never run after each epoch or specify an int to
@@ -65,6 +72,8 @@ class TrainLoop:
         self.test_loader = test_loader
         self.optimizer = optimizer
         self.criterion = criterion
+        self.collate_batch_pred_fn = collate_batch_pred_fn
+        self.pred_transform_fn = pred_transform_fn
         self.end_auto_eval = end_auto_eval
         self.use_amp = use_amp
 
@@ -340,26 +349,14 @@ class TrainLoop:
                     y_pred_batch, y_test_batch, metadata_batch = \
                         self.batch_model_feed_def.get_predictions(self.model, batch_data, self.device)
 
-                # TODO: check if it is the best idea to append predictions to the list and not to some torch tensor
-                # TODO: also if append is the best option and not the concat
-                if type(y_test_batch) is list:
-                    y_test += y_test_batch
-                else:
-                    y_test.append(y_test_batch)
-
-                if type(y_pred_batch) is list:
-                    y_pred += y_pred_batch
-                else:
-                    y_pred.append(y_pred_batch)
+                y_test = self.collate_batch_pred_fn(y_test_batch, y_test)
+                y_pred = self.collate_batch_pred_fn(y_pred_batch, y_pred)
 
                 if metadata_batch is not None:
                     metadata_list.append(metadata_batch)
 
-            if type(y_test_batch) is not list:
-                y_test = torch.cat(y_test)
-
-            if type(y_pred_batch) is not list:
-                y_pred = torch.cat(y_pred)
+            y_test = self.pred_transform_fn(y_test)
+            y_pred = self.pred_transform_fn(y_pred)
 
             metadata = dict_util.combine_prediction_metadata_batches(metadata_list) if len(metadata_list) > 0 else None
 
@@ -387,6 +384,7 @@ class TrainLoopModelCheckpoint(TrainLoop):
                  hyperparams,
                  cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix='',
                  rm_subopt_local_models=False, num_best_checkpoints_kept=2,
+                 collate_batch_pred_fn=append_predictions, pred_transform_fn=torch_cat_transf,
                  end_auto_eval=True, use_amp=False):
         """TrainLoop with the automatic model check-pointing at the end of each epoch
 
@@ -416,6 +414,10 @@ class TrainLoopModelCheckpoint(TrainLoop):
                 the metric minimization is done otherwise metric maximization is done
             num_best_checkpoints_kept (int): number of best performing models which are kept when removing suboptimal
                 model checkpoints
+            collate_batch_pred_fn (callable): collate function transforming batch predictions as they come out from the
+                model
+            pred_transform_fn (callable): function transforming all the produced predictions after all the batches have
+                been run through the model
             end_auto_eval (bool or int): used to optionally disable otherwise automatic end of epoch/training val/test
                 loss calculations. This is useful when conducting very costly experiments to save on compute time.
                 Specify either True/False boolean to always run or never run after each epoch or specify an int to
@@ -423,6 +425,7 @@ class TrainLoopModelCheckpoint(TrainLoop):
             use_amp (bool): use Nvidia Apex 16-bit Automatic Mixed Precision (AMP)
         """
         TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion,
+                           collate_batch_pred_fn, pred_transform_fn,
                            end_auto_eval, use_amp)
         self.project_name = project_name
         self.experiment_name = experiment_name
@@ -453,6 +456,7 @@ class TrainLoopModelEndSave(TrainLoop):
                  project_name, experiment_name, local_model_result_folder_path,
                  hyperparams, val_result_package=None, test_result_package=None,
                  cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix='',
+                 collate_batch_pred_fn=append_predictions, pred_transform_fn=torch_cat_transf,
                  end_auto_eval=True, use_amp=False):
         """TrainLoop with the model performance evaluation and final model saving at the end of the training process
 
@@ -479,6 +483,10 @@ class TrainLoopModelEndSave(TrainLoop):
                 Everything else results just in local storage to disk
             bucket_name (str): name of the bucket in the cloud storage
             cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
+            collate_batch_pred_fn (callable): collate function transforming batch predictions as they come out from the
+                model
+            pred_transform_fn (callable): function transforming all the produced predictions after all the batches have
+                been run through the model
             end_auto_eval (bool or int): used to optionally disable otherwise automatic end of epoch/training val/test
                 loss calculations. This is useful when conducting very costly experiments to save on compute time.
                 Specify either True/False boolean to always run or never run after each epoch or specify an int to
@@ -486,6 +494,7 @@ class TrainLoopModelEndSave(TrainLoop):
             use_amp (bool): use Nvidia Apex 16-bit Automatic Mixed Precision (AMP)
         """
         TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion,
+                           collate_batch_pred_fn, pred_transform_fn,
                            end_auto_eval, use_amp)
         self.project_name = project_name
         self.experiment_name = experiment_name
@@ -536,6 +545,7 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
                  hyperparams, val_result_package=None, test_result_package=None,
                  cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix='',
                  rm_subopt_local_models=False, num_best_checkpoints_kept=2,
+                 collate_batch_pred_fn=append_predictions, pred_transform_fn=torch_cat_transf,
                  end_auto_eval=True, use_amp=False):
         """TrainLoop both saving model check-pointing at the end of each epoch and model performance reporting
             and model saving at the end of the training process
@@ -568,6 +578,10 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
                 the metric minimization is done otherwise metric maximization is done
             num_best_checkpoints_kept (int): number of best performing models which are kept when removing suboptimal
                 model checkpoints
+            collate_batch_pred_fn (callable): collate function transforming batch predictions as they come out from the
+                model
+            pred_transform_fn (callable): function transforming all the produced predictions after all the batches have
+                been run through the model
             end_auto_eval (bool or int): used to optionally disable otherwise automatic end of epoch/training val/test
                 loss calculations. This is useful when conducting very costly experiments to save on compute time.
                 Specify either True/False boolean to always run or never run after each epoch or specify an int to
@@ -582,6 +596,7 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
                                        project_name, experiment_name, os.path.expanduser(local_model_result_folder_path),
                                        hyperparams, val_result_package, test_result_package,
                                        cloud_save_mode, bucket_name, cloud_dir_prefix,
+                                       collate_batch_pred_fn, pred_transform_fn,
                                        end_auto_eval, use_amp)
         self.rm_subopt_local_models = rm_subopt_local_models
 
