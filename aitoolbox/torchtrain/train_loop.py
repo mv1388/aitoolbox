@@ -349,14 +349,14 @@ class TrainLoop:
                     y_pred_batch, y_test_batch, metadata_batch = \
                         self.batch_model_feed_def.get_predictions(self.model, batch_data, self.device)
 
-                y_test = self.collate_batch_pred_fn(y_test_batch, y_test)
                 y_pred = self.collate_batch_pred_fn(y_pred_batch, y_pred)
+                y_test = self.collate_batch_pred_fn(y_test_batch, y_test)
 
                 if metadata_batch is not None:
                     metadata_list.append(metadata_batch)
 
-            y_test = self.pred_transform_fn(y_test)
             y_pred = self.pred_transform_fn(y_pred)
+            y_test = self.pred_transform_fn(y_test)
 
             metadata = dict_util.combine_prediction_metadata_batches(metadata_list) if len(metadata_list) > 0 else None
 
