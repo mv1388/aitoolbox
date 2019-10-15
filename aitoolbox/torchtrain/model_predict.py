@@ -1,44 +1,10 @@
-from abc import ABC, abstractmethod
-
 from aitoolbox.torchtrain.train_loop import TrainLoop
 from aitoolbox.cloud.AWS.results_save import S3ResultsSaver
 from aitoolbox.cloud.GoogleCloud.results_save import GoogleStorageResultsSaver
 from aitoolbox.experiment.local_save.local_results_save import LocalResultsSaver
 
 
-class AbstractModelPredictor(ABC):
-    def __init__(self, model, data_loader):
-        self.model = model
-        self.data_loader = data_loader
-
-    @abstractmethod
-    def model_predict(self):
-        pass
-
-    @abstractmethod
-    def model_get_loss(self, loss_criterion):
-        pass
-
-    @abstractmethod
-    def evaluate_model(self, result_package,
-                       project_name, experiment_name, local_model_result_folder_path,
-                       **kwargs):
-        pass
-
-    @abstractmethod
-    def evaluate_result_package(self, result_package, return_result_package=True):
-        pass
-
-    @abstractmethod
-    def execute_batch_end_callbacks(self):
-        pass
-
-    @abstractmethod
-    def execute_epoch_end_callbacks(self):
-        pass
-
-
-class PyTorchModelPredictor(AbstractModelPredictor):
+class PyTorchModelPredictor:
     def __init__(self, model, data_loader, callbacks=None):
         """
 
@@ -47,7 +13,8 @@ class PyTorchModelPredictor(AbstractModelPredictor):
                 network model
             data_loader (torch.utils.data.DataLoader):
         """
-        AbstractModelPredictor.__init__(self, model, data_loader)
+        self.model = model
+        self.data_loader = data_loader
 
         self.train_loop = TrainLoop(self.model, None, None, self.data_loader, None, None)
         self.train_loop.callbacks_handler.register_callbacks(callbacks)
