@@ -1,12 +1,12 @@
 import os
 
-from aitoolbox.torchtrain.callbacks.callbacks import AbstractCallback
+from aitoolbox.torchtrain.callbacks.callbacks import AbstractExperimentCallback
 from aitoolbox.cloud.AWS.model_load import PyTorchS3ModelLoader
 from aitoolbox.cloud.GoogleCloud.model_load import PyTorchGoogleStorageModelLoader
 from aitoolbox.experiment.local_load.local_model_load import PyTorchLocalModelLoader
 
 
-class ModelLoadContinueTraining(AbstractCallback):
+class ModelLoadContinueTraining(AbstractExperimentCallback):
     def __init__(self,
                  saved_experiment_timestamp, saved_model_dir='checkpoint_model', epoch_num=None,
                  used_data_parallel=False, custom_local_loader_class=None,
@@ -34,8 +34,8 @@ class ModelLoadContinueTraining(AbstractCallback):
             cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
             **kwargs: additional parameters for the local model loader load_model() function
         """
-        AbstractCallback.__init__(self, 'Model loading and initialization from checkpoint before training',
-                                  execution_order=0)
+        AbstractExperimentCallback.__init__(self, 'Model loading and initialization from checkpoint before training',
+                                            execution_order=0)
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path) \
@@ -55,7 +55,7 @@ class ModelLoadContinueTraining(AbstractCallback):
         self.model_loader = None
 
     def on_train_loop_registration(self):
-        self.try_infer_experiment_details()
+        self.try_infer_experiment_details(infer_cloud_details=True)
 
         if self.cloud_save_mode in ['s3', 'aws_s3', 'aws']:
             self.model_loader = PyTorchS3ModelLoader(self.local_model_result_folder_path,
@@ -86,28 +86,3 @@ class ModelLoadContinueTraining(AbstractCallback):
             self.model_loader.init_amp()
 
         self.train_loop_obj.epoch = model_representation['epoch'] + 1
-
-    def try_infer_experiment_details(self):
-        try:
-            if self.project_name is None:
-                self.project_name = self.train_loop_obj.project_name
-            if self.experiment_name is None:
-                self.experiment_name = self.train_loop_obj.experiment_name
-            if self.local_model_result_folder_path is None:
-                self.local_model_result_folder_path = self.train_loop_obj.local_model_result_folder_path
-
-            if self.cloud_save_mode == 's3' and \
-                    hasattr(self.train_loop_obj,
-                            'cloud_save_mode') and self.cloud_save_mode != self.train_loop_obj.cloud_save_mode:
-                self.cloud_save_mode = self.train_loop_obj.cloud_save_mode
-            if self.bucket_name == 'model-result' and \
-                    hasattr(self.train_loop_obj, 'bucket_name') and self.bucket_name != self.train_loop_obj.bucket_name:
-                self.bucket_name = self.train_loop_obj.bucket_name
-            if self.cloud_dir_prefix == '' and \
-                    hasattr(self.train_loop_obj,
-                            'cloud_dir_prefix') and self.cloud_dir_prefix != self.train_loop_obj.cloud_dir_prefix:
-                self.cloud_dir_prefix = self.train_loop_obj.cloud_dir_prefix
-        except AttributeError:
-            raise AttributeError('Currently used TrainLoop does not support automatic project folder structure '
-                                 'creation. Project name, etc. thus can not be automatically deduced. Please provide'
-                                 'it in the callback parameters instead of currently used None values.')
