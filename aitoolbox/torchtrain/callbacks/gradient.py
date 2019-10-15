@@ -7,6 +7,8 @@ import torch
 
 from aitoolbox.torchtrain.callbacks.callbacks import AbstractCallback
 from aitoolbox.experiment.local_save.folder_create import ExperimentFolderCreator
+from aitoolbox.cloud.AWS.results_save import BaseResultsSaver as BaseResultsS3Saver
+from aitoolbox.cloud.GoogleCloud.results_save import BaseResultsGoogleStorageSaver
 
 style.use('ggplot')
 
@@ -105,6 +107,7 @@ class GradDistributionPlot(AbstractCallback):
         self.cloud_dir_prefix = cloud_dir_prefix
 
         self.model_layers_extract_def = model_layers_extract_def
+        self.cloud_results_saver = None
 
     def on_train_loop_registration(self):
         self.try_infer_experiment_details()
@@ -155,6 +158,22 @@ class GradDistributionPlot(AbstractCallback):
             os.mkdir(grad_plot_dir_path)
 
         return grad_plot_dir_path
+
+    def prepare_results_saver(self):
+        """
+
+        Returns:
+            None
+        """
+        if self.cloud_save_mode == 's3' or self.cloud_save_mode == 'aws_s3' or self.cloud_save_mode == 'aws':
+            self.cloud_results_saver = BaseResultsS3Saver(bucket_name=self.bucket_name,
+                                                          cloud_dir_prefix=self.cloud_dir_prefix)
+
+        elif self.cloud_save_mode == 'gcs' or self.cloud_save_mode == 'google_storage' or self.cloud_save_mode == 'google storage':
+            self.cloud_results_saver = BaseResultsGoogleStorageSaver(bucket_name=self.bucket_name,
+                                                                     cloud_dir_prefix=self.cloud_dir_prefix)
+        else:
+            self.cloud_results_saver = None
 
     def try_infer_experiment_details(self):
         try:
