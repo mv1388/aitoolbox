@@ -124,7 +124,10 @@ class AbstractCallback:
 
 class AbstractExperimentCallback(AbstractCallback):
     def __init__(self, callback_name, execution_order=0):
-        """
+        """Extension of the AbstractCallback implementing the automatic experiment details inference from TrainLoop
+
+        This abstract callback is inherited from when the implemented callbacks intend to save results files into the
+        experiment folder and also potentially upload them to AWS S3.
 
         Args:
             callback_name (str): name of the callback
