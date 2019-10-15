@@ -7,7 +7,7 @@ function usage()
 
    Usage: $download_data [--path_dest STR] [--dataset STR] [--preproc STR]
 
-   optional arguments:
+   arguments:
      -p, --path_dest STR    destination path where to download the dataset
      -d, --dataset STR      dataset to be optionally downloaded from the S3 storage directly to ec2 instance
      -r, --preproc STR      the preprocessed version of the main dataset

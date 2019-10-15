@@ -7,7 +7,7 @@ function usage()
 
    Usage: $update_experiments_on_AWS [--key STR] [--address STR] [--project STR]
 
-   optional arguments:
+   arguments:
      -k, --key STR          path to ssh key
      -a, --address STR      ec2 instance Public DNS address
      -p, --project STR      path to the project to be optionally uploaded to the running ec2 instance
