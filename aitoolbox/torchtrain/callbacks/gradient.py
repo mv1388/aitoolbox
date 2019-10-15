@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import matplotlib.style as style
 import torch
 
-from aitoolbox.torchtrain.callbacks.callbacks import AbstractCallback
+from aitoolbox.torchtrain.callbacks.callbacks import AbstractCallback, AbstractExperimentCallback
 from aitoolbox.experiment.local_save.folder_create import ExperimentFolderCreator
 from aitoolbox.cloud.AWS.results_save import BaseResultsSaver as BaseResultsS3Saver
 from aitoolbox.cloud.GoogleCloud.results_save import BaseResultsGoogleStorageSaver
@@ -92,11 +92,11 @@ class GradientStatsPrint(AbstractCallback):
                 print(f'Layer {i} grad are None')
 
 
-class GradDistributionPlot(AbstractCallback):
+class GradDistributionPlot(AbstractExperimentCallback):
     def __init__(self, model_layers_extract_def,
                  project_name=None, experiment_name=None, local_model_result_folder_path=None,
                  cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix=''):
-        AbstractCallback.__init__(self, 'Gradient distribution plotter')
+        AbstractExperimentCallback.__init__(self, 'Gradient distribution plotter')
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path) \
@@ -110,7 +110,7 @@ class GradDistributionPlot(AbstractCallback):
         self.cloud_results_saver = None
 
     def on_train_loop_registration(self):
-        self.try_infer_experiment_details()
+        self.try_infer_experiment_details(infer_cloud_details=True)
 
     def on_epoch_end(self):
         self.gradient_plot()
@@ -174,28 +174,3 @@ class GradDistributionPlot(AbstractCallback):
                                                                      cloud_dir_prefix=self.cloud_dir_prefix)
         else:
             self.cloud_results_saver = None
-
-    def try_infer_experiment_details(self):
-        try:
-            if self.project_name is None:
-                self.project_name = self.train_loop_obj.project_name
-            if self.experiment_name is None:
-                self.experiment_name = self.train_loop_obj.experiment_name
-            if self.local_model_result_folder_path is None:
-                self.local_model_result_folder_path = self.train_loop_obj.local_model_result_folder_path
-
-            if self.cloud_save_mode == 's3' and \
-                    hasattr(self.train_loop_obj,
-                            'cloud_save_mode') and self.cloud_save_mode != self.train_loop_obj.cloud_save_mode:
-                self.cloud_save_mode = self.train_loop_obj.cloud_save_mode
-            if self.bucket_name == 'model-result' and \
-                    hasattr(self.train_loop_obj, 'bucket_name') and self.bucket_name != self.train_loop_obj.bucket_name:
-                self.bucket_name = self.train_loop_obj.bucket_name
-            if self.cloud_dir_prefix == '' and \
-                    hasattr(self.train_loop_obj,
-                            'cloud_dir_prefix') and self.cloud_dir_prefix != self.train_loop_obj.cloud_dir_prefix:
-                self.cloud_dir_prefix = self.train_loop_obj.cloud_dir_prefix
-        except AttributeError:
-            raise AttributeError('Currently used TrainLoop does not support automatic project folder structure '
-                                 'creation. Project name, etc. thus can not be automatically deduced. Please provide'
-                                 'it in the callback parameters instead of currently used None values.')
