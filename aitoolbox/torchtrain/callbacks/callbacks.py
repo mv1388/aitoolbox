@@ -144,16 +144,19 @@ class AbstractExperimentCallback(AbstractCallback):
         # self.cloud_dir_prefix = ''
 
     def try_infer_experiment_details(self, infer_cloud_details):
-        """
+        """Infer paths where to save experiment related files from the running TrainLoop.
+
+        This details inference function should only be called after the callback has already been registered in the
+        TrainLoop, e.g. in the on_train_loop_registration().
 
         Args:
-            infer_cloud_details (bool):
+            infer_cloud_details (bool): should infer only local project folder details or also cloud project destination
 
         Raises:
             AttributeError
 
         Returns:
-
+            None
         """
         try:
             if self.project_name is None:
