@@ -15,7 +15,7 @@ from aitoolbox.experiment.local_experiment_saver import FullPyTorchExperimentLoc
 from aitoolbox.experiment.local_save.local_model_save import LocalSubOptimalModelRemover, PyTorchLocalModelSaver
 from aitoolbox.experiment.result_package.abstract_result_packages import AbstractResultPackage
 from aitoolbox.experiment.result_reporting.hyperparam_reporter import HyperParameterReporter
-from aitoolbox.torchtrain.callbacks.callbacks import AbstractCallback
+from aitoolbox.torchtrain.callbacks.abstract import AbstractCallback
 from aitoolbox.utils import util
 
 

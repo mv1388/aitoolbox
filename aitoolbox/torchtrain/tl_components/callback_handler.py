@@ -1,4 +1,4 @@
-from aitoolbox.torchtrain.callbacks.callbacks import AbstractCallback
+from aitoolbox.torchtrain.callbacks.abstract import AbstractCallback
 
 
 class CallbacksHandler:

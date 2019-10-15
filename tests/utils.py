@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from aitoolbox.torchtrain.data.batch_model_feed_defs import AbstractModelFeedDefinition
-from aitoolbox.torchtrain.callbacks.callbacks import AbstractCallback
+from aitoolbox.torchtrain.callbacks.abstract import AbstractCallback
 from aitoolbox.experiment.result_package.abstract_result_packages import AbstractResultPackage
 from aitoolbox.experiment.core_metrics.abstract_metric import AbstractBaseMetric
 from aitoolbox.torchtrain.model import TTModel

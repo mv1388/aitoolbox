@@ -127,7 +127,7 @@ and providing them as a parameter list to TrainLoop's `fit(callbacks=[callback_1
 
 AIToolbox by default already offers a wide selection of different useful callbacks. However when
 some completely new functionality is desired the user can also implement their own callbacks by 
-inheriting from the base callback object [`AbstractCallback`](/aitoolbox/torchtrain/callbacks/callbacks.py). 
+inheriting from the base callback object [`AbstractCallback`](/aitoolbox/torchtrain/callbacks/abstract.py). 
 All that the user has to do is to implement corresponding methods to execute the new callback 
 at the desired point in the train loop, such as: start/end of batch, epoch, training.
 

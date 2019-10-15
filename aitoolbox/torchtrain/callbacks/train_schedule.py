@@ -1,6 +1,6 @@
 from torch.optim.lr_scheduler import ReduceLROnPlateau, LambdaLR, StepLR, MultiStepLR
 
-from aitoolbox.torchtrain.callbacks.callbacks import AbstractCallback
+from aitoolbox.torchtrain.callbacks.abstract import AbstractCallback
 
 
 class GeneralLRScheduler(AbstractCallback):
