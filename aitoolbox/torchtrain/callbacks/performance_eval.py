@@ -1,7 +1,7 @@
 import copy
 import os
 
-from aitoolbox.torchtrain.callbacks.callbacks import AbstractCallback
+from aitoolbox.torchtrain.callbacks.callbacks import AbstractCallback, AbstractExperimentCallback
 from aitoolbox.torchtrain.tl_components import message_passing as msg_passing_settings
 from aitoolbox.cloud.AWS.results_save import BaseResultsSaver as BaseResultsS3Saver
 from aitoolbox.cloud.GoogleCloud.results_save import BaseResultsGoogleStorageSaver
@@ -293,7 +293,7 @@ class MetricHistoryRename(TrainHistoryFormatter):
                                        strict_metric_extract=strict_metric_extract)
 
 
-class ModelTrainHistoryBaseCB(AbstractCallback):
+class ModelTrainHistoryBaseCB(AbstractExperimentCallback):
     def __init__(self, callback_name, execution_order=0,
                  epoch_end=True, train_end=False,
                  project_name=None, experiment_name=None, local_model_result_folder_path=None,
@@ -315,7 +315,7 @@ class ModelTrainHistoryBaseCB(AbstractCallback):
             bucket_name (str): name of the bucket in the cloud storage
             cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
         """
-        AbstractCallback.__init__(self, callback_name, execution_order)
+        AbstractExperimentCallback.__init__(self, callback_name, execution_order)
         if epoch_end is False and train_end is False:
             raise ValueError('Both epoch_end and train_end are set to False. At least one of these should be True.')
         self.epoch_end = epoch_end
@@ -330,37 +330,6 @@ class ModelTrainHistoryBaseCB(AbstractCallback):
         self.cloud_dir_prefix = cloud_dir_prefix
 
         self.cloud_results_saver = None
-
-    def try_infer_experiment_details(self):
-        """
-
-        Returns:
-            None
-
-        Raises:
-            AttributeError
-        """
-        try:
-            if self.project_name is None:
-                self.project_name = self.train_loop_obj.project_name
-            if self.experiment_name is None:
-                self.experiment_name = self.train_loop_obj.experiment_name
-            if self.local_model_result_folder_path is None:
-                self.local_model_result_folder_path = self.train_loop_obj.local_model_result_folder_path
-
-            if self.cloud_save_mode == 's3' and \
-                    hasattr(self.train_loop_obj, 'cloud_save_mode') and self.cloud_save_mode != self.train_loop_obj.cloud_save_mode:
-                self.cloud_save_mode = self.train_loop_obj.cloud_save_mode
-            if self.bucket_name == 'model-result' and \
-                    hasattr(self.train_loop_obj, 'bucket_name') and self.bucket_name != self.train_loop_obj.bucket_name:
-                self.bucket_name = self.train_loop_obj.bucket_name
-            if self.cloud_dir_prefix == '' and \
-                    hasattr(self.train_loop_obj, 'cloud_dir_prefix') and self.cloud_dir_prefix != self.train_loop_obj.cloud_dir_prefix:
-                self.cloud_dir_prefix = self.train_loop_obj.cloud_dir_prefix
-        except AttributeError:
-            raise AttributeError('Currently used TrainLoop does not support automatic project folder structure '
-                                 'creation. Project name, etc. thus can not be automatically deduced. Please provide'
-                                 'it in the callback parameters instead of currently used None values.')
 
     def prepare_results_saver(self):
         """
@@ -408,7 +377,7 @@ class ModelTrainHistoryPlot(ModelTrainHistoryBaseCB):
                                          cloud_dir_prefix=cloud_dir_prefix)
 
     def on_train_loop_registration(self):
-        self.try_infer_experiment_details()
+        self.try_infer_experiment_details(infer_cloud_details=True)
         self.prepare_results_saver()
 
     def on_epoch_end(self):
@@ -484,7 +453,7 @@ class ModelTrainHistoryFileWriter(ModelTrainHistoryBaseCB):
                                          cloud_dir_prefix=cloud_dir_prefix)
 
     def on_train_loop_registration(self):
-        self.try_infer_experiment_details()
+        self.try_infer_experiment_details(infer_cloud_details=True)
         self.prepare_results_saver()
 
     def on_epoch_end(self):
