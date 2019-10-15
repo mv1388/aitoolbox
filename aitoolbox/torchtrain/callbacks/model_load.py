@@ -1,6 +1,6 @@
 import os
 
-from aitoolbox.torchtrain.callbacks.callbacks import AbstractExperimentCallback
+from aitoolbox.torchtrain.callbacks.abstract import AbstractExperimentCallback
 from aitoolbox.cloud.AWS.model_load import PyTorchS3ModelLoader
 from aitoolbox.cloud.GoogleCloud.model_load import PyTorchGoogleStorageModelLoader
 from aitoolbox.experiment.local_load.local_model_load import PyTorchLocalModelLoader

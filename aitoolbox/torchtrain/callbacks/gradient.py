@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import matplotlib.style as style
 import torch
 
-from aitoolbox.torchtrain.callbacks.callbacks import AbstractCallback, AbstractExperimentCallback
+from aitoolbox.torchtrain.callbacks.abstract import AbstractCallback, AbstractExperimentCallback
 from aitoolbox.experiment.local_save.folder_create import ExperimentFolderCreator
 from aitoolbox.cloud.AWS.results_save import BaseResultsSaver as BaseResultsS3Saver
 from aitoolbox.cloud.GoogleCloud.results_save import BaseResultsGoogleStorageSaver
