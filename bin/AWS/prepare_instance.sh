@@ -25,11 +25,13 @@ function usage()
 
    Usage: $prepare_instance [--key STR] [--address STR] [--project STR] ...
 
-   optional arguments:
+   arguments:
      -k, --key STR          path to ssh key
      -a, --address STR      ec2 instance Public DNS address
      -f, --framework STR    desired deep learning framework
      -v, --version FLOAT    AIToolbox version to be installed on ec2
+
+   optional arguments:
      -p, --project STR      path to the project to be optionally uploaded to the running ec2 instance
      -d, --dataset STR      dataset to be optionally downloaded from the S3 storage directly to ec2 instance
      -r, --preproc STR      the preprocessed version of the main dataset

@@ -7,7 +7,7 @@ function usage()
 
    Usage: $update_package_on_AWS [--key STR] [--address STR] [--framework STR] [--version FLOAT]
 
-   optional arguments:
+   arguments:
      -k, --key STR          path to ssh key
      -a, --address STR      ec2 instance Public DNS address
      -f, --framework STR    desired deep learning framework
