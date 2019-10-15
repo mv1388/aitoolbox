@@ -3,6 +3,8 @@ from aitoolbox.cloud.AWS.results_save import S3ResultsSaver
 from aitoolbox.cloud.GoogleCloud.results_save import GoogleStorageResultsSaver
 from aitoolbox.experiment.local_save.local_results_save import LocalResultsSaver
 
+# Removed abstract class definition: https://github.com/mv1388/aitoolbox/pull/306
+
 
 class PyTorchModelPredictor:
     def __init__(self, model, data_loader, callbacks=None):
