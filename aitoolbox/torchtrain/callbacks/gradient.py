@@ -4,7 +4,26 @@ import torch
 from aitoolbox.torchtrain.callbacks.callbacks import AbstractCallback
 
 
-class GradNormClip(AbstractCallback):
+class GradientCallbackBase(AbstractCallback):
+    def __init__(self, callback_name, execution_order=0):
+        """Base abstract class for gradient related callbacks
+
+        It has not implemented logic except for the the turning enabling of the grad_cb_used inside TrainLoop as part of
+        the on_train_loop_registration(). Consequently, this potentially repeated task in every gradient calculation
+        callback doesn't need to be done for every implemented callback.
+
+        Args:
+            callback_name (str): name of the callback
+            execution_order (int): order of the callback execution. If all the used callbacks have the orders set to 0,
+                than the callbacks are executed in the order they were registered.
+        """
+        AbstractCallback.__init__(self, callback_name, execution_order)
+
+    def on_train_loop_registration(self):
+        self.train_loop_obj.grad_cb_used = True
+
+
+class GradNormClip(GradientCallbackBase):
     def __init__(self, max_norm, **kwargs):
         """Gradient norm clipping
 
@@ -12,12 +31,9 @@ class GradNormClip(AbstractCallback):
             max_norm (int or float): gradient clipping
             **kwargs:
         """
-        AbstractCallback.__init__(self, 'Gradient clipping')
+        GradientCallbackBase.__init__(self, 'Gradient clipping')
         self.max_norm = max_norm
         self.kwargs = kwargs
-
-    def on_train_loop_registration(self):
-        self.train_loop_obj.grad_cb_used = True
 
     def on_after_gradient_update(self):
         torch.nn.utils.clip_grad_norm_(self.train_loop_obj.model.parameters(), self.max_norm, **self.kwargs)
