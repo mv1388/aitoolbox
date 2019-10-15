@@ -1,6 +1,6 @@
 import unittest
 
-from aitoolbox.torchtrain.callbacks.callbacks import AbstractCallback
+from aitoolbox.torchtrain.callbacks.basic import AbstractCallback
 from aitoolbox.torchtrain.train_loop import TrainLoop
 from tests.utils import function_exists, NetUnifiedBatchFeed, CallbackTracker
 
