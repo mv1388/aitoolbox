@@ -2,7 +2,8 @@ import unittest
 
 from tests.utils import *
 
-from aitoolbox.torchtrain.callbacks.callbacks import AbstractCallback, EarlyStopping
+from aitoolbox.torchtrain.callbacks.basic import EarlyStopping
+from aitoolbox.torchtrain.callbacks.abstract import AbstractCallback
 from aitoolbox.torchtrain.train_loop import TrainLoop
 
 
