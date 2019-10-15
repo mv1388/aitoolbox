@@ -2,11 +2,11 @@ import os
 import numpy as np
 from torch.utils.tensorboard import SummaryWriter
 
-from aitoolbox.torchtrain.callbacks.callbacks import AbstractCallback
+from aitoolbox.torchtrain.callbacks.callbacks import AbstractExperimentCallback
 from aitoolbox.experiment.local_save.folder_create import ExperimentFolderCreator as FolderCreator
 
 
-class TensorboardReporterBaseCB(AbstractCallback):
+class TensorboardReporterBaseCB(AbstractExperimentCallback):
     def __init__(self, callback_name, comment='', flush_secs=120, filename_suffix='',
                  project_name=None, experiment_name=None, local_model_result_folder_path=None, log_dir=None,
                  is_project=True, **kwargs):
@@ -25,18 +25,17 @@ class TensorboardReporterBaseCB(AbstractCallback):
                 into a specific full path given in the log_dir parameter
             **kwargs: additional parameters for tensorboard SummaryWriter
         """
-        AbstractCallback.__init__(self, callback_name)
+        AbstractExperimentCallback.__init__(self, callback_name)
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path) \
             if local_model_result_folder_path is not None \
             else None
         self.log_dir = log_dir
+        self.is_project = is_project
         self.fallback_log_dir = 'tensorboard'
 
-        if is_project:
-            self.full_log_dir = self.try_infer_experiment_details()
-        else:
+        if not self.is_project:
             if log_dir is not None:
                 self.full_log_dir = os.path.expanduser(log_dir)
             else:
@@ -47,41 +46,31 @@ class TensorboardReporterBaseCB(AbstractCallback):
         self.tb_writer = SummaryWriter(log_dir=self.full_log_dir, comment=comment,
                                        flush_secs=flush_secs, filename_suffix=filename_suffix, **kwargs)
 
+    def on_train_loop_registration(self):
+        if self.is_project:
+            self.try_infer_experiment_details(infer_cloud_details=False)
+            self.full_log_dir = self.create_log_dir()
+
     def on_train_end(self):
         self.tb_writer.close()
 
-    def try_infer_experiment_details(self):
-        """
+    def create_log_dir(self):
+        """Crate log folder
 
         Returns:
-            str: tensorboard folder path
-
-        Raises:
-            AttributeError
+            str: log dir path
         """
-        try:
-            if self.project_name is None:
-                self.project_name = self.train_loop_obj.project_name
-            if self.experiment_name is None:
-                self.experiment_name = self.train_loop_obj.experiment_name
-            if self.local_model_result_folder_path is None:
-                self.local_model_result_folder_path = self.train_loop_obj.local_model_result_folder_path
-            if self.log_dir is None:
-                self.log_dir = self.fallback_log_dir
+        if self.log_dir is None:
+            self.log_dir = self.fallback_log_dir
 
-            experiment_path = FolderCreator.create_experiment_base_folder(self.project_name, self.experiment_name,
-                                                                          self.train_loop_obj.experiment_timestamp,
-                                                                          self.local_model_result_folder_path)
-            full_log_dir = os.path.join(experiment_path, self.log_dir)
-            if not os.path.exists(full_log_dir):
-                os.mkdir(full_log_dir)
+        experiment_path = FolderCreator.create_experiment_base_folder(self.project_name, self.experiment_name,
+                                                                      self.train_loop_obj.experiment_timestamp,
+                                                                      self.local_model_result_folder_path)
+        full_log_dir = os.path.join(experiment_path, self.log_dir)
+        if not os.path.exists(full_log_dir):
+            os.mkdir(full_log_dir)
 
-            return full_log_dir
-
-        except AttributeError:
-            raise AttributeError('Currently used TrainLoop does not support automatic project folder structure '
-                                 'creation. Project log_dir thus can not be automatically deduced. Please provide'
-                                 'it in the callback parameter instead of currently used None value.')
+        return full_log_dir
 
 
 class TBBatchLossReport(TensorboardReporterBaseCB):
