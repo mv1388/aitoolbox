@@ -2,7 +2,7 @@ import unittest
 
 from tests.utils import *
 
-from aitoolbox.torchtrain.callbacks.basic import EarlyStopping
+from aitoolbox.torchtrain.callbacks.basic import EarlyStopping, FunctionOnTrainLoop
 from aitoolbox.torchtrain.train_loop import TrainLoop
 
 
@@ -137,3 +137,68 @@ class TestEarlyStoppingCallback(unittest.TestCase):
             result.append(train_loop.early_stop)
 
         self.assertEqual(result, expected_result)
+
+
+def cb_fn(tl):
+    tl.epoch = 100
+
+
+class TestLambdaOnTrainLoop(unittest.TestCase):
+    def test_execute_callback(self):
+        callback = FunctionOnTrainLoop(cb_fn)
+        train_loop = TrainLoop(NetUnifiedBatchFeed(), None, None, None, None, None)
+        train_loop.callbacks_handler.register_callbacks([callback])
+        self.assertEqual(train_loop.epoch, 0)
+        callback.execute_callback()
+        self.assertEqual(train_loop.epoch, 100)
+
+    def test_on_train_loop_registration(self):
+        callback = FunctionOnTrainLoop(cb_fn, tl_registration=True)
+        train_loop = TrainLoop(NetUnifiedBatchFeed(), None, None, None, None, None)
+        train_loop.callbacks_handler.register_callbacks([callback])
+        self.assertEqual(train_loop.epoch, 100)
+
+    def test_on_epoch_begin(self):
+        callback = FunctionOnTrainLoop(cb_fn, epoch_begin=True)
+        train_loop = TrainLoop(NetUnifiedBatchFeed(), None, None, None, None, None)
+        train_loop.callbacks_handler.register_callbacks([callback])
+        self.assertEqual(train_loop.epoch, 0)
+        train_loop.callbacks_handler.execute_epoch_begin()
+        self.assertEqual(train_loop.epoch, 100)
+
+    def test_on_train_end(self):
+        callback = FunctionOnTrainLoop(cb_fn, train_end=True)
+        train_loop = TrainLoop(NetUnifiedBatchFeed(), None, None, None, None, None)
+        train_loop.callbacks_handler.register_callbacks([callback])
+        self.assertEqual(train_loop.epoch, 0)
+        train_loop.callbacks_handler.execute_train_end()
+        self.assertEqual(train_loop.epoch, 100)
+
+    def test_on_after_gradient_update(self):
+        callback = FunctionOnTrainLoop(cb_fn, after_gradient_update=True)
+        train_loop = TrainLoop(NetUnifiedBatchFeed(), None, None, None, None, None)
+        train_loop.callbacks_handler.register_callbacks([callback])
+        self.assertEqual(train_loop.epoch, 0)
+        self.assertTrue(train_loop.grad_cb_used)
+        train_loop.callbacks_handler.execute_gradient_update()
+        self.assertEqual(train_loop.epoch, 100)
+
+    def test_on_after_optimizer_step(self):
+        callback = FunctionOnTrainLoop(cb_fn, after_optimizer_step=True)
+        train_loop = TrainLoop(NetUnifiedBatchFeed(), None, None, None, None, None)
+        train_loop.callbacks_handler.register_callbacks([callback])
+        self.assertEqual(train_loop.epoch, 0)
+        self.assertTrue(train_loop.grad_cb_used)
+        train_loop.callbacks_handler.execute_optimizer_step()
+        self.assertEqual(train_loop.epoch, 100)
+
+    def test_on_after_gradient_update_register_combo(self):
+        def cb_fn_add(tl):
+            tl.epoch += 100
+        callback = FunctionOnTrainLoop(cb_fn_add, tl_registration=True, after_gradient_update=True)
+        train_loop = TrainLoop(NetUnifiedBatchFeed(), None, None, None, None, None)
+        train_loop.callbacks_handler.register_callbacks([callback])
+        self.assertEqual(train_loop.epoch, 100)
+        self.assertTrue(train_loop.grad_cb_used)
+        train_loop.callbacks_handler.execute_gradient_update()
+        self.assertEqual(train_loop.epoch, 200)

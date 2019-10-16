@@ -212,16 +212,17 @@ class EmailNotification(AbstractCallback):
                                  'it in the callback parameters instead of currently used None values.')
 
 
-class LambdaOnTrainLoop(AbstractCallback):
-    def __init__(self, fn_to_execute, tl_registration=False,
+class FunctionOnTrainLoop(AbstractCallback):
+    def __init__(self, fn_to_execute,
+                 tl_registration=False,
                  epoch_begin=False, epoch_end=False, train_begin=False, train_end=False, batch_begin=False, batch_end=False,
                  after_gradient_update=False, after_optimizer_step=False, execution_order=0):
-        """Execute given lambda or function as a callback in the TrainLoop
+        """Execute given function as a callback in the TrainLoop
 
         Args:
-            fn_to_execute (lambda or function): lambda/function logic to be executed at the desired point of
-                the TrainLoop. The lambda/function should take a single input as an argument which is the reference to
-                 the encapsulating TrainLoop object (self.train_loop_obj).
+            fn_to_execute (function): function logic to be executed at the desired point of the TrainLoop.
+                The function should take a single input as an argument which is the reference to the encapsulating
+                TrainLoop object (self.train_loop_obj).
             tl_registration (bool): should execute on TrainLoop registration
             epoch_begin (bool): should execute at the beginning of the epoch
             epoch_end (bool): should execute at the end of the epoch
@@ -234,7 +235,7 @@ class LambdaOnTrainLoop(AbstractCallback):
             execution_order (int): order of the callback execution. If all the used callbacks have the orders set to 0,
                 than the callbacks are executed in the order they were registered.
         """
-        AbstractCallback.__init__(self, 'Execute given lambda/function as a callback', execution_order)
+        AbstractCallback.__init__(self, 'Execute given function as a callback', execution_order)
         self.fn_to_execute = fn_to_execute
         self.tl_registration = tl_registration
         self.epoch_begin = epoch_begin
