@@ -210,3 +210,81 @@ class EmailNotification(AbstractCallback):
             raise AttributeError('Currently used TrainLoop does not support automatic project folder structure '
                                  'creation. Project name, etc. thus can not be automatically deduced. Please provide'
                                  'it in the callback parameters instead of currently used None values.')
+
+
+class FunctionOnTrainLoop(AbstractCallback):
+    def __init__(self, fn_to_execute,
+                 tl_registration=False,
+                 epoch_begin=False, epoch_end=False, train_begin=False, train_end=False, batch_begin=False, batch_end=False,
+                 after_gradient_update=False, after_optimizer_step=False, execution_order=0):
+        """Execute given function as a callback in the TrainLoop
+
+        Args:
+            fn_to_execute (function): function logic to be executed at the desired point of the TrainLoop.
+                The function should take a single input as an argument which is the reference to the encapsulating
+                TrainLoop object (self.train_loop_obj).
+            tl_registration (bool): should execute on TrainLoop registration
+            epoch_begin (bool): should execute at the beginning of the epoch
+            epoch_end (bool): should execute at the end of the epoch
+            train_begin (bool): should execute at the beginning of the training
+            train_end (bool): should execute at the end of the training
+            batch_begin (bool): should execute at the beginning of the batch
+            batch_end (bool): should execute at the end of the batch
+            after_gradient_update (bool): should execute after the gradient update
+            after_optimizer_step (bool): should execute after the optimizer step
+            execution_order (int): order of the callback execution. If all the used callbacks have the orders set to 0,
+                than the callbacks are executed in the order they were registered.
+        """
+        AbstractCallback.__init__(self, 'Execute given function as a callback', execution_order)
+        self.fn_to_execute = fn_to_execute
+        self.tl_registration = tl_registration
+        self.epoch_begin = epoch_begin
+        self.epoch_end = epoch_end
+        self.train_begin = train_begin
+        self.train_end = train_end
+        self.batch_begin = batch_begin
+        self.batch_end = batch_end
+        self.after_gradient_update = after_gradient_update
+        self.after_optimizer_step = after_optimizer_step
+
+    def execute_callback(self):
+        self.fn_to_execute(self.train_loop_obj)
+
+    def on_train_loop_registration(self):
+        if self.after_gradient_update or self.after_optimizer_step:
+            self.train_loop_obj.grad_cb_used = True
+
+        if self.tl_registration:
+            self.execute_callback()
+
+    def on_epoch_begin(self):
+        if self.epoch_begin:
+            self.execute_callback()
+
+    def on_epoch_end(self):
+        if self.epoch_end:
+            self.execute_callback()
+
+    def on_train_begin(self):
+        if self.train_begin:
+            self.execute_callback()
+
+    def on_train_end(self):
+        if self.train_end:
+            self.execute_callback()
+
+    def on_batch_begin(self):
+        if self.batch_begin:
+            self.execute_callback()
+
+    def on_batch_end(self):
+        if self.batch_end:
+            self.execute_callback()
+
+    def on_after_gradient_update(self):
+        if self.after_gradient_update:
+            self.execute_callback()
+
+    def on_after_optimizer_step(self):
+        if self.after_optimizer_step:
+            self.execute_callback()
