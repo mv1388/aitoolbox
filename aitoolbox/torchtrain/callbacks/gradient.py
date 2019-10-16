@@ -51,7 +51,7 @@ class GradNormClip(GradientCallbackBase):
         """Gradient norm clipping
 
         Args:
-            max_norm (int or float): max norm of the gradients
+            max_grad_norm (int or float): max norm of the gradients
             **kwargs:
         """
         GradientCallbackBase.__init__(self, 'Gradient norm clipping')
