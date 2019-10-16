@@ -32,20 +32,34 @@ class GradientCallbackBase(AbstractCallback):
         self.train_loop_obj.grad_cb_used = True
 
 
+class GradValueClip(GradientCallbackBase):
+    def __init__(self, max_grad_value):
+        """Gradient value clipping
+
+        Args:
+            max_grad_value (int or float): maximum allowed value of the gradients
+        """
+        GradientCallbackBase.__init__(self, 'Gradient value clipping')
+        self.max_grad_value = max_grad_value
+
+    def on_after_gradient_update(self):
+        torch.nn.utils.clip_grad_value_(self.train_loop_obj.model.parameters(), self.max_grad_value)
+
+
 class GradNormClip(GradientCallbackBase):
-    def __init__(self, max_norm, **kwargs):
+    def __init__(self, max_grad_norm, **kwargs):
         """Gradient norm clipping
 
         Args:
-            max_norm (int or float): gradient clipping
+            max_norm (int or float): max norm of the gradients
             **kwargs:
         """
-        GradientCallbackBase.__init__(self, 'Gradient clipping')
-        self.max_norm = max_norm
+        GradientCallbackBase.__init__(self, 'Gradient norm clipping')
+        self.max_grad_norm = max_grad_norm
         self.kwargs = kwargs
 
     def on_after_gradient_update(self):
-        torch.nn.utils.clip_grad_norm_(self.train_loop_obj.model.parameters(), self.max_norm, **self.kwargs)
+        torch.nn.utils.clip_grad_norm_(self.train_loop_obj.model.parameters(), self.max_grad_norm, **self.kwargs)
 
 
 class GradientStatsPrint(AbstractCallback):
