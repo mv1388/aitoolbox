@@ -1,16 +1,12 @@
 import os
 import numpy as np
-import seaborn as sns
-import matplotlib.pyplot as plt
-import matplotlib.style as style
 import torch
 
 from aitoolbox.torchtrain.callbacks.abstract import AbstractCallback, AbstractExperimentCallback
-from aitoolbox.experiment.local_save.folder_create import ExperimentFolderCreator
+from aitoolbox.experiment.local_save.local_results_save import BaseLocalResultsSaver
+from aitoolbox.experiment.result_reporting.report_generator import GradientPlotter
 from aitoolbox.cloud.AWS.results_save import BaseResultsSaver as BaseResultsS3Saver
 from aitoolbox.cloud.GoogleCloud.results_save import BaseResultsGoogleStorageSaver
-
-style.use('ggplot')
 
 
 class GradientCallbackBase(AbstractCallback):
@@ -67,8 +63,8 @@ class GradientStatsPrint(AbstractCallback):
         """Model gradients statistics reporting
 
         Args:
-            model_layers_extract_def: function/lambda accepting model as the input and returning a list of all
-                the layers in the model for which the gradient stats should be calculated
+            model_layers_extract_def (lambda or function): lambda/function accepting model as the input and returning
+                a list of all the layers in the model for which the gradient stats should be calculated
             on_every_grad_update (bool): should the gradient stats be calculated on every gradient update, e.g. after
                 every batch or only at the end of the epoch
         """
@@ -107,9 +103,25 @@ class GradientStatsPrint(AbstractCallback):
 
 
 class GradDistributionPlot(AbstractExperimentCallback):
-    def __init__(self, model_layers_extract_def,
+    def __init__(self, model_layers_extract_def, grad_plots_dir_name='grad_distribution',
                  project_name=None, experiment_name=None, local_model_result_folder_path=None,
                  cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix=''):
+        """Plot layers' gradient distributions after every epoch
+
+        Args:
+            model_layers_extract_def (lambda or function): lambda/function accepting model as the input and returning
+                a list of all the layers in the model for which the gradient stats should be calculated
+            grad_plots_dir_name (str): name of the folder where gradient distribution plots are saved after every epoch
+            project_name (str or None): root name of the project
+            experiment_name (str or None): name of the particular experiment
+            local_model_result_folder_path (str or None): root local path where project folder will be created
+            cloud_save_mode (str or None): Storage destination selector.
+                For AWS S3: 's3' / 'aws_s3' / 'aws'
+                For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
+                Everything else results just in local storage to disk
+            bucket_name (str): name of the bucket in the cloud storage
+            cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
+        """
         AbstractExperimentCallback.__init__(self, 'Gradient distribution plotter')
         self.project_name = project_name
         self.experiment_name = experiment_name
@@ -119,9 +131,12 @@ class GradDistributionPlot(AbstractExperimentCallback):
         self.cloud_save_mode = cloud_save_mode
         self.bucket_name = bucket_name
         self.cloud_dir_prefix = cloud_dir_prefix
+        self.grad_plots_dir_name = grad_plots_dir_name
 
         self.model_layers_extract_def = model_layers_extract_def
         self.cloud_results_saver = None
+
+        self.gradient_plotter = None
 
     def on_train_loop_registration(self):
         self.try_infer_experiment_details(infer_cloud_details=True)
@@ -132,33 +147,14 @@ class GradDistributionPlot(AbstractExperimentCallback):
 
     def gradient_plot(self):
         grad_plot_dir_path = self.create_plot_dirs()
-        grad_plot_dir_epoch_path = os.path.join(grad_plot_dir_path, f'epoch_{self.train_loop_obj.epoch}')
-        os.mkdir(grad_plot_dir_epoch_path)
+        if self.gradient_plotter is None:
+            self.gradient_plotter = GradientPlotter(experiment_grad_results_local_path=grad_plot_dir_path)
 
         model_layers_list = self.model_layers_extract_def(self.train_loop_obj.model)
-        saved_plot_paths = []
+        model_layer_gradients = [layer.weight.grad.reshape(-1).cpu().numpy() if layer.weight.grad is not None else None
+                                 for layer in model_layers_list]
 
-        for i, layer in enumerate(model_layers_list):
-            gradients = layer.weight.grad
-
-            if gradients is not None:
-                file_name = f'Layer_{i}.png'
-                file_path = os.path.join(grad_plot_dir_epoch_path, file_name)
-
-                gradients_flat = gradients.reshape(-1).cpu().numpy()
-
-                fig = plt.figure()
-                fig.set_size_inches(10, 8)
-
-                ax = sns.distplot(gradients_flat)
-                ax.set_xlabel("Gradient magnitude", size=10)
-                ax.set_title(f'Gradient distribution for layer {i}', size=10)
-
-                fig.savefig(file_path)
-                plt.close()
-                saved_plot_paths.append((file_path, file_name))
-            else:
-                print(f'Layer {i} grad are None')
+        saved_plot_paths = self.gradient_plotter.generate_report(model_layer_gradients, f'epoch_{self.train_loop_obj.epoch}')
 
         if self.cloud_results_saver is not None:
             self.save_to_cloud(saved_plot_paths)
@@ -168,19 +164,25 @@ class GradDistributionPlot(AbstractExperimentCallback):
             self.cloud_results_saver.create_experiment_cloud_storage_folder_structure(self.project_name,
                                                                                       self.experiment_name,
                                                                                       self.train_loop_obj.experiment_timestamp)
-        grad_plot_dir_path = os.path.join(experiment_cloud_path, 'grad_distribution')
+        grad_plots_dir_path = os.path.join(experiment_cloud_path, self.grad_plots_dir_name)
 
-        for local_f_path, f_name in saved_plot_paths:
-            plot_file_cloud_path = os.path.join(grad_plot_dir_path, f_name)
-            self.cloud_results_saver.save_file(local_file_path=local_f_path,
+        for file_path_in_cloud_grad_results_dir, local_file_path in saved_plot_paths:
+            plot_file_cloud_path = os.path.join(grad_plots_dir_path, file_path_in_cloud_grad_results_dir)
+            self.cloud_results_saver.save_file(local_file_path=local_file_path,
                                                cloud_file_path=plot_file_cloud_path)
 
-    def prepare_results_saver(self):
-        """
+    def create_plot_dirs(self):
+        experiment_results_local_path = \
+            BaseLocalResultsSaver.create_experiment_local_results_folder(self.project_name, self.experiment_name,
+                                                                         self.train_loop_obj.experiment_timestamp,
+                                                                         self.local_model_result_folder_path)
+        grad_plots_dir_path = os.path.join(experiment_results_local_path, self.grad_plots_dir_name)
+        if not os.path.exists(grad_plots_dir_path):
+            os.mkdir(grad_plots_dir_path)
 
-        Returns:
-            None
-        """
+        return grad_plots_dir_path
+
+    def prepare_results_saver(self):
         if self.cloud_save_mode == 's3' or self.cloud_save_mode == 'aws_s3' or self.cloud_save_mode == 'aws':
             self.cloud_results_saver = BaseResultsS3Saver(bucket_name=self.bucket_name,
                                                           cloud_dir_prefix=self.cloud_dir_prefix)
@@ -190,18 +192,3 @@ class GradDistributionPlot(AbstractExperimentCallback):
                                                                      cloud_dir_prefix=self.cloud_dir_prefix)
         else:
             self.cloud_results_saver = None
-
-    def create_plot_dirs(self):
-        experiment_path = \
-            ExperimentFolderCreator.create_experiment_base_folder(self.project_name, self.experiment_name,
-                                                                  self.train_loop_obj.experiment_timestamp,
-                                                                  self.local_model_result_folder_path)
-        results_dir_path = os.path.join(experiment_path, 'results')
-
-        if not os.path.exists(results_dir_path):
-            os.mkdir(results_dir_path)
-        grad_plot_dir_path = os.path.join(results_dir_path, 'grad_distribution')
-        if not os.path.exists(grad_plot_dir_path):
-            os.mkdir(grad_plot_dir_path)
-
-        return grad_plot_dir_path
