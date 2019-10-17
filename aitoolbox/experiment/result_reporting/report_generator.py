@@ -1,4 +1,5 @@
 import os
+import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib.style as style
@@ -62,7 +63,16 @@ class TrainingHistoryPlotter:
 
         ax.set_xlabel("Epoch", size=10)
         ax.set_ylabel(metric_name, size=10)
-        ax.set_title(metric_name, size=10)
+
+        # Adding plot title and subtitles
+        ax.text(s=metric_name, x=0.5, y=1.07, fontsize=16, weight='bold', ha='center', va='bottom',
+                transform=ax.transAxes)
+        ax.text(s=f'Max result: {max(result_history)} {metric_name} (at epoch {np.argmax(result_history)})',
+                x=0.5, y=1.035, fontsize=8, alpha=0.75,
+                ha='center', va='bottom', transform=ax.transAxes)
+        ax.text(s=f'Min result: {min(result_history)} {metric_name} (at epoch {np.argmin(result_history)})',
+                x=0.5, y=1.01, fontsize=8, alpha=0.75,
+                ha='center', va='bottom', transform=ax.transAxes)
 
         fig.savefig(file_path)
         plt.close()
