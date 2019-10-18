@@ -35,7 +35,7 @@ class ModelLoadContinueTraining(AbstractExperimentCallback):
             **kwargs: additional parameters for the local model loader load_model() function
         """
         AbstractExperimentCallback.__init__(self, 'Model loading and initialization from checkpoint before training',
-                                            execution_order=0)
+                                            execution_order=-10)
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path) \
