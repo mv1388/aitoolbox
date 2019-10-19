@@ -15,7 +15,7 @@ except AttributeError:
     APEX_AVAILABLE = False
 
 from aitoolbox.utils import dict_util
-from aitoolbox.torchtrain.model import TTModel, ModelWrap
+from aitoolbox.torchtrain.model import TTModel, ModelWrap, TTDataParallel
 from aitoolbox.torchtrain.multi_loss_optim import MultiLoss, MultiOptimizer
 from aitoolbox.torchtrain.data.batch_model_feed_defs import AbstractModelFeedDefinition
 from aitoolbox.torchtrain.tl_components.callback_handler import CallbacksHandler
@@ -40,8 +40,7 @@ class TrainLoop:
         the logic needed for prediction of target variables.
 
         Args:
-            model (aitoolbox.torchtrain.model.TTModel or aitoolbox.torchtrain.model.ModelWrap): neural
-                network model
+            model (TTModel or ModelWrap or TTDataParallel): neural network model
             train_loader (torch.utils.data.DataLoader): data loader for train data set
             validation_loader (torch.utils.data.DataLoader): data loader for validation data set
             test_loader (torch.utils.data.DataLoader): data loader for test data set
@@ -57,7 +56,7 @@ class TrainLoop:
                 execute only every specified number of epochs.
             use_amp (bool): use Nvidia Apex 16-bit Automatic Mixed Precision (AMP)
         """
-        if isinstance(model, TTModel):
+        if isinstance(model, TTModel) or isinstance(model, TTDataParallel):
             self.model = model
             self.batch_model_feed_def = None
         elif type(model) == ModelWrap:
@@ -94,9 +93,10 @@ class TrainLoop:
 
         self.grad_cb_used = False
 
-        if not isinstance(self.model, TTModel) and not isinstance(self.model, Module):
-            raise TypeError('Provided model is not inherited from TTModel or base PyTorch Module')
-        if not isinstance(self.model, TTModel) and \
+        if not isinstance(self.model, TTModel) and not isinstance(self.model, TTDataParallel) and \
+                not isinstance(self.model, Module):
+            raise TypeError('Provided model is not inherited from TTModel/TTDataParallel and base PyTorch Module')
+        if not isinstance(self.model, TTModel) and not isinstance(self.model, TTDataParallel) and \
                 isinstance(self.model, Module) and not isinstance(self.batch_model_feed_def, AbstractModelFeedDefinition):
             raise TypeError('Provided the base PyTorch model but did not give the batch_model_feed_def')
         if self.use_amp and not APEX_AVAILABLE:
@@ -141,7 +141,7 @@ class TrainLoop:
             for batch_data in tqdm(self.train_loader):
                 self.callbacks_handler.execute_batch_begin()
 
-                if isinstance(self.model, TTModel):
+                if isinstance(self.model, TTModel) or isinstance(self.model, TTDataParallel):
                     loss_batch = self.model.get_loss(batch_data, self.criterion, self.device)
                 else:
                     loss_batch = self.batch_model_feed_def.get_loss(self.model, batch_data, self.criterion, self.device)
@@ -265,7 +265,7 @@ class TrainLoop:
 
         with torch.no_grad():
             for batch_data in tqdm(data_loader):
-                if isinstance(self.model, TTModel):
+                if isinstance(self.model, TTModel) or isinstance(self.model, TTDataParallel):
                     loss_batch = self.model.get_loss_eval(batch_data, self.criterion, self.device)
                 else:
                     loss_batch = self.batch_model_feed_def.get_loss_eval(self.model, batch_data, self.criterion,
@@ -343,7 +343,7 @@ class TrainLoop:
 
         with torch.no_grad():
             for batch_data in tqdm(data_loader):
-                if isinstance(self.model, TTModel):
+                if isinstance(self.model, TTModel) or isinstance(self.model, TTDataParallel):
                     y_pred_batch, y_test_batch, metadata_batch = self.model.get_predictions(batch_data, self.device)
                 else:
                     y_pred_batch, y_test_batch, metadata_batch = \
@@ -389,8 +389,7 @@ class TrainLoopModelCheckpoint(TrainLoop):
         """TrainLoop with the automatic model check-pointing at the end of each epoch
 
         Args:
-            model (aitoolbox.torchtrain.model.TTModel or aitoolbox.torchtrain.model.ModelWrap): neural
-                network model
+            model (TTModel or ModelWrap or TTDataParallel): neural network model
             train_loader (torch.utils.data.DataLoader):
             validation_loader (torch.utils.data.DataLoader):
             test_loader (torch.utils.data.DataLoader):
@@ -461,8 +460,7 @@ class TrainLoopModelEndSave(TrainLoop):
         """TrainLoop with the model performance evaluation and final model saving at the end of the training process
 
         Args:
-            model (aitoolbox.torchtrain.model.TTModel or aitoolbox.torchtrain.model.ModelWrap): neural
-                network model
+            model (TTModel or ModelWrap or TTDataParallel): neural network model
             train_loader (torch.utils.data.DataLoader):
             validation_loader (torch.utils.data.DataLoader or None):
             test_loader (torch.utils.data.DataLoader or None):
@@ -551,8 +549,7 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
             and model saving at the end of the training process
 
         Args:
-            model (aitoolbox.torchtrain.model.TTModel or aitoolbox.torchtrain.model.ModelWrap): neural
-                network model
+            model (TTModel or ModelWrap or TTDataParallel): neural network model
             train_loader (torch.utils.data.DataLoader):
             validation_loader (torch.utils.data.DataLoader or None):
             test_loader (torch.utils.data.DataLoader or None):
