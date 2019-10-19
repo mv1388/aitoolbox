@@ -102,8 +102,7 @@ class TTDataParallel(nn.DataParallel):
                     functools.partial(copy_function(getattr(module, method_name)), self))
 
         # Optionally transfer additional TTModel attributes to the TTDataParallel level
-        if add_model_attributes is not None and \
-                (type(add_model_attributes) is list or type(add_model_attributes) is tuple):
+        if add_model_attributes is not None and isinstance(add_model_attributes, (list, tuple)):
             for attr_name in add_model_attributes:
                 setattr(self, attr_name, getattr(module, attr_name))
 
