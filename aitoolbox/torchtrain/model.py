@@ -1,7 +1,9 @@
 from abc import ABC, abstractmethod
+import functools
 import torch.nn as nn
 from torch.nn.modules import Module
 
+from aitoolbox.utils.util import copy_function
 from aitoolbox.torchtrain.data.batch_model_feed_defs import AbstractModelFeedDefinition
 
 
@@ -65,6 +67,38 @@ class TTModel(nn.Module, ABC):
 
 # For back-compatibility: TTFullModel was the previous name for TTModel
 TTFullModel = TTModel
+
+
+class TTDataParallel(nn.DataParallel):
+    def __init__(self, module, default_model_methods=('get_loss', 'get_loss_eval', 'get_predictions'), **kwargs):
+        """
+
+        Args:
+            module (TTModel):
+            default_model_methods (list or tuple):
+            **kwargs:
+        """
+        super().__init__(module, **kwargs)
+        self.get_loss_fn = copy_function(module.get_loss)
+        self.get_loss_eval_fn = copy_function(module.get_loss_eval)
+        self.get_predictions_fn = copy_function(module.get_predictions)
+
+        methods = list(set(dir(module))
+                       - set(dir(nn.Module)) - set(vars(module)['_modules'].keys()) - set(default_model_methods))
+        additional_methods = [method_name for method_name in methods if callable(getattr(module, method_name, None))]
+
+        for method_name in additional_methods:
+            setattr(self, method_name,
+                    functools.partial(copy_function(getattr(module, method_name)), self))
+
+    def get_loss(self, batch_data, criterion, device):
+        return self.get_loss_fn(self, batch_data, criterion, device)
+
+    def get_loss_eval(self, batch_data, criterion, device):
+        return self.get_loss_eval_fn(self, batch_data, criterion, device)
+
+    def get_predictions(self, batch_data, device):
+        return self.get_predictions_fn(self, batch_data, device)
 
 
 class ModelWrap:
