@@ -70,7 +70,8 @@ TTFullModel = TTModel
 
 
 class TTDataParallel(nn.DataParallel):
-    def __init__(self, module, default_model_methods=('get_loss', 'get_loss_eval', 'get_predictions'), **kwargs):
+    def __init__(self, module, add_model_attributes=None,
+                 default_model_methods=('get_loss', 'get_loss_eval', 'get_predictions'), **kwargs):
         """torchtrain enabled DataParallel
 
         This DataParallel wrapper works in the same way as the original PyTorch nn.DataParallel. Furthermore it exposes
@@ -79,6 +80,8 @@ class TTDataParallel(nn.DataParallel):
 
         Args:
             module (TTModel): neural network model
+            add_model_attributes (list or tuple or None): additional TTModel attributes which need to be transferred to
+                the TTDataParallel level to enable their use in the transferred/exposed class methods
             default_model_methods (list or tuple): list of core methods which are present also in TTModel abstract class
             **kwargs: additional parameters for underlying nn.DataParallel
         """
@@ -97,6 +100,12 @@ class TTDataParallel(nn.DataParallel):
         for method_name in additional_methods:
             setattr(self, method_name,
                     functools.partial(copy_function(getattr(module, method_name)), self))
+
+        # Optionally transfer additional TTModel attributes to the TTDataParallel level
+        if add_model_attributes is not None and \
+                (type(add_model_attributes) is list or type(add_model_attributes) is tuple):
+            for attr_name in add_model_attributes:
+                setattr(self, attr_name, getattr(module, attr_name))
 
     def get_loss(self, batch_data, criterion, device):
         return self.get_loss_fn(self, batch_data, criterion, device)
