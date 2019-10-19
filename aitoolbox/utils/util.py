@@ -27,7 +27,7 @@ def copy_function(fn):
         fn (callable): original function
 
     Returns:
-        function: copy of the provided function
+        callable: copy of the provided function
     """
     g = types.FunctionType(fn.__code__, fn.__globals__, name=fn.__name__,
                            argdefs=fn.__defaults__,

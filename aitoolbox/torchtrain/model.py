@@ -71,18 +71,25 @@ TTFullModel = TTModel
 
 class TTDataParallel(nn.DataParallel):
     def __init__(self, module, default_model_methods=('get_loss', 'get_loss_eval', 'get_predictions'), **kwargs):
-        """
+        """torchtrain enabled DataParallel
+
+        This DataParallel wrapper works in the same way as the original PyTorch nn.DataParallel. Furthermore it exposes
+        TTModel batch data feeding definitions (additional abstract methods) to the TrainLoop while still enabling
+        multi GPU training.
 
         Args:
-            module (TTModel):
-            default_model_methods (list or tuple):
-            **kwargs:
+            module (TTModel): neural network model
+            default_model_methods (list or tuple): list of core methods which are present also in TTModel abstract class
+            **kwargs: additional parameters for underlying nn.DataParallel
         """
         super().__init__(module, **kwargs)
+
+        # Core TTModel methods which every model has
         self.get_loss_fn = copy_function(module.get_loss)
         self.get_loss_eval_fn = copy_function(module.get_loss_eval)
         self.get_predictions_fn = copy_function(module.get_predictions)
 
+        # Transfer any additional sub-methods from TTModel to TTDataParallel
         methods = list(set(dir(module))
                        - set(dir(nn.Module)) - set(vars(module)['_modules'].keys()) - set(default_model_methods))
         additional_methods = [method_name for method_name in methods if callable(getattr(module, method_name, None))]
