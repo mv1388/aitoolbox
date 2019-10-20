@@ -1,7 +1,6 @@
 # AI Toolbox
 
 [![Build Status](https://travis-ci.org/mv1388/AIToolbox.svg?branch=master)](https://travis-ci.org/mv1388/AIToolbox)
-<!-- [![CircleCI](https://circleci.com/gh/mv1388/aitoolbox/tree/master.svg?style=svg)](https://circleci.com/gh/mv1388/aitoolbox/tree/master) -->
 &nbsp; &nbsp;
 [![codebeat badge](https://codebeat.co/badges/04217a3f-a838-418f-8f14-66cf6ae1b03d)](https://codebeat.co/projects/github-com-mv1388-aitoolbox-master)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/8349596c31a948d8916814a2037ffdf3)](https://www.codacy.com/manual/mv1388/AIToolbox?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=mv1388/AIToolbox&amp;utm_campaign=Badge_Grade)
