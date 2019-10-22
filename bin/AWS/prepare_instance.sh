@@ -35,6 +35,7 @@ function usage()
      -p, --project STR      path to the project to be optionally uploaded to the running ec2 instance
      -d, --dataset STR      dataset to be optionally downloaded from the S3 storage directly to ec2 instance
      -r, --preproc STR      the preprocessed version of the main dataset
+     -x, --apex             switch on to install Nvidia Apex library for mixed precision training
      -h, --help             show this help message and exit
 
 HEREDOC
@@ -47,6 +48,7 @@ AIToolbox_version="0.3"
 local_project_path=
 dataset_name=
 preproc_dataset=
+use_apex=false
 
 while [[ $# -gt 0 ]]; do
 key="$1"
@@ -79,6 +81,10 @@ case $key in
     -r|--preproc)
     preproc_dataset="$2"
     shift 2 # past argument value
+    ;;
+    -x|--apex)
+    use_apex=true
+    shift 1 # past argument value
     ;;
     -h|--help )
     usage;
@@ -139,10 +145,12 @@ pip install --ignore-installed greenlet
 conda install -y -c conda-forge jsonnet
 conda install -y -c anaconda seaborn=0.9.0
 
-git clone https://github.com/NVIDIA/apex
-cd apex
-pip install -v --no-cache-dir --global-option=\"--cpp_ext\" --global-option=\"--cuda_ext\" ./
-cd ..
+if [ $use_apex == true ]; then
+    git clone https://github.com/NVIDIA/apex
+    cd apex
+    pip install -v --no-cache-dir --global-option=\"--cpp_ext\" --global-option=\"--cuda_ext\" ./
+    cd ..
+fi
 
 pip install aitoolbox-$AIToolbox_version.tar.gz
 
