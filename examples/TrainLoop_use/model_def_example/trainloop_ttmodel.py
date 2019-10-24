@@ -34,7 +34,7 @@ class Net(TTModel):
         data, target = batch_data
         data, target = data.to(device), target.to(device)
 
-        output = model(data)
+        output = self(data)
         loss = criterion(output, target)
 
         return loss
@@ -43,7 +43,7 @@ class Net(TTModel):
         data, y_test = batch_data
         data = data.to(device)
 
-        output = model(data)
+        output = self(data)
         y_pred = output.argmax(dim=1, keepdim=False)  # get the index of the max log-probability
 
         return y_pred.cpu(), y_test, {}
