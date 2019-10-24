@@ -42,8 +42,8 @@ class TrainLoop:
         Args:
             model (TTModel or ModelWrap or TTDataParallel): neural network model
             train_loader (torch.utils.data.DataLoader): data loader for train data set
-            validation_loader (torch.utils.data.DataLoader): data loader for validation data set
-            test_loader (torch.utils.data.DataLoader): data loader for test data set
+            validation_loader (torch.utils.data.DataLoader or None): data loader for validation data set
+            test_loader (torch.utils.data.DataLoader or None): data loader for test data set
             optimizer (torch.optim.optimizer.Optimizer or MultiOptimizer): optimizer algorithm.
             criterion (torch.nn.modules.loss._Loss or MultiLoss): criterion criterion during the training procedure.
             collate_batch_pred_fn (callable): collate function transforming batch predictions as they come out from the
@@ -390,9 +390,9 @@ class TrainLoopModelCheckpoint(TrainLoop):
 
         Args:
             model (TTModel or ModelWrap or TTDataParallel): neural network model
-            train_loader (torch.utils.data.DataLoader):
-            validation_loader (torch.utils.data.DataLoader):
-            test_loader (torch.utils.data.DataLoader):
+            train_loader (torch.utils.data.DataLoader): data loader for train data set
+            validation_loader (torch.utils.data.DataLoader or None): data loader for validation data set
+            test_loader (torch.utils.data.DataLoader or None): data loader for test data set
             optimizer (torch.optim.optimizer.Optimizer or MultiOptimizer): optimizer algorithm.
             criterion (torch.nn.modules.loss._Loss or MultiLoss): criterion criterion during the training procedure.
             project_name (str): root name of the project
@@ -461,9 +461,9 @@ class TrainLoopModelEndSave(TrainLoop):
 
         Args:
             model (TTModel or ModelWrap or TTDataParallel): neural network model
-            train_loader (torch.utils.data.DataLoader):
-            validation_loader (torch.utils.data.DataLoader or None):
-            test_loader (torch.utils.data.DataLoader or None):
+            train_loader (torch.utils.data.DataLoader): data loader for train data set
+            validation_loader (torch.utils.data.DataLoader or None): data loader for validation data set
+            test_loader (torch.utils.data.DataLoader or None): data loader for test data set
             optimizer (torch.optim.optimizer.Optimizer or MultiOptimizer): optimizer algorithm.
             criterion (torch.nn.modules.loss._Loss or MultiLoss): criterion criterion during the training procedure.
             project_name (str): root name of the project
@@ -550,9 +550,9 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
 
         Args:
             model (TTModel or ModelWrap or TTDataParallel): neural network model
-            train_loader (torch.utils.data.DataLoader):
-            validation_loader (torch.utils.data.DataLoader or None):
-            test_loader (torch.utils.data.DataLoader or None):
+            train_loader (torch.utils.data.DataLoader): data loader for train data set
+            validation_loader (torch.utils.data.DataLoader or None): data loader for validation data set
+            test_loader (torch.utils.data.DataLoader or None): data loader for test data set
             optimizer (torch.optim.optimizer.Optimizer or MultiOptimizer): optimizer algorithm.
             criterion (torch.nn.modules.loss._Loss or MultiLoss): criterion criterion during the training procedure.
             project_name (str): root name of the project
