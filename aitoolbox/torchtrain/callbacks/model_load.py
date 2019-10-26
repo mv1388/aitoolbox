@@ -71,6 +71,11 @@ class ModelLoadContinueTraining(AbstractExperimentCallback):
         self.train_loop_obj.epoch = model_representation['epoch'] + 1
 
     def init_model_loader(self):
+        """Initialize model loader object based on provided arguments to the callback object
+
+        Returns:
+            None
+        """
         if self.cloud_save_mode in ['s3', 'aws_s3', 'aws']:
             self.model_loader = PyTorchS3ModelLoader(self.local_model_result_folder_path,
                                                      self.bucket_name, self.cloud_dir_prefix)
