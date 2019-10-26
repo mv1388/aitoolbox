@@ -56,7 +56,21 @@ class ModelLoadContinueTraining(AbstractExperimentCallback):
 
     def on_train_loop_registration(self):
         self.try_infer_experiment_details(infer_cloud_details=True)
+        self.init_model_loader()
 
+        model_representation = self.model_loader.load_model(self.project_name, self.experiment_name,
+                                                            self.saved_experiment_timestamp, self.saved_model_dir,
+                                                            self.epoch_num, **self.local_loader_kwargs)
+
+        self.train_loop_obj.model = self.model_loader.init_model(self.train_loop_obj.model,
+                                                                 self.used_data_parallel)
+        self.train_loop_obj.optimizer = self.model_loader.init_optimizer(self.train_loop_obj.optimizer)
+        if self.train_loop_obj.use_amp:
+            self.model_loader.init_amp()
+
+        self.train_loop_obj.epoch = model_representation['epoch'] + 1
+
+    def init_model_loader(self):
         if self.cloud_save_mode in ['s3', 'aws_s3', 'aws']:
             self.model_loader = PyTorchS3ModelLoader(self.local_model_result_folder_path,
                                                      self.bucket_name, self.cloud_dir_prefix)
@@ -74,15 +88,3 @@ class ModelLoadContinueTraining(AbstractExperimentCallback):
                 self.model_loader = PyTorchLocalModelLoader(self.local_model_result_folder_path)
             else:
                 self.model_loader = self.custom_local_loader_class(self.local_model_result_folder_path)
-
-        model_representation = self.model_loader.load_model(self.project_name, self.experiment_name,
-                                                            self.saved_experiment_timestamp, self.saved_model_dir,
-                                                            self.epoch_num, **self.local_loader_kwargs)
-
-        self.train_loop_obj.model = self.model_loader.init_model(self.train_loop_obj.model,
-                                                                 self.used_data_parallel)
-        self.train_loop_obj.optimizer = self.model_loader.init_optimizer(self.train_loop_obj.optimizer)
-        if self.train_loop_obj.use_amp:
-            self.model_loader.init_amp()
-
-        self.train_loop_obj.epoch = model_representation['epoch'] + 1
