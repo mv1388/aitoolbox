@@ -111,7 +111,7 @@ class TrainLoop:
             callbacks (list): callbacks that are executed during the training run
 
         Returns:
-            TTModel, torch.nn.modules.Module, TTDataParallel: trained model
+            TTModel or torch.nn.modules.Module or TTDataParallel: trained model
         """
         return self.fit(num_epoch, callbacks)
 
@@ -123,7 +123,7 @@ class TrainLoop:
             callbacks (list): callbacks that are executed during the training run
 
         Returns:
-            TTModel, torch.nn.modules.Module, TTDataParallel: trained model
+            TTModel or torch.nn.modules.Module or TTDataParallel: trained model
         """
         self.callbacks_handler.register_callbacks(callbacks)
 
