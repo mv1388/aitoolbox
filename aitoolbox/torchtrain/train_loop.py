@@ -219,8 +219,7 @@ class TrainLoop:
             None
         """
         if self.test_loader is not None and \
-                ((type(self.end_auto_eval) is bool and self.end_auto_eval) or
-                 (type(self.end_auto_eval) is int and self.epoch % self.end_auto_eval == 0)):
+                ((type(self.end_auto_eval) is bool and self.end_auto_eval) or type(self.end_auto_eval) is int):
             test_loss = self.evaluate_loss_on_test_set()
             print(f'TEST LOSS: {test_loss}')
             # To keep TrainingHistory from complaining due to the non-matching metric result lengths the checking
