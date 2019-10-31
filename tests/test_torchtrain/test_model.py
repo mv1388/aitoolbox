@@ -42,8 +42,8 @@ class MyBasicModel(TTBasicModel):
     def forward(self, *input):
         pass
 
-    def __call__(self, *args):
-        return DummyData([el.value + 10 for el in args], device='gpu')
+    def __call__(self, a, b):
+        return DummyData([a.value + 10, b.value + 20], device='gpu')
 
 
 class DummyData:
@@ -73,7 +73,7 @@ class TestTTModelBasic(unittest.TestCase):
 
         model = MyBasicModel()
         loss = model.get_loss([d1, d2, d3], lambda y_pred, y: sum(y_pred.value + [y.value]), 'gpu')
-        self.assertEqual(loss, 323)
+        self.assertEqual(loss, 333)
         self.assertEqual(d1.device, 'gpu')
         self.assertEqual(d2.device, 'gpu')
         self.assertEqual(d3.device, 'gpu')
@@ -85,7 +85,7 @@ class TestTTModelBasic(unittest.TestCase):
 
         model = MyBasicModel()
         predictions, targets, metadata = model.get_predictions([d1, d2, d3], 'gpu')
-        self.assertEqual(predictions.value, [11, 12])
+        self.assertEqual(predictions.value, [11, 22])
         self.assertEqual(predictions.device, 'cpu')
         self.assertEqual(targets.value, 300)
         self.assertEqual(targets.device, 'cpu')
