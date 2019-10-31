@@ -3,7 +3,7 @@ from torch import nn
 
 from tests.utils import *
 
-from aitoolbox.torchtrain.model import TTModel, TTDataParallel
+from aitoolbox.torchtrain.model import TTModel, TTBasicModel, TTDataParallel
 from aitoolbox.utils.util import function_exists
 
 
@@ -33,6 +33,66 @@ class TestTTModel(unittest.TestCase):
                 pass
 
         self.assertTrue(isinstance(MyModel(), nn.Module))
+
+
+class MyBasicModel(TTBasicModel):
+    def __init__(self):
+        super().__init__()
+
+    def forward(self, *input_data):
+        pass
+
+    def __call__(self, a, b):
+        return DummyData([a.value + 10, b.value + 20], device='gpu')
+
+
+class DummyData:
+    def __init__(self, value, device='cpu'):
+        self.value = value
+        self.device = device
+
+    def to(self, device):
+        self.device = device
+        return self
+
+    def cpu(self):
+        self.device = 'cpu'
+        return self
+
+
+class TestTTModelBasic(unittest.TestCase):
+    def test_inheritance(self):
+        model = TTBasicModel()
+        self.assertTrue(isinstance(model, nn.Module))
+        self.assertTrue(isinstance(model, TTModel))
+
+    def test_get_loss(self):
+        d1 = DummyData(1)
+        d2 = DummyData(2)
+        d3 = DummyData(300)
+
+        model = MyBasicModel()
+        loss = model.get_loss([d1, d2, d3], lambda y_pred, y: sum(y_pred.value + [y.value]), 'gpu')
+        self.assertEqual(loss, 333)
+        self.assertEqual(d1.device, 'gpu')
+        self.assertEqual(d2.device, 'gpu')
+        self.assertEqual(d3.device, 'gpu')
+
+    def test_get_predictions(self):
+        d1 = DummyData(1)
+        d2 = DummyData(2)
+        d3 = DummyData(300)
+
+        model = MyBasicModel()
+        predictions, targets, metadata = model.get_predictions([d1, d2, d3], 'gpu')
+        self.assertEqual(predictions.value, [11, 22])
+        self.assertEqual(predictions.device, 'cpu')
+        self.assertEqual(targets.value, 300)
+        self.assertEqual(targets.device, 'cpu')
+        self.assertEqual(d1.device, 'gpu')
+        self.assertEqual(d2.device, 'gpu')
+        self.assertEqual(d3.device, 'cpu')
+        self.assertEqual(metadata, {})
 
 
 class MyModel(NetUnifiedBatchFeed):
