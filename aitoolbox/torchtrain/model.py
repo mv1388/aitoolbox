@@ -89,7 +89,7 @@ class TTModelBasic(TTModel):
         *batch_input_data, targets = batch_data
         batch_input_data = [data.to(device) for data in batch_input_data]
 
-        predictions = self(batch_input_data)
+        predictions = self(*batch_input_data)
 
         return predictions.cpu(), targets, {}
 
