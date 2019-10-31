@@ -39,7 +39,7 @@ class MyBasicModel(TTBasicModel):
     def __init__(self):
         super().__init__()
 
-    def forward(self, *input):
+    def forward(self, *input_data):
         pass
 
     def __call__(self, a, b):
@@ -92,6 +92,7 @@ class TestTTModelBasic(unittest.TestCase):
         self.assertEqual(d1.device, 'gpu')
         self.assertEqual(d2.device, 'gpu')
         self.assertEqual(d3.device, 'cpu')
+        self.assertEqual(metadata, {})
 
 
 class MyModel(NetUnifiedBatchFeed):
