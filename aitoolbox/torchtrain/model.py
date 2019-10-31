@@ -69,6 +69,31 @@ class TTModel(nn.Module, ABC):
 TTFullModel = TTModel
 
 
+class TTModelBasic(TTModel):
+    """
+    Extension of the TTModel abstract class with already implemented simple loss and prediction calculation functions
+
+    This is mainly meant to be used for simple models where during the development of multiple model architectures,
+    the get_loss() and get_predictions() would always stay the same. Using TTModelBasic thus removes the need to
+    constantly duplicate code in these two functions.
+    """
+    def get_loss(self, batch_data, criterion, device):
+        *batch_input_data, targets = [data.to(device) for data in batch_data]
+
+        predictions = self(*batch_input_data)
+        loss = criterion(predictions, targets)
+
+        return loss
+
+    def get_predictions(self, batch_data, device):
+        *batch_input_data, targets = batch_data
+        batch_input_data = [data.to(device) for data in batch_input_data]
+
+        predictions = self(batch_input_data)
+
+        return predictions.cpu(), targets, {}
+
+
 class TTDataParallel(nn.DataParallel):
     def __init__(self, module, add_model_attributes=None,
                  default_model_methods=('get_loss', 'get_loss_eval', 'get_predictions'), **kwargs):
