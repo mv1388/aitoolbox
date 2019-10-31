@@ -3,7 +3,7 @@ from torch import nn
 
 from tests.utils import *
 
-from aitoolbox.torchtrain.model import TTModel, TTModelBasic, TTDataParallel
+from aitoolbox.torchtrain.model import TTModel, TTBasicModel, TTDataParallel
 from aitoolbox.utils.util import function_exists
 
 
@@ -35,7 +35,7 @@ class TestTTModel(unittest.TestCase):
         self.assertTrue(isinstance(MyModel(), nn.Module))
 
 
-class MyBasicModel(TTModelBasic):
+class MyBasicModel(TTBasicModel):
     def __init__(self):
         super().__init__()
 
@@ -62,7 +62,7 @@ class DummyData:
 
 class TestTTModelBasic(unittest.TestCase):
     def test_inheritance(self):
-        model = TTModelBasic()
+        model = TTBasicModel()
         self.assertTrue(isinstance(model, nn.Module))
         self.assertTrue(isinstance(model, TTModel))
 

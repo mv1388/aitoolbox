@@ -69,12 +69,12 @@ class TTModel(nn.Module, ABC):
 TTFullModel = TTModel
 
 
-class TTModelBasic(TTModel):
+class TTBasicModel(TTModel):
     """
     Extension of the TTModel abstract class with already implemented simple loss and prediction calculation functions
 
     This is mainly meant to be used for simple models where during the development of multiple model architectures,
-    the get_loss() and get_predictions() would always stay the same. Using TTModelBasic thus removes the need to
+    the get_loss() and get_predictions() would always stay the same. Using TTBasicModel thus removes the need to
     constantly duplicate code in these two functions.
     """
     def get_loss(self, batch_data, criterion, device):
