@@ -14,7 +14,7 @@ class TestTrainLoop(unittest.TestCase):
 
         train_loop = TrainLoop(NetUnifiedBatchFeed(), None, 100, None, None, None)
         self.assertEqual(train_loop.train_history.train_history, {'loss': [], 'accumulated_loss': [], 'val_loss': []})
-        
+
         self.assertEqual(train_loop.callbacks, [])
         self.assertIsInstance(train_loop.callbacks_handler, CallbacksHandler)
         self.assertEqual(train_loop.callbacks_handler.train_loop_obj, train_loop)
