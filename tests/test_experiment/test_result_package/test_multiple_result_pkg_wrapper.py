@@ -171,18 +171,18 @@ class TestMultipleResultPackageWrapper(unittest.TestCase):
         pkg_2.prepare_result_package([10] * 100, [11] * 100, {'qqq': 445}, self.build_train_hist())
 
         with self.assertRaises(ValueError):
-            res = pkg_1 + pkg_2
+            _ = pkg_1 + pkg_2
 
         with self.assertRaises(ValueError):
-            res = pkg_1 + {'metric3': 1, 'metric4': 2}
+            _ = pkg_1 + {'metric3': 1, 'metric4': 2}
 
         pkg_1.prepare_result_package([10] * 100, [11] * 100, {'dddd': 222}, self.build_train_hist())
 
         with self.assertRaises(ValueError):
-            res = pkg_1 + 2233
+            _ = pkg_1 + 2233
 
         with self.assertRaises(ValueError):
-            res = pkg_1 + [32313]
+            _ = pkg_1 + [32313]
 
     def test_append_fail(self):
         result_d_1 = {'metric1': 33232, 'metric2': 1000}
