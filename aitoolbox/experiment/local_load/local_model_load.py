@@ -5,9 +5,7 @@ import torch
 try:
     from apex import amp
     APEX_AVAILABLE = True
-except ModuleNotFoundError:
-    APEX_AVAILABLE = False
-except AttributeError:
+except ImportError:
     APEX_AVAILABLE = False
 
 from aitoolbox.experiment.local_save.folder_create import ExperimentFolderCreator
