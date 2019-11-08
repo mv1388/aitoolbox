@@ -70,12 +70,14 @@ TTFullModel = TTModel
 
 
 class TTBasicModel(TTModel):
-    """
-    Extension of the TTModel abstract class with already implemented simple loss and prediction calculation functions
+    """Extension of the TTModel abstract class with already implemented simple loss and prediction calculation functions
 
-    This is mainly meant to be used for simple models where during the development of multiple model architectures,
-    the get_loss() and get_predictions() would always stay the same. Using TTBasicModel thus removes the need to
-    constantly duplicate code in these two functions.
+    The pre-implemented get_loss() and get_predictions() will take all the provided data sources from the data loader
+    except the last one as an input to the model. The last data source from the data loader will be treated as
+    the target variable. (*batch_input_data, targets = batch_data)
+
+    This base class is mainly meant to be used for simple models. TTBasicModel removes the need to constantly
+    duplicate code in get_loss and get_predictions.
     """
     def get_loss(self, batch_data, criterion, device):
         *batch_input_data, targets = [data.to(device) for data in batch_data]
