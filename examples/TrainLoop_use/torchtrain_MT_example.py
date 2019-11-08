@@ -64,10 +64,10 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 train_iterator, valid_iterator, test_iterator = BucketIterator.splits(
     (train_data, valid_data, test_data),
-     batch_size=BATCH_SIZE,
-     sort_key = lambda x : len(x.src),
-     sort_within_batch=True,
-     device=device)
+    batch_size=BATCH_SIZE,
+    sort_key = lambda x : len(x.src),
+    sort_within_batch=True,
+    device=device)
 
 
 class Encoder(nn.Module):
