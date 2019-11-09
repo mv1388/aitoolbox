@@ -35,7 +35,7 @@ matrix:
         - virtualenv -p python3 ~/venv
         - source ~/venv/bin/activate
 
-cache: pip
+#cache: pip
 
 # command to install dependencies
 install:
