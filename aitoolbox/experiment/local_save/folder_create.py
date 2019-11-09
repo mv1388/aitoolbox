@@ -1,10 +1,10 @@
 import os
 
 
-class ExperimentFolderCreator:
+class ExperimentFolder:
     @staticmethod
-    def create_experiment_base_folder(project_name, experiment_name, experiment_timestamp,
-                                      local_model_result_folder_path):
+    def create_base_folder(project_name, experiment_name, experiment_timestamp,
+                           local_model_result_folder_path):
         """Create local folder hierarchy for the experiment tracking
 
         Args:
@@ -17,9 +17,8 @@ class ExperimentFolderCreator:
             str: path to the created experiment base folder
         """
         project_path, experiment_path = \
-            ExperimentFolderCreator.get_experiment_base_folder_paths(project_name, experiment_name,
-                                                                     experiment_timestamp,
-                                                                     local_model_result_folder_path)
+            ExperimentFolder.get_base_folder_paths(project_name, experiment_name, experiment_timestamp,
+                                                   local_model_result_folder_path)
 
         if not os.path.exists(project_path):
             os.mkdir(project_path)
@@ -29,8 +28,8 @@ class ExperimentFolderCreator:
         return experiment_path
 
     @staticmethod
-    def get_experiment_base_folder_paths(project_name, experiment_name, experiment_timestamp,
-                                         local_model_result_folder_path):
+    def get_base_folder_paths(project_name, experiment_name, experiment_timestamp,
+                              local_model_result_folder_path):
         """Generate local folder hierarchy paths for the experiment tracking
 
         Does not actually create the folders, just generates the folder paths

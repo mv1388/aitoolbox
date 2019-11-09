@@ -5,7 +5,7 @@ import datetime
 import pickle
 import json
 
-from aitoolbox.experiment.local_save.folder_create import ExperimentFolderCreator
+from aitoolbox.experiment.local_save.folder_create import ExperimentFolder
 from aitoolbox.experiment.result_reporting.report_generator import TrainingHistoryPlotter
 
 
@@ -96,8 +96,8 @@ class BaseLocalResultsSaver:
         Returns:
             str:
         """
-        ExperimentFolderCreator.create_experiment_base_folder(project_name, experiment_name, experiment_timestamp,
-                                                              local_model_result_folder_path)
+        ExperimentFolder.create_base_folder(project_name, experiment_name, experiment_timestamp,
+                                            local_model_result_folder_path)
 
         _, _, experiment_results_path = \
             BaseLocalResultsSaver.get_experiment_local_results_folder_paths(project_name, experiment_name,
@@ -122,9 +122,8 @@ class BaseLocalResultsSaver:
             str, str, str: project_dir_path, experiment_dir_path, experiment_results_dir_path
         """
         project_dir_path, experiment_dir_path = \
-            ExperimentFolderCreator.get_experiment_base_folder_paths(project_name, experiment_name,
-                                                                     experiment_timestamp,
-                                                                     local_model_result_folder_path)
+            ExperimentFolder.get_base_folder_paths(project_name, experiment_name, experiment_timestamp,
+                                                   local_model_result_folder_path)
         experiment_results_dir_path = os.path.join(experiment_dir_path, 'results')
 
         return project_dir_path, experiment_dir_path, experiment_results_dir_path
