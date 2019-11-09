@@ -1,7 +1,7 @@
 import os
 from shutil import copyfile
 
-from aitoolbox.experiment.local_save.folder_create import ExperimentFolderCreator as FolderCreator
+from aitoolbox.experiment.local_save.folder_create import ExperimentFolder as FolderCreator
 from aitoolbox.cloud.AWS.model_save import BaseModelSaver
 from aitoolbox.cloud.AWS.results_save import BaseResultsSaver
 from aitoolbox.cloud.GoogleCloud.model_save import BaseModelGoogleStorageSaver
@@ -23,9 +23,8 @@ class HyperParameterReporter:
         self.experiment_timestamp = experiment_timestamp
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
 
-        self.experiment_dir_path = FolderCreator.create_experiment_base_folder(project_name, experiment_name,
-                                                                               experiment_timestamp,
-                                                                               local_model_result_folder_path)
+        self.experiment_dir_path = FolderCreator.create_base_folder(project_name, experiment_name, experiment_timestamp,
+                                                                    local_model_result_folder_path)
 
         self.file_name = 'hyperparams_list.txt'
         self.local_hyperparams_file_path = os.path.join(self.experiment_dir_path, self.file_name)
