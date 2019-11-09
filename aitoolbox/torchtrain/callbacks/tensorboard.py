@@ -3,7 +3,7 @@ import numpy as np
 from torch.utils.tensorboard import SummaryWriter
 
 from aitoolbox.torchtrain.callbacks.abstract import AbstractExperimentCallback
-from aitoolbox.experiment.local_save.folder_create import ExperimentFolderCreator as FolderCreator
+from aitoolbox.experiment.local_save.folder_create import ExperimentFolder as FolderCreator
 
 
 class TensorboardReporterBaseCB(AbstractExperimentCallback):
@@ -63,9 +63,9 @@ class TensorboardReporterBaseCB(AbstractExperimentCallback):
         if self.log_dir is None:
             self.log_dir = self.fallback_log_dir
 
-        experiment_path = FolderCreator.create_experiment_base_folder(self.project_name, self.experiment_name,
-                                                                      self.train_loop_obj.experiment_timestamp,
-                                                                      self.local_model_result_folder_path)
+        experiment_path = FolderCreator.create_base_folder(self.project_name, self.experiment_name,
+                                                           self.train_loop_obj.experiment_timestamp,
+                                                           self.local_model_result_folder_path)
         full_log_dir = os.path.join(experiment_path, self.log_dir)
         if not os.path.exists(full_log_dir):
             os.mkdir(full_log_dir)
