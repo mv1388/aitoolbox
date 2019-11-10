@@ -1,5 +1,6 @@
 from __future__ import print_function
 import argparse
+import os
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -10,6 +11,8 @@ from aitoolbox.torchtrain.train_loop import TrainLoop, TrainLoopModelCheckpointE
 from aitoolbox.torchtrain.model import TTModel
 from aitoolbox.torchtrain.callbacks.performance_eval import ModelPerformanceEvaluation, ModelPerformancePrintReport
 from aitoolbox.experiment.result_package.basic_packages import ClassificationResultPackage
+
+THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 class Net(TTModel):
@@ -101,17 +104,17 @@ callbacks = [ModelPerformanceEvaluation(ClassificationResultPackage(), args.__di
              ModelPerformancePrintReport(['train_Accuracy', 'val_Accuracy'], strict_metric_reporting=True)]
 
 
-TrainLoop(model,
-          train_loader, test_loader, None,
-          optimizer, criterion)(num_epoch=10, callbacks=callbacks)
+# TrainLoop(model,
+#           train_loader, test_loader, None,
+#           optimizer, criterion)(num_epoch=10, callbacks=callbacks)
 
 
-# TrainLoopModelCheckpointEndSave(model,
-#                                 train_loader, test_loader, test_loader,
-#                                 optimizer, criterion,
-#                                 project_name='localRunCNNTest',
-#                                 experiment_name='CNN_MNIST_test',
-#                                 local_model_result_folder_path='~/MemoryNet/model_results',
-#                                 hyperparams=args.__dict__,
-#                                 test_result_package=ClassificationResultPackage(),
-#                                 cloud_save_mode=None)(num_epoch=5, callbacks=callbacks)
+TrainLoopModelCheckpointEndSave(model,
+                                train_loader, test_loader, test_loader,
+                                optimizer, criterion,
+                                project_name='localRunCNNTest',
+                                experiment_name='CNN_MNIST_test',
+                                local_model_result_folder_path=THIS_DIR,
+                                hyperparams=args.__dict__,
+                                test_result_package=ClassificationResultPackage(),
+                                cloud_save_mode=None)(num_epoch=5, callbacks=callbacks)
