@@ -96,6 +96,9 @@ class TTBasicModel(TTModel):
         return predictions.cpu(), targets, {}
 
 
+
+
+
 class TTDataParallel(nn.DataParallel):
     def __init__(self, module, add_model_attributes=None,
                  default_model_methods=('get_loss', 'get_loss_eval', 'get_predictions'), **kwargs):
