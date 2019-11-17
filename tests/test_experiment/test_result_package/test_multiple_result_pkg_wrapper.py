@@ -1,7 +1,6 @@
 import unittest
 
 from aitoolbox.experiment.result_package.abstract_result_packages import MultipleResultPackageWrapper
-from aitoolbox.experiment.training_history import TrainingHistory
 from tests.utils import DummyResultPackageExtendVariable
 
 

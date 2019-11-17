@@ -34,12 +34,14 @@ class AbstractLocalResultsSaver(ABC):
         pass
 
     @abstractmethod
-    def save_experiment_results_separate_files(self, result_package, project_name, experiment_name, experiment_timestamp,
+    def save_experiment_results_separate_files(self, result_package, training_history,
+                                               project_name, experiment_name, experiment_timestamp,
                                                save_true_pred_labels=False, protect_existing_folder=True):
         """Separate file results saving method which all the result savers have to implement to give an expected API
         
         Args:
             result_package (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
+            training_history (aitoolbox.experiment.training_history.TrainingHistory):
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             experiment_timestamp (str or None): time stamp at the start of training

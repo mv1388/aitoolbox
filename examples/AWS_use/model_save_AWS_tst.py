@@ -11,7 +11,6 @@ import random
 from aitoolbox.cloud.AWS.model_save import KerasS3ModelSaver
 from aitoolbox.cloud.AWS.results_save import S3ResultsSaver
 from aitoolbox.experiment.result_package.basic_packages import ClassificationResultPackage
-from aitoolbox.experiment.training_history import TrainingHistory
 
 
 class RepeatVector4D(layers.Layer):
