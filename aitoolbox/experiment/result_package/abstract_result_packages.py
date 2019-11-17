@@ -35,7 +35,6 @@ class AbstractResultPackage(ABC):
         self.results_dict = None
 
         self.hyperparameters = None
-        self.training_history = None
         self.package_metadata = kwargs
 
     @abstractmethod
@@ -52,7 +51,7 @@ class AbstractResultPackage(ABC):
         """
         pass
 
-    def prepare_result_package(self, y_true, y_predicted, hyperparameters=None, training_history=None, **kwargs):
+    def prepare_result_package(self, y_true, y_predicted, hyperparameters=None, **kwargs):
         """Prepares the result package by taking labels and running them through the specified metrics
 
         This function is automatically called from the torchtrain callbacks to evaluate the provided callback.
@@ -63,7 +62,6 @@ class AbstractResultPackage(ABC):
             y_true (numpy.array or list): ground truth targets
             y_predicted (numpy.array or list): predicted targets
             hyperparameters (dict or None): dictionary filled with the set hyperparameters
-            training_history (aitoolbox.experiment.training_history.TrainingHistory):
             **kwargs (dict):
 
         Returns:
@@ -82,7 +80,6 @@ class AbstractResultPackage(ABC):
 
         self.results_dict = None
         self.hyperparameters = hyperparameters
-        self.training_history = training_history
         self.additional_results = kwargs
 
         self.results_dict = self.prepare_results_dict()
@@ -135,23 +132,6 @@ class AbstractResultPackage(ABC):
         """
         self.qa_check_hyperparameters_dict()
         return self.hyperparameters
-
-    def get_training_history(self):
-        """Extract training history dict from the training history object
-
-        Returns:
-            dict: training history dict
-        """
-        # History QA check is (automatically) done in the history object and not here in the result package
-        return self.training_history.get_train_history()
-
-    def get_training_history_object(self):
-        """Return training history object wrapping the training history dict
-
-        Returns:
-            aitoolbox.experiment.training_history.TrainingHistory: training history object
-        """
-        return self.training_history
 
     def get_additional_results_dump_paths(self):
         """Return paths to the additional results which are stored to local drive when the package is evaluated
@@ -334,8 +314,7 @@ class AbstractResultPackage(ABC):
         self_object_copy = copy.deepcopy(self)
 
         multi_result_pkg = MultipleResultPackageWrapper()
-        multi_result_pkg.prepare_result_package([self_object_copy, other_object_pkg],
-                                                self_object_copy.hyperparameters, self_object_copy.training_history)
+        multi_result_pkg.prepare_result_package([self_object_copy, other_object_pkg], self_object_copy.hyperparameters)
 
         return multi_result_pkg
 
@@ -465,7 +444,7 @@ class MultipleResultPackageWrapper(AbstractResultPackage):
                                        strict_content_check=strict_content_check, **kwargs)
         self.result_packages = None
 
-    def prepare_result_package(self, result_packages, hyperparameters=None, training_history=None, **kwargs):
+    def prepare_result_package(self, result_packages, hyperparameters=None, **kwargs):
         """
 
         Args:
@@ -475,7 +454,6 @@ class MultipleResultPackageWrapper(AbstractResultPackage):
                 aitoolbox.experiment.result_package.abstract_result_packages.PreCalculatedResultPackage to satisfy
                 the result package object requirement.
             hyperparameters (dict or None):
-            training_history (aitoolbox.ExperimentSave.training_history.TrainingHistory):
             **kwargs:
 
         Returns:
@@ -484,7 +462,6 @@ class MultipleResultPackageWrapper(AbstractResultPackage):
         self.results_dict = None
         self.result_packages = result_packages
         self.hyperparameters = hyperparameters
-        self.training_history = training_history
         self.additional_results = kwargs
 
         self.results_dict = self.prepare_results_dict()
@@ -566,7 +543,6 @@ class MultipleResultPackageWrapper(AbstractResultPackage):
 
         self_multi_result_pkg.prepare_result_package(self_multi_result_pkg.result_packages + other_object_pkg_list,
                                                      self_multi_result_pkg.hyperparameters,
-                                                     self_multi_result_pkg.training_history,
                                                      **self_multi_result_pkg.package_metadata)
         return self_multi_result_pkg
 
@@ -586,5 +562,5 @@ class MultipleResultPackageWrapper(AbstractResultPackage):
             else other_object_pkg.result_packages
 
         self.prepare_result_package(self.result_packages + other_object_pkg_list,
-                                    self.hyperparameters, self.training_history, **self.package_metadata)
+                                    self.hyperparameters, **self.package_metadata)
         return self

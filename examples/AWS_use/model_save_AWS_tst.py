@@ -151,8 +151,7 @@ print(experiment_timestamp)
 _, y = make_classification(100)
 y_pred = [random.randint(0, 1) for _ in range(100)]
 class_pkg = ClassificationResultPackage()
-class_pkg.prepare_result_package(y, y_pred, hyperparameters={'bash_script_path': 'dasdassd'},
-                                 training_history=TrainingHistory())
+class_pkg.prepare_result_package(y, y_pred, hyperparameters={'bash_script_path': 'dasdassd'})
 
 res_saver = S3ResultsSaver(local_model_result_folder_path=local_model_result_folder_path)
 

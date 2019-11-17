@@ -79,14 +79,12 @@ class ModelPerformanceEvaluation(AbstractCallback):
             y_pred, y_test, additional_results = self.train_loop_obj.predict_on_train_set()
             self.train_result_package.prepare_result_package(y_test, y_pred,
                                                              hyperparameters=self.args,
-                                                             training_history=self.train_loop_obj.train_history,
                                                              additional_results=additional_results)
 
         if self.on_val_data:
             y_pred, y_test, additional_results = self.train_loop_obj.predict_on_validation_set()
             self.result_package.prepare_result_package(y_test, y_pred,
                                                        hyperparameters=self.args,
-                                                       training_history=self.train_loop_obj.train_history,
                                                        additional_results=additional_results)
 
         self.store_evaluated_metrics_to_history(prefix=prefix)

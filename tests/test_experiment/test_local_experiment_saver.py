@@ -16,11 +16,10 @@ THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 class DummyFullResultPackage(AbstractResultPackage):
-    def __init__(self, result_dict, hyper_params, train_hist):
+    def __init__(self, result_dict, hyper_params):
         AbstractResultPackage.__init__(self, 'dummyFullPkg')
         self.result_dict = result_dict
         self.hyper_params = hyper_params
-        self.training_history = TrainingHistory().wrap_pre_prepared_history(train_hist)
         self.y_true = [10.0] * 100
         self.y_predicted = [123.4] * 100
 
@@ -32,9 +31,6 @@ class DummyFullResultPackage(AbstractResultPackage):
 
     def get_hyperparameters(self):
         return self.hyper_params
-
-    def get_training_history(self):
-        return self.get_training_history_object()
 
 
 class TestFullPyTorchExperimentLocalSaver(unittest.TestCase):
@@ -67,13 +63,14 @@ class TestFullPyTorchExperimentLocalSaver(unittest.TestCase):
         results_path = os.path.join(exp_path, 'results')
 
         result_pkg = DummyFullResultPackage({'metric1': 33434, 'acc1': 223.43, 'loss': 4455.6},
-                                            {'epoch': 20, 'lr': 0.334}, {})
+                                            {'epoch': 20, 'lr': 0.334})
+        training_history = TrainingHistory().wrap_pre_prepared_history({})
 
         model_checkpoint = {'model_state_dict': model.state_dict(), 'optimizer_state_dict': None,
                             'epoch': 10, 'hyperparams': {}}
         saver = FullPyTorchExperimentLocalSaver(project_name=project_dir_name, experiment_name=exp_dir_name,
                                                 local_model_result_folder_path=THIS_DIR)
-        saved_paths = saver.save_experiment(model_checkpoint, result_pkg, current_time,
+        saved_paths = saver.save_experiment(model_checkpoint, result_pkg, training_history, current_time,
                                             save_true_pred_labels=save_true_pred_labels, separate_files=separate_files)
 
         model_file_path_true = os.path.join(model_path, f'model_{exp_dir_name}_{current_time}.pth')
@@ -128,11 +125,12 @@ class TestFullKerasExperimentLocalSaver(unittest.TestCase):
         results_path = os.path.join(exp_path, 'results')
 
         result_pkg = DummyFullResultPackage({'metric1': 33434, 'acc1': 223.43, 'loss': 4455.6},
-                                            {'epoch': 20, 'lr': 0.334}, {})
+                                            {'epoch': 20, 'lr': 0.334})
+        training_history = TrainingHistory().wrap_pre_prepared_history({})
 
         saver = FullKerasExperimentLocalSaver(project_name=project_dir_name, experiment_name=exp_dir_name,
                                               local_model_result_folder_path=THIS_DIR)
-        saved_paths = saver.save_experiment(model, result_pkg, current_time,
+        saved_paths = saver.save_experiment(model, result_pkg, training_history, current_time,
                                             save_true_pred_labels=save_true_pred_labels, separate_files=separate_files)
 
         model_file_path_true = os.path.join(model_path, f'model_{exp_dir_name}_{current_time}.h5')

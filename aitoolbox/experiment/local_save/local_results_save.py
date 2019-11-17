@@ -11,12 +11,14 @@ from aitoolbox.experiment.result_reporting.report_generator import TrainingHisto
 
 class AbstractLocalResultsSaver(ABC):
     @abstractmethod
-    def save_experiment_results(self, result_package, project_name, experiment_name, experiment_timestamp=None,
+    def save_experiment_results(self, result_package, training_history,
+                                project_name, experiment_name, experiment_timestamp=None,
                                 save_true_pred_labels=False, protect_existing_folder=True):
         """Single file results saving method which all the result savers have to implement to give an expected API
         
         Args:
             result_package (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
+            training_history (aitoolbox.experiment.training_history.TrainingHistory):
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             experiment_timestamp (str or None): time stamp at the start of training
@@ -165,12 +167,14 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
         """
         BaseLocalResultsSaver.__init__(self, local_model_result_folder_path, file_format)
 
-    def save_experiment_results(self, result_package, project_name, experiment_name, experiment_timestamp=None,
+    def save_experiment_results(self, result_package, training_history,
+                                project_name, experiment_name, experiment_timestamp=None,
                                 save_true_pred_labels=False, protect_existing_folder=True):
         """Saves all the experiment results into single local file
 
         Args:
             result_package (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
+            training_history (aitoolbox.experiment.training_history.TrainingHistory):
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             experiment_timestamp (str or None): time stamp at the start of training
@@ -191,18 +195,16 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
 
         results = result_package.get_results()
         hyperparameters = result_package.get_hyperparameters()
-        training_history_object = result_package.training_history
-        training_history = result_package.get_training_history()
 
         additional_results_dump_paths = result_package.get_additional_results_dump_paths()
-        plots_paths = TrainingHistoryPlotter(experiment_results_local_path).generate_report(training_history_object,
+        plots_paths = TrainingHistoryPlotter(experiment_results_local_path).generate_report(training_history,
                                                                                             plots_folder_name='plots')
 
         exp_results_hyperparam_dict = {'experiment_name': experiment_name,
                                        'experiment_results_local_path': experiment_results_local_path,
                                        'results': results,
                                        'hyperparameters': hyperparameters,
-                                       'training_history': training_history}
+                                       'training_history': training_history.get_train_history()}
 
         if save_true_pred_labels:
             exp_results_hyperparam_dict = {'y_true': result_package.y_true, 'y_predicted': result_package.y_predicted,
@@ -225,13 +227,14 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
         
         return experiment_results_paths
 
-    def save_experiment_results_separate_files(self, result_package, project_name, experiment_name,
-                                               experiment_timestamp=None, save_true_pred_labels=False,
-                                               protect_existing_folder=True):
+    def save_experiment_results_separate_files(self, result_package, training_history,
+                                               project_name, experiment_name, experiment_timestamp=None,
+                                               save_true_pred_labels=False, protect_existing_folder=True):
         """Saves the experiment results into separate local files
 
         Args:
             result_package (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
+            training_history (aitoolbox.experiment.training_history.TrainingHistory):
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             experiment_timestamp (str or None): time stamp at the start of training
@@ -249,11 +252,9 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
 
         results = result_package.get_results()
         hyperparameters = result_package.get_hyperparameters()
-        training_history_object = result_package.training_history
-        training_history = result_package.get_training_history()
 
         additional_results_dump_paths = result_package.get_additional_results_dump_paths()
-        plots_paths = TrainingHistoryPlotter(experiment_results_local_path).generate_report(training_history_object,
+        plots_paths = TrainingHistoryPlotter(experiment_results_local_path).generate_report(training_history,
                                                                                             plots_folder_name='plots')
 
         experiment_results_dict = {'experiment_name': experiment_name,
@@ -266,7 +267,7 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
 
         experiment_train_hist_dict = {'experiment_name': experiment_name,
                                       'experiment_results_local_path': experiment_results_local_path,
-                                      'training_history': training_history}
+                                      'training_history': training_history.get_train_history()}
 
         results_file_name_w_type = f'results_{experiment_name}_{experiment_timestamp}'
         results_file_local_path_w_type = os.path.join(experiment_results_local_path, results_file_name_w_type)

@@ -95,8 +95,7 @@ class PyTorchModelPredictor:
         y_pred, y_test, additional_results = self.train_loop.predict_on_test_set()
 
         result_package.prepare_result_package(y_test, y_pred,
-                                              hyperparameters={}, training_history=self.train_loop.train_history,
-                                              additional_results=additional_results)
+                                              hyperparameters={}, additional_results=additional_results)
 
         if return_result_package:
             return result_package

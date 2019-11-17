@@ -190,7 +190,6 @@ class ModelTrainEndSave(AbstractCallback):
             self.val_result_package.pkg_name += '_VAL'
             self.val_result_package.prepare_result_package(y_test, y_pred,
                                                            hyperparameters=self.hyperparams,
-                                                           training_history=self.train_loop_obj.train_history,
                                                            additional_results=additional_results)
             self.result_package = self.val_result_package
 
@@ -199,12 +198,11 @@ class ModelTrainEndSave(AbstractCallback):
             self.test_result_package.pkg_name += '_TEST'
             self.test_result_package.prepare_result_package(y_test_test, y_pred_test,
                                                             hyperparameters=self.hyperparams,
-                                                            training_history=self.train_loop_obj.train_history,
                                                             additional_results=additional_results_test)
             self.result_package = self.test_result_package + self.result_package if self.result_package is not None \
                 else self.test_result_package
 
-        self.results_saver.save_experiment(model_final_state, self.result_package,
+        self.results_saver.save_experiment(model_final_state, self.result_package, self.train_loop_obj.train_history,
                                            experiment_timestamp=self.train_loop_obj.experiment_timestamp,
                                            save_true_pred_labels=True)
 

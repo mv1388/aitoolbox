@@ -11,7 +11,7 @@ from aitoolbox.cloud.GoogleCloud.results_save import GoogleStorageResultsSaver
 
 class AbstractExperimentSaver(ABC):
     @abstractmethod
-    def save_experiment(self, model, result_package, experiment_timestamp=None,
+    def save_experiment(self, model, result_package, training_history, experiment_timestamp=None,
                         save_true_pred_labels=False, separate_files=False,
                         protect_existing_folder=True):
         """Method which all the experiment savers need to implement which instructs how the experiment should be saved
@@ -19,6 +19,7 @@ class AbstractExperimentSaver(ABC):
         Args:
             model:
             result_package (aitoolbox.ExperimentSave.result_package.AbstractResultPackage):
+            training_history (aitoolbox.experiment.training_history.TrainingHistory):
             experiment_timestamp (str): time stamp of the training start
             save_true_pred_labels (bool): should ground truth labels also be saved
             separate_files (bool): should the results be saved in separate pickle files or should all of the results
@@ -47,7 +48,7 @@ class BaseFullExperimentSaver(AbstractExperimentSaver):
         self.project_name = project_name
         self.experiment_name = experiment_name
 
-    def save_experiment(self, model, result_package, experiment_timestamp=None,
+    def save_experiment(self, model, result_package, training_history, experiment_timestamp=None,
                         save_true_pred_labels=False, separate_files=False,
                         protect_existing_folder=True):
         """Save the experiment snapshot formed out of the model and model's results
@@ -55,6 +56,7 @@ class BaseFullExperimentSaver(AbstractExperimentSaver):
         Args:
             model (dict or keras.engine.training.Model):
             result_package (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
+            training_history (aitoolbox.experiment.training_history.TrainingHistory):
             experiment_timestamp (str): time stamp at the start of training
             save_true_pred_labels (bool): should ground truth labels also be saved
             separate_files (bool): should the results be saved in separate pickle files or should all of the results
@@ -74,6 +76,7 @@ class BaseFullExperimentSaver(AbstractExperimentSaver):
                                                              protect_existing_folder=protect_existing_folder)
 
         cloud_results_path, _ = self.results_saver.save_experiment_results(result_package=result_package,
+                                                                           training_history=training_history,
                                                                            project_name=self.project_name,
                                                                            experiment_name=self.experiment_name,
                                                                            experiment_timestamp=experiment_timestamp,

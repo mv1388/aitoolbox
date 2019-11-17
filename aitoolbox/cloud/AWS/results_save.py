@@ -9,12 +9,14 @@ from aitoolbox.experiment.local_save.local_results_save import LocalResultsSaver
 
 class AbstractResultsSaver(ABC):
     @abstractmethod
-    def save_experiment_results(self, result_package, project_name, experiment_name, experiment_timestamp=None,
+    def save_experiment_results(self, result_package, training_history,
+                                project_name, experiment_name, experiment_timestamp=None,
                                 save_true_pred_labels=False, separate_files=False, protect_existing_folder=True):
         """
         
         Args:
             result_package (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
+            training_history (aitoolbox.experiment.training_history.TrainingHistory):
             project_name (str):
             experiment_name (str):
             experiment_timestamp (str):
@@ -72,13 +74,15 @@ class S3ResultsSaver(AbstractResultsSaver, BaseResultsSaver):
         BaseResultsSaver.__init__(self, bucket_name, cloud_dir_prefix)
         self.local_results_saver = LocalResultsSaver(local_model_result_folder_path)
 
-    def save_experiment_results(self, result_package, project_name, experiment_name, experiment_timestamp=None,
+    def save_experiment_results(self, result_package, training_history,
+                                project_name, experiment_name, experiment_timestamp=None,
                                 save_true_pred_labels=False, separate_files=False, protect_existing_folder=True):
         """Save produced experiment results recorded in the result package to the results file on local drive and upload
             them to S3
 
         Args:
             result_package (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
+            training_history (aitoolbox.experiment.training_history.TrainingHistory):
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             experiment_timestamp (str or None): time stamp at the start of training
@@ -95,6 +99,7 @@ class S3ResultsSaver(AbstractResultsSaver, BaseResultsSaver):
 
         if not separate_files:
             saved_local_results_details = self.local_results_saver.save_experiment_results(result_package,
+                                                                                           training_history,
                                                                                            project_name,
                                                                                            experiment_name,
                                                                                            experiment_timestamp,
@@ -103,6 +108,7 @@ class S3ResultsSaver(AbstractResultsSaver, BaseResultsSaver):
         else:
             saved_local_results_details = \
                 self.local_results_saver.save_experiment_results_separate_files(result_package,
+                                                                                training_history,
                                                                                 project_name,
                                                                                 experiment_name,
                                                                                 experiment_timestamp,
