@@ -1,4 +1,5 @@
 import os
+import csv
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -84,30 +85,46 @@ class TrainingHistoryWriter:
         """Write the calculated performance metrics in the training history into human-readable text file
 
         Args:
-            experiment_results_local_path (str): path to the main experiment results folder on the local drive
+            experiment_results_local_path (str or None): path to the main experiment results folder on the local drive
         """
         self.experiment_results_local_path = experiment_results_local_path
-        self.plots_local_folder_path = experiment_results_local_path
+        self.metric_name_cols = None
 
-    def generate_report(self, training_history, epoch, file_name, results_folder_name=None):
+    def generate_report(self, training_history, epoch, file_name, results_folder_name='', file_format='txt'):
         """Write all the currently present performance result in the training history into the text file
 
         Args:
             training_history (aitoolbox.experiment.training_history.TrainingHistory):
             epoch (int): current epoch
             file_name (str): output text file name
-            results_folder_name (str or None): results folder path where the report file will be located
+            results_folder_name (str): results folder path where the report file will be located
+            file_format (str): output file format. Can be either 'txt' human readable output or
+                'tsv' for a tabular format or 'csv' for comma separated format.
 
         Returns:
             str, str: file name/path inside the experiment folder, local file_path
         """
-        if results_folder_name is not None:
-            self.plots_local_folder_path = os.path.join(self.experiment_results_local_path, results_folder_name)
-            if not os.path.exists(self.plots_local_folder_path):
-                os.mkdir(self.plots_local_folder_path)
+        results_write_local_folder_path = os.path.join(self.experiment_results_local_path, results_folder_name)
+        if not os.path.exists(results_write_local_folder_path):
+            os.mkdir(results_write_local_folder_path)
 
-        file_path = os.path.join(self.plots_local_folder_path, file_name)
+        file_path = os.path.join(results_write_local_folder_path, file_name)
 
+        if file_format == 'txt':
+            self.write_txt(training_history, epoch, file_path)
+        elif file_format == 'tsv':
+            self.write_csv_tsv(training_history, epoch, file_path, delimiter='\t')
+        elif file_format == 'csv':
+            self.write_csv_tsv(training_history, epoch, file_path, delimiter=',')
+        else:
+            raise ValueError(f"Output format '{file_format}' is not supported. "
+                             "Select one of the following: txt, tsv, csv.")
+
+        return os.path.join(results_folder_name if results_folder_name is not None else '',
+                            file_name), file_path
+
+    @staticmethod
+    def write_txt(training_history, epoch, file_path):
         with open(file_path, 'a') as f:
             f.write('============================\n')
             f.write(f'Epoch: {epoch}\n')
@@ -116,8 +133,22 @@ class TrainingHistoryWriter:
                 f.write(f'{metric_name}:\t{result_history[-1]}\n')
             f.write('\n\n')
 
-        return os.path.join(results_folder_name if results_folder_name is not None else '',
-                            file_name), file_path
+    def write_csv_tsv(self, training_history, epoch, file_path, delimiter):
+        with open(file_path, 'a') as f:
+            tsv_writer = csv.writer(f, delimiter=delimiter)
+            current_metric_names = list(training_history.get_train_history_dict(flatten_dict=True).keys())
+
+            if self.metric_name_cols is None:
+                self.metric_name_cols = current_metric_names
+                tsv_writer.writerow(['Epoch'] + self.metric_name_cols)
+
+            if sorted(current_metric_names) != sorted(self.metric_name_cols):
+                self.metric_name_cols = current_metric_names
+                tsv_writer.writerow(['NEW_METRICS_DETECTED'])
+                tsv_writer.writerow(['Epoch'] + self.metric_name_cols)
+
+            training_history_dict = training_history.get_train_history_dict(flatten_dict=True)
+            tsv_writer.writerow([epoch] + [training_history_dict[metric_name][-1] for metric_name in self.metric_name_cols])
 
 
 class GradientPlotter:
