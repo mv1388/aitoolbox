@@ -64,7 +64,7 @@ optimizer = optim.Adam(model.parameters(), lr=0.001)
 criterion = nn.CrossEntropyLoss()
 
 used_args = {'batch_size': 100, 'hidden_size': 50, 'ctx_n_layers': 1, 'qus_n_layers': 1, 'dropout': 0.2,
-             'dev_mode_size': 2, 'lr': 0.001, 'num_epoch': 2}
+             'dev_mode_size': 2, 'lr': 0.001, 'num_epochs': 2}
 
 
 print('Starting model evaluation')

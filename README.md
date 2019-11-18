@@ -36,7 +36,7 @@ tl = TrainLoop(model,
                train_loader, val_loader, test_loader,
                optimizer, criterion, use_amp=False)
 
-model = tl.fit(num_epoch=10)
+model = tl.fit(num_epochs=10)
 ```
 
 AIToolbox includes a few more advanced derivations of the basic TrainLoop

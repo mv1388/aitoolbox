@@ -212,6 +212,54 @@ class EmailNotification(AbstractCallback):
                                  'it in the callback parameters instead of currently used None values.')
 
 
+class DataSubsetTestRun(AbstractCallback):
+    def __init__(self, num_train_batches=1, num_val_batches=0, num_test_batches=0):
+        """Subset the provided data loaders to execute neural net only on a small dataset subset
+
+        This is especially useful when first developing the neural architectures and debugging them. Subsetting the full
+        dataset helps with fast development iterations.
+
+        Args:
+            num_train_batches (int): number of the training data batches that are kept in the training dataset
+            num_val_batches (int): number of the validation data batches that are kept in the validation dataset
+            num_test_batches (int): number of the test data batches that are kept in the test dataset
+        """
+        AbstractCallback.__init__(self, 'Run model on a small subset of the training dataset')
+        self.num_train_batches = num_train_batches
+        self.num_val_batches = num_val_batches
+        self.num_test_batches = num_test_batches
+
+    def on_train_begin(self):
+        self.train_loop_obj.train_loader = self.subset_data_loader(self.train_loop_obj.train_loader,
+                                                                   self.num_train_batches)
+
+        if self.num_val_batches > 0:
+            self.train_loop_obj.validation_loader = self.subset_data_loader(self.train_loop_obj.validation_loader,
+                                                                            self.num_val_batches)
+        if self.num_test_batches > 0:
+            self.train_loop_obj.test_loader = self.subset_data_loader(self.train_loop_obj.test_loader,
+                                                                      self.num_test_batches)
+
+    @staticmethod
+    def subset_data_loader(data_loader, num_batches):
+        sub_set = []
+
+        for i, batch in enumerate(data_loader):
+            sub_set.append(batch)
+
+            if i == num_batches - 1:
+                break
+
+        return sub_set
+
+    def on_train_loop_registration(self):
+        if self.num_val_batches > 0 and self.train_loop_obj.validation_loader is None:
+            raise ValueError("Validation loader was not provided to the TrainLoop, can't subset it")
+
+        if self.num_test_batches > 0 and self.train_loop_obj.test_loader is None:
+            raise ValueError("Test loader was not provided to the TrainLoop, can't subset it")
+
+
 class FunctionOnTrainLoop(AbstractCallback):
     def __init__(self, fn_to_execute,
                  tl_registration=False,
