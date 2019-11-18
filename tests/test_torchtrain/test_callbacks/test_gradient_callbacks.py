@@ -57,7 +57,7 @@ class TestGradientStatsPrintCallback(unittest.TestCase):
         captured_output = io.StringIO()  # Create StringIO object
         sys.stdout = captured_output
 
-        TrainLoop(model, train_loader, None, None, optimizer, criterion).fit(num_epoch=1, callbacks=[callback])
+        TrainLoop(model, train_loader, None, None, optimizer, criterion).fit(num_epochs=1, callbacks=[callback])
         sys.stdout = sys.__stdout__
         expected_print = '\n'.join(captured_output.getvalue().split('\n')[7:]).strip()
 

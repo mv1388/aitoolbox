@@ -101,23 +101,23 @@ class TrainLoop:
             raise ValueError('Trying to use Nvidia Apex AMP for 16-bit mixed precision. However, Nvidia Apex is not'
                              'installed.')
 
-    def __call__(self, num_epoch, callbacks=None):
+    def __call__(self, num_epochs, callbacks=None):
         """Train the model using the train loop
 
         Args:
-            num_epoch (int): how many epochs the network will be trained
+            num_epochs (int): how many epochs the network will be trained
             callbacks (list): callbacks that are executed during the training run
 
         Returns:
             TTModel or torch.nn.modules.Module or TTDataParallel: trained model
         """
-        return self.fit(num_epoch, callbacks)
+        return self.fit(num_epochs, callbacks)
 
-    def fit(self, num_epoch, callbacks=None):
+    def fit(self, num_epochs, callbacks=None):
         """Train the model using the train loop
 
         Args:
-            num_epoch (int): how many epochs the network will be trained
+            num_epochs (int): how many epochs the network will be trained
             callbacks (list): callbacks that are executed during the training run
 
         Returns:
@@ -130,7 +130,7 @@ class TrainLoop:
 
         self.callbacks_handler.execute_train_begin()
 
-        for self.epoch in range(self.epoch, num_epoch):
+        for self.epoch in range(self.epoch, num_epochs):
             print('\n\n========================================================================')
             print('========================================================================')
             print(f'Epoch: {self.epoch}')

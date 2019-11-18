@@ -51,7 +51,7 @@ model.add(Activation('softmax'))
 optimizer = keras.optimizers.rmsprop(lr=0.0001, decay=1e-6)
 
 
-# TrainLoop(model, optimizer, 'categorical_crossentropy', ['accuracy'])(num_epoch=10, batch_size=batch_size,
+# TrainLoop(model, optimizer, 'categorical_crossentropy', ['accuracy'])(num_epochs=10, batch_size=batch_size,
 #                                                                       x=x_train,
 #                                                                       y=y_train,
 #                                                                       validation_data=(x_test, y_test),

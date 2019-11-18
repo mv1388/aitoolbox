@@ -68,7 +68,7 @@ optimizer = optim.Adam(model.parameters(), lr=0.001)
 criterion = nn.CrossEntropyLoss()
 
 used_args = {'batch_size': 100, 'hidden_size': 50, 'ctx_n_layers': 1, 'qus_n_layers': 1, 'dropout': 0.2,
-             'dev_mode_size': 2, 'lr': 0.001, 'num_epoch': 2}
+             'dev_mode_size': 2, 'lr': 0.001, 'num_epochs': 2}
 
 
 qa_result_pkg_cp = QuestionAnswerResultPackage([paragraph_tokens for paragraph_tokens, _, _, _ in data_dev],
@@ -88,7 +88,7 @@ print('Starting train loop')
 # Simple train loop
 # TrainLoop(model,
 #           train_loader, dev_loader, None,
-#           optimizer, criterion)(num_epoch=30, callbacks=callbacks)
+#           optimizer, criterion)(num_epochs=30, callbacks=callbacks)
 
 
 # Mode checkpoint & save train loop

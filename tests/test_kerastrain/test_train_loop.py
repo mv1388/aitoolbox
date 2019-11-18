@@ -128,7 +128,7 @@ class TestTrainLoop(unittest.TestCase):
         callback_full = train_loop.callbacks[1]
         callback_short = train_loop.callbacks[2]
 
-        model_return = train_loop.do_train(num_epoch=num_epochs, batch_size=300)
+        model_return = train_loop.fit(num_epochs=num_epochs, batch_size=300)
 
         self.assertEqual(model, model_return)
 
@@ -166,7 +166,7 @@ class TestTrainLoop(unittest.TestCase):
                                                          KerasCallbackTracker(), KerasCallbackTrackerShort(),
                                                          AbstractKerasCallback('callback_test2')])
 
-        train_loop.do_train(num_epoch=num_epochs, batch_size=300)
+        train_loop.fit(num_epochs=num_epochs, batch_size=300)
         train_history = train_loop.train_history
 
         self.assertEqual(train_history.epoch, [0, 1])
