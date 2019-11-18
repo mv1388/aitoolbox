@@ -47,11 +47,11 @@ class TrainLoop:
 
         self.experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
 
-    def __call__(self, num_epoch, batch_size, callbacks=None, **kwargs):
+    def __call__(self, num_epochs, batch_size, callbacks=None, **kwargs):
         """
 
         Args:
-            num_epoch (int):
+            num_epochs (int):
             batch_size (int):
             callbacks (list):
             kwargs (dict):
@@ -59,13 +59,13 @@ class TrainLoop:
         Returns:
             keras.engine.training.Model:
         """
-        return self.do_train(num_epoch, batch_size, callbacks, **kwargs)
+        return self.fit(num_epochs, batch_size, callbacks, **kwargs)
 
-    def do_train(self, num_epoch, batch_size, callbacks=None, **kwargs):
+    def fit(self, num_epochs, batch_size, callbacks=None, **kwargs):
         """
 
         Args:
-            num_epoch (int):
+            num_epochs (int):
             batch_size (int):
             callbacks (list):
             kwargs (dict):
@@ -77,12 +77,12 @@ class TrainLoop:
 
         if not self.is_generator(self.train_loader):
             self.train_history = self.model.fit(x=self.x_train, y=self.y_train,
-                                                epochs=num_epoch, batch_size=batch_size, callbacks=self.callbacks,
+                                                epochs=num_epochs, batch_size=batch_size, callbacks=self.callbacks,
                                                 validation_data=self.validation_loader,
                                                 **kwargs)
         else:
             self.train_history = self.model.fit_generator(generator=self.train_loader,
-                                                          epochs=num_epoch, callbacks=self.callbacks,
+                                                          epochs=num_epochs, callbacks=self.callbacks,
                                                           validation_data=self.validation_loader,
                                                           **kwargs)
 
