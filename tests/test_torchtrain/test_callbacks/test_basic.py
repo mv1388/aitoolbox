@@ -1,8 +1,11 @@
 import unittest
+import torch
+from torch.utils.data.dataset import TensorDataset
+from torch.utils.data.dataloader import DataLoader
 
 from tests.utils import *
 
-from aitoolbox.torchtrain.callbacks.basic import EarlyStopping, FunctionOnTrainLoop
+from aitoolbox.torchtrain.callbacks.basic import EarlyStopping, DataSubsetTestRun, FunctionOnTrainLoop
 from aitoolbox.torchtrain.train_loop import TrainLoop
 
 
@@ -137,6 +140,67 @@ class TestEarlyStoppingCallback(unittest.TestCase):
             result.append(train_loop.early_stop)
 
         self.assertEqual(result, expected_result)
+
+
+class TestDataSubsetTestRun(unittest.TestCase):
+    def test_train_loader_execute_callback(self):
+        train_loader = DataLoader(TensorDataset(torch.Tensor(1000, 10)), batch_size=100)
+
+        callback = DataSubsetTestRun(num_train_batches=3)
+        train_loop = TrainLoop(NetUnifiedBatchFeed(), train_loader, None, None, None, None)
+        train_loop.callbacks_handler.register_callbacks([callback])
+        train_loop.callbacks_handler.execute_train_begin()
+
+        self.assertEqual(len(train_loop.train_loader), 3)
+        self.assertEqual(type(train_loop.train_loader), list)
+        for batch in train_loop.train_loader:
+            self.assertEqual(batch[0].shape, (100, 10))
+
+    def test_all_loaders_execute_callback(self):
+        train_loader = DataLoader(TensorDataset(torch.Tensor(1000, 10)), batch_size=100)
+        val_loader = DataLoader(TensorDataset(torch.Tensor(500, 10)), batch_size=50)
+        test_loader = DataLoader(TensorDataset(torch.Tensor(200, 10)), batch_size=30)
+
+        callback = DataSubsetTestRun(num_train_batches=3, num_val_batches=2, num_test_batches=2)
+        train_loop = TrainLoop(NetUnifiedBatchFeed(), train_loader, val_loader, test_loader, None, None)
+        train_loop.callbacks_handler.register_callbacks([callback])
+        train_loop.callbacks_handler.execute_train_begin()
+
+        self.assertEqual(len(train_loop.train_loader), 3)
+        self.assertEqual(type(train_loop.train_loader), list)
+        for batch in train_loop.train_loader:
+            self.assertEqual(batch[0].shape, (100, 10))
+
+        self.assertEqual(len(train_loop.validation_loader), 2)
+        self.assertEqual(type(train_loop.validation_loader), list)
+        for batch in train_loop.validation_loader:
+            self.assertEqual(batch[0].shape, (50, 10))
+
+        self.assertEqual(len(train_loop.test_loader), 2)
+        self.assertEqual(type(train_loop.test_loader), list)
+        for batch in train_loop.test_loader:
+            self.assertEqual(batch[0].shape, (30, 10))
+
+    def test_exception_throw(self):
+        train_loader = DataLoader(TensorDataset(torch.Tensor(1000, 10)), batch_size=100)
+
+        callback = DataSubsetTestRun(num_train_batches=3, num_val_batches=2)
+        train_loop = TrainLoop(NetUnifiedBatchFeed(), train_loader, None, None, None, None)
+
+        with self.assertRaises(ValueError):
+            train_loop.callbacks_handler.register_callbacks([callback])
+
+        callback = DataSubsetTestRun(num_train_batches=3, num_test_batches=2)
+        train_loop = TrainLoop(NetUnifiedBatchFeed(), train_loader, None, None, None, None)
+
+        with self.assertRaises(ValueError):
+            train_loop.callbacks_handler.register_callbacks([callback])
+
+        callback = DataSubsetTestRun(num_train_batches=3, num_val_batches=2, num_test_batches=2)
+        train_loop = TrainLoop(NetUnifiedBatchFeed(), train_loader, None, None, None, None)
+
+        with self.assertRaises(ValueError):
+            train_loop.callbacks_handler.register_callbacks([callback])
 
 
 def cb_fn(tl):
