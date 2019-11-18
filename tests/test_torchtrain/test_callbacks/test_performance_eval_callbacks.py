@@ -1,5 +1,6 @@
 import unittest
 import os
+import csv
 import shutil
 from tests.utils import *
 
@@ -217,12 +218,75 @@ class TestModelTrainHistoryFileWriter(unittest.TestCase):
         with open(f_path, 'r') as f:
             f_content = [l.strip() for l in f.readlines()]
 
-        print(f_content)
         self.assertEqual(f_content,
                          ['============================', 'Epoch: 0', '============================',
                           'loss:\t99999', 'NEW_METRIC:\t133323.4', '', '',
                           '============================', 'Epoch: 1', '============================',
                           'loss:\t99999', 'NEW_METRIC:\t133323.4', 'COMPLETEY_NEW_METRIC:\t3333.4', '', ''])
+
+        project_path = os.path.join(THIS_DIR, 'dummyProject')
+        if os.path.exists(project_path):
+            shutil.rmtree(project_path)
+
+    def test_execute_callback_tsv_format(self):
+        dummy_optimizer = DummyOptimizer()
+        dummy_train_loader = list(range(4))
+        dummy_val_loader = list(range(3))
+        dummy_test_loader = list(range(2))
+        model = NetUnifiedBatchFeed()
+
+        callback = ModelTrainHistoryFileWriter(file_format='tsv', project_name='dummyProject', experiment_name='exper',
+                                               local_model_result_folder_path=THIS_DIR, cloud_save_mode=None)
+        train_loop = TrainLoop(model, dummy_train_loader, dummy_val_loader, dummy_test_loader, dummy_optimizer, None)
+        train_loop.callbacks_handler.register_callbacks([callback])
+        train_loop.train_history = TrainingHistory().wrap_pre_prepared_history(
+            {'loss': [123.4, 1223.4, 13323.4, 13323.4, 99999],
+             'accumulated_loss': [], 'val_loss': [],
+             'NEW_METRIC': [13323.4, 133323.4]})
+
+        # Epoch 1
+        train_loop.callbacks_handler.execute_epoch_end()
+        f_path = os.path.join(THIS_DIR, 'dummyProject', f'exper_{train_loop.experiment_timestamp}',
+                              'results', 'results.tsv')
+
+        with open(f_path, 'r') as f:
+            tsv_reader = csv.reader(f, delimiter='\t')
+            output_lines = [l for l in tsv_reader]
+
+        self.assertEqual(output_lines, [['Epoch', 'loss', 'NEW_METRIC'],
+                                        ['0', '99999', '133323.4']])
+
+        # Epoch 2
+        train_loop.epoch += 1
+        train_loop.insert_metric_result_into_history('loss', 3333.4)
+        train_loop.insert_metric_result_into_history('NEW_METRIC', 1111.2)
+        train_loop.callbacks_handler.execute_epoch_end()
+
+        with open(f_path, 'r') as f:
+            tsv_reader = csv.reader(f, delimiter='\t')
+            output_lines = [l for l in tsv_reader]
+
+        self.assertEqual(output_lines, [['Epoch', 'loss', 'NEW_METRIC'],
+                                        ['0', '99999', '133323.4'],
+                                        ['1', '3333.4', '1111.2']])
+
+        # Epoch 3
+        train_loop.epoch += 1
+        train_loop.insert_metric_result_into_history('loss', 555.4)
+        train_loop.insert_metric_result_into_history('NEW_METRIC', 333.2)
+        train_loop.insert_metric_result_into_history('COMPLETELY_NEW_METRIC', 123456.7)
+        train_loop.callbacks_handler.execute_epoch_end()
+
+        with open(f_path, 'r') as f:
+            tsv_reader = csv.reader(f, delimiter='\t')
+            output_lines = [l for l in tsv_reader]
+
+        self.assertEqual(output_lines, [['Epoch', 'loss', 'NEW_METRIC'],
+                                        ['0', '99999', '133323.4'],
+                                        ['1', '3333.4', '1111.2'],
+                                        ['NEW_METRICS_DETECTED'],
+                                        ['Epoch', 'loss', 'NEW_METRIC', 'COMPLETELY_NEW_METRIC'],
+                                        ['2', '555.4', '333.2', '123456.7']])
 
         project_path = os.path.join(THIS_DIR, 'dummyProject')
         if os.path.exists(project_path):

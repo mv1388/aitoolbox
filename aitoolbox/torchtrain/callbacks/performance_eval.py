@@ -425,7 +425,7 @@ class ModelTrainHistoryPlot(ModelTrainHistoryBaseCB):
 
 
 class ModelTrainHistoryFileWriter(ModelTrainHistoryBaseCB):
-    def __init__(self, epoch_end=True, train_end=False,
+    def __init__(self, epoch_end=True, train_end=False, file_format='txt',
                  project_name=None, experiment_name=None, local_model_result_folder_path=None,
                  cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix=''):
         """Write evaluated performance metric history to the text file
@@ -433,6 +433,8 @@ class ModelTrainHistoryFileWriter(ModelTrainHistoryBaseCB):
         Args:
             epoch_end (bool): should plot after every epoch
             train_end (bool): should plot at the end of the training
+            file_format (str): output file format. Can be either 'txt' human readable output or
+                'tsv' for a tabular format or 'csv' for comma separated format.
             project_name (str or None): root name of the project
             experiment_name (str or None): name of the particular experiment
             local_model_result_folder_path (str or None): root local path where project folder will be created
@@ -451,6 +453,9 @@ class ModelTrainHistoryFileWriter(ModelTrainHistoryBaseCB):
                                          local_model_result_folder_path=local_model_result_folder_path,
                                          cloud_save_mode=cloud_save_mode, bucket_name=bucket_name,
                                          cloud_dir_prefix=cloud_dir_prefix)
+        # experiment_results_local_path will be set when callback is executed inside write_current_train_history()
+        self.result_writer = TrainingHistoryWriter(experiment_results_local_path=None)
+        self.file_format = file_format
 
     def on_train_loop_registration(self):
         self.try_infer_experiment_details(infer_cloud_details=True)
@@ -477,12 +482,13 @@ class ModelTrainHistoryFileWriter(ModelTrainHistoryBaseCB):
             BaseLocalResultsSaver.create_experiment_local_results_folder(self.project_name, self.experiment_name,
                                                                          self.train_loop_obj.experiment_timestamp,
                                                                          self.local_model_result_folder_path)
+        self.result_writer.experiment_results_local_path = experiment_results_local_path
 
-        result_writer = TrainingHistoryWriter(experiment_results_local_path=experiment_results_local_path)
         results_file_path_in_cloud_results_dir, results_file_local_path = \
-            result_writer.generate_report(training_history=self.train_loop_obj.train_history,
-                                          epoch=self.train_loop_obj.epoch,
-                                          file_name=f'{prefix}results.txt')
+            self.result_writer.generate_report(training_history=self.train_loop_obj.train_history,
+                                               epoch=self.train_loop_obj.epoch,
+                                               file_name=f'{prefix}results.{self.file_format}',
+                                               file_format=self.file_format)
 
         self.message_service.write_message('ModelTrainHistoryFileWriter_results_file_local_paths',
                                            [results_file_local_path],
