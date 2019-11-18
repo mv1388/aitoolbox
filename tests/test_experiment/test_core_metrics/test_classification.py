@@ -1,6 +1,5 @@
 import unittest
 
-from tests.utils import *
 from aitoolbox.experiment.core_metrics.classification import AccuracyMetric
 
 

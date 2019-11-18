@@ -2,7 +2,7 @@ import os
 
 from aitoolbox.cloud.AWS.data_access import BaseDataLoader
 from aitoolbox.experiment.local_load.local_model_load import AbstractLocalModelLoader, PyTorchLocalModelLoader
-from aitoolbox.experiment.local_save.folder_create import ExperimentFolderCreator
+from aitoolbox.experiment.local_save.folder_create import ExperimentFolder
 
 
 class BaseModelLoader(BaseDataLoader):
@@ -46,9 +46,8 @@ class BaseModelLoader(BaseDataLoader):
                                                project_name,
                                                experiment_name + '_' + experiment_timestamp,
                                                model_save_dir)
-        experiment_dir_path = ExperimentFolderCreator.create_experiment_base_folder(project_name, experiment_name,
-                                                                                    experiment_timestamp,
-                                                                                    self.local_model_result_folder_path)
+        experiment_dir_path = ExperimentFolder.create_base_folder(project_name, experiment_name, experiment_timestamp,
+                                                                  self.local_model_result_folder_path)
         local_model_folder_path = os.path.join(experiment_dir_path, model_save_dir)
         if not os.path.exists(local_model_folder_path):
             os.mkdir(local_model_folder_path)

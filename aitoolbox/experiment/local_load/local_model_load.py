@@ -5,12 +5,10 @@ import torch
 try:
     from apex import amp
     APEX_AVAILABLE = True
-except ModuleNotFoundError:
-    APEX_AVAILABLE = False
-except AttributeError:
+except ImportError:
     APEX_AVAILABLE = False
 
-from aitoolbox.experiment.local_save.folder_create import ExperimentFolderCreator
+from aitoolbox.experiment.local_save.folder_create import ExperimentFolder
 
 
 class AbstractLocalModelLoader(ABC):
@@ -57,9 +55,9 @@ class PyTorchLocalModelLoader(AbstractLocalModelLoader):
         Returns:
             model
         """
-        _, experiment_dir_path = ExperimentFolderCreator.get_experiment_base_folder_paths(project_name, experiment_name,
-                                                                                          experiment_timestamp,
-                                                                                          self.local_model_result_folder_path)
+        _, experiment_dir_path = ExperimentFolder.get_base_folder_paths(project_name, experiment_name,
+                                                                        experiment_timestamp,
+                                                                        self.local_model_result_folder_path)
         if epoch_num is None:
             model_name = f'model_{experiment_name}_{experiment_timestamp}.pth'
         else:

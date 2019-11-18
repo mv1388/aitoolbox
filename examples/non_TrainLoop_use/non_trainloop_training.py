@@ -1,17 +1,17 @@
-from __future__ import print_function
-import argparse
+from tqdm import tqdm
 import os
+import time
+import datetime
+import argparse
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 from torchvision import datasets, transforms
 
-from aitoolbox.torchtrain.train_loop import TrainLoop, TrainLoopModelCheckpointEndSave
-from aitoolbox.torchtrain.model import ModelWrap
-from aitoolbox.torchtrain.data.batch_model_feed_defs import AbstractModelFeedDefinition
-from aitoolbox.torchtrain.callbacks.performance_eval import ModelPerformanceEvaluation, ModelPerformancePrintReport
+from aitoolbox.experiment.training_history import TrainingHistory
 from aitoolbox.experiment.result_package.basic_packages import ClassificationResultPackage
+from aitoolbox.experiment.local_experiment_saver import FullPyTorchExperimentLocalSaver
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -33,26 +33,6 @@ class Net(nn.Module):
         x = F.relu(self.fc1(x))
         x = self.fc2(x)
         return F.log_softmax(x, dim=1)
-
-
-class MNISTModelFeedDefinition(AbstractModelFeedDefinition):
-    def get_loss(self, model, batch_data, criterion, device):
-        data, target = batch_data
-        data, target = data.to(device), target.to(device)
-
-        output = model(data)
-        loss = criterion(output, target)
-
-        return loss
-
-    def get_predictions(self, model, batch_data, device):
-        data, y_test = batch_data
-        data = data.to(device)
-
-        output = model(data)
-        y_pred = output.argmax(dim=1, keepdim=False)  # get the index of the max log-probability
-
-        return y_pred.cpu(), y_test, {}
 
 
 ################################################################################################
@@ -102,22 +82,46 @@ model = Net()
 optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
 criterion = F.nll_loss
 
-callbacks = [ModelPerformanceEvaluation(ClassificationResultPackage(), args.__dict__,
-                                        on_train_data=True, on_val_data=True),
-             ModelPerformancePrintReport(['train_Accuracy', 'val_Accuracy'], strict_metric_reporting=True)]
+experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
+training_history = TrainingHistory()
 
 
-# TrainLoop(ModelWrap(model, MNISTModelFeedDefinition()),
-#           train_loader, test_loader, None,
-#           optimizer, criterion)(num_epoch=10, callbacks=callbacks)
+for epoch in range(args.epochs):
+    print(f'EPOCH: {epoch}')
+
+    # Training
+    model.train()
+    for data, target in tqdm(train_loader):
+        optimizer.zero_grad()
+        predictions = model(data)
+
+        loss = criterion(predictions, target)
+        loss.backward()
+
+        optimizer.step()
+
+    # Testing
+    model.eval()
+    y_pred, y_test = [], []
+    for data, target in tqdm(test_loader):
+        predictions = model(data)
+        y_pred += predictions.tolist()
+        y_test += target.tolist()
+
+    result_pkg = ClassificationResultPackage()
+    result_pkg.prepare_result_package(y_true=y_test, y_predicted=y_pred,
+                                      hyperparameters=args.__dict__, training_history=training_history)
+
+    for metric_name, metric_result in result_pkg.get_results().items():
+        training_history.insert_single_result_into_history(metric_name, metric_result)
 
 
-TrainLoopModelCheckpointEndSave(ModelWrap(model, MNISTModelFeedDefinition()),
-                                train_loader, test_loader, test_loader,
-                                optimizer, criterion,
-                                project_name='localRunCNNTest',
-                                experiment_name='CNN_MNIST_test',
-                                local_model_result_folder_path=THIS_DIR,
-                                hyperparams=args.__dict__,
-                                test_result_package=ClassificationResultPackage(),
-                                cloud_save_mode=None)(num_epoch=5, callbacks=callbacks)
+# Save model & results
+experiment_saver = FullPyTorchExperimentLocalSaver(project_name='localRunCNNTest', experiment_name='CNN_MNIST_test',
+                                                   local_model_result_folder_path=THIS_DIR)
+
+model_checkpoint = {'model_state_dict': model.state_dict(),
+                    'optimizer_state_dict': optimizer.state_dict(),
+                    'epoch': epoch,
+                    'hyperparams': args.__dict__}
+experiment_saver.save_experiment(model_checkpoint, result_pkg, experiment_timestamp=experiment_timestamp)

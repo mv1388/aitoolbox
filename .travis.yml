@@ -22,20 +22,20 @@ matrix:
 #      os: linux
 #      dist: bionic  # Ubuntu 18.04
 #      python: 3.7
-    - name: "OSX xcode10.2 - Python 3"
-      os: osx
-      osx_image: xcode10.2
-      language: generic
-      addons:
-        homebrew:
-          # update: true
-          packages: python3
-      before_install:
-        - pip3 install virtualenv
-        - virtualenv -p python3 ~/venv
-        - source ~/venv/bin/activate
+#    - name: "OSX xcode10.2 - Python 3"
+#      os: osx
+#      osx_image: xcode10.2
+#      language: generic
+#      addons:
+#        homebrew:
+#          # update: true
+#          packages: python3
+#      before_install:
+#        - pip3 install virtualenv
+#        - virtualenv -p python3 ~/venv
+#        - source ~/venv/bin/activate
 
-cache: pip
+#cache: pip
 
 # command to install dependencies
 install:

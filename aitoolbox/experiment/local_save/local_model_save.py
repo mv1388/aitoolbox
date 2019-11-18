@@ -3,7 +3,7 @@ import os
 import time
 import datetime
 
-from aitoolbox.experiment.local_save.folder_create import ExperimentFolderCreator
+from aitoolbox.experiment.local_save.folder_create import ExperimentFolder
 
 
 class AbstractLocalModelSaver(ABC):
@@ -49,9 +49,8 @@ class BaseLocalModelSaver:
         Returns:
             str: path to the created models folder in the experiment base folder
         """
-        experiment_path = ExperimentFolderCreator.create_experiment_base_folder(project_name, experiment_name,
-                                                                                experiment_timestamp,
-                                                                                self.local_model_result_folder_path)
+        experiment_path = ExperimentFolder.create_base_folder(project_name, experiment_name, experiment_timestamp,
+                                                              self.local_model_result_folder_path)
 
         experiment_model_path = os.path.join(experiment_path,
                                              'model' if not self.checkpoint_model else 'checkpoint_model')

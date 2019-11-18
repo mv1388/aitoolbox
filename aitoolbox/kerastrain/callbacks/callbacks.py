@@ -95,9 +95,9 @@ class ModelCheckpoint(AbstractKerasCallback):
                                                          protect_existing_folder=True)
         
         if self.rm_subopt_local_models is not False:
-            _, _, model_local_path, model_weights_local_path = model_paths
+            _, model_local_path = model_paths
             self.subopt_model_remover.decide_if_remove_suboptimal_model(self.train_loop_obj.train_history,
-                                                                        [model_local_path, model_weights_local_path])
+                                                                        [model_local_path])
 
 
 class ModelTrainEndSave(AbstractKerasCallback):
