@@ -92,7 +92,7 @@ class TestTrainLoop(unittest.TestCase):
         callback_full = train_loop.callbacks[1]
         callback_short = train_loop.callbacks[2]
 
-        model_return = train_loop.fit(num_epoch=num_epochs)
+        model_return = train_loop.fit(num_epochs=num_epochs)
 
         self.assertEqual(model, model_return)
         self.assertFalse(train_loop.early_stop)
@@ -157,7 +157,7 @@ class TestTrainLoop(unittest.TestCase):
         callback_full = train_loop.callbacks[1]
         callback_short = train_loop.callbacks[2]
 
-        model_return = train_loop.fit(num_epoch=num_epochs)
+        model_return = train_loop.fit(num_epochs=num_epochs)
 
         self.assertEqual(model, model_return)
         self.assertFalse(train_loop.early_stop)
@@ -227,7 +227,7 @@ class TestTrainLoop(unittest.TestCase):
         train_loop.callbacks_handler.register_callbacks([AbstractCallback('callback_test1'),
                                                          CallbackTracker(), CallbackTrackerShort(),
                                                          AbstractCallback('callback_test2')])
-        train_loop.fit(num_epoch=num_epochs)
+        train_loop.fit(num_epochs=num_epochs)
 
         if eval_mode == 'train':
             y_pred, y_test, metadata = train_loop.predict_on_train_set()
@@ -269,7 +269,7 @@ class TestTrainLoop(unittest.TestCase):
         train_loop.callbacks_handler.register_callbacks([AbstractCallback('callback_test1'),
                                                          CallbackTracker(), CallbackTrackerShort(),
                                                          AbstractCallback('callback_test2')])
-        train_loop.fit(num_epoch=num_epochs)
+        train_loop.fit(num_epochs=num_epochs)
 
         if eval_mode == 'train':
             y_pred, y_test, metadata = train_loop.predict_on_train_set()
@@ -308,7 +308,7 @@ class TestTrainLoop(unittest.TestCase):
         train_loop.callbacks_handler.register_callbacks([AbstractCallback('callback_test1'),
                                                          CallbackTracker(), CallbackTrackerShort(),
                                                          AbstractCallback('callback_test2')])
-        train_loop.fit(num_epoch=num_epochs)
+        train_loop.fit(num_epochs=num_epochs)
 
         self.assertEqual(train_loop.train_history.train_history, {'loss': [1.0, 1.0], 'accumulated_loss': [1.0, 1.0],
                                                                   'val_loss': [1.0, 1.0], 'train_end_test_loss': [1.0]})

@@ -106,7 +106,7 @@ callbacks = [ModelPerformanceEvaluation(ClassificationResultPackage(), args.__di
 
 # TrainLoop(model,
 #           train_loader, test_loader, None,
-#           optimizer, criterion)(num_epoch=10, callbacks=callbacks)
+#           optimizer, criterion)(num_epochs=10, callbacks=callbacks)
 
 
 TrainLoopModelCheckpointEndSave(model,
