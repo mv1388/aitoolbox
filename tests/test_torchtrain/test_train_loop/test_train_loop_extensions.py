@@ -7,7 +7,7 @@ from aitoolbox.torchtrain.tl_components.callback_handler import CallbacksHandler
 from tests.utils import NetUnifiedBatchFeed, DummyOptimizer, MiniDummyOptimizer, DummyResultPackage
 
 
-class TestTrainLoopModelCheckpoint(unittest.TestCase):
+class TestTrainLoopCheckpoint(unittest.TestCase):
     def test_init_values(self):
         train_loop_non_val = TrainLoopCheckpoint(NetUnifiedBatchFeed(), None, None, None, DummyOptimizer(), None,
                                                       "project_name", "experiment_name", "local_model_result_folder_path", {})
@@ -31,7 +31,7 @@ class TestTrainLoopModelCheckpoint(unittest.TestCase):
                                      "local_model_result_folder_path", {})
 
 
-class TestTrainLoopModelEndSave(unittest.TestCase):
+class TestTrainLoopEndSave(unittest.TestCase):
     def test_init_values(self):
         train_loop_non_val = TrainLoopEndSave(NetUnifiedBatchFeed(), None, 100, 100, DummyOptimizer(), None,
                                                    "project_name", "experiment_name", "local_model_result_folder_path",
@@ -102,7 +102,7 @@ class TestTrainLoopModelEndSave(unittest.TestCase):
                              cloud_save_mode='s3')
 
 
-class TestTrainLoopModelCheckpointEndSave(unittest.TestCase):
+class TestTrainLoopCheckpointEndSave(unittest.TestCase):
     def test_init_values(self):
         train_loop_non_val = TrainLoopCheckpointEndSave(NetUnifiedBatchFeed(), None, 100, None, DummyOptimizer(), None,
                                                              "project_name", "experiment_name", "local_model_result_folder_path",
