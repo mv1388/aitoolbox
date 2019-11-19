@@ -293,7 +293,7 @@ class MetricHistoryRename(TrainHistoryFormatter):
 
 class ModelTrainHistoryBaseCB(AbstractExperimentCallback):
     def __init__(self, callback_name, execution_order=0,
-                 epoch_end=True, train_end=False,
+                 epoch_end=True, train_end=False, file_format='',
                  project_name=None, experiment_name=None, local_model_result_folder_path=None,
                  cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix=''):
         """Base callback class to be inherited from when reporting train performance history
@@ -303,6 +303,7 @@ class ModelTrainHistoryBaseCB(AbstractExperimentCallback):
             execution_order (int):
             epoch_end (bool): should plot after every epoch
             train_end (bool): should plot at the end of the training
+            file_format (str): output file format
             project_name (str or None): root name of the project
             experiment_name (str or None): name of the particular experiment
             local_model_result_folder_path (str or None): root local path where project folder will be created
@@ -318,6 +319,7 @@ class ModelTrainHistoryBaseCB(AbstractExperimentCallback):
             raise ValueError('Both epoch_end and train_end are set to False. At least one of these should be True.')
         self.epoch_end = epoch_end
         self.train_end = train_end
+        self.file_format = file_format
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path) \
@@ -347,7 +349,7 @@ class ModelTrainHistoryBaseCB(AbstractExperimentCallback):
 
 
 class ModelTrainHistoryPlot(ModelTrainHistoryBaseCB):
-    def __init__(self, epoch_end=True, train_end=False,
+    def __init__(self, epoch_end=True, train_end=False, file_format='png',
                  project_name=None, experiment_name=None, local_model_result_folder_path=None,
                  cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix=''):
         """Plot the evaluated performance metric history
@@ -355,6 +357,8 @@ class ModelTrainHistoryPlot(ModelTrainHistoryBaseCB):
         Args:
             epoch_end (bool): should plot after every epoch
             train_end (bool): should plot at the end of the training
+            file_format (str): output file format. Can be either 'png' for saving separate images or 'pdf' for combining
+                all the plots into a single pdf file.
             project_name (str or None): root name of the project
             experiment_name (str or None): name of the particular experiment
             local_model_result_folder_path (str or None): root local path where project folder will be created
@@ -368,11 +372,14 @@ class ModelTrainHistoryPlot(ModelTrainHistoryBaseCB):
         # execution_order=97 makes sure that any performance calculation callbacks are executed before and the most
         # recent results can already be found in the train_history
         ModelTrainHistoryBaseCB.__init__(self, 'Model Train history Plot report', execution_order=97,
-                                         epoch_end=epoch_end, train_end=train_end,
+                                         epoch_end=epoch_end, train_end=train_end, file_format=file_format,
                                          project_name=project_name, experiment_name=experiment_name,
                                          local_model_result_folder_path=local_model_result_folder_path,
                                          cloud_save_mode=cloud_save_mode, bucket_name=bucket_name,
                                          cloud_dir_prefix=cloud_dir_prefix)
+        if self.file_format not in ['png', 'pdf']:
+            raise ValueError(f"Output format '{self.file_format}' is not supported. "
+                             "Select one of the following: 'png' or 'pdf'.")
 
     def on_train_loop_registration(self):
         self.try_infer_experiment_details(infer_cloud_details=True)
@@ -403,7 +410,8 @@ class ModelTrainHistoryPlot(ModelTrainHistoryBaseCB):
         plotter = TrainingHistoryPlotter(experiment_results_local_path=experiment_results_local_path)
         saved_local_results_details = \
             plotter.generate_report(training_history=self.train_loop_obj.train_history,
-                                    plots_folder_name=f'{prefix}plots_epoch_{self.train_loop_obj.epoch}')
+                                    plots_folder_name=f'{prefix}plots_epoch_{self.train_loop_obj.epoch}',
+                                    file_format=self.file_format)
 
         results_file_local_paths = [result_local_path for _, result_local_path in saved_local_results_details]
         self.message_service.write_message('ModelTrainHistoryPlot_results_file_local_paths',
@@ -446,14 +454,16 @@ class ModelTrainHistoryFileWriter(ModelTrainHistoryBaseCB):
         # execution_order=97 makes sure that any performance calculation callbacks are executed before and the most
         # recent results can already be found in the train_history
         ModelTrainHistoryBaseCB.__init__(self, 'Model Train performance history file writer', execution_order=97,
-                                         epoch_end=epoch_end, train_end=train_end,
+                                         epoch_end=epoch_end, train_end=train_end, file_format=file_format,
                                          project_name=project_name, experiment_name=experiment_name,
                                          local_model_result_folder_path=local_model_result_folder_path,
                                          cloud_save_mode=cloud_save_mode, bucket_name=bucket_name,
                                          cloud_dir_prefix=cloud_dir_prefix)
         # experiment_results_local_path will be set when callback is executed inside write_current_train_history()
         self.result_writer = TrainingHistoryWriter(experiment_results_local_path=None)
-        self.file_format = file_format
+        if self.file_format not in ['txt', 'tsv', 'csv']:
+            raise ValueError(f"Output format '{self.file_format}' is not supported. "
+                             "Select one of the following: 'txt', 'tsv' or 'csv'.")
 
     def on_train_loop_registration(self):
         self.try_infer_experiment_details(infer_cloud_details=True)
