@@ -373,7 +373,7 @@ class TrainLoop:
         self.train_history.insert_single_result_into_history(metric_name, metric_result)
 
 
-class TrainLoopModelCheckpoint(TrainLoop):
+class TrainLoopCheckpoint(TrainLoop):
     def __init__(self, model,
                  train_loader, validation_loader, test_loader,
                  optimizer, criterion,
@@ -445,7 +445,7 @@ class TrainLoopModelCheckpoint(TrainLoop):
         ])
 
 
-class TrainLoopModelEndSave(TrainLoop):
+class TrainLoopEndSave(TrainLoop):
     def __init__(self, model,
                  train_loader, validation_loader, test_loader,
                  optimizer, criterion,
@@ -532,7 +532,7 @@ class TrainLoopModelEndSave(TrainLoop):
             raise TypeError(f'test_result_package {self.test_result_package} is not inherited from AbstractResultPackage')
 
 
-class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
+class TrainLoopCheckpointEndSave(TrainLoopEndSave):
     def __init__(self, model,
                  train_loader, validation_loader, test_loader,
                  optimizer, criterion,
@@ -585,13 +585,13 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
         if 'experiment_file_path' not in hyperparams:
             hyperparams['experiment_file_path'] = inspect.getframeinfo(inspect.currentframe().f_back).filename
 
-        TrainLoopModelEndSave.__init__(self, model, train_loader, validation_loader, test_loader,
-                                       optimizer, criterion,
-                                       project_name, experiment_name, os.path.expanduser(local_model_result_folder_path),
-                                       hyperparams, val_result_package, test_result_package,
-                                       cloud_save_mode, bucket_name, cloud_dir_prefix,
-                                       collate_batch_pred_fn, pred_transform_fn,
-                                       end_auto_eval, use_amp)
+        TrainLoopEndSave.__init__(self, model, train_loader, validation_loader, test_loader,
+                                  optimizer, criterion,
+                                  project_name, experiment_name, os.path.expanduser(local_model_result_folder_path),
+                                  hyperparams, val_result_package, test_result_package,
+                                  cloud_save_mode, bucket_name, cloud_dir_prefix,
+                                  collate_batch_pred_fn, pred_transform_fn,
+                                  end_auto_eval, use_amp)
         self.rm_subopt_local_models = rm_subopt_local_models
 
         self.callbacks_handler.register_callbacks([
@@ -602,3 +602,9 @@ class TrainLoopModelCheckpointEndSave(TrainLoopModelEndSave):
                             rm_subopt_local_models=self.rm_subopt_local_models,
                             num_best_checkpoints_kept=num_best_checkpoints_kept)
         ])
+
+
+# For back compatibility
+TrainLoopModelCheckpoint = TrainLoopCheckpoint
+TrainLoopModelEndSave = TrainLoopEndSave
+TrainLoopModelCheckpointEndSave = TrainLoopCheckpointEndSave
