@@ -43,14 +43,14 @@ AIToolbox includes a few more advanced derivations of the basic TrainLoop
 which automatically handle the experiment tracking by creating model
 checkpoints, performance reports, example predictions, etc. All of this can be saved just on the local drive
 or can also be automatically also stored on AWS S3.  Currently implemented advanced 
-[`TrainLoops`](/aitoolbox/torchtrain/train_loop.py) are `TrainLoopModelCheckpoint`, `TrainLoopModelEndSave` and `TrainLoopModelCheckpointEndSave`.
+[`TrainLoops`](/aitoolbox/torchtrain/train_loop.py) are `TrainLoopCheckpoint`, `TrainLoopEndSave` and `TrainLoopCheckpointEndSave`.
 Here, 'Checkpoint' stands for checkpointing after each epoch, while 'EndSave' will only persist and evaluate at the very end of the training. 
 
-For the most complete experiment tracking it is recommended to use the `TrainLoopModelCheckpointEndSave` option. 
+For the most complete experiment tracking it is recommended to use the `TrainLoopCheckpointEndSave` option. 
 The optional use of the *result packages* needed for the neural net performance evaluation is explained in 
 the [experiment section](#experiment) bellow.
 ```python
-TrainLoopModelCheckpointEndSave(model,
+TrainLoopCheckpointEndSave(model,
                                 train_loader, validation_loader, test_loader,
                                 optimizer, criterion,
                                 project_name, experiment_name, local_model_result_folder_path,
