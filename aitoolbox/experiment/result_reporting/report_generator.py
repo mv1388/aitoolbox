@@ -3,6 +3,7 @@ import csv
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
+from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.style as style
 style.use('ggplot')
 
@@ -16,7 +17,7 @@ class TrainingHistoryPlotter:
         """
         self.experiment_results_local_path = experiment_results_local_path
 
-    def generate_report(self, training_history, plots_folder_name='plots'):
+    def generate_report(self, training_history, plots_folder_name='plots', file_format='png'):
         """Plot all the currently present performance result in the training history
 
         Every plot shows the progression of a single performance metric over the epochs.
@@ -24,38 +25,69 @@ class TrainingHistoryPlotter:
         Args:
             training_history (aitoolbox.experiment.training_history.TrainingHistory): TrainLoop training history
             plots_folder_name (str): local dir name where the plots should be saved
+            file_format (str): output file format. Can be either 'png' for saving separate images or 'pdf' for combining
+                all the plots into a single pdf file.
 
         Returns:
             list: list of saved plot paths
         """
-        plots_local_folder_path = os.path.join(self.experiment_results_local_path, plots_folder_name)
-        if not os.path.exists(plots_local_folder_path):
-            os.mkdir(plots_local_folder_path)
+        if file_format == 'png':
+            plots_local_folder_path = os.path.join(self.experiment_results_local_path, plots_folder_name)
+            if not os.path.exists(plots_local_folder_path):
+                os.mkdir(plots_local_folder_path)
 
-        plots_paths = []
+            plots_paths = self.plot_png(training_history, plots_local_folder_path, plots_folder_name)
 
-        for metric_name, result_history in training_history.get_train_history_dict(flatten_dict=True).items():
-            if len(result_history) > 1:
-                file_name, file_path = self.plot_performance_curve(metric_name, result_history, plots_local_folder_path)
-                plots_paths.append([os.path.join(plots_folder_name, file_name), file_path])
+        elif file_format == 'pdf':
+            plots_paths = self.plot_pdf(training_history, self.experiment_results_local_path, plots_folder_name)
+        else:
+            raise ValueError(f"Not supported file_format: {file_format}. "
+                             "Select one of the following: 'png' or 'pdf'.")
 
         return plots_paths
 
+    def plot_png(self, training_history, plots_local_folder_path, plots_folder_name):
+        plots_paths = []
+
+        for metric_name, fig in self.generate_plots(training_history):
+            file_name = f'{metric_name}.png'
+            file_path = os.path.join(plots_local_folder_path, file_name)
+
+            fig.savefig(file_path)
+            plt.close()
+
+            plots_paths.append([os.path.join(plots_folder_name, file_name), file_path])
+
+        return plots_paths
+
+    def plot_pdf(self, training_history, plots_local_folder_path, plots_file_name):
+        file_name = f'{plots_file_name}.pdf'
+        file_path = os.path.join(plots_local_folder_path, file_name)
+
+        with PdfPages(file_path) as pdf_pages:
+            for _, fig in self.generate_plots(training_history):
+                pdf_pages.savefig(fig)
+
+        return [[file_name, file_path]]
+
     @staticmethod
-    def plot_performance_curve(metric_name, result_history, results_local_folder_path):
+    def generate_plots(training_history):
+        for metric_name, result_history in training_history.get_train_history_dict(flatten_dict=True).items():
+            if len(result_history) > 1:
+                fig = TrainingHistoryPlotter.plot_performance_curve(metric_name, result_history)
+                yield metric_name, fig
+
+    @staticmethod
+    def plot_performance_curve(metric_name, result_history):
         """Plot the performance of a selected calculated metric over the epochs
 
         Args:
             metric_name (str or int): name of plotted metric
             result_history (list or np.array): results history for the selected metric
-            results_local_folder_path (str): path to the folder where the plot should be saved
 
         Returns:
-            (str, str): file_name, file_path
+            plt.figure: plot figure
         """
-        file_name = f'{metric_name}.png'
-        file_path = os.path.join(results_local_folder_path, file_name)
-
         fig = plt.figure()
         fig.set_size_inches(10, 8)
         
@@ -75,9 +107,7 @@ class TrainingHistoryPlotter:
                 x=0.5, y=1.01, fontsize=8, alpha=0.75,
                 ha='center', va='bottom', transform=ax.transAxes)
 
-        fig.savefig(file_path)
-        plt.close()
-        return file_name, file_path
+        return fig
 
 
 class TrainingHistoryWriter:
@@ -118,7 +148,7 @@ class TrainingHistoryWriter:
             self.write_csv_tsv(training_history, epoch, file_path, delimiter=',')
         else:
             raise ValueError(f"Output format '{file_format}' is not supported. "
-                             "Select one of the following: txt, tsv, csv.")
+                             "Select one of the following: 'txt', 'tsv', 'csv'.")
 
         return os.path.join(results_folder_name if results_folder_name is not None else '',
                             file_name), file_path
