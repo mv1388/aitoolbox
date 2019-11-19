@@ -51,13 +51,13 @@ The optional use of the *result packages* needed for the neural net performance 
 the [experiment section](#experiment) bellow.
 ```python
 TrainLoopCheckpointEndSave(model,
-                                train_loader, validation_loader, test_loader,
-                                optimizer, criterion,
-                                project_name, experiment_name, local_model_result_folder_path,
-                                hyperparams, val_result_package=None, test_result_package=None,
-                                cloud_save_mode='s3', bucket_name='models', cloud_dir_prefix='',
-                                rm_subopt_local_models=False, num_best_checkpoints_kept=2,
-                                use_amp=False)
+                           train_loader, validation_loader, test_loader,
+                           optimizer, criterion,
+                           project_name, experiment_name, local_model_result_folder_path,
+                           hyperparams, val_result_package=None, test_result_package=None,
+                           cloud_save_mode='s3', bucket_name='models', cloud_dir_prefix='',
+                           rm_subopt_local_models=False, num_best_checkpoints_kept=2,
+                           use_amp=False)
 ```
 
 Lastly, all the TrainingLoop versions also support training with **Automatic Mixed Precision**
