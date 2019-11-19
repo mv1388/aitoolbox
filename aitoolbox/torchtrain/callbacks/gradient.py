@@ -103,7 +103,7 @@ class GradientStatsPrint(AbstractCallback):
 
 
 class GradDistributionPlot(AbstractExperimentCallback):
-    def __init__(self, model_layers_extract_def, grad_plots_dir_name='grad_distribution',
+    def __init__(self, model_layers_extract_def, grad_plots_dir_name='grad_distribution', file_format='png',
                  project_name=None, experiment_name=None, local_model_result_folder_path=None,
                  cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix=''):
         """Plot layers' gradient distributions after every epoch
@@ -112,6 +112,8 @@ class GradDistributionPlot(AbstractExperimentCallback):
             model_layers_extract_def (lambda or function): lambda/function accepting model as the input and returning
                 a list of all the layers in the model for which the gradient stats should be calculated
             grad_plots_dir_name (str): name of the folder where gradient distribution plots are saved after every epoch
+            file_format (str): output file format. Can be either 'png' for saving separate images or 'pdf' for combining
+                all the plots into a single pdf file.
             project_name (str or None): root name of the project
             experiment_name (str or None): name of the particular experiment
             local_model_result_folder_path (str or None): root local path where project folder will be created
@@ -132,6 +134,10 @@ class GradDistributionPlot(AbstractExperimentCallback):
         self.bucket_name = bucket_name
         self.cloud_dir_prefix = cloud_dir_prefix
         self.grad_plots_dir_name = grad_plots_dir_name
+        self.file_format = file_format
+        if self.file_format not in ['png', 'pdf']:
+            raise ValueError(f"Output format '{self.file_format}' is not supported. "
+                             "Select one of the following: 'png' or 'pdf'.")
 
         self.model_layers_extract_def = model_layers_extract_def
         self.cloud_results_saver = None
@@ -154,7 +160,8 @@ class GradDistributionPlot(AbstractExperimentCallback):
         model_layer_gradients = [layer.weight.grad.reshape(-1).cpu().numpy() if layer.weight.grad is not None else None
                                  for layer in model_layers_list]
 
-        saved_plot_paths = self.gradient_plotter.generate_report(model_layer_gradients, f'epoch_{self.train_loop_obj.epoch}')
+        saved_plot_paths = self.gradient_plotter.generate_report(model_layer_gradients, f'epoch_{self.train_loop_obj.epoch}',
+                                                                 file_format=self.file_format)
 
         if self.cloud_results_saver is not None:
             self.save_to_cloud(saved_plot_paths)
