@@ -6,7 +6,7 @@ from tests.utils import *
 
 from aitoolbox.torchtrain.callbacks.performance_eval import ModelPerformanceEvaluation, \
     ModelTrainHistoryFileWriter, MetricHistoryRename
-from aitoolbox.torchtrain.train_loop import TrainLoop, TrainLoopModelCheckpoint
+from aitoolbox.torchtrain.train_loop import TrainLoop, TrainLoopCheckpoint
 from aitoolbox.experiment.training_history import TrainingHistory
 
 
@@ -26,7 +26,7 @@ class TestModelPerformanceEvaluationCallback(unittest.TestCase):
         callback = ModelPerformanceEvaluation(result_pkg, {},
                                               on_each_epoch=True, on_train_data=False, on_val_data=True,
                                               if_available_output_to_project_dir=True)
-        train_loop = TrainLoopModelCheckpoint(model, dummy_train_loader, dummy_val_loader, dummy_test_loader, dummy_optimizer, None,
+        train_loop = TrainLoopCheckpoint(model, dummy_train_loader, dummy_val_loader, dummy_test_loader, dummy_optimizer, None,
                                               "project_name", "experiment_name", "local_model_result_folder_path", {})
         train_loop.callbacks_handler.register_callbacks([callback])
 
@@ -38,8 +38,8 @@ class TestModelPerformanceEvaluationCallback(unittest.TestCase):
         callback = ModelPerformanceEvaluation(result_pkg, {},
                                               on_each_epoch=True, on_train_data=False, on_val_data=True,
                                               if_available_output_to_project_dir=False)
-        train_loop = TrainLoopModelCheckpoint(model, dummy_train_loader, dummy_val_loader, dummy_test_loader,
-                                              dummy_optimizer, None,
+        train_loop = TrainLoopCheckpoint(model, dummy_train_loader, dummy_val_loader, dummy_test_loader,
+                                         dummy_optimizer, None,
                                               "project_name", "experiment_name", "local_model_result_folder_path", {})
         train_loop.callbacks_handler.register_callbacks([callback])
 

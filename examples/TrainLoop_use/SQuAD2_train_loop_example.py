@@ -7,7 +7,7 @@ from aitoolbox.nlp.dataset.SQuAD2.SQuAD2DataReader import SQuAD2ConcatContextDat
 from aitoolbox.torchtrain.data.dataset import BasicDataset as SQuAD2Dataset
 from aitoolbox.nlp.dataset.torch_collate_fns import qa_concat_ctx_span_collate_fn
 
-from aitoolbox.torchtrain.train_loop import TrainLoop, TrainLoopModelCheckpointEndSave
+from aitoolbox.torchtrain.train_loop import TrainLoop, TrainLoopCheckpointEndSave
 from aitoolbox.torchtrain.callbacks.performance_eval import ModelPerformanceEvaluation, \
     ModelPerformancePrintReport, ModelTrainHistoryPlot
 from aitoolbox.torchtrain.callbacks.train_schedule import ReduceLROnPlateauScheduler
@@ -101,12 +101,12 @@ qa_test_result_pkg = QuestionAnswerResultPackage([paragraph_tokens for paragraph
                                                  output_text_dir='tempData_final_test')
 
 # If you have AWS cli backend spetup you cna enable the cloud_save_mode to upload the models/results to the cloud
-TrainLoopModelCheckpointEndSave(model,
-                                train_loader, dev_loader, test_loader,
-                                optimizer, criterion,
-                                project_name='SQUAD2ModelExample', experiment_name='MemoryNetPytorchTest',
-                                local_model_result_folder_path=f'{project_folder_prefix}/model_results',
-                                hyperparams=used_args,
-                                val_result_package=qa_val_result_pkg, test_result_package=qa_test_result_pkg,
-                                cloud_save_mode=None)\
+TrainLoopCheckpointEndSave(model,
+                           train_loader, dev_loader, test_loader,
+                           optimizer, criterion,
+                           project_name='SQUAD2ModelExample', experiment_name='MemoryNetPytorchTest',
+                           local_model_result_folder_path=f'{project_folder_prefix}/model_results',
+                           hyperparams=used_args,
+                           val_result_package=qa_val_result_pkg, test_result_package=qa_test_result_pkg,
+                           cloud_save_mode=None)\
     (num_epoch=3, callbacks=callbacks)

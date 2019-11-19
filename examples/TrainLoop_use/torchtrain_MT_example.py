@@ -10,7 +10,7 @@ import spacy
 
 import random
 
-from aitoolbox.torchtrain.train_loop import TrainLoopModelCheckpointEndSave
+from aitoolbox.torchtrain.train_loop import TrainLoopCheckpointEndSave
 from aitoolbox.torchtrain.model import ModelWrap
 from aitoolbox.torchtrain.data.batch_model_feed_defs import AbstractModelFeedDefinition
 from aitoolbox.nlp.experiment_evaluation.NLP_result_package import MachineTranslationResultPackage
@@ -409,12 +409,12 @@ finish_result_pkg_test = MachineTranslationResultPackage(vocab_trg, vocab_src,
                                                          output_text_dir='final_text_test',
                                                          output_attn_heatmap_dir='final_attn_test')
 
-TrainLoopModelCheckpointEndSave(ModelWrap(model, MachineTranslationFeedDefinition()),
-                                train_iterator, valid_iterator, test_iterator,
-                                optimizer, criterion,
-                                project_name='MT_project_test',
-                                experiment_name='Seq2SeqPytorchTest',
-                                local_model_result_folder_path='<PATH>',
-                                hyperparams={},
-                                test_result_package=finish_result_pkg_test)\
+TrainLoopCheckpointEndSave(ModelWrap(model, MachineTranslationFeedDefinition()),
+                           train_iterator, valid_iterator, test_iterator,
+                           optimizer, criterion,
+                           project_name='MT_project_test',
+                           experiment_name='Seq2SeqPytorchTest',
+                           local_model_result_folder_path='<PATH>',
+                           hyperparams={},
+                           test_result_package=finish_result_pkg_test)\
     (num_epoch=2, grad_clip=10)

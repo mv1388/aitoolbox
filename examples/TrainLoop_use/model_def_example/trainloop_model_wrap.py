@@ -7,7 +7,7 @@ import torch.nn.functional as F
 import torch.optim as optim
 from torchvision import datasets, transforms
 
-from aitoolbox.torchtrain.train_loop import TrainLoop, TrainLoopModelCheckpointEndSave
+from aitoolbox.torchtrain.train_loop import TrainLoop, TrainLoopCheckpointEndSave
 from aitoolbox.torchtrain.model import ModelWrap
 from aitoolbox.torchtrain.data.batch_model_feed_defs import AbstractModelFeedDefinition
 from aitoolbox.torchtrain.callbacks.performance_eval import ModelPerformanceEvaluation, ModelPerformancePrintReport
@@ -112,12 +112,12 @@ callbacks = [ModelPerformanceEvaluation(ClassificationResultPackage(), args.__di
 #           optimizer, criterion)(num_epochs=10, callbacks=callbacks)
 
 
-TrainLoopModelCheckpointEndSave(ModelWrap(model, MNISTModelFeedDefinition()),
-                                train_loader, test_loader, test_loader,
-                                optimizer, criterion,
-                                project_name='localRunCNNTest',
-                                experiment_name='CNN_MNIST_test',
-                                local_model_result_folder_path=THIS_DIR,
-                                hyperparams=args.__dict__,
-                                test_result_package=ClassificationResultPackage(),
-                                cloud_save_mode=None)(num_epoch=5, callbacks=callbacks)
+TrainLoopCheckpointEndSave(ModelWrap(model, MNISTModelFeedDefinition()),
+                           train_loader, test_loader, test_loader,
+                           optimizer, criterion,
+                           project_name='localRunCNNTest',
+                           experiment_name='CNN_MNIST_test',
+                           local_model_result_folder_path=THIS_DIR,
+                           hyperparams=args.__dict__,
+                           test_result_package=ClassificationResultPackage(),
+                           cloud_save_mode=None)(num_epoch=5, callbacks=callbacks)

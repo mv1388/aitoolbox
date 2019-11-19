@@ -3,7 +3,7 @@ import unittest
 from tests.utils import *
 
 from aitoolbox.torchtrain.callbacks.abstract import AbstractCallback, AbstractExperimentCallback
-from aitoolbox.torchtrain.train_loop import TrainLoop, TrainLoopModelCheckpointEndSave
+from aitoolbox.torchtrain.train_loop import TrainLoop, TrainLoopCheckpointEndSave
 from tests.utils import function_exists, NetUnifiedBatchFeed, CallbackTracker
 
 
@@ -59,11 +59,11 @@ class TestAbstractExperimentCallback(unittest.TestCase):
         experiment_name = 'test_experiment'
         local_path = 'my_local_path'
 
-        train_loop = TrainLoopModelCheckpointEndSave(model, None, [], None, DummyOptimizer(), None,
-                                                     project_name=project_name, experiment_name=experiment_name,
-                                                     local_model_result_folder_path=local_path,
-                                                     hyperparams={}, val_result_package=DummyResultPackageExtend(),
-                                                     cloud_save_mode=None)
+        train_loop = TrainLoopCheckpointEndSave(model, None, [], None, DummyOptimizer(), None,
+                                                project_name=project_name, experiment_name=experiment_name,
+                                                local_model_result_folder_path=local_path,
+                                                hyperparams={}, val_result_package=DummyResultPackageExtend(),
+                                                cloud_save_mode=None)
         train_loop.callbacks_handler.register_callbacks([callback])
         callback.try_infer_experiment_details(infer_cloud_details=False)
 
@@ -79,10 +79,10 @@ class TestAbstractExperimentCallback(unittest.TestCase):
         experiment_name = 'test_experiment'
         local_path = 'my_local_path'
 
-        train_loop = TrainLoopModelCheckpointEndSave(model, None, [], None, DummyOptimizer(), None,
-                                                     project_name=project_name, experiment_name=experiment_name,
-                                                     local_model_result_folder_path=local_path,
-                                                     hyperparams={}, val_result_package=DummyResultPackageExtend())
+        train_loop = TrainLoopCheckpointEndSave(model, None, [], None, DummyOptimizer(), None,
+                                                project_name=project_name, experiment_name=experiment_name,
+                                                local_model_result_folder_path=local_path,
+                                                hyperparams={}, val_result_package=DummyResultPackageExtend())
         train_loop.callbacks_handler.register_callbacks([callback])
         callback.try_infer_experiment_details(infer_cloud_details=True)
 
@@ -106,12 +106,12 @@ class TestAbstractExperimentCallback(unittest.TestCase):
         bucket_name = 'my_fancy_bucket'
         cloud_dir_prefix = 'MyFolder_prefix'
 
-        train_loop = TrainLoopModelCheckpointEndSave(model, None, [], None, DummyOptimizer(), None,
-                                                     project_name=project_name, experiment_name=experiment_name,
-                                                     local_model_result_folder_path=local_path,
-                                                     hyperparams={}, val_result_package=DummyResultPackageExtend(),
-                                                     cloud_save_mode=cloud_save_mode, bucket_name=bucket_name,
-                                                     cloud_dir_prefix=cloud_dir_prefix)
+        train_loop = TrainLoopCheckpointEndSave(model, None, [], None, DummyOptimizer(), None,
+                                                project_name=project_name, experiment_name=experiment_name,
+                                                local_model_result_folder_path=local_path,
+                                                hyperparams={}, val_result_package=DummyResultPackageExtend(),
+                                                cloud_save_mode=cloud_save_mode, bucket_name=bucket_name,
+                                                cloud_dir_prefix=cloud_dir_prefix)
         train_loop.callbacks_handler.register_callbacks([callback])
         callback.try_infer_experiment_details(infer_cloud_details=True)
 
