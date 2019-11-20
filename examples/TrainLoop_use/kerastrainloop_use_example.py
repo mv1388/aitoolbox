@@ -65,5 +65,5 @@ TrainLoopModelCheckpointEndSave(model,
                                 args={},
                                 val_result_package=ClassificationResultPackage(),
                                 test_result_package=ClassificationResultPackage())\
-    (num_epoch=1, batch_size=batch_size,
+    (num_epochs=1, batch_size=batch_size,
      shuffle=True)
