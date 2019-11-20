@@ -190,55 +190,92 @@ class GradientPlotter:
         """
         self.experiment_grad_results_local_path = experiment_grad_results_local_path
 
-    def generate_report(self, model_layer_gradients, grad_plots_folder_name='grad_plots'):
+    def generate_report(self, model_layer_gradients, grad_plots_folder_name='grad_plots', file_format='png'):
         """Plot all the gradient distributions for the layers in the model
 
         Args:
             model_layer_gradients (list): list of model's gradients
             grad_plots_folder_name (str): name of the folder where gradient distribution plots will be saved
+            file_format (str): output file format. Can be either 'png' for saving separate images or 'pdf' for combining
+                all the plots into a single pdf file.
 
         Returns:
             list: list of saved plot paths: [file_path_in_cloud_grad_results_dir, local_file_path]
         """
-        grad_plots_local_folder_path = os.path.join(self.experiment_grad_results_local_path, grad_plots_folder_name)
-        if not os.path.exists(grad_plots_local_folder_path):
-            os.mkdir(grad_plots_local_folder_path)
+        if file_format == 'png':
+            grad_plots_local_folder_path = os.path.join(self.experiment_grad_results_local_path, grad_plots_folder_name)
+            if not os.path.exists(grad_plots_local_folder_path):
+                os.mkdir(grad_plots_local_folder_path)
 
-        saved_plot_paths = []
+            plots_paths = self.plot_png(model_layer_gradients, grad_plots_local_folder_path, grad_plots_folder_name)
 
-        for i, gradients in enumerate(model_layer_gradients):
-            if gradients is not None:
-                file_name, file_path = self.plot_gradient_distribution(gradients, i, grad_plots_local_folder_path)
+        elif file_format == 'pdf':
+            plots_paths = self.plot_pdf(model_layer_gradients, self.experiment_grad_results_local_path, grad_plots_folder_name)
+        else:
+            raise ValueError(f"Not supported file_format: {file_format}. "
+                             "Select one of the following: 'png' or 'pdf'.")
 
-                saved_plot_paths.append([os.path.join(grad_plots_folder_name, file_name), file_path])
-            else:
-                print(f'Layer {i} grad are None')
+        return plots_paths
 
-        return saved_plot_paths
+    def plot_png(self, model_layer_gradients, grad_plots_local_folder_path, plots_folder_name):
+        plots_paths = []
+
+        for layer_name, fig in self.generate_dist_plots(model_layer_gradients):
+            file_name = f'layer_{layer_name}.png'
+            file_path = os.path.join(grad_plots_local_folder_path, file_name)
+
+            fig.savefig(file_path)
+            plt.close()
+
+            plots_paths.append([os.path.join(plots_folder_name, file_name), file_path])
+
+        return plots_paths
+
+    def plot_pdf(self, model_layer_gradients, plots_local_folder_path, plots_file_name):
+        file_name = f'{plots_file_name}.pdf'
+        file_path = os.path.join(plots_local_folder_path, file_name)
+
+        with PdfPages(file_path) as pdf_pages:
+            for _, fig in self.generate_dist_plots(model_layer_gradients):
+                pdf_pages.savefig(fig)
+
+        return [[file_name, file_path]]
 
     @staticmethod
-    def plot_gradient_distribution(gradients, layer_name, grad_plots_local_folder_path):
+    def generate_dist_plots(model_layer_gradients, layer_names=None):
+        for i, gradients in enumerate(model_layer_gradients):
+            layer_name = i if layer_names is None else layer_names[i]
+
+            if gradients is not None:
+                fig = GradientPlotter.plot_gradient_distribution(gradients, layer_name)
+                yield layer_name, fig
+            else:
+                print(f'Layer {layer_name} grads are None')
+
+    @staticmethod
+    def plot_gradient_distribution(gradients, layer_name):
         """Plot and save to file the distribution of the single layer's gradients
 
         Args:
             gradients (list or np.array): a flattened list  of gradients from a single layer
             layer_name (str or int): name or index of the layer
-            grad_plots_local_folder_path (str): path to the folder where the plot should be saved
 
         Returns:
-            (str, str): file_name, file_path
+            plt.figure: plot figure
         """
-        file_name = f'layer_{layer_name}.png'
-        file_path = os.path.join(grad_plots_local_folder_path, file_name)
-
         fig = plt.figure()
         fig.set_size_inches(10, 8)
 
         ax = sns.distplot(gradients)
         ax.set_xlabel("Gradient magnitude", size=10)
-        ax.set_title(f'Gradient distribution for layer {layer_name}', size=10)
 
-        fig.savefig(file_path)
-        plt.close()
+        # Adding plot title and subtitles
+        ax.text(s=f'Gradient distribution for layer {layer_name}',
+                x=0.5, y=1.07, fontsize=16, weight='bold', ha='center', va='bottom', transform=ax.transAxes)
+        ax.text(s=f'Mean: {np.mean(gradients)}',
+                x=0.5, y=1.035, fontsize=8, alpha=0.75, ha='center', va='bottom', transform=ax.transAxes)
+        ax.text(s=f'Std: {np.std(gradients)}',
+                x=0.5, y=1.01, fontsize=8, alpha=0.75,
+                ha='center', va='bottom', transform=ax.transAxes)
 
-        return file_name, file_path
+        return fig
