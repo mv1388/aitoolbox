@@ -417,4 +417,4 @@ TrainLoopCheckpointEndSave(ModelWrap(model, MachineTranslationFeedDefinition()),
                            local_model_result_folder_path='<PATH>',
                            hyperparams={},
                            test_result_package=finish_result_pkg_test)\
-    (num_epoch=2, grad_clip=10)
+    (num_epochs=2, grad_clip=10)
