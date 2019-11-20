@@ -268,6 +268,14 @@ class GradientPlotter:
 
         ax = sns.distplot(gradients)
         ax.set_xlabel("Gradient magnitude", size=10)
-        ax.set_title(f'Gradient distribution for layer {layer_name}', size=10)
+
+        # Adding plot title and subtitles
+        ax.text(s=f'Gradient distribution for layer {layer_name}',
+                x=0.5, y=1.07, fontsize=16, weight='bold', ha='center', va='bottom', transform=ax.transAxes)
+        ax.text(s=f'Mean: {np.mean(gradients)}',
+                x=0.5, y=1.035, fontsize=8, alpha=0.75, ha='center', va='bottom', transform=ax.transAxes)
+        ax.text(s=f'Std: {np.std(gradients)}',
+                x=0.5, y=1.01, fontsize=8, alpha=0.75,
+                ha='center', va='bottom', transform=ax.transAxes)
 
         return fig
