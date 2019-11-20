@@ -117,4 +117,4 @@ TrainLoopCheckpointEndSave(model,
                            local_model_result_folder_path=THIS_DIR,
                            hyperparams=args.__dict__,
                            test_result_package=ClassificationResultPackage(),
-                           cloud_save_mode=None)(num_epoch=5, callbacks=callbacks)
+                           cloud_save_mode=None)(num_epochs=5, callbacks=callbacks)
