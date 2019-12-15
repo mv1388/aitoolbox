@@ -24,11 +24,10 @@ class DummyTrainingHistory(TrainingHistory):
 
 
 class DummyFullResultPackage(AbstractResultPackage):
-    def __init__(self, result_dict, hyper_params, train_hist):
+    def __init__(self, result_dict, hyper_params):
         AbstractResultPackage.__init__(self, 'dummyFullPkg')
         self.result_dict = result_dict
         self.hyper_params = hyper_params
-        self.training_history = DummyTrainingHistory().wrap_pre_prepared_history(train_hist)
         self.y_true = [10.0] * 100
         self.y_predicted = [123.4] * 100
 
@@ -175,7 +174,8 @@ class TestLocalResultsSaverSingleFile(unittest.TestCase):
         exp_dir_name = 'experimentSubDir'
         current_time = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
         result_pkg = DummyFullResultPackage({'metric1': 33434, 'acc1': 223.43, 'loss': 4455.6},
-                                            {'epoch': 20, 'lr': 0.334}, {})
+                                            {'epoch': 20, 'lr': 0.334})
+        training_history = DummyTrainingHistory().wrap_pre_prepared_history({})
         result_file_name_true = f'results_hyperParams_hist_{exp_dir_name}_{current_time}{expected_extension}'
 
         project_path = os.path.join(THIS_DIR, project_dir_name)
@@ -184,7 +184,8 @@ class TestLocalResultsSaverSingleFile(unittest.TestCase):
         result_file_path_true = os.path.join(results_path, result_file_name_true)
 
         saver = LocalResultsSaver(local_model_result_folder_path=THIS_DIR, file_format=file_format)
-        experiment_results_paths = saver.save_experiment_results(result_pkg, project_dir_name, exp_dir_name,
+        experiment_results_paths = saver.save_experiment_results(result_pkg, training_history,
+                                                                 project_dir_name, exp_dir_name,
                                                                  current_time,
                                                                  save_true_pred_labels=save_true_pred_labels)
         self.assertEqual(len(experiment_results_paths), 1)
@@ -210,7 +211,7 @@ class TestLocalResultsSaverSingleFile(unittest.TestCase):
         self.assertEqual(read_result_dict['experiment_results_local_path'], results_path)
         self.assertEqual(read_result_dict['results'], result_pkg.result_dict)
         self.assertEqual(read_result_dict['hyperparameters'], result_pkg.hyper_params)
-        self.assertEqual(read_result_dict['training_history'], result_pkg.get_training_history())
+        self.assertEqual(read_result_dict['training_history'], training_history.get_train_history())
 
         if save_true_pred_labels:
             self.assertEqual(read_result_dict['y_true'], result_pkg.y_true)
@@ -238,7 +239,8 @@ class TestLocalResultsSaverSeparateFiles(unittest.TestCase):
         exp_dir_name = 'experimentSubDir'
         current_time = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
         result_pkg = DummyFullResultPackage({'metric1': 33434, 'acc1': 223.43, 'loss': 4455.6},
-                                            {'epoch': 20, 'lr': 0.334}, {})
+                                            {'epoch': 20, 'lr': 0.334})
+        training_history = DummyTrainingHistory().wrap_pre_prepared_history({})
         result_file_name_true = f'results_{exp_dir_name}_{current_time}{expected_extension}'
         hyper_param_file_name_true = f'hyperparams_{exp_dir_name}_{current_time}{expected_extension}'
         train_hist_file_name_true = f'train_history_{exp_dir_name}_{current_time}{expected_extension}'
@@ -253,7 +255,8 @@ class TestLocalResultsSaverSeparateFiles(unittest.TestCase):
         labels_file_path_true = os.path.join(results_path, labels_file_name_true)
 
         saver = LocalResultsSaver(local_model_result_folder_path=THIS_DIR, file_format=file_format)
-        experiment_results_paths = saver.save_experiment_results_separate_files(result_pkg, project_dir_name, exp_dir_name,
+        experiment_results_paths = saver.save_experiment_results_separate_files(result_pkg, training_history,
+                                                                                project_dir_name, exp_dir_name,
                                                                                 current_time,
                                                                                 save_true_pred_labels=save_true_pred_labels)
         self.assertEqual(len(experiment_results_paths), 4 if save_true_pred_labels else 3)
@@ -306,7 +309,7 @@ class TestLocalResultsSaverSeparateFiles(unittest.TestCase):
 
         self.assertEqual(read_train_hist_dict['experiment_name'], exp_dir_name)
         self.assertEqual(read_train_hist_dict['experiment_results_local_path'], results_path)
-        self.assertEqual(read_train_hist_dict['training_history'], result_pkg.get_training_history())
+        self.assertEqual(read_train_hist_dict['training_history'], training_history.get_train_history())
 
         if save_true_pred_labels:
             read_labels_dict = read_result_file(labels_file_path)

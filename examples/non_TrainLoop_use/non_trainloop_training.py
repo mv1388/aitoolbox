@@ -109,8 +109,7 @@ for epoch in range(args.epochs):
         y_test += target.tolist()
 
     result_pkg = ClassificationResultPackage()
-    result_pkg.prepare_result_package(y_true=y_test, y_predicted=y_pred,
-                                      hyperparameters=args.__dict__, training_history=training_history)
+    result_pkg.prepare_result_package(y_true=y_test, y_predicted=y_pred, hyperparameters=args.__dict__)
 
     for metric_name, metric_result in result_pkg.get_results().items():
         training_history.insert_single_result_into_history(metric_name, metric_result)
@@ -124,4 +123,5 @@ model_checkpoint = {'model_state_dict': model.state_dict(),
                     'optimizer_state_dict': optimizer.state_dict(),
                     'epoch': epoch,
                     'hyperparams': args.__dict__}
-experiment_saver.save_experiment(model_checkpoint, result_pkg, experiment_timestamp=experiment_timestamp)
+experiment_saver.save_experiment(model_checkpoint, result_pkg,
+                                 training_history, experiment_timestamp=experiment_timestamp)
