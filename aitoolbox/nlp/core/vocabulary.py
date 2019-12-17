@@ -25,14 +25,14 @@ class Vocabulary:
         self.word2count = {}
         if not self.document_level:
             self.index2word = {self.PAD_token: "PAD", self.OOV_token: "OOV", self.SOS_token: "SOS", self.EOS_token: "EOS"}
-            self.num_words = 4  # Count SOS, EOS, PAD
             self.default_tokens = [self.PAD_token, self.OOV_token, self.SOS_token, self.EOS_token]
         else:
             self.index2word = {self.PAD_token: "PAD", self.OOV_token: "OOV", self.SOS_token: "SOS",
                                self.EOS_token: "EOS", self.SOD_token: "SOD", self.EOD_token: "EOD"}
-            self.num_words = 6
             self.default_tokens = [self.PAD_token, self.OOV_token, self.SOS_token, self.EOS_token,
                                    self.SOD_token, self.EOD_token]
+
+        self.num_words = len(self.default_tokens)
 
     def add_sentence(self, sentence_tokens):
         """Add tokenized sentence to the vocabulary
