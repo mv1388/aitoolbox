@@ -27,11 +27,11 @@ def qa_concat_ctx_span_collate_fn(data):
         for i, seq in enumerate(sequences):
             end = lengths[i]
             padded_seqs[i, :end] = seq[:end]
-        return padded_seqs, torch.Tensor(lengths)
+        return padded_seqs, torch.LongTensor(lengths)
 
     paragraph, question, span = list(zip(*data))
 
     paragraph_pad, paragraph_lengths = merge(paragraph)
     question_pad, question_lengths = merge(question)
 
-    return paragraph_pad, paragraph_lengths, question_pad, question_lengths, torch.Tensor(span)
+    return paragraph_pad, paragraph_lengths, question_pad, question_lengths, torch.LongTensor(span)
