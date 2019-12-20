@@ -38,8 +38,8 @@ class ROUGEMetric(AbstractBaseMetric):
             # Not affecting the metric calculation. Just for record keeping it drops the texts to disk so they can be
             # reviewed
             self.dump_answer_text_to_disk(self.y_true, self.y_predicted,
-                                                     self.output_text_dir, self.output_text_cleaning_regex,
-                                                     self.target_actual_text)
+                                          self.output_text_dir, self.output_text_cleaning_regex,
+                                          self.target_actual_text)
 
         self.prepare_text()
 
