@@ -37,9 +37,9 @@ class ROUGEMetric(AbstractBaseMetric):
         if self.output_text_dir is not None:
             # Not affecting the metric calculation. Just for record keeping it drops the texts to disk so they can be
             # reviewed
-            ROUGEPerlMetric.dump_answer_text_to_disk(self.y_true, self.y_predicted,
-                                                     self.output_text_dir, self.output_text_cleaning_regex,
-                                                     self.target_actual_text)
+            self.dump_answer_text_to_disk(self.y_true, self.y_predicted,
+                                          self.output_text_dir, self.output_text_cleaning_regex,
+                                          self.target_actual_text)
 
         self.prepare_text()
 
@@ -61,6 +61,45 @@ class ROUGEMetric(AbstractBaseMetric):
         if not self.target_actual_text:
             self.y_true = [' '.join(sent) for sent in self.y_true]
         self.y_predicted = [' '.join(sent) if len(sent) > 0 else ' ' for sent in self.y_predicted]
+
+    @staticmethod
+    def dump_answer_text_to_disk(true_text, pred_text, output_text_dir, output_text_cleaning_regex, target_actual_text):
+        """
+
+        Problems:
+            Defined regex text cleaning to deal with Illegal division by zero
+            https://ireneli.eu/2018/01/11/working-with-rouge-1-5-5-evaluation-metric-in-python/
+
+        Args:
+            true_text (list):
+            pred_text (list):
+            output_text_dir (str):
+            output_text_cleaning_regex (list):
+            target_actual_text (bool):
+
+        Returns:
+
+        """
+        if os.path.exists(output_text_dir):
+            shutil.rmtree(output_text_dir)
+
+        os.mkdir(output_text_dir)
+
+        for i, (pred_answ, true_answ) in enumerate(zip(pred_text, true_text)):
+            with open(os.path.join(output_text_dir, f'answer_pred_true_{i}.txt'), 'w', encoding='utf-8') as f:
+                # Default regex cleaners: (r'<.*?>', r'[^a-zA-Z0-9.?! ]+')
+                pred_answ_clean = ROUGEPerlMetric.regex_clean_text(pred_answ, output_text_cleaning_regex)
+                pred_answ_clean = ' '.join(pred_answ_clean) if len(pred_answ_clean) > 0 else ' '
+
+                if target_actual_text:
+                    true_answ_clean = [true_answ]
+                else:
+                    true_answ_clean = ROUGEPerlMetric.regex_clean_text(true_answ, output_text_cleaning_regex)
+                true_answ_clean = ' '.join(true_answ_clean)
+
+                f.write(f'Answer to question {i}:\n')
+                f.write(f'Predicted:\t{pred_answ_clean}\n')
+                f.write(f'True:\t{true_answ_clean}\n')
 
 
 class ROUGEPerlMetric(AbstractBaseMetric):
