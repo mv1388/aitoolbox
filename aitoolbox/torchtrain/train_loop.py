@@ -131,8 +131,8 @@ class TrainLoop:
         self.callbacks_handler.execute_train_begin()
 
         for self.epoch in range(self.epoch, num_epochs):
-            print('\n\n========================================================================')
-            print('========================================================================')
+            print('\n\n================================================================================')
+            print('================================================================================')
             print(f'Epoch: {self.epoch}')
             self.callbacks_handler.execute_epoch_begin()
 
