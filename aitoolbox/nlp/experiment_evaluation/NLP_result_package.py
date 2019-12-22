@@ -4,7 +4,7 @@ from aitoolbox.utils import dict_util
 from aitoolbox.experiment.local_save.local_results_save import BaseLocalResultsSaver
 from aitoolbox.experiment.result_package.abstract_result_packages import AbstractResultPackage
 from aitoolbox.experiment.core_metrics.classification import AccuracyMetric
-from aitoolbox.nlp.experiment_evaluation.NLP_metrics import ROUGEMetric, ROUGEPerlMetric, \
+from aitoolbox.nlp.experiment_evaluation.NLP_metrics import ROUGEMetric, ROUGEPerlMetric, ExactMatchTextMetric, \
     BLEUSentenceScoreMetric, BLEUCorpusScoreMetric, BLEUScoreStrTorchNLPMetric
 from aitoolbox.nlp.experiment_evaluation.attention_heatmap import AttentionHeatMap
 
@@ -72,7 +72,9 @@ class QuestionAnswerResultPackage(AbstractResultPackage):
             rogue_metric = ROUGEPerlMetric(true_text, pred_text, self.output_text_dir,
                                            target_actual_text=self.use_target_actual_text)
 
-        results_dict = rogue_metric.get_metric_dict()
+        em_metric = ExactMatchTextMetric(true_text, pred_text, target_actual_text=self.use_target_actual_text)
+
+        results_dict = rogue_metric + em_metric
 
         if self.flatten_result_dict:
             results_dict = dict_util.flatten_dict(results_dict)
