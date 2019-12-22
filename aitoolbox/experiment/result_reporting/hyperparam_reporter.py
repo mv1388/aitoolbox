@@ -1,14 +1,15 @@
 import os
-from shutil import copyfile
+import shutil
 
 from aitoolbox.experiment.local_save.folder_create import ExperimentFolder as FolderCreator
+from aitoolbox.utils.file_system import zip_folder
 from aitoolbox.cloud.AWS.model_save import BaseModelSaver
 from aitoolbox.cloud.AWS.results_save import BaseResultsSaver
 from aitoolbox.cloud.GoogleCloud.model_save import BaseModelGoogleStorageSaver
 from aitoolbox.cloud.GoogleCloud.results_save import BaseResultsGoogleStorageSaver
 
 
-class HyperParameterReporter:
+class HyperParamSourceReporter:
     def __init__(self, project_name, experiment_name, experiment_timestamp, local_model_result_folder_path):
         """Writer of selected hyperparameters to human-readable text file on disk
 
@@ -75,16 +76,17 @@ class HyperParameterReporter:
         is executed
 
         Args:
-            hyperparams (dict): hyper-parameters listed in the dict
+            hyperparams (dict): hyper-parameters listed in the dict. In order for this function to work, the dict needs
+                to include `experiment_file_path` key.
 
         Returns:
-            str: path to the saved hyper-param text file
+            str: path to the saved main python experiment file
         """
         if 'experiment_file_path' in hyperparams:
             try:
                 destination_file_path = os.path.join(self.experiment_dir_path,
                                                      os.path.basename(hyperparams['experiment_file_path']))
-                copyfile(hyperparams['experiment_file_path'], destination_file_path)
+                shutil.copyfile(hyperparams['experiment_file_path'], destination_file_path)
                 return destination_file_path
             except FileNotFoundError:
                 print('experiment_file_path leading to the non-existent file. Possibly this error is related to'
@@ -94,3 +96,28 @@ class HyperParameterReporter:
         else:
             print('experiment_file_path experiment execution file path missing in the hyperparams dict. '
                   'Consequently not copying the file to the experiment dir.')
+
+    def save_experiment_source_files(self, hyperparams):
+        """Saves all the experiment source files into single source code zip
+
+        Args:
+            hyperparams (dict): hyper-parameters listed in the dict. In order for this function to work, the dict needs
+                to include `source_dirs_paths` key.
+
+        Returns:
+            str: path to the saved experiment source code zip
+        """
+        if 'source_dirs_paths' in hyperparams and \
+                type(hyperparams['source_dirs_paths']) in [list, tuple] and len(hyperparams['source_dirs_paths']) > 0:
+            src_dir_in_project_dir = os.path.join(self.experiment_dir_path, 'source_code')
+            os.mkdir(src_dir_in_project_dir)
+
+            for src_dir_path in hyperparams['source_dirs_paths']:
+                src_dir_path = os.path.expanduser(src_dir_path)
+                destination_file_path = os.path.join(src_dir_in_project_dir, os.path.basename(src_dir_path))
+                shutil.copytree(src_dir_path, destination_file_path)
+
+            zip_path = zip_folder(src_dir_in_project_dir, src_dir_in_project_dir)
+            shutil.rmtree(src_dir_in_project_dir)
+
+            return zip_path

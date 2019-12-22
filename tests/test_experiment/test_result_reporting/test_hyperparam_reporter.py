@@ -2,7 +2,7 @@ import unittest
 import os
 import shutil
 
-from aitoolbox.experiment.result_reporting.hyperparam_reporter import HyperParameterReporter
+from aitoolbox.experiment.result_reporting.hyperparam_reporter import HyperParamSourceReporter
 
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -10,7 +10,7 @@ THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
 class TestHyperParameterReporter(unittest.TestCase):
     def test_init(self):
-        param_saver = HyperParameterReporter('my_project', 'fancy_experiment', '2019_01_01_00_11', THIS_DIR)
+        param_saver = HyperParamSourceReporter('my_project', 'fancy_experiment', '2019_01_01_00_11', THIS_DIR)
 
         experiment_path = os.path.join(THIS_DIR, 'my_project', 'fancy_experiment_2019_01_01_00_11')
 
@@ -28,7 +28,7 @@ class TestHyperParameterReporter(unittest.TestCase):
     def test_save_args_to_text_file(self):
         args = {'a': 103, 'pram2': 444, 'LR': 0.0002, 'path': 'dasdas/33332edas'}
 
-        param_saver = HyperParameterReporter('my_project', 'fancy_experiment', '2019_01_01_00_11', THIS_DIR)
+        param_saver = HyperParamSourceReporter('my_project', 'fancy_experiment', '2019_01_01_00_11', THIS_DIR)
         local_args_file_path = param_saver.save_hyperparams_to_text_file(args)
         self.check_saved_file_contents(local_args_file_path, args)
 
