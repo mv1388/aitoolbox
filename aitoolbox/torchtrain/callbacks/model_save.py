@@ -12,7 +12,7 @@ from aitoolbox.experiment.experiment_saver import FullPyTorchExperimentS3Saver, 
 from aitoolbox.experiment.local_experiment_saver import FullPyTorchExperimentLocalSaver
 from aitoolbox.experiment.local_save.local_model_save import LocalSubOptimalModelRemover, PyTorchLocalModelSaver
 from aitoolbox.experiment.result_package.abstract_result_packages import AbstractResultPackage
-from aitoolbox.experiment.result_reporting.hyperparam_reporter import HyperParameterReporter
+from aitoolbox.experiment.result_reporting.hyperparam_reporter import HyperParamSourceReporter
 from aitoolbox.torchtrain.callbacks.abstract import AbstractCallback
 from aitoolbox.utils import util
 
@@ -104,13 +104,14 @@ class ModelCheckpoint(AbstractCallback):
 
     def save_hyperparams(self):
         if not self._hyperparams_already_saved:
-            param_reporter = HyperParameterReporter(self.project_name, self.experiment_name,
-                                                    self.train_loop_obj.experiment_timestamp,
-                                                    self.local_model_result_folder_path)
+            param_reporter = HyperParamSourceReporter(self.project_name, self.experiment_name,
+                                                      self.train_loop_obj.experiment_timestamp,
+                                                      self.local_model_result_folder_path)
 
             if not os.path.isfile(param_reporter.local_hyperparams_file_path):
                 local_hyperparams_file_path = param_reporter.save_hyperparams_to_text_file(self.hyperparams)
                 local_experiment_python_file_path = param_reporter.save_experiment_python_file(self.hyperparams)
+                local_source_code_zip_path = param_reporter.save_experiment_source_files(self.hyperparams)
 
                 # Should also save to cloud
                 if type(self.model_checkpointer) != PyTorchLocalModelSaver:
@@ -120,6 +121,10 @@ class ModelCheckpoint(AbstractCallback):
                         param_reporter.copy_to_cloud_storage(local_experiment_python_file_path,
                                                              self.model_checkpointer,
                                                              file_name=os.path.basename(local_experiment_python_file_path))
+                    if local_source_code_zip_path is not None:
+                        param_reporter.copy_to_cloud_storage(local_source_code_zip_path,
+                                                             self.model_checkpointer,
+                                                             file_name=os.path.basename(local_source_code_zip_path))
 
                 self._hyperparams_already_saved = True
 
@@ -222,13 +227,14 @@ class ModelTrainEndSave(AbstractCallback):
 
     def save_hyperparams(self):
         if not self._hyperparams_already_saved:
-            param_reporter = HyperParameterReporter(self.project_name, self.experiment_name,
-                                                    self.train_loop_obj.experiment_timestamp,
-                                                    self.local_model_result_folder_path)
+            param_reporter = HyperParamSourceReporter(self.project_name, self.experiment_name,
+                                                      self.train_loop_obj.experiment_timestamp,
+                                                      self.local_model_result_folder_path)
 
             if not os.path.isfile(param_reporter.local_hyperparams_file_path):
                 local_hyperparams_file_path = param_reporter.save_hyperparams_to_text_file(self.hyperparams)
                 local_experiment_python_file_path = param_reporter.save_experiment_python_file(self.hyperparams)
+                local_source_code_zip_path = param_reporter.save_experiment_source_files(self.hyperparams)
 
                 # Should also save to cloud
                 if type(self.results_saver) != FullPyTorchExperimentLocalSaver:
@@ -238,6 +244,10 @@ class ModelTrainEndSave(AbstractCallback):
                         param_reporter.copy_to_cloud_storage(local_experiment_python_file_path,
                                                              self.results_saver.model_saver,
                                                              file_name=os.path.basename(local_experiment_python_file_path))
+                    if local_source_code_zip_path is not None:
+                        param_reporter.copy_to_cloud_storage(local_source_code_zip_path,
+                                                             self.model_checkpointer,
+                                                             file_name=os.path.basename(local_source_code_zip_path))
 
                 self._hyperparams_already_saved = True
 

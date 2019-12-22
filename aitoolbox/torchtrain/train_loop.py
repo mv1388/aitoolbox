@@ -379,7 +379,7 @@ class TrainLoopCheckpoint(TrainLoop):
                  optimizer, criterion,
                  project_name, experiment_name, local_model_result_folder_path,
                  hyperparams,
-                 cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix='',
+                 cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix='', source_dirs=(),
                  rm_subopt_local_models=False, num_best_checkpoints_kept=2,
                  collate_batch_pred_fn=append_predictions, pred_transform_fn=torch_cat_transf,
                  end_auto_eval=True, use_amp=False):
@@ -405,6 +405,7 @@ class TrainLoopCheckpoint(TrainLoop):
                 Everything else results just in local storage to disk
             bucket_name (str): name of the bucket in the cloud storage
             cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
+            source_dirs (list or tuple): paths to the local folders with the source code files used in experiment
             rm_subopt_local_models (bool or str): if True, the deciding metric is set to 'loss'. Give string metric name
                 to set it as a deciding metric for suboptimal model removal. If metric name consists of substring 'loss'
                 the metric minimization is done otherwise metric maximization is done
@@ -434,6 +435,8 @@ class TrainLoopCheckpoint(TrainLoop):
 
         if 'experiment_file_path' not in self.hyperparams:
             self.hyperparams['experiment_file_path'] = inspect.getframeinfo(inspect.currentframe().f_back).filename
+        if 'source_dirs_paths' not in self.hyperparams:
+            self.hyperparams['source_dirs_paths'] = source_dirs
 
         self.callbacks_handler.register_callbacks([
             ModelCheckpoint(self.project_name, self.experiment_name, self.local_model_result_folder_path,
@@ -451,7 +454,7 @@ class TrainLoopEndSave(TrainLoop):
                  optimizer, criterion,
                  project_name, experiment_name, local_model_result_folder_path,
                  hyperparams, val_result_package=None, test_result_package=None,
-                 cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix='',
+                 cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix='', source_dirs=(),
                  collate_batch_pred_fn=append_predictions, pred_transform_fn=torch_cat_transf,
                  end_auto_eval=True, use_amp=False):
         """TrainLoop with the model performance evaluation and final model saving at the end of the training process
@@ -478,6 +481,7 @@ class TrainLoopEndSave(TrainLoop):
                 Everything else results just in local storage to disk
             bucket_name (str): name of the bucket in the cloud storage
             cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
+            source_dirs (list or tuple): paths to the local folders with the source code files used in experiment
             collate_batch_pred_fn (callable): collate function transforming batch predictions as they come out from the
                 model
             pred_transform_fn (callable): function transforming all the produced predictions after all the batches have
@@ -503,6 +507,8 @@ class TrainLoopEndSave(TrainLoop):
 
         if 'experiment_file_path' not in self.hyperparams:
             self.hyperparams['experiment_file_path'] = inspect.getframeinfo(inspect.currentframe().f_back).filename
+        if 'source_dirs_paths' not in self.hyperparams:
+            self.hyperparams['source_dirs_paths'] = source_dirs
         self.check_if_result_packages_possible()
 
         self.callbacks_handler.register_callbacks([
@@ -538,7 +544,7 @@ class TrainLoopCheckpointEndSave(TrainLoopEndSave):
                  optimizer, criterion,
                  project_name, experiment_name, local_model_result_folder_path,
                  hyperparams, val_result_package=None, test_result_package=None,
-                 cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix='',
+                 cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix='', source_dirs=(),
                  rm_subopt_local_models=False, num_best_checkpoints_kept=2,
                  collate_batch_pred_fn=append_predictions, pred_transform_fn=torch_cat_transf,
                  end_auto_eval=True, use_amp=False):
@@ -567,6 +573,7 @@ class TrainLoopCheckpointEndSave(TrainLoopEndSave):
                 Everything else results just in local storage to disk
             bucket_name (str): name of the bucket in the cloud storage
             cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
+            source_dirs (list or tuple): paths to the local folders with the source code files used in experiment
             rm_subopt_local_models (bool or str): if True, the deciding metric is set to 'loss'. Give string metric name
                 to set it as a deciding metric for suboptimal model removal. If metric name consists of substring 'loss'
                 the metric minimization is done otherwise metric maximization is done
@@ -584,12 +591,14 @@ class TrainLoopCheckpointEndSave(TrainLoopEndSave):
         """
         if 'experiment_file_path' not in hyperparams:
             hyperparams['experiment_file_path'] = inspect.getframeinfo(inspect.currentframe().f_back).filename
+        if 'source_dirs_paths' not in hyperparams:
+            hyperparams['source_dirs_paths'] = source_dirs
 
         TrainLoopEndSave.__init__(self, model, train_loader, validation_loader, test_loader,
                                   optimizer, criterion,
                                   project_name, experiment_name, os.path.expanduser(local_model_result_folder_path),
                                   hyperparams, val_result_package, test_result_package,
-                                  cloud_save_mode, bucket_name, cloud_dir_prefix,
+                                  cloud_save_mode, bucket_name, cloud_dir_prefix, source_dirs,
                                   collate_batch_pred_fn, pred_transform_fn,
                                   end_auto_eval, use_amp)
         self.rm_subopt_local_models = rm_subopt_local_models
