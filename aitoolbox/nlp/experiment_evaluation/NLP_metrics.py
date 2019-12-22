@@ -213,7 +213,7 @@ class ROUGEPerlMetric(AbstractBaseMetric):
 class ExactMatchMetric(AbstractBaseMetric):
     def __init__(self, y_true, y_predicted,
                  target_actual_text=False, output_text_dir=None):
-        """
+        """Calculate exact match of answered strings
 
         Args:
             y_true (numpy.array or list):
