@@ -2,6 +2,7 @@ import os
 import re
 import shutil
 import string
+from collections import Counter
 import numpy as np
 from pyrouge import Rouge155
 from rouge import Rouge
@@ -251,6 +252,7 @@ class ExactMatchTextMetric(AbstractBaseMetric):
 
         All methods below this line are from the official SQuAD 2.0 eval script
         https://worksheets.codalab.org/rest/bundles/0x6b567e1cf2e041ec80d7098f031c5c9e/contents/blob/
+
         Args:
             text_str (str):
 
@@ -277,7 +279,7 @@ class ExactMatchTextMetric(AbstractBaseMetric):
 class F1TextMetric(AbstractBaseMetric):
     def __init__(self, y_true, y_predicted,
                  target_actual_text=False, output_text_dir=None):
-        """Calculate exact match of answered strings
+        """Calculate F1 score of answered strings
 
         Args:
             y_true (numpy.array or list):
@@ -290,10 +292,46 @@ class F1TextMetric(AbstractBaseMetric):
 
         self.target_actual_text = target_actual_text
         self.output_text_dir = output_text_dir
-        AbstractBaseMetric.__init__(self, y_true, y_predicted, metric_name='EM', np_array=False)
+        AbstractBaseMetric.__init__(self, y_true, y_predicted, metric_name='F1', np_array=False)
 
     def calculate_metric(self):
-        pass
+        if self.output_text_dir is not None:
+            # Not affecting the metric calculation. Just for record keeping it drops the texts to disk so they can be
+            # reviewed
+            ROUGEMetric.dump_answer_text_to_disk(self.y_true, self.y_predicted,
+                                                 self.output_text_dir, [], self.target_actual_text)
+
+        if not self.target_actual_text:
+            self.y_true = [' '.join(sent) for sent in self.y_true]
+        self.y_predicted = [' '.join(sent) for sent in self.y_predicted]
+
+        f1 = 0
+        for pred_answ, true_answ in zip(self.y_predicted, self.y_true):
+            f1 += self.compute_f1(true_answ, pred_answ)
+
+        self.metric_result = 100. * f1 / len(self.y_true)
+
+    @staticmethod
+    def compute_f1(a_gold, a_pred):
+        gold_toks = F1TextMetric.get_tokens(a_gold)
+        pred_toks = F1TextMetric.get_tokens(a_pred)
+        common = Counter(gold_toks) & Counter(pred_toks)
+        num_same = sum(common.values())
+        if len(gold_toks) == 0 or len(pred_toks) == 0:
+            # If either is no-answer, then F1 is 1 if they agree, 0 otherwise
+            return int(gold_toks == pred_toks)
+        if num_same == 0:
+            return 0
+        precision = 1.0 * num_same / len(pred_toks)
+        recall = 1.0 * num_same / len(gold_toks)
+        f1 = (2 * precision * recall) / (precision + recall)
+        return f1
+
+    @staticmethod
+    def get_tokens(s):
+        if not s:
+            return []
+        return ExactMatchTextMetric.normalize_answer(s).split()
 
 
 class BLEUSentenceScoreMetric(AbstractBaseMetric):
