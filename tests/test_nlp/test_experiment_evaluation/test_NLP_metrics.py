@@ -73,6 +73,10 @@ class TestExactMatchMetric(unittest.TestCase):
                                             'uuuu'.split(), 'Today is Not sunny'.split()])
         self.assertEqual(em_semi_match_2.get_metric(), 25.)
 
+    def test_raise_exception(self):
+        with self.assertRaises(ValueError):
+            ExactMatchMetric(['bla bla bla'.split()], ['bla bla bla'.split(), 'bla bla bla'.split()])
+
 
 class TestBLEUSentenceScoreMetric(unittest.TestCase):
     def test_single_sentence_calculate_metric(self):
