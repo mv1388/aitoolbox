@@ -454,7 +454,7 @@ class TrainLoopEndSave(TrainLoop):
                  optimizer, criterion,
                  project_name, experiment_name, local_model_result_folder_path,
                  hyperparams, val_result_package=None, test_result_package=None,
-                 cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix='', source_dirs=None,
+                 cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix='', source_dirs=(),
                  collate_batch_pred_fn=append_predictions, pred_transform_fn=torch_cat_transf,
                  end_auto_eval=True, use_amp=False):
         """TrainLoop with the model performance evaluation and final model saving at the end of the training process
@@ -544,7 +544,7 @@ class TrainLoopCheckpointEndSave(TrainLoopEndSave):
                  optimizer, criterion,
                  project_name, experiment_name, local_model_result_folder_path,
                  hyperparams, val_result_package=None, test_result_package=None,
-                 cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix='', source_dirs=None,
+                 cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix='', source_dirs=(),
                  rm_subopt_local_models=False, num_best_checkpoints_kept=2,
                  collate_batch_pred_fn=append_predictions, pred_transform_fn=torch_cat_transf,
                  end_auto_eval=True, use_amp=False):
