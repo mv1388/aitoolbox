@@ -6,7 +6,7 @@ from aitoolbox.experiment.result_package.abstract_result_packages import Abstrac
 from aitoolbox.experiment.core_metrics.classification import AccuracyMetric
 from aitoolbox.nlp.experiment_evaluation.NLP_metrics import ROUGEMetric, ROUGEPerlMetric, \
     ExactMatchTextMetric, F1TextMetric, \
-    BLEUSentenceScoreMetric, BLEUCorpusScoreMetric, BLEUScoreStrTorchNLPMetric
+    BLEUSentenceScoreMetric, BLEUCorpusScoreMetric, BLEUScoreStrTorchNLPMetric, PerplexityMetric
 from aitoolbox.nlp.experiment_evaluation.attention_heatmap import AttentionHeatMap
 
 
