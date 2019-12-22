@@ -55,6 +55,25 @@ class TestROUGEMetric(unittest.TestCase):
                 self.assertAlmostEqual(dict_1[k1][k2], dict_2[k1][k2])
 
 
+class TestExactMatchMetric(unittest.TestCase):
+    def test_calculate_metric(self):
+        em_match = ExactMatchMetric(['bla bla bla'.split()], ['bla bla bla'.split()])
+        self.assertEqual(em_match.get_metric(), 100.)
+
+        em_non_match = ExactMatchMetric(['bla not match bla'.split()], ['bla bla bla'.split()])
+        self.assertEqual(em_non_match.get_metric(), 0.)
+
+        em_semi_match = ExactMatchMetric(['bla bla bla'.split(), 'bla NON bla'.split()],
+                                         ['bla bla bla'.split(), 'bla bla bla'.split()])
+        self.assertEqual(em_semi_match.get_metric(), 50.)
+
+        em_semi_match_2 = ExactMatchMetric(['bla bla bla'.split(), 'bla NON dasdadad dqewq'.split(),
+                                            'bla blla'.split(), 'Today is sunny'.split()],
+                                           ['bla bla bla'.split(), 'bla bla bla'.split(),
+                                            'uuuu'.split(), 'Today is Not sunny'.split()])
+        self.assertEqual(em_semi_match_2.get_metric(), 25.)
+
+
 class TestBLEUSentenceScoreMetric(unittest.TestCase):
     def test_single_sentence_calculate_metric(self):
         bleu_1 = BLEUSentenceScoreMetric(['bla bla bla bla'.split()], ['bla bla bla bla'.split()])
