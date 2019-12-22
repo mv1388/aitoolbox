@@ -274,6 +274,28 @@ class ExactMatchMetric(AbstractBaseMetric):
         return white_space_fix(remove_articles(remove_punc(lower(text_str))))
 
 
+class F1TextMetric(AbstractBaseMetric):
+    def __init__(self, y_true, y_predicted,
+                 target_actual_text=False, output_text_dir=None):
+        """Calculate exact match of answered strings
+
+        Args:
+            y_true (numpy.array or list):
+            y_predicted (numpy.array or list):
+            target_actual_text (bool):
+            output_text_dir (str):
+        """
+        if len(y_true) != len(y_predicted):
+            raise ValueError(f'len(y_true) != len(y_predicted). Got {len(y_true)} != {len(y_predicted)}')
+
+        self.target_actual_text = target_actual_text
+        self.output_text_dir = output_text_dir
+        AbstractBaseMetric.__init__(self, y_true, y_predicted, metric_name='EM', np_array=False)
+
+    def calculate_metric(self):
+        pass
+
+
 class BLEUSentenceScoreMetric(AbstractBaseMetric):
     def __init__(self, y_true, y_predicted, source_sents=None, output_text_dir=None):
         """BLEU score calculation
