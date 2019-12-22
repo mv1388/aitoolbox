@@ -78,6 +78,29 @@ class TestExactMatchMetric(unittest.TestCase):
             ExactMatchTextMetric(['bla bla bla'.split()], ['bla bla bla'.split(), 'bla bla bla'.split()])
 
 
+class TestF1TextMetric(unittest.TestCase):
+    def test_calculate_metric(self):
+        em_match = F1TextMetric(['bla bla bla'.split()], ['bla bla bla'.split()])
+        self.assertEqual(em_match.get_metric(), 100.)
+
+        em_non_match = F1TextMetric(['not match'.split()], ['bla bla bla'.split()])
+        self.assertEqual(em_non_match.get_metric(), 0.)
+
+        em_semi_match = F1TextMetric(['bla bla bla'.split(), 'bla NON bla'.split()],
+                                     ['bla bla bla'.split(), 'bla bla bla'.split()])
+        self.assertEqual(em_semi_match.get_metric(), 83.33333333333333)
+
+        em_semi_match_2 = F1TextMetric(['bla bla bla'.split(), 'bla NON dasdadad dqewq'.split(),
+                                        'bla blla'.split(), 'Today is sunny'.split()],
+                                       ['bla bla bla'.split(), 'bla bla bla'.split(),
+                                        'uuuu'.split(), 'Today is Not sunny'.split()])
+        self.assertEqual(em_semi_match_2.get_metric(), 53.57142857142857)
+
+    def test_raise_exception(self):
+        with self.assertRaises(ValueError):
+            F1TextMetric(['bla bla bla'.split()], ['bla bla bla'.split(), 'bla bla bla'.split()])
+
+
 class TestBLEUSentenceScoreMetric(unittest.TestCase):
     def test_single_sentence_calculate_metric(self):
         bleu_1 = BLEUSentenceScoreMetric(['bla bla bla bla'.split()], ['bla bla bla bla'.split()])
