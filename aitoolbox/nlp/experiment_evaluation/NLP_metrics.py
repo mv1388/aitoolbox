@@ -1,6 +1,7 @@
 import os
 import re
 import shutil
+import string
 import numpy as np
 from pyrouge import Rouge155
 from rouge import Rouge
@@ -207,6 +208,70 @@ class ROUGEPerlMetric(AbstractBaseMetric):
             re_pattern = re.compile(cleaning_regex)
             text = [re_pattern.sub('', t) for t in text if len(re_pattern.sub('', t)) > 0]
         return text
+
+
+class ExactMatchMetric(AbstractBaseMetric):
+    def __init__(self, y_true, y_predicted,
+                 target_actual_text=False, output_text_dir=None):
+        """
+
+        Args:
+            y_true (numpy.array or list):
+            y_predicted (numpy.array or list):
+            target_actual_text (bool):
+            output_text_dir (str):
+        """
+        if len(y_true) != len(y_predicted):
+            raise ValueError(f'len(y_true) != len(y_predicted). Got {len(y_true)} != {len(y_predicted)}')
+
+        self.target_actual_text = target_actual_text
+        self.output_text_dir = output_text_dir
+        AbstractBaseMetric.__init__(self, y_true, y_predicted, metric_name='EM', np_array=False)
+
+    def calculate_metric(self):
+        if self.output_text_dir is not None:
+            # Not affecting the metric calculation. Just for record keeping it drops the texts to disk so they can be
+            # reviewed
+            ROUGEMetric.dump_answer_text_to_disk(self.y_true, self.y_predicted,
+                                                 self.output_text_dir, [], self.target_actual_text)
+
+        if not self.target_actual_text:
+            self.y_true = [' '.join(sent) for sent in self.y_true]
+        self.y_predicted = [' '.join(sent) for sent in self.y_predicted]
+
+        em = 0
+        for pred_answ, true_answ in zip(self.y_predicted, self.y_true):
+            em += int(self.normalize_answer(pred_answ) == self.normalize_answer(true_answ))
+
+        self.metric_result = 100. * em / len(self.y_true)
+
+    @staticmethod
+    def normalize_answer(text_str):
+        """Convert to lowercase and remove punctuation, articles and extra whitespace.
+
+        All methods below this line are from the official SQuAD 2.0 eval script
+        https://worksheets.codalab.org/rest/bundles/0x6b567e1cf2e041ec80d7098f031c5c9e/contents/blob/
+        Args:
+            text_str (str):
+
+        Returns:
+            str
+        """
+        def remove_articles(text):
+            regex = re.compile(r'\b(a|an|the)\b', re.UNICODE)
+            return re.sub(regex, ' ', text)
+
+        def white_space_fix(text):
+            return ' '.join(text.split())
+
+        def remove_punc(text):
+            exclude = set(string.punctuation)
+            return ''.join(ch for ch in text if ch not in exclude)
+
+        def lower(text):
+            return text.lower()
+
+        return white_space_fix(remove_articles(remove_punc(lower(text_str))))
 
 
 class BLEUSentenceScoreMetric(AbstractBaseMetric):
