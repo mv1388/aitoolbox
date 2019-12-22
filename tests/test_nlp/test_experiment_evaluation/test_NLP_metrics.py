@@ -57,25 +57,25 @@ class TestROUGEMetric(unittest.TestCase):
 
 class TestExactMatchMetric(unittest.TestCase):
     def test_calculate_metric(self):
-        em_match = ExactMatchMetric(['bla bla bla'.split()], ['bla bla bla'.split()])
+        em_match = ExactMatchTextMetric(['bla bla bla'.split()], ['bla bla bla'.split()])
         self.assertEqual(em_match.get_metric(), 100.)
 
-        em_non_match = ExactMatchMetric(['bla not match bla'.split()], ['bla bla bla'.split()])
+        em_non_match = ExactMatchTextMetric(['bla not match bla'.split()], ['bla bla bla'.split()])
         self.assertEqual(em_non_match.get_metric(), 0.)
 
-        em_semi_match = ExactMatchMetric(['bla bla bla'.split(), 'bla NON bla'.split()],
-                                         ['bla bla bla'.split(), 'bla bla bla'.split()])
+        em_semi_match = ExactMatchTextMetric(['bla bla bla'.split(), 'bla NON bla'.split()],
+                                             ['bla bla bla'.split(), 'bla bla bla'.split()])
         self.assertEqual(em_semi_match.get_metric(), 50.)
 
-        em_semi_match_2 = ExactMatchMetric(['bla bla bla'.split(), 'bla NON dasdadad dqewq'.split(),
-                                            'bla blla'.split(), 'Today is sunny'.split()],
-                                           ['bla bla bla'.split(), 'bla bla bla'.split(),
-                                            'uuuu'.split(), 'Today is Not sunny'.split()])
+        em_semi_match_2 = ExactMatchTextMetric(['bla bla bla'.split(), 'bla NON dasdadad dqewq'.split(),
+                                                'bla blla'.split(), 'Today is sunny'.split()],
+                                               ['bla bla bla'.split(), 'bla bla bla'.split(),
+                                                'uuuu'.split(), 'Today is Not sunny'.split()])
         self.assertEqual(em_semi_match_2.get_metric(), 25.)
 
     def test_raise_exception(self):
         with self.assertRaises(ValueError):
-            ExactMatchMetric(['bla bla bla'.split()], ['bla bla bla'.split(), 'bla bla bla'.split()])
+            ExactMatchTextMetric(['bla bla bla'.split()], ['bla bla bla'.split(), 'bla bla bla'.split()])
 
 
 class TestBLEUSentenceScoreMetric(unittest.TestCase):
