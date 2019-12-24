@@ -22,3 +22,4 @@ torchvision
 pytorch-nlp
 pyrouge
 rouge
+transformers
