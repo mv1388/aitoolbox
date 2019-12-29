@@ -65,10 +65,6 @@ class TTModel(nn.Module, ABC):
         pass
 
 
-# For back-compatibility: TTFullModel was the previous name for TTModel
-TTFullModel = TTModel
-
-
 class TTBasicModel(TTModel):
     """Extension of the TTModel abstract class with already implemented simple loss and prediction calculation functions
 
