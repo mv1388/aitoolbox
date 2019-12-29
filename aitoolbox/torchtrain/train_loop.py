@@ -611,9 +611,3 @@ class TrainLoopCheckpointEndSave(TrainLoopEndSave):
                             rm_subopt_local_models=self.rm_subopt_local_models,
                             num_best_checkpoints_kept=num_best_checkpoints_kept)
         ])
-
-
-# For back compatibility
-TrainLoopModelCheckpoint = TrainLoopCheckpoint
-TrainLoopModelEndSave = TrainLoopEndSave
-TrainLoopModelCheckpointEndSave = TrainLoopCheckpointEndSave
