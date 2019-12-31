@@ -37,6 +37,7 @@ setup(name='aitoolbox',
                         'pytorch-nlp',
                         'rouge',
                         'pyrouge',
+                        'transformers'
                         ],
 
       test_suite='tests',
