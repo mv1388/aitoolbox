@@ -39,7 +39,8 @@ class AttentionHeatMap(AbstractBaseMetric):
         dir_path = self.prepare_folder_for_saving(self.plot_save_dir)
         output_plot_paths = []
 
-        for i, (attn_matrix, source_sent, target_sent) in enumerate(zip(self.attention_matrices, self.source_sentences, self.target_sentences)):
+        for i, (attn_matrix, source_sent, target_sent) in \
+                enumerate(zip(self.attention_matrices, self.source_sentences, self.target_sentences)):
             plot_file_path = os.path.join(dir_path, f'attn_plot_{i}.png')
             output_plot_paths.append(plot_file_path)
 

@@ -11,7 +11,7 @@ from aitoolbox.experiment.result_reporting.report_generator import TrainingHisto
 
 class ModelPerformanceEvaluation(AbstractCallback):
     def __init__(self, result_package, args,
-                 on_each_epoch=True, on_train_data=False, on_val_data=True, add_loss=False, eval_frequency=None,
+                 on_each_epoch=True, on_train_data=False, on_val_data=True, eval_frequency=None,
                  if_available_output_to_project_dir=True):
         """Track performance metrics from result_package and store them into TrainLoop's history
 
@@ -27,8 +27,6 @@ class ModelPerformanceEvaluation(AbstractCallback):
             on_each_epoch (bool): calculate performance results just at the end of training or at the end of each epoch
             on_train_data (bool):
             on_val_data (bool):
-            add_loss (bool): should model's loss also be computed in addition to the model's predictions and given to
-                the provided result packages.
             eval_frequency (int or None): evaluation is done every specified number of epochs. Useful when predictions
                 are quite expensive and are slowing down the overall training
             if_available_output_to_project_dir (bool): if using train loop version which builds project local folder
@@ -47,7 +45,6 @@ class ModelPerformanceEvaluation(AbstractCallback):
         self.on_each_epoch = on_each_epoch
         self.on_train_data = on_train_data
         self.on_val_data = on_val_data
-        self.add_loss = add_loss
         self.eval_frequency = eval_frequency
         self.if_available_output_to_project_dir = if_available_output_to_project_dir
 
@@ -80,7 +77,7 @@ class ModelPerformanceEvaluation(AbstractCallback):
         """
         if self.on_train_data:
             y_pred, y_test, additional_results = self.train_loop_obj.predict_on_train_set()
-            if self.add_loss:
+            if self.train_result_package.requires_loss:
                 additional_results['loss'] = self.train_loop_obj.evaluate_loss_on_train_set()
             self.train_result_package.prepare_result_package(y_test, y_pred,
                                                              hyperparameters=self.args,
@@ -88,7 +85,7 @@ class ModelPerformanceEvaluation(AbstractCallback):
 
         if self.on_val_data:
             y_pred, y_test, additional_results = self.train_loop_obj.predict_on_validation_set()
-            if self.add_loss:
+            if self.result_package.requires_loss:
                 additional_results['loss'] = self.train_loop_obj.evaluate_loss_on_validation_set()
             self.result_package.prepare_result_package(y_test, y_pred,
                                                        hyperparameters=self.args,
