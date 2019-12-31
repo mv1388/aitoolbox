@@ -224,29 +224,56 @@ class TrainLoop:
             # has been turned off
             self.insert_metric_result_into_history('train_end_test_loss', test_loss)
 
-    def evaluate_loss_on_train_set(self):
+    def evaluate_loss_on_train_set(self, force_prediction=False):
         """Run train dataset through the network without updating the weights and return the loss
 
+        Args:
+            force_prediction (bool):
+
         Returns:
             float: loss
         """
-        return self.evaluate_model_loss(self.train_loader)
+        if not self.prediction_store.has_train_loss(self.epoch) or force_prediction:
+            loss = self.evaluate_model_loss(self.train_loader)
+            self.prediction_store.insert_train_loss(loss, self.epoch, force_prediction)
+        else:
+            loss = self.prediction_store.get_train_loss(self.epoch)
 
-    def evaluate_loss_on_validation_set(self):
+        return loss
+
+    def evaluate_loss_on_validation_set(self, force_prediction=False):
         """Run validation dataset through the network without updating the weights and return the loss
 
+        Args:
+            force_prediction (bool):
+
         Returns:
             float: loss
         """
-        return self.evaluate_model_loss(self.validation_loader)
+        if not self.prediction_store.has_val_loss(self.epoch) or force_prediction:
+            loss = self.evaluate_model_loss(self.validation_loader)
+            self.prediction_store.insert_val_loss(loss, self.epoch, force_prediction)
+        else:
+            loss = self.prediction_store.get_val_loss(self.epoch)
 
-    def evaluate_loss_on_test_set(self):
+        return loss
+
+    def evaluate_loss_on_test_set(self, force_prediction=False):
         """Run test dataset through the network without updating the weights and return the loss
 
+        Args:
+            force_prediction (bool):
+
         Returns:
             float: loss
         """
-        return self.evaluate_model_loss(self.test_loader)
+        if not self.prediction_store.has_test_loss(self.epoch) or force_prediction:
+            loss = self.evaluate_model_loss(self.test_loader)
+            self.prediction_store.insert_test_loss(loss, self.epoch, force_prediction)
+        else:
+            loss = self.prediction_store.get_test_loss(self.epoch)
+
+        return loss
 
     def evaluate_model_loss(self, data_loader):
         """Run given dataset through the network without updating the weights and return the loss
