@@ -511,17 +511,13 @@ class BLEUScoreStrTorchNLPMetric(AbstractBaseMetric):
 
 
 class PerplexityMetric(AbstractBaseMetric):
-    def __init__(self, y_true, y_predicted):
-        """
+    def __init__(self, batch_losses):
+        """Perplexity metric used in MT
 
         Args:
-            y_true (numpy.array or list):
-            y_predicted (numpy.array or list):
-
+            batch_losses (numpy.array or list):
         """
-        raise NotImplementedError
-
-        AbstractBaseMetric.__init__(self, y_true, y_predicted, metric_name='Perplexity', np_array=False)
+        AbstractBaseMetric.__init__(self, None, batch_losses, metric_name='Perplexity', np_array=False)
 
     def calculate_metric(self):
-        raise NotImplementedError
+        self.metric_result = np.exp(np.mean(self.y_predicted))
