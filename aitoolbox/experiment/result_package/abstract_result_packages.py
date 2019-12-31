@@ -34,6 +34,8 @@ class AbstractResultPackage(ABC):
         self.additional_results_dump_paths = None
         self.results_dict = None
 
+        self.requires_loss = False
+
         self.hyperparameters = None
         self.package_metadata = kwargs
 

@@ -190,6 +190,7 @@ class MachineTranslationResultPackage(AbstractResultPackage):
 
         AbstractResultPackage.__init__(self, pkg_name='MachineTranslationResult',
                                        strict_content_check=strict_content_check, np_array=False, **kwargs)
+        self.requires_loss = True
         self.target_vocab = target_vocab
         self.source_vocab = source_vocab
         self.source_sents = source_sents
