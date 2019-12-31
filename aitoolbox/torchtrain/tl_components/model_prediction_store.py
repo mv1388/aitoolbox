@@ -25,12 +25,7 @@ class ModelPredictionStore:
         Returns:
             None
         """
-        self.auto_purge(epoch)
-
-        if not self.has_train_predictions(epoch) or force_prediction:
-            self.prediction_store['train_pred'] = predictions
-        else:
-            raise ValueError
+        self._insert_data('train_pred', predictions, epoch, force_prediction)
 
     def insert_val_predictions(self, predictions, epoch, force_prediction=False):
         """
@@ -43,12 +38,7 @@ class ModelPredictionStore:
         Returns:
             None
         """
-        self.auto_purge(epoch)
-
-        if not self.has_val_predictions(epoch) or force_prediction:
-            self.prediction_store['val_pred'] = predictions
-        else:
-            raise ValueError
+        self._insert_data('val_pred', predictions, epoch, force_prediction)
 
     def insert_test_predictions(self, predictions, epoch, force_prediction=False):
         """
@@ -61,12 +51,7 @@ class ModelPredictionStore:
         Returns:
             None
         """
-        self.auto_purge(epoch)
-
-        if not self.has_test_predictions(epoch) or force_prediction:
-            self.prediction_store['test_pred'] = predictions
-        else:
-            raise ValueError
+        self._insert_data('test_pred', predictions, epoch, force_prediction)
 
     def get_train_predictions(self, epoch):
         """
@@ -77,11 +62,7 @@ class ModelPredictionStore:
         Returns:
             tuple:
         """
-        if epoch == self.prediction_store['epoch'] and self.has_train_predictions(epoch):
-            print('Getting train set predictions from store')
-            return self.prediction_store['train_pred']
-        else:
-            raise ValueError
+        return self._get_data('train_pred', epoch)
 
     def get_val_predictions(self, epoch):
         """
@@ -92,11 +73,7 @@ class ModelPredictionStore:
         Returns:
             tuple:
         """
-        if epoch == self.prediction_store['epoch'] and self.has_val_predictions(epoch):
-            print('Getting validation set predictions from store')
-            return self.prediction_store['val_pred']
-        else:
-            raise ValueError
+        return self._get_data('val_pred', epoch)
 
     def get_test_predictions(self, epoch):
         """
@@ -107,11 +84,7 @@ class ModelPredictionStore:
         Returns:
             tuple:
         """
-        if epoch == self.prediction_store['epoch'] and self.has_test_predictions(epoch):
-            print('Getting test set predictions from store')
-            return self.prediction_store['test_pred']
-        else:
-            raise ValueError
+        return self._get_data('test_pred', epoch)
 
     def has_train_predictions(self, epoch):
         """
@@ -122,7 +95,7 @@ class ModelPredictionStore:
         Returns:
             bool:
         """
-        return 'train_pred' in self.prediction_store and epoch == self.prediction_store['epoch']
+        return self._has_data('train_pred', epoch)
 
     def has_val_predictions(self, epoch):
         """
@@ -133,7 +106,7 @@ class ModelPredictionStore:
         Returns:
             bool:
         """
-        return 'val_pred' in self.prediction_store and epoch == self.prediction_store['epoch']
+        return self._has_data('val_pred', epoch)
 
     def has_test_predictions(self, epoch):
         """
@@ -144,7 +117,159 @@ class ModelPredictionStore:
         Returns:
             bool:
         """
-        return 'test_pred' in self.prediction_store and epoch == self.prediction_store['epoch']
+        return self._has_data('test_pred', epoch)
+
+    def insert_train_loss(self, loss, epoch, force_prediction=False):
+        """
+
+        Args:
+            loss (tuple):
+            epoch (int):
+            force_prediction (bool):
+
+        Returns:
+            None
+        """
+        self._insert_data('train_loss', loss, epoch, force_prediction)
+
+    def insert_val_loss(self, loss, epoch, force_prediction=False):
+        """
+
+        Args:
+            loss (tuple):
+            epoch (int):
+            force_prediction (bool):
+
+        Returns:
+            None
+        """
+        self._insert_data('val_loss', loss, epoch, force_prediction)
+
+    def insert_test_loss(self, loss, epoch, force_prediction=False):
+        """
+
+        Args:
+            loss (tuple):
+            epoch (int):
+            force_prediction (bool):
+
+        Returns:
+            None
+        """
+        self._insert_data('test_loss', loss, epoch, force_prediction)
+
+    def get_train_loss(self, epoch):
+        """
+
+        Args:
+            epoch (int):
+
+        Returns:
+            tuple:
+        """
+        return self._get_data('train_loss', epoch)
+
+    def get_val_loss(self, epoch):
+        """
+
+        Args:
+            epoch (int):
+
+        Returns:
+            tuple:
+        """
+        return self._get_data('val_loss', epoch)
+
+    def get_test_loss(self, epoch):
+        """
+
+        Args:
+            epoch (int):
+
+        Returns:
+            tuple:
+        """
+        return self._get_data('test_loss', epoch)
+
+    def has_train_loss(self, epoch):
+        """
+
+        Args:
+            epoch (int):
+
+        Returns:
+            bool:
+        """
+        return self._has_data('train_loss', epoch)
+
+    def has_val_loss(self, epoch):
+        """
+
+        Args:
+            epoch (int):
+
+        Returns:
+            bool:
+        """
+        return self._has_data('val_loss', epoch)
+
+    def has_test_loss(self, epoch):
+        """
+
+        Args:
+            epoch (int):
+
+        Returns:
+            bool:
+        """
+        return self._has_data('test_loss', epoch)
+
+    def _insert_data(self, source_name, data, epoch, force_prediction=False):
+        """
+
+        Args:
+            source_name (str):
+            data (tuple):
+            epoch (int):
+            force_prediction (bool):
+
+        Returns:
+            None
+        """
+        self.auto_purge(epoch)
+
+        if not self._has_data(source_name, epoch) or force_prediction:
+            self.prediction_store[source_name] = data
+        else:
+            raise ValueError
+
+    def _get_data(self, source_name, epoch):
+        """
+
+        Args:
+            source_name (str):
+            epoch (int):
+
+        Returns:
+            tuple:
+        """
+        if self._has_data(source_name, epoch):
+            print(f'Getting {source_name} predictions/loss from store')
+            return self.prediction_store[source_name]
+        else:
+            raise ValueError
+
+    def _has_data(self, source_name, epoch):
+        """
+
+        Args:
+            source_name (str):
+            epoch (int):
+
+        Returns:
+            bool:
+        """
+        return source_name in self.prediction_store and epoch == self.prediction_store['epoch']
 
     def auto_purge(self, epoch):
         """
