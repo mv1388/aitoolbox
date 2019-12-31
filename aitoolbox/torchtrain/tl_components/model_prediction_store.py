@@ -123,7 +123,7 @@ class ModelPredictionStore:
         """
 
         Args:
-            loss (tuple):
+            loss (float):
             epoch (int):
             force_prediction (bool):
 
@@ -136,7 +136,7 @@ class ModelPredictionStore:
         """
 
         Args:
-            loss (tuple):
+            loss (float):
             epoch (int):
             force_prediction (bool):
 
@@ -149,7 +149,7 @@ class ModelPredictionStore:
         """
 
         Args:
-            loss (tuple):
+            loss (float):
             epoch (int):
             force_prediction (bool):
 
@@ -165,7 +165,7 @@ class ModelPredictionStore:
             epoch (int):
 
         Returns:
-            tuple:
+            float:
         """
         return self._get_data('train_loss', epoch)
 
@@ -176,7 +176,7 @@ class ModelPredictionStore:
             epoch (int):
 
         Returns:
-            tuple:
+            float:
         """
         return self._get_data('val_loss', epoch)
 
@@ -187,7 +187,7 @@ class ModelPredictionStore:
             epoch (int):
 
         Returns:
-            tuple:
+            float:
         """
         return self._get_data('test_loss', epoch)
 
@@ -229,7 +229,7 @@ class ModelPredictionStore:
 
         Args:
             source_name (str):
-            data (tuple):
+            data (tuple or float):
             epoch (int):
             force_prediction (bool):
 
@@ -251,7 +251,7 @@ class ModelPredictionStore:
             epoch (int):
 
         Returns:
-            tuple:
+            tuple or float:
         """
         if self._has_data(source_name, epoch):
             print(f'Getting {source_name} predictions/loss from store')
