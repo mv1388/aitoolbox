@@ -25,7 +25,7 @@ class CallbacksHandler:
         
         self.registered_cbs = [
             self.cbs_on_epoch_begin, self.cbs_on_epoch_end,
-            self.cbs_on_train_begin, self.cbs_on_train_end, 
+            self.cbs_on_train_begin, self.cbs_on_train_end,
             self.cbs_on_batch_begin,  self.cbs_on_batch_end,
             self.cbs_on_after_gradient_update, self.cbs_on_after_optimizer_step
         ]

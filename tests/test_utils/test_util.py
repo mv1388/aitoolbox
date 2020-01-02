@@ -76,14 +76,16 @@ class EmptyFunctions:
         pass
 
     def return_only_fn(self):
-        return "value"
+        return "value" + str(self.a)
 
+    @staticmethod
     def full_fn(self):
         print('aaaa')
 
-    def full_fn_arg(self,a):
+    @staticmethod
+    def full_fn_arg(self, a):
         return a
 
     def full_fn_arg_sum(self, a, b):
-        c = a + b
+        c = a + b + self.a
         return c
