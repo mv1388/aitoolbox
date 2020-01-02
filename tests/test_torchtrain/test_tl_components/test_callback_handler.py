@@ -2,6 +2,7 @@ import unittest
 
 from tests.utils import *
 from aitoolbox.torchtrain.tl_components.callback_handler import CallbacksHandler
+from aitoolbox.torchtrain.callbacks.abstract import AbstractCallback
 from aitoolbox.torchtrain.train_loop import TrainLoop
 
 
@@ -23,3 +24,200 @@ class TestCallbacksHandler(unittest.TestCase):
         self.assertTrue(function_exists(callback_handler, 'execute_batch_begin'))
         self.assertTrue(function_exists(callback_handler, 'execute_batch_end'))
         self.assertTrue(function_exists(callback_handler, 'execute_gradient_update'))
+
+    def test_register_callbacks(self):
+        train_loop = TrainLoop(NetUnifiedBatchFeed(), None, 100, None, None, None)
+        cb_handler = CallbacksHandler(train_loop)
+
+        batch_begin_cb = BatchBeginCB(execution_order=50)
+        batch_begin_train_begin_cb = BatchBeginTrainBeginCB(execution_order=1)
+        batch_begin_train_begin_after_opti_cb = BatchBeginTrainBeginAfterOptiCB(execution_order=0)
+        callbacks = [batch_begin_cb, batch_begin_train_begin_cb, batch_begin_train_begin_after_opti_cb]
+
+        cb_handler.register_callbacks(callbacks)
+
+        self.assertEqual(train_loop.callbacks,
+                         [batch_begin_train_begin_after_opti_cb, batch_begin_train_begin_cb, batch_begin_cb])
+
+        self.assertEqual(
+            cb_handler.registered_cbs,
+            [
+                [], [],
+                [batch_begin_train_begin_after_opti_cb, batch_begin_train_begin_cb], [],
+                [batch_begin_train_begin_after_opti_cb, batch_begin_train_begin_cb, batch_begin_cb], [],
+                [], [batch_begin_train_begin_after_opti_cb]
+            ]
+        )
+
+        self.assertEqual(cb_handler.cbs_on_train_begin,
+                         [batch_begin_train_begin_after_opti_cb, batch_begin_train_begin_cb])
+
+        self.assertEqual(cb_handler.cbs_on_batch_begin,
+                         [batch_begin_train_begin_after_opti_cb, batch_begin_train_begin_cb, batch_begin_cb])
+
+        self.assertEqual(cb_handler.cbs_on_after_optimizer_step,
+                         [batch_begin_train_begin_after_opti_cb])
+
+        self.assertEqual(cb_handler.cbs_on_epoch_begin, [])
+        self.assertEqual(cb_handler.cbs_on_epoch_end, [])
+
+    def test_split_on_execution_position(self):
+        train_loop = TrainLoop(NetUnifiedBatchFeed(), None, 100, None, None, None)
+        cb_handler = CallbacksHandler(train_loop)
+
+        batch_begin_cb = BatchBeginCB()
+        batch_begin_train_begin_cb = BatchBeginTrainBeginCB()
+        batch_begin_train_begin_after_opti_cb = BatchBeginTrainBeginAfterOptiCB()
+        callbacks = [batch_begin_cb, batch_begin_train_begin_cb, batch_begin_train_begin_after_opti_cb]
+
+        cb_handler.split_on_execution_position(callbacks)
+
+        self.assertEqual(
+            cb_handler.registered_cbs,
+            [
+                [], [],
+                [batch_begin_train_begin_cb, batch_begin_train_begin_after_opti_cb], [],
+                [batch_begin_cb, batch_begin_train_begin_cb, batch_begin_train_begin_after_opti_cb], [],
+                [], [batch_begin_train_begin_after_opti_cb]
+            ]
+        )
+
+        self.assertEqual(cb_handler.cbs_on_train_begin,
+                         [batch_begin_train_begin_cb, batch_begin_train_begin_after_opti_cb])
+
+        self.assertEqual(cb_handler.cbs_on_batch_begin,
+                         [batch_begin_cb, batch_begin_train_begin_cb, batch_begin_train_begin_after_opti_cb])
+
+        self.assertEqual(cb_handler.cbs_on_after_optimizer_step,
+                         [batch_begin_train_begin_after_opti_cb])
+
+        self.assertEqual(cb_handler.cbs_on_epoch_begin, [])
+        self.assertEqual(cb_handler.cbs_on_epoch_end, [])
+
+    def test_split_on_execution_position_ordering(self):
+        train_loop = TrainLoop(NetUnifiedBatchFeed(), None, 100, None, None, None)
+        cb_handler = CallbacksHandler(train_loop)
+
+        batch_begin_cb = BatchBeginCB(execution_order=50)
+        batch_begin_train_begin_cb = BatchBeginTrainBeginCB(execution_order=1)
+        batch_begin_train_begin_after_opti_cb = BatchBeginTrainBeginAfterOptiCB(execution_order=0)
+        callbacks = [batch_begin_cb, batch_begin_train_begin_cb, batch_begin_train_begin_after_opti_cb]
+
+        cb_handler.split_on_execution_position(callbacks)
+
+        self.assertEqual(
+            cb_handler.registered_cbs,
+            [
+                [], [],
+                [batch_begin_train_begin_after_opti_cb, batch_begin_train_begin_cb], [],
+                [batch_begin_train_begin_after_opti_cb, batch_begin_train_begin_cb, batch_begin_cb], [],
+                [], [batch_begin_train_begin_after_opti_cb]
+            ]
+        )
+
+        self.assertEqual(cb_handler.cbs_on_train_begin,
+                         [batch_begin_train_begin_after_opti_cb, batch_begin_train_begin_cb])
+
+        self.assertEqual(cb_handler.cbs_on_batch_begin,
+                         [batch_begin_train_begin_after_opti_cb, batch_begin_train_begin_cb, batch_begin_cb])
+
+        self.assertEqual(cb_handler.cbs_on_after_optimizer_step,
+                         [batch_begin_train_begin_after_opti_cb])
+
+        self.assertEqual(cb_handler.cbs_on_epoch_begin, [])
+        self.assertEqual(cb_handler.cbs_on_epoch_end, [])
+
+    def test_split_on_execution_register_train_loop(self):
+        train_loop = TrainLoop(NetUnifiedBatchFeed(), None, 100, None, None, None)
+        cb_handler = CallbacksHandler(train_loop)
+
+        batch_begin_cb = BatchBeginCB(execution_order=50)
+        batch_begin_train_begin_cb = BatchBeginTrainBeginCB(execution_order=1)
+        batch_begin_train_begin_after_opti_cb = BatchBeginTrainBeginAfterOptiCB(execution_order=0)
+        callbacks = [batch_begin_cb, batch_begin_train_begin_cb, batch_begin_train_begin_after_opti_cb]
+
+        cb_handler.split_on_execution_position(callbacks, register_train_loop=True)
+
+        self.assertTrue(batch_begin_cb.registered_tl)
+
+    def test_split_on_execution_execute_split_callbacks(self):
+        train_loop = TrainLoop(NetUnifiedBatchFeed(), None, 100, None, None, None)
+        cb_handler = CallbacksHandler(train_loop)
+
+        batch_begin_cb = BatchBeginCB(execution_order=50)
+        batch_begin_train_begin_cb = BatchBeginTrainBeginCB(execution_order=1)
+        batch_begin_train_begin_after_opti_cb = BatchBeginTrainBeginAfterOptiCB(execution_order=0)
+        callbacks = [batch_begin_cb, batch_begin_train_begin_cb, batch_begin_train_begin_after_opti_cb]
+
+        cb_handler.split_on_execution_position(callbacks, register_train_loop=True)
+
+        self.assertFalse(batch_begin_train_begin_after_opti_cb.exe_on_batch_begin)
+        self.assertFalse(cb_handler.cbs_on_batch_begin[0].exe_on_batch_begin)
+        self.assertFalse(batch_begin_train_begin_after_opti_cb.exe_on_train_begin)
+        self.assertFalse(cb_handler.cbs_on_train_begin[0].exe_on_train_begin)
+        self.assertFalse(batch_begin_train_begin_after_opti_cb.exe_on_after_optimizer_step)
+        self.assertFalse(cb_handler.cbs_on_after_optimizer_step[0].exe_on_after_optimizer_step)
+
+        cb_handler.execute_batch_begin()
+        self.assertTrue(batch_begin_train_begin_after_opti_cb.exe_on_batch_begin)
+        self.assertTrue(cb_handler.cbs_on_batch_begin[0].exe_on_batch_begin)
+        self.assertFalse(batch_begin_train_begin_after_opti_cb.exe_on_train_begin)
+        self.assertFalse(cb_handler.cbs_on_train_begin[0].exe_on_train_begin)
+        self.assertFalse(batch_begin_train_begin_after_opti_cb.exe_on_after_optimizer_step)
+        self.assertFalse(cb_handler.cbs_on_after_optimizer_step[0].exe_on_after_optimizer_step)
+
+        cb_handler.execute_train_begin()
+        self.assertTrue(batch_begin_train_begin_after_opti_cb.exe_on_batch_begin)
+        self.assertTrue(cb_handler.cbs_on_batch_begin[0].exe_on_batch_begin)
+        self.assertTrue(batch_begin_train_begin_after_opti_cb.exe_on_train_begin)
+        self.assertTrue(cb_handler.cbs_on_train_begin[0].exe_on_train_begin)
+        self.assertFalse(batch_begin_train_begin_after_opti_cb.exe_on_after_optimizer_step)
+        self.assertFalse(cb_handler.cbs_on_after_optimizer_step[0].exe_on_after_optimizer_step)
+
+        cb_handler.execute_optimizer_step()
+        self.assertTrue(batch_begin_train_begin_after_opti_cb.exe_on_batch_begin)
+        self.assertTrue(cb_handler.cbs_on_batch_begin[0].exe_on_batch_begin)
+        self.assertTrue(batch_begin_train_begin_after_opti_cb.exe_on_train_begin)
+        self.assertTrue(cb_handler.cbs_on_train_begin[0].exe_on_train_begin)
+        self.assertTrue(batch_begin_train_begin_after_opti_cb.exe_on_after_optimizer_step)
+        self.assertTrue(cb_handler.cbs_on_after_optimizer_step[0].exe_on_after_optimizer_step)
+
+
+class BatchBeginCB(AbstractCallback):
+    def __init__(self, execution_order=0):
+        super().__init__('', execution_order)
+        self.registered_tl = False
+
+    def on_train_loop_registration(self):
+        self.registered_tl = True
+
+    def on_batch_begin(self):
+        print("executed")
+
+
+class BatchBeginTrainBeginCB(AbstractCallback):
+    def __init__(self, execution_order=0):
+        super().__init__('', execution_order)
+
+    def on_batch_begin(self):
+        print("executed")
+
+    def on_train_begin(self):
+        print("executed")
+
+
+class BatchBeginTrainBeginAfterOptiCB(AbstractCallback):
+    def __init__(self, execution_order=0):
+        super().__init__('', execution_order)
+        self.exe_on_batch_begin = False
+        self.exe_on_train_begin = False
+        self.exe_on_after_optimizer_step = False
+
+    def on_batch_begin(self):
+        self.exe_on_batch_begin = True
+
+    def on_train_begin(self):
+        self.exe_on_train_begin = True
+
+    def on_after_optimizer_step(self):
+        self.exe_on_after_optimizer_step = True
