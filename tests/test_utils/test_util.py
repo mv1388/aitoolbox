@@ -79,11 +79,11 @@ class EmptyFunctions:
         return "value" + str(self.a)
 
     @staticmethod
-    def full_fn(self):
+    def full_fn():
         print('aaaa')
 
     @staticmethod
-    def full_fn_arg(self, a):
+    def full_fn_arg(a):
         return a
 
     def full_fn_arg_sum(self, a, b):
