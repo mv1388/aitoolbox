@@ -37,16 +37,16 @@ def copy_function(fn):
     return g
 
 
-def flatten_list_of_lists(l):
+def flatten_list_of_lists(nested_list):
     """
 
     Args:
-        l (list):
+        nested_list (list):
 
     Returns:
         list or None:
     """
-    if l is not None:
-        return [item for sublist in l for item in sublist]
+    if nested_list is not None:
+        return [item for sublist in nested_list for item in sublist]
     else:
         return None
