@@ -164,9 +164,10 @@ class CallbacksHandler:
             other (list): callbacks list
 
         Returns:
-            None
+            CallbacksHandler:
         """
         self.register_callbacks(other)
+        return self
 
     def __iadd__(self, other):
         """
@@ -175,9 +176,10 @@ class CallbacksHandler:
             other (list): callbacks list
 
         Returns:
-            None
+            CallbacksHandler:
         """
         self.register_callbacks(other)
+        return self
 
     def __contains__(self, item):
         """
