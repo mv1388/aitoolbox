@@ -238,39 +238,13 @@ class CallbacksHandler(BasicCallbacksHandler):
             if not all(0 == cb.execution_order for cb in cbs_at_position):
                 cbs_at_position.sort(key=lambda cb: cb.execution_order)
 
-    def print_registered_callback_names(self):
-        print('CALLBACKS:')
-        self.print_callback_info(self.train_loop_obj.callbacks)
-
-    def print_registered_callbacks_execution_position(self):
-        print('CALLBACKS:')
-        print('At on_epoch_begin')
-        self.print_callback_info(self.cbs_on_epoch_begin)
-        print('At on_epoch_end')
-        self.print_callback_info(self.cbs_on_epoch_end)
-        print('At on_train_begin')
-        self.print_callback_info(self.cbs_on_train_begin)
-        print('At on_train_end')
-        self.print_callback_info(self.cbs_on_train_end)
-        print('At on_batch_begin')
-        self.print_callback_info(self.cbs_on_batch_begin)
-        print('At on_batch_end')
-        self.print_callback_info(self.cbs_on_batch_end)
-        print('At on_after_gradient_update')
-        self.print_callback_info(self.cbs_on_after_gradient_update)
-        print('At on_after_optimizer_step')
-        self.print_callback_info(self.cbs_on_after_optimizer_step)
-
-    @staticmethod
-    def print_callback_info(callback_list):
-        for callback in callback_list:
-            print(f'\t{callback.callback_name}: {type(callback)}, execution_order: {callback.execution_order}')
-    
-    @staticmethod
-    def enforce_callback_type(callbacks):
-        for cb in callbacks:
-            if not isinstance(cb, AbstractCallback):
-                raise TypeError(f'Callback {cb} is not inherited from the AbstractCallback')
-    
     def __str__(self):
-        return 'CALLBACKS:\n' + '\n'.join([f'\t{callback.callback_name}' for callback in self.train_loop_obj.callbacks])
+        return 'CALLBACKS\n' \
+               f'At on_epoch_begin:\n{self.print_callback_info(self.cbs_on_epoch_begin)}\n' \
+               f'At on_epoch_end:\n{self.print_callback_info(self.cbs_on_epoch_end)}\n' \
+               f'At on_train_begin:\n{self.print_callback_info(self.cbs_on_train_begin)}\n' \
+               f'At on_train_end:\n{self.print_callback_info(self.cbs_on_train_end)}\n' \
+               f'At on_batch_begin:\n{self.print_callback_info(self.cbs_on_batch_begin)}\n' \
+               f'At on_batch_end:\n{self.print_callback_info(self.cbs_on_batch_end)}\n' \
+               f'At on_after_gradient_update:\n{self.print_callback_info(self.cbs_on_after_gradient_update)}\n' \
+               f'At on_after_optimizer_step:\n{self.print_callback_info(self.cbs_on_after_optimizer_step)}'
