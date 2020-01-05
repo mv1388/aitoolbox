@@ -133,6 +133,10 @@ class CallbacksHandler(BasicCallbacksHandler):
     def __init__(self, train_loop_obj):
         """Callback handler used for the callback orchestration inside the TrainLoop
 
+        Compared to `BasicCallbacksHandler`, this handler will at certain TrainLoop stage only execute those
+        callbacks which have implemented the functionality intended to be executed at this particular stage.
+        Thus, `CallbacksHandler` doesn't unnecessarily execute callbacks at stages they are not implemented at.
+
         Common use of this handler is to call different methods inside the TrainLoop at different stages of the training
         process. Thus execute desired callbacks' functionality at the desired point of the training process.
 
