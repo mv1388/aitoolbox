@@ -71,8 +71,16 @@ class BasicCallbacksHandler:
             if not isinstance(cb, AbstractCallback):
                 raise TypeError(f'Callback {cb} is not inherited from the AbstractCallback')
 
+    @staticmethod
+    def print_callback_info(callback_list):
+        return '\n'.join([f'\t{callback.callback_name}: {type(callback)}, execution_order: {callback.execution_order}'
+                          for callback in callback_list])
+
+    def print_registered_callback_names(self):
+        print(self)
+
     def __str__(self):
-        return 'CALLBACKS:\n' + '\n'.join([f'\t{callback.callback_name}' for callback in self.train_loop_obj.callbacks])
+        return 'CALLBACKS:\n' + self.print_callback_info(self.train_loop_obj.callbacks)
 
     def __len__(self):
         return len(self.train_loop_obj.callbacks)
