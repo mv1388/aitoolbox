@@ -2,7 +2,7 @@ from aitoolbox.torchtrain.callbacks.abstract import AbstractCallback
 from aitoolbox.utils.util import is_empty_function
 
 
-class CallbacksHandler:
+class BasicCallbacksHandler:
     def __init__(self, train_loop_obj):
         """Callback handler used for the callback orchestration inside the TrainLoop
 
@@ -13,6 +13,125 @@ class CallbacksHandler:
             train_loop_obj (aitoolbox.torchtrain.train_loop.TrainLoop): reference to the encapsulating TrainLoop
         """
         self.train_loop_obj = train_loop_obj
+
+    def register_callbacks(self, callbacks):
+        """Register TrainLoop object reference inside the listed callbacks when the TrainLoop is created
+
+        Normally, this is called from inside of the train loop by the TrainLoop itself. Basically train loop "registers"
+        itself.
+
+        Args:
+            callbacks (list): list of callbacks
+
+        Returns:
+            None
+        """
+        if callbacks is not None and len(callbacks) > 0:
+            self.enforce_callback_type(callbacks)
+            self.train_loop_obj.callbacks += [cb.register_train_loop_object(self.train_loop_obj) for cb in callbacks]
+
+        if not all(0 == cb.execution_order for cb in self.train_loop_obj.callbacks):
+            self.train_loop_obj.callbacks = sorted(self.train_loop_obj.callbacks, key=lambda cb: cb.execution_order)
+
+    def execute_epoch_begin(self):
+        for callback in self.train_loop_obj.callbacks:
+            callback.on_epoch_begin()
+
+    def execute_epoch_end(self):
+        for callback in self.train_loop_obj.callbacks:
+            callback.on_epoch_end()
+
+    def execute_train_begin(self):
+        for callback in self.train_loop_obj.callbacks:
+            callback.on_train_begin()
+
+    def execute_train_end(self):
+        for callback in self.train_loop_obj.callbacks:
+            callback.on_train_end()
+
+    def execute_batch_begin(self):
+        for callback in self.train_loop_obj.callbacks:
+            callback.on_batch_begin()
+
+    def execute_batch_end(self):
+        for callback in self.train_loop_obj.callbacks:
+            callback.on_batch_end()
+
+    def execute_gradient_update(self):
+        for callback in self.train_loop_obj.callbacks:
+            callback.on_after_gradient_update()
+
+    def execute_optimizer_step(self):
+        for callback in self.train_loop_obj.callbacks:
+            callback.on_after_optimizer_step()
+
+    @staticmethod
+    def enforce_callback_type(callbacks):
+        for cb in callbacks:
+            if not isinstance(cb, AbstractCallback):
+                raise TypeError(f'Callback {cb} is not inherited from the AbstractCallback')
+
+    def __str__(self):
+        return 'CALLBACKS:\n' + '\n'.join([f'\t{callback.callback_name}' for callback in self.train_loop_obj.callbacks])
+
+    def __len__(self):
+        return len(self.train_loop_obj.callbacks)
+
+    def __add__(self, other):
+        """
+
+        Args:
+            other (list): callbacks list
+
+        Returns:
+            None
+        """
+        self.register_callbacks(other)
+        return self
+
+    def __iadd__(self, other):
+        """
+
+        Args:
+            other (list): callbacks list
+
+        Returns:
+            None
+        """
+        self.register_callbacks(other)
+        return self
+
+    def __contains__(self, item):
+        """
+
+        Args:
+            item:
+
+        Returns:
+            bool:
+        """
+        if type(item) == str:
+            for cb in self.train_loop_obj.callbacks:
+                if cb.callback_name == item:
+                    return True
+        else:
+            for cb in self.train_loop_obj.callbacks:
+                if type(cb) == item:
+                    return True
+        return False
+
+
+class CallbacksHandler(BasicCallbacksHandler):
+    def __init__(self, train_loop_obj):
+        """Callback handler used for the callback orchestration inside the TrainLoop
+
+        Common use of this handler is to call different methods inside the TrainLoop at different stages of the training
+        process. Thus execute desired callbacks' functionality at the desired point of the training process.
+
+        Args:
+            train_loop_obj (aitoolbox.torchtrain.train_loop.TrainLoop): reference to the encapsulating TrainLoop
+        """
+        super().__init__(train_loop_obj)
 
         self.cbs_on_epoch_begin = []
         self.cbs_on_epoch_end = []
@@ -42,13 +161,7 @@ class CallbacksHandler:
         Returns:
             None
         """
-        if callbacks is not None and len(callbacks) > 0:
-            self.enforce_callback_type(callbacks)
-            self.train_loop_obj.callbacks += [cb.register_train_loop_object(self.train_loop_obj) for cb in callbacks]
-
-        if not all(0 == cb.execution_order for cb in self.train_loop_obj.callbacks):
-            self.train_loop_obj.callbacks = sorted(self.train_loop_obj.callbacks, key=lambda cb: cb.execution_order)
-            
+        super().register_callbacks(callbacks)
         self.split_on_execution_position(callbacks, register_train_loop=False)
 
     def execute_epoch_begin(self):
@@ -153,49 +266,3 @@ class CallbacksHandler:
     
     def __str__(self):
         return 'CALLBACKS:\n' + '\n'.join([f'\t{callback.callback_name}' for callback in self.train_loop_obj.callbacks])
-
-    def __len__(self):
-        return len(self.train_loop_obj.callbacks)
-
-    def __add__(self, other):
-        """
-
-        Args:
-            other (list): callbacks list
-
-        Returns:
-            CallbacksHandler:
-        """
-        self.register_callbacks(other)
-        return self
-
-    def __iadd__(self, other):
-        """
-
-        Args:
-            other (list): callbacks list
-
-        Returns:
-            CallbacksHandler:
-        """
-        self.register_callbacks(other)
-        return self
-
-    def __contains__(self, item):
-        """
-
-        Args:
-            item:
-
-        Returns:
-            bool:
-        """
-        if type(item) == str:
-            for cb in self.train_loop_obj.callbacks:
-                if cb.callback_name == item:
-                    return True
-        else:
-            for cb in self.train_loop_obj.callbacks:
-                if type(cb) == item:
-                    return True
-        return False
