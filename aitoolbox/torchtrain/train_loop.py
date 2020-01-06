@@ -85,8 +85,8 @@ class TrainLoop:
         self.prediction_store = ModelPredictionStore(auto_purge=True)
         self.message_service = MessageService()
 
-        self.callbacks_handler = CallbacksHandler(self)
         self.callbacks = []
+        self.callbacks_handler = CallbacksHandler(self)
         self.early_stop = False
 
         self.grad_cb_used = False
