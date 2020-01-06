@@ -92,7 +92,7 @@ class BasicCallbacksHandler:
             other (list): callbacks list
 
         Returns:
-            None
+            BasicCallbacksHandler:
         """
         self.register_callbacks(other)
         return self
@@ -104,7 +104,7 @@ class BasicCallbacksHandler:
             other (list): callbacks list
 
         Returns:
-            None
+            BasicCallbacksHandler:
         """
         self.register_callbacks(other)
         return self
