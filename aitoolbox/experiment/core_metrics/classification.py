@@ -21,11 +21,11 @@ class AccuracyMetric(AbstractBaseMetric):
         if len(self.y_predicted.shape) > 1 and self.y_predicted.shape[1] > 1:
             self.y_predicted = np.argmax(self.y_predicted, axis=1)
         elif self.positive_class_thresh is not None:
-            # Don't want to break the job just because of that
-            if np.max(self.y_predicted) > 1.0:
+            if np.min(self.y_predicted) >= 0. and np.max(self.y_predicted) <= 1.:
+                self.y_predicted = self.y_predicted >= self.positive_class_thresh
+            else:
                 print('Thresholding the predicted probabilities as if they are binary. However, found'
-                      'predicted value above 1.0. The accuracy results might be not correct.')
-            self.y_predicted = self.y_predicted >= self.positive_class_thresh
+                      'predicted value above 1.0. Threshold has not been applied.')
 
         if len(self.y_true.shape) > 1 and self.y_true.shape[1] > 1:
             self.y_true = np.argmax(self.y_true, axis=1)
