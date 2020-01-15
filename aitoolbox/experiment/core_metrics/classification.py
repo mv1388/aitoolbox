@@ -5,25 +5,29 @@ from aitoolbox.experiment.core_metrics.abstract_metric import AbstractBaseMetric
 
 
 class AccuracyMetric(AbstractBaseMetric):
-    def __init__(self, y_true, y_predicted):
+    def __init__(self, y_true, y_predicted, positive_class_thresh=0.5):
         """Model prediction accuracy
 
         Args:
             y_true (numpy.array or list): ground truth targets
             y_predicted (numpy.array or list): predicted targets
+            positive_class_thresh (float or None): predicted probability positive class threshold. Useful when dealing
+                with multi-class labels.
         """
+        self.positive_class_thresh = positive_class_thresh
         AbstractBaseMetric.__init__(self, y_true, y_predicted, metric_name='Accuracy')
 
     def calculate_metric(self):
-        # if self.y_predicted_label_thresh is not None:
-        #     y_label_predicted = np.where(self.y_predicted > self.y_predicted_label_thresh, 1, 0)
-        #     self.metric_result = accuracy_score(self.y_true, y_label_predicted)
-        # else:
-        #     self.metric_result = accuracy_score(self.y_true, self.y_predicted)
-
-        if len(self.y_predicted.shape) > 1:
+        if len(self.y_predicted.shape) > 1 and self.y_predicted.shape[1] > 1:
             self.y_predicted = np.argmax(self.y_predicted, axis=1)
-        if len(self.y_true.shape) > 1:
+        elif self.positive_class_thresh is not None:
+            # Don't want to break the job just because of that
+            if np.max(self.y_predicted) > 1.0:
+                print('Thresholding the predicted probabilities as if they are binary. However, found'
+                      'predicted value above 1.0. The accuracy results might be not correct.')
+            self.y_predicted = self.y_predicted >= self.positive_class_thresh
+
+        if len(self.y_true.shape) > 1 and self.y_true.shape[1] > 1:
             self.y_true = np.argmax(self.y_true, axis=1)
 
         self.metric_result = accuracy_score(self.y_true, self.y_predicted)
