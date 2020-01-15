@@ -69,7 +69,7 @@ class BinaryClassificationResultPackage(AbstractResultPackage):
         Returns:
             dict:
         """
-        accuracy_result = AccuracyMetric(self.y_true, self.y_predicted, 
+        accuracy_result = AccuracyMetric(self.y_true, self.y_predicted,
                                          positive_class_thresh=self.positive_class_thresh)
         roc_auc_result = ROCAUCMetric(self.y_true, self.y_predicted)
         pr_auc_result = PrecisionRecallCurveAUCMetric(self.y_true, self.y_predicted)
