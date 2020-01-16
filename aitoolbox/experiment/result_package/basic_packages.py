@@ -49,17 +49,19 @@ class GeneralResultPackage(AbstractResultPackage):
 
 
 class BinaryClassificationResultPackage(AbstractResultPackage):
-    def __init__(self, strict_content_check=False, **kwargs):
+    def __init__(self, positive_class_thresh=0.5, strict_content_check=False, **kwargs):
         """Binary classification task result package
 
         Evaluates the following metrics: accuracy, ROC-AUC, PR-AUC and F1 score
 
         Args:
+            positive_class_thresh (float or None): predicted probability positive class threshold
             strict_content_check (bool): should just print warning or raise the error and crash
             **kwargs (dict):
         """
         AbstractResultPackage.__init__(self, pkg_name='BinaryClassificationResult',
                                        strict_content_check=strict_content_check, **kwargs)
+        self.positive_class_thresh = positive_class_thresh
 
     def prepare_results_dict(self):
         """
@@ -67,7 +69,8 @@ class BinaryClassificationResultPackage(AbstractResultPackage):
         Returns:
             dict:
         """
-        accuracy_result = AccuracyMetric(self.y_true, self.y_predicted)
+        accuracy_result = AccuracyMetric(self.y_true, self.y_predicted,
+                                         positive_class_thresh=self.positive_class_thresh)
         roc_auc_result = ROCAUCMetric(self.y_true, self.y_predicted)
         pr_auc_result = PrecisionRecallCurveAUCMetric(self.y_true, self.y_predicted)
         f1_score_result = F1ScoreMetric(self.y_true, self.y_predicted)
@@ -95,11 +98,7 @@ class ClassificationResultPackage(AbstractResultPackage):
         Returns:
             dict:
         """
-        accuracy_result = AccuracyMetric(self.y_true, self.y_predicted).get_metric_dict()
-
-        # Causing problems in default mode. With proper selection of parameters it could work for multiclass
-        # roc_auc_result = ROCAUCMetric(self.y_true, self.y_predicted)
-        # f1_score_result = F1ScoreMetric(self.y_true, self.y_predicted)
+        accuracy_result = AccuracyMetric(self.y_true, self.y_predicted, positive_class_thresh=None).get_metric_dict()
 
         return accuracy_result
 

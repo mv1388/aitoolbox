@@ -133,9 +133,9 @@ class QuestionAnswerSpanClassificationResultPackage(AbstractResultPackage):
         y_span_end_true = self.y_true[:, 1]
         y_span_end_predicted = self.y_predicted[:, 1]
 
-        span_start_accuracy = AccuracyMetric(y_span_start_true, y_span_start_predicted)
+        span_start_accuracy = AccuracyMetric(y_span_start_true, y_span_start_predicted, positive_class_thresh=None)
         span_start_accuracy.metric_name += '_span_start'
-        span_end_accuracy = AccuracyMetric(y_span_end_true, y_span_end_predicted)
+        span_end_accuracy = AccuracyMetric(y_span_end_true, y_span_end_predicted, positive_class_thresh=None)
         span_end_accuracy.metric_name += '_span_end'
 
         return span_start_accuracy + span_end_accuracy
