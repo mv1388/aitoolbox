@@ -11,8 +11,8 @@ class AccuracyMetric(AbstractBaseMetric):
         Args:
             y_true (numpy.array or list): ground truth targets
             y_predicted (numpy.array or list): predicted targets
-            positive_class_thresh (float or None): predicted probability positive class threshold. Useful when dealing
-                with multi-class labels.
+            positive_class_thresh (float or None): predicted probability positive class threshold.
+                Set it to None when dealing with multi-class labels.
         """
         self.positive_class_thresh = positive_class_thresh
         AbstractBaseMetric.__init__(self, y_true, y_predicted, metric_name='Accuracy')
@@ -63,48 +63,51 @@ class PrecisionRecallCurveAUCMetric(AbstractBaseMetric):
 
 
 class F1ScoreMetric(AbstractBaseMetric):
-    def __init__(self, y_true, y_predicted, y_predicted_label_thresh=0.5):
+    def __init__(self, y_true, y_predicted, positive_class_thresh=0.5):
         """Model prediction F1 score
 
         Args:
             y_true (numpy.array or list): ground truth targets
             y_predicted (numpy.array or list): predicted targets
+            positive_class_thresh (float): predicted probability positive class threshold
         """
-        self.y_predicted_label_thresh = y_predicted_label_thresh
+        self.positive_class_thresh = positive_class_thresh
         AbstractBaseMetric.__init__(self, y_true, y_predicted, metric_name='F1_score')
 
     def calculate_metric(self):
-        y_label_predicted = np.where(self.y_predicted > self.y_predicted_label_thresh, 1, 0)
+        y_label_predicted = np.where(self.y_predicted > self.positive_class_thresh, 1, 0)
         self.metric_result = f1_score(self.y_true, y_label_predicted)
 
 
 class PrecisionMetric(AbstractBaseMetric):
-    def __init__(self, y_true, y_predicted, y_predicted_label_thresh=0.5):
+    def __init__(self, y_true, y_predicted, positive_class_thresh=0.5):
         """Model prediction precision
 
         Args:
             y_true (numpy.array or list): ground truth targets
             y_predicted (numpy.array or list): predicted targets
+            positive_class_thresh (float): predicted probability positive class threshold
         """
-        self.y_predicted_label_thresh = y_predicted_label_thresh
+        self.positive_class_thresh = positive_class_thresh
         AbstractBaseMetric.__init__(self, y_true, y_predicted, metric_name='Precision')
 
     def calculate_metric(self):
-        y_label_predicted = np.where(self.y_predicted > self.y_predicted_label_thresh, 1, 0)
+        y_label_predicted = np.where(self.y_predicted > self.positive_class_thresh, 1, 0)
         self.metric_result = precision_score(self.y_true, y_label_predicted)
 
 
 class RecallMetric(AbstractBaseMetric):
-    def __init__(self, y_true, y_predicted, y_predicted_label_thresh=0.5):
+    def __init__(self, y_true, y_predicted, positive_class_thresh=0.5):
         """Model prediction recall score
 
         Args:
             y_true (numpy.array or list): ground truth targets
             y_predicted (numpy.array or list): predicted targets
+            positive_class_thresh (float): predicted probability positive class threshold
         """
-        self.y_predicted_label_thresh = y_predicted_label_thresh
+        self.positive_class_thresh = positive_class_thresh
         AbstractBaseMetric.__init__(self, y_true, y_predicted, metric_name='Recall')
 
     def calculate_metric(self):
-        y_label_predicted = np.where(self.y_predicted > self.y_predicted_label_thresh, 1, 0)
+        y_label_predicted = np.where(self.y_predicted > self.positive_class_thresh, 1, 0)
         self.metric_result = recall_score(self.y_true, y_label_predicted)
