@@ -73,7 +73,8 @@ class BinaryClassificationResultPackage(AbstractResultPackage):
                                          positive_class_thresh=self.positive_class_thresh)
         roc_auc_result = ROCAUCMetric(self.y_true, self.y_predicted)
         pr_auc_result = PrecisionRecallCurveAUCMetric(self.y_true, self.y_predicted)
-        f1_score_result = F1ScoreMetric(self.y_true, self.y_predicted)
+        f1_score_result = F1ScoreMetric(self.y_true, self.y_predicted,
+                                        positive_class_thresh=self.positive_class_thresh)
 
         return accuracy_result + roc_auc_result + pr_auc_result + f1_score_result
 
