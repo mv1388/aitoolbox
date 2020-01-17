@@ -92,6 +92,37 @@ class TTBasicModel(TTModel):
         return predictions.cpu(), targets, {}
 
 
+class TTBasicMultiGPUModel(TTBasicModel):
+    """Extension of the TTModel abstract class with already implemented simple loss and prediction calculation functions
+        which support leveled utilization when training on multi-GPU.
+
+    The pre-implemented get_loss() and get_predictions() will take all the provided data sources from the data loader
+    except the last one as an input to the model. The last data source from the data loader will be treated as
+    the target variable. (*batch_input_data, targets = batch_data)
+
+    In the case of the get_loss() the inout into the model's forward() function will also provide `targets` and
+    `criterion` arguments in order to enable calculation of the loss inside forward() function.
+
+    The forward() function should have the following parameter signature and should finish with:
+
+        def forward(*batch_input_data, targets=None, criterion=None):
+            ... predictions calculation via the computational graph ...
+
+            if criterion is not None:
+                return criterion(predictions, targets)
+            else:
+                return predictions
+
+    This base class is mainly meant to be used for simple models. TTBasicModel removes the need to constantly
+    duplicate code in get_loss and get_predictions.
+    """
+    def get_loss(self, batch_data, criterion, device):
+        *batch_input_data, targets = [data.to(device) for data in batch_data]
+
+        loss = self(*batch_input_data, targets=targets, criterion=criterion)
+        return loss
+
+
 class TTDataParallel(nn.DataParallel):
     def __init__(self, module, add_model_attributes=None,
                  default_model_methods=('get_loss', 'get_loss_eval', 'get_predictions'), **kwargs):
