@@ -123,6 +123,28 @@ class TTBasicMultiGPUModel(TTBasicModel):
         return loss
 
 
+class TTMultiGPUModelWrap(TTBasicMultiGPUModel):
+    def __init__(self, model):
+        """
+
+        Args:
+            model (TTModel):
+        """
+        TTBasicMultiGPUModel.__init__(self)
+        if not isinstance(model, TTModel):
+            raise TypeError(f'Provided model not inherited from TTModel')
+
+        self.model = model
+
+    def forward(self, *input_data, targets=None, criterion=None):
+        predictions = self.model(*input_data)
+
+        if criterion is not None:
+            return criterion(predictions, targets)
+        else:
+            return predictions
+
+
 class TTDataParallel(nn.DataParallel):
     def __init__(self, module, add_model_attributes=None,
                  default_model_methods=('get_loss', 'get_loss_eval', 'get_predictions'), **kwargs):
