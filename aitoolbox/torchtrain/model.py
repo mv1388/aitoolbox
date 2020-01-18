@@ -123,6 +123,29 @@ class TTBasicMultiGPUModel(TTBasicModel):
         return loss
 
 
+class TTMultiGPUModelWrap(TTBasicMultiGPUModel):
+    def __init__(self, model):
+        """Model wrapper optimizing the model for multi-GPU training by moving the loss calculation to the GPUs
+
+        Args:
+            model (TTModel): neural network model. The model should follow the basic PyTorch model definition where
+                the forward() function returns predictions
+        """
+        TTBasicMultiGPUModel.__init__(self)
+        if not isinstance(model, nn.Module):
+            raise TypeError(f'Provided model not inherited from nn.Module')
+
+        self.model = model
+
+    def forward(self, *input_data, targets=None, criterion=None):
+        predictions = self.model(*input_data)
+
+        if criterion is not None:
+            return criterion(predictions, targets)
+
+        return predictions
+
+
 class TTDataParallel(nn.DataParallel):
     def __init__(self, module, add_model_attributes=None,
                  default_model_methods=('get_loss', 'get_loss_eval', 'get_predictions'), **kwargs):
