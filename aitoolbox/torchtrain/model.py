@@ -125,14 +125,15 @@ class TTBasicMultiGPUModel(TTBasicModel):
 
 class TTMultiGPUModelWrap(TTBasicMultiGPUModel):
     def __init__(self, model):
-        """
+        """Model wrapper optimizing the model for multi-GPU training by moving the loss calculation to the GPUs
 
         Args:
-            model (TTModel):
+            model (TTModel): neural network model. The model should follow the basic PyTorch model definition where
+                the forward() function returns predictions
         """
         TTBasicMultiGPUModel.__init__(self)
-        if not isinstance(model, TTModel):
-            raise TypeError(f'Provided model not inherited from TTModel')
+        if not isinstance(model, nn.Module):
+            raise TypeError(f'Provided model not inherited from nn.Module')
 
         self.model = model
 
