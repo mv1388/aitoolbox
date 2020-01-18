@@ -142,8 +142,8 @@ class TTMultiGPUModelWrap(TTBasicMultiGPUModel):
 
         if criterion is not None:
             return criterion(predictions, targets)
-        else:
-            return predictions
+
+        return predictions
 
 
 class TTDataParallel(nn.DataParallel):
