@@ -19,5 +19,5 @@ def torch_cat_transf(predictions):
     return torch.cat(predictions)
 
 
-def not_list_torch_cat_transf(predictions):
-    return torch.cat(predictions) if not isinstance(predictions, list) else predictions
+def keep_list_transf(predictions):
+    return predictions
