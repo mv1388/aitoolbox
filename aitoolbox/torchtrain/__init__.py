@@ -1,4 +1,4 @@
-from aitoolbox.torchtrain.model import TTModel, TTDataParallel, ModelWrap
+from aitoolbox.torchtrain.model import TTModel, TTDataParallel, MultiGPUModelWrap, ModelWrap
 from aitoolbox.torchtrain.train_loop import TrainLoop, TrainLoopCheckpoint, TrainLoopEndSave, TrainLoopCheckpointEndSave
 from aitoolbox.torchtrain.data.batch_model_feed_defs import AbstractModelFeedDefinition
 

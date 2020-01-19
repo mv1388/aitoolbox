@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 import functools
 import torch.nn as nn
-from torch.nn.modules import Module
 
 from aitoolbox.utils.util import copy_function
 from aitoolbox.torchtrain.data.batch_model_feed_defs import AbstractModelFeedDefinition
@@ -203,12 +202,12 @@ class ModelWrap:
         ModelWrap can be used as a replacement of TTModel when using the TrainLoop.
 
         Args:
-            model (Module): neural network model
+            model (nn.Module): neural network model
             batch_model_feed_def (AbstractModelFeedDefinition or None): data
                 prep definition for batched data. This definition prepares the data for each batch that gets than fed
                 into the neural network.
         """
-        if not isinstance(model, Module):
+        if not isinstance(model, nn.Module):
             raise TypeError('Provided model is not inherited base PyTorch Module')
         if not isinstance(batch_model_feed_def, AbstractModelFeedDefinition):
             raise TypeError('Provided the base PyTorch model but did not give '
