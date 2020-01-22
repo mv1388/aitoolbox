@@ -36,6 +36,7 @@ function usage()
      -d, --dataset STR      dataset to be optionally downloaded from the S3 storage directly to ec2 instance
      -r, --preproc STR      the preprocessed version of the main dataset
      -x, --apex             switch on to install Nvidia Apex library for mixed precision training
+     -o, --os-name STR      username depending on the OS chosen. Default is ubuntu
      -h, --help             show this help message and exit
 
 HEREDOC
@@ -49,6 +50,7 @@ local_project_path=
 dataset_name=
 preproc_dataset=
 use_apex=false
+username="ubuntu"
 
 while [[ $# -gt 0 ]]; do
 key="$1"
@@ -86,6 +88,10 @@ case $key in
     use_apex=true
     shift 1 # past argument value
     ;;
+    -o|--os-name)
+    username="$2"
+    shift 2 # past argument value
+    ;;
     -h|--help )
     usage;
     exit;
@@ -114,15 +120,15 @@ else
 fi
 
 
-ssh -i "$key_path" ubuntu@"$ec2_instance_address" 'mkdir ~/project ; mkdir ~/project/data ; mkdir ~/project/model_results'
+ssh -i $key_path $username@$ec2_instance_address 'mkdir ~/project ; mkdir ~/project/data ; mkdir ~/project/model_results'
 
-scp -i $key_path ../../dist/aitoolbox-$AIToolbox_version.tar.gz  ubuntu@$ec2_instance_address:~/project
-scp -i $key_path download_data.sh  ubuntu@$ec2_instance_address:~/project
-scp -i $key_path run_experiment.sh  ubuntu@$ec2_instance_address:~/project
+scp -i $key_path ../../dist/aitoolbox-$AIToolbox_version.tar.gz  $username@$ec2_instance_address:~/project
+scp -i $key_path download_data.sh  $username@$ec2_instance_address:~/project
+scp -i $key_path run_experiment.sh  $username@$ec2_instance_address:~/project
 
 # Stuff for pyrouge package
-scp -i $key_path ../pyrouge_set_rouge_path ubuntu@$ec2_instance_address:~/project
-scp -i $key_path -r ../ROUGE-1.5.5 ubuntu@$ec2_instance_address:~/project
+scp -i $key_path ../pyrouge_set_rouge_path $username@$ec2_instance_address:~/project
+scp -i $key_path -r ../ROUGE-1.5.5 $username@$ec2_instance_address:~/project
 
 echo "#!/usr/bin/env bash
 
@@ -177,7 +183,7 @@ fi
 " > finish_prepare_instance.sh
 
 chmod u+x finish_prepare_instance.sh
-scp -i $key_path finish_prepare_instance.sh  ubuntu@$ec2_instance_address:~/.
+scp -i $key_path finish_prepare_instance.sh  $username@$ec2_instance_address:~/.
 rm finish_prepare_instance.sh
 
 if [ "$local_project_path" != '' ]; then
@@ -185,4 +191,4 @@ if [ "$local_project_path" != '' ]; then
     source $local_project_path/AWS_run_scripts/AWS_core_scripts/aws_project_upload.sh $key_path $ec2_instance_address "~/project" $local_project_path
 fi
 
-ssh -i $key_path ubuntu@$ec2_instance_address
+ssh -i $key_path $username@$ec2_instance_address
