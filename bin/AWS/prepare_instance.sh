@@ -114,15 +114,15 @@ else
 fi
 
 
-ssh -i "$key_path" ec2-user@"$ec2_instance_address" 'mkdir ~/project ; mkdir ~/project/data ; mkdir ~/project/model_results'
+ssh -i "$key_path" ubuntu@"$ec2_instance_address" 'mkdir ~/project ; mkdir ~/project/data ; mkdir ~/project/model_results'
 
-scp -i $key_path ../../dist/aitoolbox-$AIToolbox_version.tar.gz  ec2-user@$ec2_instance_address:~/project
-scp -i $key_path download_data.sh  ec2-user@$ec2_instance_address:~/project
-scp -i $key_path run_experiment.sh  ec2-user@$ec2_instance_address:~/project
+scp -i $key_path ../../dist/aitoolbox-$AIToolbox_version.tar.gz  ubuntu@$ec2_instance_address:~/project
+scp -i $key_path download_data.sh  ubuntu@$ec2_instance_address:~/project
+scp -i $key_path run_experiment.sh  ubuntu@$ec2_instance_address:~/project
 
 # Stuff for pyrouge package
-scp -i $key_path ../pyrouge_set_rouge_path ec2-user@$ec2_instance_address:~/project
-scp -i $key_path -r ../ROUGE-1.5.5 ec2-user@$ec2_instance_address:~/project
+scp -i $key_path ../pyrouge_set_rouge_path ubuntu@$ec2_instance_address:~/project
+scp -i $key_path -r ../ROUGE-1.5.5 ubuntu@$ec2_instance_address:~/project
 
 echo "#!/usr/bin/env bash
 
@@ -177,7 +177,7 @@ fi
 " > finish_prepare_instance.sh
 
 chmod u+x finish_prepare_instance.sh
-scp -i $key_path finish_prepare_instance.sh  ec2-user@$ec2_instance_address:~/.
+scp -i $key_path finish_prepare_instance.sh  ubuntu@$ec2_instance_address:~/.
 rm finish_prepare_instance.sh
 
 if [ "$local_project_path" != '' ]; then
@@ -185,4 +185,4 @@ if [ "$local_project_path" != '' ]; then
     source $local_project_path/AWS_run_scripts/AWS_core_scripts/aws_project_upload.sh $key_path $ec2_instance_address "~/project" $local_project_path
 fi
 
-ssh -i $key_path ec2-user@$ec2_instance_address
+ssh -i $key_path ubuntu@$ec2_instance_address
