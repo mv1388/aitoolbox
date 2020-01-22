@@ -14,6 +14,9 @@ function usage()
      -v, --version FLOAT    AIToolbox version to be installed on ec2
      -h, --help             show this help message and exit
 
+   optional arguments:
+     -o, --os-name STR      username depending on the OS chosen. Default is ubuntu
+
 HEREDOC
 }
 
@@ -21,6 +24,7 @@ key_path=
 ec2_instance_address=
 DL_framework="pytorch"
 AIToolbox_version="0.3"
+username="ubuntu"
 
 while [[ $# -gt 0 ]]; do
 key="$1"
@@ -40,6 +44,10 @@ case $key in
     ;;
     -v|--version)
     AIToolbox_version="$2"
+    shift 2 # past argument value
+    ;;
+    -o|--os-name)
+    username="$2"
     shift 2 # past argument value
     ;;
     -h|--help )
@@ -70,6 +78,6 @@ else
 fi
 
 
-scp -i $key_path ../../dist/aitoolbox-$AIToolbox_version.tar.gz  ec2-user@$ec2_instance_address:~/project
+scp -i $key_path ../../dist/aitoolbox-$AIToolbox_version.tar.gz  $username@$ec2_instance_address:~/project
 
-ssh -i $key_path ec2-user@$ec2_instance_address "source activate $py_env ; pip uninstall aitoolbox ; pip install ~/project/aitoolbox-$AIToolbox_version.tar.gz"
+ssh -i $key_path $username@$ec2_instance_address "source activate $py_env ; pip uninstall aitoolbox ; pip install ~/project/aitoolbox-$AIToolbox_version.tar.gz"
