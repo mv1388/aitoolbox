@@ -266,3 +266,35 @@ class HotpotQADatasetFetcher(AbstractDatasetFetcher, BaseDataLoader):
             self.load_file(cloud_file_path='HotpotQA/HotpotQA.zip',
                            local_file_path=hotpotqa_local_file_path)
             file_system.unzip_file(hotpotqa_local_file_path, hotpotqa_local_folder_path)
+
+
+class TriviaQADatasetFetcher(AbstractDatasetFetcher, BaseDataLoader):
+    def __init__(self, bucket_name='dataset-store', local_dataset_folder_path='~/project/data'):
+        """
+
+        Args:
+            bucket_name (str):
+            local_dataset_folder_path (str):
+        """
+        BaseDataLoader.__init__(self, bucket_name, local_dataset_folder_path)
+
+    def fetch_dataset(self, protect_local_folder=True):
+        """
+
+        Args:
+            protect_local_folder (bool):
+
+        Returns:
+            None
+        """
+        if not self.exists_local_data_folder('TriviaQA', protect_local_folder):
+            rc_local_folder_path = os.path.join(self.local_base_data_folder_path, 'TriviaQA')
+            unfiltered_local_folder_path = os.path.join(self.local_base_data_folder_path, 'TriviaQA')
+            rc_local_file_path = os.path.join(rc_local_folder_path, 'triviaqa-rc.tar.gz')
+            unfiltered_local_file_path = os.path.join(unfiltered_local_folder_path, 'triviaqa-unfiltered.tar.gz')
+            self.load_file(cloud_file_path='TriviaQA/triviaqa-rc.tar.gz',
+                           local_file_path=rc_local_file_path)
+            self.load_file(cloud_file_path='TriviaQA/triviaqa-unfiltered.tar.gz',
+                           local_file_path=unfiltered_local_file_path)
+            file_system.unzip_file(rc_local_file_path, rc_local_folder_path)
+            file_system.unzip_file(unfiltered_local_file_path, unfiltered_local_folder_path)

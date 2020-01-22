@@ -126,6 +126,32 @@ function download_HotpotQA {
     unzip $download_path/HotpotQA/HotpotQA.zip -d $download_path/HotpotQA/
 }
 
+function download_TriviaQA {
+    local download_path=$1
+    local preproc_dataset=$2
+
+    if [ $preproc_dataset == "orig" ]; then
+        echo Downloading both original TriviaQA datsets: RC and unfiltered
+        echo "Location: $download_path"
+        aws s3 cp s3://dataset-store/TriviaQA $download_path/TriviaQA --recursive
+        tar xvf $download_path/TriviaQA/triviaqa-rc.tar.gz -C $download_path/TriviaQA/
+        tar xvf $download_path/TriviaQA/triviaqa-unfiltered.tar.gz -C $download_path/TriviaQA/
+
+    elif [ $preproc_dataset == "rc-orig" ]; then
+        echo Downloading only original TriviaQA RC dataset
+        echo "Location: $download_path"
+        aws s3 cp s3://dataset-store/TriviaQA/triviaqa-rc.tar.gz $download_path/TriviaQA/triviaqa-rc.tar.gz
+        tar xvf $download_path/TriviaQA/triviaqa-rc.tar.gz -C $download_path/TriviaQA/
+    elif [ $preproc_dataset == "unfiltered-orig" ]; then
+        echo Downloading only original TriviaQA unfiltered dataset
+        echo "Location: $download_path"
+        aws s3 cp s3://dataset-store/TriviaQA/triviaqa-unfiltered.tar.gz $download_path/TriviaQA/triviaqa-unfiltered.tar.gz
+        tar xvf $download_path/TriviaQA/triviaqa-unfiltered.tar.gz -C $download_path/TriviaQA/
+    else
+        echo Did not find specified preprocessed dataset. Nothing will be downloaded
+    fi
+}
+
 function download_glove {
     local download_path=$1
     local preproc_dataset=$2
@@ -167,6 +193,9 @@ elif [ $dataset_name == "qangaroo" ]; then
 
 elif [ $dataset_name == "HotpotQA" ]; then
     download_HotpotQA $download_path
+
+elif [ $dataset_name == "TriviaQA" ]; then
+    download_TriviaQA $download_path $preproc_dataset
 
 elif [ $dataset_name == "glove" ]; then
     download_glove $download_path $preproc_dataset
