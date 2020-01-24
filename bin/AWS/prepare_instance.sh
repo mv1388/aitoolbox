@@ -143,13 +143,12 @@ cd project
 
 source activate $py_env
 
+pip install -U boto3
+pip install awscli
+pip install -U numpy
 pip install --ignore-installed greenlet
-
-#pip install -U boto3
-#pip install awscl
-#pip install -U numpy
-#conda install -y -c conda-forge jsonnet
-#conda install -y -c anaconda seaborn=0.9.0
+conda install -y -c conda-forge jsonnet
+conda install -y -c anaconda seaborn=0.9.0
 
 if [ $use_apex == true ]; then
     git clone https://github.com/NVIDIA/apex
