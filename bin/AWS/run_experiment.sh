@@ -15,7 +15,7 @@ source $project_root_path/AWS_run_scripts/AWS_core_scripts/aws_run_experiments_p
 
 if [[ "$terminate_cmd" == "-t"  || "$terminate_cmd" == "--terminate" ]]; then
     echo Terminating the instance
-    aws_instance_id=$(ec2-metadata --instance-id | cut -d " " -f 2)
+    aws_instance_id=$(ec2metadata --instance-id | cut -d " " -f 2)
 
     aws ec2 terminate-instances --instance-ids $aws_instance_id
 fi
