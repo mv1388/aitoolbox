@@ -99,10 +99,11 @@ class BaseDataLoader:
 
 class AbstractDatasetFetcher(ABC):
     @abstractmethod
-    def fetch_dataset(self, protect_local_folder=True):
+    def fetch_dataset(self, dataset_name=None, protect_local_folder=True):
         """
 
         Args:
+            dataset_name (str or None):
             protect_local_folder (bool):
 
         Returns:
@@ -121,10 +122,11 @@ class SQuAD2DatasetFetcher(AbstractDatasetFetcher, BaseDataLoader):
         """
         BaseDataLoader.__init__(self, bucket_name, local_dataset_folder_path)
 
-    def fetch_dataset(self, protect_local_folder=True):
+    def fetch_dataset(self, dataset_name=None, protect_local_folder=True):
         """
 
         Args:
+            dataset_name (None): no effect here
             protect_local_folder (bool):
 
         Returns:
@@ -192,10 +194,11 @@ class CNNDailyMailDatasetFetcher(AbstractDatasetFetcher, BaseDataLoader):
         BaseDataLoader.__init__(self, bucket_name, local_dataset_folder_path)
         self.available_prepocessed_datasets = ['abisee', 'danqi']
 
-    def fetch_dataset(self, protect_local_folder=True):
+    def fetch_dataset(self, dataset_name=None, protect_local_folder=True):
         """
 
         Args:
+            dataset_name (None): no effect here
             protect_local_folder (bool):
 
         Returns:
@@ -263,10 +266,11 @@ class HotpotQADatasetFetcher(AbstractDatasetFetcher, BaseDataLoader):
         """
         BaseDataLoader.__init__(self, bucket_name, local_dataset_folder_path)
 
-    def fetch_dataset(self, protect_local_folder=True):
+    def fetch_dataset(self, dataset_name=None, protect_local_folder=True):
         """
 
         Args:
+            dataset_name (None): no effect here
             protect_local_folder (bool):
 
         Returns:

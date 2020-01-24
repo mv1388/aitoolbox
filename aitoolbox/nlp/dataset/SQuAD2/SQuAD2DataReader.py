@@ -32,7 +32,7 @@ def get_dataset_local_copy(local_dataset_folder_path, protect_local_folder=True)
     """
     dataset_fetcher = SQuAD2DatasetFetcher(bucket_name='dataset-store',
                                            local_dataset_folder_path=local_dataset_folder_path)
-    dataset_fetcher.fetch_dataset(protect_local_folder)
+    dataset_fetcher.fetch_dataset(protect_local_folder=protect_local_folder)
 
 
 class SQuAD2ConcatContextDatasetReader:
