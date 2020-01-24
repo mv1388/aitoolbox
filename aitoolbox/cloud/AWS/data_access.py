@@ -147,26 +147,38 @@ class QAngarooDatasetFetcher(AbstractDatasetFetcher, BaseDataLoader):
         """
         BaseDataLoader.__init__(self, bucket_name, local_dataset_folder_path)
 
-    def fetch_dataset(self, protect_local_folder=True):
+    def fetch_dataset(self, dataset_name=None, protect_local_folder=True):
         """
 
         Args:
+            dataset_name (str or None): possible options: medhop, wikihop or None
             protect_local_folder (bool):
 
         Returns:
             None
         """
         if not self.exists_local_data_folder('qangaroo_v1', protect_local_folder):
-            medhop_local_folder_path = os.path.join(self.local_base_data_folder_path, 'qangaroo_v1')
-            wikihop_local_folder_path = os.path.join(self.local_base_data_folder_path, 'qangaroo_v1')
-            medhop_local_file_path = os.path.join(medhop_local_folder_path, 'medhop.zip')
-            wikihop_local_file_path = os.path.join(wikihop_local_folder_path, 'wikihop.zip')
-            self.load_file(cloud_file_path='qangaroo_v1/medhop.zip',
-                           local_file_path=medhop_local_file_path)
-            self.load_file(cloud_file_path='qangaroo_v1/wikihop.zip',
-                           local_file_path=wikihop_local_file_path)
-            file_system.unzip_file(medhop_local_file_path, medhop_local_folder_path)
-            file_system.unzip_file(wikihop_local_file_path, wikihop_local_folder_path)
+            if dataset_name == 'medhop':
+                self._fetch_medhop()
+            elif dataset_name == 'wikihop':
+                self._fetch_wikihop()
+            else:
+                self._fetch_medhop()
+                self._fetch_wikihop()
+
+    def _fetch_medhop(self):
+        medhop_local_folder_path = os.path.join(self.local_base_data_folder_path, 'qangaroo_v1')
+        medhop_local_file_path = os.path.join(medhop_local_folder_path, 'medhop.zip')
+        self.load_file(cloud_file_path='qangaroo_v1/medhop.zip',
+                       local_file_path=medhop_local_file_path)
+        file_system.unzip_file(medhop_local_file_path, medhop_local_folder_path)
+
+    def _fetch_wikihop(self):
+        wikihop_local_folder_path = os.path.join(self.local_base_data_folder_path, 'qangaroo_v1')
+        wikihop_local_file_path = os.path.join(wikihop_local_folder_path, 'wikihop.zip')
+        self.load_file(cloud_file_path='qangaroo_v1/wikihop.zip',
+                       local_file_path=wikihop_local_file_path)
+        file_system.unzip_file(wikihop_local_file_path, wikihop_local_folder_path)
 
 
 class CNNDailyMailDatasetFetcher(AbstractDatasetFetcher, BaseDataLoader):
@@ -278,23 +290,35 @@ class TriviaQADatasetFetcher(AbstractDatasetFetcher, BaseDataLoader):
         """
         BaseDataLoader.__init__(self, bucket_name, local_dataset_folder_path)
 
-    def fetch_dataset(self, protect_local_folder=True):
+    def fetch_dataset(self, dataset_name=None, protect_local_folder=True):
         """
 
         Args:
+            dataset_name (str or None): possible options: rc, unfiltered or None
             protect_local_folder (bool):
 
         Returns:
             None
         """
         if not self.exists_local_data_folder('TriviaQA', protect_local_folder):
-            rc_local_folder_path = os.path.join(self.local_base_data_folder_path, 'TriviaQA')
-            unfiltered_local_folder_path = os.path.join(self.local_base_data_folder_path, 'TriviaQA')
-            rc_local_file_path = os.path.join(rc_local_folder_path, 'triviaqa-rc.tar.gz')
-            unfiltered_local_file_path = os.path.join(unfiltered_local_folder_path, 'triviaqa-unfiltered.tar.gz')
-            self.load_file(cloud_file_path='TriviaQA/triviaqa-rc.tar.gz',
-                           local_file_path=rc_local_file_path)
-            self.load_file(cloud_file_path='TriviaQA/triviaqa-unfiltered.tar.gz',
-                           local_file_path=unfiltered_local_file_path)
-            file_system.unzip_file(rc_local_file_path, rc_local_folder_path)
-            file_system.unzip_file(unfiltered_local_file_path, unfiltered_local_folder_path)
+            if dataset_name == 'rc':
+                self._fetch_rc()
+            elif dataset_name == 'unfiltered':
+                self._fetch_unfiltered()
+            else:
+                self._fetch_rc()
+                self._fetch_unfiltered()
+
+    def _fetch_rc(self):
+        rc_local_folder_path = os.path.join(self.local_base_data_folder_path, 'TriviaQA')
+        rc_local_file_path = os.path.join(rc_local_folder_path, 'triviaqa-rc.tar.gz')
+        self.load_file(cloud_file_path='TriviaQA/triviaqa-rc.tar.gz',
+                       local_file_path=rc_local_file_path)
+        file_system.unzip_file(rc_local_file_path, rc_local_folder_path)
+
+    def _fetch_unfiltered(self):
+        unfiltered_local_folder_path = os.path.join(self.local_base_data_folder_path, 'TriviaQA')
+        unfiltered_local_file_path = os.path.join(unfiltered_local_folder_path, 'triviaqa-unfiltered.tar.gz')
+        self.load_file(cloud_file_path='TriviaQA/triviaqa-unfiltered.tar.gz',
+                       local_file_path=unfiltered_local_file_path)
+        file_system.unzip_file(unfiltered_local_file_path, unfiltered_local_folder_path)
