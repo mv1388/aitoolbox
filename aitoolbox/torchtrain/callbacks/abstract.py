@@ -135,6 +135,8 @@ class AbstractExperimentCallback(AbstractCallback):
         self.experiment_name = None
         self.local_model_result_folder_path = None
 
+        # Not set to None as the experiment details above because None value is reserved to indicate only local saving
+        # and no cloud saving.
         # self.cloud_save_mode = 's3'
         # self.bucket_name = 'model-result'
         # self.cloud_dir_prefix = ''
