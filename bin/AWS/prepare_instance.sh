@@ -141,6 +141,7 @@ echo "#!/usr/bin/env bash
 export LANGUAGE=en_US.UTF-8
 export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
+export AWS_DEFAULT_REGION=eu-west-1
 
 #echo Ireland AWS zone: eu-west-1
 

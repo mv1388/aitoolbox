@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# Example how to run:
+# ./submit_job.sh -k <SSH_KEY_LOCATION> -p ~/PycharmProjects/QANet -d SQuAD2 -r orig
+
+#######################
+
 # usage function
 function usage()
 {
@@ -8,20 +13,20 @@ function usage()
    Usage: ./submit_job.sh [--key STR] [--project STR] ...
 
    arguments:
-     -k, --key STR            path to ssh key
-     -p, --project STR        path to the project to be optionally uploaded to the running ec2 instance
+     -k, --key STR                  path to ssh key
+     -p, --project STR              path to the project to be optionally uploaded to the running ec2 instance
 
    optional arguments:
-     -d, --dataset STR        dataset to be optionally downloaded from the S3 storage directly to ec2 instance
-     -r, --preproc STR        the preprocessed version of the main dataset
-     -f, --framework STR      desired deep learning framework
-     -v, --version FLOAT      AIToolbox version to be installed on ec2
-     -e, --experiment-script  name of the experiment bash script to be executed in order to start the training
-     -x, --apex               switch on to install Nvidia Apex library for mixed precision training
-     -o, --os-name STR        username depending on the OS chosen. Default is ubuntu
-     -t, --terminate          the instance will be terminated when training is done
-     -s, --ssh-start          automatically ssh into the instance when the training starts
-     -h, --help               show this help message and exit
+     -d, --dataset STR              dataset to be optionally downloaded from the S3 storage directly to ec2 instance
+     -r, --preproc STR              the preprocessed version of the main dataset
+     -f, --framework STR            desired deep learning framework
+     -v, --version FLOAT            AIToolbox version to be installed on ec2
+     -e, --experiment-script STR    name of the experiment bash script to be executed in order to start the training
+     -x, --apex                     switch on to install Nvidia Apex library for mixed precision training
+     -o, --os-name STR              username depending on the OS chosen. Default is ubuntu
+     -t, --terminate                the instance will be terminated when training is done
+     -s, --ssh-start                automatically ssh into the instance when the training starts
+     -h, --help                     show this help message and exit
 
 HEREDOC
 }
