@@ -5,7 +5,7 @@ function usage()
 {
    cat << HEREDOC
 
-   Usage: ./submit_job [--key STR] [--address STR] [--project STR] ...
+   Usage: ./submit_job.sh [--key STR] [--project STR] ...
 
    arguments:
      -k, --key STR          path to ssh key
@@ -145,5 +145,5 @@ ssh -i $key_path $username@$ec2_instance_address \
 echo "Instance IP: $ec2_instance_address"
 
 if [ $ssh_at_start == true ]; then
-    ssh -i $key_path $username@$ec2_instance_address -t "tmux a -t training"
+    ./ssh_to_instance.sh $key_path $ec2_instance_address --os-name $username --ssh-tmux
 fi
