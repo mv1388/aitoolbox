@@ -23,15 +23,15 @@ function usage()
 {
    cat << HEREDOC
 
-   Usage: $prepare_instance [--key STR] [--address STR] [--project STR] ...
+   Usage: $prepare_instance [--address STR] [--project STR] ...
 
    arguments:
-     -k, --key STR          path to ssh key
      -a, --address STR      ec2 instance Public DNS address
      -f, --framework STR    desired deep learning framework
      -v, --version FLOAT    AIToolbox version to be installed on ec2
 
    optional arguments:
+     -k, --key STR          path to ssh key
      -p, --project STR      path to the project to be optionally uploaded to the running ec2 instance
      -d, --dataset STR      dataset to be optionally downloaded from the S3 storage directly to ec2 instance
      -r, --preproc STR      the preprocessed version of the main dataset
@@ -43,7 +43,7 @@ function usage()
 HEREDOC
 }
 
-key_path=
+key_path=$(jq -r '.key_path' configs/my_config.json)
 ec2_instance_address=
 DL_framework="pytorch"
 AIToolbox_version="0.3"

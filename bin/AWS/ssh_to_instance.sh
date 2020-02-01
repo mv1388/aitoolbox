@@ -1,22 +1,20 @@
 #!/usr/bin/env bash
 
-key_path=$1
 ec2_instance_address=$2
-shift 2
-
+shift 1
 
 # usage function
 function usage()
 {
    cat << HEREDOC
 
-   Usage: $ssh_to_instance <SSH_KEY_LOCATION> <INSTANCE_IP_ADDRESS>  (optional: [--ssh-tmux] [--os-name ubuntu])
+   Usage: $ssh_to_instance <INSTANCE_IP_ADDRESS>  (optional: [--key <SSH_KEY_LOCATION>] [--ssh-tmux] [--os-name ubuntu])
 
    arguments:
-     <SSH_KEY_LOCATION>     path to ssh key
      <INSTANCE_IP_ADDRESS>  ec2 instance Public DNS address
 
    optional arguments:
+     -k, --key STR          path to ssh key
      -s, --ssh-tmux         if turned on attach to the running tmux session
      -o, --os-name STR      username depending on the OS chosen. Default is ubuntu
      -h, --help             show this help message and exit
@@ -24,6 +22,7 @@ function usage()
 HEREDOC
 }
 
+key_path=$(jq -r '.key_path' configs/my_config.json)
 username="ubuntu"
 ssh_to_tmux=false
 
@@ -31,7 +30,11 @@ while [[ $# -gt 0 ]]; do
 key="$1"
 
 case $key in
-     -o|--os-name)
+    -k|--key)
+    key_path="$2"
+    shift 2 # past argument value
+    ;;
+    -o|--os-name)
     username="$2"
     shift 2 # past argument value
     ;;

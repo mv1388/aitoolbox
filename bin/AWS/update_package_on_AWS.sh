@@ -5,22 +5,22 @@ function usage()
 {
    cat << HEREDOC
 
-   Usage: $update_package_on_AWS [--key STR] [--address STR] [--framework STR] [--version FLOAT]
+   Usage: $update_package_on_AWS [--address STR] [--framework STR] [--version FLOAT]
 
    arguments:
-     -k, --key STR          path to ssh key
      -a, --address STR      ec2 instance Public DNS address
      -f, --framework STR    desired deep learning framework
      -v, --version FLOAT    AIToolbox version to be installed on ec2
      -h, --help             show this help message and exit
 
    optional arguments:
+     -k, --key STR          path to ssh key
      -o, --os-name STR      username depending on the OS chosen. Default is ubuntu
 
 HEREDOC
 }
 
-key_path=
+key_path=$(jq -r '.key_path' configs/my_config.json)
 ec2_instance_address=
 DL_framework="pytorch"
 AIToolbox_version="0.3"
