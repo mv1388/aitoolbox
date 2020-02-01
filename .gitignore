@@ -6,3 +6,5 @@
 
 /aitoolbox.egg-info
 .mypy_cache
+
+/bin/AWS/configs

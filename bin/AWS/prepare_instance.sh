@@ -37,6 +37,7 @@ function usage()
      -r, --preproc STR      the preprocessed version of the main dataset
      -x, --apex             switch on to install Nvidia Apex library for mixed precision training
      -o, --os-name STR      username depending on the OS chosen. Default is ubuntu
+     --no-ssh               disable auto ssh-ing to the instance
      -h, --help             show this help message and exit
 
 HEREDOC
@@ -51,6 +52,7 @@ dataset_name=
 preproc_dataset=
 use_apex=false
 username="ubuntu"
+auto_ssh_to_instance=true
 
 while [[ $# -gt 0 ]]; do
 key="$1"
@@ -92,6 +94,10 @@ case $key in
     username="$2"
     shift 2 # past argument value
     ;;
+    --no-ssh)
+    auto_ssh_to_instance=false
+    shift 1 # past argument value
+    ;;
     -h|--help )
     usage;
     exit;
@@ -120,7 +126,7 @@ else
 fi
 
 
-ssh -i $key_path $username@$ec2_instance_address 'mkdir ~/project ; mkdir ~/project/data ; mkdir ~/project/model_results'
+ssh -i $key_path -o "StrictHostKeyChecking no" $username@$ec2_instance_address 'mkdir ~/project ; mkdir ~/project/data ; mkdir ~/project/model_results'
 
 scp -i $key_path ../../dist/aitoolbox-$AIToolbox_version.tar.gz  $username@$ec2_instance_address:~/project
 scp -i $key_path download_data.sh  $username@$ec2_instance_address:~/project
@@ -136,9 +142,9 @@ export LANGUAGE=en_US.UTF-8
 export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
 
-echo Ireland AWS zone: eu-west-1
+#echo Ireland AWS zone: eu-west-1
 
-aws configure
+#aws configure
 cd project
 
 source activate $py_env
@@ -192,4 +198,6 @@ if [ "$local_project_path" != '' ]; then
     source $local_project_path/AWS_run_scripts/AWS_core_scripts/aws_project_upload.sh $key_path $ec2_instance_address "~/project" $local_project_path
 fi
 
-ssh -i $key_path $username@$ec2_instance_address
+if [ $auto_ssh_to_instance == true ]; then
+    ssh -i $key_path $username@$ec2_instance_address
+fi
