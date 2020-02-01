@@ -21,6 +21,8 @@ function usage()
      -r, --preproc STR              the preprocessed version of the main dataset
      -f, --framework STR            desired deep learning framework
      -v, --version FLOAT            AIToolbox version to be installed on ec2
+     -i, --instance-config STR      instance configuration json filename
+     --instance-type STR            instance type label; if this is provided the value from --instance-config is ignored
      -e, --experiment-script STR    name of the experiment bash script to be executed in order to start the training
      -x, --apex                     switch on to install Nvidia Apex library for mixed precision training
      -o, --os-name STR              username depending on the OS chosen. Default is ubuntu
@@ -37,6 +39,8 @@ dataset_name=
 preproc_dataset=
 DL_framework="pytorch"
 AIToolbox_version="0.3"
+instance_config="config_p2_xlarge.json"
+instance_type=
 experiment_script_file="aws_run_experiments_project.sh"
 use_apex=false
 username="ubuntu"
@@ -69,6 +73,14 @@ case $key in
     ;;
     -v|--version)
     AIToolbox_version="$2"
+    shift 2 # past argument value
+    ;;
+    -i|--instance-config)
+    instance_config="$2"
+    shift 2 # past argument value
+    ;;
+    --instance-type)
+    instance_type="$2"
     shift 2 # past argument value
     ;;
     -e|--experiment-script)
@@ -127,12 +139,16 @@ if [ "$terminate_cmd" == true ]; then
     terminate_setting="--terminate"
 fi
 
+if [[ "$instance_type" != "" ]]; then
+    instance_config=config_$(tr . _ <<< $instance_type).json
+fi
+
 
 #############################
 # Instance creation
 #############################
 echo "Creating spot request"
-request_id=$(aws ec2 request-spot-instances --launch-specification file://configs/config_spec.json --query 'SpotInstanceRequests[0].SpotInstanceRequestId' --output text)
+request_id=$(aws ec2 request-spot-instances --launch-specification file://configs/$instance_config --query 'SpotInstanceRequests[0].SpotInstanceRequestId' --output text)
 aws ec2 wait spot-instance-request-fulfilled --spot-instance-request-ids $request_id
 
 echo "Waiting for instance create"
