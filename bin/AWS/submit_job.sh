@@ -9,11 +9,11 @@ function usage()
 
    arguments:
      -k, --key STR          path to ssh key
-     -f, --framework STR    desired deep learning framework
-     -v, --version FLOAT    AIToolbox version to be installed on ec2
+     -p, --project STR      path to the project to be optionally uploaded to the running ec2 instance
 
    optional arguments:
-     -p, --project STR      path to the project to be optionally uploaded to the running ec2 instance
+     -f, --framework STR    desired deep learning framework
+     -v, --version FLOAT    AIToolbox version to be installed on ec2
      -d, --dataset STR      dataset to be optionally downloaded from the S3 storage directly to ec2 instance
      -r, --preproc STR      the preprocessed version of the main dataset
      -x, --apex             switch on to install Nvidia Apex library for mixed precision training
@@ -92,7 +92,7 @@ case $key in
 esac
 done
 
-if [ "$key_path" == "" ] || [ "$DL_framework" == "" ] || [ "$AIToolbox_version" == "" ]; then
+if [ "$key_path" == "" ] || [ "$local_project_path" == "" ]; then
     echo "Not provided required parameters"
     usage
     exit
