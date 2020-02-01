@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-ec2_instance_address=$2
+ec2_instance_address=$1
 shift 1
 
 # usage function
