@@ -10,13 +10,13 @@ function usage()
 {
    cat << HEREDOC
 
-   Usage: ./submit_job.sh [--key STR] [--project STR] ...
+   Usage: ./submit_job.sh [--project STR] ...
 
    arguments:
-     -k, --key STR                  path to ssh key
      -p, --project STR              path to the project to be optionally uploaded to the running ec2 instance
 
    optional arguments:
+     -k, --key STR                  path to ssh key
      -d, --dataset STR              dataset to be optionally downloaded from the S3 storage directly to ec2 instance
      -r, --preproc STR              the preprocessed version of the main dataset
      -f, --framework STR            desired deep learning framework
@@ -33,7 +33,7 @@ function usage()
 HEREDOC
 }
 
-key_path=
+key_path=$(jq -r '.key_path' configs/my_config.json)
 local_project_path=
 dataset_name=
 preproc_dataset=

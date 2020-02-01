@@ -5,18 +5,20 @@ function usage()
 {
    cat << HEREDOC
 
-   Usage: $update_experiments_on_AWS [--key STR] [--address STR] [--project STR]
+   Usage: $update_experiments_on_AWS [--address STR] [--project STR]
 
    arguments:
-     -k, --key STR          path to ssh key
      -a, --address STR      ec2 instance Public DNS address
      -p, --project STR      path to the project to be optionally uploaded to the running ec2 instance
      -h, --help             show this help message and exit
 
+   optional arguments:
+     -k, --key STR          path to ssh key
+
 HEREDOC
 }
 
-key_path=
+key_path=$(jq -r '.key_path' configs/my_config.json)
 ec2_instance_address=
 local_project_path=
 
