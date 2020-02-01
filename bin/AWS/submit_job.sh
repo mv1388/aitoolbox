@@ -8,29 +8,31 @@ function usage()
    Usage: ./submit_job.sh [--key STR] [--project STR] ...
 
    arguments:
-     -k, --key STR          path to ssh key
-     -p, --project STR      path to the project to be optionally uploaded to the running ec2 instance
+     -k, --key STR            path to ssh key
+     -p, --project STR        path to the project to be optionally uploaded to the running ec2 instance
 
    optional arguments:
-     -f, --framework STR    desired deep learning framework
-     -v, --version FLOAT    AIToolbox version to be installed on ec2
-     -d, --dataset STR      dataset to be optionally downloaded from the S3 storage directly to ec2 instance
-     -r, --preproc STR      the preprocessed version of the main dataset
-     -x, --apex             switch on to install Nvidia Apex library for mixed precision training
-     -o, --os-name STR      username depending on the OS chosen. Default is ubuntu
-     -t, --terminate        the instance will be terminated when training is done
-     -s, --ssh-start        automatically ssh into the instance when the training starts
-     -h, --help             show this help message and exit
+     -d, --dataset STR        dataset to be optionally downloaded from the S3 storage directly to ec2 instance
+     -r, --preproc STR        the preprocessed version of the main dataset
+     -f, --framework STR      desired deep learning framework
+     -v, --version FLOAT      AIToolbox version to be installed on ec2
+     -e, --experiment-script  name of the experiment bash script to be executed in order to start the training
+     -x, --apex               switch on to install Nvidia Apex library for mixed precision training
+     -o, --os-name STR        username depending on the OS chosen. Default is ubuntu
+     -t, --terminate          the instance will be terminated when training is done
+     -s, --ssh-start          automatically ssh into the instance when the training starts
+     -h, --help               show this help message and exit
 
 HEREDOC
 }
 
 key_path=
-DL_framework="pytorch"
-AIToolbox_version="0.3"
 local_project_path=
 dataset_name=
 preproc_dataset=
+DL_framework="pytorch"
+AIToolbox_version="0.3"
+experiment_script_file="aws_run_experiments_project.sh"
 use_apex=false
 username="ubuntu"
 terminate_cmd=false
@@ -44,14 +46,6 @@ case $key in
     key_path="$2"
     shift 2 # past argument value
     ;;
-    -f|--framework)
-    DL_framework="$2"
-    shift 2 # past argument value
-    ;;
-    -v|--version)
-    AIToolbox_version="$2"
-    shift 2 # past argument value
-    ;;
     -p|--project)
     local_project_path="$2"
     shift 2 # past argument value
@@ -62,6 +56,18 @@ case $key in
     ;;
     -r|--preproc)
     preproc_dataset="$2"
+    shift 2 # past argument value
+    ;;
+    -f|--framework)
+    DL_framework="$2"
+    shift 2 # past argument value
+    ;;
+    -v|--version)
+    AIToolbox_version="$2"
+    shift 2 # past argument value
+    ;;
+    -e|--experiment-script)
+    experiment_script_file="$2"
     shift 2 # past argument value
     ;;
     -x|--apex)
@@ -140,7 +146,7 @@ echo "Preparing instance"
 
 echo "Running the job"
 ssh -i $key_path $username@$ec2_instance_address \
-    "./finish_prepare_instance.sh ; source activate $py_env ; cd project ; tmux new-session -d -s 'training' ./run_experiment.sh $terminate_setting"
+    "./finish_prepare_instance.sh ; source activate $py_env ; cd project ; tmux new-session -d -s 'training' ./run_experiment.sh $terminate_setting --experiment-script $experiment_script_file"
 
 echo "Instance IP: $ec2_instance_address"
 

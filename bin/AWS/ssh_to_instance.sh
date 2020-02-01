@@ -15,6 +15,8 @@ function usage()
    arguments:
      <SSH_KEY_LOCATION>     path to ssh key
      <INSTANCE_IP_ADDRESS>  ec2 instance Public DNS address
+
+   optional arguments:
      -s, --ssh-tmux         if turned on attach to the running tmux session
      -o, --os-name STR      username depending on the OS chosen. Default is ubuntu
      -h, --help             show this help message and exit
