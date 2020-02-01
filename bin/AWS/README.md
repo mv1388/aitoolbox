@@ -1,5 +1,26 @@
 # AWS scripts
 
+
+## All-in-one training job submission
+
+To easily create a training job on the EC2 instance use the [submit_job.sh](submit_job.sh) script.
+
+This is an all-in-one solution which first creates the spot instance, initializes it with 
+the bootstrapping procedure and finally executes the training job on the instance.
+
+The training automatically runs inside a `tmux` session so that the user can ssh into and disconnect
+from the instance without breaking the training run.
+
+An example of `submit_job.sh` call:
+
+```bash
+./submit_job.sh -k <SSH_KEY_LOCATION> -p ~/PycharmProjects/QANet -d SQuAD2 -r orig
+```
+
+There are further parameters of the script the user can specify. 
+For further info about these execute `--help` option when calling the script.
+
+
 ## Instance preparation
 
 Main script for preparing the instance after it has been created via web console: 

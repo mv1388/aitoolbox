@@ -6,6 +6,7 @@
 
 project_root_path=~/project
 export PYTHONPATH=${PYTHONPATH}:$project_root_path
+export AWS_DEFAULT_REGION=eu-west-1
 
 # usage function
 function usage()
