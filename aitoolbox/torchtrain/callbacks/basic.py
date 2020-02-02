@@ -265,8 +265,7 @@ class LogUpload(AbstractExperimentCallback):
             if self.fail_if_cloud_missing:
                 raise ValueError("Cloud saving not supported. Produced logs can potentially get los in the case of "
                                  "instance termination.")
-            else:
-                print("Cloud saving not supported. Produced logs can potentially get los in the case of instance termination.")
+            print("Cloud saving not supported. Produced logs can potentially get los in the case of instance termination.")
 
     def on_epoch_end(self):
         self.upload_log_file()
