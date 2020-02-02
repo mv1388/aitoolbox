@@ -1,8 +1,11 @@
+import os
 import numpy as np
 
-from aitoolbox.torchtrain.callbacks.abstract import AbstractCallback
+from aitoolbox.torchtrain.callbacks.abstract import AbstractCallback, AbstractExperimentCallback
 from aitoolbox.utils import util
 from aitoolbox.cloud.AWS.simple_email_service import SESSender
+from aitoolbox.cloud.AWS.results_save import BaseResultsSaver
+from aitoolbox.cloud.GoogleCloud.results_save import BaseResultsGoogleStorageSaver
 
 
 class ListRegisteredCallbacks(AbstractCallback):
@@ -210,6 +213,76 @@ class EmailNotification(AbstractCallback):
             raise AttributeError('Currently used TrainLoop does not support automatic project folder structure '
                                  'creation. Project name, etc. thus can not be automatically deduced. Please provide'
                                  'it in the callback parameters instead of currently used None values.')
+
+
+class LogUpload(AbstractExperimentCallback):
+    def __init__(self, log_file_path='~/project/training.log', fail_if_cloud_missing=True,
+                 project_name=None, experiment_name=None, local_model_result_folder_path=None,
+                 cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix=''):
+        """Upload logging file to the cloud storage
+
+        Uploading happens after each epoch and at the end of the training process.
+
+        Args:
+            log_file_path (str): path to the local logging file
+            fail_if_cloud_missing (bool): should throw the exception if cloud saving is not available
+            project_name (str or None): root name of the project
+            experiment_name (str or None): name of the particular experiment
+            local_model_result_folder_path (str or None): root local path where project folder will be created
+            cloud_save_mode (str or None): Storage destination selector.
+                For AWS S3: 's3' / 'aws_s3' / 'aws'
+                For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
+                Everything else results just in local storage to disk
+            bucket_name (str): name of the bucket in the cloud storage
+            cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
+        """
+        AbstractExperimentCallback.__init__(self, "", execution_order=1500)
+        self.project_name = project_name
+        self.experiment_name = experiment_name
+        self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path) \
+            if local_model_result_folder_path is not None \
+            else None
+        self.cloud_save_mode = cloud_save_mode
+        self.bucket_name = bucket_name
+        self.cloud_dir_prefix = cloud_dir_prefix
+
+        self.log_file_path = os.path.expanduser(log_file_path)
+        self.log_filename = os.path.basename(self.log_file_path)
+        self.fail_if_cloud_missing = fail_if_cloud_missing
+
+        self.cloud_saver = None
+
+    def on_train_loop_registration(self):
+        self.try_infer_experiment_details(infer_cloud_details=True)
+
+        if self.cloud_save_mode == 's3' or self.cloud_save_mode == 'aws_s3' or self.cloud_save_mode == 'aws':
+            self.cloud_saver = BaseResultsSaver(bucket_name=self.bucket_name, cloud_dir_prefix=self.cloud_dir_prefix)
+
+        elif self.cloud_save_mode == 'gcs' or self.cloud_save_mode == 'google_storage' or self.cloud_save_mode == 'google storage':
+            self.cloud_saver = BaseResultsGoogleStorageSaver(bucket_name=self.bucket_name,
+                                                             cloud_dir_prefix=self.cloud_dir_prefix)
+        else:
+            if self.fail_if_cloud_missing:
+                raise ValueError("Cloud saving not supported. Produced logs can potentially get los in the case of "
+                                 "instance termination.")
+            else:
+                print("Cloud saving not supported. Produced logs can potentially get los in the case of instance termination.")
+
+    def on_epoch_end(self):
+        self.upload_log_file()
+
+    def on_train_end(self):
+        self.upload_log_file()
+
+    def upload_log_file(self):
+        experiment_results_cloud_path = \
+            self.cloud_saver.create_experiment_cloud_storage_folder_structure(self.project_name,
+                                                                              self.experiment_name,
+                                                                              self.train_loop_obj.experiment_timestamp)
+        experiment_cloud_path = os.path.dirname(experiment_results_cloud_path)
+
+        self.cloud_saver.save_file(local_file_path=self.log_file_path,
+                                   cloud_file_path=os.path.join(experiment_cloud_path, self.log_filename))
 
 
 class DataSubsetTestRun(AbstractCallback):
