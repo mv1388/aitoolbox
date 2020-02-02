@@ -18,6 +18,8 @@ function usage()
    optional arguments:
      -t, --terminate                the instance will be terminated when training is done
      -e, --experiment-script STR    name of the experiment bash script to be executed in order to start the training
+     -l, --log-path STR             path to the local log file which will be uploaded to s3
+     -s, --log-s3-upload-dir STR
      -h, --help                     show this help message and exit
 
 HEREDOC
@@ -25,6 +27,8 @@ HEREDOC
 
 terminate_cmd=false
 experiment_script_file="aws_run_experiments_project.sh"
+log_file_path=
+log_s3_dir_path="s3://model-result/training_logs"
 
 while [[ $# -gt 0 ]]; do
 key="$1"
@@ -36,6 +40,14 @@ case $key in
     ;;
     -e|--experiment-script)
     experiment_script_file="$2"
+    shift 2 # past argument value
+    ;;
+    -l|--log-path)
+    log_file_path="$2"
+    shift 2 # past argument value
+    ;;
+    -s|--log-s3-upload-dir)
+    log_s3_dir_path="$2"
     shift 2 # past argument value
     ;;
     -h|--help )
@@ -52,6 +64,13 @@ done
 
 
 source $project_root_path/AWS_run_scripts/AWS_core_scripts/$experiment_script_file $project_root_path
+
+
+if [[ $log_file_path != "" && -f $log_file_path ]]; then
+    s3_log_path="$log_s3_dir_path/$(basename $log_file_path)"
+
+    aws s3 cp $log_file_path $s3_log_path
+fi
 
 if [[ $terminate_cmd == true ]]; then
     echo Terminating the instance
