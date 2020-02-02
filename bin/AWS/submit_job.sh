@@ -24,7 +24,7 @@ function usage()
      -i, --instance-config STR      instance configuration json filename
      --instance-type STR            instance type label; if this is provided the value from --instance-config is ignored
      -e, --experiment-script STR    name of the experiment bash script to be executed in order to start the training
-     -l, --log-s3-upload-dir STR
+     --log-s3-upload-dir STR        path to the logs folder on S3 to which the training log should be uploaded
      -x, --apex                     switch on to install Nvidia Apex library for mixed precision training
      -o, --os-name STR              username depending on the OS chosen. Default is ubuntu
      -t, --terminate                the instance will be terminated when training is done
@@ -94,7 +94,7 @@ case $key in
     experiment_script_file="$2"
     shift 2 # past argument value
     ;;
-    -l|--log-s3-upload-dir)
+    --log-s3-upload-dir)
     log_s3_dir_path="$2"
     shift 2 # past argument value
     ;;

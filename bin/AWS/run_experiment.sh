@@ -19,7 +19,7 @@ function usage()
      -t, --terminate                the instance will be terminated when training is done
      -e, --experiment-script STR    name of the experiment bash script to be executed in order to start the training
      -l, --log-path STR             path to the local log file which will be uploaded to s3
-     -s, --log-s3-upload-dir STR
+     --log-s3-upload-dir STR        path to the logs folder on S3 to which the training log should be uploaded
      -h, --help                     show this help message and exit
 
 HEREDOC
@@ -46,7 +46,7 @@ case $key in
     log_file_path="$2"
     shift 2 # past argument value
     ;;
-    -s|--log-s3-upload-dir)
+    --log-s3-upload-dir)
     log_s3_dir_path="$2"
     shift 2 # past argument value
     ;;
