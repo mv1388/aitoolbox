@@ -24,6 +24,7 @@ function usage()
      -i, --instance-config STR      instance configuration json filename
      --instance-type STR            instance type label; if this is provided the value from --instance-config is ignored
      -e, --experiment-script STR    name of the experiment bash script to be executed in order to start the training
+     --log-s3-upload-dir STR        path to the logs folder on S3 to which the training log should be uploaded
      -x, --apex                     switch on to install Nvidia Apex library for mixed precision training
      -o, --os-name STR              username depending on the OS chosen. Default is ubuntu
      -t, --terminate                the instance will be terminated when training is done
@@ -42,10 +43,16 @@ AIToolbox_version="0.3"
 instance_config="config_p2_xlarge.json"
 instance_type=
 experiment_script_file="aws_run_experiments_project.sh"
+log_s3_dir_path="s3://model-result/training_logs"
 use_apex=false
 username="ubuntu"
 terminate_cmd=false
 ssh_at_start=false
+
+job_timestamp=$(date +"%Y%m%d_%H_%M_%S")
+logging_filename="training_$job_timestamp.log"
+logging_path="~/$logging_filename"
+
 
 while [[ $# -gt 0 ]]; do
 key="$1"
@@ -85,6 +92,10 @@ case $key in
     ;;
     -e|--experiment-script)
     experiment_script_file="$2"
+    shift 2 # past argument value
+    ;;
+    --log-s3-upload-dir)
+    log_s3_dir_path="$2"
     shift 2 # past argument value
     ;;
     -x|--apex)
@@ -143,6 +154,11 @@ if [[ "$instance_type" != "" ]]; then
     instance_config=config_$(tr . _ <<< $instance_type).json
 fi
 
+log_upload_setting=""
+if [ "$log_s3_dir_path" != "None" ] && [ "$log_s3_dir_path" != "False" ]; then
+    log_upload_setting="--log-path $logging_path --log-s3-upload-dir $log_s3_dir_path"
+fi
+
 
 #############################
 # Instance creation
@@ -167,7 +183,7 @@ echo "Preparing instance"
 
 echo "Running the job"
 ssh -i $key_path $username@$ec2_instance_address \
-    "./finish_prepare_instance.sh ; source activate $py_env ; cd project ; tmux new-session -d -s 'training' ./run_experiment.sh $terminate_setting --experiment-script $experiment_script_file"
+    "./finish_prepare_instance.sh ; source activate $py_env ; cd project ; tmux new-session -d -s 'training' './run_experiment.sh $terminate_setting --experiment-script $experiment_script_file $log_upload_setting' \; pipe-pane 'cat > $logging_path'"
 
 echo "Instance IP: $ec2_instance_address"
 
