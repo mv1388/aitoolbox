@@ -23,7 +23,7 @@ function usage()
 {
    cat << HEREDOC
 
-   Usage: $prepare_instance [--address STR] [--project STR] ...
+   Usage: ./prepare_instance.sh [--address STR] [--project STR] ...
 
    arguments:
      -a, --address STR      ec2 instance Public DNS address

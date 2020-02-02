@@ -8,7 +8,7 @@ function usage()
 {
    cat << HEREDOC
 
-   Usage: $ssh_to_instance <INSTANCE_IP_ADDRESS>  (optional: [--key <SSH_KEY_LOCATION>] [--ssh-tmux] [--os-name ubuntu])
+   Usage: ./ssh_to_instance.sh <INSTANCE_IP_ADDRESS>  (optional: [--key <SSH_KEY_LOCATION>] [--ssh-tmux] [--os-name ubuntu])
 
    arguments:
      <INSTANCE_IP_ADDRESS>  ec2 instance Public DNS address

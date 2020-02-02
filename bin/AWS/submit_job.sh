@@ -201,5 +201,5 @@ ssh -i $key_path $username@$ec2_instance_address \
 echo "Instance IP: $ec2_instance_address"
 
 if [ $ssh_at_start == true ]; then
-    ./ssh_to_instance.sh $key_path $ec2_instance_address --os-name $username --ssh-tmux
+    ./ssh_to_instance.sh $ec2_instance_address --os-name $username --ssh-tmux
 fi

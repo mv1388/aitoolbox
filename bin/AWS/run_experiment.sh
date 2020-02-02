@@ -13,7 +13,7 @@ function usage()
 {
    cat << HEREDOC
 
-   Usage: $run_experiment (optional: [--terminate] [--experiment-script run_experiment.sh])
+   Usage: ./run_experiment.sh (optional: [--terminate] [--experiment-script run_experiment.sh])
 
    optional arguments:
      -t, --terminate                the instance will be terminated when training is done

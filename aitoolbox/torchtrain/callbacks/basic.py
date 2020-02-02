@@ -137,10 +137,12 @@ class EmailNotification(AbstractCallback):
 
     def on_epoch_end(self):
         subject = f"End of epoch {self.train_loop_obj.epoch} report: {self.project_name}: {self.experiment_name}"
-
         performance_list = self.get_metric_list_html()
-        plots_file_paths = self.message_service.read_messages('ModelTrainHistoryPlot_results_file_local_paths')
-        plots_file_paths += self.message_service.read_messages('ModelTrainHistoryFileWriter_results_file_local_paths')
+
+        plot_msgs = self.message_service.read_messages('ModelTrainHistoryPlot_results_file_local_paths')
+        plots_file_paths = plot_msgs if plot_msgs is not None else []
+        file_writer_msgs = self.message_service.read_messages('ModelTrainHistoryFileWriter_results_file_local_paths')
+        plots_file_paths += file_writer_msgs if file_writer_msgs is not None else []
         plots_file_paths = util.flatten_list_of_lists(plots_file_paths)
 
         body_text = f"""<h2>End of epoch {self.train_loop_obj.epoch}</h2>
@@ -151,11 +153,13 @@ class EmailNotification(AbstractCallback):
 
     def on_train_end(self):
         subject = f"End of training: {self.project_name}: {self.experiment_name}"
-
         performance_list = self.get_metric_list_html()
         hyperparams = self.get_hyperparams_html()
-        plots_file_paths = self.message_service.read_messages('ModelTrainHistoryPlot_results_file_local_paths')
-        plots_file_paths += self.message_service.read_messages('ModelTrainHistoryFileWriter_results_file_local_paths')
+
+        plot_msgs = self.message_service.read_messages('ModelTrainHistoryPlot_results_file_local_paths')
+        plots_file_paths = plot_msgs if plot_msgs is not None else []
+        file_writer_msgs = self.message_service.read_messages('ModelTrainHistoryFileWriter_results_file_local_paths')
+        plots_file_paths += file_writer_msgs if file_writer_msgs is not None else []
         plots_file_paths = util.flatten_list_of_lists(plots_file_paths)
 
         body_text = f"""<h2>End of training at epoch {self.train_loop_obj.epoch}</h2>

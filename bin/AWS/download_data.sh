@@ -5,7 +5,7 @@ function usage()
 {
    cat << HEREDOC
 
-   Usage: $download_data [--path_dest STR] [--dataset STR] [--preproc STR]
+   Usage: ./download_data.sh [--path_dest STR] [--dataset STR] [--preproc STR]
 
    arguments:
      -p, --path_dest STR    destination path where to download the dataset
