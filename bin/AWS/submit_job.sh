@@ -24,7 +24,7 @@ function usage()
      -i, --instance-config STR      instance configuration json filename
      --instance-type STR            instance type label; if this is provided the value from --instance-config is ignored
      -e, --experiment-script STR    name of the experiment bash script to be executed in order to start the training
-     --default-log                  if used than the logs will be saved to the default log file `training.log` without any timestamps
+     --default-log                  if used than the logs will be saved to the default log file training.log without any timestamps
      --log-s3-upload-dir STR        path to the logs folder on S3 to which the training log should be uploaded
      -x, --apex                     switch on to install Nvidia Apex library for mixed precision training
      -o, --os-name STR              username depending on the OS chosen. Default is ubuntu
