@@ -5,7 +5,7 @@ function usage()
 {
    cat << HEREDOC
 
-   Usage: $update_package_on_AWS [--address STR] [--framework STR] [--version FLOAT]
+   Usage: ./update_package_on_AWS.sh [--address STR] [--framework STR] [--version FLOAT]
 
    arguments:
      -a, --address STR      ec2 instance Public DNS address

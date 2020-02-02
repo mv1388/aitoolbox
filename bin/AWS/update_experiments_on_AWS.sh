@@ -5,7 +5,7 @@ function usage()
 {
    cat << HEREDOC
 
-   Usage: $update_experiments_on_AWS [--address STR] [--project STR]
+   Usage: ./update_experiments_on_AWS.sh [--address STR] [--project STR]
 
    arguments:
      -a, --address STR      ec2 instance Public DNS address
