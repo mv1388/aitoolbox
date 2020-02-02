@@ -24,6 +24,7 @@ function usage()
      -i, --instance-config STR      instance configuration json filename
      --instance-type STR            instance type label; if this is provided the value from --instance-config is ignored
      -e, --experiment-script STR    name of the experiment bash script to be executed in order to start the training
+     --default-log                  if used than the logs will be saved to the default log file `training.log` without any timestamps
      --log-s3-upload-dir STR        path to the logs folder on S3 to which the training log should be uploaded
      -x, --apex                     switch on to install Nvidia Apex library for mixed precision training
      -o, --os-name STR              username depending on the OS chosen. Default is ubuntu
@@ -44,14 +45,17 @@ instance_config="config_p2_xlarge.json"
 instance_type=
 experiment_script_file="aws_run_experiments_project.sh"
 log_s3_dir_path="s3://model-result/training_logs"
+default_log=false
 use_apex=false
 username="ubuntu"
 terminate_cmd=false
 ssh_at_start=false
 
+default_logging_filename="training.log"
+
 job_timestamp=$(date +"%Y%m%d_%H_%M_%S")
 logging_filename="training_$job_timestamp.log"
-logging_path="~/$logging_filename"
+logging_path="~/project/$logging_filename"
 
 
 while [[ $# -gt 0 ]]; do
@@ -93,6 +97,10 @@ case $key in
     -e|--experiment-script)
     experiment_script_file="$2"
     shift 2 # past argument value
+    ;;
+    --default-log)
+    default_log=true
+    shift 1 # past argument value
     ;;
     --log-s3-upload-dir)
     log_s3_dir_path="$2"
@@ -152,6 +160,11 @@ fi
 
 if [[ "$instance_type" != "" ]]; then
     instance_config=config_$(tr . _ <<< $instance_type).json
+fi
+
+if [ "$default_log" == true ]; then
+    logging_filename=$default_logging_filename
+    logging_path="~/project/$logging_filename"
 fi
 
 log_upload_setting=""
