@@ -187,14 +187,20 @@ aws ec2 wait instance-status-ok --instance-ids $instance_id
 ec2_instance_address=$(aws ec2 describe-instances --instance-ids $instance_id --query 'Reservations[*].Instances[*].PublicDnsName' --output text)
 
 
-########################################################
-# Bootstrapping the instance and executing the training
-########################################################
+##############################
+# Bootstrapping the instance
+##############################
 echo "Preparing instance"
 ./prepare_instance.sh -k $key_path -a $ec2_instance_address \
     -f $DL_framework -v $AIToolbox_version -p $local_project_path -d $dataset_name -r $preproc_dataset $apex_setting -o $username --no-ssh
+
+echo "Bootstrapping"
 ssh -i $key_path $username@$ec2_instance_address "./finish_prepare_instance.sh"
 
+
+##############################
+# Executing the training
+##############################
 echo "Running the job"
 ssh -i $key_path $username@$ec2_instance_address \
     "source activate $py_env ; cd project ; tmux new-session -d -s 'training' './run_experiment.sh $terminate_setting --experiment-script $experiment_script_file $log_upload_setting' \; pipe-pane 'cat > $logging_path'"
