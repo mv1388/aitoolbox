@@ -193,10 +193,11 @@ ec2_instance_address=$(aws ec2 describe-instances --instance-ids $instance_id --
 echo "Preparing instance"
 ./prepare_instance.sh -k $key_path -a $ec2_instance_address \
     -f $DL_framework -v $AIToolbox_version -p $local_project_path -d $dataset_name -r $preproc_dataset $apex_setting -o $username --no-ssh
+ssh -i $key_path $username@$ec2_instance_address "./finish_prepare_instance.sh"
 
 echo "Running the job"
 ssh -i $key_path $username@$ec2_instance_address \
-    "./finish_prepare_instance.sh ; source activate $py_env ; cd project ; tmux new-session -d -s 'training' './run_experiment.sh $terminate_setting --experiment-script $experiment_script_file $log_upload_setting' \; pipe-pane 'cat > $logging_path'"
+    "source activate $py_env ; cd project ; tmux new-session -d -s 'training' './run_experiment.sh $terminate_setting --experiment-script $experiment_script_file $log_upload_setting' \; pipe-pane 'cat > $logging_path'"
 
 echo "Instance IP: $ec2_instance_address"
 
