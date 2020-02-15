@@ -75,7 +75,7 @@ class KerasS3ModelSaver(AbstractModelSaver, BaseModelSaver):
         """Save Keras model to AWS S3
 
         Args:
-            model (keras.engine.training.Model):
+            model (keras.Model):
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             experiment_timestamp (str or None): time stamp at the start of training
@@ -151,7 +151,8 @@ class PyTorchS3ModelSaver(AbstractModelSaver, BaseModelSaver):
         """Save PyTorch model representation to AWS S3
 
         Args:
-            model (dict): PyTorch model representation dict
+            model (dict or deepspeed.DeepSpeedLight): PyTorch model representation dict
+                or a DeepSpeed "engine" all-in-one model representation
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             experiment_timestamp (str or None): time stamp at the start of training

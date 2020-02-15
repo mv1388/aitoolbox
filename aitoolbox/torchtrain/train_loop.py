@@ -11,6 +11,11 @@ try:
     APEX_AVAILABLE = True
 except ImportError:
     APEX_AVAILABLE = False
+try:
+    import deepspeed
+    DEEPSPEED_AVAILABLE = True
+except ImportError:
+    DEEPSPEED_AVAILABLE = False
 
 from aitoolbox.utils import dict_util
 from aitoolbox.torchtrain.model import TTModel, ModelWrap, TTDataParallel
@@ -30,7 +35,7 @@ class TrainLoop:
                  train_loader, validation_loader, test_loader,
                  optimizer, criterion,
                  collate_batch_pred_fn=append_predictions, pred_transform_fn=torch_cat_transf,
-                 end_auto_eval=True, use_amp=False):
+                 end_auto_eval=True, use_amp=False, use_deepspeed=False):
         """Core PyTorch TrainLoop supporting the model training and target prediction
 
         Implements core training procedures: batch feeding into the network as part of (multi)epoch train loop,
@@ -53,6 +58,7 @@ class TrainLoop:
                 Specify either True/False boolean to always run or never run after each epoch or specify an int to
                 execute only every specified number of epochs.
             use_amp (bool): use Nvidia Apex 16-bit Automatic Mixed Precision (AMP)
+            use_deepspeed (bool): use Microsoft DeepSpeed
         """
         if isinstance(model, TTModel) or isinstance(model, TTDataParallel):
             self.model = model
@@ -73,6 +79,7 @@ class TrainLoop:
         self.pred_transform_fn = pred_transform_fn
         self.end_auto_eval = end_auto_eval
         self.use_amp = use_amp
+        self.use_deepspeed = use_deepspeed
 
         USE_CUDA = torch.cuda.is_available()
         self.device = torch.device("cuda" if USE_CUDA else "cpu")
@@ -100,6 +107,8 @@ class TrainLoop:
         if self.use_amp and not APEX_AVAILABLE:
             raise ValueError('Trying to use Nvidia Apex AMP for 16-bit mixed precision. However, Nvidia Apex is not'
                              'installed.')
+        if self.use_deepspeed and not DEEPSPEED_AVAILABLE:
+            raise ValueError('Trying to use Microsoft DeepSpeed. However, DeepSpeed is not installed.')
 
     def __call__(self, num_epochs, callbacks=None):
         """Train the model using the train loop
@@ -121,7 +130,7 @@ class TrainLoop:
             callbacks (list): callbacks that are executed during the training run
 
         Returns:
-            TTModel or torch.nn.modules.Module or TTDataParallel: trained model
+            TTModel or torch.nn.modules.Module or TTDataParallel or deepspeed.DeepSpeedLight: trained model
         """
         self.callbacks_handler.register_callbacks(callbacks)
 
@@ -139,18 +148,17 @@ class TrainLoop:
             for batch_data in tqdm(self.train_loader):
                 self.callbacks_handler.execute_batch_begin()
 
+                # Feed batch into the model
                 if isinstance(self.model, TTModel) or isinstance(self.model, TTDataParallel):
                     loss_batch = self.model.get_loss(batch_data, self.criterion, self.device)
                 else:
                     loss_batch = self.batch_model_feed_def.get_loss(self.model, batch_data, self.criterion, self.device)
-
                 self.loss_batch_accum.append(loss_batch.item())
 
                 self.optimizer.zero_grad()
 
-                if not self.use_amp:
-                    loss_batch.backward()
-                else:
+                # Backward pass through the model
+                if self.use_amp:
                     if not isinstance(loss_batch, MultiLoss):
                         # Single loss Apex AMP calculation
                         with amp.scale_loss(loss_batch, self.optimizer) as scaled_loss:
@@ -158,10 +166,18 @@ class TrainLoop:
                     else:
                         # Multi-loss Apex AMP calculation
                         loss_batch.backward_amp(self.optimizer.optimizer_list)
+                elif self.use_deepspeed:
+                    self.model.backward(loss_batch)
+                else:
+                    loss_batch.backward()
 
                 if self.grad_cb_used:
                     self.callbacks_handler.execute_gradient_update()
-                self.optimizer.step()
+                # Optimizer step
+                if self.use_deepspeed:
+                    self.model.step()
+                else:
+                    self.optimizer.step()
                 if self.grad_cb_used:
                     self.callbacks_handler.execute_optimizer_step()
 
@@ -409,7 +425,7 @@ class TrainLoopCheckpoint(TrainLoop):
                  cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix='', source_dirs=(),
                  rm_subopt_local_models=False, num_best_checkpoints_kept=2,
                  collate_batch_pred_fn=append_predictions, pred_transform_fn=torch_cat_transf,
-                 end_auto_eval=True, use_amp=False):
+                 end_auto_eval=True, use_amp=False, use_deepspeed=False):
         """TrainLoop with the automatic model check-pointing at the end of each epoch
 
         Args:
@@ -447,10 +463,11 @@ class TrainLoopCheckpoint(TrainLoop):
                 Specify either True/False boolean to always run or never run after each epoch or specify an int to
                 execute only every specified number of epochs.
             use_amp (bool): use Nvidia Apex 16-bit Automatic Mixed Precision (AMP)
+            use_deepspeed (bool): use Microsoft DeepSpeed
         """
         TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion,
                            collate_batch_pred_fn, pred_transform_fn,
-                           end_auto_eval, use_amp)
+                           end_auto_eval, use_amp, use_deepspeed)
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
@@ -483,7 +500,7 @@ class TrainLoopEndSave(TrainLoop):
                  hyperparams, val_result_package=None, test_result_package=None,
                  cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix='', source_dirs=(),
                  collate_batch_pred_fn=append_predictions, pred_transform_fn=torch_cat_transf,
-                 end_auto_eval=True, use_amp=False):
+                 end_auto_eval=True, use_amp=False, use_deepspeed=False):
         """TrainLoop with the model performance evaluation and final model saving at the end of the training process
 
         Args:
@@ -518,10 +535,11 @@ class TrainLoopEndSave(TrainLoop):
                 Specify either True/False boolean to always run or never run after each epoch or specify an int to
                 execute only every specified number of epochs.
             use_amp (bool): use Nvidia Apex 16-bit Automatic Mixed Precision (AMP)
+            use_deepspeed (bool): use Microsoft DeepSpeed
         """
         TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion,
                            collate_batch_pred_fn, pred_transform_fn,
-                           end_auto_eval, use_amp)
+                           end_auto_eval, use_amp, use_deepspeed)
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
@@ -574,7 +592,7 @@ class TrainLoopCheckpointEndSave(TrainLoopEndSave):
                  cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix='', source_dirs=(),
                  rm_subopt_local_models=False, num_best_checkpoints_kept=2,
                  collate_batch_pred_fn=append_predictions, pred_transform_fn=torch_cat_transf,
-                 end_auto_eval=True, use_amp=False):
+                 end_auto_eval=True, use_amp=False, use_deepspeed=False):
         """TrainLoop both saving model check-pointing at the end of each epoch and model performance reporting
             and model saving at the end of the training process
 
@@ -615,6 +633,7 @@ class TrainLoopCheckpointEndSave(TrainLoopEndSave):
                 Specify either True/False boolean to always run or never run after each epoch or specify an int to
                 execute only every specified number of epochs.
             use_amp (bool): use Nvidia Apex 16-bit Automatic Mixed Precision (AMP)
+            use_deepspeed (bool): use Microsoft DeepSpeed
         """
         if 'experiment_file_path' not in hyperparams:
             hyperparams['experiment_file_path'] = inspect.getframeinfo(inspect.currentframe().f_back).filename
@@ -627,7 +646,7 @@ class TrainLoopCheckpointEndSave(TrainLoopEndSave):
                                   hyperparams, val_result_package, test_result_package,
                                   cloud_save_mode, bucket_name, cloud_dir_prefix, source_dirs,
                                   collate_batch_pred_fn, pred_transform_fn,
-                                  end_auto_eval, use_amp)
+                                  end_auto_eval, use_amp, use_deepspeed)
         self.rm_subopt_local_models = rm_subopt_local_models
 
         self.callbacks_handler.register_callbacks([

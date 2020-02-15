@@ -33,8 +33,10 @@ class BaseFullExperimentLocalSaver(AbstractExperimentSaver):
         """Save the experiment with the provided model saver
 
         Args:
-            model (dict or keras.engine.training.Model): model representation. If used with PyTorch it is a simple
-                dict under the hood. In the case of Keras training this would be the keras Model.
+            model (dict or deepspeed.DeepSpeedLight or keras.Model): model representation.
+                If used with PyTorch it is a simple dict under the hood. If used with PyTorch in combination with
+                Microsoft DeepSpeed it's DeepSpeed "engine" all-in-one model representation. 
+                In the case of Keras training this would be the keras Model.
             result_package (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
                 selected result package which will be evaluated to produce the performance results
             training_history (aitoolbox.experiment.training_history.TrainingHistory):
