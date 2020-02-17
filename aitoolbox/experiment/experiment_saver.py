@@ -54,7 +54,10 @@ class BaseFullExperimentSaver(AbstractExperimentSaver):
         """Save the experiment snapshot formed out of the model and model's results
 
         Args:
-            model (dict or keras.engine.training.Model):
+            model (dict or deepspeed.DeepSpeedLight or keras.Model): model representation.
+                If used with PyTorch it is a simple dict under the hood. If used with PyTorch in combination with
+                Microsoft DeepSpeed it's DeepSpeed "engine" all-in-one model representation.
+                In the case of Keras training this would be the keras Model.
             result_package (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
             training_history (aitoolbox.experiment.training_history.TrainingHistory):
             experiment_timestamp (str): time stamp at the start of training

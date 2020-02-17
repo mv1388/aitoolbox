@@ -2,6 +2,11 @@ from abc import ABC, abstractmethod
 import os
 import time
 import datetime
+try:
+    import deepspeed
+    DEEPSPEED_AVAILABLE = True
+except ImportError:
+    DEEPSPEED_AVAILABLE = False
 
 from aitoolbox.experiment.local_save.folder_create import ExperimentFolder
 
@@ -12,7 +17,7 @@ class AbstractLocalModelSaver(ABC):
         """Model saving method which all the model savers have to implement to give an expected API to other components
         
         Args:
-            model (keras.engine.training.Model or dict): model representation. If used with PyTorch it is a simple
+            model (keras.Model or dict): model representation. If used with PyTorch it is a simple
                 dict under the hood. In the case of Keras training this would be the keras Model.
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
@@ -75,7 +80,7 @@ class KerasLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
         """Save the Keras model to the local drive
 
         Args:
-            model (keras.engine.training.Model): Keras model
+            model (keras.Model): Keras model
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             experiment_timestamp (str or None): time stamp at the start of training
@@ -135,7 +140,8 @@ class PyTorchLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
         """Save the PyTorch model representation dict to the local drive
 
         Args:
-            model (dict): PyTorch model represented as a dict of weights, optimizer state and other necessary info
+            model (dict or deepspeed.DeepSpeedLight): PyTorch model represented as a dict of weights,
+                optimizer state and other necessary info. Or a DeepSpeed "engine" all-in-one model representation.
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             experiment_timestamp (str or None): time stamp at the start of training
@@ -160,8 +166,11 @@ class PyTorchLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
 
         model_local_path = os.path.join(experiment_model_local_path, model_name)
 
-        import torch
-        torch.save(model, model_local_path)
+        if DEEPSPEED_AVAILABLE and isinstance(model, deepspeed.DeepSpeedLight):
+            model.save_checkpoint(model_local_path, epoch)
+        else:
+            import torch
+            torch.save(model, model_local_path)
 
         return model_name, model_local_path
 
@@ -170,16 +179,19 @@ class PyTorchLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
         """Check if PyTorch model save dict contains all the necessary elements for the training state reconstruction
 
         Args:
-            model (dict): PyTorch model represented as a dict of weights, optimizer state and other necessary info
+            model (dict or deepspeed.DeepSpeedLight): PyTorch model represented as a dict of weights,
+                optimizer state and other necessary info. Or a DeepSpeed "engine" all-in-one model representation.
 
         Returns:
             None:
         """
         # TODO: maybe add some check about the actual values/content of the dict as well
-        for required_element in ['model_state_dict', 'optimizer_state_dict', 'epoch', 'hyperparams']:
-            if required_element not in model:
-                raise ValueError(f'Required element of the model dict {required_element} is missing. Given model'
-                                 f'dict has the following elements: {model.keys()}')
+        if not DEEPSPEED_AVAILABLE or \
+                (DEEPSPEED_AVAILABLE and not isinstance(model, deepspeed.DeepSpeedLight)):
+            for required_element in ['model_state_dict', 'optimizer_state_dict', 'epoch', 'hyperparams']:
+                if required_element not in model:
+                    raise ValueError(f'Required element of the model dict {required_element} is missing. Given model'
+                                     f'dict has the following elements: {model.keys()}')
 
 
 class LocalSubOptimalModelRemover:
