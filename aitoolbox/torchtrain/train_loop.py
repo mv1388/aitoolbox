@@ -155,7 +155,8 @@ class TrainLoop:
                     loss_batch = self.batch_model_feed_def.get_loss(self.model, batch_data, self.criterion, self.device)
                 self.loss_batch_accum.append(loss_batch.item())
 
-                self.optimizer.zero_grad()
+                if not self.use_deepspeed:
+                    self.optimizer.zero_grad()
 
                 # Backward pass through the model
                 if self.use_amp:
