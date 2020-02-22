@@ -72,7 +72,7 @@ class TestAbstractExperimentCallback(unittest.TestCase):
         self.assertEqual(callback.local_model_result_folder_path, local_path)
 
     def test_try_infer_experiment_details_cloud(self):
-        callback = AbstractCloudExperimentCallback('test_callback')
+        callback = AbstractExperimentCallback('test_callback')
         model = NetUnifiedBatchFeed()
 
         project_name = 'test_project'
@@ -95,7 +95,7 @@ class TestAbstractExperimentCallback(unittest.TestCase):
         self.assertEqual(callback.cloud_dir_prefix, train_loop.cloud_dir_prefix)
 
     def test_try_infer_experiment_details_cloud_spec(self):
-        callback = AbstractCloudExperimentCallback('test_callback')
+        callback = AbstractExperimentCallback('test_callback')
         model = NetUnifiedBatchFeed()
 
         project_name = 'test_project'
@@ -127,10 +127,36 @@ class TestAbstractExperimentCallback(unittest.TestCase):
         self.assertEqual(callback.bucket_name, bucket_name)
         self.assertEqual(callback.cloud_dir_prefix, cloud_dir_prefix)
 
+    def test_override_train_loop_values_in_callback(self):
+        project_name = 'test_project'
+        experiment_name = 'test_experiment'
+        local_path = 'my_local_path'
+        cloud_save_mode = 'gcs'
+        bucket_name = 'my_fancy_bucket'
+        cloud_dir_prefix = 'MyFolder_prefix'
 
-class AbstractCloudExperimentCallback(AbstractExperimentCallback):
-    def __init__(self, callback_name, execution_order=0):
-        AbstractExperimentCallback.__init__(self, callback_name, execution_order)
-        self.cloud_save_mode = 's3'
-        self.bucket_name = 'model-result'
-        self.cloud_dir_prefix = ''
+        callback = AbstractExperimentCallback('test_callback',
+                                              project_name, experiment_name, local_path,
+                                              cloud_save_mode, bucket_name, cloud_dir_prefix)
+        model = NetUnifiedBatchFeed()
+
+        train_loop = TrainLoopCheckpointEndSave(model, None, [], None, DummyOptimizer(), None,
+                                                project_name=f'TL_{project_name}', experiment_name=f'TL_{experiment_name}',
+                                                local_model_result_folder_path=f'TL_{local_path}',
+                                                hyperparams={}, val_result_package=DummyResultPackageExtend(),
+                                                cloud_save_mode='s3', bucket_name=f'TL_{bucket_name}',
+                                                cloud_dir_prefix=f'TL_{cloud_dir_prefix}')
+        train_loop.callbacks_handler.register_callbacks([callback])
+        callback.try_infer_experiment_details(infer_cloud_details=True)
+
+        self.assertEqual(callback.project_name, project_name)
+        self.assertEqual(callback.experiment_name, experiment_name)
+        self.assertEqual(callback.local_model_result_folder_path, local_path)
+
+        self.assertEqual(callback.cloud_save_mode, cloud_save_mode)
+        self.assertEqual(callback.bucket_name, bucket_name)
+        self.assertEqual(callback.cloud_dir_prefix, cloud_dir_prefix)
+
+        self.assertEqual(train_loop.cloud_save_mode, 's3')
+        self.assertEqual(train_loop.bucket_name, f'TL_{bucket_name}')
+        self.assertEqual(train_loop.cloud_dir_prefix, f'TL_{cloud_dir_prefix}')

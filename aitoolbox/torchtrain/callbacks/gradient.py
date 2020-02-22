@@ -7,6 +7,7 @@ from aitoolbox.experiment.local_save.local_results_save import BaseLocalResultsS
 from aitoolbox.experiment.result_reporting.report_generator import GradientPlotter
 from aitoolbox.cloud.AWS.results_save import BaseResultsSaver as BaseResultsS3Saver
 from aitoolbox.cloud.GoogleCloud.results_save import BaseResultsGoogleStorageSaver
+from aitoolbox.cloud import s3_available_options, gcs_available_options
 
 
 class GradientCallbackBase(AbstractCallback):
@@ -105,7 +106,7 @@ class GradientStatsPrint(AbstractCallback):
 class GradDistributionPlot(AbstractExperimentCallback):
     def __init__(self, model_layers_extract_def, grad_plots_dir_name='grad_distribution', file_format='png',
                  project_name=None, experiment_name=None, local_model_result_folder_path=None,
-                 cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix=''):
+                 cloud_save_mode=None, bucket_name=None, cloud_dir_prefix=None):
         """Plot layers' gradient distributions after every epoch
 
         Args:
@@ -124,15 +125,9 @@ class GradDistributionPlot(AbstractExperimentCallback):
             bucket_name (str): name of the bucket in the cloud storage
             cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
         """
-        AbstractExperimentCallback.__init__(self, 'Gradient distribution plotter')
-        self.project_name = project_name
-        self.experiment_name = experiment_name
-        self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path) \
-            if local_model_result_folder_path is not None \
-            else None
-        self.cloud_save_mode = cloud_save_mode
-        self.bucket_name = bucket_name
-        self.cloud_dir_prefix = cloud_dir_prefix
+        AbstractExperimentCallback.__init__(self, 'Gradient distribution plotter',
+                                            project_name, experiment_name, local_model_result_folder_path,
+                                            cloud_save_mode, bucket_name, cloud_dir_prefix)
         self.grad_plots_dir_name = grad_plots_dir_name
         self.file_format = file_format
         if self.file_format not in ['png', 'pdf']:
@@ -190,11 +185,11 @@ class GradDistributionPlot(AbstractExperimentCallback):
         return grad_plots_dir_path
 
     def prepare_results_saver(self):
-        if self.cloud_save_mode == 's3' or self.cloud_save_mode == 'aws_s3' or self.cloud_save_mode == 'aws':
+        if self.cloud_save_mode in s3_available_options:
             self.cloud_results_saver = BaseResultsS3Saver(bucket_name=self.bucket_name,
                                                           cloud_dir_prefix=self.cloud_dir_prefix)
 
-        elif self.cloud_save_mode == 'gcs' or self.cloud_save_mode == 'google_storage' or self.cloud_save_mode == 'google storage':
+        elif self.cloud_save_mode in gcs_available_options:
             self.cloud_results_saver = BaseResultsGoogleStorageSaver(bucket_name=self.bucket_name,
                                                                      cloud_dir_prefix=self.cloud_dir_prefix)
         else:

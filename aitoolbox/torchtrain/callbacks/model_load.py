@@ -1,9 +1,8 @@
-import os
-
 from aitoolbox.torchtrain.callbacks.abstract import AbstractExperimentCallback
 from aitoolbox.cloud.AWS.model_load import PyTorchS3ModelLoader
 from aitoolbox.cloud.GoogleCloud.model_load import PyTorchGoogleStorageModelLoader
 from aitoolbox.experiment.local_load.local_model_load import PyTorchLocalModelLoader
+from aitoolbox.cloud import s3_available_options, gcs_available_options
 
 
 class ModelLoadContinueTraining(AbstractExperimentCallback):
@@ -11,7 +10,7 @@ class ModelLoadContinueTraining(AbstractExperimentCallback):
                  saved_experiment_timestamp, saved_model_dir='checkpoint_model', epoch_num=None,
                  used_data_parallel=False, custom_local_loader_class=None,
                  project_name=None, experiment_name=None, local_model_result_folder_path=None,
-                 cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix='', **kwargs):
+                 cloud_save_mode=None, bucket_name=None, cloud_dir_prefix=None, **kwargs):
         """(Down)load previously trained and saved model and continue training from this snapshot instead from beginning
 
         Args:
@@ -35,16 +34,9 @@ class ModelLoadContinueTraining(AbstractExperimentCallback):
             **kwargs: additional parameters for the local model loader load_model() function
         """
         AbstractExperimentCallback.__init__(self, 'Model loading and initialization from checkpoint before training',
+                                            project_name, experiment_name, local_model_result_folder_path,
+                                            cloud_save_mode, bucket_name, cloud_dir_prefix,
                                             execution_order=-10)
-        self.project_name = project_name
-        self.experiment_name = experiment_name
-        self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path) \
-            if local_model_result_folder_path is not None \
-            else None
-        self.cloud_save_mode = cloud_save_mode
-        self.bucket_name = bucket_name
-        self.cloud_dir_prefix = cloud_dir_prefix
-
         self.saved_experiment_timestamp = saved_experiment_timestamp
         self.saved_model_dir = saved_model_dir
         self.epoch_num = epoch_num
@@ -76,13 +68,13 @@ class ModelLoadContinueTraining(AbstractExperimentCallback):
         Returns:
             None
         """
-        if self.cloud_save_mode in ['s3', 'aws_s3', 'aws']:
+        if self.cloud_save_mode in s3_available_options:
             self.model_loader = PyTorchS3ModelLoader(self.local_model_result_folder_path,
                                                      self.bucket_name, self.cloud_dir_prefix)
             if self.custom_local_loader_class is not None:
                 self.model_loader.local_model_loader = self.custom_local_loader_class(self.local_model_result_folder_path)
 
-        elif self.cloud_save_mode in ['gcs', 'google_storage', 'google storage']:
+        elif self.cloud_save_mode in gcs_available_options:
             self.model_loader = PyTorchGoogleStorageModelLoader(self.local_model_result_folder_path,
                                                                 self.bucket_name, self.cloud_dir_prefix)
             if self.custom_local_loader_class is not None:
