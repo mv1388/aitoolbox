@@ -141,8 +141,6 @@ class AbstractExperimentCallback(AbstractCallback):
             if local_model_result_folder_path is not None \
             else None
 
-        # Not set to None as the experiment details above because None value is reserved to indicate only local saving
-        # and no cloud saving.
         self.cloud_save_mode = cloud_save_mode
         self.bucket_name = bucket_name
         self.cloud_dir_prefix = cloud_dir_prefix
