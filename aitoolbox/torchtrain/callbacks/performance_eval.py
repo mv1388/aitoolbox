@@ -5,6 +5,7 @@ from aitoolbox.torchtrain.callbacks.abstract import AbstractCallback, AbstractEx
 from aitoolbox.torchtrain.tl_components import message_passing as msg_passing_settings
 from aitoolbox.cloud.AWS.results_save import BaseResultsSaver as BaseResultsS3Saver
 from aitoolbox.cloud.GoogleCloud.results_save import BaseResultsGoogleStorageSaver
+from aitoolbox.cloud import s3_available_options, gcs_available_options
 from aitoolbox.experiment.local_save.local_results_save import BaseLocalResultsSaver
 from aitoolbox.experiment.result_reporting.report_generator import TrainingHistoryPlotter, TrainingHistoryWriter
 
@@ -299,7 +300,7 @@ class ModelTrainHistoryBaseCB(AbstractExperimentCallback):
     def __init__(self, callback_name, execution_order=0,
                  epoch_end=True, train_end=False, file_format='',
                  project_name=None, experiment_name=None, local_model_result_folder_path=None,
-                 cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix=''):
+                 cloud_save_mode=None, bucket_name=None, cloud_dir_prefix=None):
         """Base callback class to be inherited from when reporting train performance history
 
         Args:
@@ -318,20 +319,15 @@ class ModelTrainHistoryBaseCB(AbstractExperimentCallback):
             bucket_name (str): name of the bucket in the cloud storage
             cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
         """
-        AbstractExperimentCallback.__init__(self, callback_name, execution_order)
+        AbstractExperimentCallback.__init__(self, callback_name,
+                                            project_name, experiment_name, local_model_result_folder_path,
+                                            cloud_save_mode, bucket_name, cloud_dir_prefix,
+                                            execution_order=execution_order)
         if epoch_end is False and train_end is False:
             raise ValueError('Both epoch_end and train_end are set to False. At least one of these should be True.')
         self.epoch_end = epoch_end
         self.train_end = train_end
         self.file_format = file_format
-        self.project_name = project_name
-        self.experiment_name = experiment_name
-        self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path) \
-            if local_model_result_folder_path is not None \
-            else None
-        self.cloud_save_mode = cloud_save_mode
-        self.bucket_name = bucket_name
-        self.cloud_dir_prefix = cloud_dir_prefix
 
         self.cloud_results_saver = None
 
@@ -341,11 +337,11 @@ class ModelTrainHistoryBaseCB(AbstractExperimentCallback):
         Returns:
             None
         """
-        if self.cloud_save_mode == 's3' or self.cloud_save_mode == 'aws_s3' or self.cloud_save_mode == 'aws':
+        if self.cloud_save_mode in s3_available_options:
             self.cloud_results_saver = BaseResultsS3Saver(bucket_name=self.bucket_name,
                                                           cloud_dir_prefix=self.cloud_dir_prefix)
 
-        elif self.cloud_save_mode == 'gcs' or self.cloud_save_mode == 'google_storage' or self.cloud_save_mode == 'google storage':
+        elif self.cloud_save_mode in gcs_available_options:
             self.cloud_results_saver = BaseResultsGoogleStorageSaver(bucket_name=self.bucket_name,
                                                                      cloud_dir_prefix=self.cloud_dir_prefix)
         else:
@@ -355,7 +351,7 @@ class ModelTrainHistoryBaseCB(AbstractExperimentCallback):
 class ModelTrainHistoryPlot(ModelTrainHistoryBaseCB):
     def __init__(self, epoch_end=True, train_end=False, file_format='png',
                  project_name=None, experiment_name=None, local_model_result_folder_path=None,
-                 cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix=''):
+                 cloud_save_mode=None, bucket_name=None, cloud_dir_prefix=None):
         """Plot the evaluated performance metric history
 
         Args:
@@ -437,7 +433,7 @@ class ModelTrainHistoryPlot(ModelTrainHistoryBaseCB):
 class ModelTrainHistoryFileWriter(ModelTrainHistoryBaseCB):
     def __init__(self, epoch_end=True, train_end=False, file_format='txt',
                  project_name=None, experiment_name=None, local_model_result_folder_path=None,
-                 cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix=''):
+                 cloud_save_mode=None, bucket_name=None, cloud_dir_prefix=None):
         """Write evaluated performance metric history to the text file
 
         Args:

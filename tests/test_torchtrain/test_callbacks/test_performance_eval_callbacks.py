@@ -191,7 +191,7 @@ class TestModelTrainHistoryFileWriter(unittest.TestCase):
         model = NetUnifiedBatchFeed()
 
         callback = ModelTrainHistoryFileWriter(project_name='dummyProject', experiment_name='exper',
-                                               local_model_result_folder_path=THIS_DIR, cloud_save_mode=None)
+                                               local_model_result_folder_path=THIS_DIR, cloud_save_mode='local')
         train_loop = TrainLoop(model, dummy_train_loader, dummy_val_loader, dummy_test_loader, dummy_optimizer, None)
         train_loop.callbacks_handler.register_callbacks([callback])
         train_loop.train_history = TrainingHistory().wrap_pre_prepared_history({'loss': [123.4, 1223.4, 13323.4, 13323.4, 99999],
@@ -236,7 +236,7 @@ class TestModelTrainHistoryFileWriter(unittest.TestCase):
         model = NetUnifiedBatchFeed()
 
         callback = ModelTrainHistoryFileWriter(file_format='tsv', project_name='dummyProject', experiment_name='exper',
-                                               local_model_result_folder_path=THIS_DIR, cloud_save_mode=None)
+                                               local_model_result_folder_path=THIS_DIR, cloud_save_mode='local')
         train_loop = TrainLoop(model, dummy_train_loader, dummy_val_loader, dummy_test_loader, dummy_optimizer, None)
         train_loop.callbacks_handler.register_callbacks([callback])
         train_loop.train_history = TrainingHistory().wrap_pre_prepared_history(
