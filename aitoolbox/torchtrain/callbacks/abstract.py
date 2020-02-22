@@ -131,6 +131,15 @@ class AbstractExperimentCallback(AbstractCallback):
 
         Args:
             callback_name (str): name of the callback
+            project_name (str or None): root name of the project
+            experiment_name (str or None): name of the particular experiment
+            local_model_result_folder_path (str or None): root local path where project folder will be created
+            cloud_save_mode (str or None): Storage destination selector.
+                For AWS S3: 's3' / 'aws_s3' / 'aws'
+                For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
+                Everything else results just in local storage to disk
+            bucket_name (str): name of the bucket in the cloud storage
+            cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
             execution_order (int): order of the callback execution. If all the used callbacks have the orders set to 0,
                 than the callbacks are executed in the order they were registered.
         """
@@ -150,6 +159,15 @@ class AbstractExperimentCallback(AbstractCallback):
 
         This details inference function should only be called after the callback has already been registered in the
         TrainLoop, e.g. in the on_train_loop_registration().
+
+        General rule:
+            take details from the TrainLoop -> for this option where experiment details are inferred from TrainLoop
+                            all of the cloud_save_mode, bucket_name and cloud_dir_prefix should be set to None
+
+            Based on `self.cloud_save_mode` the inference decision is made as follows:
+                - ['s3', 'aws_s3', 'aws'] --> AWS S3
+                - ['gcs', 'google_storage', 'google storage'] --> Google Cloud Storage
+                - 'local' or whatever value -> local only
 
         Args:
             infer_cloud_details (bool): should infer only local project folder details or also cloud project destination
@@ -173,9 +191,6 @@ class AbstractExperimentCallback(AbstractCallback):
                                  'them in the callback parameters instead of currently used None values.')
 
         try:
-            # 's3' etc. ... -> cloud
-            # 'local' -> local only
-            # None -> take from train loop
             if infer_cloud_details and \
                     self.cloud_save_mode is None and self.bucket_name is None and self.cloud_dir_prefix is None:
                 # infer from train loop
