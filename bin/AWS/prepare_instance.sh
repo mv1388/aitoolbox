@@ -47,9 +47,9 @@ key_path=$(jq -r '.key_path' configs/my_config.json)
 ec2_instance_address=
 DL_framework="pytorch"
 AIToolbox_version="0.3"
-local_project_path=
-dataset_name=
-preproc_dataset=
+local_project_path="None"
+dataset_name="None"
+preproc_dataset="None"
 use_apex=false
 username="ubuntu"
 auto_ssh_to_instance=true
@@ -185,7 +185,7 @@ pip install aitoolbox-$AIToolbox_version.tar.gz
 #cd ../..
 
 
-if [ $dataset_name != '' ]; then
+if [ $dataset_name != 'None' ]; then
     ./download_data.sh -p ~/project/data -d $dataset_name -r $preproc_dataset
 fi
 " > finish_prepare_instance.sh
@@ -194,7 +194,7 @@ chmod u+x finish_prepare_instance.sh
 scp -i $key_path finish_prepare_instance.sh  $username@$ec2_instance_address:~/.
 rm finish_prepare_instance.sh
 
-if [ "$local_project_path" != '' ]; then
+if [ "$local_project_path" != 'None' ]; then
     echo Uploading project folder $local_project_path
     source $local_project_path/AWS_run_scripts/AWS_core_scripts/aws_project_upload.sh $key_path $ec2_instance_address "~/project" $local_project_path
 fi

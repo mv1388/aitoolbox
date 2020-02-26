@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-# Example how to run:
-# ./submit_job.sh -k <SSH_KEY_LOCATION> -p ~/PycharmProjects/QANet -d SQuAD2 -r orig
-
 #######################
 
 # usage function
@@ -10,22 +7,18 @@ function usage()
 {
    cat << HEREDOC
 
-   Usage: ./submit_job.sh [--project STR] ...
-
-   arguments:
-     -p, --project STR              path to the project to be optionally uploaded to the running ec2 instance
+   Usage: ./create_instance.sh [--project STR] ...
 
    optional arguments:
      -k, --key STR                  path to ssh key
+     -p, --project STR              path to the project to be optionally uploaded to the running ec2 instance
      -d, --dataset STR              dataset to be optionally downloaded from the S3 storage directly to ec2 instance
      -r, --preproc STR              the preprocessed version of the main dataset
      -f, --framework STR            desired deep learning framework
      -v, --version FLOAT            AIToolbox version to be installed on ec2
      -i, --instance-config STR      instance configuration json filename
      --instance-type STR            instance type label; if this is provided the value from --instance-config is ignored
-     -e, --experiment-script STR    name of the experiment bash script to be executed in order to start the training
-     --default-log                  if used than the logs will be saved to the default log file training.log without any timestamps
-     --log-s3-upload-dir STR        path to the logs folder on S3 to which the training log should be uploaded
+     -n, --no-bootstrap             keep the newly created instance and don't run the bootstrapping
      -x, --apex                     switch on to install Nvidia Apex library for mixed precision training
      -o, --os-name STR              username depending on the OS chosen. Default is ubuntu
      -t, --terminate                the instance will be terminated when training is done
@@ -43,19 +36,11 @@ DL_framework="pytorch"
 AIToolbox_version="0.3"
 instance_config="config_p2_xlarge.json"
 instance_type=
-experiment_script_file="aws_run_experiments_project.sh"
-log_s3_dir_path="s3://model-result/training_logs"
-default_log=false
+run_bootstrap=true
 use_apex=false
 username="ubuntu"
 terminate_cmd=false
 ssh_at_start=false
-
-default_logging_filename="training.log"
-
-job_timestamp=$(date +"%Y%m%d_%H_%M_%S")
-logging_filename="training_$job_timestamp.log"
-logging_path="~/project/$logging_filename"
 
 
 while [[ $# -gt 0 ]]; do
@@ -94,17 +79,9 @@ case $key in
     instance_type="$2"
     shift 2 # past argument value
     ;;
-    -e|--experiment-script)
-    experiment_script_file="$2"
-    shift 2 # past argument value
-    ;;
-    --default-log)
-    default_log=true
+    -n|--no-bootstrap)
+    run_bootstrap=false
     shift 1 # past argument value
-    ;;
-    --log-s3-upload-dir)
-    log_s3_dir_path="$2"
-    shift 2 # past argument value
     ;;
     -x|--apex)
     use_apex=true
@@ -134,7 +111,7 @@ case $key in
 esac
 done
 
-if [ "$key_path" == "" ] || [ "$local_project_path" == "" ]; then
+if [ "$key_path" == "" ] ; then
     echo "Not provided required parameters"
     usage
     exit
@@ -160,16 +137,6 @@ fi
 
 if [[ "$instance_type" != "" ]]; then
     instance_config=config_$(tr . _ <<< $instance_type).json
-fi
-
-if [ "$default_log" == true ]; then
-    logging_filename=$default_logging_filename
-    logging_path="~/project/$logging_filename"
-fi
-
-log_upload_setting=""
-if [ "$log_s3_dir_path" != "None" ] && [ "$log_s3_dir_path" != "False" ]; then
-    log_upload_setting="--log-path $logging_path --log-s3-upload-dir $log_s3_dir_path"
 fi
 
 
@@ -198,9 +165,11 @@ echo "Preparing instance"
 #########################################################
 # Bootstrapping the instance and execute the training
 #########################################################
-echo "Running the job"
-ssh -i $key_path $username@$ec2_instance_address \
-    "source activate $py_env ; tmux new-session -d -s 'training' './finish_prepare_instance.sh ; cd project ; ./run_experiment.sh $terminate_setting --experiment-script $experiment_script_file $log_upload_setting' \; pipe-pane 'cat > $logging_path'"
+if [ $run_bootstrap == true ]; then
+    echo "Instance bootstrapping"
+    ssh -i $key_path $username@$ec2_instance_address \
+        "source activate $py_env ; tmux new-session -d -s 'training' './finish_prepare_instance.sh'"
+fi
 
 echo "Instance IP: $ec2_instance_address"
 
