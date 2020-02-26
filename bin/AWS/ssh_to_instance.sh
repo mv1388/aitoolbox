@@ -58,5 +58,5 @@ done
 if [ $ssh_to_tmux == false ]; then
     ssh -i $key_path $username@$ec2_instance_address
 else
-    ssh -i $key_path $username@$ec2_instance_address -t "tmux a -t training"
+    ssh -i $key_path $username@$ec2_instance_address -t "tmux new-session -A -s training"
 fi
