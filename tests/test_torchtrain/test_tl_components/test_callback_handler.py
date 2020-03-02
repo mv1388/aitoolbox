@@ -69,6 +69,19 @@ class TestCallbacksHandler(unittest.TestCase):
         self.assertEqual(cb_handler.cbs_on_epoch_begin, [])
         self.assertEqual(cb_handler.cbs_on_epoch_end, [])
 
+    def test_enforce_callbacks_quality(self):
+        train_loop = TrainLoop(NetUnifiedBatchFeed(), None, None, None, None, None)
+        # Workaround in order to test behaviour without the GPU
+        train_loop.device = torch.device(f"cuda:0")
+
+        callback_0 = AbstractCallback('dummy cb', device_idx_execution=0)
+        with self.assertRaises(ValueError):
+            train_loop.callbacks_handler.register_callbacks([callback_0])
+
+        callback_2 = AbstractCallback('dummy cb', device_idx_execution=2)
+        with self.assertRaises(ValueError):
+            train_loop.callbacks_handler.register_callbacks([callback_2])
+
     def test_split_on_execution_position(self):
         train_loop = TrainLoop(NetUnifiedBatchFeed(), None, 100, None, None, None)
         cb_handler = CallbacksHandler(train_loop)
