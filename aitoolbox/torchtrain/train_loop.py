@@ -35,7 +35,7 @@ class TrainLoop:
                  train_loader, validation_loader, test_loader,
                  optimizer, criterion,
                  collate_batch_pred_fn=append_predictions, pred_transform_fn=torch_cat_transf,
-                 end_auto_eval=True, use_amp=False, use_deepspeed=False):
+                 end_auto_eval=True, cuda_device_idx=None, use_amp=False, use_deepspeed=False):
         """Core PyTorch TrainLoop supporting the model training and target prediction
 
         Implements core training procedures: batch feeding into the network as part of (multi)epoch train loop,
@@ -57,6 +57,7 @@ class TrainLoop:
                 loss calculations. This is useful when conducting very costly experiments to save on compute time.
                 Specify either True/False boolean to always run or never run after each epoch or specify an int to
                 execute only every specified number of epochs.
+            cuda_device_idx (int or None): CUDA device index used when training on multiple GPUs
             use_amp (bool): use Nvidia Apex 16-bit Automatic Mixed Precision (AMP)
             use_deepspeed (bool): use Microsoft DeepSpeed
         """
@@ -82,7 +83,14 @@ class TrainLoop:
         self.use_deepspeed = use_deepspeed
 
         USE_CUDA = torch.cuda.is_available()
-        self.device = torch.device("cuda" if USE_CUDA else "cpu")
+        cuda_suffix = ''
+        if USE_CUDA and cuda_device_idx is not None:
+            if cuda_device_idx >= torch.cuda.device_count():
+                raise ValueError(f'Selected cuda_device_idx of {cuda_device_idx} is too high. There are only '
+                                 f'{torch.cuda.device_count()} available GPU devices. Select id ranging from '
+                                 f'0 to {torch.cuda.device_count() - 1}')
+            cuda_suffix = f':{cuda_device_idx}'
+        self.device = torch.device(f"cuda{cuda_suffix}" if USE_CUDA else "cpu")
 
         self.experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
         self.loss_batch_accum = []
@@ -426,7 +434,7 @@ class TrainLoopCheckpoint(TrainLoop):
                  cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix='', source_dirs=(),
                  rm_subopt_local_models=False, num_best_checkpoints_kept=2,
                  collate_batch_pred_fn=append_predictions, pred_transform_fn=torch_cat_transf,
-                 end_auto_eval=True, use_amp=False, use_deepspeed=False):
+                 end_auto_eval=True, cuda_device_idx=None, use_amp=False, use_deepspeed=False):
         """TrainLoop with the automatic model check-pointing at the end of each epoch
 
         Args:
@@ -463,12 +471,13 @@ class TrainLoopCheckpoint(TrainLoop):
                 loss calculations. This is useful when conducting very costly experiments to save on compute time.
                 Specify either True/False boolean to always run or never run after each epoch or specify an int to
                 execute only every specified number of epochs.
+            cuda_device_idx (int or None): CUDA device index used when training on multiple GPUs
             use_amp (bool): use Nvidia Apex 16-bit Automatic Mixed Precision (AMP)
             use_deepspeed (bool): use Microsoft DeepSpeed
         """
         TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion,
                            collate_batch_pred_fn, pred_transform_fn,
-                           end_auto_eval, use_amp, use_deepspeed)
+                           end_auto_eval, cuda_device_idx, use_amp, use_deepspeed)
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
@@ -501,7 +510,7 @@ class TrainLoopEndSave(TrainLoop):
                  hyperparams, val_result_package=None, test_result_package=None,
                  cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix='', source_dirs=(),
                  collate_batch_pred_fn=append_predictions, pred_transform_fn=torch_cat_transf,
-                 end_auto_eval=True, use_amp=False, use_deepspeed=False):
+                 end_auto_eval=True, cuda_device_idx=None, use_amp=False, use_deepspeed=False):
         """TrainLoop with the model performance evaluation and final model saving at the end of the training process
 
         Args:
@@ -535,12 +544,13 @@ class TrainLoopEndSave(TrainLoop):
                 loss calculations. This is useful when conducting very costly experiments to save on compute time.
                 Specify either True/False boolean to always run or never run after each epoch or specify an int to
                 execute only every specified number of epochs.
+            cuda_device_idx (int or None): CUDA device index used when training on multiple GPUs
             use_amp (bool): use Nvidia Apex 16-bit Automatic Mixed Precision (AMP)
             use_deepspeed (bool): use Microsoft DeepSpeed
         """
         TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion,
                            collate_batch_pred_fn, pred_transform_fn,
-                           end_auto_eval, use_amp, use_deepspeed)
+                           end_auto_eval, cuda_device_idx, use_amp, use_deepspeed)
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
@@ -593,7 +603,7 @@ class TrainLoopCheckpointEndSave(TrainLoopEndSave):
                  cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix='', source_dirs=(),
                  rm_subopt_local_models=False, num_best_checkpoints_kept=2,
                  collate_batch_pred_fn=append_predictions, pred_transform_fn=torch_cat_transf,
-                 end_auto_eval=True, use_amp=False, use_deepspeed=False):
+                 end_auto_eval=True, cuda_device_idx=None, use_amp=False, use_deepspeed=False):
         """TrainLoop both saving model check-pointing at the end of each epoch and model performance reporting
             and model saving at the end of the training process
 
@@ -633,6 +643,7 @@ class TrainLoopCheckpointEndSave(TrainLoopEndSave):
                 loss calculations. This is useful when conducting very costly experiments to save on compute time.
                 Specify either True/False boolean to always run or never run after each epoch or specify an int to
                 execute only every specified number of epochs.
+            cuda_device_idx (int or None): CUDA device index used when training on multiple GPUs
             use_amp (bool): use Nvidia Apex 16-bit Automatic Mixed Precision (AMP)
             use_deepspeed (bool): use Microsoft DeepSpeed
         """
@@ -647,7 +658,7 @@ class TrainLoopCheckpointEndSave(TrainLoopEndSave):
                                   hyperparams, val_result_package, test_result_package,
                                   cloud_save_mode, bucket_name, cloud_dir_prefix, source_dirs,
                                   collate_batch_pred_fn, pred_transform_fn,
-                                  end_auto_eval, use_amp, use_deepspeed)
+                                  end_auto_eval, cuda_device_idx, use_amp, use_deepspeed)
         self.rm_subopt_local_models = rm_subopt_local_models
 
         self.callbacks_handler.register_callbacks([
