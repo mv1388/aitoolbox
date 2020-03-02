@@ -1,3 +1,5 @@
+import torch
+
 from aitoolbox.torchtrain.callbacks.abstract import AbstractCallback
 from aitoolbox.utils.util import is_empty_function
 
@@ -27,7 +29,7 @@ class BasicCallbacksHandler:
             None
         """
         if callbacks is not None and len(callbacks) > 0:
-            self.enforce_callback_type(callbacks)
+            self.enforce_callbacks_quality(callbacks)
             self.train_loop_obj.callbacks += [cb.register_train_loop_object(self.train_loop_obj) for cb in callbacks]
 
         if not all(0 == cb.execution_order for cb in self.train_loop_obj.callbacks):
@@ -65,11 +67,16 @@ class BasicCallbacksHandler:
         for callback in self.train_loop_obj.callbacks:
             callback.on_after_optimizer_step()
 
-    @staticmethod
-    def enforce_callback_type(callbacks):
+    def enforce_callbacks_quality(self, callbacks):
         for cb in callbacks:
             if not isinstance(cb, AbstractCallback):
                 raise TypeError(f'Callback {cb} is not inherited from the AbstractCallback')
+            
+            if cb.device_idx_execution is not None and self.train_loop_obj.device.index is not None:
+                if cb.device_idx_execution >= torch.cuda.device_count():
+                    raise ValueError(f'Selected device_idx_execution of {cb.device_idx_execution} is too high. '
+                                     f'There are only {torch.cuda.device_count()} available GPU devices. '
+                                     f'Select index ranging from 0 to {torch.cuda.device_count() - 1}')
 
     @staticmethod
     def print_callback_info(callback_list):

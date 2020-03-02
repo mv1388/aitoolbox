@@ -87,7 +87,7 @@ class TrainLoop:
         if USE_CUDA and cuda_device_idx is not None:
             if cuda_device_idx >= torch.cuda.device_count():
                 raise ValueError(f'Selected cuda_device_idx of {cuda_device_idx} is too high. There are only '
-                                 f'{torch.cuda.device_count()} available GPU devices. Select id ranging from '
+                                 f'{torch.cuda.device_count()} available GPU devices. Select index ranging from '
                                  f'0 to {torch.cuda.device_count() - 1}')
             cuda_suffix = f':{cuda_device_idx}'
         self.device = torch.device(f"cuda{cuda_suffix}" if USE_CUDA else "cpu")

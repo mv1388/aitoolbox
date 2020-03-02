@@ -3,7 +3,7 @@ from typing import Optional
 
 
 class AbstractCallback:
-    def __init__(self, callback_name, execution_order=0):
+    def __init__(self, callback_name, execution_order=0, device_idx_execution=None):
         """Abstract callback class that all actual callback classes have to inherit from
 
         In the inherited callback classes the callback methods should be overwritten and used to implement desired
@@ -13,6 +13,8 @@ class AbstractCallback:
             callback_name (str): name of the callback
             execution_order (int): order of the callback execution. If all the used callbacks have the orders set to 0,
                 than the callbacks are executed in the order they were registered.
+            device_idx_execution (int or None): index of the (CUDA GPU) device DDP process inside which the callback
+                should be executed
         """
         from aitoolbox.torchtrain.train_loop import TrainLoop
         from aitoolbox.torchtrain.tl_components.message_passing import MessageService
@@ -21,6 +23,7 @@ class AbstractCallback:
         self.execution_order = execution_order
         self.train_loop_obj: Optional[TrainLoop] = None
         self.message_service: Optional[MessageService] = None
+        self.device_idx_execution = device_idx_execution
 
     def register_train_loop_object(self, train_loop_obj):
         """Introduce the reference to the encapsulating trainloop so that the callback has access to the
@@ -123,7 +126,7 @@ class AbstractExperimentCallback(AbstractCallback):
     def __init__(self, callback_name,
                  project_name=None, experiment_name=None, local_model_result_folder_path=None,
                  cloud_save_mode=None, bucket_name=None, cloud_dir_prefix=None,
-                 execution_order=0):
+                 execution_order=0, device_idx_execution=None):
         """Extension of the AbstractCallback implementing the automatic experiment details inference from TrainLoop
 
         This abstract callback is inherited from when the implemented callbacks intend to save results files into the
@@ -142,8 +145,11 @@ class AbstractExperimentCallback(AbstractCallback):
             cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
             execution_order (int): order of the callback execution. If all the used callbacks have the orders set to 0,
                 than the callbacks are executed in the order they were registered.
+            device_idx_execution (int or None): index of the (CUDA GPU) device DDP process inside which the callback
+                should be executed
         """
-        AbstractCallback.__init__(self, callback_name, execution_order=execution_order)
+        AbstractCallback.__init__(self, callback_name, execution_order=execution_order,
+                                  device_idx_execution=device_idx_execution)
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path) \
