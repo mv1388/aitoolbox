@@ -6,10 +6,10 @@ from aitoolbox.torchtrain.callbacks.ddp import DistributedSamplerSetEpoch
 
 class DDPInitializer:
     def __init__(self, train_loop_obj):
-        """
+        """Distributed Data Parallel process initializer for the TrainLoop
 
         Args:
-            train_loop_obj (aitoolbox.torchtrain.train_loop.TrainLoop):
+            train_loop_obj (aitoolbox.torchtrain.train_loop.TrainLoop): reference to the encapsulating TrainLoop
         """
         self.train_loop_obj = train_loop_obj
 
@@ -20,7 +20,7 @@ class DDPInitializer:
             raise ValueError('sampler option is mutually exclusive with shuffle')
 
     def add_distributed_samplers(self, world_size, rank, train_data_shuffle):
-        """
+        """Add Distributed Samplers needed for DDP to the normal single process DataLoader provided to the TrainLoop
 
         Args:
             world_size (int): world size of for the distributed training
