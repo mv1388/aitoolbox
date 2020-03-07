@@ -9,9 +9,11 @@ import torch.nn as nn
 from torch.nn.modules import Module
 import torch.multiprocessing as mp
 import torch.distributed as dist
+from torch.nn.parallel import DistributedDataParallel
 try:
     from apex import amp
     from apex.parallel import DistributedDataParallel as ApexDistributedDataParallel
+    from aitoolbox.torchtrain.parallel import TTApexDistributedDataParallel
     APEX_AVAILABLE = True
 except ImportError:
     APEX_AVAILABLE = False
@@ -23,7 +25,7 @@ except ImportError:
 
 from aitoolbox.utils import dict_util
 from aitoolbox.torchtrain.model import TTModel, ModelWrap
-from aitoolbox.torchtrain.parallel import TTDataParallel
+from aitoolbox.torchtrain.parallel import TTDataParallel, TTDistributedDataParallel
 from aitoolbox.torchtrain.multi_loss_optim import MultiLoss, MultiOptimizer
 from aitoolbox.torchtrain.data.batch_model_feed_defs import AbstractModelFeedDefinition
 from aitoolbox.torchtrain.tl_components.callback_handler import CallbacksHandler
@@ -164,7 +166,8 @@ class TrainLoop:
                 self.callbacks_handler.execute_batch_begin()
 
                 # Feed batch into the model
-                if isinstance(self.model, TTModel) or isinstance(self.model, TTDataParallel):
+                # if isinstance(self.model, TTModel) or isinstance(self.model, TTDataParallel):
+                if self.batch_model_feed_def is None:
                     loss_batch = self.model.get_loss(batch_data, self.criterion, self.device)
                 else:
                     loss_batch = self.batch_model_feed_def.get_loss(self.model, batch_data, self.criterion, self.device)
@@ -473,10 +476,16 @@ class TrainLoop:
         self.criterion = self.criterion.to(self.device)
         self.model = self.model.to(self.device)
 
-        if not self.use_amp:
-            self.model = nn.parallel.DistributedDataParallel(self.model, device_ids=[gpu], **ddp_args['ddp_model_args'])
+        if isinstance(self.model, TTModel):
+            if not self.use_amp:
+                self.model = TTDistributedDataParallel(self.model, device_ids=[gpu], **ddp_args['ddp_model_args'])
+            else:
+                self.model = TTApexDistributedDataParallel(self.model, **ddp_args['ddp_model_args'])
         else:
-            self.model = ApexDistributedDataParallel(self.model, **ddp_args['ddp_model_args'])
+            if not self.use_amp:
+                self.model = DistributedDataParallel(self.model, device_ids=[gpu], **ddp_args['ddp_model_args'])
+            else:
+                self.model = ApexDistributedDataParallel(self.model, **ddp_args['ddp_model_args'])
 
         self.fit(num_epochs, callbacks)
 
