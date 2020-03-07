@@ -5,9 +5,13 @@ import datetime
 import inspect
 import numpy as np
 import torch
+import torch.nn as nn
 from torch.nn.modules import Module
+import torch.multiprocessing as mp
+import torch.distributed as dist
 try:
     from apex import amp
+    from apex.parallel import DistributedDataParallel as ApexDistributedDataParallel
     APEX_AVAILABLE = True
 except ImportError:
     APEX_AVAILABLE = False
@@ -22,6 +26,7 @@ from aitoolbox.torchtrain.model import TTModel, ModelWrap, TTDataParallel
 from aitoolbox.torchtrain.multi_loss_optim import MultiLoss, MultiOptimizer
 from aitoolbox.torchtrain.data.batch_model_feed_defs import AbstractModelFeedDefinition
 from aitoolbox.torchtrain.tl_components.callback_handler import CallbacksHandler
+from aitoolbox.torchtrain.tl_components.ddp_init import DDPInitializer
 from aitoolbox.torchtrain.callbacks.model_save import ModelCheckpoint, ModelTrainEndSave
 from aitoolbox.experiment.training_history import TrainingHistory
 from aitoolbox.torchtrain.tl_components.model_prediction_store import ModelPredictionStore
@@ -99,6 +104,7 @@ class TrainLoop:
         self.train_history = TrainingHistory(has_validation=self.validation_loader is not None)
         self.prediction_store = ModelPredictionStore(auto_purge=True)
         self.message_service = MessageService()
+        self.ddp_initializer = None
 
         self.callbacks = []
         self.callbacks_handler = CallbacksHandler(self)
@@ -412,6 +418,66 @@ class TrainLoop:
         self.model.train()
 
         return y_pred, y_test, metadata
+
+    def fit_distributed(self, num_epochs, callbacks=None,
+                        train_data_shuffle=True, ddp_model_args=None,
+                        num_nodes=1, node_rank=0, num_gpus=torch.cuda.device_count()):
+        """Train the model using the train loop in the Distributed Data Parallel setting
+
+        During the training, multiple processes will be spawned, one for each of the available GPUs.
+
+        Args:
+            num_epochs (int):
+            callbacks (list or None):
+            train_data_shuffle (bool):
+            ddp_model_args (dict or None):
+            num_nodes (int):
+            node_rank (int):
+            num_gpus (int):
+        """
+        os.environ['MASTER_ADDR'] = 'localhost'
+        os.environ['MASTER_PORT'] = '8888'
+        ddp_args = {
+            'node_rank': node_rank,
+            'num_gpus': num_gpus,
+            'world_size': num_nodes * num_gpus,
+            'train_data_shuffle': train_data_shuffle,
+            'ddp_model_args': ddp_model_args if ddp_model_args is not None else {}
+        }
+
+        mp.spawn(self._spawn_fit,
+                 args=(
+                     ddp_args, num_epochs, callbacks
+                 ),
+                 nprocs=ddp_args['world_size'])
+
+    def _spawn_fit(self, gpu, ddp_args, num_epochs, callbacks):
+        """
+
+        Args:
+            gpu (int):
+            ddp_args (dict):
+            num_epochs (int):
+            callbacks (list or None):
+        """
+        rank = ddp_args['node_rank'] * ddp_args['num_gpus'] + gpu
+        dist.init_process_group(backend='nccl', init_method='env://', world_size=ddp_args['world_size'], rank=rank)
+        torch.manual_seed(0)
+        torch.cuda.set_device(gpu)
+        self.device = torch.device(f"cuda:{gpu}")
+
+        self.ddp_initializer = DDPInitializer(self)
+        self.ddp_initializer.add_distributed_samplers(ddp_args['world_size'], rank, ddp_args['train_data_shuffle'])
+
+        self.criterion = self.criterion.to(self.device)
+        self.model = self.model.to(self.device)
+
+        if not self.use_amp:
+            self.model = nn.parallel.DistributedDataParallel(self.model, device_ids=[gpu], **ddp_args['ddp_model_args'])
+        else:
+            self.model = ApexDistributedDataParallel(self.model, **ddp_args['ddp_model_args'])
+
+        self.fit(num_epochs, callbacks)
 
     def insert_metric_result_into_history(self, metric_name, metric_result):
         """Insert a metric result into the train history
