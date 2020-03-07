@@ -141,7 +141,7 @@ class TrainLoop:
 
         Args:
             num_epochs (int): how many epochs the network will be trained
-            callbacks (list): callbacks that are executed during the training run
+            callbacks (list or None): callbacks that are executed during the training run
 
         Returns:
             TTModel or torch.nn.modules.Module or TTDataParallel or deepspeed.DeepSpeedLight: trained model
@@ -427,13 +427,13 @@ class TrainLoop:
         During the training, multiple processes will be spawned, one for each of the available GPUs.
 
         Args:
-            num_epochs (int):
-            callbacks (list or None):
-            train_data_shuffle (bool):
-            ddp_model_args (dict or None):
-            num_nodes (int):
-            node_rank (int):
-            num_gpus (int):
+            num_epochs (int): how many epochs the network will be trained
+            callbacks (list or None): callbacks that are executed during the training run
+            train_data_shuffle (bool): should train loader return shuffled data
+            ddp_model_args (dict or None): parameters for DistributedDataParallel / APEX DistributedDataParallel model
+            num_nodes (int): number of nodes in the cluster
+            node_rank (int): rank of the current node
+            num_gpus (int): number of GPUs in the node
         """
         os.environ['MASTER_ADDR'] = 'localhost'
         os.environ['MASTER_PORT'] = '8888'
@@ -452,13 +452,13 @@ class TrainLoop:
                  nprocs=ddp_args['world_size'])
 
     def _spawn_fit(self, gpu, ddp_args, num_epochs, callbacks):
-        """
+        """Helper function that prepares the TrainLoop state inside each of the spawned processes and initiates training
 
         Args:
-            gpu (int):
-            ddp_args (dict):
-            num_epochs (int):
-            callbacks (list or None):
+            gpu (int): provided by the mp.spawn(); index of the GPU allocated to the current process
+            ddp_args (dict): parameters dict needed for the distributed training setup
+            num_epochs (int): how many epochs the network will be trained
+            callbacks (list or None): callbacks that are executed during the training run
         """
         rank = ddp_args['node_rank'] * ddp_args['num_gpus'] + gpu
         dist.init_process_group(backend='nccl', init_method='env://', world_size=ddp_args['world_size'], rank=rank)

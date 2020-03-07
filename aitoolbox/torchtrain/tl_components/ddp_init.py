@@ -23,9 +23,9 @@ class DDPInitializer:
         """
         
         Args:
-            world_size (int): 
-            rank (int): 
-            train_data_shuffle (bool): 
+            world_size (int): world size of for the distributed training
+            rank (int): rank of the current process
+            train_data_shuffle (bool): should train loader return shuffled data
         """
         train_sampler = val_sampler = test_sampler = None
 
@@ -51,12 +51,12 @@ class DDPInitializer:
     @staticmethod
     def build_loader_sampler(data_loader, shuffle, world_size, rank):
         """Replicate given data loader with added distributed sampler 
-        
+
         Args:
             data_loader (DataLoader): original single process data loader without the distributed sampler
             shuffle (bool): should the added sampler be returning examples in the shuffled order
-            world_size (int): 
-            rank (int): 
+            world_size (int): world size of for the distributed training
+            rank (int): rank of the current process
 
         Returns:
             DataLoader, DistributedSampler: new data loader with the sampler, reference to the distributed sampler

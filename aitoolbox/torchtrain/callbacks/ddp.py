@@ -6,7 +6,7 @@ class DistributedSamplerSetEpoch(AbstractCallback):
         """Callback setting epoch index in the DistributedSamplers at the beginning of every epoch
 
         Args:
-            train_sampler (torch.utils.data.distributed.DistributedSampler or None): 
+            train_sampler (torch.utils.data.distributed.DistributedSampler or None):
                 Distributed sampler for train loader
             validation_sampler (torch.utils.data.distributed.DistributedSampler or None):
                 Distributed sampler for validation loader
