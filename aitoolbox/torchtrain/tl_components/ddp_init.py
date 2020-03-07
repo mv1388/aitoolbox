@@ -18,7 +18,7 @@ class DDPInitializer:
                 (self.train_loop_obj.validation_loader is not None and isinstance(self.train_loop_obj.validation_loader.sampler, RandomSampler)) or \
                 (self.train_loop_obj.test_loader is not None and isinstance(self.train_loop_obj.test_loader.sampler, RandomSampler)):
             raise ValueError('sampler option is mutually exclusive with shuffle')
-        
+
     def add_distributed_samplers(self, world_size, rank, train_data_shuffle):
         """
 
