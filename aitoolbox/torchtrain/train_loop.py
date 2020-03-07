@@ -5,7 +5,6 @@ import datetime
 import inspect
 import numpy as np
 import torch
-import torch.nn as nn
 from torch.nn.modules import Module
 import torch.multiprocessing as mp
 import torch.distributed as dist
@@ -166,7 +165,6 @@ class TrainLoop:
                 self.callbacks_handler.execute_batch_begin()
 
                 # Feed batch into the model
-                # if isinstance(self.model, TTModel) or isinstance(self.model, TTDataParallel):
                 if self.batch_model_feed_def is None:
                     loss_batch = self.model.get_loss(batch_data, self.criterion, self.device)
                 else:
