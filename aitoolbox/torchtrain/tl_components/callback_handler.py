@@ -23,7 +23,7 @@ class BasicCallbacksHandler:
         itself.
 
         Args:
-            callbacks (list): list of callbacks
+            callbacks (list or None): list of callbacks
 
         Returns:
             None
@@ -175,7 +175,7 @@ class CallbacksHandler(BasicCallbacksHandler):
         itself.
 
         Args:
-            callbacks (list): list of callbacks
+            callbacks (list or None): list of callbacks
 
         Returns:
             None
