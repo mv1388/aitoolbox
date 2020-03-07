@@ -134,7 +134,11 @@ class EmailNotification(AbstractCallback):
         self.project_name = project_name
         self.experiment_name = experiment_name
 
-        self.ses_sender = SESSender(sender_name, sender_email, recipient_email, aws_region)
+        self.ses_sender = None
+        self.sender_name = sender_name
+        self.sender_email = sender_email
+        self.recipient_email = recipient_email
+        self.aws_region = aws_region
 
     def on_epoch_end(self):
         subject = f"End of epoch {self.train_loop_obj.epoch} report: {self.project_name}: {self.experiment_name}"
@@ -218,6 +222,8 @@ class EmailNotification(AbstractCallback):
             raise AttributeError('Currently used TrainLoop does not support automatic project folder structure '
                                  'creation. Project name, etc. thus can not be automatically deduced. Please provide'
                                  'it in the callback parameters instead of currently used None values.')
+
+        self.ses_sender = SESSender(self.sender_name, self.sender_email, self.recipient_email, self.aws_region)
 
 
 class LogUpload(AbstractExperimentCallback):
