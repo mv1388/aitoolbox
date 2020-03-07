@@ -147,6 +147,14 @@ class TTApexDistributedDataParallelExplicit(ApexDistributedDataParallel):
 class TTParallelBase:
     def __init__(self, module, add_model_attributes=None,
                  default_model_methods=('get_loss', 'get_loss_eval', 'get_predictions')):
+        """torchtrain parallel base class used for transferring TTModel functions to the PyTorch Parallel wrappers level
+
+        Args:
+            module (TTModel): neural network model
+            add_model_attributes (list or tuple or None): additional TTModel attributes which need to be transferred to
+                the TTDataParallel level to enable their use in the transferred/exposed class methods
+            default_model_methods (list or tuple): list of core methods which are present also in TTModel abstract class
+        """
         # Core TTModel methods which every model has
         self.get_loss_fn = copy_function(module.get_loss)
         self.get_loss_eval_fn = copy_function(module.get_loss_eval)
@@ -179,6 +187,19 @@ class TTParallelBase:
 class TTDataParallel(nn.DataParallel, TTParallelBase):
     def __init__(self, module, add_model_attributes=None,
                  default_model_methods=('get_loss', 'get_loss_eval', 'get_predictions'), **kwargs):
+        """torchtrain enabled DataParallel
+
+        This DataParallel wrapper works in the same way as the original PyTorch nn.DataParallel. Furthermore it exposes
+        TTModel batch data feeding definitions (additional abstract methods) to the TrainLoop while still enabling
+        multi GPU training.
+
+        Args:
+            module (TTModel): neural network model
+            add_model_attributes (list or tuple or None): additional TTModel attributes which need to be transferred to
+                the TTDataParallel level to enable their use in the transferred/exposed class methods
+            default_model_methods (list or tuple): list of core methods which are present also in TTModel abstract class
+            **kwargs: additional parameters for underlying nn.DataParallel
+        """
         nn.DataParallel.__init__(self, module, **kwargs)
         TTParallelBase.__init__(self, module, add_model_attributes, default_model_methods)
 
@@ -186,6 +207,15 @@ class TTDataParallel(nn.DataParallel, TTParallelBase):
 class TTDistributedDataParallel(DistributedDataParallel, TTParallelBase):
     def __init__(self, module, add_model_attributes=None,
                  default_model_methods=('get_loss', 'get_loss_eval', 'get_predictions'), **kwargs):
+        """torchtrain enabled DistributedDataParallel
+
+        Args:
+            module (TTModel): neural network model
+            add_model_attributes (list or tuple or None): additional TTModel attributes which need to be transferred to
+                the TTDistributedDataParallel level to enable their use in the transferred/exposed class methods
+            default_model_methods (list or tuple): list of core methods which are present also in TTModel abstract class
+            **kwargs: additional parameters for underlying nn.parallel.DistributedDataParallel
+        """
         DistributedDataParallel.__init__(self, module, **kwargs)
         TTParallelBase.__init__(self, module, add_model_attributes, default_model_methods)
 
@@ -194,5 +224,15 @@ if APEX_AVAILABLE:
     class TTApexDistributedDataParallel(ApexDistributedDataParallel, TTParallelBase):
         def __init__(self, module, add_model_attributes=None,
                      default_model_methods=('get_loss', 'get_loss_eval', 'get_predictions'), **kwargs):
+            """torchtrain enabled Nvidia Apex DistributedDataParallel
+
+            Args:
+                module (TTModel): neural network model
+                add_model_attributes (list or tuple or None): additional TTModel attributes which need to be
+                transferred to the TTDataParallel level to enable their use in the transferred/exposed class methods
+                default_model_methods (list or tuple): list of core methods which are present also in TTModel
+                    abstract class
+                **kwargs: additional parameters for underlying apex.parallel.DistributedDataParallel
+            """
             ApexDistributedDataParallel.__init__(self, module, **kwargs)
             TTParallelBase.__init__(self, module, add_model_attributes, default_model_methods)
