@@ -3,7 +3,8 @@ from torch import nn
 
 from tests.utils import *
 
-from aitoolbox.torchtrain.model import TTModel, TTBasicModel, TTDataParallel
+from aitoolbox.torchtrain.model import TTModel, TTBasicModel
+from aitoolbox import TTDataParallel
 from aitoolbox.utils.util import function_exists
 
 

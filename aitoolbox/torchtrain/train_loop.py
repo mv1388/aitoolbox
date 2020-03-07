@@ -22,7 +22,8 @@ except ImportError:
     DEEPSPEED_AVAILABLE = False
 
 from aitoolbox.utils import dict_util
-from aitoolbox.torchtrain.model import TTModel, ModelWrap, TTDataParallel
+from aitoolbox.torchtrain.model import TTModel, ModelWrap
+from aitoolbox.torchtrain.parallel import TTDataParallel
 from aitoolbox.torchtrain.multi_loss_optim import MultiLoss, MultiOptimizer
 from aitoolbox.torchtrain.data.batch_model_feed_defs import AbstractModelFeedDefinition
 from aitoolbox.torchtrain.tl_components.callback_handler import CallbacksHandler
