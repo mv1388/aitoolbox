@@ -67,6 +67,10 @@ class BasicCallbacksHandler:
         for callback in self.train_loop_obj.callbacks:
             callback.on_after_optimizer_step()
 
+    def execute_multiprocess_start(self):
+        for callback in self.train_loop_obj.callbacks:
+            callback.on_multiprocess_start()
+
     def enforce_callbacks_quality(self, callbacks):
         for cb in callbacks:
             if not isinstance(cb, AbstractCallback):
@@ -160,12 +164,14 @@ class CallbacksHandler(BasicCallbacksHandler):
         self.cbs_on_batch_end = []
         self.cbs_on_after_gradient_update = []
         self.cbs_on_after_optimizer_step = []
+        self.cbs_on_multiprocess_start = []
         
         self.registered_cbs = [
             self.cbs_on_epoch_begin, self.cbs_on_epoch_end,
             self.cbs_on_train_begin, self.cbs_on_train_end,
             self.cbs_on_batch_begin,  self.cbs_on_batch_end,
-            self.cbs_on_after_gradient_update, self.cbs_on_after_optimizer_step
+            self.cbs_on_after_gradient_update, self.cbs_on_after_optimizer_step,
+            self.cbs_on_multiprocess_start
         ]
 
     def register_callbacks(self, callbacks):
@@ -215,6 +221,10 @@ class CallbacksHandler(BasicCallbacksHandler):
         for callback in self.cbs_on_after_optimizer_step:
             callback.on_after_optimizer_step()
 
+    def execute_multiprocess_start(self):
+        for callback in self.cbs_on_multiprocess_start:
+            callback.on_multiprocess_start()
+
     def split_on_execution_position(self, callbacks, register_train_loop=False):
         if callbacks is not None and len(callbacks) > 0:
             for callback in callbacks:
@@ -245,6 +255,9 @@ class CallbacksHandler(BasicCallbacksHandler):
                 if not is_empty_function(callback.on_after_optimizer_step):
                     self.cbs_on_after_optimizer_step.append(callback)
 
+                if not is_empty_function(callback.on_multiprocess_start):
+                    self.cbs_on_multiprocess_start.append(callback)
+
         for cbs_at_position in self.registered_cbs:
             if not all(0 == cb.execution_order for cb in cbs_at_position):
                 cbs_at_position.sort(key=lambda cb: cb.execution_order)
@@ -258,4 +271,5 @@ class CallbacksHandler(BasicCallbacksHandler):
                f'At on_batch_begin:\n{self.print_callback_info(self.cbs_on_batch_begin)}\n' \
                f'At on_batch_end:\n{self.print_callback_info(self.cbs_on_batch_end)}\n' \
                f'At on_after_gradient_update:\n{self.print_callback_info(self.cbs_on_after_gradient_update)}\n' \
-               f'At on_after_optimizer_step:\n{self.print_callback_info(self.cbs_on_after_optimizer_step)}'
+               f'At on_after_optimizer_step:\n{self.print_callback_info(self.cbs_on_after_optimizer_step)}\n' \
+               f'At on_multiprocess_start:\n{self.print_callback_info(self.cbs_on_multiprocess_start)}'

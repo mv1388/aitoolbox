@@ -53,7 +53,7 @@ class TestCallbacksHandler(unittest.TestCase):
                 [], [],
                 [batch_begin_train_begin_after_opti_cb, batch_begin_train_begin_cb], [],
                 [batch_begin_train_begin_after_opti_cb, batch_begin_train_begin_cb, batch_begin_cb], [],
-                [], [batch_begin_train_begin_after_opti_cb]
+                [], [batch_begin_train_begin_after_opti_cb], []
             ]
         )
 
@@ -104,7 +104,7 @@ class TestCallbacksHandler(unittest.TestCase):
                 [], [],
                 [batch_begin_train_begin_cb, batch_begin_train_begin_after_opti_cb], [],
                 [batch_begin_cb, batch_begin_train_begin_cb, batch_begin_train_begin_after_opti_cb], [],
-                [], [batch_begin_train_begin_after_opti_cb]
+                [], [batch_begin_train_begin_after_opti_cb], []
             ]
         )
 
@@ -137,7 +137,7 @@ class TestCallbacksHandler(unittest.TestCase):
                 [], [],
                 [batch_begin_train_begin_after_opti_cb, batch_begin_train_begin_cb], [],
                 [batch_begin_train_begin_after_opti_cb, batch_begin_train_begin_cb, batch_begin_cb], [],
-                [], [batch_begin_train_begin_after_opti_cb]
+                [], [batch_begin_train_begin_after_opti_cb], []
             ]
         )
 

@@ -422,7 +422,7 @@ class TrainLoop:
         return y_pred, y_test, metadata
 
     def fit_distributed(self, num_epochs, callbacks=None,
-                        train_data_shuffle=True, ddp_model_args=None,
+                        train_data_shuffle=True, ddp_model_args=None, in_process_data_load=None,
                         num_nodes=1, node_rank=0, num_gpus=torch.cuda.device_count()):
         """Train the model using the train loop in the Distributed Data Parallel setting
 
@@ -433,6 +433,11 @@ class TrainLoop:
             callbacks (list or None): callbacks that are executed during the training run
             train_data_shuffle (bool): should train loader return shuffled data
             ddp_model_args (dict or None): parameters for DistributedDataParallel / APEX DistributedDataParallel model
+            in_process_data_load (AbstractCallback or list or None):
+                in-process data loading logic implemented as a torchtrain callback. The logic should be placed inside
+                the on_multiprocess_start() callback function.
+                When using this data loading option bare in mind that loaded dataset will be replicated in memory for
+                every spawned training process. This can in turn in cause extensive overall memory consumption.
             num_nodes (int): number of nodes in the cluster
             node_rank (int): rank of the current node
             num_gpus (int): number of GPUs in the node
@@ -447,13 +452,17 @@ class TrainLoop:
             'ddp_model_args': ddp_model_args if ddp_model_args is not None else {}
         }
 
+        from aitoolbox.torchtrain.callbacks.abstract import AbstractCallback
+        if isinstance(in_process_data_load, AbstractCallback):
+            in_process_data_load = [in_process_data_load]
+
         mp.spawn(self._spawn_fit,
                  args=(
-                     ddp_args, num_epochs, callbacks
+                     ddp_args, num_epochs, callbacks, in_process_data_load
                  ),
                  nprocs=ddp_args['world_size'])
 
-    def _spawn_fit(self, gpu, ddp_args, num_epochs, callbacks):
+    def _spawn_fit(self, gpu, ddp_args, num_epochs, callbacks, in_process_data_load):
         """Helper function that prepares the TrainLoop state inside each of the spawned processes and initiates training
 
         Args:
@@ -461,12 +470,19 @@ class TrainLoop:
             ddp_args (dict): parameters dict needed for the distributed training setup
             num_epochs (int): how many epochs the network will be trained
             callbacks (list or None): callbacks that are executed during the training run
+            in_process_data_load (list or None): in-process data loading logic implemented as a torchtrain callback.
+                The logic should be placed inside the on_multiprocess_start() callback function.
+                When using this data loading option bare in mind that loaded dataset will be replicated in memory for
+                every spawned training process. This can in turn in cause extensive overall memory consumption.
         """
         rank = ddp_args['node_rank'] * ddp_args['num_gpus'] + gpu
         dist.init_process_group(backend='nccl', init_method='env://', world_size=ddp_args['world_size'], rank=rank)
         torch.manual_seed(0)
         torch.cuda.set_device(gpu)
         self.device = torch.device(f"cuda:{gpu}")
+
+        self.callbacks_handler.register_callbacks(in_process_data_load)
+        self.callbacks_handler.execute_multiprocess_start()
 
         self.ddp_initializer = DDPInitializer(self)
         self.ddp_initializer.add_distributed_samplers(ddp_args['world_size'], rank, ddp_args['train_data_shuffle'])

@@ -121,6 +121,14 @@ class AbstractCallback:
         """
         pass
 
+    def on_multiprocess_start(self):
+        """Logic executed after a new multiprocessing process is spawned at the beginning of every child process
+
+        Returns:
+
+        """
+        pass
+
 
 class AbstractExperimentCallback(AbstractCallback):
     def __init__(self, callback_name,
