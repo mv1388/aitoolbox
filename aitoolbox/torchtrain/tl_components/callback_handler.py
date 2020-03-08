@@ -30,7 +30,11 @@ class BasicCallbacksHandler:
         """
         if callbacks is not None and len(callbacks) > 0:
             self.enforce_callbacks_quality(callbacks)
-            self.train_loop_obj.callbacks += [cb.register_train_loop_object(self.train_loop_obj) for cb in callbacks]
+            self.train_loop_obj.callbacks += \
+                [cb.register_train_loop_object(self.train_loop_obj) for cb in callbacks
+                 if self.train_loop_obj.device.index is None or 
+                 cb.device_idx_execution is None or
+                 (cb.device_idx_execution is not None and cb.device_idx_execution == self.train_loop_obj.device.index)]
 
         if not all(0 == cb.execution_order for cb in self.train_loop_obj.callbacks):
             self.train_loop_obj.callbacks = sorted(self.train_loop_obj.callbacks, key=lambda cb: cb.execution_order)
@@ -228,35 +232,40 @@ class CallbacksHandler(BasicCallbacksHandler):
     def split_on_execution_position(self, callbacks, register_train_loop=False):
         if callbacks is not None and len(callbacks) > 0:
             for callback in callbacks:
-                if register_train_loop:
-                    callback = callback.register_train_loop_object(self.train_loop_obj)
+                if self.train_loop_obj.device.index is None or \
+                        callback.device_idx_execution is None or \
+                        (callback.device_idx_execution is not None and
+                         callback.device_idx_execution == self.train_loop_obj.device.index):
 
-                if not is_empty_function(callback.on_epoch_begin):
-                    self.cbs_on_epoch_begin.append(callback)
+                    if register_train_loop:
+                        callback = callback.register_train_loop_object(self.train_loop_obj)
 
-                if not is_empty_function(callback.on_epoch_end):
-                    self.cbs_on_epoch_end.append(callback)
+                    if not is_empty_function(callback.on_epoch_begin):
+                        self.cbs_on_epoch_begin.append(callback)
 
-                if not is_empty_function(callback.on_train_begin):
-                    self.cbs_on_train_begin.append(callback)
+                    if not is_empty_function(callback.on_epoch_end):
+                        self.cbs_on_epoch_end.append(callback)
 
-                if not is_empty_function(callback.on_train_end):
-                    self.cbs_on_train_end.append(callback)
+                    if not is_empty_function(callback.on_train_begin):
+                        self.cbs_on_train_begin.append(callback)
 
-                if not is_empty_function(callback.on_batch_begin):
-                    self.cbs_on_batch_begin.append(callback)
+                    if not is_empty_function(callback.on_train_end):
+                        self.cbs_on_train_end.append(callback)
 
-                if not is_empty_function(callback.on_batch_end):
-                    self.cbs_on_batch_end.append(callback)
+                    if not is_empty_function(callback.on_batch_begin):
+                        self.cbs_on_batch_begin.append(callback)
 
-                if not is_empty_function(callback.on_after_gradient_update):
-                    self.cbs_on_after_gradient_update.append(callback)
+                    if not is_empty_function(callback.on_batch_end):
+                        self.cbs_on_batch_end.append(callback)
 
-                if not is_empty_function(callback.on_after_optimizer_step):
-                    self.cbs_on_after_optimizer_step.append(callback)
+                    if not is_empty_function(callback.on_after_gradient_update):
+                        self.cbs_on_after_gradient_update.append(callback)
 
-                if not is_empty_function(callback.on_multiprocess_start):
-                    self.cbs_on_multiprocess_start.append(callback)
+                    if not is_empty_function(callback.on_after_optimizer_step):
+                        self.cbs_on_after_optimizer_step.append(callback)
+
+                    if not is_empty_function(callback.on_multiprocess_start):
+                        self.cbs_on_multiprocess_start.append(callback)
 
         for cbs_at_position in self.registered_cbs:
             if not all(0 == cb.execution_order for cb in cbs_at_position):
