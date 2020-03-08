@@ -27,7 +27,6 @@ from aitoolbox.torchtrain.model import TTModel, ModelWrap
 from aitoolbox.torchtrain.parallel import TTDataParallel, TTDistributedDataParallel
 from aitoolbox.torchtrain.multi_loss_optim import MultiLoss, MultiOptimizer
 from aitoolbox.torchtrain.data.batch_model_feed_defs import AbstractModelFeedDefinition
-from aitoolbox.torchtrain.callbacks.abstract import AbstractCallback
 from aitoolbox.torchtrain.tl_components.callback_handler import CallbacksHandler
 from aitoolbox.torchtrain.tl_components.ddp_init import DDPInitializer
 from aitoolbox.torchtrain.callbacks.model_save import ModelCheckpoint, ModelTrainEndSave
@@ -453,6 +452,7 @@ class TrainLoop:
             'ddp_model_args': ddp_model_args if ddp_model_args is not None else {}
         }
 
+        from aitoolbox.torchtrain.callbacks.abstract import AbstractCallback
         if isinstance(in_process_data_load, AbstractCallback):
             in_process_data_load = [in_process_data_load]
 
