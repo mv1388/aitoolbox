@@ -322,7 +322,7 @@ class TrainLoop:
 
         with torch.no_grad():
             for batch_data in tqdm(data_loader):
-                if isinstance(self.model, TTModel) or isinstance(self.model, TTDataParallel):
+                if self.batch_model_feed_def is None:
                     loss_batch = self.model.get_loss_eval(batch_data, self.criterion, self.device)
                 else:
                     loss_batch = self.batch_model_feed_def.get_loss_eval(self.model, batch_data, self.criterion,
@@ -400,7 +400,7 @@ class TrainLoop:
 
         with torch.no_grad():
             for batch_data in tqdm(data_loader):
-                if isinstance(self.model, TTModel) or isinstance(self.model, TTDataParallel):
+                if self.batch_model_feed_def is None:
                     y_pred_batch, y_test_batch, metadata_batch = self.model.get_predictions(batch_data, self.device)
                 else:
                     y_pred_batch, y_test_batch, metadata_batch = \
