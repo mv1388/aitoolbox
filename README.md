@@ -22,9 +22,7 @@ automatically shut down when training is finished and all the results
 are safely stored on S3.
 
 
-## torchtrain
-
-### TrainLoop
+## TrainLoop
 
 [`TrainLoop`](/aitoolbox/torchtrain/train_loop.py) is the main abstraction for PyTorch neural net training. At its core
 it handles the batch feeding of data into the model, calculating loss and updating parameters for a specified number of epochs.
@@ -32,6 +30,8 @@ To learn how to define the TrainLoop supported PyTorch model please look at the 
 
 After the model is created, the simplest way to train it via the TrainLoop abstraction is by doing the following:
 ```python
+from aitoolbox.torchtrain.train_loop import *
+
 tl = TrainLoop(model,
                train_loader, val_loader, test_loader,
                optimizer, criterion, use_amp=False)
@@ -50,6 +50,8 @@ For the most complete experiment tracking it is recommended to use the `TrainLoo
 The optional use of the *result packages* needed for the neural net performance evaluation is explained in 
 the [experiment section](#experiment) bellow.
 ```python
+from aitoolbox.torchtrain.train_loop import *
+
 TrainLoopCheckpointEndSave(
     model,
     train_loader, validation_loader, test_loader,
@@ -70,6 +72,7 @@ All other training related steps are handled automatically by the TrainLoop. Exa
 is shown bellow and more can be read in the official 
 [Nvidia apex documentation](https://nvidia.github.io/apex/amp.html#opt-levels-and-properties).
 ```python
+from aitoolbox.torchtrain.train_loop import *
 from apex import amp
 
 model, optimizer = amp.initialize(model, optimizer, opt_level="O1")
@@ -78,17 +81,18 @@ TrainLoop(model, ...,
           optimizer, criterion, use_amp=True).fit(10)
 ``` 
 
-### Multi-GPU training
+## Multi-GPU training
 
 All TrainLoop versions in addition to single GPU also support multi-GPU training to achieve even faster training.
 Following the core PyTorch setup, two multi-GPU training approaches are available: 
 `DataParallel` implemented via `TTDataParallel` and `DistributedDataParallel` implemented via `TTDistributedDataParallel`.
 
-#### DataParallel - via TTDataParallel
+### DataParallel - via TTDataParallel
 
 To use DataParallel-like multiGPU training with TrainLoop just wrap the model (`TTModel`, [more in Model section](#model))
 into the `TTDataParallel` object, the same way it would done in core PyTorch:
 ```python
+from aitoolbox.torchtrain.train_loop import *
 from aitoolbox.torchtrain.parallel import TTDataParallel
 
 model = ... # TTModel
@@ -101,7 +105,7 @@ TrainLoop(
 ).fit(num_epochs=10)
 ```
 
-#### DistributedDataParallel - via TTDistributedDataParallel
+### DistributedDataParallel - via TTDistributedDataParallel
 
 Distributed training on multiple GPUs via DistributedDataParallel is enabled by the TrainLoop itself under
 the hood by wrapping the model (`TTModel`, [more in Model section](#model)) into `TTDistributedDataParallel`.
@@ -114,6 +118,8 @@ To enable distributed training via DistributedDataParallel, all the user has to 
 TrainLoop where `TTModel` should be provided and then call train loop's dedicated `fit_distributed()` 
 function (instead of `fit()` used otherwise when not training distributed).
 ```python
+from aitoolbox.torchtrain.train_loop import *
+
 model = ... # TTModel
 
 TrainLoop(
@@ -125,7 +131,7 @@ TrainLoop(
                   num_nodes=1, node_rank=0, num_gpus=torch.cuda.device_count())
 ```
 
-### Model
+## Model
 
 To take advantage of the TrainLoop abstraction the user has to define their model as a class which is a standard way
 in core PyTorch as well. The only difference is that for TrainLoop supported training the model class has 
@@ -167,7 +173,7 @@ class MyNeuralModel(TTModel):
         # return predictions, true_targets, metadata
 ```
 
-### Callbacks
+## Callbacks
 
 For advanced applications the basic logic offered in different default TrainLoops might not be enough.
 Additional needed logic can be injected into the training procedure by using [`callbacks`](/aitoolbox/torchtrain/callbacks)
