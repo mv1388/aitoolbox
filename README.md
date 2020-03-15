@@ -50,14 +50,16 @@ For the most complete experiment tracking it is recommended to use the `TrainLoo
 The optional use of the *result packages* needed for the neural net performance evaluation is explained in 
 the [experiment section](#experiment) bellow.
 ```python
-TrainLoopCheckpointEndSave(model,
-                           train_loader, validation_loader, test_loader,
-                           optimizer, criterion,
-                           project_name, experiment_name, local_model_result_folder_path,
-                           hyperparams, val_result_package=None, test_result_package=None,
-                           cloud_save_mode='s3', bucket_name='models', cloud_dir_prefix='',
-                           rm_subopt_local_models=False, num_best_checkpoints_kept=2,
-                           use_amp=False)
+TrainLoopCheckpointEndSave(
+    model,
+    train_loader, validation_loader, test_loader,
+    optimizer, criterion,
+    project_name, experiment_name, local_model_result_folder_path,
+    hyperparams, val_result_package=None, test_result_package=None,
+    cloud_save_mode='s3', bucket_name='models', cloud_dir_prefix='',
+    rm_subopt_local_models=False, num_best_checkpoints_kept=2,
+    use_amp=False
+)
 ```
 
 Lastly, all the TrainLoop versions also support training with **Automatic Mixed Precision**
@@ -92,10 +94,11 @@ from aitoolbox.torchtrain.parallel import TTDataParallel
 model = ... # TTModel
 model = TTDataParallel(model)
 
-TrainLoop(model,
-          train_loader, val_loader, test_loader,
-          optimizer, criterion) \
-    .fit(num_epochs=10)
+TrainLoop(
+    model,
+    train_loader, val_loader, test_loader,
+    optimizer, criterion
+).fit(num_epochs=10)
 ```
 
 #### DistributedDataParallel - via TTDistributedDataParallel
@@ -113,14 +116,14 @@ function (instead of `fit()` used otherwise when not training distributed).
 ```python
 model = ... # TTModel
 
-TrainLoop(model,
-          train_loader, val_loader, test_loader,
-          optimizer, criterion) \
-    .fit_distributed(num_epochs=10, callbacks=None,
-                     train_data_shuffle=True, ddp_model_args=None, in_process_data_load=None,
-                     num_nodes=1, node_rank=0, num_gpus=torch.cuda.device_count())
+TrainLoop(
+    model,
+    train_loader, val_loader, test_loader,
+    optimizer, criterion
+).fit_distributed(num_epochs=10, callbacks=None,
+                  train_data_shuffle=True, ddp_model_args=None, in_process_data_load=None,
+                  num_nodes=1, node_rank=0, num_gpus=torch.cuda.device_count())
 ```
-
 
 ### Model
 
