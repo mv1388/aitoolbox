@@ -60,7 +60,7 @@ TrainLoopCheckpointEndSave(model,
                            use_amp=False)
 ```
 
-Lastly, all the TrainingLoop versions also support training with **Automatic Mixed Precision**
+Lastly, all the TrainLoop versions also support training with **Automatic Mixed Precision**
 using the [Nvidia apex](https://github.com/NVIDIA/apex) extension. To use this feature the user first
 has to install the Nvidia apex library ([installation instructions](https://github.com/NVIDIA/apex#linux)). 
 After that, the user only has to properly amp initialize the model and optimizer and finally set the TrainLoop parameter to `use_amp=True`.
@@ -75,6 +75,52 @@ model, optimizer = amp.initialize(model, optimizer, opt_level="O1")
 TrainLoop(model, ...,
           optimizer, criterion, use_amp=True).fit(10)
 ``` 
+
+### Multi-GPU training
+
+All TrainLoop versions in addition to single GPU also support multi-GPU training to achieve even faster training.
+Following the core PyTorch setup, two multi-GPU training approaches are available: 
+`DataParallel` implemented via `TTDataParallel` and `DistributedDataParallel` implemented via `TTDistributedDataParallel`.
+
+#### DataParallel - via TTDataParallel
+
+To use DataParallel-like multiGPU training with TrainLoop just wrap the model (`TTModel`, [more in Model section](#model))
+into the `TTDataParallel` object, the same way it would done in core PyTorch:
+```python
+from aitoolbox.torchtrain.parallel import TTDataParallel
+
+model = ... # TTModel
+model = TTDataParallel(model)
+
+TrainLoop(model,
+          train_loader, val_loader, test_loader,
+          optimizer, criterion) \
+    .fit(num_epochs=10)
+```
+
+#### DistributedDataParallel - via TTDistributedDataParallel
+
+Distributed training on multiple GPUs via DistributedDataParallel is enabled by the TrainLoop itself under
+the hood by wrapping the model (`TTModel`, [more in Model section](#model)) into `TTDistributedDataParallel`.
+TrainLoop also automatically spawns multiple processes and initializes them. Inside each spawned process
+the model and all other necessary training components are moved to the correct GPU belonging to a specific
+process. Lastly, TrainLoop also automatically adds the PyTorch `DistributedSampler` to each of the provided
+data loaders in order to ensure different data batches go to different GPUs and there is no overlap.
+
+To enable distributed training via DistributedDataParallel, all the user has to do is to initialize
+TrainLoop where `TTModel` should be provided and then call train loop's dedicated `fit_distributed()` 
+function (instead of `fit()` used otherwise when not training distributed).
+```python
+model = ... # TTModel
+
+TrainLoop(model,
+          train_loader, val_loader, test_loader,
+          optimizer, criterion) \
+    .fit_distributed(num_epochs=10, callbacks=None,
+                     train_data_shuffle=True, ddp_model_args=None, in_process_data_load=None,
+                     num_nodes=1, node_rank=0, num_gpus=torch.cuda.device_count())
+```
+
 
 ### Model
 
