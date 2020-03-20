@@ -422,7 +422,7 @@ class TrainLoop:
         return y_pred, y_test, metadata
 
     def fit_distributed(self, num_epochs, callbacks=None,
-                        train_data_shuffle=True, ddp_model_args=None, in_process_data_load=None,
+                        train_data_shuffle=True, ddp_model_args=None, amp_init_args=None, in_process_data_load=None,
                         num_nodes=1, node_rank=0, num_gpus=torch.cuda.device_count()):
         """Train the model using the train loop in the Distributed Data Parallel setting
 
@@ -433,6 +433,12 @@ class TrainLoop:
             callbacks (list or None): callbacks that are executed during the training run
             train_data_shuffle (bool): should train loader return shuffled data
             ddp_model_args (dict or None): parameters for DistributedDataParallel / APEX DistributedDataParallel model
+                Available parameters for DistributedDataParallel:
+                    https://pytorch.org/docs/master/nn.html#torch.nn.parallel.DistributedDataParallel
+                Available parameters for APEX DistributedDataParallel:
+                    https://nvidia.github.io/apex/parallel.html#apex.parallel.DistributedDataParallel
+            amp_init_args (dict or None): Apex AMP initialization parameters
+                Available parameters: https://nvidia.github.io/apex/amp.html#apex.amp.initialize
             in_process_data_load (AbstractCallback or list or None):
                 in-process data loading logic implemented as a torchtrain callback. The logic should be placed inside
                 the on_multiprocess_start() callback function.
@@ -449,12 +455,19 @@ class TrainLoop:
             'num_gpus': num_gpus,
             'world_size': num_nodes * num_gpus,
             'train_data_shuffle': train_data_shuffle,
-            'ddp_model_args': ddp_model_args if ddp_model_args is not None else {}
+            'ddp_model_args': ddp_model_args if ddp_model_args is not None else {},
+            'amp_init_args': amp_init_args if amp_init_args is not None else {}
         }
 
         from aitoolbox.torchtrain.callbacks.abstract import AbstractCallback
         if isinstance(in_process_data_load, AbstractCallback):
             in_process_data_load = [in_process_data_load]
+
+        if amp_init_args is not None:
+            self.use_amp = True
+        if self.use_amp and not APEX_AVAILABLE:
+            raise ValueError('Trying to use Nvidia Apex AMP for 16-bit mixed precision. However, Nvidia Apex is not'
+                             'installed.')
 
         mp.spawn(self._spawn_fit,
                  args=(
@@ -489,6 +502,9 @@ class TrainLoop:
 
         self.criterion = self.criterion.to(self.device)
         self.model = self.model.to(self.device)
+
+        if self.use_amp:
+            self.model, self.optimizer = amp.initialize(self.model, self.optimizer, **ddp_args['amp_init_args'])
 
         if isinstance(self.model, TTModel):
             if not self.use_amp:
