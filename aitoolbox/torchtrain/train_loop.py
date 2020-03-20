@@ -497,7 +497,6 @@ class TrainLoop:
         # Optionally load data in-process
         self.callbacks_handler.register_callbacks(in_process_data_load)
         self.callbacks_handler.execute_multiprocess_start()
-
         # Add DistributedSampler to the data loaders
         self.ddp_initializer = DDPInitializer(self)
         self.ddp_initializer.add_distributed_samplers(ddp_args['world_size'], rank, ddp_args['train_data_shuffle'])
