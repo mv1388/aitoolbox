@@ -494,18 +494,23 @@ class TrainLoop:
         torch.cuda.set_device(gpu)
         self.device = torch.device(f"cuda:{gpu}")
 
+        # Optionally load data in-process
         self.callbacks_handler.register_callbacks(in_process_data_load)
         self.callbacks_handler.execute_multiprocess_start()
 
+        # Add DistributedSampler to the data loaders
         self.ddp_initializer = DDPInitializer(self)
         self.ddp_initializer.add_distributed_samplers(ddp_args['world_size'], rank, ddp_args['train_data_shuffle'])
 
+        # Move to the GPU belonging to the process
         self.criterion = self.criterion.to(self.device)
         self.model = self.model.to(self.device)
 
+        # Optionally initialize APEX
         if self.use_amp:
             self.model, self.optimizer = amp.initialize(self.model, self.optimizer, **ddp_args['amp_init_args'])
 
+        # Wrap models into DDP module
         if isinstance(self.model, TTModel):
             if not self.use_amp:
                 self.model = TTDistributedDataParallel(self.model, device_ids=[gpu], **ddp_args['ddp_model_args'])
