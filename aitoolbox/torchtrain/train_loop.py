@@ -422,7 +422,7 @@ class TrainLoop:
         return y_pred, y_test, metadata
 
     def fit_distributed(self, num_epochs, callbacks=None,
-                        train_data_shuffle=True, ddp_model_args=None, in_process_data_load=None,
+                        train_data_shuffle=True, ddp_model_args=None, amp_init_args=None, in_process_data_load=None,
                         num_nodes=1, node_rank=0, num_gpus=torch.cuda.device_count()):
         """Train the model using the train loop in the Distributed Data Parallel setting
 
@@ -433,6 +433,12 @@ class TrainLoop:
             callbacks (list or None): callbacks that are executed during the training run
             train_data_shuffle (bool): should train loader return shuffled data
             ddp_model_args (dict or None): parameters for DistributedDataParallel / APEX DistributedDataParallel model
+                Available parameters for DistributedDataParallel:
+                    https://pytorch.org/docs/master/nn.html#torch.nn.parallel.DistributedDataParallel
+                Available parameters for APEX DistributedDataParallel:
+                    https://nvidia.github.io/apex/parallel.html#apex.parallel.DistributedDataParallel
+            amp_init_args (dict or None): Apex AMP initialization parameters
+                Available parameters: https://nvidia.github.io/apex/amp.html#apex.amp.initialize
             in_process_data_load (AbstractCallback or list or None):
                 in-process data loading logic implemented as a torchtrain callback. The logic should be placed inside
                 the on_multiprocess_start() callback function.
@@ -449,12 +455,19 @@ class TrainLoop:
             'num_gpus': num_gpus,
             'world_size': num_nodes * num_gpus,
             'train_data_shuffle': train_data_shuffle,
-            'ddp_model_args': ddp_model_args if ddp_model_args is not None else {}
+            'ddp_model_args': ddp_model_args if ddp_model_args is not None else {},
+            'amp_init_args': amp_init_args if amp_init_args is not None else {}
         }
 
         from aitoolbox.torchtrain.callbacks.abstract import AbstractCallback
         if isinstance(in_process_data_load, AbstractCallback):
             in_process_data_load = [in_process_data_load]
+
+        if amp_init_args is not None:
+            self.use_amp = True
+        if self.use_amp and not APEX_AVAILABLE:
+            raise ValueError('Trying to use Nvidia Apex AMP for 16-bit mixed precision. However, Nvidia Apex is not'
+                             'installed.')
 
         mp.spawn(self._spawn_fit,
                  args=(
@@ -481,15 +494,22 @@ class TrainLoop:
         torch.cuda.set_device(gpu)
         self.device = torch.device(f"cuda:{gpu}")
 
+        # Optionally load data in-process
         self.callbacks_handler.register_callbacks(in_process_data_load)
         self.callbacks_handler.execute_multiprocess_start()
-
+        # Add DistributedSampler to the data loaders
         self.ddp_initializer = DDPInitializer(self)
         self.ddp_initializer.add_distributed_samplers(ddp_args['world_size'], rank, ddp_args['train_data_shuffle'])
 
+        # Move to the GPU belonging to the process
         self.criterion = self.criterion.to(self.device)
         self.model = self.model.to(self.device)
 
+        # Optionally initialize APEX
+        if self.use_amp:
+            self.model, self.optimizer = amp.initialize(self.model, self.optimizer, **ddp_args['amp_init_args'])
+
+        # Wrap models into DDP module
         if isinstance(self.model, TTModel):
             if not self.use_amp:
                 self.model = TTDistributedDataParallel(self.model, device_ids=[gpu], **ddp_args['ddp_model_args'])
@@ -618,7 +638,9 @@ class TrainLoopEndSave(TrainLoop):
                 specify the python file path as the value for the `experiment_file_path` key. If running the training
                 directly from the terminal the path deduction is done automatically.
             val_result_package (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or None):
+                result package evaluated on validation data at the end of training
             test_result_package (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or None):
+                result package evaluated on test data at the end of training
             cloud_save_mode (str or None): Storage destination selector.
                 For AWS S3: 's3' / 'aws_s3' / 'aws'
                 For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
@@ -712,7 +734,9 @@ class TrainLoopCheckpointEndSave(TrainLoopEndSave):
                 specify the python file path as the value for the `experiment_file_path` key. If running the training
                 directly from the terminal the path deduction is done automatically.
             val_result_package (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or None):
+                result package evaluated on validation data at the end of training
             test_result_package (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or None):
+                result package evaluated on test data at the end of training
             cloud_save_mode (str or None): Storage destination selector.
                 For AWS S3: 's3' / 'aws_s3' / 'aws'
                 For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
