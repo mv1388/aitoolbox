@@ -116,7 +116,7 @@ TrainLoop(
 
 ## Automatic Mixed Precision training via Nvidia Apex
 
-All the TrainLoop versions also support training with Automatic Mixed Precision (_AMP_)
+All the TrainLoop versions also support training with Automatic Mixed Precision (*AMP*)
 using the [Nvidia apex](https://github.com/NVIDIA/apex) extension. To use this feature the user first
 has to install the Nvidia apex library ([installation instructions](https://github.com/NVIDIA/apex#linux)). 
 
