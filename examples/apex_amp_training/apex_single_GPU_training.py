@@ -5,6 +5,8 @@ import torch.optim as optim
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
 
+# To install follow these instructions:
+#   https://github.com/NVIDIA/apex#linux
 from apex import amp
 
 from aitoolbox import TrainLoop, TTModel
