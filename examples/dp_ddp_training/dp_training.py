@@ -51,21 +51,21 @@ if __name__ == '__main__':
     batch_size = 100
     batch_size_multi_gpu = batch_size * torch.cuda.device_count()
 
-    train_loader = torch.utils.data.DataLoader(
+    train_loader = DataLoader(
         datasets.MNIST(
             './data', train=True, download=True,
             transform=transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))])
         ),
         batch_size=batch_size_multi_gpu)
 
-    val_loader = torch.utils.data.DataLoader(
+    val_loader = DataLoader(
         datasets.MNIST(
             './data', train=False,
             transform=transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))])
         ),
         batch_size=batch_size_multi_gpu)
 
-    test_loader = torch.utils.data.DataLoader(
+    test_loader = DataLoader(
         datasets.MNIST(
             './data', train=False,
             transform=transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))])
