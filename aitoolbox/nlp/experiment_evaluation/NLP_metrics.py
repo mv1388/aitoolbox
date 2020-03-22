@@ -51,7 +51,7 @@ class ROUGEMetric(AbstractBaseMetric):
 
         # TODO: remove try-except... just for testing
         try:
-            self.metric_result = rouge_calc.get_scores(hypothesis, reference, avg=True)
+            return rouge_calc.get_scores(hypothesis, reference, avg=True)
         except:
             print('hypothesis')
             print(hypothesis)
@@ -148,7 +148,7 @@ class ROUGEPerlMetric(AbstractBaseMetric):
         rouge_output = rouge.convert_and_evaluate()
         output_dict = rouge.output_to_dict(rouge_output)
         
-        self.metric_result = output_dict
+        return output_dict
 
     @staticmethod
     def dump_answer_text_to_disk(true_text, pred_text, output_text_dir, output_text_cleaning_regex, target_actual_text):
@@ -244,7 +244,7 @@ class ExactMatchTextMetric(AbstractBaseMetric):
         for pred_answ, true_answ in zip(self.y_predicted, self.y_true):
             em += int(self.normalize_answer(pred_answ) == self.normalize_answer(true_answ))
 
-        self.metric_result = 100. * em / len(self.y_true)
+        return 100. * em / len(self.y_true)
 
     @staticmethod
     def normalize_answer(text_str):
@@ -309,7 +309,7 @@ class F1TextMetric(AbstractBaseMetric):
         for pred_answ, true_answ in zip(self.y_predicted, self.y_true):
             f1 += self.compute_f1(true_answ, pred_answ)
 
-        self.metric_result = 100. * f1 / len(self.y_true)
+        return 100. * f1 / len(self.y_true)
 
     @staticmethod
     def compute_f1(a_gold, a_pred):
@@ -369,13 +369,14 @@ class BLEUSentenceScoreMetric(AbstractBaseMetric):
         self.check_transl_sent_num_match([self.y_true, self.y_predicted])
 
         sentence_bleu_results = [sentence_bleu([true_t], pred_t) for true_t, pred_t in zip(self.y_true, self.y_predicted)]
-        self.metric_result = np.mean(sentence_bleu_results)
 
         if self.output_text_dir is not None:
             self.dump_translation_text_to_disk(self.source_sents,
                                                [' '.join(sent) for sent in self.y_predicted],
                                                [' '.join(sent) for sent in self.y_true],
                                                sentence_bleu_results, self.output_text_dir)
+
+        return np.mean(sentence_bleu_results)
 
     @staticmethod
     def dump_translation_text_to_disk(source_sents, pred_translations, true_translations, sentence_bleu_results,
@@ -457,13 +458,13 @@ class BLEUCorpusScoreMetric(AbstractBaseMetric):
     def calculate_metric(self):
         BLEUSentenceScoreMetric.check_transl_sent_num_match([self.y_true, self.y_predicted])
 
-        self.metric_result = corpus_bleu([[sent] for sent in self.y_true], self.y_predicted)
-
         if self.output_text_dir is not None:
             BLEUSentenceScoreMetric.dump_translation_text_to_disk(self.source_sents,
                                                                   [' '.join(sent) for sent in self.y_predicted],
                                                                   [' '.join(sent) for sent in self.y_true],
                                                                   ['na'] * len(self.y_predicted), self.output_text_dir)
+
+        return corpus_bleu([[sent] for sent in self.y_true], self.y_predicted)
 
 
 class BLEUScoreStrTorchNLPMetric(AbstractBaseMetric):
@@ -501,13 +502,14 @@ class BLEUScoreStrTorchNLPMetric(AbstractBaseMetric):
 
         sentence_bleu_results = [bleu.get_moses_multi_bleu([' '.join(true_t)], [' '.join(pred_t)], lowercase=self.lowercase) 
                                  for true_t, pred_t in zip(self.y_true, self.y_predicted)]
-        self.metric_result = float(np.mean(sentence_bleu_results))
         
         if self.output_text_dir is not None:
             BLEUSentenceScoreMetric.dump_translation_text_to_disk(self.source_sents,
                                                                   [' '.join(sent) for sent in self.y_predicted],
                                                                   [' '.join(sent) for sent in self.y_true],
                                                                   sentence_bleu_results, self.output_text_dir)
+
+        return float(np.mean(sentence_bleu_results))
 
 
 class PerplexityMetric(AbstractBaseMetric):
@@ -520,4 +522,4 @@ class PerplexityMetric(AbstractBaseMetric):
         AbstractBaseMetric.__init__(self, None, batch_losses, metric_name='Perplexity', np_array=False)
 
     def calculate_metric(self):
-        self.metric_result = np.exp(np.mean(self.y_predicted))
+        return np.exp(np.mean(self.y_predicted))
