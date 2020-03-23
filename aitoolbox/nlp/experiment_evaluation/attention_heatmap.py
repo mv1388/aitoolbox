@@ -48,7 +48,7 @@ class AttentionHeatMap(AbstractBaseMetric):
 
             self.plot_sentence_attention(attn_matrix, source_sent, target_sent, plot_file_path)
 
-        self.metric_result = output_plot_paths
+        return output_plot_paths
 
     @staticmethod
     def plot_sentence_attention(attention_matrix, sentence_source, sentence_target, plot_file_path=None):

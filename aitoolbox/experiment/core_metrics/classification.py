@@ -30,7 +30,7 @@ class AccuracyMetric(AbstractBaseMetric):
         if len(self.y_true.shape) > 1 and self.y_true.shape[1] > 1:
             self.y_true = np.argmax(self.y_true, axis=1)
 
-        self.metric_result = accuracy_score(self.y_true, self.y_predicted)
+        return accuracy_score(self.y_true, self.y_predicted)
 
 
 class ROCAUCMetric(AbstractBaseMetric):
@@ -44,7 +44,7 @@ class ROCAUCMetric(AbstractBaseMetric):
         AbstractBaseMetric.__init__(self, y_true, y_predicted, metric_name='ROC_AUC')
 
     def calculate_metric(self):
-        self.metric_result = roc_auc_score(self.y_true, self.y_predicted)
+        return roc_auc_score(self.y_true, self.y_predicted)
 
 
 class PrecisionRecallCurveAUCMetric(AbstractBaseMetric):
@@ -59,7 +59,7 @@ class PrecisionRecallCurveAUCMetric(AbstractBaseMetric):
 
     def calculate_metric(self):
         precision, recall, thresholds = precision_recall_curve(self.y_true, self.y_predicted)
-        self.metric_result = auc(recall, precision)
+        return auc(recall, precision)
 
 
 class F1ScoreMetric(AbstractBaseMetric):
@@ -76,7 +76,7 @@ class F1ScoreMetric(AbstractBaseMetric):
 
     def calculate_metric(self):
         y_label_predicted = np.where(self.y_predicted > self.positive_class_thresh, 1, 0)
-        self.metric_result = f1_score(self.y_true, y_label_predicted)
+        return f1_score(self.y_true, y_label_predicted)
 
 
 class PrecisionMetric(AbstractBaseMetric):
@@ -93,7 +93,7 @@ class PrecisionMetric(AbstractBaseMetric):
 
     def calculate_metric(self):
         y_label_predicted = np.where(self.y_predicted > self.positive_class_thresh, 1, 0)
-        self.metric_result = precision_score(self.y_true, y_label_predicted)
+        return precision_score(self.y_true, y_label_predicted)
 
 
 class RecallMetric(AbstractBaseMetric):
@@ -110,4 +110,4 @@ class RecallMetric(AbstractBaseMetric):
 
     def calculate_metric(self):
         y_label_predicted = np.where(self.y_predicted > self.positive_class_thresh, 1, 0)
-        self.metric_result = recall_score(self.y_true, y_label_predicted)
+        return recall_score(self.y_true, y_label_predicted)

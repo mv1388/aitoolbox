@@ -312,4 +312,4 @@ class DummyAbstractBaseMetric(AbstractBaseMetric):
         AbstractBaseMetric.__init__(self, val, val+10, 'dummy_metric', np_array=False)
 
     def calculate_metric(self):
-        self.metric_result = self.y_true
+        return self.y_true

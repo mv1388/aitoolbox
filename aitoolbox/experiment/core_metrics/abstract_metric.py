@@ -17,14 +17,14 @@ class AbstractBaseMetric(ABC):
         self.metric_name = metric_name
         self.metric_result = None
 
-        self.calculate_metric()
+        self.metric_result = self.calculate_metric()
 
     @abstractmethod
     def calculate_metric(self):
-        """Perform metric calculation and save the result into self.metric_result
+        """Perform metric calculation and return it from this function
         
         Returns:
-            None
+            float or dict: return metric_result
         """
         pass
 
