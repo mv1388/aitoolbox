@@ -209,9 +209,11 @@ class TrainLoop:
 
             self.message_service.end_of_epoch_trigger()
 
-            # self.early_stop is changed from the early stopper callback
             if self.ddp_training_mode:
-                self.ddp_handler.mp_sync_early_stop()
+                # Sync early stopping setting between multiple processes when using DDP
+                # Triggers overall early stopping if at least one of the processes has triggered early stopping
+                self.early_stop = sum(self.ddp_handler.mp_sync(self.early_stop).numpy()) > 0
+            # self.early_stop is changed from the early stopper callback
             if self.early_stop:
                 break
 
@@ -232,6 +234,8 @@ class TrainLoop:
             train_loss_batch_accum_avg = np.mean(self.loss_batch_accum, axis=0).tolist()
         else:
             train_loss_batch_accum_avg = np.mean(self.loss_batch_accum).item()
+        if self.ddp_training_mode:
+            train_loss_batch_accum_avg = np.mean(self.ddp_handler.mp_sync(train_loss_batch_accum_avg).numpy()).item()
 
         print(f'AVG BATCH ACCUMULATED TRAIN LOSS: {train_loss_batch_accum_avg}')
         self.insert_metric_result_into_history('accumulated_loss', train_loss_batch_accum_avg)
@@ -335,6 +339,9 @@ class TrainLoop:
 
                 loss_avg.append(loss_batch.item())
 
+            if self.ddp_training_mode:
+                loss_avg = self.ddp_handler.mp_sync(loss_avg).numpy()
+
         self.model.train()
 
         return np.mean(loss_avg, axis=0)
@@ -421,6 +428,11 @@ class TrainLoop:
             y_test = self.pred_transform_fn(y_test)
 
             metadata = dict_util.combine_prediction_metadata_batches(metadata_list) if len(metadata_list) > 0 else None
+
+            if self.ddp_training_mode:
+                y_pred = self.ddp_handler.mp_sync(y_pred).cpu()
+                y_test = self.ddp_handler.mp_sync(y_test).cpu()
+                metadata = self.ddp_handler.mp_sync_dict_of_lists(metadata) if metadata is not None else None
 
         self.model.train()
 
