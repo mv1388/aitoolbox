@@ -81,15 +81,52 @@ class DDPHandler:
         data_loader_args['sampler'] = ddp_sampler
         data_loader_sampler = DataLoader(**data_loader_args)
         return data_loader_sampler, ddp_sampler
-    
-    def mp_sync_early_stop(self):
-        """Sync early stopping setting between multiple processes when using DDP
 
-        Triggers overall early stopping if at least one of the processes has triggered early stopping
+    def mp_sync(self, data, concat_mp_data=True):
+        """Multiprocess data sync
+
+        Share input data between all the active processes so that every process has all the values from
+        all the processes. This way we can achieve the same state of the data across all the parallel processes.
+
+        Args:
+            data (torch.Tensor, list, float, int): data to be synchronized between processes.
+                In case this is torch.Tensor, resulting output the device location will be preserved.
+            concat_mp_data (bool): should the returned list of collected tensors be concatenated into a single list
+                of values
+
+        Returns:
+            torch.Tensor: list of `data` variable values synced across all the active processes
         """
-        current_proc_early_stop = torch.Tensor([self.train_loop_obj.early_stop]).to(device=self.train_loop_obj.device)
+        input_data_device = 'cpu'
+        if not hasattr(data, '__len__'):
+            data = [data]
+
+        if isinstance(data, torch.Tensor):
+            input_data_device = data.device.type
+        else:
+            data = torch.Tensor(data)
+
+        data_tensor_wrap = data.to(self.train_loop_obj.device)
+        mp_data = [torch.zeros_like(data_tensor_wrap) for _ in range(dist.get_world_size())]
+        dist.all_gather(mp_data, data_tensor_wrap)
         
-        mp_early_stop = [torch.zeros_like(current_proc_early_stop) for _ in range(dist.get_world_size())]
-        dist.all_gather(mp_early_stop, current_proc_early_stop)
-        
-        self.train_loop_obj.early_stop = sum(torch.cat(mp_early_stop)) > 0
+        if concat_mp_data:
+            mp_data = torch.cat(mp_data)
+        # at this point all the data in mp_data still on the GPUs, optionally move back to CPU
+        if input_data_device == 'cpu':
+            mp_data = mp_data.cpu()
+
+        return mp_data
+
+    def mp_sync_dict_of_lists(self, dict_list_data):
+        """Multiprocess dict of lists sync
+
+        Convenience wrapper around the `mp_sync()` for the specific case of dict of lists syncing.
+
+        Args:
+            dict_list_data (dict): dict of lists to be synchronized across the processes
+
+        Returns:
+            dict: synchronized dict of lists with combined values gathered from all the active processes
+        """
+        return {k: self.mp_sync(values_list).tolist() for k, values_list in dict_list_data.items()}
