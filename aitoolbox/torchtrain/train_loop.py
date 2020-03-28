@@ -111,7 +111,7 @@ class TrainLoop:
         self.callbacks = []
         self.callbacks_handler = CallbacksHandler(self)
         # using torch tensor instead of bool in order to enable ddp multi-process broadcasting
-        self.early_stop = torch.BoolTensor([False])
+        self.early_stop = torch.Tensor([False])
 
         self.grad_cb_used = False
         self.ddp_training_mode = False
@@ -209,6 +209,12 @@ class TrainLoop:
             self.message_service.end_of_epoch_trigger()
 
             # self.early_stop is changed from the early stopper callback
+            if self.ddp_training_mode:
+                gather_t = [torch.zeros_like(self.early_stop) for _ in range(dist.get_world_size())]
+                dist.all_gather(gather_t, self.early_stop)
+                if sum(torch.cat(gather_t)) > 0:
+                    self.early_stop = torch.Tensor([True])
+
             if self.early_stop:
                 break
 
@@ -496,6 +502,7 @@ class TrainLoop:
         torch.manual_seed(0)
         torch.cuda.set_device(gpu)
         self.device = torch.device(f"cuda:{gpu}")
+        self.early_stop = self.early_stop.to(self.device)
 
         # Optionally load data in-process
         self.callbacks_handler.register_callbacks(in_process_data_load)

@@ -1,7 +1,6 @@
 import os
 import numpy as np
 import torch
-import torch.distributed as dist
 
 from aitoolbox.torchtrain.callbacks.abstract import AbstractCallback, AbstractExperimentCallback
 from aitoolbox.utils import util
@@ -66,10 +65,7 @@ class EarlyStopping(AbstractCallback):
                     self.patience_count -= 1
 
             if self.patience_count < 0:
-                self.train_loop_obj.early_stop = torch.BoolTensor([True])
-
-                if self.train_loop_obj.ddp_training_mode:
-                    dist.broadcast(self.train_loop_obj.early_stop, src=dist.get_rank())
+                self.train_loop_obj.early_stop = torch.Tensor([True]).to(device=self.train_loop_obj.device)
                 print(f'Early stopping at epoch: {self.train_loop_obj.epoch}. Best recorded epoch: {self.best_epoch}.')
 
 
@@ -88,10 +84,7 @@ class TerminateOnNaN(AbstractCallback):
 
         if last_measure is not None:
             if np.isnan(last_measure) or np.isinf(last_measure):
-                self.train_loop_obj.early_stop = torch.BoolTensor([True])
-
-                if self.train_loop_obj.ddp_training_mode:
-                    dist.broadcast(self.train_loop_obj.early_stop, src=dist.get_rank())
+                self.train_loop_obj.early_stop = torch.Tensor([True]).to(device=self.train_loop_obj.device)
                 print(f'Terminating on {self.monitor} = {last_measure} at epoch: {self.train_loop_obj.epoch}.')
 
 
