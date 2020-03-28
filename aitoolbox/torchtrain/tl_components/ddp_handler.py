@@ -1,12 +1,14 @@
+import torch
+import torch.distributed as dist
 from torch.utils.data import DataLoader
 from torch.utils.data.distributed import DistributedSampler
 
 from aitoolbox.torchtrain.callbacks.ddp import DistributedSamplerSetEpoch
 
 
-class DDPInitializer:
+class DDPHandler:
     def __init__(self, train_loop_obj):
-        """Distributed Data Parallel process initializer for the TrainLoop
+        """Distributed Data Parallel process handler for the TrainLoop
 
         Args:
             train_loop_obj (aitoolbox.torchtrain.train_loop.TrainLoop): reference to the encapsulating TrainLoop
@@ -79,3 +81,14 @@ class DDPInitializer:
         data_loader_args['sampler'] = ddp_sampler
         data_loader_sampler = DataLoader(**data_loader_args)
         return data_loader_sampler, ddp_sampler
+    
+    def mp_sync_early_stop(self):
+        """Sync early stopping setting between multiple processes when using DDP
+
+        Triggers overall early stopping if at least one of the processes has triggered early stopping
+        """
+        mp_early_stop = [torch.zeros_like(self.train_loop_obj.early_stop) for _ in range(dist.get_world_size())]
+        dist.all_gather(mp_early_stop, self.train_loop_obj.early_stop)
+        
+        if sum(torch.cat(mp_early_stop)) > 0:
+            self.train_loop_obj.early_stop = torch.Tensor([True])
