@@ -65,7 +65,7 @@ class EarlyStopping(AbstractCallback):
                     self.patience_count -= 1
 
             if self.patience_count < 0:
-                self.train_loop_obj.early_stop = torch.Tensor([True]).to(device=self.train_loop_obj.device)
+                self.train_loop_obj.early_stop = True
                 print(f'Early stopping at epoch: {self.train_loop_obj.epoch}. Best recorded epoch: {self.best_epoch}.')
 
 
@@ -84,7 +84,7 @@ class TerminateOnNaN(AbstractCallback):
 
         if last_measure is not None:
             if np.isnan(last_measure) or np.isinf(last_measure):
-                self.train_loop_obj.early_stop = torch.Tensor([True]).to(device=self.train_loop_obj.device)
+                self.train_loop_obj.early_stop = True
                 print(f'Terminating on {self.monitor} = {last_measure} at epoch: {self.train_loop_obj.epoch}.')
 
 

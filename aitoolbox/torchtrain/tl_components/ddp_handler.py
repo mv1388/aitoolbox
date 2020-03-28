@@ -87,8 +87,9 @@ class DDPHandler:
 
         Triggers overall early stopping if at least one of the processes has triggered early stopping
         """
-        mp_early_stop = [torch.zeros_like(self.train_loop_obj.early_stop) for _ in range(dist.get_world_size())]
-        dist.all_gather(mp_early_stop, self.train_loop_obj.early_stop)
+        current_proc_early_stop = torch.Tensor([self.train_loop_obj.early_stop]).to(device=self.train_loop_obj.device)
         
-        if sum(torch.cat(mp_early_stop)) > 0:
-            self.train_loop_obj.early_stop = torch.Tensor([True])
+        mp_early_stop = [torch.zeros_like(current_proc_early_stop) for _ in range(dist.get_world_size())]
+        dist.all_gather(mp_early_stop, current_proc_early_stop)
+        
+        self.train_loop_obj.early_stop = sum(torch.cat(mp_early_stop)) > 0
