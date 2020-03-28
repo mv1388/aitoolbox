@@ -1,6 +1,5 @@
 import os
 import numpy as np
-import torch
 
 from aitoolbox.torchtrain.callbacks.abstract import AbstractCallback, AbstractExperimentCallback
 from aitoolbox.utils import util
