@@ -110,9 +110,11 @@ class TrainLoop:
 
         self.callbacks = []
         self.callbacks_handler = CallbacksHandler(self)
-        self.early_stop = False
+        # using torch tensor instead of bool in order to enable ddp multi-process broadcasting
+        self.early_stop = torch.BoolTensor([False])
 
         self.grad_cb_used = False
+        self.ddp_training_mode = False
 
         if not isinstance(self.model, TTModel) and not isinstance(self.model, TTDataParallel) and \
                 not isinstance(self.model, Module):
@@ -448,6 +450,7 @@ class TrainLoop:
             node_rank (int): rank of the current node
             num_gpus (int): number of GPUs in the node
         """
+        self.ddp_training_mode = True
         os.environ['MASTER_ADDR'] = 'localhost'
         os.environ['MASTER_PORT'] = '8888'
         ddp_args = {
