@@ -3,6 +3,7 @@ import os
 import time
 import datetime
 import inspect
+from typing import Optional
 import numpy as np
 import torch
 from torch.nn.modules import Module
@@ -28,7 +29,7 @@ from aitoolbox.torchtrain.parallel import TTDataParallel, TTDistributedDataParal
 from aitoolbox.torchtrain.multi_loss_optim import MultiLoss, MultiOptimizer
 from aitoolbox.torchtrain.data.batch_model_feed_defs import AbstractModelFeedDefinition
 from aitoolbox.torchtrain.tl_components.callback_handler import CallbacksHandler
-from aitoolbox.torchtrain.tl_components.ddp_init import DDPInitializer
+from aitoolbox.torchtrain.tl_components.ddp_handler import DDPHandler
 from aitoolbox.torchtrain.callbacks.model_save import ModelCheckpoint, ModelTrainEndSave
 from aitoolbox.experiment.training_history import TrainingHistory
 from aitoolbox.torchtrain.tl_components.model_prediction_store import ModelPredictionStore
@@ -106,7 +107,9 @@ class TrainLoop:
         self.train_history = TrainingHistory(has_validation=self.validation_loader is not None)
         self.prediction_store = ModelPredictionStore(auto_purge=True)
         self.message_service = MessageService()
-        self.ddp_initializer = None
+
+        self.ddp_training_mode = False
+        self.ddp_handler: Optional[DDPHandler] = None
 
         self.callbacks = []
         self.callbacks_handler = CallbacksHandler(self)
@@ -207,6 +210,8 @@ class TrainLoop:
             self.message_service.end_of_epoch_trigger()
 
             # self.early_stop is changed from the early stopper callback
+            if self.ddp_training_mode:
+                self.ddp_handler.mp_sync_early_stop()
             if self.early_stop:
                 break
 
@@ -448,6 +453,7 @@ class TrainLoop:
             node_rank (int): rank of the current node
             num_gpus (int): number of GPUs in the node
         """
+        self.ddp_training_mode = True
         os.environ['MASTER_ADDR'] = 'localhost'
         os.environ['MASTER_PORT'] = '8888'
         ddp_args = {
@@ -498,8 +504,8 @@ class TrainLoop:
         self.callbacks_handler.register_callbacks(in_process_data_load)
         self.callbacks_handler.execute_multiprocess_start()
         # Add DistributedSampler to the data loaders
-        self.ddp_initializer = DDPInitializer(self)
-        self.ddp_initializer.add_distributed_samplers(ddp_args['world_size'], rank, ddp_args['train_data_shuffle'])
+        self.ddp_handler = DDPHandler(self)
+        self.ddp_handler.add_distributed_samplers(ddp_args['world_size'], rank, ddp_args['train_data_shuffle'])
 
         # Move to the GPU belonging to the process
         self.criterion = self.criterion.to(self.device)
