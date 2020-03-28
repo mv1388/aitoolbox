@@ -430,8 +430,8 @@ class TrainLoop:
             metadata = dict_util.combine_prediction_metadata_batches(metadata_list) if len(metadata_list) > 0 else None
 
             if self.ddp_training_mode:
-                y_pred = self.ddp_handler.mp_sync(y_pred)
-                y_test = self.ddp_handler.mp_sync(y_test)
+                y_pred = self.ddp_handler.mp_sync(y_pred).cpu()
+                y_test = self.ddp_handler.mp_sync(y_test).cpu()
                 metadata = self.ddp_handler.mp_sync_dict_of_lists(metadata) if metadata is not None else None
 
         self.model.train()
