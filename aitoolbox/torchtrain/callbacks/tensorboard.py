@@ -26,7 +26,8 @@ class TensorboardReporterBaseCB(AbstractExperimentCallback):
             **kwargs: additional parameters for tensorboard SummaryWriter
         """
         AbstractExperimentCallback.__init__(self, callback_name,
-                                            project_name, experiment_name, local_model_result_folder_path)
+                                            project_name, experiment_name, local_model_result_folder_path,
+                                            device_idx_execution=0)
         self.log_dir = log_dir
         self.is_project = is_project
         self.fallback_log_dir = 'tensorboard'

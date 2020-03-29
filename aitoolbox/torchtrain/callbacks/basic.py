@@ -130,7 +130,8 @@ class EmailNotification(AbstractCallback):
             experiment_name (str or None): name of the particular experiment
             aws_region (str): AWS SES region
         """
-        AbstractCallback.__init__(self, 'Send email to notify about the state of training', execution_order=98)
+        AbstractCallback.__init__(self, 'Send email to notify about the state of training',
+                                  execution_order=98, device_idx_execution=0)
         self.project_name = project_name
         self.experiment_name = experiment_name
 
@@ -250,7 +251,7 @@ class LogUpload(AbstractExperimentCallback):
         AbstractExperimentCallback.__init__(self, "Upload Tmux logging file to cloud",
                                             project_name, experiment_name, local_model_result_folder_path,
                                             cloud_save_mode, bucket_name, cloud_dir_prefix,
-                                            execution_order=1500)
+                                            execution_order=1500, device_idx_execution=0)
         self.log_file_path = os.path.expanduser(log_file_path)
         self.log_filename = os.path.basename(self.log_file_path)
         self.fail_if_cloud_missing = fail_if_cloud_missing
@@ -341,7 +342,7 @@ class FunctionOnTrainLoop(AbstractCallback):
     def __init__(self, fn_to_execute,
                  tl_registration=False,
                  epoch_begin=False, epoch_end=False, train_begin=False, train_end=False, batch_begin=False, batch_end=False,
-                 after_gradient_update=False, after_optimizer_step=False, execution_order=0):
+                 after_gradient_update=False, after_optimizer_step=False, execution_order=0, device_idx_execution=None):
         """Execute given function as a callback in the TrainLoop
 
         Args:
@@ -360,7 +361,7 @@ class FunctionOnTrainLoop(AbstractCallback):
             execution_order (int): order of the callback execution. If all the used callbacks have the orders set to 0,
                 than the callbacks are executed in the order they were registered.
         """
-        AbstractCallback.__init__(self, 'Execute given function as a callback', execution_order)
+        AbstractCallback.__init__(self, 'Execute given function as a callback', execution_order, device_idx_execution)
         self.fn_to_execute = fn_to_execute
         self.tl_registration = tl_registration
         self.epoch_begin = epoch_begin

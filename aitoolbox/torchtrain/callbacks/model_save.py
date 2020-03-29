@@ -44,7 +44,7 @@ class ModelCheckpoint(AbstractCallback):
             num_best_checkpoints_kept (int): number of best performing models which are kept when removing suboptimal
                 model checkpoints
         """
-        AbstractCallback.__init__(self, 'Model checkpoint at end of epoch')
+        AbstractCallback.__init__(self, 'Model checkpoint at end of epoch', device_idx_execution=0)
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
@@ -195,7 +195,8 @@ class ModelTrainEndSave(AbstractCallback):
                                                                  local_model_result_folder_path=self.local_model_result_folder_path)
 
     def on_train_end(self):
-        self.save_hyperparams()
+        if not self.train_loop_obj.ddp_training_mode or self.train_loop_obj.device.index == 0:
+            self.save_hyperparams()
         if not self.train_loop_obj.use_deepspeed:
             model_final_state = {'model_state_dict': self.train_loop_obj.model.state_dict(),
                                  'optimizer_state_dict': self.train_loop_obj.optimizer.state_dict(),
@@ -228,9 +229,11 @@ class ModelTrainEndSave(AbstractCallback):
             self.result_package = self.test_result_package + self.result_package if self.result_package is not None \
                 else self.test_result_package
 
-        self.results_saver.save_experiment(model_final_state, self.result_package, self.train_loop_obj.train_history,
-                                           experiment_timestamp=self.train_loop_obj.experiment_timestamp,
-                                           save_true_pred_labels=True)
+        if not self.train_loop_obj.ddp_training_mode or self.train_loop_obj.device.index == 0:
+            self.results_saver.save_experiment(model_final_state, self.result_package,
+                                               self.train_loop_obj.train_history,
+                                               experiment_timestamp=self.train_loop_obj.experiment_timestamp,
+                                               save_true_pred_labels=True)
 
     def on_train_loop_registration(self):
         if self.val_result_package is not None:

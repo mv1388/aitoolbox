@@ -151,7 +151,7 @@ class ModelPerformancePrintReport(AbstractCallback):
                 case of missing metric throw and exception and thus interrupt the training loop
             list_tracked_metrics (bool):
         """
-        AbstractCallback.__init__(self, 'Model performance print reporter')
+        AbstractCallback.__init__(self, 'Model performance print reporter', device_idx_execution=0)
         self.metrics = metrics
         self.on_each_epoch = on_each_epoch
         self.report_frequency = report_frequency
@@ -322,7 +322,7 @@ class ModelTrainHistoryBaseCB(AbstractExperimentCallback):
         AbstractExperimentCallback.__init__(self, callback_name,
                                             project_name, experiment_name, local_model_result_folder_path,
                                             cloud_save_mode, bucket_name, cloud_dir_prefix,
-                                            execution_order=execution_order)
+                                            execution_order=execution_order, device_idx_execution=0)
         if epoch_end is False and train_end is False:
             raise ValueError('Both epoch_end and train_end are set to False. At least one of these should be True.')
         self.epoch_end = epoch_end

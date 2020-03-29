@@ -69,7 +69,7 @@ class GradientStatsPrint(AbstractCallback):
             on_every_grad_update (bool): should the gradient stats be calculated on every gradient update, e.g. after
                 every batch or only at the end of the epoch
         """
-        AbstractCallback.__init__(self, 'Print model gradient stats')
+        AbstractCallback.__init__(self, 'Print model gradient stats', device_idx_execution=0)
         self.model_layers_extract_def = model_layers_extract_def
         self.on_every_grad_update = on_every_grad_update
 
@@ -127,7 +127,8 @@ class GradDistributionPlot(AbstractExperimentCallback):
         """
         AbstractExperimentCallback.__init__(self, 'Gradient distribution plotter',
                                             project_name, experiment_name, local_model_result_folder_path,
-                                            cloud_save_mode, bucket_name, cloud_dir_prefix)
+                                            cloud_save_mode, bucket_name, cloud_dir_prefix,
+                                            device_idx_execution=0)
         self.grad_plots_dir_name = grad_plots_dir_name
         self.file_format = file_format
         if self.file_format not in ['png', 'pdf']:
