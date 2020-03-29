@@ -75,6 +75,14 @@ class BasicCallbacksHandler:
         for callback in self.train_loop_obj.callbacks:
             callback.on_multiprocess_start()
 
+    def mp_filter_callbacks(self):
+        self.train_loop_obj.callbacks = self._mp_filter_cb_list(self.train_loop_obj.callbacks)
+
+    def _mp_filter_cb_list(self, callbacks_list):
+        return [cb for cb in callbacks_list
+                if cb.device_idx_execution is None or
+                (cb.device_idx_execution is not None and cb.device_idx_execution == self.train_loop_obj.device.index)]
+
     def enforce_callbacks_quality(self, callbacks):
         for cb in callbacks:
             if not isinstance(cb, AbstractCallback):
@@ -270,6 +278,26 @@ class CallbacksHandler(BasicCallbacksHandler):
         for cbs_at_position in self.registered_cbs:
             if not all(0 == cb.execution_order for cb in cbs_at_position):
                 cbs_at_position.sort(key=lambda cb: cb.execution_order)
+                
+    def mp_filter_callbacks(self):
+        super().mp_filter_callbacks()
+        self.cbs_on_epoch_begin = self._mp_filter_cb_list(self.cbs_on_epoch_begin)
+        self.cbs_on_epoch_end = self._mp_filter_cb_list(self.cbs_on_epoch_end)
+        self.cbs_on_train_begin = self._mp_filter_cb_list(self.cbs_on_train_begin)
+        self.cbs_on_train_end = self._mp_filter_cb_list(self.cbs_on_train_end)
+        self.cbs_on_batch_begin = self._mp_filter_cb_list(self.cbs_on_batch_begin)
+        self.cbs_on_batch_end = self._mp_filter_cb_list(self.cbs_on_batch_end)
+        self.cbs_on_after_gradient_update = self._mp_filter_cb_list(self.cbs_on_after_gradient_update)
+        self.cbs_on_after_optimizer_step = self._mp_filter_cb_list(self.cbs_on_after_optimizer_step)
+        self.cbs_on_multiprocess_start = self._mp_filter_cb_list(self.cbs_on_multiprocess_start)
+
+        self.registered_cbs = [
+            self.cbs_on_epoch_begin, self.cbs_on_epoch_end,
+            self.cbs_on_train_begin, self.cbs_on_train_end,
+            self.cbs_on_batch_begin, self.cbs_on_batch_end,
+            self.cbs_on_after_gradient_update, self.cbs_on_after_optimizer_step,
+            self.cbs_on_multiprocess_start
+        ]
 
     def __str__(self):
         return 'CALLBACKS\n' \

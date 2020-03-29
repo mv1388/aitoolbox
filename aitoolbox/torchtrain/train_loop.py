@@ -511,6 +511,7 @@ class TrainLoop:
         torch.manual_seed(0)
         torch.cuda.set_device(gpu)
         self.device = torch.device(f"cuda:{gpu}")
+        self.callbacks_handler.mp_filter_callbacks()
 
         # Optionally load data in-process
         self.callbacks_handler.register_callbacks(in_process_data_load)
