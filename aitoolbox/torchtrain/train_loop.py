@@ -159,9 +159,10 @@ class TrainLoop:
         self.callbacks_handler.execute_train_begin()
 
         for self.epoch in range(self.epoch, num_epochs):
-            print('\n\n================================================================================')
-            print('================================================================================')
-            print(f'Epoch: {self.epoch}')
+            if not self.ddp_training_mode or self.device.index == 0:
+                print('\n\n================================================================================')
+                print('================================================================================')
+                print(f'Epoch: {self.epoch}')
             self.callbacks_handler.execute_epoch_begin()
 
             for batch_data in tqdm(self.train_loader):
@@ -237,19 +238,22 @@ class TrainLoop:
         if self.ddp_training_mode:
             train_loss_batch_accum_avg = np.mean(self.ddp_handler.mp_sync(train_loss_batch_accum_avg).numpy()).item()
 
-        print(f'AVG BATCH ACCUMULATED TRAIN LOSS: {train_loss_batch_accum_avg}')
+        if not self.ddp_training_mode or self.device.index == 0:
+            print(f'AVG BATCH ACCUMULATED TRAIN LOSS: {train_loss_batch_accum_avg}')
         self.insert_metric_result_into_history('accumulated_loss', train_loss_batch_accum_avg)
         self.loss_batch_accum = []
 
         if (type(self.end_auto_eval) is bool and self.end_auto_eval) or \
                 (type(self.end_auto_eval) is int and self.epoch % self.end_auto_eval == 0):
             train_loss = self.evaluate_loss_on_train_set()
-            print(f'TRAIN LOSS: {train_loss}')
+            if not self.ddp_training_mode or self.device.index == 0:
+                print(f'TRAIN LOSS: {train_loss}')
             self.insert_metric_result_into_history('loss', train_loss)
 
             if self.validation_loader is not None:
                 val_loss = self.evaluate_loss_on_validation_set()
-                print(f'VAL LOSS: {val_loss}')
+                if not self.ddp_training_mode or self.device.index == 0:
+                    print(f'VAL LOSS: {val_loss}')
                 self.insert_metric_result_into_history('val_loss', val_loss)
 
     def auto_execute_end_of_training(self):
@@ -261,7 +265,8 @@ class TrainLoop:
         if self.test_loader is not None and \
                 ((type(self.end_auto_eval) is bool and self.end_auto_eval) or type(self.end_auto_eval) is int):
             test_loss = self.evaluate_loss_on_test_set()
-            print(f'TEST LOSS: {test_loss}')
+            if not self.ddp_training_mode or self.device.index == 0:
+                print(f'TEST LOSS: {test_loss}')
             # To keep TrainingHistory from complaining due to the non-matching metric result lengths the checking
             # has been turned off
             self.insert_metric_result_into_history('train_end_test_loss', test_loss)
