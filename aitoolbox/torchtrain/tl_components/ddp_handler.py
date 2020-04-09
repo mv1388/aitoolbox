@@ -38,12 +38,12 @@ class DDPHandler:
 
         if self.train_loop_obj.validation_loader is not None:
             self.train_loop_obj.validation_loader, val_sampler = \
-                self.build_loader_sampler(self.train_loop_obj.validation_loader, shuffle=train_data_shuffle,
+                self.build_loader_sampler(self.train_loop_obj.validation_loader, shuffle=False,
                                           world_size=world_size, rank=rank)
 
         if self.train_loop_obj.test_loader is not None:
             self.train_loop_obj.test_loader, test_sampler = \
-                self.build_loader_sampler(self.train_loop_obj.test_loader, shuffle=train_data_shuffle,
+                self.build_loader_sampler(self.train_loop_obj.test_loader, shuffle=False,
                                           world_size=world_size, rank=rank)
 
         self.train_loop_obj.callbacks_handler.register_callbacks([
