@@ -1,4 +1,5 @@
 import unittest
+import torch.nn as nn
 
 from tests.test_torchtrain.test_model import MyModel
 
@@ -51,6 +52,12 @@ class TestTTDataParallel(unittest.TestCase):
         self.assertTrue(hasattr(model_parallel, 'get_model_level_str'))
 
         self.assertFalse(hasattr(model_parallel, 'model_level_str'))
+
+    def test_inheritance(self):
+        model = MyModel()
+        model_parallel = TTDataParallel(model)
+
+        self.assertTrue(isinstance(model_parallel, nn.DataParallel))
 
     def test_init_attr_transfer(self):
         model = MyModel()
