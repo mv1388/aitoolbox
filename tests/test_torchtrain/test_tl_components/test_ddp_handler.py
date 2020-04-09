@@ -4,9 +4,8 @@ from torch.utils.data.dataloader import DataLoader
 from torch.utils.data.distributed import DistributedSampler
 from tests.utils import SmallFFNet
 
-from aitoolbox import TrainLoop
+from aitoolbox import TrainLoop, BasicDataset
 from aitoolbox.torchtrain.tl_components.ddp_handler import DDPHandler
-from aitoolbox import BasicDataset
 from aitoolbox.torchtrain.callbacks.ddp import DistributedSamplerSetEpoch
 
 
