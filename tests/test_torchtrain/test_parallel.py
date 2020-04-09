@@ -58,6 +58,7 @@ class TestTTDataParallel(unittest.TestCase):
         model_parallel = TTDataParallel(model)
 
         self.assertTrue(isinstance(model_parallel, nn.DataParallel))
+        self.assertTrue(isinstance(model_parallel, TTParallelBase))
 
     def test_init_attr_transfer(self):
         model = MyModel()
