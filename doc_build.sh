@@ -1,7 +1,3 @@
 #!/usr/bin/env bash
 
-sphinx-apidoc -f -o docs/source aitoolbox/
-
-cd docs
-make html
-cd ..
+sphinx-build -b html docs/source docs/build
