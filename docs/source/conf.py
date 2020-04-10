@@ -36,11 +36,18 @@ master_doc = 'index'
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',
-    'sphinx.ext.mathjax'
+    'sphinx.ext.mathjax',
+    'sphinxcontrib.apidoc'
 ]
 
 napoleon_google_docstring = True
 napoleon_numpy_docstring = False
+
+apidoc_module_dir = '../../aitoolbox'
+apidoc_output_dir = 'api'
+apidoc_separate_modules = False
+apidoc_module_first = True
+
 
 autodoc_mock_imports = ['tensorflow', 'keras']
 

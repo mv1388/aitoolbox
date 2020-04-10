@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-sphinx-apidoc -f -o docs/source aitoolbox/
+source activate py36
 
-cd docs
-make html
-cd ..
+sphinx-build -b html docs/source docs/build
