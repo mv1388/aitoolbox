@@ -8,8 +8,7 @@
 [![CodeFactor](https://www.codefactor.io/repository/github/mv1388/aitoolbox/badge)](https://www.codefactor.io/repository/github/mv1388/aitoolbox)
 
 [**Documentation**](https://aitoolbox.readthedocs.io/en/latest/)
-
----------------
+#
 
 
 A framework which helps you train deep learning models in PyTorch and quickly iterate experiments. 
