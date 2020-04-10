@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-AIToolbox - PyTorch Model Training Framework with Experiment Tracking Support
+AIToolbox - Model Training Framework for PyTorch
 ===================================================================================
 
 .. toctree::
