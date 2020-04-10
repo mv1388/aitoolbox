@@ -9,7 +9,6 @@
 
 [Documentation](https://aitoolbox.readthedocs.io/en/latest/)
 
-&nbsp;
 
 A framework which helps you train deep learning models in PyTorch and quickly iterate experiments. 
 It hides the repetitive technicalities of training the neural nets and 
