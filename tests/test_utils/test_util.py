@@ -13,6 +13,24 @@ class TestUtil(unittest.TestCase):
         self.assertFalse(util.function_exists(DummyOptimizer(), 'zero_grad_ctr'))
         self.assertFalse(util.function_exists(DummyOptimizer(), 'step_ctr'))
 
+    def test_copy_function(self):
+        src_fn_obj = SourceFn()
+        my_fn_copy = util.copy_function(src_fn_obj.my_fn)
+        my_fn_input_copy = util.copy_function(src_fn_obj.my_fn_input)
+
+        self.assertEqual(my_fn_copy(None), 'my_fn_return_value')
+        self.assertEqual(my_fn_input_copy(None, 'Value 1'), 'my_fn_return_value: Value 1')
+
+    def test_copy_function_another_object(self):
+        src_fn_obj = SourceFn()
+        my_fn_copy = util.copy_function(src_fn_obj.my_fn)
+        my_fn_input_copy = util.copy_function(src_fn_obj.my_fn_input)
+
+        target_fn_obj = TargetFnCopy(my_fn_copy, my_fn_input_copy)
+
+        self.assertEqual(target_fn_obj.copy_my_fn(), 'my_fn_return_value')
+        self.assertEqual(target_fn_obj.copy_my_fn_input('Value 2'), 'my_fn_return_value: Value 2')
+
     def test_is_empty_function(self):
         def empty_fn():
             pass
@@ -89,3 +107,23 @@ class EmptyFunctions:
     def full_fn_arg_sum(self, a, b):
         c = a + b + self.a
         return c
+
+
+class SourceFn:
+    def my_fn(self):
+        return 'my_fn_return_value'
+
+    def my_fn_input(self, value):
+        return f'my_fn_return_value: {value}'
+
+
+class TargetFnCopy:
+    def __init__(self, source_my_fn, source_my_fn_input):
+        self.source_my_fn = source_my_fn
+        self.source_my_fn_input = source_my_fn_input
+
+    def copy_my_fn(self):
+        return self.source_my_fn(self)
+
+    def copy_my_fn_input(self, value):
+        return self.source_my_fn_input(self, value)
