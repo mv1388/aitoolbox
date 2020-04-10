@@ -45,7 +45,7 @@ class TrainingHistory:
         """Returns QA-ed and optionally flattened training history dict
 
         Args:
-            flatten_dict (bool): should the returnd training history dict be flattened. So no nested dicts of dicts.
+            flatten_dict (bool): should the returned training history dict be flattened. So no nested dicts of dicts.
                 The keys of the nested dicts will we "_" concatenated and moved into the single level dict.
 
         Returns:
