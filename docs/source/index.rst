@@ -3,67 +3,29 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to AIToolbox's documentation!
-=====================================
+AIToolbox - PyTorch Model Training Framework with Experiment Tracking Support
+===================================================================================
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
    :hidden:
 
-   user_guide
+   torchtrain
+   experiment
+   cloud
    examples
    api/aitoolbox
 
 
-Here is some normal text
+A framework which helps you train deep learning models in PyTorch and quickly iterate experiments.
+It hides the repetitive technicalities of training the neural nets and frees you to focus on interesting part of
+devising new models. In essence, it offers a keras-style train loop abstraction which can be used for higher
+level training process while still allowing the manual control on the lower level when desired.
 
-`Link to AIToolbox repo <https://github.com/mv1388/aitoolbox>`_
+In addition to orchestrating the model training loop the framework also helps you keep track of different
+experiments by automatically saving models in a structured traceable way and creating performance reports.
+These can be stored both locally or on AWS S3 (Google Cloud Storage in beta) which makes the library very useful
+when training on the GPU instance on AWS. Instance can be automatically shut down when training is finished and all
+the results are safely stored on S3.
 
-.. math::
-    y \sim \mathcal{N}(0, 1)
-
-
-.. math:: \beta \sim \text{Poisson}(\lambda=5)
-   :label: beta_prior
-
-The prior on :math:`\beta` is a Poisson distribution with rate parameter of 5 :eq:`beta_prior`.
-
-
-
-
-Section
--------
-
-Here's some normal text.
-
- ::
-
-  # And here's some code
-  for i in range(5):
-    print(i)
-
-  # code block keeps going until un-indent
-
-Normal text again
-
-
-*Italic* text
-
-Subsection
-^^^^^^^^^^
-
-.. automodule:: aitoolbox.torchtrain.train_loop
-   :members:
-   :inherited-members:
-   :show-inheritance:
-
-
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
