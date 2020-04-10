@@ -7,7 +7,7 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/8349596c31a948d8916814a2037ffdf3)](https://www.codacy.com/manual/mv1388/AIToolbox?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=mv1388/AIToolbox&amp;utm_campaign=Badge_Grade)
 [![CodeFactor](https://www.codefactor.io/repository/github/mv1388/aitoolbox/badge)](https://www.codefactor.io/repository/github/mv1388/aitoolbox)
 
-**Documentation**: https://aitoolbox.readthedocs.io/en/latest/
+[**Documentation**](https://aitoolbox.readthedocs.io/en/latest/)
 
 
 A framework which helps you train deep learning models in PyTorch and quickly iterate experiments. 
