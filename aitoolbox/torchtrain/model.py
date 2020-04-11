@@ -19,9 +19,9 @@ class TTModel(nn.Module, ABC):
         Executed during training stage where model weights are updated based on the loss returned from this function.
 
         Args:
-            batch_data:
-            criterion:
-            device:
+            batch_data: model input data batch
+            criterion: loss criterion
+            device: device on which the model is being trained
 
         Returns:
             PyTorch loss
@@ -39,9 +39,9 @@ class TTModel(nn.Module, ABC):
         For simple examples this function can just call the get_loss() and return its result.
 
         Args:
-            batch_data:
-            criterion:
-            device:
+            batch_data: model input data batch
+            criterion: loss criterion
+            device: device on which the model is being trained
 
         Returns:
             PyTorch loss
@@ -53,8 +53,8 @@ class TTModel(nn.Module, ABC):
         """Get predictions during evaluation stage
 
         Args:
-            batch_data:
-            device:
+            batch_data: model input data batch
+            device: device on which the model is making the prediction
 
         Returns:
             np.array, np.array, dict: y_pred.cpu(), y_test.cpu(), metadata
