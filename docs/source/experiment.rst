@@ -2,7 +2,10 @@ experiment
 ==========
 
 .. toctree::
-   :maxdepth: 5
+   :maxdepth: 1
    :caption: Guides:
 
    experiment/result_package
+   experiment/metrics
+   experiment/training_history
+   experiment/experiment_save
