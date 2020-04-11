@@ -15,7 +15,7 @@ AIToolbox - Model Training Framework for PyTorch
    experiment
    cloud
    examples
-   api/aitoolbox
+   api/api_aitoolbox
 
 
 A framework which helps you train deep learning models in PyTorch and quickly iterate experiments.
