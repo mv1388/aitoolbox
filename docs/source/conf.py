@@ -30,6 +30,19 @@ release = ''
 
 master_doc = 'index'
 
+add_module_names = True
+add_function_parentheses = True
+
+autodoc_member_order = 'bysource'
+autoclass_content = 'both'
+
+# Handled already by the `autoclass_content` above in a nicer way
+# autodoc_default_options = {
+#     'special-members': '__init__'
+# }
+
+autodoc_mock_imports = ['tensorflow', 'keras']
+
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
@@ -37,6 +50,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',
     'sphinx.ext.mathjax',
+    'sphinx.ext.viewcode',
     'sphinxcontrib.apidoc'  # Using https://github.com/sphinx-contrib/apidoc
 ]
 
@@ -47,14 +61,11 @@ napoleon_numpy_docstring = False
 #   https://github.com/sphinx-contrib/apidoc
 apidoc_module_dir = '../../aitoolbox'
 apidoc_output_dir = 'api'
+apidoc_excluded_paths = ['kerastrain', 'tftrain']
 apidoc_separate_modules = True
 apidoc_module_first = True
 
-autodoc_default_options = {
-    'special-members': '__init__'
-}
-
-autodoc_mock_imports = ['tensorflow', 'keras']
+apidoc_extra_args = ['-f', '-t', 'docs/source/_templates/apidoc']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -72,6 +83,18 @@ exclude_patterns = []
 #
 # html_theme = 'alabaster'
 html_theme = 'sphinx_rtd_theme'
+
+html_theme_options = {
+    # these are for sphinx_rtd_theme:
+    'collapse_navigation': False,
+    'navigation_depth': -1,
+    'titles_only': True
+
+    # these are for alabaster:
+    # 'show_relbars': True,
+    # 'fixed_sidebar': True,
+    # 'sidebar_collapse': True,
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
