@@ -48,6 +48,9 @@ apidoc_output_dir = 'api'
 apidoc_separate_modules = False
 apidoc_module_first = True
 
+autodoc_default_options = {
+    'special-members': '__init__'
+}
 
 autodoc_mock_imports = ['tensorflow', 'keras']
 
