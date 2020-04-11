@@ -14,6 +14,7 @@ AIToolbox - Model Training Framework for PyTorch
    torchtrain
    experiment
    cloud
+   nlp
 
 .. toctree::
    :maxdepth: 5
@@ -56,8 +57,9 @@ However, the greatest benefit of AIToolbox comes when all components are used to
 the process of PyTorch model training and experiment tracking as much as possible.
 Most of this top-level API is exposed to the user via the functionality implemented in :mod:`aitoolbox.torchtrain`.
 
-To learn more about each of AIToolbox components have a look at the corresponding documentation sections:
+To learn more about components available in AIToolbox have a look at the corresponding documentation sections:
 
 * :doc:`torchtrain`
 * :doc:`experiment`
 * :doc:`cloud`
+* :doc:`nlp`
