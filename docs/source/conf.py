@@ -47,7 +47,7 @@ napoleon_numpy_docstring = False
 #   https://github.com/sphinx-contrib/apidoc
 apidoc_module_dir = '../../aitoolbox'
 apidoc_output_dir = 'api'
-apidoc_separate_modules = False
+apidoc_separate_modules = True
 apidoc_module_first = True
 
 autodoc_default_options = {
