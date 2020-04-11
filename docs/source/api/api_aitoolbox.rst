@@ -1,5 +1,5 @@
-aitoolbox API
-=================
+aitoolbox
+=========
 
 .. automodule:: aitoolbox
    :members:
