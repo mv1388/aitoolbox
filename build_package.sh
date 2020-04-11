@@ -29,5 +29,5 @@ git add -A dist/
 
 
 if [ "$build_documentation" == true ]; then
-    ./doc_build.sh
+    ./doc_build.sh --clean
 fi
