@@ -69,7 +69,6 @@ apidoc_excluded_paths = ['kerastrain', 'tftrain']
 apidoc_separate_modules = True
 apidoc_module_first = True
 
-# apidoc_extra_args = ['-f', '-t', 'docs/source/_templates/apidoc']
 apidoc_extra_args = ['-f', '-t', f'{os.path.dirname(__file__)}/_templates/apidoc']
 
 # Add any paths that contain templates here, relative to this directory.
