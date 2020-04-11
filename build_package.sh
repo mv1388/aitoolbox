@@ -14,7 +14,6 @@ case $key in
     ;;
     *)    # unknown option
     echo "Don't know the argument"
-    usage;
     ;;
 esac
 done
