@@ -7,7 +7,7 @@ AIToolbox - Model Training Framework for PyTorch
 ===================================================================================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 5
    :caption: Contents:
    :hidden:
 
