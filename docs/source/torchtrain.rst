@@ -7,7 +7,7 @@ results are either stored only locally or if desired also automatically synced t
 (AWS S3 or Google Cloud Storage).
 
 .. toctree::
-   :maxdepth: 5
+   :maxdepth: 1
    :caption: Guides:
 
    torchtrain/train_loop
