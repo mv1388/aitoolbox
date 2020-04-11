@@ -14,4 +14,5 @@ results are either stored only locally or if desired also automatically synced t
    torchtrain/model
    torchtrain/callbacks
    torchtrain/parallel
+   torchtrain/apex_training
    torchtrain/developer

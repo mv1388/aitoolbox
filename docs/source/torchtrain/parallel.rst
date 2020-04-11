@@ -1,4 +1,4 @@
-Multi-GPU training
+Multi-GPU Training
 ==================
 
 
