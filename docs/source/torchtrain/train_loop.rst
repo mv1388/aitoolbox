@@ -52,7 +52,9 @@ they do on top of the core training loop functionality. The available TrainLoops
 TrainLoop
 ^^^^^^^^^
 The simplest TrainLoop version which only performs the model training and does no experiment tracking and
-performance evaluation. The API can be found in: :class:`aitoolbox.torchtrain.train_loop.TrainLoop`.
+performance evaluation.
+
+The API can be found in: :class:`aitoolbox.torchtrain.train_loop.TrainLoop`.
 
 Example of the ``TrainLoop`` used to train the model:
 
@@ -78,8 +80,9 @@ Example of the ``TrainLoop`` used to train the model:
 TrainLoopCheckpoint
 ^^^^^^^^^^^^^^^^^^^
 Same training process as in TrainLoop with additional automatic model checkpointing (saving) after every epoch. Model
-saving can be done only to the local disk or also to the cloud storage such as AWS S3. The API can be found in:
-:class:`aitoolbox.torchtrain.train_loop.TrainLoopCheckpoint`.
+saving can be done only to the local disk or also to the cloud storage such as AWS S3.
+
+The API can be found in: :class:`aitoolbox.torchtrain.train_loop.TrainLoopCheckpoint`.
 
 .. code-block:: python
 
@@ -118,7 +121,9 @@ TrainLoopEndSave
 Same training process as in TrainLoop with additional automatic model checkpointing (saving) and model performance
 evaluation at the end of the training process. This way the TrainLoop ensures experiment tracking a the end of
 the training. Model and experiment results saving can be done only to the local disk or also to the cloud storage
-such as AWS S3. The API can be found in: :class:`aitoolbox.torchtrain.train_loop.TrainLoopEndSave`.
+such as AWS S3.
+
+The API can be found in: :class:`aitoolbox.torchtrain.train_loop.TrainLoopEndSave`.
 
 For information about the ``ResultPackage`` used in this example, have a look at the :doc:`../experiment/result_package`
 section.
@@ -163,6 +168,7 @@ At its core it is the same training process as in TrainLoop with additional auto
 each epoch as well as automatic model checkpointing and model performance evaluation at the end of the training process.
 This way the TrainLoop ensures full experiment tracking with the maximum extent. Model and experiment results saving
 can be done only to the local disk or also to the cloud storage such as AWS S3.
+
 The API can be found in: :class:`aitoolbox.torchtrain.train_loop.TrainLoopCheckpointEndSave`.
 
 For information about the ``ResultPackage`` used in this example, have a look at the :doc:`../experiment/result_package`
