@@ -37,12 +37,14 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',
     'sphinx.ext.mathjax',
-    'sphinxcontrib.apidoc'
+    'sphinxcontrib.apidoc'  # Using https://github.com/sphinx-contrib/apidoc
 ]
 
 napoleon_google_docstring = True
 napoleon_numpy_docstring = False
 
+# For documentation of `sphinxcontrib.apidoc` params have a look at:
+#   https://github.com/sphinx-contrib/apidoc
 apidoc_module_dir = '../../aitoolbox'
 apidoc_output_dir = 'api'
 apidoc_separate_modules = False
