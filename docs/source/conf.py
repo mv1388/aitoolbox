@@ -4,6 +4,10 @@
 # list see the documentation:
 # http://www.sphinx-doc.org/en/master/config
 
+# -- Imports -----------------------------------------------------------------
+
+import datetime
+
 # -- Path setup --------------------------------------------------------------
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -18,7 +22,7 @@ sys.path.insert(0, os.path.abspath('../..'))
 # -- Project information -----------------------------------------------------
 
 project = 'AIToolbox'
-copyright = '2020, Marko Vidoni'
+copyright = f'{datetime.datetime.now().year}, Marko Vidoni'
 author = 'Marko Vidoni'
 
 # The full version, including alpha/beta/rc tags
@@ -65,7 +69,7 @@ apidoc_excluded_paths = ['kerastrain', 'tftrain']
 apidoc_separate_modules = True
 apidoc_module_first = True
 
-apidoc_extra_args = ['-f', '--templatedir=docs/source/_templates/apidoc']
+apidoc_extra_args = ['-f', '-t', 'docs/source/_templates/apidoc']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
