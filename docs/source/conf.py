@@ -61,6 +61,9 @@ extensions = [
 napoleon_google_docstring = True
 napoleon_numpy_docstring = False
 
+napoleon_include_private_with_doc = True
+napoleon_include_special_with_doc = True
+
 # For documentation of `sphinxcontrib.apidoc` params have a look at:
 #   https://github.com/sphinx-contrib/apidoc
 apidoc_module_dir = '../../aitoolbox'
