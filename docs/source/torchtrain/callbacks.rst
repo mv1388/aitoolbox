@@ -28,6 +28,7 @@ Example of the several basic callbacks used to infuse additional logic into the 
     from aitoolbox.torchtrain.train_loop import *
     from aitoolbox.torchtrain.callbacks.basic import EarlyStopping, TerminateOnNaN, AllPredictionsSame
 
+
     model = CNNModel()  # TTModel based neural model
     train_loader = DataLoader(...)
     val_loader = DataLoader(...)

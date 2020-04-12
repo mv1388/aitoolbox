@@ -19,6 +19,7 @@ Example of initialization is shown bellow and more can be read in the
     from apex import amp
     from aitoolbox.torchtrain.train_loop import *
 
+
     train_loader = DataLoader(...)
     val_loader = DataLoader(...)
     test_loader = DataLoader(...)
@@ -56,6 +57,7 @@ approach (DDP is currently only multi-GPU training setup supported by Apex AMP).
 .. code-block:: python
 
     from aitoolbox.torchtrain.train_loop import *
+
 
     train_loader = DataLoader(...)
     val_loader = DataLoader(...)

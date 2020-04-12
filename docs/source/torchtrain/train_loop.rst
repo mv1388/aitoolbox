@@ -62,6 +62,7 @@ Example of the ``TrainLoop`` used to train the model:
 
     from aitoolbox.torchtrain.train_loop import *
 
+
     model = CNNModel()  # TTModel based neural model
     train_loader = DataLoader(...)
     val_loader = DataLoader(...)
@@ -88,6 +89,7 @@ The API can be found in: :class:`aitoolbox.torchtrain.train_loop.TrainLoopCheckp
 
     from aitoolbox.torchtrain.train_loop import *
     from aitoolbox.experiment.result_package.basic_packages import ClassificationResultPackage
+
 
     hyperparams = {
         'lr': 0.001,
@@ -132,6 +134,7 @@ section.
 
     from aitoolbox.torchtrain.train_loop import *
     from aitoolbox.experiment.result_package.basic_packages import ClassificationResultPackage
+
 
     hyperparams = {
         'lr': 0.001,
@@ -182,6 +185,7 @@ For a full working example of the ``TrainLoopCheckpointEndSave`` training, check
 
     from aitoolbox.torchtrain.train_loop import *
     from aitoolbox.experiment.result_package.basic_packages import ClassificationResultPackage
+
 
     hyperparams = {
         'lr': 0.001,
