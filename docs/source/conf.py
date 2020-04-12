@@ -45,7 +45,8 @@ autoclass_content = 'both'
 #     'special-members': '__init__'
 # }
 
-autodoc_mock_imports = ['tensorflow', 'keras']
+autodoc_mock_imports = ['torch', 'torchvision', 'allennlp', 'rouge', 'pyrouge', 'pytorch-nlp', 'nltk', 'gensim'
+                        'tensorflow', 'keras']
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
