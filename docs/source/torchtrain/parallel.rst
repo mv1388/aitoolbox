@@ -20,6 +20,7 @@ core *PyTorch* with *DataParallel*:
     from aitoolbox.torchtrain.train_loop import *
     from aitoolbox.torchtrain.parallel import TTDataParallel
 
+
     model = CNNModel()  # TTModel based neural model
     model = TTDataParallel(model)
 
@@ -59,6 +60,7 @@ otherwise when not training distributed).
 .. code-block:: python
 
     from aitoolbox.torchtrain.train_loop import *
+
 
     model = CNNModel()  # TTModel based neural model
 

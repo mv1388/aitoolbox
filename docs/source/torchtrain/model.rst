@@ -26,6 +26,7 @@ the TrainLoop:
 
     from aitoolbox.torchtrain.model import TTModel
 
+
     class MyNeuralModel(TTModel):
         def __init__(self):
             # model layers, etc.

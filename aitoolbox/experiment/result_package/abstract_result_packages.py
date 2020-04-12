@@ -46,7 +46,7 @@ class AbstractResultPackage(ABC):
         Mostly this consists of executing calculation of selected performance metrics and returning their result dicts.
         If you want to use multiple performance metrics you have to combine them in the single self.results_dict
         at the end by doing this:
-            self.results_dict = {**metric_dict_1, **metric_dict_2}
+            return {**metric_dict_1, **metric_dict_2}
 
         Returns:
             dict: calculated result dict
