@@ -54,8 +54,8 @@ For a full working example which shows the use of multiple callbacks of various 
 <https://github.com/mv1388/aitoolbox/blob/master/examples/TrainLoop_use/trainloop_fully_tracked_experiment.py#L81>`_.
 
 
-Developing New Callbacks
-------------------------
+Implementing New Callbacks
+--------------------------
 
 However when some completely new functionality is desired which is not available out of the box in AIToolbox
 the user can also implement their own custom callbacks. These can then be used as any other callback to further
