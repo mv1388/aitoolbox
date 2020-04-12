@@ -45,7 +45,7 @@ autoclass_content = 'both'
 #     'special-members': '__init__'
 # }
 
-autodoc_mock_imports = [
+autodoc_mock_imports = ['torch', 'torchvision',
                         'tensorflow', 'keras',
                         'nltk', 'gensim', 'allennlp',
                         'rouge', 'pyrouge', 'pytorch-nlp']
