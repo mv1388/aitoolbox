@@ -4,12 +4,13 @@ import numpy as np
 
 
 class AbstractBaseMetric(ABC):
-    def __init__(self, y_true, y_predicted, metric_name=None, np_array=True):
+    def __init__(self, y_true, y_predicted, metric_name, np_array=True):
         """Base metric with core metric functionality needed by all the derived actual performance metrics
 
         Args:
             y_true (numpy.array or list or str): ground truth targets
             y_predicted (numpy.array or list or str): predicted targets
+            metric_name (str): name of the calculated metric
             np_array (bool): should the provided targets be converted to numpy array or left as they are
         """
         self.y_true = np.array(y_true) if np_array else y_true
