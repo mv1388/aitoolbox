@@ -94,6 +94,8 @@ for a standalone model performance evaluation, even when not dealing with PyTorc
     performance_results = result_pkg.get_results()
 
 
+.. _implementing-new-result-pkgs:
+
 Implementing New Result Packages
 --------------------------------
 
@@ -124,8 +126,8 @@ being done in the encapsulating result package. To learn more about the AIToolbo
 implementations have a look at the :doc:`metrics` documentation section.
 
 
-Example or Result Package using AIToolbox Metric
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Example or Result Package using AIToolbox Result Metric
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: python
 
