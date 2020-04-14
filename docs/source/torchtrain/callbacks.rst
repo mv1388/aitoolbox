@@ -172,3 +172,33 @@ the experiment details from the running ``TrainLoop`` and infuses our callback w
 
 For the example of the ``try_infer_experiment_details()`` use in practice check this implementation:
 :meth:`aitoolbox.torchtrain.callbacks.performance_eval.ModelTrainHistoryPlot.on_train_loop_registration`.
+
+
+DDP Multi-Processing Callbacks
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+When the callbacks are used during the DistributedDataParallel TrainLoop (more about this can be found in
+:doc:`parallel`), by default they are executed in each of the running processes. This behaviour can be desired, however
+in certain situations the opposite is required and the callback should only be executed in one lead process.
+
+When developing such a callback which is intended to be executed only in one of the spawned processes the torchtrain
+callbacks framework enables this via the ``device_idx_execution`` parameter which is part of every callback inherited
+from the ``AbstractCallback``. ``device_idx_execution`` tells the TrainLoop engine as part of which process and corresponding
+*GPU device id* the callback should be executed. For exmaple if the callback has ``device_idx_execution`` set to ``0``,
+this means that the callback will only be executed as part of the process which is running on the first GPU. When
+``device_idx_execution`` is set to ``None`` which is the default, the callback is executed inside every running process.
+
+Simple example callback that gets executed in only the process running on the first GPU:
+
+.. code-block:: python
+
+    from aitoolbox.torchtrain.callbacks.abstract import AbstractCallback
+
+
+    class DemoFirstGPUCallback(AbstractCallback):
+        def __init__(self):
+            super().__init__('first GPU callback example',
+                             device_idx_execution=0)
+
+        def on_train_begin(self):
+            ..... Some logic ....
