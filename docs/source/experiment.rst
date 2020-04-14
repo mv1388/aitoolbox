@@ -29,5 +29,5 @@ In general, :mod:`aitoolbox.experiment` helps the user with the following:
 
    experiment/result_package
    experiment/metrics
-   experiment/training_history
    experiment/experiment_save
+   experiment/training_history
