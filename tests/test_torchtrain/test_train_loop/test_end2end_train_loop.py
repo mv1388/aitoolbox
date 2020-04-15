@@ -1,0 +1,108 @@
+import unittest
+
+import numpy as np
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+import torch.optim as optim
+from torch.utils.data.dataloader import DataLoader
+from torch.utils.data.dataset import TensorDataset
+
+from aitoolbox.torchtrain.train_loop import TrainLoop
+from aitoolbox.torchtrain.model import TTModel
+
+np.random.seed(0)
+torch.manual_seed(0)
+
+
+class FFNet(TTModel):
+    def __init__(self):
+        super().__init__()
+        self.ff_1 = nn.Linear(50, 100)
+        self.ff_2 = nn.Linear(100, 100)
+        self.ff_3 = nn.Linear(100, 10)
+
+    def forward(self, batch_data):
+        ff_out = F.relu(self.ff_1(batch_data))
+        ff_out = F.relu(self.ff_2(ff_out))
+        ff_out = self.ff_3(ff_out)
+        out_softmax = F.log_softmax(ff_out, dim=1)
+        return out_softmax
+
+    def get_loss(self, batch_data, criterion, device):
+        input_data, target = batch_data
+        input_data = input_data.to(device)
+        target = target.to(device)
+
+        predicted = self(input_data)
+        loss = criterion(predicted, target)
+
+        return loss
+
+    def get_predictions(self, batch_data, device):
+        input_data, target = batch_data
+        input_data = input_data.to(device)
+
+        predicted = self(input_data)
+
+        return predicted.cpu(), target, {}
+
+
+class TestEnd2EndTrainLoop(unittest.TestCase):
+    def test_e2e_ff_net_train_loop(self):
+        batch_size = 10
+
+        train_dataset = TensorDataset(torch.randn(100, 50), torch.randint(low=0, high=10, size=(100,)))
+        val_dataset = TensorDataset(torch.randn(30, 50), torch.randint(low=0, high=10, size=(30,)))
+        test_dataset = TensorDataset(torch.randn(30, 50), torch.randint(low=0, high=10, size=(30,)))
+
+        train_dataloader = DataLoader(train_dataset, batch_size=batch_size)
+        val_dataloader = DataLoader(val_dataset, batch_size=batch_size)
+        test_dataloader = DataLoader(test_dataset, batch_size=batch_size)
+
+        model = FFNet()
+        optimizer = optim.Adam(model.parameters(), lr=0.001, betas=(0.9, 0.999))
+        criterion = nn.NLLLoss()
+
+        train_loop = TrainLoop(
+            model,
+            train_dataloader, val_dataloader, test_dataloader,
+            optimizer, criterion
+        )
+
+        train_loop.fit(num_epochs=5)
+
+        self.assertEqual(
+            train_loop.train_history.train_history,
+            {'loss': [2.224587655067444, 2.1440203189849854, 2.0584306001663206, 1.962017869949341, 1.8507084131240845],
+             'accumulated_loss': [2.3059947967529295, 2.1976317405700683, 2.114974856376648, 2.0259472250938417, 1.9252637863159179],
+             'val_loss': [2.330514828364054, 2.345397472381592, 2.363233725229899, 2.3853348096211753, 2.4111196994781494],
+             'train_end_test_loss': [2.31626296043396]}
+        )
+        self.assertEqual(train_loop.epoch, 4)
+
+    def test_e2e_ff_net_train_loop_loss(self):
+        batch_size = 10
+
+        train_dataset = TensorDataset(torch.randn(100, 50), torch.randint(low=0, high=10, size=(100,)))
+        val_dataset = TensorDataset(torch.randn(30, 50), torch.randint(low=0, high=10, size=(30,)))
+        test_dataset = TensorDataset(torch.randn(30, 50), torch.randint(low=0, high=10, size=(30,)))
+
+        train_dataloader = DataLoader(train_dataset, batch_size=batch_size)
+        val_dataloader = DataLoader(val_dataset, batch_size=batch_size)
+        test_dataloader = DataLoader(test_dataset, batch_size=batch_size)
+
+        model = FFNet()
+        optimizer = optim.Adam(model.parameters(), lr=0.001, betas=(0.9, 0.999))
+        criterion = nn.NLLLoss()
+
+        train_loop = TrainLoop(
+            model,
+            train_dataloader, val_dataloader, test_dataloader,
+            optimizer, criterion
+        )
+        train_loop.fit(num_epochs=5)
+
+        self.assertEqual(train_loop.evaluate_loss_on_train_set(), 1.8507084131240845)
+        self.assertEqual(train_loop.evaluate_loss_on_validation_set(), 2.4111196994781494)
+        self.assertEqual(train_loop.evaluate_loss_on_test_set(), 2.31626296043396)
