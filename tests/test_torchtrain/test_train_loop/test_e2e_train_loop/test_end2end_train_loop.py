@@ -175,6 +175,40 @@ class TestEnd2EndTrainLoop(unittest.TestCase):
         self.assertEqual(test_target.tolist(), test_dataset.tensors[1].tolist())
         self.assertEqual(test_dataset.tensors[0].sum(dim=1).tolist(), test_meta['example_feat_sum'])
 
+    def test_e2e_ff_net_train_loop_model_weights(self):
+        self.set_seeds()
+        batch_size = 10
+
+        train_dataset = TensorDataset(torch.randn(100, 50), torch.randint(low=0, high=10, size=(100,)))
+        val_dataset = TensorDataset(torch.randn(30, 50), torch.randint(low=0, high=10, size=(30,)))
+        test_dataset = TensorDataset(torch.randn(30, 50), torch.randint(low=0, high=10, size=(30,)))
+
+        train_dataloader = DataLoader(train_dataset, batch_size=batch_size)
+        val_dataloader = DataLoader(val_dataset, batch_size=batch_size)
+        test_dataloader = DataLoader(test_dataset, batch_size=batch_size)
+
+        model = FFNet()
+        optimizer = optim.Adam(model.parameters(), lr=0.001, betas=(0.9, 0.999))
+        criterion = nn.NLLLoss()
+
+        self.assertEqual([el.sum().item() for el in list(model.parameters())],
+                         [8.608831405639648, 1.3766423463821411, 2.205052614212036,
+                          -0.059001624584198, 1.996423363685608, 0.15424364805221558])
+
+        train_loop = TrainLoop(
+            model,
+            train_dataloader, val_dataloader, test_dataloader,
+            optimizer, criterion
+        )
+        model = train_loop.fit(num_epochs=5)
+
+        self.assertEqual(len(list(model.parameters())), 6)
+        self.assertEqual([list(el.shape) for el in list(model.parameters())],
+                         [[100, 50], [100], [100, 100], [100], [10, 100], [10]])
+        self.assertEqual([el.sum().item() for el in list(model.parameters())],
+                         [9.557740211486816, 2.34255313873291, 38.55471420288086,
+                          0.5636203289031982, -4.555063724517822, 0.14755704998970032])
+
     @staticmethod
     def set_seeds():
         manual_seed = 0
