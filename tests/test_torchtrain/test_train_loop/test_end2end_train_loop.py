@@ -1,5 +1,6 @@
 import unittest
 
+import random
 import numpy as np
 import torch
 import torch.nn as nn
@@ -11,8 +12,10 @@ from torch.utils.data.dataset import TensorDataset
 from aitoolbox.torchtrain.train_loop import TrainLoop
 from aitoolbox.torchtrain.model import TTModel
 
-np.random.seed(0)
-torch.manual_seed(0)
+# np.random.seed(0)
+# torch.manual_seed(0)
+
+
 
 
 class FFNet(TTModel):
@@ -49,7 +52,21 @@ class FFNet(TTModel):
 
 
 class TestEnd2EndTrainLoop(unittest.TestCase):
+    def set_seeds(self):
+        manualSeed = 0
+        np.random.seed(manualSeed)
+        random.seed(manualSeed)
+        torch.manual_seed(manualSeed)
+        # if you are suing GPU
+        torch.cuda.manual_seed(manualSeed)
+        torch.cuda.manual_seed_all(manualSeed)
+
+        torch.backends.cudnn.enabled = False
+        torch.backends.cudnn.benchmark = False
+        torch.backends.cudnn.deterministic = True
+
     def test_e2e_ff_net_train_loop(self):
+        self.set_seeds()
         batch_size = 10
 
         train_dataset = TensorDataset(torch.randn(100, 50), torch.randint(low=0, high=10, size=(100,)))
@@ -82,6 +99,7 @@ class TestEnd2EndTrainLoop(unittest.TestCase):
         self.assertEqual(train_loop.epoch, 4)
 
     def test_e2e_ff_net_train_loop_loss(self):
+        self.set_seeds()
         batch_size = 10
 
         train_dataset = TensorDataset(torch.randn(100, 50), torch.randint(low=0, high=10, size=(100,)))
@@ -108,6 +126,7 @@ class TestEnd2EndTrainLoop(unittest.TestCase):
         self.assertEqual(train_loop.evaluate_loss_on_test_set(), 2.31626296043396)
 
     def test_e2e_ff_net_train_loop_predictions(self):
+        self.set_seeds()
         batch_size = 10
 
         train_dataset = TensorDataset(torch.randn(100, 50), torch.randint(low=0, high=10, size=(100,)))
