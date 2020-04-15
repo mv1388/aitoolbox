@@ -191,9 +191,11 @@ class TestEnd2EndTrainLoop(unittest.TestCase):
         optimizer = optim.Adam(model.parameters(), lr=0.001, betas=(0.9, 0.999))
         criterion = nn.NLLLoss()
 
-        self.assertEqual([el.sum().item() for el in list(model.parameters())],
-                         [8.608831405639648, 1.3766423463821411, 2.205052614212036,
-                          -0.059001624584198, 1.996423363685608, 0.15424364805221558])
+        self.assertEqual(len(list(model.parameters())), 6)
+        for model_w, expected_model_w in zip([el.sum().item() for el in list(model.parameters())],
+                                             [8.608831405639648, 1.3766423463821411, 2.205052614212036,
+                                              -0.059001624584198, 1.996423363685608, 0.15424364805221558]):
+            self.assertAlmostEqual(model_w, expected_model_w, places=6)
 
         train_loop = TrainLoop(
             model,
@@ -205,9 +207,10 @@ class TestEnd2EndTrainLoop(unittest.TestCase):
         self.assertEqual(len(list(model.parameters())), 6)
         self.assertEqual([list(el.shape) for el in list(model.parameters())],
                          [[100, 50], [100], [100, 100], [100], [10, 100], [10]])
-        self.assertEqual([el.sum().item() for el in list(model.parameters())],
-                         [9.557740211486816, 2.34255313873291, 38.55471420288086,
-                          0.5636203289031982, -4.555063724517822, 0.14755704998970032])
+        for model_w, expected_model_w in zip([el.sum().item() for el in list(model.parameters())],
+                                             [9.557740211486816, 2.34255313873291, 38.55471420288086,
+                                              0.5636203289031982, -4.555063724517822, 0.14755704998970032]):
+            self.assertAlmostEqual(model_w, expected_model_w, places=6)
 
     @staticmethod
     def set_seeds():
