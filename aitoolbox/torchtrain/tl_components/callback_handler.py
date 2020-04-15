@@ -202,26 +202,32 @@ class CallbacksHandler(BasicCallbacksHandler):
         self.split_on_execution_position(callbacks, register_train_loop=False)
 
     def execute_epoch_begin(self):
+        self.train_loop_obj.prediction_store.purge_prediction_store(self.train_loop_obj.epoch)
         for callback in self.cbs_on_epoch_begin:
             callback.on_epoch_begin()
 
     def execute_epoch_end(self):
+        self.train_loop_obj.prediction_store.purge_prediction_store(self.train_loop_obj.epoch)
         for callback in self.cbs_on_epoch_end:
             callback.on_epoch_end()
 
     def execute_train_begin(self):
+        self.train_loop_obj.prediction_store.purge_prediction_store(self.train_loop_obj.epoch)
         for callback in self.cbs_on_train_begin:
             callback.on_train_begin()
 
     def execute_train_end(self):
+        self.train_loop_obj.prediction_store.purge_prediction_store(self.train_loop_obj.epoch)
         for callback in self.cbs_on_train_end:
             callback.on_train_end()
 
     def execute_batch_begin(self):
+        self.train_loop_obj.prediction_store.purge_prediction_store(self.train_loop_obj.epoch)
         for callback in self.cbs_on_batch_begin:
             callback.on_batch_begin()
 
     def execute_batch_end(self):
+        self.train_loop_obj.prediction_store.purge_prediction_store(self.train_loop_obj.epoch)
         for callback in self.cbs_on_batch_end:
             callback.on_batch_end()
 
