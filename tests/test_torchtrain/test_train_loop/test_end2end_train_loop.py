@@ -12,11 +12,6 @@ from torch.utils.data.dataset import TensorDataset
 from aitoolbox.torchtrain.train_loop import TrainLoop
 from aitoolbox.torchtrain.model import TTModel
 
-# np.random.seed(0)
-# torch.manual_seed(0)
-
-
-
 
 class FFNet(TTModel):
     def __init__(self):
@@ -52,19 +47,6 @@ class FFNet(TTModel):
 
 
 class TestEnd2EndTrainLoop(unittest.TestCase):
-    def set_seeds(self):
-        manualSeed = 0
-        np.random.seed(manualSeed)
-        random.seed(manualSeed)
-        torch.manual_seed(manualSeed)
-        # if you are suing GPU
-        torch.cuda.manual_seed(manualSeed)
-        torch.cuda.manual_seed_all(manualSeed)
-
-        torch.backends.cudnn.enabled = False
-        torch.backends.cudnn.benchmark = False
-        torch.backends.cudnn.deterministic = True
-
     def test_e2e_ff_net_train_loop(self):
         self.set_seeds()
         batch_size = 10
@@ -89,6 +71,8 @@ class TestEnd2EndTrainLoop(unittest.TestCase):
 
         train_loop.fit(num_epochs=5)
 
+        print(train_loop.train_history.train_history)
+
         self.assertEqual(
             train_loop.train_history.train_history,
             {'loss': [2.224587655067444, 2.1440203189849854, 2.0584306001663206, 1.962017869949341, 1.8507084131240845],
@@ -98,32 +82,32 @@ class TestEnd2EndTrainLoop(unittest.TestCase):
         )
         self.assertEqual(train_loop.epoch, 4)
 
-    def test_e2e_ff_net_train_loop_loss(self):
-        self.set_seeds()
-        batch_size = 10
-
-        train_dataset = TensorDataset(torch.randn(100, 50), torch.randint(low=0, high=10, size=(100,)))
-        val_dataset = TensorDataset(torch.randn(30, 50), torch.randint(low=0, high=10, size=(30,)))
-        test_dataset = TensorDataset(torch.randn(30, 50), torch.randint(low=0, high=10, size=(30,)))
-
-        train_dataloader = DataLoader(train_dataset, batch_size=batch_size)
-        val_dataloader = DataLoader(val_dataset, batch_size=batch_size)
-        test_dataloader = DataLoader(test_dataset, batch_size=batch_size)
-
-        model = FFNet()
-        optimizer = optim.Adam(model.parameters(), lr=0.001, betas=(0.9, 0.999))
-        criterion = nn.NLLLoss()
-
-        train_loop = TrainLoop(
-            model,
-            train_dataloader, val_dataloader, test_dataloader,
-            optimizer, criterion
-        )
-        train_loop.fit(num_epochs=5)
-
-        self.assertEqual(train_loop.evaluate_loss_on_train_set(), 1.8507084131240845)
-        self.assertEqual(train_loop.evaluate_loss_on_validation_set(), 2.4111196994781494)
-        self.assertEqual(train_loop.evaluate_loss_on_test_set(), 2.31626296043396)
+    # def test_e2e_ff_net_train_loop_loss(self):
+    #     self.set_seeds()
+    #     batch_size = 10
+    #
+    #     train_dataset = TensorDataset(torch.randn(100, 50), torch.randint(low=0, high=10, size=(100,)))
+    #     val_dataset = TensorDataset(torch.randn(30, 50), torch.randint(low=0, high=10, size=(30,)))
+    #     test_dataset = TensorDataset(torch.randn(30, 50), torch.randint(low=0, high=10, size=(30,)))
+    #
+    #     train_dataloader = DataLoader(train_dataset, batch_size=batch_size)
+    #     val_dataloader = DataLoader(val_dataset, batch_size=batch_size)
+    #     test_dataloader = DataLoader(test_dataset, batch_size=batch_size)
+    #
+    #     model = FFNet()
+    #     optimizer = optim.Adam(model.parameters(), lr=0.001, betas=(0.9, 0.999))
+    #     criterion = nn.NLLLoss()
+    #
+    #     train_loop = TrainLoop(
+    #         model,
+    #         train_dataloader, val_dataloader, test_dataloader,
+    #         optimizer, criterion
+    #     )
+    #     train_loop.fit(num_epochs=5)
+    #
+    #     self.assertEqual(train_loop.evaluate_loss_on_train_set(), 1.8507084131240845)
+    #     self.assertEqual(train_loop.evaluate_loss_on_validation_set(), 2.4111196994781494)
+    #     self.assertEqual(train_loop.evaluate_loss_on_test_set(), 2.31626296043396)
 
     def test_e2e_ff_net_train_loop_predictions(self):
         self.set_seeds()
@@ -173,3 +157,17 @@ class TestEnd2EndTrainLoop(unittest.TestCase):
         )
         self.assertEqual(test_target.tolist(), test_dataset.tensors[1].tolist())
         self.assertEqual(test_dataset.tensors[0].sum(dim=1).tolist(), test_meta['example_feat_sum'])
+
+    @staticmethod
+    def set_seeds():
+        manual_seed = 0
+        np.random.seed(manual_seed)
+        random.seed(manual_seed)
+        torch.manual_seed(manual_seed)
+        # if you are suing GPU
+        torch.cuda.manual_seed(manual_seed)
+        torch.cuda.manual_seed_all(manual_seed)
+
+        torch.backends.cudnn.enabled = False
+        torch.backends.cudnn.benchmark = False
+        torch.backends.cudnn.deterministic = True
