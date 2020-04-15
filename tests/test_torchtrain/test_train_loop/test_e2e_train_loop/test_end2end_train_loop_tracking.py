@@ -234,7 +234,7 @@ class TestEnd2EndTrainLoopCheckpointEndSave(unittest.TestCase):
             val_result_package=ClassificationResultPackage(), test_result_package=ClassificationResultPackage(),
             cloud_save_mode=None
         )
-        train_loop.fit(num_epochs=2)
+        train_loop.fit(num_epochs=5)
 
         experiment_dir_path = os.path.join(THIS_DIR, train_loop.project_name,
                                            f'{train_loop.experiment_name}_{train_loop.experiment_timestamp}')
@@ -290,7 +290,7 @@ class TestEnd2EndTrainLoopCheckpointEndSave(unittest.TestCase):
 
         self.assertEqual(
             results_dict['results'],
-            {'ClassificationResult_TEST': {'Accuracy': 0.1}, 'ClassificationResult_VAL': {'Accuracy': 0.15}}
+            {'ClassificationResult_TEST': {'Accuracy': 0.1}, 'ClassificationResult_VAL': {'Accuracy': 0.125}}
         )
 
         self.assertEqual(len(results_dict['hyperparameters']), 3)
