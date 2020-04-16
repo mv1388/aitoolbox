@@ -97,10 +97,6 @@ class TestCNNMnistEnd2EndTrainLoopCheckpointEndSave(unittest.TestCase):
         train_loop.fit(num_epochs=3)
         self.assertEqual(train_loop.epoch, 2)
 
-        self.assertAlmostEqual(train_loop.evaluate_loss_on_train_set(), 0.04546945019857958, places=6)
-        self.assertAlmostEqual(train_loop.evaluate_loss_on_validation_set(), 0.04546945019857958, places=6)
-        self.assertAlmostEqual(train_loop.evaluate_loss_on_test_set(), 0.04546945019857958, places=6)
-
         train_pred, train_target, train_meta = train_loop.predict_on_train_set()
         with open(f'{THIS_DIR}/resources/mnist_pred_train_3e.p', 'rb') as f:
             correct_train_pred = pickle.load(f)
