@@ -95,24 +95,7 @@ class TestCNNMnistEnd2EndTrainLoopCheckpointEndSave(unittest.TestCase):
             cloud_save_mode=None
         )
         train_loop.fit(num_epochs=3)
-        tl_history = train_loop.train_history.train_history
-
         self.assertEqual(train_loop.epoch, 2)
-
-        result_approx = {
-            'loss': [0.2760361768677831, 0.10083887679851614, 0.04546945019857958],
-            'accumulated_loss': [0.44150516266934575, 0.1245885466481559, 0.07134055544040166],
-            'val_loss': [0.2760361768677831, 0.10083887679851614, 0.04546945019857958],
-            'train_end_test_loss': [0.04546945019857958]
-        }
-
-        self.assertEqual(sorted(tl_history.keys()), sorted(result_approx.keys()))
-
-        for metric, results_list in result_approx.items():
-            self.assertEqual(len(results_list), len(tl_history[metric]))
-
-            for correct_result, tl_result in zip(results_list, tl_history[metric]):
-                self.assertAlmostEqual(correct_result, tl_result, places=6)
 
         self.assertAlmostEqual(train_loop.evaluate_loss_on_train_set(), 0.04546945019857958, places=6)
         self.assertAlmostEqual(train_loop.evaluate_loss_on_validation_set(), 0.04546945019857958, places=6)
