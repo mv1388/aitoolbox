@@ -1,5 +1,6 @@
 import unittest
 
+import os
 import random
 import numpy as np
 import torch
@@ -11,6 +12,8 @@ from torch.utils.data.dataset import TensorDataset
 
 from aitoolbox.torchtrain.train_loop import TrainLoop
 from aitoolbox.torchtrain.model import TTModel
+
+THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 class FFNet(TTModel):
@@ -174,6 +177,53 @@ class TestEnd2EndTrainLoop(unittest.TestCase):
         )
         self.assertEqual(test_target.tolist(), test_dataset.tensors[1].tolist())
         self.assertEqual(test_dataset.tensors[0].sum(dim=1).tolist(), test_meta['example_feat_sum'])
+
+    def test_e2e_ff_net_train_loop_model_weights(self):
+        self.set_seeds()
+        batch_size = 10
+
+        train_dataset = TensorDataset(torch.randn(100, 50), torch.randint(low=0, high=10, size=(100,)))
+        val_dataset = TensorDataset(torch.randn(30, 50), torch.randint(low=0, high=10, size=(30,)))
+        test_dataset = TensorDataset(torch.randn(30, 50), torch.randint(low=0, high=10, size=(30,)))
+
+        train_dataloader = DataLoader(train_dataset, batch_size=batch_size)
+        val_dataloader = DataLoader(val_dataset, batch_size=batch_size)
+        test_dataloader = DataLoader(test_dataset, batch_size=batch_size)
+
+        model = FFNet()
+        optimizer = optim.Adam(model.parameters(), lr=0.001, betas=(0.9, 0.999))
+        criterion = nn.NLLLoss()
+
+        expected_init_model = torch.load(f'{THIS_DIR}/resources/init_model.pth')
+        self.assertEqual(model.state_dict().keys(), expected_init_model.keys())
+
+        for layer_name in expected_init_model.keys():
+            self.assertEqual(model.state_dict()[layer_name].shape, expected_init_model[layer_name].shape)
+            for row_model, row_expected in zip(model.state_dict()[layer_name], expected_init_model[layer_name]):
+                if len(row_model.shape) == 0 and len(row_expected.shape) == 0:
+                    self.assertAlmostEqual(row_model.tolist(), row_expected.tolist(), places=6)
+                else:
+                    for el_model, el_expected in zip(row_model.tolist(), row_expected.tolist()):
+                        self.assertAlmostEqual(el_model, el_expected, places=6)
+
+        train_loop = TrainLoop(
+            model,
+            train_dataloader, val_dataloader, test_dataloader,
+            optimizer, criterion
+        )
+        model = train_loop.fit(num_epochs=5)
+
+        expected_trained_model = torch.load(f'{THIS_DIR}/resources/trained_model_e5.pth')
+        self.assertEqual(model.state_dict().keys(), expected_trained_model.keys())
+
+        for layer_name in expected_trained_model.keys():
+            self.assertEqual(model.state_dict()[layer_name].shape, expected_trained_model[layer_name].shape)
+            for row_model, row_expected in zip(model.state_dict()[layer_name], expected_trained_model[layer_name]):
+                if len(row_model.shape) == 0 and len(row_expected.shape) == 0:
+                    self.assertAlmostEqual(row_model.tolist(), row_expected.tolist(), places=6)
+                else:
+                    for el_model, el_expected in zip(row_model.tolist(), row_expected.tolist()):
+                        self.assertAlmostEqual(el_model, el_expected, places=6)
 
     @staticmethod
     def set_seeds():
