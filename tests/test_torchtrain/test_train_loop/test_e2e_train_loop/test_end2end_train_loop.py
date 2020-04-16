@@ -198,7 +198,13 @@ class TestEnd2EndTrainLoop(unittest.TestCase):
         self.assertEqual(model.state_dict().keys(), expected_init_model.keys())
 
         for layer_name in expected_init_model.keys():
-            self.assertEqual(model.state_dict()[layer_name].tolist(), expected_init_model[layer_name].tolist())
+            self.assertEqual(model.state_dict()[layer_name].shape, expected_init_model[layer_name].shape)
+            for row_model, row_expected in zip(model.state_dict()[layer_name], expected_init_model[layer_name]):
+                if len(row_model.shape) == 0 and len(row_expected.shape) == 0:
+                    self.assertAlmostEqual(row_model.tolist(), row_expected.tolist(), places=6)
+                else:
+                    for el_model, el_expected in zip(row_model.tolist(), row_expected.tolist()):
+                        self.assertAlmostEqual(el_model, el_expected, places=6)
 
         train_loop = TrainLoop(
             model,
@@ -211,7 +217,13 @@ class TestEnd2EndTrainLoop(unittest.TestCase):
         self.assertEqual(model.state_dict().keys(), expected_trained_model.keys())
 
         for layer_name in expected_trained_model.keys():
-            self.assertEqual(model.state_dict()[layer_name].tolist(), expected_trained_model[layer_name].tolist())
+            self.assertEqual(model.state_dict()[layer_name].shape, expected_trained_model[layer_name].shape)
+            for row_model, row_expected in zip(model.state_dict()[layer_name], expected_trained_model[layer_name]):
+                if len(row_model.shape) == 0 and len(row_expected.shape) == 0:
+                    self.assertAlmostEqual(row_model.tolist(), row_expected.tolist(), places=6)
+                else:
+                    for el_model, el_expected in zip(row_model.tolist(), row_expected.tolist()):
+                        self.assertAlmostEqual(el_model, el_expected, places=6)
 
     @staticmethod
     def set_seeds():
