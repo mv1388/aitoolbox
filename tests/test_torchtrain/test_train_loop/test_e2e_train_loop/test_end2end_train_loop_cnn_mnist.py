@@ -146,101 +146,115 @@ class TestCNNMnistEnd2EndTrainLoopCheckpointEndSave(unittest.TestCase):
         if os.path.exists(data_path):
             shutil.rmtree(data_path)
 
-    # def test_e2e_ff_net_train_loop_tracking_saved_files_check(self):
-    #     self.set_seeds()
-    #     batch_size = 10
-    #
-    #     train_dataset = TensorDataset(torch.randn(100, 50), torch.randint(low=0, high=10, size=(100,)))
-    #     val_dataset = TensorDataset(torch.randn(40, 50), torch.randint(low=0, high=10, size=(40,)))
-    #     test_dataset = TensorDataset(torch.randn(30, 50), torch.randint(low=0, high=10, size=(30,)))
-    #
-    #     train_dataloader = DataLoader(train_dataset, batch_size=batch_size)
-    #     val_dataloader = DataLoader(val_dataset, batch_size=batch_size)
-    #     test_dataloader = DataLoader(test_dataset, batch_size=batch_size)
-    #
-    #     model = FFNet()
-    #     optimizer = optim.Adam(model.parameters(), lr=0.001, betas=(0.9, 0.999))
-    #     criterion = nn.NLLLoss()
-    #
-    #     train_loop = TrainLoopCheckpointEndSave(
-    #         model,
-    #         train_dataloader, val_dataloader, test_dataloader,
-    #         optimizer, criterion,
-    #         project_name='e2e_train_loop_example', experiment_name='TrainLoopCheckpointEndSave_example',
-    #         local_model_result_folder_path=THIS_DIR,
-    #         hyperparams={'batch_size': batch_size},
-    #         val_result_package=ClassificationResultPackage(), test_result_package=ClassificationResultPackage(),
-    #         cloud_save_mode=None
-    #     )
-    #     train_loop.fit(num_epochs=5)
-    #
-    #     experiment_dir_path = os.path.join(THIS_DIR, train_loop.project_name,
-    #                                        f'{train_loop.experiment_name}_{train_loop.experiment_timestamp}')
-    #
-    #     self.assertTrue(os.path.exists(os.path.join(experiment_dir_path, 'checkpoint_model')))
-    #     self.assertTrue(os.path.isdir(os.path.join(experiment_dir_path, 'checkpoint_model')))
-    #     self.assertTrue(os.path.exists(os.path.join(experiment_dir_path, 'model')))
-    #     self.assertTrue(os.path.isdir(os.path.join(experiment_dir_path, 'model')))
-    #     self.assertTrue(os.path.exists(os.path.join(experiment_dir_path, 'results')))
-    #     self.assertTrue(os.path.isdir(os.path.join(experiment_dir_path, 'results')))
-    #
-    #     self.assertTrue(os.path.exists(os.path.join(experiment_dir_path, 'hyperparams_list.txt')))
-    #     self.assertTrue(os.path.isfile(os.path.join(experiment_dir_path, 'hyperparams_list.txt')))
-    #     self.assertTrue(os.path.exists(os.path.join(experiment_dir_path, THIS_FILE)))
-    #     self.assertTrue(os.path.isfile(os.path.join(experiment_dir_path, THIS_FILE)))
-    #
-    #     self.assertEqual(
-    #         sorted(os.listdir(os.path.join(experiment_dir_path, 'checkpoint_model'))),
-    #         [f'model_{train_loop.experiment_name}_{train_loop.experiment_timestamp}_E{ep}.pth'
-    #          for ep in range(train_loop.epoch + 1)]
-    #     )
-    #     self.assertEqual(os.listdir(os.path.join(experiment_dir_path, 'model')),
-    #                      [f'model_{train_loop.experiment_name}_{train_loop.experiment_timestamp}.pth'])
-    #
-    #     results_dir_path = os.path.join(experiment_dir_path, 'results')
-    #
-    #     self.assertEqual(sorted(os.listdir(os.path.join(results_dir_path, 'plots'))),
-    #                      ['accumulated_loss.png', 'loss.png', 'val_loss.png'])
-    #
-    #     results_pickle_path = os.path.join(
-    #         results_dir_path,
-    #         f'results_hyperParams_hist_{train_loop.experiment_name}_{train_loop.experiment_timestamp}.p'
-    #     )
-    #     with open(results_pickle_path, 'rb') as f:
-    #         results_dict = pickle.load(f)
-    #
-    #     self.assertEqual(list(results_dict.keys()),
-    #                      ['y_true', 'y_predicted', 'experiment_name', 'experiment_results_local_path', 'results',
-    #                       'hyperparameters', 'training_history'])
-    #
-    #     self.assertEqual(results_dict['experiment_name'], train_loop.experiment_name)
-    #     self.assertEqual(results_dict['experiment_results_local_path'], results_dir_path)
-    #
-    #     self.assertEqual(results_dict['y_predicted']['ClassificationResult_TEST'].tolist(),
-    #                      train_loop.predict_on_test_set()[0].tolist())
-    #     self.assertEqual(results_dict['y_predicted']['ClassificationResult_VAL'].tolist(),
-    #                      train_loop.predict_on_validation_set()[0].tolist())
-    #
-    #     self.assertEqual(results_dict['y_true']['ClassificationResult_TEST'].tolist(),
-    #                      train_loop.predict_on_test_set()[1].tolist())
-    #     self.assertEqual(results_dict['y_true']['ClassificationResult_VAL'].tolist(),
-    #                      train_loop.predict_on_validation_set()[1].tolist())
-    #
-    #     self.assertEqual(
-    #         results_dict['results'],
-    #         {'ClassificationResult_TEST': {'Accuracy': 0.1}, 'ClassificationResult_VAL': {'Accuracy': 0.125}}
-    #     )
-    #
-    #     self.assertEqual(len(results_dict['hyperparameters']), 3)
-    #     self.assertEqual(results_dict['hyperparameters']['batch_size'], 10)
-    #     self.assertEqual(results_dict['hyperparameters']['experiment_file_path'], __file__)
-    #     self.assertEqual(results_dict['hyperparameters']['source_dirs_paths'], ())
-    #
-    #     self.assertEqual(results_dict['training_history'], train_loop.train_history.train_history)
-    #
-    #     project_path = os.path.join(THIS_DIR, 'e2e_train_loop_example')
-    #     if os.path.exists(project_path):
-    #         shutil.rmtree(project_path)
+    def test_e2e_ff_net_train_loop_tracking_saved_files_check(self):
+        self.set_seeds()
+
+        train_loader = DataLoader(
+            datasets.MNIST(
+                f'{THIS_DIR}/mnist_data', train=False, download=True,  # set to train=False so that test is done faster
+                transform=transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))])
+            ),
+            batch_size=100)
+        val_loader = DataLoader(
+            datasets.MNIST(
+                f'{THIS_DIR}/mnist_data', train=False,
+                transform=transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))])
+            ),
+            batch_size=100)
+        test_loader = DataLoader(
+            datasets.MNIST(
+                f'{THIS_DIR}/mnist_data', train=False,
+                transform=transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))])
+            ),
+            batch_size=100)
+
+        model = CnnNet()
+        optimizer = optim.Adam(model.parameters(), lr=0.001, betas=(0.9, 0.999))
+        criterion = nn.NLLLoss()
+
+        train_loop = TrainLoopCheckpointEndSave(
+            model,
+            train_loader, val_loader, test_loader,
+            optimizer, criterion,
+            project_name='e2e_train_loop_example', experiment_name='TrainLoopCheckpointEndSave_cnn_mnist_example',
+            local_model_result_folder_path=THIS_DIR,
+            hyperparams={'batch_size': 100, 'num_epochs': 3},
+            val_result_package=ClassificationResultPackage(), test_result_package=ClassificationResultPackage(),
+            cloud_save_mode=None
+        )
+        train_loop.fit(num_epochs=3)
+
+        experiment_dir_path = os.path.join(THIS_DIR, train_loop.project_name,
+                                           f'{train_loop.experiment_name}_{train_loop.experiment_timestamp}')
+
+        self.assertTrue(os.path.exists(os.path.join(experiment_dir_path, 'checkpoint_model')))
+        self.assertTrue(os.path.isdir(os.path.join(experiment_dir_path, 'checkpoint_model')))
+        self.assertTrue(os.path.exists(os.path.join(experiment_dir_path, 'model')))
+        self.assertTrue(os.path.isdir(os.path.join(experiment_dir_path, 'model')))
+        self.assertTrue(os.path.exists(os.path.join(experiment_dir_path, 'results')))
+        self.assertTrue(os.path.isdir(os.path.join(experiment_dir_path, 'results')))
+
+        self.assertTrue(os.path.exists(os.path.join(experiment_dir_path, 'hyperparams_list.txt')))
+        self.assertTrue(os.path.isfile(os.path.join(experiment_dir_path, 'hyperparams_list.txt')))
+        self.assertTrue(os.path.exists(os.path.join(experiment_dir_path, THIS_FILE)))
+        self.assertTrue(os.path.isfile(os.path.join(experiment_dir_path, THIS_FILE)))
+
+        self.assertEqual(
+            sorted(os.listdir(os.path.join(experiment_dir_path, 'checkpoint_model'))),
+            [f'model_{train_loop.experiment_name}_{train_loop.experiment_timestamp}_E{ep}.pth'
+             for ep in range(train_loop.epoch + 1)]
+        )
+        self.assertEqual(os.listdir(os.path.join(experiment_dir_path, 'model')),
+                         [f'model_{train_loop.experiment_name}_{train_loop.experiment_timestamp}.pth'])
+
+        results_dir_path = os.path.join(experiment_dir_path, 'results')
+
+        self.assertEqual(sorted(os.listdir(os.path.join(results_dir_path, 'plots'))),
+                         ['accumulated_loss.png', 'loss.png', 'val_loss.png'])
+
+        results_pickle_path = os.path.join(
+            results_dir_path,
+            f'results_hyperParams_hist_{train_loop.experiment_name}_{train_loop.experiment_timestamp}.p'
+        )
+        with open(results_pickle_path, 'rb') as f:
+            results_dict = pickle.load(f)
+
+        self.assertEqual(list(results_dict.keys()),
+                         ['y_true', 'y_predicted', 'experiment_name', 'experiment_results_local_path', 'results',
+                          'hyperparameters', 'training_history'])
+
+        self.assertEqual(results_dict['experiment_name'], train_loop.experiment_name)
+        self.assertEqual(results_dict['experiment_results_local_path'], results_dir_path)
+
+        self.assertEqual(results_dict['y_predicted']['ClassificationResult_TEST'].tolist(),
+                         train_loop.predict_on_test_set()[0].tolist())
+        self.assertEqual(results_dict['y_predicted']['ClassificationResult_VAL'].tolist(),
+                         train_loop.predict_on_validation_set()[0].tolist())
+
+        self.assertEqual(results_dict['y_true']['ClassificationResult_TEST'].tolist(),
+                         train_loop.predict_on_test_set()[1].tolist())
+        self.assertEqual(results_dict['y_true']['ClassificationResult_VAL'].tolist(),
+                         train_loop.predict_on_validation_set()[1].tolist())
+
+        self.assertEqual(
+            results_dict['results'],
+            {'ClassificationResult_TEST': {'Accuracy': 0.9847}, 'ClassificationResult_VAL': {'Accuracy': 0.9847}}
+        )
+
+        self.assertEqual(len(results_dict['hyperparameters']), 4)
+        self.assertEqual(results_dict['hyperparameters']['num_epochs'], 3)
+        self.assertEqual(results_dict['hyperparameters']['batch_size'], 100)
+        self.assertEqual(results_dict['hyperparameters']['experiment_file_path'], __file__)
+        self.assertEqual(results_dict['hyperparameters']['source_dirs_paths'], ())
+
+        self.assertEqual(results_dict['training_history'], train_loop.train_history.train_history)
+
+        project_path = os.path.join(THIS_DIR, 'e2e_train_loop_example')
+        if os.path.exists(project_path):
+            shutil.rmtree(project_path)
+        data_path = os.path.join(THIS_DIR, 'mnist_data')
+        if os.path.exists(data_path):
+            shutil.rmtree(data_path)
 
     @staticmethod
     def set_seeds():
