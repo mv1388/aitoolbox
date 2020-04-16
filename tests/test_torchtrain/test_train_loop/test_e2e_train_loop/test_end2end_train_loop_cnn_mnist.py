@@ -236,10 +236,8 @@ class TestCNNMnistEnd2EndTrainLoopCheckpointEndSave(unittest.TestCase):
         self.assertEqual(results_dict['y_true']['ClassificationResult_VAL'].tolist(),
                          train_loop.predict_on_validation_set()[1].tolist())
 
-        self.assertEqual(
-            results_dict['results'],
-            {'ClassificationResult_TEST': {'Accuracy': 0.9847}, 'ClassificationResult_VAL': {'Accuracy': 0.9847}}
-        )
+        self.assertAlmostEqual(results_dict['results']['ClassificationResult_TEST']['Accuracy'], 0.9847, places=3)
+        self.assertAlmostEqual(results_dict['results']['ClassificationResult_VAL']['Accuracy'], 0.9847, places=3)
 
         self.assertEqual(len(results_dict['hyperparameters']), 4)
         self.assertEqual(results_dict['hyperparameters']['num_epochs'], 3)
