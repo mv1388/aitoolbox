@@ -285,5 +285,4 @@ class ModelPredictionStore:
             self.purge_prediction_store(self.prediction_store['epoch'] + 1)
 
     def purge_prediction_store(self, epoch):
-        print('Purge prediction store')
         self.prediction_store = {'epoch': epoch}
