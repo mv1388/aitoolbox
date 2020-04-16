@@ -1,5 +1,6 @@
 import unittest
 
+import os
 import random
 import numpy as np
 import torch
@@ -11,6 +12,8 @@ from torch.utils.data.dataset import TensorDataset
 
 from aitoolbox.torchtrain.train_loop import TrainLoop
 from aitoolbox.torchtrain.model import TTModel
+
+THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 class FFNet(TTModel):
@@ -191,11 +194,11 @@ class TestEnd2EndTrainLoop(unittest.TestCase):
         optimizer = optim.Adam(model.parameters(), lr=0.001, betas=(0.9, 0.999))
         criterion = nn.NLLLoss()
 
-        self.assertEqual(len(list(model.parameters())), 6)
-        for model_w, expected_model_w in zip([el.sum().item() for el in list(model.parameters())],
-                                             [8.608831405639648, 1.3766423463821411, 2.205052614212036,
-                                              -0.059001624584198, 1.996423363685608, 0.15424364805221558]):
-            self.assertAlmostEqual(model_w, expected_model_w, places=6)
+        expected_init_model = torch.load(f'{THIS_DIR}/resources/init_model.pth')
+        self.assertEqual(model.state_dict().keys(), expected_init_model.keys())
+
+        for layer_name in expected_init_model.keys():
+            self.assertEqual(model.state_dict()[layer_name].tolist(), expected_init_model[layer_name].tolist())
 
         train_loop = TrainLoop(
             model,
@@ -204,13 +207,11 @@ class TestEnd2EndTrainLoop(unittest.TestCase):
         )
         model = train_loop.fit(num_epochs=5)
 
-        self.assertEqual(len(list(model.parameters())), 6)
-        self.assertEqual([list(el.shape) for el in list(model.parameters())],
-                         [[100, 50], [100], [100, 100], [100], [10, 100], [10]])
-        for model_w, expected_model_w in zip([el.sum().item() for el in list(model.parameters())],
-                                             [9.557740211486816, 2.34255313873291, 38.55471420288086,
-                                              0.5636203289031982, -4.555063724517822, 0.14755704998970032]):
-            self.assertAlmostEqual(model_w, expected_model_w, places=6)
+        expected_trained_model = torch.load(f'{THIS_DIR}/resources/trained_model_e5.pth')
+        self.assertEqual(model.state_dict().keys(), expected_trained_model.keys())
+
+        for layer_name in expected_trained_model.keys():
+            self.assertEqual(model.state_dict()[layer_name].tolist(), expected_trained_model[layer_name].tolist())
 
     @staticmethod
     def set_seeds():
