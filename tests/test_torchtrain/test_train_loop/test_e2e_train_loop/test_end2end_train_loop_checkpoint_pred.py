@@ -380,7 +380,7 @@ class TestEnd2EndTrainLoopModelSaveReloadPrediction(unittest.TestCase):
             model_reloaded,
             train_dataloader, val_dataloader, test_dataloader,
             optimizer_reloaded, criterion,
-            project_name='e2e_train_loop_example', experiment_name='TrainLoopCheckpointEndSave_example',
+            project_name=train_loop.project_name, experiment_name=train_loop.experiment_name,
             local_model_result_folder_path=THIS_DIR,
             hyperparams={'batch_size': batch_size},
             val_result_package=ClassificationResultPackage(), test_result_package=ClassificationResultPackage(),
