@@ -3,7 +3,6 @@ import unittest
 import os
 import shutil
 import random
-import pickle
 import numpy as np
 import torch
 import torch.nn as nn
@@ -15,6 +14,7 @@ from torch.utils.data.dataset import TensorDataset
 from aitoolbox.torchtrain.train_loop import TrainLoopCheckpointEndSave, TrainLoop
 from aitoolbox.torchtrain.model import TTModel
 from aitoolbox.experiment.result_package.basic_packages import ClassificationResultPackage
+from aitoolbox.torchtrain.model_predict import PyTorchModelPredictor
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -112,6 +112,76 @@ class TestEnd2EndTrainLoopModelSaveReloadPrediction(unittest.TestCase):
         train_loss_reload = train_loop_reload.evaluate_loss_on_train_set()
         val_loss_reload = train_loop_reload.evaluate_loss_on_validation_set()
         test_loss_reload = train_loop_reload.evaluate_loss_on_test_set()
+
+        self.assertEqual(train_pred.tolist(), train_pred_reload.tolist())
+        self.assertEqual(val_pred.tolist(), val_pred_reload.tolist())
+        self.assertEqual(test_pred.tolist(), test_pred_reload.tolist())
+
+        self.assertEqual(train_loss, train_loss_reload)
+        self.assertEqual(val_loss, val_loss_reload)
+        self.assertEqual(test_loss, test_loss_reload)
+
+        project_path = os.path.join(THIS_DIR, 'e2e_train_loop_example')
+        if os.path.exists(project_path):
+            shutil.rmtree(project_path)
+
+    def test_e2e_ff_net_reload_model_predictor_prediction(self):
+        self.set_seeds()
+        batch_size = 10
+
+        train_dataset = TensorDataset(torch.randn(100, 50), torch.randint(low=0, high=10, size=(100,)))
+        val_dataset = TensorDataset(torch.randn(30, 50), torch.randint(low=0, high=10, size=(30,)))
+        test_dataset = TensorDataset(torch.randn(30, 50), torch.randint(low=0, high=10, size=(30,)))
+
+        train_dataloader = DataLoader(train_dataset, batch_size=batch_size)
+        val_dataloader = DataLoader(val_dataset, batch_size=batch_size)
+        test_dataloader = DataLoader(test_dataset, batch_size=batch_size)
+
+        model = FFNet()
+        optimizer = optim.Adam(model.parameters(), lr=0.001, betas=(0.9, 0.999))
+        criterion = nn.NLLLoss()
+
+        train_loop = TrainLoopCheckpointEndSave(
+            model,
+            train_dataloader, val_dataloader, test_dataloader,
+            optimizer, criterion,
+            project_name='e2e_train_loop_example', experiment_name='TrainLoopCheckpointEndSave_example',
+            local_model_result_folder_path=THIS_DIR,
+            hyperparams={'batch_size': batch_size},
+            val_result_package=ClassificationResultPackage(), test_result_package=ClassificationResultPackage(),
+            cloud_save_mode=None
+        )
+        train_loop.fit(num_epochs=5)
+
+        train_pred, _, _ = train_loop.predict_on_train_set()
+        val_pred, _, _ = train_loop.predict_on_validation_set()
+        test_pred, _, _ = train_loop.predict_on_test_set()
+
+        train_loss = train_loop.evaluate_loss_on_train_set()
+        val_loss = train_loop.evaluate_loss_on_validation_set()
+        test_loss = train_loop.evaluate_loss_on_test_set()
+
+        model_state = torch.load(
+            os.path.join(THIS_DIR, train_loop.project_name,
+                         f'{train_loop.experiment_name}_{train_loop.experiment_timestamp}',
+                         'model',
+                         f'model_{train_loop.experiment_name}_{train_loop.experiment_timestamp}.pth')
+        )
+
+        model_reloaded = FFNet()
+        model_reloaded.load_state_dict(model_state['model_state_dict'])
+
+        train_model_predictor = PyTorchModelPredictor(model_reloaded, train_dataloader)
+        val_model_predictor = PyTorchModelPredictor(model_reloaded, val_dataloader)
+        test_model_predictor = PyTorchModelPredictor(model_reloaded, test_dataloader)
+
+        train_pred_reload, _, _ = train_model_predictor.model_predict()
+        val_pred_reload, _, _ = val_model_predictor.model_predict()
+        test_pred_reload, _, _ = test_model_predictor.model_predict()
+
+        train_loss_reload = train_model_predictor.model_get_loss(criterion)
+        val_loss_reload = val_model_predictor.model_get_loss(criterion)
+        test_loss_reload = test_model_predictor.model_get_loss(criterion)
 
         self.assertEqual(train_pred.tolist(), train_pred_reload.tolist())
         self.assertEqual(val_pred.tolist(), val_pred_reload.tolist())
