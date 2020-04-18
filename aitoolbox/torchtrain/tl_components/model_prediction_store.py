@@ -251,14 +251,14 @@ class ModelPredictionStore:
             raise ValueError
 
     def _get_data(self, source_name, epoch):
-        """
+        """Get data based on the source name from the cache
 
         Args:
-            source_name (str):
-            epoch (int):
+            source_name (str): data source name
+            epoch (int): current epoch of the TrainLoop
 
         Returns:
-            tuple or float:
+            tuple or float: cached data
         """
         if self._has_data(source_name, epoch):
             print(f'Getting {source_name} predictions/loss from store')
@@ -267,22 +267,22 @@ class ModelPredictionStore:
             raise ValueError
 
     def _has_data(self, source_name, epoch):
-        """
+        """Check if data under the specified source name is currently available in the cache
 
         Args:
-            source_name (str):
-            epoch (int):
+            source_name (str): data source name
+            epoch (int): current epoch of the TrainLoop
 
         Returns:
-            bool:
+            bool: if the requested data is available in the cache
         """
         return source_name in self.prediction_store and epoch == self.prediction_store['epoch']
 
     def auto_purge(self, epoch):
-        """
+        """Automatically purge the current cache if the given epoch index had moved past the last cached epoch
 
         Args:
-            epoch (int):
+            epoch (int): current epoch of the TrainLoop
 
         Returns:
             None
