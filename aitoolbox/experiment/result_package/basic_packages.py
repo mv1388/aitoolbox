@@ -20,11 +20,6 @@ class GeneralResultPackage(AbstractResultPackage):
         self.metrics_list = metrics_list
 
     def prepare_results_dict(self):
-        """
-
-        Returns:
-            dict:
-        """
         self.qa_check_hyperparameters_dict()
         results_dict = {}
 
@@ -35,11 +30,6 @@ class GeneralResultPackage(AbstractResultPackage):
         return results_dict
 
     def qa_check_metrics_list(self):
-        """
-
-        Returns:
-            None
-        """
         if len(self.metrics_list) == 0:
             self.warn_about_result_data_problem('Metrics list is empty')
 
@@ -64,11 +54,6 @@ class BinaryClassificationResultPackage(AbstractResultPackage):
         self.positive_class_thresh = positive_class_thresh
 
     def prepare_results_dict(self):
-        """
-
-        Returns:
-            dict:
-        """
         accuracy_result = AccuracyMetric(self.y_true, self.y_predicted,
                                          positive_class_thresh=self.positive_class_thresh)
         roc_auc_result = ROCAUCMetric(self.y_true, self.y_predicted)
@@ -94,11 +79,6 @@ class ClassificationResultPackage(AbstractResultPackage):
                                        strict_content_check=strict_content_check, **kwargs)
 
     def prepare_results_dict(self):
-        """
-
-        Returns:
-            dict:
-        """
         accuracy_result = AccuracyMetric(self.y_true, self.y_predicted, positive_class_thresh=None).get_metric_dict()
 
         return accuracy_result
@@ -118,11 +98,6 @@ class RegressionResultPackage(AbstractResultPackage):
                                        strict_content_check=strict_content_check, **kwargs)
 
     def prepare_results_dict(self):
-        """
-
-        Returns:
-            dict:
-        """
         mse_result = MeanSquaredErrorMetric(self.y_true, self.y_predicted)
         mae_result = MeanAbsoluteErrorMetric(self.y_true, self.y_predicted)
 

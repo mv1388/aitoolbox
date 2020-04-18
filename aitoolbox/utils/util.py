@@ -82,13 +82,13 @@ def is_empty_function(fn):
 
 
 def flatten_list_of_lists(nested_list):
-    """
+    """Flatten the nested list of lists
 
     Args:
-        nested_list (list):
+        nested_list (list): nested list of lists to be flattened
 
     Returns:
-        list or None:
+        list or None: flattened list
     """
     if nested_list is not None:
         return [item for sublist in nested_list for item in sublist]

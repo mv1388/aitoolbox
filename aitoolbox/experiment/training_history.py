@@ -13,7 +13,8 @@ class TrainingHistory:
         Args:
             has_validation: if train history should by default include 'val_loss'. This is needed when train loops
                 by default evaluate loss on validation set when such a set is available.
-            strict_content_check (bool):
+            strict_content_check (bool): should just print warning or raise the error and crash in case of found
+                (quality) problems
         """
         self.train_history = {'loss': [], 'accumulated_loss': [], 'val_loss': []} if has_validation \
             else {'loss': [], 'accumulated_loss': []}
@@ -84,7 +85,7 @@ class TrainingHistory:
         return self
 
     def qa_check_history_records(self):
-        """
+        """Quality check history
 
         Returns:
             None
@@ -97,14 +98,6 @@ class TrainingHistory:
                     f'Warning: Train history records not of the same size. Problem with: {k}')
 
     def warn_about_result_data_problem(self, msg):
-        """
-
-        Args:
-            msg (str):
-
-        Returns:
-            None
-        """
         if self.strict_content_check:
             raise ValueError(msg)
         else:
@@ -150,10 +143,10 @@ class TrainingHistory:
         return self
 
     def add_history_dict(self, other):
-        """
+        """Add another training history dict to this training history
 
         Args:
-            other (dict):
+            other (dict): another training history dict
 
         Returns:
             None

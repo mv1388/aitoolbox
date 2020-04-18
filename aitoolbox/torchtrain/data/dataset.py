@@ -3,10 +3,10 @@ from torch.utils.data import Dataset
 
 class BasicDataset(Dataset):
     def __init__(self, data):
-        """
+        """Basic PyTorch dataset where each row (first dimension) represents the example
 
         Args:
-            data:
+            data (list or torch.Tensor): dataset
         """
         self.data = data
 
@@ -14,14 +14,6 @@ class BasicDataset(Dataset):
         return len(self.data)
 
     def __getitem__(self, idx):
-        """
-
-        Args:
-            idx:
-
-        Returns:
-
-        """
         return self.data[idx]
 
 

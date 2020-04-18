@@ -8,6 +8,17 @@ import torch
 
 
 class AbstractModelFeedDefinition(ABC):
+    """
+    Model Feed Definition
+
+    The primary way of defining the model for TrainLoop training is to utilize:
+        aitoolbox.torchtrain.model.TTModel
+
+    Use of the ModelFeedDefinition is the legacy way of defining the model. However in certain scenarios where the
+    TTModel might prove to increase complexity, ModelFeedDefinition still is useful for augmenting the nn.Module with
+    the logic to calculate loss and predictions.
+    """
+
     @abstractmethod
     def get_loss(self, model, batch_data, criterion, device):
         """Get loss during training stage
@@ -17,10 +28,10 @@ class AbstractModelFeedDefinition(ABC):
         Executed during training stage where model weights are updated based on the loss returned from this function.
 
         Args:
-            model:
-            batch_data:
-            criterion:
-            device:
+            model (nn.Module): neural network model
+            batch_data: model input data batch
+            criterion: loss criterion
+            device: device on which the model is being trained
 
         Returns:
             PyTorch loss
@@ -38,10 +49,10 @@ class AbstractModelFeedDefinition(ABC):
         For simple examples this function can just call the get_loss() and return its result.
 
         Args:
-            model:
-            batch_data:
-            criterion:
-            device:
+            model (nn.Module): neural network model
+            batch_data: model input data batch
+            criterion: loss criterion
+            device: device on which the model is being trained
 
         Returns:
             PyTorch loss
@@ -53,9 +64,9 @@ class AbstractModelFeedDefinition(ABC):
         """Get predictions during evaluation stage
 
         Args:
-            model:
-            batch_data:
-            device:
+            model (nn.Module): neural network model
+            batch_data: model input data batch
+            device: device on which the model is being trained
 
         Returns:
             np.array, np.array, dict: y_pred.cpu(), y_test.cpu(), metadata
@@ -148,6 +159,6 @@ class ImageClassificationFeedDefinition(AbstractModelFeedDefinition):
         data = data.to(device)
 
         output = model(data)
-        y_pred = output.argmax(dim=1, keepdim=False)  # get the index of the max log-probability
+        y_pred = output.argmax(dim=1, keepdim=False)
 
         return y_pred.cpu(), y_test, {}
