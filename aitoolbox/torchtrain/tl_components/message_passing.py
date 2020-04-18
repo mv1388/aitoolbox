@@ -11,9 +11,9 @@ class Message:
         """Wrapper object to represent the messages in the MessageService together with their handling settings
 
         Args:
-            key (str):
-            value:
-            msg_handling_settings (str or list):
+            key (str): message key
+            value: message value
+            msg_handling_settings (str or list): selected message handling settings for this particular message
         """
         self.key = key
         self.value = value
@@ -50,7 +50,7 @@ class MessageService:
         """Write a new message to the message service
 
         Args:
-            key (str):message key
+            key (str): message key
             value: message content
             msg_handling_settings (str or list): setting how to handle the lifespan of the message
 

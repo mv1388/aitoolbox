@@ -6,9 +6,12 @@ from aitoolbox.torchtrain.data.batch_model_feed_defs import AbstractModelFeedDef
 
 class TTModel(nn.Module, ABC):
     """
+    TTModel is an extension of core PyTorch nn.Module
+
     TT in TTModel --> TorchTrain Model
 
-    User also needs to implement forward() method according to the nn.Module inheritance
+    In addition to the common ``forward()`` method required by the base nn.Module, the user also needs to implement
+    the additional AIToolbox specific ``get_loss()`` and ``get_predictions()`` methods.
     """
     @abstractmethod
     def get_loss(self, batch_data, criterion, device):
