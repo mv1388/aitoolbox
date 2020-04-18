@@ -8,7 +8,7 @@ class ModelPredictionStore:
         the TrainLoop which takes the cached values if they are available instead of recalculating.
 
         Args:
-            auto_purge (bool):
+            auto_purge (bool): should the prediction service cache be automatically purged at the end of each epoch
         """
         self.do_auto_purge = auto_purge
 
