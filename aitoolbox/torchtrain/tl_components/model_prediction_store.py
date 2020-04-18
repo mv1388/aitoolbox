@@ -15,12 +15,13 @@ class ModelPredictionStore:
         self.prediction_store = {'epoch': 0}
 
     def insert_train_predictions(self, predictions, epoch, force_prediction=False):
-        """
+        """Insert training dataset predictions into the cache
 
         Args:
-            predictions (tuple):
-            epoch (int):
-            force_prediction (bool):
+            predictions (tuple): model training dataset predictions
+            epoch (int): current epoch of the TrainLoop
+            force_prediction (bool): insert the predicted values even if they are available in the prediction cache.
+                This causes the old cached predictions to be overwritten.
 
         Returns:
             None
@@ -28,12 +29,13 @@ class ModelPredictionStore:
         self._insert_data('train_pred', predictions, epoch, force_prediction)
 
     def insert_val_predictions(self, predictions, epoch, force_prediction=False):
-        """
+        """Insert validation dataset predictions into the cache
 
         Args:
-            predictions (tuple):
-            epoch (int):
-            force_prediction (bool):
+            predictions (tuple): model validation dataset predictions
+            epoch (int): current epoch of the TrainLoop
+            force_prediction (bool): insert the predicted values even if they are available in the prediction cache.
+                This causes the old cached predictions to be overwritten.
 
         Returns:
             None
@@ -41,12 +43,13 @@ class ModelPredictionStore:
         self._insert_data('val_pred', predictions, epoch, force_prediction)
 
     def insert_test_predictions(self, predictions, epoch, force_prediction=False):
-        """
+        """Insert test dataset predictions into the cache
 
         Args:
-            predictions (tuple):
-            epoch (int):
-            force_prediction (bool):
+            predictions (tuple): model test dataset predictions
+            epoch (int): current epoch of the TrainLoop
+            force_prediction (bool): insert the predicted values even if they are available in the prediction cache.
+                This causes the old cached predictions to be overwritten.
 
         Returns:
             None
@@ -54,78 +57,79 @@ class ModelPredictionStore:
         self._insert_data('test_pred', predictions, epoch, force_prediction)
 
     def get_train_predictions(self, epoch):
-        """
+        """Get training dataset predictions out of the cache
 
         Args:
-            epoch (int):
+            epoch (int): current epoch of the TrainLoop
 
         Returns:
-            tuple:
+            tuple: cached model train dataset predictions
         """
         return self._get_data('train_pred', epoch)
 
     def get_val_predictions(self, epoch):
-        """
+        """Get validation dataset predictions out of the cache
 
         Args:
-            epoch (int):
+            epoch (int): current epoch of the TrainLoop
 
         Returns:
-            tuple:
+            tuple: cached model validation dataset predictions
         """
         return self._get_data('val_pred', epoch)
 
     def get_test_predictions(self, epoch):
-        """
+        """Get test dataset predictions out of the cache
 
         Args:
-            epoch (int):
+            epoch (int): current epoch of the TrainLoop
 
         Returns:
-            tuple:
+            tuple: cached model test dataset predictions
         """
         return self._get_data('test_pred', epoch)
 
     def has_train_predictions(self, epoch):
-        """
+        """Are there training dataset predictions in the cache
 
         Args:
-            epoch (int):
+            epoch (int): current epoch of the TrainLoop
 
         Returns:
-            bool:
+            bool: if predictions are in the cache
         """
         return self._has_data('train_pred', epoch)
 
     def has_val_predictions(self, epoch):
-        """
+        """Are there validation dataset predictions in the cache
 
         Args:
-            epoch (int):
+            epoch (int): current epoch of the TrainLoop
 
         Returns:
-            bool:
+            bool: if predictions are in the cache
         """
         return self._has_data('val_pred', epoch)
 
     def has_test_predictions(self, epoch):
-        """
+        """Are there test dataset predictions in the cache
 
         Args:
-            epoch (int):
+            epoch (int): current epoch of the TrainLoop
 
         Returns:
-            bool:
+            bool: if predictions are in the cache
         """
         return self._has_data('test_pred', epoch)
 
     def insert_train_loss(self, loss, epoch, force_prediction=False):
-        """
+        """Insert training dataset loss into the cache
 
         Args:
-            loss (float):
-            epoch (int):
-            force_prediction (bool):
+            loss (float):  model train dataset loss
+            epoch (int): current epoch of the TrainLoop
+            force_prediction (bool): insert the loss value even if it is available in the loss cache.
+                This causes the old cached loss value to be overwritten.
 
         Returns:
             None
@@ -133,12 +137,13 @@ class ModelPredictionStore:
         self._insert_data('train_loss', loss, epoch, force_prediction)
 
     def insert_val_loss(self, loss, epoch, force_prediction=False):
-        """
+        """Insert validation dataset loss into the cache
 
         Args:
-            loss (float):
-            epoch (int):
-            force_prediction (bool):
+            loss (float): model validation dataset loss
+            epoch (int): current epoch of the TrainLoop
+            force_prediction (bool): insert the loss value even if it is available in the loss cache.
+                This causes the old cached loss value to be overwritten.
 
         Returns:
             None
@@ -146,12 +151,13 @@ class ModelPredictionStore:
         self._insert_data('val_loss', loss, epoch, force_prediction)
 
     def insert_test_loss(self, loss, epoch, force_prediction=False):
-        """
+        """Insert test dataset loss into the cache
 
         Args:
-            loss (float):
-            epoch (int):
-            force_prediction (bool):
+            loss (float): model test dataset loss
+            epoch (int): current epoch of the TrainLoop
+            force_prediction (bool): insert the loss value even if it is available in the loss cache.
+                This causes the old cached loss value to be overwritten.
 
         Returns:
             None
@@ -159,79 +165,80 @@ class ModelPredictionStore:
         self._insert_data('test_loss', loss, epoch, force_prediction)
 
     def get_train_loss(self, epoch):
-        """
+        """Get training dataset model loss out of the cache
 
         Args:
-            epoch (int):
+            epoch (int): current epoch of the TrainLoop
 
         Returns:
-            float:
+            float: cached model train dataset loss
         """
         return self._get_data('train_loss', epoch)
 
     def get_val_loss(self, epoch):
-        """
+        """Get validation dataset model loss out of the cache
 
         Args:
-            epoch (int):
+            epoch (int): current epoch of the TrainLoop
 
         Returns:
-            float:
+            float: cached model validation dataset loss
         """
         return self._get_data('val_loss', epoch)
 
     def get_test_loss(self, epoch):
-        """
+        """Get test dataset model loss out of the cache
 
         Args:
-            epoch (int):
+            epoch (int): current epoch of the TrainLoop
 
         Returns:
-            float:
+            float: cached model test dataset loss
         """
         return self._get_data('test_loss', epoch)
 
     def has_train_loss(self, epoch):
-        """
+        """Is there training dataset model loss in the cache
 
         Args:
-            epoch (int):
+            epoch (int): current epoch of the TrainLoop
 
         Returns:
-            bool:
+            bool: if loss value is in the cache
         """
         return self._has_data('train_loss', epoch)
 
     def has_val_loss(self, epoch):
-        """
+        """Is there validation dataset model loss in the cache
 
         Args:
-            epoch (int):
+            epoch (int): current epoch of the TrainLoop
 
         Returns:
-            bool:
+            bool: if loss value is in the cache
         """
         return self._has_data('val_loss', epoch)
 
     def has_test_loss(self, epoch):
-        """
+        """Is there test dataset model loss in the cache
 
         Args:
-            epoch (int):
+            epoch (int): current epoch of the TrainLoop
 
         Returns:
-            bool:
+            bool: if loss value is in the cache
         """
         return self._has_data('test_loss', epoch)
 
     def _insert_data(self, source_name, data, epoch, force_prediction=False):
-        """
+        """Insert a general value into the prediction / loss cache
 
         Args:
-            source_name (str):
-            data (tuple or float):
-            epoch (int):
-            force_prediction (bool):
+            source_name (str): data source name
+            data (tuple or float): data to be cached
+            epoch (int): current epoch of the TrainLoop
+            force_prediction (bool): insert the data into the cache even if it is already available in the cache.
+                This causes the old cached data under the same `source_name` to be overwritten.
 
         Returns:
             None
