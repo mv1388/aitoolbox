@@ -423,3 +423,106 @@ class TestEnd2EndTrainLoopModelSaveReloadPrediction(unittest.TestCase):
         torch.backends.cudnn.enabled = False
         torch.backends.cudnn.benchmark = False
         torch.backends.cudnn.deterministic = True
+
+
+class TestEnd2EndTrainLoopModelOptimizerSaveReloadContinueTraining(unittest.TestCase):
+    def test_e2e_ff_net_continue_training_further_epoch(self):
+        self.set_seeds()
+        batch_size = 10
+
+        train_dataset = TensorDataset(torch.randn(100, 50), torch.randint(low=0, high=10, size=(100,)))
+        val_dataset = TensorDataset(torch.randn(30, 50), torch.randint(low=0, high=10, size=(30,)))
+        test_dataset = TensorDataset(torch.randn(30, 50), torch.randint(low=0, high=10, size=(30,)))
+
+        train_dataloader = DataLoader(train_dataset, batch_size=batch_size)
+        val_dataloader = DataLoader(val_dataset, batch_size=batch_size)
+        test_dataloader = DataLoader(test_dataset, batch_size=batch_size)
+
+        model = FFNet()
+        optimizer = optim.Adam(model.parameters(), lr=0.001, betas=(0.9, 0.999))
+        criterion = nn.NLLLoss()
+
+        train_loop = TrainLoopCheckpointEndSave(
+            model,
+            train_dataloader, val_dataloader, test_dataloader,
+            optimizer, criterion,
+            project_name='e2e_train_loop_example', experiment_name='TrainLoopCheckpointEndSave_example',
+            local_model_result_folder_path=THIS_DIR,
+            hyperparams={'batch_size': batch_size},
+            val_result_package=ClassificationResultPackage(), test_result_package=ClassificationResultPackage(),
+            cloud_save_mode=None
+        )
+        train_loop.fit(num_epochs=5)
+
+        model_loader = PyTorchLocalModelLoader(THIS_DIR)
+        model_loader.load_model(train_loop.project_name, train_loop.experiment_name,
+                                train_loop.experiment_timestamp,
+                                model_save_dir='model', epoch_num=None)
+
+        model_reloaded = FFNet()
+        model_reloaded = model_loader.init_model(model_reloaded)
+        optimizer_reloaded = optim.Adam(model_reloaded.parameters(), lr=0.001, betas=(0.9, 0.999))
+        optimizer_reloaded = model_loader.init_optimizer(optimizer_reloaded)
+        criterion_reloaded = nn.NLLLoss()
+
+        for (orig_k, orig_state), (reload_k, reload_state) in zip(model.state_dict().items(), model_reloaded.state_dict().items()):
+            self.assertEqual(orig_k, reload_k)
+            self.assertEqual(orig_state.tolist(), reload_state.tolist())
+
+        train_loop_cont = TrainLoop(
+            model,
+            train_dataloader, val_dataloader, test_dataloader,
+            optimizer, criterion
+        )
+        train_loop_cont.epoch = 5
+        train_loop_cont.fit(num_epochs=6)
+
+        train_loop_reload = TrainLoop(
+            model_reloaded,
+            train_dataloader, val_dataloader, test_dataloader,
+            optimizer_reloaded, criterion_reloaded
+        )
+        train_loop_reload.epoch = 5
+        train_loop_reload.fit(num_epochs=6)
+
+        train_pred, _, _ = train_loop_cont.predict_on_train_set()
+        val_pred, _, _ = train_loop_cont.predict_on_validation_set()
+        test_pred, _, _ = train_loop_cont.predict_on_test_set()
+
+        train_pred_reload, _, _ = train_loop_reload.predict_on_train_set()
+        val_pred_reload, _, _ = train_loop_reload.predict_on_validation_set()
+        test_pred_reload, _, _ = train_loop_reload.predict_on_test_set()
+
+        train_loss = train_loop_cont.evaluate_loss_on_train_set()
+        val_loss = train_loop_cont.evaluate_loss_on_validation_set()
+        test_loss = train_loop_cont.evaluate_loss_on_test_set()
+
+        train_loss_reload = train_loop_reload.evaluate_loss_on_train_set()
+        val_loss_reload = train_loop_reload.evaluate_loss_on_validation_set()
+        test_loss_reload = train_loop_reload.evaluate_loss_on_test_set()
+
+        self.assertEqual(train_pred.tolist(), train_pred_reload.tolist())
+        self.assertEqual(val_pred.tolist(), val_pred_reload.tolist())
+        self.assertEqual(test_pred.tolist(), test_pred_reload.tolist())
+
+        self.assertEqual(train_loss, train_loss_reload)
+        self.assertEqual(val_loss, val_loss_reload)
+        self.assertEqual(test_loss, test_loss_reload)
+
+        project_path = os.path.join(THIS_DIR, 'e2e_train_loop_example')
+        if os.path.exists(project_path):
+            shutil.rmtree(project_path)
+
+    @staticmethod
+    def set_seeds():
+        manual_seed = 0
+        np.random.seed(manual_seed)
+        random.seed(manual_seed)
+        torch.manual_seed(manual_seed)
+        # if you are suing GPU
+        torch.cuda.manual_seed(manual_seed)
+        torch.cuda.manual_seed_all(manual_seed)
+
+        torch.backends.cudnn.enabled = False
+        torch.backends.cudnn.benchmark = False
+        torch.backends.cudnn.deterministic = True
