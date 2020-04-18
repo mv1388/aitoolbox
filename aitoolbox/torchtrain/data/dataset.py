@@ -34,7 +34,7 @@ class ListDataset(Dataset):
             *data_lists (list): data lists that have the same size of the first dimension. Input is represented as
                 a list of data lists.
         """
-        assert all(len(data_lists[0]) == data_l for data_l in data_lists)
+        assert all(len(data_lists[0]) == len(data_l) for data_l in data_lists)
         self.data_lists = data_lists
 
     def __getitem__(self, index):
