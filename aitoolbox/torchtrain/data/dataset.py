@@ -25,10 +25,10 @@ class ListDataset(Dataset):
         of PyTorch built-in TensorDataset.
 
         Examples:
-            list_dataset_1 = [...]
-            list_dataset_2 = [...]
-            list_dataset_3 = [...]
-            ListDataset(list_dataset_1, list_dataset_2, list_dataset_3)
+            >>> list_dataset_1 = [...]
+            >>> list_dataset_2 = [...]
+            >>> list_dataset_3 = [...]
+            >>> ListDataset(list_dataset_1, list_dataset_2, list_dataset_3)
 
         Arguments:
             *data_lists (list): data lists that have the same size of the first dimension. Input is represented as
