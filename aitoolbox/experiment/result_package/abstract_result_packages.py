@@ -64,7 +64,7 @@ class AbstractResultPackage(ABC):
             y_true (numpy.array or list): ground truth targets
             y_predicted (numpy.array or list): predicted targets
             hyperparameters (dict or None): dictionary filled with the set hyperparameters
-            **kwargs (dict):
+            **kwargs (dict): additional results for the result package
 
         Returns:
             None

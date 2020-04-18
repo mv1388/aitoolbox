@@ -47,7 +47,7 @@ class AbstractCallback:
         """Execute callback initialization / preparation after the train_loop_object becomes available
 
         Returns:
-
+            None
         """
         pass
 
@@ -55,7 +55,7 @@ class AbstractCallback:
         """Logic executed at the beginning of the epoch
 
         Returns:
-
+            None
         """
         pass
 
@@ -63,7 +63,7 @@ class AbstractCallback:
         """Logic executed at the end of the epoch
 
         Returns:
-
+            None
         """
         pass
 
@@ -71,7 +71,7 @@ class AbstractCallback:
         """Logic executed at the beginning of the overall training
 
         Returns:
-
+            None
         """
         pass
 
@@ -79,7 +79,7 @@ class AbstractCallback:
         """Logic executed at the end of the overall training
 
         Returns:
-
+            None
         """
         pass
 
@@ -87,7 +87,7 @@ class AbstractCallback:
         """Logic executed before the batch is inserted into the model
 
         Returns:
-
+            None
         """
         pass
 
@@ -95,7 +95,7 @@ class AbstractCallback:
         """Logic executed after the batch is inserted into the model
 
         Returns:
-
+            None
         """
         pass
 
@@ -106,7 +106,7 @@ class AbstractCallback:
         on_train_loop_registration(). Otherwise logic implemented here will not be executed by the TrainLoop.
 
         Returns:
-
+            None
         """
         pass
 
@@ -117,7 +117,7 @@ class AbstractCallback:
         on_train_loop_registration(). Otherwise logic implemented here will not be executed by the TrainLoop.
 
         Returns:
-
+            None
         """
         pass
 
@@ -125,7 +125,7 @@ class AbstractCallback:
         """Logic executed after a new multiprocessing process is spawned at the beginning of every child process
 
         Returns:
-
+            None
         """
         pass
 
