@@ -238,7 +238,7 @@ class ModelPredictionStore:
             data (tuple or float): data to be cached
             epoch (int): current epoch of the TrainLoop
             force_prediction (bool): insert the data into the cache even if it is already available in the cache.
-                This causes the old cached data under the same `source_name` to be overwritten.
+                This causes the old cached data under the same ``source_name`` to be overwritten.
 
         Returns:
             None
