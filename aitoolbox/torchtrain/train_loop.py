@@ -275,7 +275,8 @@ class TrainLoop:
         """Run train dataset through the network without updating the weights and return the loss
 
         Args:
-            force_prediction (bool):
+            force_prediction (bool): recompute the loss even if it is available in the prediction cache. This causes
+                the old cached value to be overwritten.
 
         Returns:
             float: loss
@@ -292,7 +293,8 @@ class TrainLoop:
         """Run validation dataset through the network without updating the weights and return the loss
 
         Args:
-            force_prediction (bool):
+            force_prediction (bool): recompute the loss even if it is available in the prediction cache. This causes
+                the old cached value to be overwritten.
 
         Returns:
             float: loss
@@ -309,7 +311,8 @@ class TrainLoop:
         """Run test dataset through the network without updating the weights and return the loss
 
         Args:
-            force_prediction (bool):
+            force_prediction (bool): recompute the loss even if it is available in the prediction cache. This causes
+                the old cached value to be overwritten.
 
         Returns:
             float: loss
@@ -326,7 +329,7 @@ class TrainLoop:
         """Run given dataset through the network without updating the weights and return the loss
 
         Args:
-            data_loader (torch.utils.data.DataLoader):
+            data_loader (torch.utils.data.DataLoader): dataloader containing the data on which the loss is calculated
 
         Returns:
             float: loss
@@ -355,7 +358,8 @@ class TrainLoop:
         """Run train dataset through the network and return true target values, target predictions and metadata
 
         Args:
-            force_prediction (bool):
+            force_prediction (bool): recompute the output prediction even if it is available in the prediction cache.
+                This causes the old cached predictions to be overwritten.
 
         Returns:
             (torch.Tensor, torch.Tensor, dict): y_pred, y_true, metadata
@@ -372,7 +376,8 @@ class TrainLoop:
         """Run validation dataset through the network and return true target values, target predictions and metadata
 
         Args:
-            force_prediction (bool):
+            force_prediction (bool): recompute the output prediction even if it is available in the prediction cache.
+                This causes the old cached predictions to be overwritten.
 
         Returns:
             (torch.Tensor, torch.Tensor, dict): y_pred, y_true, metadata
@@ -389,7 +394,8 @@ class TrainLoop:
         """Run test dataset through the network and return true target values, target predictions and metadata
 
         Args:
-            force_prediction (bool):
+            force_prediction (bool): recompute the output prediction even if it is available in the prediction cache.
+                This causes the old cached predictions to be overwritten.
 
         Returns:
             (torch.Tensor, torch.Tensor, dict): y_pred, y_true, metadata
@@ -406,7 +412,8 @@ class TrainLoop:
         """Run given dataset through the network and return true target values, target predictions and metadata
 
         Args:
-            data_loader (torch.utils.data.DataLoader):
+            data_loader (torch.utils.data.DataLoader): dataloader containing the data on which the output predictions
+                are calculated
 
         Returns:
             (torch.Tensor, torch.Tensor, dict): y_pred, y_true, metadata
