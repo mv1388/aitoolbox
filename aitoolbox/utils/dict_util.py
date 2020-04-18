@@ -23,11 +23,11 @@ def combine_prediction_metadata_batches(metadata_list):
     return combined_metadata
 
 
-def flatten_dict(d, parent_key='', sep='_'):
+def flatten_dict(nested_dict, parent_key='', sep='_'):
     """Flatten the nested dict of dicts of ...
 
     Args:
-        d (dict): input dict
+        nested_dict (dict): input dict
         parent_key (str):
         sep (str): separator when flattening the category
 
@@ -35,7 +35,7 @@ def flatten_dict(d, parent_key='', sep='_'):
         dict: flattened dict
     """
     items = []
-    for k, v in d.items():
+    for k, v in nested_dict.items():
         new_key = parent_key + sep + k if parent_key else k
         if isinstance(v, collections.MutableMapping):
             items.extend(flatten_dict(v, new_key, sep=sep).items())

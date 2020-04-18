@@ -149,7 +149,7 @@ class ModelPerformancePrintReport(AbstractCallback):
                 are quite expensive and are slowing down the overall training
             strict_metric_reporting (bool): if False ignore missing metric in the TrainLoop.train_history, if True, in
                 case of missing metric throw and exception and thus interrupt the training loop
-            list_tracked_metrics (bool):
+            list_tracked_metrics (bool): should all tracked metrics names be listed
         """
         AbstractCallback.__init__(self, 'Model performance print reporter', device_idx_execution=0)
         self.metrics = metrics
@@ -211,7 +211,8 @@ class TrainHistoryFormatter(AbstractCallback):
                 Return new / transformed metric name and transformed metric result.
             epoch_end (bool): should the formatting be executed at the end of the epoch
             train_end (bool): should the formatting be executed at the end of the training process
-            strict_metric_extract (bool):
+            strict_metric_extract (bool): in case of (quality) problems should exception be raised on just the
+                notification printed to console
         """
         if epoch_end == train_end:
             raise ValueError(f'Only either epoch_end or train_end have to be set to True. '
@@ -271,7 +272,8 @@ class MetricHistoryRename(TrainHistoryFormatter):
             new_metric_name (str): the new metric name
             epoch_end (bool): should the formatting be executed at the end of the epoch
             train_end (bool): should the formatting be executed at the end of the training process
-            strict_metric_extract (bool):
+            strict_metric_extract (bool): in case of (quality) problems should exception be raised on just the
+                notification printed to console
         """
 
         # TODO: decide which of these two options is better
@@ -304,8 +306,9 @@ class ModelTrainHistoryBaseCB(AbstractExperimentCallback):
         """Base callback class to be inherited from when reporting train performance history
 
         Args:
-            callback_name (str):
-            execution_order (int):
+            callback_name (str): name of the callback
+            execution_order (int): order of the callback execution. If all the used callbacks have the orders set to 0,
+                than the callbacks are executed in the order they were registered.
             epoch_end (bool): should plot after every epoch
             train_end (bool): should plot at the end of the training
             file_format (str): output file format
@@ -332,7 +335,7 @@ class ModelTrainHistoryBaseCB(AbstractExperimentCallback):
         self.cloud_results_saver = None
 
     def prepare_results_saver(self):
-        """
+        """Initialize the required results saver
 
         Returns:
             None
@@ -394,10 +397,10 @@ class ModelTrainHistoryPlot(ModelTrainHistoryBaseCB):
             self.plot_current_train_history(prefix='train_end_')
 
     def plot_current_train_history(self, prefix=''):
-        """
+        """Plot current training history snapshot in the encapsulating TrainLoop
 
         Args:
-            prefix (str):
+            prefix (str): plots folder name prefix
 
         Returns:
             None
@@ -478,13 +481,13 @@ class ModelTrainHistoryFileWriter(ModelTrainHistoryBaseCB):
             self.write_current_train_history(prefix='train_end_')
 
     def write_current_train_history(self, prefix=''):
-        """
+        """Write to text file the current training history snapshot in the encapsulating TrainLoop
 
         Args:
-            prefix (str):
+            prefix (str): history text file name prefix
 
         Returns:
-
+            None
         """
         experiment_results_local_path = \
             BaseLocalResultsSaver.create_experiment_local_results_folder(self.project_name, self.experiment_name,
