@@ -521,7 +521,7 @@ class TestEnd2EndTrainLoopModelOptimizerSaveReloadContinueTraining(unittest.Test
         optimizer = optim.Adam(model.parameters(), lr=0.001, betas=(0.9, 0.999))
         criterion = nn.NLLLoss()
 
-        train_loop_cont = TrainLoopCheckpointEndSave(
+        train_loop = TrainLoopCheckpointEndSave(
             model,
             train_dataloader, val_dataloader, test_dataloader,
             optimizer, criterion,
@@ -531,11 +531,11 @@ class TestEnd2EndTrainLoopModelOptimizerSaveReloadContinueTraining(unittest.Test
             val_result_package=ClassificationResultPackage(), test_result_package=ClassificationResultPackage(),
             cloud_save_mode=None
         )
-        train_loop_cont.fit(num_epochs=5)
+        train_loop.fit(num_epochs=5)
 
         model_loader_final = PyTorchLocalModelLoader(THIS_DIR)
-        model_loader_final.load_model(train_loop_cont.project_name, train_loop_cont.experiment_name,
-                                      train_loop_cont.experiment_timestamp,
+        model_loader_final.load_model(train_loop.project_name, train_loop.experiment_name,
+                                      train_loop.experiment_timestamp,
                                       model_save_dir='model', epoch_num=None)
         model_reload_final = FFNet()
         model_reload_final = model_loader_final.init_model(model_reload_final)
@@ -544,8 +544,8 @@ class TestEnd2EndTrainLoopModelOptimizerSaveReloadContinueTraining(unittest.Test
         criterion_reload_final = nn.NLLLoss()
 
         model_loader_ep4 = PyTorchLocalModelLoader(THIS_DIR)
-        model_loader_ep4.load_model(train_loop_cont.project_name, train_loop_cont.experiment_name,
-                                    train_loop_cont.experiment_timestamp,
+        model_loader_ep4.load_model(train_loop.project_name, train_loop.experiment_name,
+                                    train_loop.experiment_timestamp,
                                     model_save_dir='checkpoint_model', epoch_num=3)
         model_reload_ep4 = FFNet()
         model_reload_ep4 = model_loader_ep4.init_model(model_reload_ep4)
@@ -681,7 +681,7 @@ class TestEnd2EndTrainLoopModelOptimizerSaveReloadContinueTraining(unittest.Test
         optimizer = optim.Adam(model.parameters(), lr=0.001, betas=(0.9, 0.999))
         criterion = nn.NLLLoss()
 
-        train_loop_cont = TrainLoopCheckpointEndSave(
+        train_loop = TrainLoopCheckpointEndSave(
             model,
             train_dataloader, val_dataloader, test_dataloader,
             optimizer, criterion,
@@ -691,11 +691,11 @@ class TestEnd2EndTrainLoopModelOptimizerSaveReloadContinueTraining(unittest.Test
             val_result_package=ClassificationResultPackage(), test_result_package=ClassificationResultPackage(),
             cloud_save_mode=None
         )
-        train_loop_cont.fit(num_epochs=5)
+        train_loop.fit(num_epochs=5)
 
         model_loader_final = PyTorchLocalModelLoader(THIS_DIR)
-        model_loader_final.load_model(train_loop_cont.project_name, train_loop_cont.experiment_name,
-                                      train_loop_cont.experiment_timestamp,
+        model_loader_final.load_model(train_loop.project_name, train_loop.experiment_name,
+                                      train_loop.experiment_timestamp,
                                       model_save_dir='model', epoch_num=None)
         model_reload_final = FFNet()
         model_reload_final = model_loader_final.init_model(model_reload_final)
@@ -704,8 +704,8 @@ class TestEnd2EndTrainLoopModelOptimizerSaveReloadContinueTraining(unittest.Test
         criterion_reload_final = nn.NLLLoss()
 
         model_loader_ep4 = PyTorchLocalModelLoader(THIS_DIR)
-        model_loader_ep4.load_model(train_loop_cont.project_name, train_loop_cont.experiment_name,
-                                    train_loop_cont.experiment_timestamp,
+        model_loader_ep4.load_model(train_loop.project_name, train_loop.experiment_name,
+                                    train_loop.experiment_timestamp,
                                     model_save_dir='checkpoint_model', epoch_num=3)
         model_reload_ep4 = FFNet()
         model_reload_ep4 = model_loader_ep4.init_model(model_reload_ep4)
@@ -841,7 +841,7 @@ class TestEnd2EndTrainLoopModelOptimizerSaveReloadContinueTraining(unittest.Test
         optimizer = optim.Adam(model.parameters(), lr=0.001, betas=(0.9, 0.999))
         criterion = nn.NLLLoss()
 
-        train_loop_cont = TrainLoopCheckpointEndSave(
+        train_loop = TrainLoopCheckpointEndSave(
             model,
             train_dataloader, val_dataloader, test_dataloader,
             optimizer, criterion,
@@ -851,49 +851,15 @@ class TestEnd2EndTrainLoopModelOptimizerSaveReloadContinueTraining(unittest.Test
             val_result_package=ClassificationResultPackage(), test_result_package=ClassificationResultPackage(),
             cloud_save_mode=None
         )
-        train_loop_cont.fit(num_epochs=5)
+        train_loop.fit(num_epochs=5)
 
-        model_loader_final = PyTorchLocalModelLoader(THIS_DIR)
-        model_loader_final.load_model(train_loop_cont.project_name, train_loop_cont.experiment_name,
-                                      train_loop_cont.experiment_timestamp,
-                                      model_save_dir='model', epoch_num=None)
         model_reload_final = FFNet()
-        model_reload_final = model_loader_final.init_model(model_reload_final)
         optimizer_reload_final = optim.Adam(model_reload_final.parameters(), lr=0.001, betas=(0.9, 0.999))
-        optimizer_reload_final = model_loader_final.init_optimizer(optimizer_reload_final)
         criterion_reload_final = nn.NLLLoss()
 
-        model_loader_ep4 = PyTorchLocalModelLoader(THIS_DIR)
-        model_loader_ep4.load_model(train_loop_cont.project_name, train_loop_cont.experiment_name,
-                                    train_loop_cont.experiment_timestamp,
-                                    model_save_dir='checkpoint_model', epoch_num=3)
         model_reload_ep4 = FFNet()
-        model_reload_ep4 = model_loader_ep4.init_model(model_reload_ep4)
         optimizer_reload_ep4 = optim.Adam(model_reload_ep4.parameters(), lr=0.001, betas=(0.9, 0.999))
-        optimizer_reload_ep4 = model_loader_ep4.init_optimizer(optimizer_reload_ep4)
         criterion_reload_ep4 = nn.NLLLoss()
-
-        for (orig_k, orig_state), (reload_k, reload_state) in zip(model.state_dict().items(),
-                                                                  model_reload_final.state_dict().items()):
-            self.assertEqual(orig_k, reload_k)
-            self.assertEqual(orig_state.tolist(), reload_state.tolist())
-
-        for orig_state, reload_state in zip(optimizer.state_dict()['state'].values(),
-                                            optimizer_reload_final.state_dict()['state'].values()):
-            self.assertEqual(orig_state['step'], reload_state['step'])
-            self.assertEqual(orig_state['exp_avg'].tolist(), reload_state['exp_avg'].tolist())
-            self.assertEqual(orig_state['exp_avg_sq'].tolist(), reload_state['exp_avg_sq'].tolist())
-
-        for (orig_k, orig_state), (reload_k, reload_state) in zip(model.state_dict().items(),
-                                                                  model_reload_ep4.state_dict().items()):
-            self.assertEqual(orig_k, reload_k)
-            self.assertNotEqual(orig_state.tolist(), reload_state.tolist())
-
-        for orig_state, reload_state in zip(optimizer.state_dict()['state'].values(),
-                                            optimizer_reload_ep4.state_dict()['state'].values()):
-            self.assertNotEqual(orig_state['step'], reload_state['step'])
-            self.assertNotEqual(orig_state['exp_avg'].tolist(), reload_state['exp_avg'].tolist())
-            self.assertNotEqual(orig_state['exp_avg_sq'].tolist(), reload_state['exp_avg_sq'].tolist())
 
         train_loop_cont = TrainLoop(
             model,
@@ -909,7 +875,11 @@ class TestEnd2EndTrainLoopModelOptimizerSaveReloadContinueTraining(unittest.Test
             optimizer_reload_final, criterion_reload_final
         )
         train_loop_reload_final.epoch = 5
-        train_loop_reload_final.fit(num_epochs=10)
+        train_loop_reload_final.fit(num_epochs=10, callbacks=[
+            ModelLoadContinueTraining(train_loop.experiment_timestamp, saved_model_dir='model', epoch_num=None,
+                                      project_name=train_loop.project_name, experiment_name=train_loop.experiment_name,
+                                      local_model_result_folder_path=THIS_DIR, cloud_save_mode='local')
+        ])
 
         train_loop_reload_ep4 = TrainLoop(
             model_reload_ep4,
@@ -917,7 +887,11 @@ class TestEnd2EndTrainLoopModelOptimizerSaveReloadContinueTraining(unittest.Test
             optimizer_reload_ep4, criterion_reload_ep4
         )
         train_loop_reload_ep4.epoch = 4
-        train_loop_reload_ep4.fit(num_epochs=10)
+        train_loop_reload_ep4.fit(num_epochs=10, callbacks=[
+            ModelLoadContinueTraining(train_loop.experiment_timestamp, saved_model_dir='checkpoint_model', epoch_num=3,
+                                      project_name=train_loop.project_name, experiment_name=train_loop.experiment_name,
+                                      local_model_result_folder_path=THIS_DIR, cloud_save_mode='local')
+        ])
 
         for (orig_k, orig_state), (reload_k, reload_state) in zip(model.state_dict().items(),
                                                                   model_reload_ep4.state_dict().items()):
