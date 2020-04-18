@@ -13,10 +13,20 @@ class TestListDataset(unittest.TestCase):
         self.list_dataset_return_format_check(batch_size=50)
         self.list_dataset_return_format_check(batch_size=100)
 
-    def list_dataset_return_format_check(self, batch_size):
-        feats_data_1 = [[i + j for j in range(10, 10 + randint(0, 20))] for i in range(100)]
-        feats_data_2 = [[i + j for j in range(100, 100 + randint(0, 100))] for i in range(100)]
-        feats_data_3 = [[i + j for j in range(1000, 1000 + randint(0, 200))] for i in range(100)]
+    def test_list_dataset_return_format_large_dataset(self):
+        self.list_dataset_return_format_check(batch_size=5, dataset_size=10000)
+        self.list_dataset_return_format_check(batch_size=10, dataset_size=10000)
+        self.list_dataset_return_format_check(batch_size=20, dataset_size=10000)
+        self.list_dataset_return_format_check(batch_size=50, dataset_size=10000)
+        self.list_dataset_return_format_check(batch_size=100, dataset_size=10000)
+        self.list_dataset_return_format_check(batch_size=200, dataset_size=10000)
+        self.list_dataset_return_format_check(batch_size=500, dataset_size=10000)
+        self.list_dataset_return_format_check(batch_size=1000, dataset_size=10000)
+
+    def list_dataset_return_format_check(self, batch_size, dataset_size=100):
+        feats_data_1 = [[i + j for j in range(10, 10 + randint(0, 20))] for i in range(dataset_size)]
+        feats_data_2 = [[i + j for j in range(100, 100 + randint(0, 100))] for i in range(dataset_size)]
+        feats_data_3 = [[i + j for j in range(1000, 1000 + randint(0, 200))] for i in range(dataset_size)]
 
         list_dataset = ListDataset(feats_data_1, feats_data_2, feats_data_3)
         dataloader = DataLoader(list_dataset, batch_size=batch_size,
