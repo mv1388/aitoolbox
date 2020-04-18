@@ -32,7 +32,7 @@ class AbstractLocalModelLoader(ABC):
 
 class PyTorchLocalModelLoader(AbstractLocalModelLoader):
     def __init__(self, local_model_result_folder_path):
-        """
+        """PyTorch saved model loader and initializer
 
         Args:
             local_model_result_folder_path (str): root local path where project folder will be created
@@ -72,8 +72,9 @@ class PyTorchLocalModelLoader(AbstractLocalModelLoader):
         """General model loading when the AIToolbox TrainLoop experiment folder structure is not used
 
         Args:
-            model_path (str):
-            map_location (str or None):
+            model_path (str): full path to the model
+            map_location (str or None): a function, :class:`torch.device`, string or a dict specifying how to remap
+                storage locations
 
         Returns:
             model
@@ -91,11 +92,11 @@ class PyTorchLocalModelLoader(AbstractLocalModelLoader):
         For this function to work, load_model() must be first called to read the model representation into memory.
 
         Args:
-            model: PyTorch model
-            used_data_parallel: if the saved model was nn.DataParallel or normal model
+            model (TTModel or nn.Module): PyTorch model
+            used_data_parallel (bool): if the saved model was nn.DataParallel or normal model
 
         Returns:
-
+            PyTorch model
         """
         self.check_if_model_loaded()
 
@@ -111,14 +112,14 @@ class PyTorchLocalModelLoader(AbstractLocalModelLoader):
         return model
 
     def init_optimizer(self, optimizer, device='cuda'):
-        """
+        """Initialize the optimizer based on saved model/optimizer checkpoint
 
         Args:
-            optimizer:
+            optimizer: PyTorch optimizer
             device (str):
 
         Returns:
-
+            PyTorch optimizer
         """
         self.check_if_model_loaded()
 

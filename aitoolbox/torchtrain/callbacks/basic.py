@@ -178,10 +178,10 @@ class EmailNotification(AbstractCallback):
         self.ses_sender.send_email(subject, body_text, plots_file_paths)
 
     def get_metric_list_html(self):
-        """
+        """Generate performance metrics list HTML
 
         Returns:
-            str:
+            str: HTML doc
         """
         performance_list = '<ul>' + \
                            '\n'.join([f'<li><p>{metric_name}: {hist[-1]}</p></li>'
@@ -191,10 +191,10 @@ class EmailNotification(AbstractCallback):
         return performance_list
 
     def get_hyperparams_html(self):
-        """
+        """Generate hyperparameters list HTML
 
         Returns:
-            str:
+            str: HTML doc
         """
         hyperparams = '<ul>' + \
                       '\n'.join([f'<li><p>{param_name}: {val}</p></li>'
@@ -205,15 +205,6 @@ class EmailNotification(AbstractCallback):
         return hyperparams
 
     def on_train_loop_registration(self):
-        """
-
-        Tries to infer the project description from the running train loop. If the train loop does not build
-        the project folder structure (e.g. basic TrainLoop) the descriptions need to be provided manually to
-        this callback.
-
-        Returns:
-            None
-        """
         try:
             if self.project_name is None:
                 self.project_name = self.train_loop_obj.project_name

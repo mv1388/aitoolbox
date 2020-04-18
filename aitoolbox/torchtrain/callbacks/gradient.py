@@ -49,7 +49,7 @@ class GradNormClip(GradientCallbackBase):
 
         Args:
             max_grad_norm (int or float): max norm of the gradients
-            **kwargs:
+            **kwargs: torch.nn.utils.clip_grad_norm_ additional arguemnts
         """
         GradientCallbackBase.__init__(self, 'Gradient norm clipping')
         self.max_grad_norm = max_grad_norm
