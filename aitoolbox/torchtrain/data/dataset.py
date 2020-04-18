@@ -27,9 +27,10 @@ class BasicDataset(Dataset):
 
 class ListDataset(Dataset):
     def __init__(self, *data_lists):
-        """Dataset wrapping lists.
+        """Dataset wrapping lists
 
-        Each sample will be retrieved by indexing tensors along the first dimension.
+        Each sample will be retrieved by indexing tensors along the first dimension. This is the list dataset version
+        of PyTorch built-in TensorDataset.
 
         Examples:
             list_dataset_1 = [...]
