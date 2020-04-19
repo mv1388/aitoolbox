@@ -22,7 +22,7 @@ class AbstractResultPackage(ABC):
                 you want to manually decide whether to leave the inputs as they are or convert them to np.array.
                 Possible options: True, False, 'auto'
                 Be slightly careful with 'auto' as it sometimes doesn't work so it is preferable to explicitly use True/False
-            **kwargs (dict):
+            **kwargs (dict): additional package_metadata for the result package
         """
         self.pkg_name = pkg_name
         self.strict_content_check = strict_content_check

@@ -61,29 +61,30 @@ class AbstractBaseMetric(ABC):
                             f'Optimally it should be either a list, dict, float or int.')
 
     def __lt__(self, other):
-        self_val, other_val = self.get_metric_self_other_val(other)
+        self_val, other_val = self._get_metric_self_other_val(other)
         return self_val < other_val
 
     def __le__(self, other):
-        self_val, other_val = self.get_metric_self_other_val(other)
+        self_val, other_val = self._get_metric_self_other_val(other)
         return self_val <= other_val
 
     def __gt__(self, other):
-        self_val, other_val = self.get_metric_self_other_val(other)
+        self_val, other_val = self._get_metric_self_other_val(other)
         return self_val > other_val
 
     def __ge__(self, other):
-        self_val, other_val = self.get_metric_self_other_val(other)
+        self_val, other_val = self._get_metric_self_other_val(other)
         return self_val >= other_val
 
-    def get_metric_self_other_val(self, other):
-        """
+    def _get_metric_self_other_val(self, other):
+        """Metric comparison prep util
 
         Args:
-            other (aitoolbox.experiment.core_metrics.abstract_metric.AbstractBaseMetric or float or int):
+            other (aitoolbox.experiment.core_metrics.abstract_metric.AbstractBaseMetric or float or int): other compared
+                metric
 
         Returns:
-            float or int:
+            float or int: metric value
         """
         if type(self.metric_result) is float or type(self.metric_result) is int:
             if isinstance(other, AbstractBaseMetric) and \
@@ -111,35 +112,35 @@ class AbstractBaseMetric(ABC):
         raise KeyError(f'Key {item} not found')
 
     def __add__(self, other):
-        """
+        """Concatenate two metrics
 
         Args:
-            other (AbstractBaseMetric or dict):
+            other (AbstractBaseMetric or dict): new metric to be added
 
         Returns:
-            dict:
+            dict: combined metric dict
         """
         return self.concat_metric(other)
 
     def __radd__(self, other):
-        """
+        """Add another metric
 
         Args:
-            other (AbstractBaseMetric or dict):
+            other (AbstractBaseMetric or dict): new metric to be added
 
         Returns:
-            dict:
+            dict: combined metric dict
         """
         return self.concat_metric(other)
 
     def concat_metric(self, other):
-        """
+        """Concatenate another metric to this one
 
         Args:
-            other (AbstractBaseMetric or dict):
+            other (AbstractBaseMetric or dict): new metric to be added
 
         Returns:
-            dict:
+            dict: combined metric dict
         """
         if isinstance(other, AbstractBaseMetric):
             other_metric_dict = other.get_metric_dict()
