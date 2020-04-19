@@ -193,7 +193,7 @@ class AbstractResultPackage(ABC):
             local_model_result_folder_path (str): root local path where project folder will be created
 
         Returns:
-
+            None
         """
         pass
 
@@ -280,38 +280,44 @@ class AbstractResultPackage(ABC):
         return len(self.results_dict)
 
     def __add__(self, other):
-        """
+        """Concatenate result packages
+
+        Combines results from both result packages into a single one.
 
         Args:
-            other (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or dict):
+            other (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or dict): another
+                result package to be concatenated
 
         Returns:
-            aitoolbox.experiment.result_package.MultipleResultPackageWrapper:
+            aitoolbox.experiment.result_package.MultipleResultPackageWrapper: merged result package
         """
         return self.add_merge_multi_pkg_wrap(other)
 
     def __radd__(self, other):
-        """
+        """Concatenate result package
 
         Args:
-            other (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or dict):
+            other (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or dict): another
+                result package to be concatenated
 
         Returns:
-            aitoolbox.experiment.result_package.MultipleResultPackageWrapper:
+            aitoolbox.experiment.result_package.MultipleResultPackageWrapper: merged result package
         """
         return self.add_merge_multi_pkg_wrap(other)
 
     def add_merge_multi_pkg_wrap(self, other_object):
-        """
+        """Result package merge
 
         Args:
             other_object (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or dict):
+                another result package to be merged with the current package
 
         Returns:
-            aitoolbox.experiment.result_package.abstract_result_packages.MultipleResultPackageWrapper:
+            aitoolbox.experiment.result_package.abstract_result_packages.MultipleResultPackageWrapper: merged result
+                package
         """
         self.warn_if_results_dict_not_defined()
-        other_object_pkg = self.create_other_object_pkg(other_object)
+        other_object_pkg = self._create_other_object_pkg(other_object)
 
         self_object_copy = copy.deepcopy(self)
 
@@ -321,14 +327,16 @@ class AbstractResultPackage(ABC):
         return multi_result_pkg
 
     @staticmethod
-    def create_other_object_pkg(other_object):
-        """
+    def _create_other_object_pkg(other_object):
+        """Util to deep copy and wrap results into the simple result package
 
         Args:
             other_object (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or dict):
+                results package or results dict
 
         Returns:
-            AbstractResultPackage | MultipleResultPackageWrapper:
+            AbstractResultPackage | MultipleResultPackageWrapper: deep copy of results wrapped in the simple result
+                package
         """
         if isinstance(other_object, AbstractResultPackage):
             other_object.warn_if_results_dict_not_defined()
@@ -343,43 +351,46 @@ class AbstractResultPackage(ABC):
         return other_object_pkg
 
     def __iadd__(self, other):
-        """
+        """Append result package
 
         Args:
-            other (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or dict):
+            other (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or dict): another
+                result package to be appended to the current package
 
         Returns:
-            aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage:
+            aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage: merged result package
         """
         return self.add_merge_dicts(other)
 
     def add_merge_dicts(self, other):
-        """
+        """Append result package to the current one
 
         Args:
-            other (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or dict):
+            other (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or dict): another
+                result package to be appended to the current package
 
         Returns:
-            aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage:
+            aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage: merged result package
         """
         self.warn_if_results_dict_not_defined()
 
         if isinstance(other, AbstractResultPackage):
             other.warn_if_results_dict_not_defined()
-            return self.merge_dicts(other.results_dict)
+            return self._merge_dicts(other.results_dict)
         elif type(other) is dict:
-            return self.merge_dicts(other)
+            return self._merge_dicts(other)
         else:
             raise ValueError(f'Addition supported on the AbstractResultPackage objects and dicts. Given {type(other)}')
 
-    def merge_dicts(self, other_results_dict):
-        """
+    def _merge_dicts(self, other_results_dict):
+        """Results dict merge util
 
         Args:
-            other_results_dict (dict):
+            other_results_dict (dict): another results dict to be added to the results dict in the current result
+                package
 
         Returns:
-            aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage:
+            aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage: merged result package
         """
         def results_duplicated(self_results_dict, other_results_dict_dup):
             for result_name in other_results_dict_dup:
@@ -422,7 +433,7 @@ class PreCalculatedResultPackage(AbstractResultPackage):
         Args:
             results_dict (dict): pre-calculated results dict
             strict_content_check (bool): should just print warning or raise the error and crash
-            **kwargs (dict):
+            **kwargs (dict): result package additional meta-data
         """
         AbstractResultPackage.__init__(self, pkg_name='PreCalculatedResult',
                                        strict_content_check=strict_content_check, **kwargs)
@@ -440,14 +451,14 @@ class MultipleResultPackageWrapper(AbstractResultPackage):
 
         Args:
             strict_content_check (bool): should just print warning or raise the error and crash
-            **kwargs (dict):
+            **kwargs (dict): result package additional meta-data
         """
         AbstractResultPackage.__init__(self, pkg_name='MultipleResultWrapper',
                                        strict_content_check=strict_content_check, **kwargs)
         self.result_packages = None
 
     def prepare_result_package(self, result_packages, hyperparameters=None, **kwargs):
-        """
+        """Prepares the multiple result package by merging the results from both result packages
 
         Args:
             result_packages (list): list of result packages where each of them is object inherited from
@@ -455,8 +466,8 @@ class MultipleResultPackageWrapper(AbstractResultPackage):
                 If you want to add raw results in dict form, this dict first needs to be wrapped into
                 aitoolbox.experiment.result_package.abstract_result_packages.PreCalculatedResultPackage to satisfy
                 the result package object requirement.
-            hyperparameters (dict or None):
-            **kwargs:
+            hyperparameters (dict or None): hyperparameters dict
+            **kwargs: result package additional meta-data
 
         Returns:
             None
@@ -469,11 +480,6 @@ class MultipleResultPackageWrapper(AbstractResultPackage):
         self.results_dict = self.prepare_results_dict()
 
     def prepare_results_dict(self):
-        """
-
-        Returns:
-            dict:
-        """
         results_dict = {}
         self.y_true = {}
         self.y_predicted = {}
@@ -494,12 +500,6 @@ class MultipleResultPackageWrapper(AbstractResultPackage):
         return results_dict
 
     def get_additional_results_dump_paths(self):
-        """
-
-        Returns:
-            list or None: list of lists of string paths if it is not None.
-                Each element of the list should be list of: [[results_file_name, results_file_local_path], ... [,]]
-        """
         self.additional_results_dump_paths = self.list_additional_results_dump_paths()
 
         sub_packages_paths = []
@@ -520,7 +520,7 @@ class MultipleResultPackageWrapper(AbstractResultPackage):
         return '\n'.join([f'--> {pkg.pkg_name}:\n{str(pkg)}' for pkg in self.result_packages])
 
     def __len__(self):
-        """
+        """Get number of result packages inside the multi result package wrapper
 
         Returns:
             int: number of result packages inside this multi package wrapper
@@ -528,16 +528,8 @@ class MultipleResultPackageWrapper(AbstractResultPackage):
         return len(self.result_packages)
 
     def add_merge_multi_pkg_wrap(self, other_object):
-        """
-
-        Args:
-            other_object (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or dict):
-
-        Returns:
-            aitoolbox.experiment.result_package.abstract_result_packages.MultipleResultPackageWrapper:
-        """
         self.warn_if_results_dict_not_defined()
-        other_object_pkg = self.create_other_object_pkg(other_object)
+        other_object_pkg = self._create_other_object_pkg(other_object)
         self_multi_result_pkg = copy.deepcopy(self)
 
         other_object_pkg_list = [other_object_pkg] if type(other_object_pkg) is not MultipleResultPackageWrapper \
@@ -549,16 +541,8 @@ class MultipleResultPackageWrapper(AbstractResultPackage):
         return self_multi_result_pkg
 
     def __iadd__(self, other):
-        """
-
-        Args:
-            other (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or dict):
-
-        Returns:
-            aitoolbox.experiment.result_package.abstract_result_packages.MultipleResultPackageWrapper:
-        """
         self.warn_if_results_dict_not_defined()
-        other_object_pkg = self.create_other_object_pkg(other)
+        other_object_pkg = self._create_other_object_pkg(other)
 
         other_object_pkg_list = [other_object_pkg] if type(other_object_pkg) is not MultipleResultPackageWrapper \
             else other_object_pkg.result_packages

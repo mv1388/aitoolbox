@@ -123,7 +123,7 @@ class AbstractBaseMetric(ABC):
         return self.concat_metric(other)
 
     def __radd__(self, other):
-        """Add another metric
+        """Append another metric
 
         Args:
             other (AbstractBaseMetric or dict): new metric to be added
