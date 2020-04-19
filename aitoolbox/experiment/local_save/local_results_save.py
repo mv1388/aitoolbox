@@ -81,7 +81,7 @@ class BaseLocalResultsSaver:
             experiment_timestamp (str): time stamp at the start of training
 
         Returns:
-            str:
+            str: experiment folder path
         """
         return self.create_experiment_local_results_folder(project_name, experiment_name, experiment_timestamp,
                                                            self.local_model_result_folder_path)
@@ -98,7 +98,7 @@ class BaseLocalResultsSaver:
             local_model_result_folder_path (str): root local path where project folder will be created
 
         Returns:
-            str:
+            str: experiment results folder path (inside the experiment folder)
         """
         ExperimentFolder.create_base_folder(project_name, experiment_name, experiment_timestamp,
                                             local_model_result_folder_path)
@@ -136,12 +136,12 @@ class BaseLocalResultsSaver:
         """Saves dict to file in desired format
 
         Args:
-            result_dict (dict):
-            file_name_w_type (str):
-            file_local_path_w_type (str):
+            result_dict (dict): results dict
+            file_name_w_type (str): filename without the file extension at the end
+            file_local_path_w_type (str): file path without the file extension at the end
 
         Returns:
-            str, str:
+            str, str: saved file name, saved file path
         """
         if self.file_format == 'pickle':
             file_name = file_name_w_type + '.p'
