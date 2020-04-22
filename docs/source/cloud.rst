@@ -12,4 +12,3 @@ cloud
 
 
 Most of the functionality available both for AWS and Google Cloud.
-
