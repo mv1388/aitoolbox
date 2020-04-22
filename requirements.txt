@@ -17,7 +17,7 @@ matplotlib
 seaborn
 scikit-learn
 allennlp
-torch==1.4
+torch
 torchvision
 pytorch-nlp
 pyrouge
