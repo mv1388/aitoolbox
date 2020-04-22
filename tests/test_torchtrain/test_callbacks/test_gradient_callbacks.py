@@ -2,6 +2,8 @@ import unittest
 import numpy as np
 import io
 import sys
+import torch
+from torch.utils.data.dataset import TensorDataset
 
 from tests.utils import *
 from torch.utils.data import DataLoader
@@ -47,10 +49,10 @@ class TestGradientStatsPrintCallback(unittest.TestCase):
         callback = GradientStatsPrint(lambda m: [m.l1, m.l2])
         model = SmallFFNet()
 
-        x = np.random.rand(100, 10)
-        y = np.random.rand(100)
+        x = torch.Tensor(np.random.rand(100, 10))
+        y = torch.Tensor(np.random.rand(100))
 
-        train_loader = DataLoader(BasicDataset(list(zip(x, y))), batch_size=10)
+        train_loader = DataLoader(TensorDataset(x, y), batch_size=10)
         optimizer = optim.SGD(model.parameters(), lr=0.01)
         criterion = nn.BCELoss()
 

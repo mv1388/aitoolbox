@@ -25,7 +25,7 @@ class AbstractLocalModelLoader(ABC):
             **kwargs: additional parameters for specific framework model loader
 
         Returns:
-
+            model
         """
         pass
 
@@ -116,7 +116,7 @@ class PyTorchLocalModelLoader(AbstractLocalModelLoader):
 
         Args:
             optimizer: PyTorch optimizer
-            device (str):
+            device (str): device id
 
         Returns:
             PyTorch optimizer

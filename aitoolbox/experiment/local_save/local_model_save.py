@@ -182,8 +182,11 @@ class PyTorchLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
             model (dict or deepspeed.DeepSpeedLight): PyTorch model represented as a dict of weights,
                 optimizer state and other necessary info. Or a DeepSpeed "engine" all-in-one model representation.
 
+        Raises:
+            ValueError
+
         Returns:
-            None:
+            None
         """
         # TODO: maybe add some check about the actual values/content of the dict as well
         if not DEEPSPEED_AVAILABLE or \

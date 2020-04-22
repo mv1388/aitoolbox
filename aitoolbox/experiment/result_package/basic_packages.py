@@ -13,7 +13,7 @@ class GeneralResultPackage(AbstractResultPackage):
             metrics_list (list): List of objects which are inherited from
                 aitoolbox.experiment.core_metrics.BaseMetric.AbstractBaseMetric
             strict_content_check (bool): should just print warning or raise the error and crash
-            **kwargs (dict):
+            **kwargs (dict): additional package_metadata for the result package
         """
         AbstractResultPackage.__init__(self, pkg_name='GeneralResultPackage', 
                                        strict_content_check=strict_content_check, **kwargs)
@@ -47,7 +47,7 @@ class BinaryClassificationResultPackage(AbstractResultPackage):
         Args:
             positive_class_thresh (float or None): predicted probability positive class threshold
             strict_content_check (bool): should just print warning or raise the error and crash
-            **kwargs (dict):
+            **kwargs (dict): additional package_metadata for the result package
         """
         AbstractResultPackage.__init__(self, pkg_name='BinaryClassificationResult',
                                        strict_content_check=strict_content_check, **kwargs)
@@ -73,7 +73,7 @@ class ClassificationResultPackage(AbstractResultPackage):
 
         Args:
             strict_content_check (bool): should just print warning or raise the error and crash
-            **kwargs (dict):
+            **kwargs (dict): additional package_metadata for the result package
         """
         AbstractResultPackage.__init__(self, pkg_name='ClassificationResult',
                                        strict_content_check=strict_content_check, **kwargs)
@@ -92,7 +92,7 @@ class RegressionResultPackage(AbstractResultPackage):
 
         Args:
             strict_content_check (bool): should just print warning or raise the error and crash
-            **kwargs (dict):
+            **kwargs (dict): additional package_metadata for the result package
         """
         AbstractResultPackage.__init__(self, pkg_name='RegressionResult', 
                                        strict_content_check=strict_content_check, **kwargs)
