@@ -2,6 +2,9 @@
 
 ## Instructions
 
-Download the _SQuAD2.0_ dataset and place it into the `./data/SQuAD2` folder.
+1. Download the _SQuAD2.0_ dataset from: https://rajpurkar.github.io/SQuAD-explorer/
+2. Place the _SQuAD2.0_ dataset into the `./data/SQuAD2` folder
+3. Execute one of the BERT QA training files
 
-SQuAD2.0 data set is available on: https://rajpurkar.github.io/SQuAD-explorer/
+If you decide to train the model with APEX, follow the instructions on the 
+[Nvidia APEX page](https://github.com/NVIDIA/apex#linux) to install the APEX package before the start of training.
