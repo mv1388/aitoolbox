@@ -22,6 +22,7 @@ setup(name='aitoolbox',
 
           'torch',
           'torchvision',
+          'torchtext',
           'pytorch-nlp',
 
           'joblib',
