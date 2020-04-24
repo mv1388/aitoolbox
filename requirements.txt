@@ -5,6 +5,7 @@ matplotlib
 seaborn
 torch
 torchvision
+torchtext
 pytorch-nlp
 joblib
 tqdm
