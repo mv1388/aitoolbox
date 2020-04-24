@@ -13,6 +13,7 @@ mkdir $project_root_path/$project_name/notebooks
 mkdir $project_root_path/$project_name/papers
 mkdir $project_root_path/$project_name/AWS_run_scripts
 mkdir $project_root_path/$project_name/AWS_run_scripts/AWS_core_scripts
+mkdir $project_root_path/$project_name/AWS_run_scripts/AWS_bootstrap
 mkdir $project_root_path/$project_name/tst_code
 
 cp template_gitignore $project_root_path/$project_name/.gitignore
@@ -22,3 +23,8 @@ chmod u+x $project_root_path/$project_name/AWS_run_scripts/AWS_core_scripts/aws_
 
 cp template_aws_run_experiments_project.sh $project_root_path/$project_name/AWS_run_scripts/AWS_core_scripts/aws_run_experiments_project.sh
 chmod u+x $project_root_path/$project_name/AWS_run_scripts/AWS_core_scripts/aws_run_experiments_project.sh
+
+touch $project_root_path/$project_name/AWS_run_scripts/AWS_bootstrap/requirements.txt
+
+touch $project_root_path/$project_name/AWS_run_scripts/AWS_bootstrap/bootstrap.sh
+chmod u+x $project_root_path/$project_name/AWS_run_scripts/AWS_bootstrap/bootstrap.sh
