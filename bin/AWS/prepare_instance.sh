@@ -169,8 +169,8 @@ fi
 pip install aitoolbox-$AIToolbox_version.tar.gz
 
 if [ $local_project_path != 'None' ]; then
-    pip install -r ~/project/AWS_run_scripts/AWS_core_scripts/requirements.txt
-    ~/project/AWS_run_scripts/AWS_core_scripts/bootstrap.sh
+    pip install -r ~/project/AWS_run_scripts/AWS_bootstrap/requirements.txt
+    ~/project/AWS_run_scripts/AWS_bootstrap/bootstrap.sh
 fi
 
 #./pyrouge_set_rouge_path ~/project/ROUGE-1.5.5
