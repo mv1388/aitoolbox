@@ -22,3 +22,5 @@ chmod u+x $project_root_path/$project_name/AWS_run_scripts/AWS_core_scripts/aws_
 
 cp template_aws_run_experiments_project.sh $project_root_path/$project_name/AWS_run_scripts/AWS_core_scripts/aws_run_experiments_project.sh
 chmod u+x $project_root_path/$project_name/AWS_run_scripts/AWS_core_scripts/aws_run_experiments_project.sh
+
+touch $project_root_path/$project_name/AWS_run_scripts/AWS_core_scripts/requirements.txt

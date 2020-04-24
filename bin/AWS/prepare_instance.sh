@@ -168,6 +168,10 @@ fi
 
 pip install aitoolbox-$AIToolbox_version.tar.gz
 
+if [ $local_project_path != 'None' ]; then
+    pip install -r ~/project/AWS_run_scripts/AWS_core_scripts/requirements.txt
+fi
+
 #./pyrouge_set_rouge_path ~/project/ROUGE-1.5.5
 #
 #sudo yum -y install perl-CPAN
