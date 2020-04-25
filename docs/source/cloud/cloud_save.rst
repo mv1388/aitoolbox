@@ -20,6 +20,15 @@ to the cloud storage.
 Model Saving
 ------------
 
+``model_save`` modules provide an API to which the user provides the model they wish to save and the module will
+automatically locally save the model in the easy to track folder structure and upload it to the selected cloud storage.
+Cloud experiment folder structure mirrors that which is created on the local drive. Currently supported cloud model
+savers can save PyTorch and Keras models to AWS S3 or Google Cloud Storage.
+
+PyTorch cloud model savers:
+
+* :class:`aitoolbox.cloud.AWS.model_save.PyTorchS3ModelSaver`
+* :class:`aitoolbox.cloud.GoogleCloud.model_save.PyTorchGoogleStorageModelSaver`
 
 
 
