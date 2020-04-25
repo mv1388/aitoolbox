@@ -88,12 +88,14 @@ class PyTorchS3ModelSaver(AbstractModelSaver, BaseModelSaver):
             (str, str, str): model_s3_path, experiment_timestamp, model_local_path
 
         Examples:
-            local_model_result_folder_path = '~/project/model_results'
-            # local_model_result_folder_path = '~/PycharmProjects/MemoryNet/model_results'
-            m_saver = PyTorchLocalModelSaver(local_model_result_folder_path=local_model_result_folder_path)
-            m_saver.save_model(model=model,
-                               project_name='QA_QAngaroo', experiment_name='FastQA_RNN_concat_model_GLOVE',
-                               protect_existing_folder=False)
+            .. code-block:: python
+
+                local_model_result_folder_path = '~/project/model_results'
+                m_saver = PyTorchLocalModelSaver(local_model_result_folder_path=local_model_result_folder_path)
+                m_saver.save_model(model=model,
+                                   project_name='QA_QAngaroo',
+                                   experiment_name='FastQA_RNN_concat_model_GLOVE',
+                                   protect_existing_folder=False)
         """
         PyTorchLocalModelSaver.check_model_dict_contents(model)
 
@@ -145,12 +147,14 @@ class KerasS3ModelSaver(AbstractModelSaver, BaseModelSaver):
             (str, str, str): model_s3_path, experiment_timestamp, model_local_path
 
         Examples:
-            local_model_result_folder_path = '~/project/model_results'
-            # local_model_result_folder_path = '~/PycharmProjects/MemoryNet/model_results'
-            m_saver = KerasS3ModelSaver(local_model_result_folder_path=local_model_result_folder_path)
-            m_saver.save_model(model=model,
-                               project_name='QA_QAngaroo', experiment_name='FastQA_RNN_concat_model_GLOVE',
-                               protect_existing_folder=False)
+            .. code-block:: python
+
+                local_model_result_folder_path = '~/project/model_results'
+                m_saver = KerasS3ModelSaver(local_model_result_folder_path=local_model_result_folder_path)
+                m_saver.save_model(model=model,
+                                   project_name='QA_QAngaroo',
+                                   experiment_name='FastQA_RNN_concat_model_GLOVE',
+                                   protect_existing_folder=False)
         """
         if experiment_timestamp is None:
             experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
