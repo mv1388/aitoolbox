@@ -4,7 +4,7 @@ import os
 from tests.utils import *
 
 from aitoolbox.experiment.experiment_saver import *
-from aitoolbox.cloud.AWS.model_save import KerasS3ModelSaver, TensorFlowS3ModelSaver, PyTorchS3ModelSaver
+from aitoolbox.cloud.AWS.model_save import PyTorchS3ModelSaver, KerasS3ModelSaver
 from aitoolbox.cloud.GoogleCloud.model_save import KerasGoogleStorageModelSaver, PyTorchGoogleStorageModelSaver
 from aitoolbox.cloud.AWS.results_save import S3ResultsSaver
 from aitoolbox.cloud.GoogleCloud.results_save import GoogleStorageResultsSaver
