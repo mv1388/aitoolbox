@@ -5,8 +5,7 @@ import unicodedata
 def unicode_to_ascii(text_string):
     """Turn a Unicode string to plain ASCII
 
-    Thanks to:
-        http://stackoverflow.com/a/518232/2809427
+    Taken from: http://stackoverflow.com/a/518232/2809427
 
     Args:
         text_string (str):
