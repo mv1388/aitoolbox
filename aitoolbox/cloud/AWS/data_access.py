@@ -16,7 +16,6 @@ class BaseDataSaver:
         """
         self.bucket_name = bucket_name
         self.s3_client = boto3.client('s3')
-        self.s3_resource = boto3.resource('s3')
 
     def save_file(self, local_file_path, cloud_file_path):
         """Save file on local drive to the AWS S3
