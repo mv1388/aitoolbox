@@ -65,66 +65,6 @@ class BaseLocalModelSaver:
         return experiment_model_path
 
 
-class KerasLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
-    def __init__(self, local_model_result_folder_path='~/project/model_result',
-                 checkpoint_model=False):
-        """Keras experiment local model saver
-
-        Args:
-            local_model_result_folder_path (str): root local path where project folder will be created
-            checkpoint_model (bool): if the model is coming from the mid-training checkpoint
-        """
-        BaseLocalModelSaver.__init__(self, local_model_result_folder_path, checkpoint_model)
-
-    def save_model(self, model, project_name, experiment_name, experiment_timestamp=None, epoch=None, protect_existing_folder=True):
-        """Save the Keras model to the local drive
-
-        Args:
-            model (keras.Model): Keras model
-            project_name (str): root name of the project
-            experiment_name (str): name of the particular experiment
-            experiment_timestamp (str or None): time stamp at the start of training
-            epoch (int or None): in which epoch the model is being saved
-            protect_existing_folder (bool): can override potentially already existing folder or not
-
-        Returns:
-            (str, str): model_name, model_local_path
-        """
-        if experiment_timestamp is None:
-            experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
-
-        experiment_model_local_path = self.create_experiment_local_models_folder(project_name, experiment_name,
-                                                                                 experiment_timestamp)
-
-        if epoch is None:
-            model_name = f'model_{experiment_name}_{experiment_timestamp}.h5'
-        else:
-            model_name = f'model_{experiment_name}_{experiment_timestamp}_E{epoch}.h5'
-
-        model_local_path = os.path.join(experiment_model_local_path, model_name)
-
-        model.save(model_local_path)
-
-        return model_name, model_local_path
-
-
-class TensorFlowLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
-    def __init__(self, local_model_result_folder_path='~/project/model_result',
-                 checkpoint_model=False):
-        """TensorFlow experiment local model saver
-
-        Args:
-            local_model_result_folder_path (str): root local path where project folder will be created
-            checkpoint_model (bool): if the model is coming from the mid-training checkpoint
-        """
-        BaseLocalModelSaver.__init__(self, local_model_result_folder_path, checkpoint_model)
-
-        raise NotImplementedError
-
-    def save_model(self, model, project_name, experiment_name, experiment_timestamp=None, epoch=None, protect_existing_folder=True):
-        raise NotImplementedError
-
-
 class PyTorchLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
     def __init__(self, local_model_result_folder_path='~/project/model_result',
                  checkpoint_model=False):
@@ -195,6 +135,67 @@ class PyTorchLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
                 if required_element not in model:
                     raise ValueError(f'Required element of the model dict {required_element} is missing. Given model'
                                      f'dict has the following elements: {model.keys()}')
+
+
+class KerasLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
+    def __init__(self, local_model_result_folder_path='~/project/model_result',
+                 checkpoint_model=False):
+        """Keras experiment local model saver
+
+        Args:
+            local_model_result_folder_path (str): root local path where project folder will be created
+            checkpoint_model (bool): if the model is coming from the mid-training checkpoint
+        """
+        BaseLocalModelSaver.__init__(self, local_model_result_folder_path, checkpoint_model)
+
+    def save_model(self, model, project_name, experiment_name, experiment_timestamp=None, epoch=None, protect_existing_folder=True):
+        """Save the Keras model to the local drive
+
+        Args:
+            model (keras.Model): Keras model
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            experiment_timestamp (str or None): time stamp at the start of training
+            epoch (int or None): in which epoch the model is being saved
+            protect_existing_folder (bool): can override potentially already existing folder or not
+
+        Returns:
+            (str, str): model_name, model_local_path
+        """
+        if experiment_timestamp is None:
+            experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
+
+        experiment_model_local_path = self.create_experiment_local_models_folder(project_name, experiment_name,
+                                                                                 experiment_timestamp)
+
+        if epoch is None:
+            model_name = f'model_{experiment_name}_{experiment_timestamp}.h5'
+        else:
+            model_name = f'model_{experiment_name}_{experiment_timestamp}_E{epoch}.h5'
+
+        model_local_path = os.path.join(experiment_model_local_path, model_name)
+
+        model.save(model_local_path)
+
+        return model_name, model_local_path
+
+
+# class TensorFlowLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
+#     def __init__(self, local_model_result_folder_path='~/project/model_result',
+#                  checkpoint_model=False):
+#         """TensorFlow experiment local model saver
+#
+#         Args:
+#             local_model_result_folder_path (str): root local path where project folder will be created
+#             checkpoint_model (bool): if the model is coming from the mid-training checkpoint
+#         """
+#         BaseLocalModelSaver.__init__(self, local_model_result_folder_path, checkpoint_model)
+#
+#         raise NotImplementedError
+#
+#     def save_model(self, model, project_name, experiment_name, experiment_timestamp=None, epoch=None,
+#                    protect_existing_folder=True):
+#         raise NotImplementedError
 
 
 class LocalSubOptimalModelRemover:
