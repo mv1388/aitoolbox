@@ -2,10 +2,9 @@ from abc import ABC, abstractmethod
 import time
 import datetime
 
-from aitoolbox.cloud.AWS.model_save import KerasS3ModelSaver, TensorFlowS3ModelSaver, PyTorchS3ModelSaver
+from aitoolbox.cloud.AWS.model_save import PyTorchS3ModelSaver, KerasS3ModelSaver
 from aitoolbox.cloud.AWS.results_save import S3ResultsSaver
-from aitoolbox.cloud.GoogleCloud.model_save import KerasGoogleStorageModelSaver, TensorFlowGoogleStorageModelSaver, \
-    PyTorchGoogleStorageModelSaver
+from aitoolbox.cloud.GoogleCloud.model_save import PyTorchGoogleStorageModelSaver, KerasGoogleStorageModelSaver
 from aitoolbox.cloud.GoogleCloud.results_save import GoogleStorageResultsSaver
 
 
@@ -112,6 +111,27 @@ class BaseFullExperimentS3Saver(BaseFullExperimentSaver):
         BaseFullExperimentSaver.__init__(self, model_saver, results_saver, project_name, experiment_name)
 
 
+class FullPyTorchExperimentS3Saver(BaseFullExperimentS3Saver):
+    def __init__(self, project_name, experiment_name,
+                 bucket_name='model-result', cloud_dir_prefix='',
+                 local_model_result_folder_path='~/project/model_result'):
+        """S3 saver for PyTorch experiments
+
+        Args:
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            bucket_name (str): name of the bucket in the cloud storage
+            cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
+            local_model_result_folder_path (str): root local path where project folder will be created
+        """
+        pytorch_model_saver = PyTorchS3ModelSaver(bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
+                                                  local_model_result_folder_path=local_model_result_folder_path)
+
+        BaseFullExperimentS3Saver.__init__(self, pytorch_model_saver, project_name, experiment_name,
+                                           bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
+                                           local_model_result_folder_path=local_model_result_folder_path)
+
+
 class FullKerasExperimentS3Saver(BaseFullExperimentS3Saver):
     def __init__(self, project_name, experiment_name,
                  bucket_name='model-result', cloud_dir_prefix='',
@@ -133,48 +153,27 @@ class FullKerasExperimentS3Saver(BaseFullExperimentS3Saver):
                                            local_model_result_folder_path=local_model_result_folder_path)
         
         
-class FullTensorFlowExperimentS3Saver(BaseFullExperimentS3Saver):
-    def __init__(self, project_name, experiment_name,
-                 bucket_name='model-result', cloud_dir_prefix='',
-                 local_model_result_folder_path='~/project/model_result'):
-        """S3 saver for TensorFlow experiments
-
-        Args:
-            project_name (str): root name of the project
-            experiment_name (str): name of the particular experiment
-            bucket_name (str): name of the bucket in the cloud storage
-            cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
-            local_model_result_folder_path (str): root local path where project folder will be created
-        """
-        tf_model_saver = TensorFlowS3ModelSaver(bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
-                                                local_model_result_folder_path=local_model_result_folder_path)
-
-        BaseFullExperimentS3Saver.__init__(self, tf_model_saver, project_name, experiment_name,
-                                           bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
-                                           local_model_result_folder_path=local_model_result_folder_path)
-        
-        raise NotImplementedError
-
-
-class FullPyTorchExperimentS3Saver(BaseFullExperimentS3Saver):
-    def __init__(self, project_name, experiment_name,
-                 bucket_name='model-result', cloud_dir_prefix='',
-                 local_model_result_folder_path='~/project/model_result'):
-        """S3 saver for PyTorch experiments
-
-        Args:
-            project_name (str): root name of the project
-            experiment_name (str): name of the particular experiment
-            bucket_name (str): name of the bucket in the cloud storage
-            cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
-            local_model_result_folder_path (str): root local path where project folder will be created
-        """
-        pytorch_model_saver = PyTorchS3ModelSaver(bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
-                                                  local_model_result_folder_path=local_model_result_folder_path)
-
-        BaseFullExperimentS3Saver.__init__(self, pytorch_model_saver, project_name, experiment_name,
-                                           bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
-                                           local_model_result_folder_path=local_model_result_folder_path)
+# class FullTensorFlowExperimentS3Saver(BaseFullExperimentS3Saver):
+#     def __init__(self, project_name, experiment_name,
+#                  bucket_name='model-result', cloud_dir_prefix='',
+#                  local_model_result_folder_path='~/project/model_result'):
+#         """S3 saver for TensorFlow experiments
+#
+#         Args:
+#             project_name (str): root name of the project
+#             experiment_name (str): name of the particular experiment
+#             bucket_name (str): name of the bucket in the cloud storage
+#             cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
+#             local_model_result_folder_path (str): root local path where project folder will be created
+#         """
+#         tf_model_saver = TensorFlowS3ModelSaver(bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
+#                                                 local_model_result_folder_path=local_model_result_folder_path)
+#
+#         BaseFullExperimentS3Saver.__init__(self, tf_model_saver, project_name, experiment_name,
+#                                            bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
+#                                            local_model_result_folder_path=local_model_result_folder_path)
+#
+#         raise NotImplementedError
 
 
 class BaseFullExperimentGoogleStorageSaver(BaseFullExperimentSaver):
@@ -200,6 +199,27 @@ class BaseFullExperimentGoogleStorageSaver(BaseFullExperimentSaver):
         BaseFullExperimentSaver.__init__(self, model_saver, results_saver, project_name, experiment_name)
 
 
+class FullPyTorchExperimentGoogleStorageSaver(BaseFullExperimentGoogleStorageSaver):
+    def __init__(self, project_name, experiment_name,
+                 bucket_name='model-result',  cloud_dir_prefix='',
+                 local_model_result_folder_path='~/project/model_result'):
+        """Google Storage saver for PyTorch experiments
+
+        Args:
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            bucket_name (str): name of the bucket in the cloud storage
+            cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
+            local_model_result_folder_path (str): root local path where project folder will be created
+        """
+        pytorch_model_saver = PyTorchGoogleStorageModelSaver(bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
+                                                             local_model_result_folder_path=local_model_result_folder_path)
+
+        BaseFullExperimentGoogleStorageSaver.__init__(self, pytorch_model_saver, project_name, experiment_name,
+                                                      bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
+                                                      local_model_result_folder_path=local_model_result_folder_path)
+
+
 class FullKerasExperimentGoogleStorageSaver(BaseFullExperimentGoogleStorageSaver):
     def __init__(self, project_name, experiment_name,
                  bucket_name='model-result',  cloud_dir_prefix='',
@@ -221,45 +241,24 @@ class FullKerasExperimentGoogleStorageSaver(BaseFullExperimentGoogleStorageSaver
                                                       local_model_result_folder_path=local_model_result_folder_path)
 
 
-class FullTensorFlowExperimentGoogleStorageSaver(BaseFullExperimentGoogleStorageSaver):
-    def __init__(self, project_name, experiment_name,
-                 bucket_name='model-result',  cloud_dir_prefix='',
-                 local_model_result_folder_path='~/project/model_result'):
-        """Google Storage saver for TensorFlow experiments
-
-        Args:
-            project_name (str): root name of the project
-            experiment_name (str): name of the particular experiment
-            bucket_name (str): name of the bucket in the cloud storage
-            cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
-            local_model_result_folder_path (str): root local path where project folder will be created
-        """
-        tf_model_saver = TensorFlowGoogleStorageModelSaver(bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
-                                                           local_model_result_folder_path=local_model_result_folder_path)
-
-        BaseFullExperimentGoogleStorageSaver.__init__(self, tf_model_saver, project_name, experiment_name,
-                                                      bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
-                                                      local_model_result_folder_path=local_model_result_folder_path)
-
-        raise NotImplementedError
-
-
-class FullPyTorchExperimentGoogleStorageSaver(BaseFullExperimentGoogleStorageSaver):
-    def __init__(self, project_name, experiment_name,
-                 bucket_name='model-result',  cloud_dir_prefix='',
-                 local_model_result_folder_path='~/project/model_result'):
-        """Google Storage saver for PyTorch experiments
-
-        Args:
-            project_name (str): root name of the project
-            experiment_name (str): name of the particular experiment
-            bucket_name (str): name of the bucket in the cloud storage
-            cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
-            local_model_result_folder_path (str): root local path where project folder will be created
-        """
-        pytorch_model_saver = PyTorchGoogleStorageModelSaver(bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
-                                                             local_model_result_folder_path=local_model_result_folder_path)
-
-        BaseFullExperimentGoogleStorageSaver.__init__(self, pytorch_model_saver, project_name, experiment_name,
-                                                      bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
-                                                      local_model_result_folder_path=local_model_result_folder_path)
+# class FullTensorFlowExperimentGoogleStorageSaver(BaseFullExperimentGoogleStorageSaver):
+#     def __init__(self, project_name, experiment_name,
+#                  bucket_name='model-result',  cloud_dir_prefix='',
+#                  local_model_result_folder_path='~/project/model_result'):
+#         """Google Storage saver for TensorFlow experiments
+#
+#         Args:
+#             project_name (str): root name of the project
+#             experiment_name (str): name of the particular experiment
+#             bucket_name (str): name of the bucket in the cloud storage
+#             cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
+#             local_model_result_folder_path (str): root local path where project folder will be created
+#         """
+#         tf_model_saver = TensorFlowGoogleStorageModelSaver(bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
+#                                                            local_model_result_folder_path=local_model_result_folder_path)
+#
+#         BaseFullExperimentGoogleStorageSaver.__init__(self, tf_model_saver, project_name, experiment_name,
+#                                                       bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
+#                                                       local_model_result_folder_path=local_model_result_folder_path)
+#
+#         raise NotImplementedError
