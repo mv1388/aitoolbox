@@ -19,8 +19,6 @@ esac
 done
 
 
-python setup.py test
-
 python setup.py sdist
 
 rm -r aitoolbox.egg-info
@@ -31,3 +29,6 @@ git add -A dist/
 if [ "$build_documentation" == true ]; then
     ./doc_build.sh --clean
 fi
+
+# Unittest package and report coverage
+./coverage_test.sh
