@@ -8,8 +8,9 @@
 .mypy_cache
 
 /bin/AWS/configs
-/.circleci_rmed
 
 /docs/build
 /docs/source/api/aitoolbox*
 /docs/source/api/modules.rst
+
+/html_coverage
