@@ -62,7 +62,7 @@ class FFNetPyTorch(nn.Module):
 
 
 class TestTrainLoopVSCorePyTorch(unittest.TestCase):
-    def test_trainloop_core_pytorch_prediction_compare(self):
+    def test_trainloop_core_pytorch_prediction_loss_compare(self):
         batch_size = 50
         num_epochs = 10
 
