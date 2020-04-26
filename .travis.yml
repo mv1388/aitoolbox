@@ -39,7 +39,7 @@ matrix:
 
 # command to install dependencies
 install:
-  - pip install tensorflow keras
+  - pip install tensorflow keras moto
   - pip install -r requirements.txt
 
 script:
