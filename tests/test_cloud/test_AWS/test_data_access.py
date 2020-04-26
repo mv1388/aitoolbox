@@ -4,13 +4,10 @@ import os
 import boto3
 from moto import mock_s3
 
-from aitoolbox.cloud.AWS.data_access import BaseDataSaver
+from tests.test_cloud.test_AWS.setup_moto_env import setup_aws_for_test
+from aitoolbox.cloud.AWS.data_access import BaseDataSaver, BaseDataLoader
 
-os.environ['AWS_ACCESS_KEY_ID'] = "testing"
-os.environ['AWS_SECRET_ACCESS_KEY'] = "testing"
-os.environ['AWS_SECURITY_TOKEN'] = "testing"
-os.environ['AWS_SESSION_TOKEN'] = "testing"
-
+setup_aws_for_test()
 BUCKET_NAME = 'test-bucket'
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -53,3 +50,37 @@ class TestBaseDataSaver(unittest.TestCase):
 
         if os.path.exists(downloaded_file_path):
             os.remove(downloaded_file_path)
+
+
+class TestBaseDataLoader(unittest.TestCase):
+    @mock_s3
+    def test_data_download(self):
+        s3 = boto3.resource('s3')
+        s3.create_bucket(Bucket=BUCKET_NAME)
+        s3_client = boto3.client('s3')
+        s3_client.upload_file(os.path.join(THIS_DIR, 'resources/file.txt'), BUCKET_NAME, 'file.txt')
+        s3_client.upload_file(os.path.join(THIS_DIR, 'resources/file.txt'), BUCKET_NAME, 'some_folder/file.txt')
+
+        data_loader = BaseDataLoader(bucket_name=BUCKET_NAME, local_base_data_folder_path=THIS_DIR)
+
+        dl_file_path = os.path.join(THIS_DIR, 'downloaded_file.txt')
+        data_loader.load_file('file.txt', dl_file_path)
+        dl_some_folder_file_path = os.path.join(THIS_DIR, 'downloaded_some_folder_file.txt')
+        data_loader.load_file('some_folder/file.txt', dl_some_folder_file_path)
+
+        with open(os.path.join(THIS_DIR, 'resources/file.txt')) as f:
+            original_content = f.readlines()
+
+        with open(dl_file_path) as f:
+            downloaded_file = f.readlines()
+
+        with open(dl_some_folder_file_path) as f:
+            downloaded_some_folder_file = f.readlines()
+
+        self.assertEqual(original_content, downloaded_file)
+        self.assertEqual(downloaded_some_folder_file, downloaded_file)
+
+        if os.path.exists(dl_file_path):
+            os.remove(dl_file_path)
+        if os.path.exists(dl_some_folder_file_path):
+            os.remove(dl_some_folder_file_path)
