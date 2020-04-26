@@ -4,7 +4,7 @@ import os
 import boto3
 from moto import mock_s3
 
-from tests.test_cloud.test_AWS.setup_moto_env import setup_aws_for_test
+from tests.setup_moto_env import setup_aws_for_test
 from aitoolbox.cloud.AWS.data_access import BaseDataSaver, BaseDataLoader
 
 setup_aws_for_test()
