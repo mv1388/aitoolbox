@@ -169,36 +169,19 @@ class TrainLoop:
                 self.callbacks_handler.execute_batch_begin()
 
                 # Feed batch into the model
-                if self.batch_model_feed_def is None:
-                    loss_batch = self.model.get_loss(batch_data, self.criterion, self.device)
-                else:
-                    loss_batch = self.batch_model_feed_def.get_loss(self.model, batch_data, self.criterion, self.device)
+                loss_batch = self.calculate_batch_loss(batch_data)
                 self.loss_batch_accum.append(loss_batch.item())
 
-                if not self.use_deepspeed:
-                    self.optimizer.zero_grad()
+                self.optimizer_zero_grad()
 
                 # Backward pass through the model
-                if self.use_amp:
-                    if not isinstance(loss_batch, MultiLoss):
-                        # Single loss Apex AMP calculation
-                        with amp.scale_loss(loss_batch, self.optimizer) as scaled_loss:
-                            scaled_loss.backward()
-                    else:
-                        # Multi-loss Apex AMP calculation
-                        loss_batch.backward_amp(self.optimizer.optimizer_list)
-                elif self.use_deepspeed:
-                    self.model.backward(loss_batch)
-                else:
-                    loss_batch.backward()
+                self.backward_pass(loss_batch)
 
                 if self.grad_cb_used:
                     self.callbacks_handler.execute_gradient_update()
+
                 # Optimizer step
-                if self.use_deepspeed:
-                    self.model.step()
-                else:
-                    self.optimizer.step()
+                self.optimizer_step()
                 if self.grad_cb_used:
                     self.callbacks_handler.execute_optimizer_step()
 
@@ -222,6 +205,60 @@ class TrainLoop:
         self.callbacks_handler.execute_train_end()
 
         return self.model
+
+    def calculate_batch_loss(self, batch_data):
+        """Push batch data through the model and calculate the batch loss
+
+        Args:
+            batch_data: input data batch
+
+        Returns:
+            loss: loss calculated on current batch
+        """
+        if self.batch_model_feed_def is None:
+            loss_batch = self.model.get_loss(batch_data, self.criterion, self.device)
+        else:
+            loss_batch = self.batch_model_feed_def.get_loss(self.model, batch_data, self.criterion, self.device)
+        return loss_batch
+
+    def optimizer_zero_grad(self):
+        """Execute optimizer zero grad
+
+        Returns:
+            None
+        """
+        if not self.use_deepspeed:
+            self.optimizer.zero_grad()
+
+    def backward_pass(self, loss_batch):
+        """Execute backward pass from the current batch loss
+
+        Args:
+            loss_batch: loss calculated on current batch
+        """
+        if self.use_amp:
+            if not isinstance(loss_batch, MultiLoss):
+                # Single loss Apex AMP calculation
+                with amp.scale_loss(loss_batch, self.optimizer) as scaled_loss:
+                    scaled_loss.backward()
+            else:
+                # Multi-loss Apex AMP calculation
+                loss_batch.backward_amp(self.optimizer.optimizer_list)
+        elif self.use_deepspeed:
+            self.model.backward(loss_batch)
+        else:
+            loss_batch.backward()
+
+    def optimizer_step(self):
+        """Execute the optimizer step
+
+        Returns:
+            None
+        """
+        if self.use_deepspeed:
+            self.model.step()
+        else:
+            self.optimizer.step()
 
     def auto_execute_end_of_epoch(self):
         """Basic performance evaluation executed by default at the end of each epoch
