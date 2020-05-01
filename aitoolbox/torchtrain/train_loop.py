@@ -149,12 +149,13 @@ class TrainLoop:
         Returns:
             TTModel or torch.nn.modules.Module or TTDataParallel or deepspeed.DeepSpeedLight: trained model
         """
+        self.callbacks_handler.register_callbacks(callbacks)
+
         self.model = self.model.to(self.device)
         self.criterion = self.criterion.to(self.device)
         # Initialize AMP when training with Nvidia APEX mixed precision
         if self.use_amp and not self.ddp_training_mode:
             self.model, self.optimizer = amp.initialize(self.model, self.optimizer, **self.amp_params)
-        self.callbacks_handler.register_callbacks(callbacks)
 
         self.model.train()
 
