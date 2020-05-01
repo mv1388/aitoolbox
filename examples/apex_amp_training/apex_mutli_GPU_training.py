@@ -81,6 +81,5 @@ if __name__ == '__main__':
     TrainLoop(model,
               train_loader, val_loader, test_loader,
               optimizer, criterion,
-              use_amp=True) \
-        .fit_distributed(num_epochs=10, callbacks=callbacks,
-                         amp_init_args={'opt_level': 'O1'})
+              use_amp={'opt_level': 'O1'}) \
+        .fit_distributed(num_epochs=10, callbacks=callbacks)

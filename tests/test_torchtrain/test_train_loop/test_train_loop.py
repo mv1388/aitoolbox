@@ -78,13 +78,14 @@ class TestTrainLoop(unittest.TestCase):
     def test_callback_on_execution(self):
         num_epochs = 2
         dummy_optimizer = DummyOptimizer()
+        dummy_loss = DummyLoss()
         dummy_train_loader = list(range(4))
         dummy_val_loader = list(range(3))
         dummy_test_loader = list(range(2))
 
         model = NetUnifiedBatchFeed()
         train_loop = TrainLoop(model, dummy_train_loader, dummy_val_loader, dummy_test_loader,
-                               dummy_optimizer, None)
+                               dummy_optimizer, dummy_loss)
         train_loop.callbacks_handler.register_callbacks([AbstractCallback('callback_test1'),
                                                          CallbackTracker(), CallbackTrackerShort(),
                                                          AbstractCallback('callback_test2')])
@@ -97,6 +98,7 @@ class TestTrainLoop(unittest.TestCase):
         self.assertEqual(model, model_return)
         self.assertFalse(train_loop.early_stop)
         self.assertEqual(train_loop.epoch, num_epochs-1)
+        self.assertEqual(dummy_loss.device.type, 'cpu')
 
         self.assertEqual(model.dummy_batch.back_ctr, num_epochs*len(dummy_train_loader))
         self.assertEqual(model.dummy_batch.item_ctr,
@@ -140,6 +142,7 @@ class TestTrainLoop(unittest.TestCase):
     def test_callback_on_execution_separate_batch_feed(self):
         num_epochs = 2
         dummy_optimizer = DummyOptimizer()
+        dummy_loss = DummyLoss()
         dummy_train_loader = list(range(4))
         dummy_val_loader = list(range(3))
         dummy_test_loader = list(range(2))
@@ -149,7 +152,7 @@ class TestTrainLoop(unittest.TestCase):
         model_wrap = ModelWrap(model=model, batch_model_feed_def=dummy_feed_def)
 
         train_loop = TrainLoop(model_wrap, dummy_train_loader, dummy_val_loader, dummy_test_loader,
-                               dummy_optimizer, None)
+                               dummy_optimizer, dummy_loss)
         train_loop.callbacks_handler.register_callbacks([AbstractCallback('callback_test1'),
                                                          CallbackTracker(), CallbackTrackerShort(),
                                                          AbstractCallback('callback_test2')])
@@ -171,6 +174,7 @@ class TestTrainLoop(unittest.TestCase):
 
         self.assertEqual(dummy_optimizer.zero_grad_ctr, num_epochs*len(dummy_train_loader))
         self.assertEqual(dummy_optimizer.step_ctr, num_epochs * len(dummy_train_loader))
+        self.assertEqual(dummy_loss.device.type, 'cpu')
 
         self.assertEqual(callback_full.callback_calls,
                          ['on_train_loop_registration', 'on_train_begin', 'on_epoch_begin', 'on_batch_begin',
@@ -217,13 +221,14 @@ class TestTrainLoop(unittest.TestCase):
     def eval_prediction(self, eval_mode):
         num_epochs = 2
         dummy_optimizer = DummyOptimizer()
+        dummy_loss = DummyLoss()
         dummy_train_loader = list(range(4))
         dummy_val_loader = list(range(3))
         dummy_test_loader = list(range(2))
 
         model = NetUnifiedBatchFeed()
         train_loop = TrainLoop(model, dummy_train_loader, dummy_val_loader, dummy_test_loader,
-                               dummy_optimizer, None)
+                               dummy_optimizer, dummy_loss)
         train_loop.callbacks_handler.register_callbacks([AbstractCallback('callback_test1'),
                                                          CallbackTracker(), CallbackTrackerShort(),
                                                          AbstractCallback('callback_test2')])
@@ -256,6 +261,7 @@ class TestTrainLoop(unittest.TestCase):
     def eval_prediction_separate_batch_feed(self, eval_mode):
         num_epochs = 2
         dummy_optimizer = DummyOptimizer()
+        dummy_loss = DummyLoss()
         dummy_train_loader = list(range(4))
         dummy_val_loader = list(range(3))
         dummy_test_loader = list(range(2))
@@ -265,7 +271,7 @@ class TestTrainLoop(unittest.TestCase):
         model_wrap = ModelWrap(model=model, batch_model_feed_def=dummy_feed_def)
 
         train_loop = TrainLoop(model_wrap, dummy_train_loader, dummy_val_loader, dummy_test_loader,
-                               dummy_optimizer, None)
+                               dummy_optimizer, dummy_loss)
         train_loop.callbacks_handler.register_callbacks([AbstractCallback('callback_test1'),
                                                          CallbackTracker(), CallbackTrackerShort(),
                                                          AbstractCallback('callback_test2')])
@@ -298,13 +304,14 @@ class TestTrainLoop(unittest.TestCase):
     def test_basic_history_tracking(self):
         num_epochs = 2
         dummy_optimizer = DummyOptimizer()
+        dummy_loss = DummyLoss()
         dummy_train_loader = list(range(4))
         dummy_val_loader = list(range(3))
         dummy_test_loader = list(range(2))
 
         model = NetUnifiedBatchFeed()
         train_loop = TrainLoop(model, dummy_train_loader, dummy_val_loader, dummy_test_loader,
-                               dummy_optimizer, None)
+                               dummy_optimizer, dummy_loss)
         train_loop.callbacks_handler.register_callbacks([AbstractCallback('callback_test1'),
                                                          CallbackTracker(), CallbackTrackerShort(),
                                                          AbstractCallback('callback_test2')])

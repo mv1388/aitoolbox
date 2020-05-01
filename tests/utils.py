@@ -265,6 +265,14 @@ class DummyOptimizer:
         print('In state_dict')
 
 
+class DummyLoss:
+    def __init__(self):
+        self.device = None
+
+    def to(self, device):
+        self.device = device
+
+
 class DummyResultPackage(AbstractResultPackage):
     def __init__(self):
         AbstractResultPackage.__init__(self, 'DummyPackage', False)
