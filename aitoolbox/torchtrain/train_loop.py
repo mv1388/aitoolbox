@@ -6,6 +6,7 @@ import inspect
 from typing import Optional
 import numpy as np
 import torch
+import torch.nn as nn
 from torch.nn.modules import Module
 import torch.multiprocessing as mp
 import torch.distributed as dist
@@ -550,16 +551,25 @@ class TrainLoop:
 
         self.fit(num_epochs, callbacks)
 
-    def insert_metric_result_into_history(self, metric_name, metric_result):
-        """Insert a metric result into the train history
-
-        This is the main and preferred API function for metric insertion as part of the train loop.
+    def fit_data_parallel(self, num_epochs, callbacks=None, dp_wrap_attributes=None):
+        """Train the model on multi-GPU with DataParallel auto wrapping
 
         Args:
-            metric_name (str): name of the metric to be inserted
-            metric_result (float or dict): new result for the corresponding metric
+            num_epochs (int): how many epochs the network will be trained
+            callbacks (list or None): callbacks that are executed during the training run
+            dp_wrap_attributes (list or tuple or None): additional TTModel attributes which need to be transferred to
+                the TTDataParallel level to enable their use in the transferred/exposed class methods
+
+        Returns:
+            TTDataParallel: trained model
         """
-        self.train_history.insert_single_result_into_history(metric_name, metric_result)
+        if not isinstance(self.model, TTDataParallel) and not isinstance(self.model, nn.DataParallel):
+            if isinstance(self.model, TTModel):
+                self.model = TTDataParallel(self.model, dp_wrap_attributes)
+            else:
+                self.model = nn.DataParallel(self.model)
+
+        return self.fit(num_epochs, callbacks)
 
     def __call__(self, num_epochs, callbacks=None):
         """Train the model using the train loop
@@ -572,6 +582,17 @@ class TrainLoop:
             TTModel or torch.nn.modules.Module or TTDataParallel: trained model
         """
         return self.fit(num_epochs, callbacks)
+
+    def insert_metric_result_into_history(self, metric_name, metric_result):
+        """Insert a metric result into the train history
+
+        This is the main and preferred API function for metric insertion as part of the train loop.
+
+        Args:
+            metric_name (str): name of the metric to be inserted
+            metric_result (float or dict): new result for the corresponding metric
+        """
+        self.train_history.insert_single_result_into_history(metric_name, metric_result)
 
 
 class TrainLoopCheckpoint(TrainLoop):
