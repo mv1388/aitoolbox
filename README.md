@@ -143,8 +143,9 @@ from aitoolbox.torchtrain.train_loop import *
 
 model = ... # TTModel
 
-TrainLoop(model, ...,
-          optimizer, criterion, use_amp={'opt_level': 'O1'}
+TrainLoop(
+    model, ...,
+    optimizer, criterion, use_amp={'opt_level': 'O1'}
 ).fit(num_epochs=10)
 ``` 
 
