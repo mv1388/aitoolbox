@@ -129,24 +129,26 @@ class TrainLoop:
         if self.use_deepspeed and not DEEPSPEED_AVAILABLE:
             raise ValueError('Trying to use Microsoft DeepSpeed. However, DeepSpeed is not installed.')
 
-    def __call__(self, num_epochs, callbacks=None):
+    def __call__(self, num_epochs, callbacks=None, grad_accumulation=1):
         """Train the model using the train loop
 
         Args:
             num_epochs (int): how many epochs the network will be trained
             callbacks (list): callbacks that are executed during the training run
+            grad_accumulation (int): number of batches the gradients are accumulated before updating weights
 
         Returns:
             TTModel or torch.nn.modules.Module or TTDataParallel: trained model
         """
-        return self.fit(num_epochs, callbacks)
+        return self.fit(num_epochs, callbacks, grad_accumulation)
 
-    def fit(self, num_epochs, callbacks=None):
+    def fit(self, num_epochs, callbacks=None, grad_accumulation=1):
         """Train the model using the train loop
 
         Args:
             num_epochs (int): how many epochs the network will be trained
             callbacks (list or None): callbacks that are executed during the training run
+            grad_accumulation (int): number of batches the gradients are accumulated before updating weights
 
         Returns:
             TTModel or torch.nn.modules.Module or TTDataParallel or deepspeed.DeepSpeedLight: trained model
@@ -165,7 +167,7 @@ class TrainLoop:
                 print(f'Epoch: {self.epoch}')
             self.callbacks_handler.execute_epoch_begin()
 
-            for batch_data in tqdm(self.train_loader):
+            for iteration, batch_data in enumerate(tqdm(self.train_loader)):
                 self.callbacks_handler.execute_batch_begin()
 
                 # Feed batch into the model
@@ -174,9 +176,8 @@ class TrainLoop:
                 else:
                     loss_batch = self.batch_model_feed_def.get_loss(self.model, batch_data, self.criterion, self.device)
                 self.loss_batch_accum.append(loss_batch.item())
-
-                if not self.use_deepspeed:
-                    self.optimizer.zero_grad()
+                # Need to divide by the number of accumulation steps if our loss is averaged over the training samples
+                loss_batch = loss_batch / grad_accumulation
 
                 # Backward pass through the model
                 if self.use_amp:
@@ -194,13 +195,20 @@ class TrainLoop:
 
                 if self.grad_cb_used:
                     self.callbacks_handler.execute_gradient_update()
-                # Optimizer step
-                if self.use_deepspeed:
-                    self.model.step()
-                else:
-                    self.optimizer.step()
-                if self.grad_cb_used:
-                    self.callbacks_handler.execute_optimizer_step()
+
+                # if (iteration + 1) % grad_accumulation == 0 or iteration == len(self.train_loader) - 1:
+                if (iteration + 1) % grad_accumulation == 0:
+                    # Optimizer step
+                    if self.use_deepspeed:
+                        self.model.step()
+                    else:
+                        self.optimizer.step()
+                    if self.grad_cb_used:
+                        self.callbacks_handler.execute_optimizer_step()
+
+                    # Optimizer zero grad
+                    if not self.use_deepspeed:
+                        self.optimizer.zero_grad()
 
                 self.callbacks_handler.execute_batch_end()
 
@@ -450,7 +458,7 @@ class TrainLoop:
 
         return y_pred, y_test, metadata
 
-    def fit_distributed(self, num_epochs, callbacks=None,
+    def fit_distributed(self, num_epochs, callbacks=None, grad_accumulation=1,
                         train_data_shuffle=True, ddp_model_args=None, amp_init_args=None, in_process_data_load=None,
                         num_nodes=1, node_rank=0, num_gpus=torch.cuda.device_count()):
         """Train the model using the train loop in the Distributed Data Parallel setting
@@ -460,6 +468,7 @@ class TrainLoop:
         Args:
             num_epochs (int): how many epochs the network will be trained
             callbacks (list or None): callbacks that are executed during the training run
+            grad_accumulation (int): number of batches the gradients are accumulated before updating weights
             train_data_shuffle (bool): should train loader return shuffled data
             ddp_model_args (dict or None): parameters for DistributedDataParallel / APEX DistributedDataParallel model
                 Available parameters for DistributedDataParallel:
@@ -501,11 +510,11 @@ class TrainLoop:
 
         mp.spawn(self._spawn_fit,
                  args=(
-                     ddp_args, num_epochs, callbacks, in_process_data_load
+                     ddp_args, num_epochs, callbacks, grad_accumulation, in_process_data_load
                  ),
                  nprocs=ddp_args['world_size'])
 
-    def _spawn_fit(self, gpu, ddp_args, num_epochs, callbacks, in_process_data_load):
+    def _spawn_fit(self, gpu, ddp_args, num_epochs, callbacks, grad_accumulation, in_process_data_load):
         """Helper function that prepares the TrainLoop state inside each of the spawned processes and initiates training
 
         Args:
@@ -513,6 +522,7 @@ class TrainLoop:
             ddp_args (dict): parameters dict needed for the distributed training setup
             num_epochs (int): how many epochs the network will be trained
             callbacks (list or None): callbacks that are executed during the training run
+            grad_accumulation (int): number of batches the gradients are accumulated before updating weights
             in_process_data_load (list or None): in-process data loading logic implemented as a torchtrain callback.
                 The logic should be placed inside the on_multiprocess_start() callback function.
                 When using this data loading option bare in mind that loaded dataset will be replicated in memory for
@@ -552,7 +562,7 @@ class TrainLoop:
             else:
                 self.model = ApexDistributedDataParallel(self.model, **ddp_args['ddp_model_args'])
 
-        self.fit(num_epochs, callbacks)
+        self.fit(num_epochs, callbacks, grad_accumulation)
 
     def insert_metric_result_into_history(self, metric_name, metric_result):
         """Insert a metric result into the train history
