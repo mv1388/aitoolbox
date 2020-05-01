@@ -133,7 +133,7 @@ AMP initialization and start training the model in the mixed precision mode. If 
 AMP initialization parameters, these should be provided as a dict parameter `use_amp={'opt_level': 'O1'}` to 
 the TrainLoop. All AMP initializations and training related steps are then handled automatically by the TrainLoop. 
 
-You can read more about different AMP optimization levels in 
+You can read more about different AMP optimization levels in the
 [Nvidia apex documentation](https://nvidia.github.io/apex/amp.html#opt-levels-and-properties).
 
 ### Single-GPU mixed precision training
@@ -154,7 +154,7 @@ Check out a full [Apex AMP training example](https://github.com/mv1388/aitoolbox
 ### Multi-GPU DDP mixed precision training
 When training in the multi-GPU setting, the setup is mostly the same as in the single-GPU. 
 All the user has to do is set accordingly the `use_amp` parameter of the TrainLoop and to instead call 
-`fit_distributed()` in order to start the training. 
+`fit_distributed()` in order to start the distributed training. 
 Under the hood, TrainLoop will initialize the model and the optimizer for AMP and start training using 
 DistributedDataParallel approach (DDP is currently only multi-GPU training setup supported by Apex AMP).
 ```python
