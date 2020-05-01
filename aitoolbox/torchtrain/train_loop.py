@@ -66,7 +66,15 @@ class TrainLoop:
                 Specify either True/False boolean to always run or never run after each epoch or specify an int to
                 execute only every specified number of epochs.
             cuda_device_idx (int or None): CUDA device index used when training on multiple GPUs
-            use_amp (bool): use Nvidia Apex 16-bit Automatic Mixed Precision (AMP)
+            use_amp (bool or dict): use Nvidia Apex 16-bit Automatic Mixed Precision (AMP)
+
+                To switch to AMP mode either:
+
+                * set this parameter to ``True`` to use default AMP initialization parameters
+                * provide custom Apex AMP initialization parameters as a dict as this parameter
+
+                Available AMP initialization parameters: https://nvidia.github.io/apex/amp.html#apex.amp.initialize
+
             use_deepspeed (bool): use Microsoft DeepSpeed
         """
         if isinstance(model, TTModel) or isinstance(model, TTDataParallel):
@@ -87,7 +95,9 @@ class TrainLoop:
         self.collate_batch_pred_fn = collate_batch_pred_fn
         self.pred_transform_fn = pred_transform_fn
         self.end_auto_eval = end_auto_eval
-        self.use_amp = use_amp
+
+        self.use_amp = use_amp is True or type(use_amp) == dict
+        self.amp_params = {} if use_amp is True else use_amp
         self.use_deepspeed = use_deepspeed
 
         USE_CUDA = torch.cuda.is_available()
@@ -151,9 +161,13 @@ class TrainLoop:
         Returns:
             TTModel or torch.nn.modules.Module or TTDataParallel or deepspeed.DeepSpeedLight: trained model
         """
+        self.model = self.model.to(self.device)
+        self.criterion = self.criterion.to(self.device)
+        # Initialize AMP when training with Nvidia APEX mixed precision
+        if self.use_amp and not self.ddp_training_mode:
+            self.model, self.optimizer = amp.initialize(self.model, self.optimizer, **self.amp_params)
         self.callbacks_handler.register_callbacks(callbacks)
 
-        self.model = self.model.to(self.device)
         self.model.train()
 
         self.callbacks_handler.execute_train_begin()
@@ -451,7 +465,7 @@ class TrainLoop:
         return y_pred, y_test, metadata
 
     def fit_distributed(self, num_epochs, callbacks=None,
-                        train_data_shuffle=True, ddp_model_args=None, amp_init_args=None, in_process_data_load=None,
+                        train_data_shuffle=True, ddp_model_args=None, in_process_data_load=None,
                         num_nodes=1, node_rank=0, num_gpus=torch.cuda.device_count()):
         """Train the model using the train loop in the Distributed Data Parallel setting
 
@@ -466,8 +480,6 @@ class TrainLoop:
                     https://pytorch.org/docs/master/nn.html#torch.nn.parallel.DistributedDataParallel
                 Available parameters for APEX DistributedDataParallel:
                     https://nvidia.github.io/apex/parallel.html#apex.parallel.DistributedDataParallel
-            amp_init_args (dict or None): Apex AMP initialization parameters
-                Available parameters: https://nvidia.github.io/apex/amp.html#apex.amp.initialize
             in_process_data_load (AbstractCallback or list or None):
                 in-process data loading logic implemented as a torchtrain callback. The logic should be placed inside
                 the on_multiprocess_start() callback function.
@@ -485,19 +497,12 @@ class TrainLoop:
             'num_gpus': num_gpus,
             'world_size': num_nodes * num_gpus,
             'train_data_shuffle': train_data_shuffle,
-            'ddp_model_args': ddp_model_args if ddp_model_args is not None else {},
-            'amp_init_args': amp_init_args if amp_init_args is not None else {}
+            'ddp_model_args': ddp_model_args if ddp_model_args is not None else {}
         }
 
         from aitoolbox.torchtrain.callbacks.abstract import AbstractCallback
         if isinstance(in_process_data_load, AbstractCallback):
             in_process_data_load = [in_process_data_load]
-
-        if amp_init_args is not None:
-            self.use_amp = True
-        if self.use_amp and not APEX_AVAILABLE:
-            raise ValueError('Trying to use Nvidia Apex AMP for 16-bit mixed precision. However, Nvidia Apex is not'
-                             'installed.')
 
         mp.spawn(self._spawn_fit,
                  args=(
@@ -533,12 +538,14 @@ class TrainLoop:
         self.ddp_handler.add_distributed_samplers(ddp_args['world_size'], rank, ddp_args['train_data_shuffle'])
 
         # Move to the GPU belonging to the process
-        self.criterion = self.criterion.to(self.device)
         self.model = self.model.to(self.device)
+        self.criterion = self.criterion.to(self.device)
 
         # Optionally initialize APEX
+        # Not using AMP initialization at the start of the fit() fn because in the multi-GPU setting the model has to
+        # be first AMP-initialized before it's wrapped into (APEX) DistributedDataParallel.
         if self.use_amp:
-            self.model, self.optimizer = amp.initialize(self.model, self.optimizer, **ddp_args['amp_init_args'])
+            self.model, self.optimizer = amp.initialize(self.model, self.optimizer, **self.amp_params)
 
         # Wrap models into DDP module
         if isinstance(self.model, TTModel):
@@ -613,7 +620,15 @@ class TrainLoopCheckpoint(TrainLoop):
                 Specify either True/False boolean to always run or never run after each epoch or specify an int to
                 execute only every specified number of epochs.
             cuda_device_idx (int or None): CUDA device index used when training on multiple GPUs
-            use_amp (bool): use Nvidia Apex 16-bit Automatic Mixed Precision (AMP)
+            use_amp (bool or dict): use Nvidia Apex 16-bit Automatic Mixed Precision (AMP)
+
+                To switch to AMP mode either:
+
+                * set this parameter to ``True`` to use default AMP initialization parameters
+                * provide custom Apex AMP initialization parameters as a dict as this parameter
+
+                Available AMP initialization parameters: https://nvidia.github.io/apex/amp.html#apex.amp.initialize
+
             use_deepspeed (bool): use Microsoft DeepSpeed
         """
         TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion,
@@ -688,7 +703,15 @@ class TrainLoopEndSave(TrainLoop):
                 Specify either True/False boolean to always run or never run after each epoch or specify an int to
                 execute only every specified number of epochs.
             cuda_device_idx (int or None): CUDA device index used when training on multiple GPUs
-            use_amp (bool): use Nvidia Apex 16-bit Automatic Mixed Precision (AMP)
+            use_amp (bool or dict): use Nvidia Apex 16-bit Automatic Mixed Precision (AMP)
+
+                To switch to AMP mode either:
+
+                * set this parameter to ``True`` to use default AMP initialization parameters
+                * provide custom Apex AMP initialization parameters as a dict as this parameter
+
+                Available AMP initialization parameters: https://nvidia.github.io/apex/amp.html#apex.amp.initialize
+
             use_deepspeed (bool): use Microsoft DeepSpeed
         """
         TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion,
@@ -789,7 +812,15 @@ class TrainLoopCheckpointEndSave(TrainLoopEndSave):
                 Specify either True/False boolean to always run or never run after each epoch or specify an int to
                 execute only every specified number of epochs.
             cuda_device_idx (int or None): CUDA device index used when training on multiple GPUs
-            use_amp (bool): use Nvidia Apex 16-bit Automatic Mixed Precision (AMP)
+            use_amp (bool or dict): use Nvidia Apex 16-bit Automatic Mixed Precision (AMP)
+
+                To switch to AMP mode either:
+
+                * set this parameter to ``True`` to use default AMP initialization parameters
+                * provide custom Apex AMP initialization parameters as a dict as this parameter
+
+                Available AMP initialization parameters: https://nvidia.github.io/apex/amp.html#apex.amp.initialize
+
             use_deepspeed (bool): use Microsoft DeepSpeed
         """
         if 'experiment_file_path' not in hyperparams:
