@@ -5,10 +5,6 @@ import torch.optim as optim
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
 
-# To install follow these instructions:
-#   https://github.com/NVIDIA/apex#linux
-from apex import amp
-
 from aitoolbox import TrainLoop, TTModel
 from aitoolbox.torchtrain.callbacks.performance_eval import ModelPerformanceEvaluation, ModelPerformancePrintReport
 from aitoolbox.experiment.result_package.basic_packages import ClassificationResultPackage
@@ -76,11 +72,9 @@ if __name__ == '__main__':
         ),
         batch_size=batch_size_multi_gpu)
 
-    model = Net().to('cuda')
+    model = Net()
     optimizer = optim.Adam(model.parameters(), lr=0.001, betas=(0.9, 0.999))
-    criterion = nn.NLLLoss().to('cuda')
-
-    model, optimizer = amp.initialize(model, optimizer, opt_level="O1")
+    criterion = nn.NLLLoss()
 
     callbacks = [ModelPerformanceEvaluation(ClassificationResultPackage(), {},
                                             on_train_data=True, on_val_data=True),
