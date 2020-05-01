@@ -129,18 +129,6 @@ class TrainLoop:
         if self.use_deepspeed and not DEEPSPEED_AVAILABLE:
             raise ValueError('Trying to use Microsoft DeepSpeed. However, DeepSpeed is not installed.')
 
-    def __call__(self, num_epochs, callbacks=None):
-        """Train the model using the train loop
-
-        Args:
-            num_epochs (int): how many epochs the network will be trained
-            callbacks (list): callbacks that are executed during the training run
-
-        Returns:
-            TTModel or torch.nn.modules.Module or TTDataParallel: trained model
-        """
-        return self.fit(num_epochs, callbacks)
-
     def fit(self, num_epochs, callbacks=None):
         """Train the model using the train loop
 
@@ -564,6 +552,18 @@ class TrainLoop:
             metric_result (float or dict): new result for the corresponding metric
         """
         self.train_history.insert_single_result_into_history(metric_name, metric_result)
+
+    def __call__(self, num_epochs, callbacks=None):
+        """Train the model using the train loop
+
+        Args:
+            num_epochs (int): how many epochs the network will be trained
+            callbacks (list): callbacks that are executed during the training run
+
+        Returns:
+            TTModel or torch.nn.modules.Module or TTDataParallel: trained model
+        """
+        return self.fit(num_epochs, callbacks)
 
 
 class TrainLoopCheckpoint(TrainLoop):
