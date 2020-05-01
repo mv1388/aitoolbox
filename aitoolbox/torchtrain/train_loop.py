@@ -562,17 +562,18 @@ class TrainLoop:
         """
         self.train_history.insert_single_result_into_history(metric_name, metric_result)
 
-    def __call__(self, num_epochs, callbacks=None):
+    def __call__(self, num_epochs, callbacks=None, grad_accumulation=1):
         """Train the model using the train loop
 
         Args:
             num_epochs (int): how many epochs the network will be trained
             callbacks (list): callbacks that are executed during the training run
+            grad_accumulation (int): number of batches the gradients are accumulated before updating weights
 
         Returns:
             TTModel or torch.nn.modules.Module or TTDataParallel: trained model
         """
-        return self.fit(num_epochs, callbacks)
+        return self.fit(num_epochs, callbacks, grad_accumulation)
 
 
 class TrainLoopCheckpoint(TrainLoop):
