@@ -128,7 +128,7 @@ All the TrainLoop versions also support training with Automatic Mixed Precision 
 using the [Nvidia apex](https://github.com/NVIDIA/apex) extension. To use this feature the user first
 has to install the Nvidia apex library ([installation instructions](https://github.com/NVIDIA/apex#linux)).
 
-The user only has set the TrainLoop parameter `use_amp` to `use_amp=True` in order to use the default 
+The user only has to set the TrainLoop parameter `use_amp` to `use_amp=True` in order to use the default 
 AMP initialization and start training the model in the mixed precision mode. If the user wants to specify custom 
 AMP initialization parameters, these should be provided as a dict parameter `use_amp={'opt_level': 'O1'}` to 
 the TrainLoop. All AMP initializations and training related steps are then handled automatically by the TrainLoop. 
@@ -137,14 +137,15 @@ You can read more about different AMP optimization levels in
 [Nvidia apex documentation](https://nvidia.github.io/apex/amp.html#opt-levels-and-properties).
 
 ### Single-GPU mixed precision training
-Example Single-GPU APEX setup:
+Example of single-GPU APEX setup:
 ```python
 from aitoolbox.torchtrain.train_loop import *
 
 model = ... # TTModel
 
 TrainLoop(model, ...,
-          optimizer, criterion, use_amp={'opt_level': 'O1'}).fit(num_epochs=10)
+          optimizer, criterion, use_amp={'opt_level': 'O1'}
+).fit(num_epochs=10)
 ``` 
 
 Check out a full [Apex AMP training example](https://github.com/mv1388/aitoolbox/blob/master/examples/apex_amp_training/apex_single_GPU_training.py).
@@ -152,8 +153,8 @@ Check out a full [Apex AMP training example](https://github.com/mv1388/aitoolbox
 ### Multi-GPU DDP mixed precision training
 When training in the multi-GPU setting, the setup is mostly the same as in the single-GPU. 
 All the user has to do is set accordingly the `use_amp` parameter of the TrainLoop and to instead call 
-`fit_distributed()` to start the training. 
-Under the hood, TrainLoop will initialize model and optimizer for AMP and start training using 
+`fit_distributed()` in order to start the training. 
+Under the hood, TrainLoop will initialize the model and the optimizer for AMP and start training using 
 DistributedDataParallel approach (DDP is currently only multi-GPU training setup supported by Apex AMP).
 ```python
 from aitoolbox.torchtrain.train_loop import *
