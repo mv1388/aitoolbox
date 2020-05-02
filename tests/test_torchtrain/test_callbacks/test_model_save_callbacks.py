@@ -34,17 +34,17 @@ class TestModelCheckpointCallback(unittest.TestCase):
         callback = ModelCheckpoint('project_name', 'experiment_name', 'local_model_result_folder_path', hyperparams={},
                                    cloud_save_mode='s3')
         train_loop = TrainLoop(NetUnifiedBatchFeed(), None, None, None, DummyOptimizer(), None)
-        train_loop.callbacks_handler.register_callbacks([callback])
+        train_loop.callbacks_handler.register_callbacks([callback], cache_callbacks=True)
         self.assertIsNone(callback.model_checkpointer)
-        train_loop.callbacks_handler.execute_train_begin()
+        train_loop.callbacks_handler.register_callbacks(None, cache_callbacks=False)
         self.assertEqual(type(callback.model_checkpointer), PyTorchS3ModelSaver)
 
         callback_2 = ModelCheckpoint('project_name', 'experiment_name', 'local_model_result_folder_path', hyperparams={},
-                                   cloud_save_mode=None)
+                                     cloud_save_mode=None)
         train_loop = TrainLoop(NetUnifiedBatchFeed(), None, None, None, DummyOptimizer(), None)
-        train_loop.callbacks_handler.register_callbacks([callback_2])
+        train_loop.callbacks_handler.register_callbacks([callback_2], cache_callbacks=True)
         self.assertIsNone(callback_2.model_checkpointer)
-        train_loop.callbacks_handler.execute_train_begin()
+        train_loop.callbacks_handler.register_callbacks(None, cache_callbacks=False)
         self.assertEqual(type(callback_2.model_checkpointer), PyTorchLocalModelSaver)
 
     def test_optimizer_missing_state_dict_exception(self):
@@ -105,19 +105,19 @@ class TestModelTrainEndSaveCallback(unittest.TestCase):
 
     def test_end_saver_type_on_train_start(self):
         callback = ModelTrainEndSave('project_name', 'experiment_name', 'local_model_result_folder_path',
-                                          {}, DummyResultPackage(), cloud_save_mode='s3')
+                                     {}, DummyResultPackage(), cloud_save_mode='s3')
         train_loop = TrainLoop(NetUnifiedBatchFeed(), None, None, None, DummyOptimizer(), None)
-        train_loop.callbacks_handler.register_callbacks([callback])
+        train_loop.callbacks_handler.register_callbacks([callback], cache_callbacks=True)
         self.assertIsNone(callback.results_saver)
-        train_loop.callbacks_handler.execute_train_begin()
+        train_loop.callbacks_handler.register_callbacks(None, cache_callbacks=False)
         self.assertEqual(type(callback.results_saver), FullPyTorchExperimentS3Saver)
 
         callback_2 = ModelTrainEndSave('project_name', 'experiment_name', 'local_model_result_folder_path',
-                                           {}, DummyResultPackage(), cloud_save_mode=None)
+                                       {}, DummyResultPackage(), cloud_save_mode=None)
         train_loop = TrainLoop(NetUnifiedBatchFeed(), None, None, None, DummyOptimizer(), None)
-        train_loop.callbacks_handler.register_callbacks([callback_2])
+        train_loop.callbacks_handler.register_callbacks([callback_2], cache_callbacks=True)
         self.assertIsNone(callback_2.results_saver)
-        train_loop.callbacks_handler.execute_train_begin()
+        train_loop.callbacks_handler.register_callbacks(None, cache_callbacks=False)
         self.assertEqual(type(callback_2.results_saver), FullPyTorchExperimentLocalSaver)
 
     def test_train_loop_reg_set_experiment_dir_path_for_additional_results(self):
