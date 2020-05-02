@@ -202,10 +202,6 @@ class MyNeuralModel(TTModel):
         ...
         # return batch loss
 
-    def get_loss_eval(self, batch_data, criterion, device):
-        # Get loss during evaluation stage. Normally just calls get_loss()
-        return self.get_loss(batch_data, criterion, device)
-
     def get_predictions(self, batch_data, device):
         # Get predictions during evaluation stage 
         # + return any metadata potentially needed for evaluation
