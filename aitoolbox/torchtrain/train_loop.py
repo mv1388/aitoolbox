@@ -715,7 +715,7 @@ class TrainLoopCheckpoint(TrainLoop):
                             bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
                             rm_subopt_local_models=self.rm_subopt_local_models,
                             num_best_checkpoints_kept=num_best_checkpoints_kept)
-        ])
+        ], cache_callbacks=True)
 
 
 class TrainLoopEndSave(TrainLoop):
@@ -796,7 +796,7 @@ class TrainLoopEndSave(TrainLoop):
                               self.hyperparams, self.val_result_package, self.test_result_package,
                               cloud_save_mode=self.cloud_save_mode,
                               bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix)
-        ])
+        ], cache_callbacks=True)
 
     def check_if_result_packages_possible(self):
         if self.val_result_package is not None and self.validation_loader is None:
@@ -900,4 +900,4 @@ class TrainLoopCheckpointEndSave(TrainLoopEndSave):
                             bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
                             rm_subopt_local_models=self.rm_subopt_local_models,
                             num_best_checkpoints_kept=num_best_checkpoints_kept)
-        ])
+        ], cache_callbacks=True)
