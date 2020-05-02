@@ -40,9 +40,11 @@ class TestTrainLoopCheckpoint(unittest.TestCase):
         self.assertFalse(raised)
 
         with self.assertRaises(AttributeError):
-            TrainLoopCheckpoint(NetUnifiedBatchFeed(), None, None, None, MiniDummyOptimizer(), None,
-                                "project_name", "experiment_name",
-                                "local_model_result_folder_path", {}).callbacks_handler.register_callbacks(None)
+            TrainLoopCheckpoint(
+                NetUnifiedBatchFeed(), None, None, None, MiniDummyOptimizer(), None,
+                "project_name", "experiment_name",
+                "local_model_result_folder_path", {}
+            ).callbacks_handler.register_callbacks(None)
 
 
 class TestTrainLoopEndSave(unittest.TestCase):
@@ -180,7 +182,8 @@ class TestTrainLoopCheckpointEndSave(unittest.TestCase):
         train_loop = TrainLoopCheckpointEndSave(NetUnifiedBatchFeed(), None, 100, None, DummyOptimizer(), None,
                                                 "project_name", "experiment_name",
                                                 "local_model_result_folder_path",
-                                                hyperparams={}, val_result_package=dummy_result_package, cloud_save_mode='s3')
+                                                hyperparams={}, val_result_package=dummy_result_package,
+                                                cloud_save_mode='s3')
 
         self.assertEqual(len(train_loop.callbacks), 0)
         self.assertEqual(len(train_loop.callbacks_handler.callbacks_cache), 2)
@@ -209,10 +212,12 @@ class TestTrainLoopCheckpointEndSave(unittest.TestCase):
         dummy_result_package = DummyResultPackage()
 
         with self.assertRaises(AttributeError):
-            TrainLoopCheckpointEndSave(NetUnifiedBatchFeed(), None, 100, None, MiniDummyOptimizer(), None,
-                                       "project_name", "experiment_name",
-                                       "local_model_result_folder_path",
-                                       hyperparams={}, val_result_package=dummy_result_package, cloud_save_mode='s3').callbacks_handler.register_callbacks(None)
+            TrainLoopCheckpointEndSave(
+                NetUnifiedBatchFeed(), None, 100, None, MiniDummyOptimizer(), None,
+                "project_name", "experiment_name",
+                "local_model_result_folder_path",
+                hyperparams={}, val_result_package=dummy_result_package, cloud_save_mode='s3'
+            ).callbacks_handler.register_callbacks(None)
 
     def test_loader_package_exceptions(self):
         with self.assertRaises(ValueError):
