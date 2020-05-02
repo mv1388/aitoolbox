@@ -15,8 +15,9 @@ class BasicCallbacksHandler:
             train_loop_obj (aitoolbox.torchtrain.train_loop.TrainLoop): reference to the encapsulating TrainLoop
         """
         self.train_loop_obj = train_loop_obj
+        self.callbacks_cache = []
 
-    def register_callbacks(self, callbacks):
+    def register_callbacks(self, callbacks, cache_callbacks=False):
         """Register TrainLoop object reference inside the listed callbacks when the TrainLoop is created
 
         Normally, this is called from inside of the train loop by the TrainLoop itself. Basically train loop "registers"
@@ -24,20 +25,31 @@ class BasicCallbacksHandler:
 
         Args:
             callbacks (list or None): list of callbacks
+            cache_callbacks (bool): should provided callbacks be cached and not yet registered. First subsequent time
+                this method is called without ``cache_callbacks`` enabled all the previously cached callbacks are added
+                and also registered with the current list of callbacks.
 
         Returns:
             None
         """
-        if callbacks is not None and len(callbacks) > 0:
-            self.enforce_callbacks_quality(callbacks)
-            self.train_loop_obj.callbacks += \
-                [cb.register_train_loop_object(self.train_loop_obj) for cb in callbacks
-                 if self.train_loop_obj.device.index is None or 
-                 cb.device_idx_execution is None or
-                 (cb.device_idx_execution is not None and cb.device_idx_execution == self.train_loop_obj.device.index)]
+        if cache_callbacks:
+            self.callbacks_cache += callbacks if callbacks is not None else []
+        else:
+            if len(self.callbacks_cache) > 0:
+                callbacks = self.callbacks_cache + (callbacks if callbacks is not None else [])
+            # enable if not using the CallbacksHandler sitting on top
+            # self.callbacks_cache = []
 
-        if not all(0 == cb.execution_order for cb in self.train_loop_obj.callbacks):
-            self.train_loop_obj.callbacks = sorted(self.train_loop_obj.callbacks, key=lambda cb: cb.execution_order)
+            if callbacks is not None and len(callbacks) > 0:
+                self.enforce_callbacks_quality(callbacks)
+                self.train_loop_obj.callbacks += \
+                    [cb.register_train_loop_object(self.train_loop_obj) for cb in callbacks
+                     if self.train_loop_obj.device.index is None or
+                     cb.device_idx_execution is None or
+                     (cb.device_idx_execution is not None and cb.device_idx_execution == self.train_loop_obj.device.index)]
+
+            if not all(0 == cb.execution_order for cb in self.train_loop_obj.callbacks):
+                self.train_loop_obj.callbacks = sorted(self.train_loop_obj.callbacks, key=lambda cb: cb.execution_order)
 
     def execute_epoch_begin(self):
         for callback in self.train_loop_obj.callbacks:
@@ -186,7 +198,7 @@ class CallbacksHandler(BasicCallbacksHandler):
             self.cbs_on_multiprocess_start
         ]
 
-    def register_callbacks(self, callbacks):
+    def register_callbacks(self, callbacks, cache_callbacks=False):
         """Register TrainLoop object reference inside the listed callbacks when the TrainLoop is created
 
         Normally, this is called from inside of the train loop by the TrainLoop itself. Basically train loop "registers"
@@ -194,12 +206,22 @@ class CallbacksHandler(BasicCallbacksHandler):
 
         Args:
             callbacks (list or None): list of callbacks
+            cache_callbacks (bool): should provided callbacks be cached and not yet registered. First subsequent time
+                this method is called without ``cache_callbacks`` enabled all the previously cached callbacks are added
+                and also registered with the current list of callbacks.
 
         Returns:
             None
         """
-        super().register_callbacks(callbacks)
-        self.split_on_execution_position(callbacks, register_train_loop=False)
+        if cache_callbacks:
+            # Just filling the self.callbacks_cache list with callbacks
+            super().register_callbacks(callbacks, cache_callbacks=cache_callbacks)
+        else:
+            super().register_callbacks(callbacks, cache_callbacks=cache_callbacks)
+            # Retrieve cached callbacks from self.callbacks_cache and combine with current callbacks
+            callbacks = self.callbacks_cache + (callbacks if callbacks is not None else [])
+            self.callbacks_cache = []
+            self.split_on_execution_position(callbacks, register_train_loop=False)
 
     def execute_epoch_begin(self):
         for callback in self.cbs_on_epoch_begin:

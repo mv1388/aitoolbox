@@ -62,24 +62,6 @@ class ModelCheckpoint(AbstractCallback):
         self.bucket_name = bucket_name
         self.cloud_dir_prefix = cloud_dir_prefix
 
-    def on_train_begin(self):
-        if self.cloud_save_mode in ['s3', 'aws_s3', 'aws']:
-            self.model_checkpointer = PyTorchS3ModelSaver(
-                bucket_name=self.bucket_name, cloud_dir_prefix=self.cloud_dir_prefix,
-                local_model_result_folder_path=self.local_model_result_folder_path,
-                checkpoint_model=True
-            )
-        elif self.cloud_save_mode in ['gcs', 'google_storage', 'google storage']:
-            self.model_checkpointer = PyTorchGoogleStorageModelSaver(
-                bucket_name=self.bucket_name, cloud_dir_prefix=self.cloud_dir_prefix,
-                local_model_result_folder_path=self.local_model_result_folder_path,
-                checkpoint_model=True
-            )
-        else:
-            self.model_checkpointer = PyTorchLocalModelSaver(
-                local_model_result_folder_path=self.local_model_result_folder_path, checkpoint_model=True
-            )
-
     def on_epoch_end(self):
         self.save_hyperparams()
         if not self.train_loop_obj.use_deepspeed:
@@ -109,6 +91,23 @@ class ModelCheckpoint(AbstractCallback):
         if not util.function_exists(self.train_loop_obj.optimizer, 'state_dict'):
             raise AttributeError('Provided optimizer does not have the required state_dict() method which is needed'
                                  'for the saving of the model and the optimizer.')
+
+        if self.cloud_save_mode in ['s3', 'aws_s3', 'aws']:
+            self.model_checkpointer = PyTorchS3ModelSaver(
+                bucket_name=self.bucket_name, cloud_dir_prefix=self.cloud_dir_prefix,
+                local_model_result_folder_path=self.local_model_result_folder_path,
+                checkpoint_model=True
+            )
+        elif self.cloud_save_mode in ['gcs', 'google_storage', 'google storage']:
+            self.model_checkpointer = PyTorchGoogleStorageModelSaver(
+                bucket_name=self.bucket_name, cloud_dir_prefix=self.cloud_dir_prefix,
+                local_model_result_folder_path=self.local_model_result_folder_path,
+                checkpoint_model=True
+            )
+        else:
+            self.model_checkpointer = PyTorchLocalModelSaver(
+                local_model_result_folder_path=self.local_model_result_folder_path, checkpoint_model=True
+            )
 
     def save_hyperparams(self):
         if not self._hyperparams_already_saved:
@@ -180,20 +179,6 @@ class ModelTrainEndSave(AbstractCallback):
         self.bucket_name = bucket_name
         self.cloud_dir_prefix = cloud_dir_prefix
 
-    def on_train_begin(self):
-        if self.cloud_save_mode in ['s3', 'aws_s3', 'aws']:
-            self.results_saver = FullPyTorchExperimentS3Saver(self.project_name, self.experiment_name,
-                                                              bucket_name=self.bucket_name, cloud_dir_prefix=self.cloud_dir_prefix,
-                                                              local_model_result_folder_path=self.local_model_result_folder_path)
-
-        elif self.cloud_save_mode in ['gcs', 'google_storage', 'google storage']:
-            self.results_saver = FullPyTorchExperimentGoogleStorageSaver(self.project_name, self.experiment_name,
-                                                                         bucket_name=self.bucket_name, cloud_dir_prefix=self.cloud_dir_prefix,
-                                                                         local_model_result_folder_path=self.local_model_result_folder_path)
-        else:
-            self.results_saver = FullPyTorchExperimentLocalSaver(self.project_name, self.experiment_name,
-                                                                 local_model_result_folder_path=self.local_model_result_folder_path)
-
     def on_train_end(self):
         if not self.train_loop_obj.ddp_training_mode or self.train_loop_obj.device.index == 0:
             self.save_hyperparams()
@@ -248,6 +233,24 @@ class ModelTrainEndSave(AbstractCallback):
         if not util.function_exists(self.train_loop_obj.optimizer, 'state_dict'):
             raise AttributeError('Provided optimizer does not have the required state_dict() method which is needed'
                                  'for the saving of the model and the optimizer.')
+
+        if self.cloud_save_mode in ['s3', 'aws_s3', 'aws']:
+            self.results_saver = FullPyTorchExperimentS3Saver(
+                self.project_name, self.experiment_name,
+                bucket_name=self.bucket_name, cloud_dir_prefix=self.cloud_dir_prefix,
+                local_model_result_folder_path=self.local_model_result_folder_path
+            )
+        elif self.cloud_save_mode in ['gcs', 'google_storage', 'google storage']:
+            self.results_saver = FullPyTorchExperimentGoogleStorageSaver(
+                self.project_name, self.experiment_name,
+                bucket_name=self.bucket_name, cloud_dir_prefix=self.cloud_dir_prefix,
+                local_model_result_folder_path=self.local_model_result_folder_path
+            )
+        else:
+            self.results_saver = FullPyTorchExperimentLocalSaver(
+                self.project_name, self.experiment_name,
+                local_model_result_folder_path=self.local_model_result_folder_path
+            )
 
     def save_hyperparams(self):
         if not self._hyperparams_already_saved:
