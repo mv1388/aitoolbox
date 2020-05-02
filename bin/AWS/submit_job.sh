@@ -27,6 +27,7 @@ function usage()
      --default-log                  if used than the logs will be saved to the default log file training.log without any timestamps
      --log-s3-upload-dir STR        path to the logs folder on S3 to which the training log should be uploaded
      -x, --apex                     switch on to install Nvidia Apex library for mixed precision training
+     --deepspeed                    install Microsoft DeepSpeed library
      -o, --os-name STR              username depending on the OS chosen. Default is ubuntu
      -t, --terminate                the instance will be terminated when training is done
      -s, --ssh-start                automatically ssh into the instance when the training starts
@@ -47,6 +48,7 @@ experiment_script_file="aws_run_experiments_project.sh"
 log_s3_dir_path="s3://model-result/training_logs"
 default_log=false
 use_apex=false
+use_deepspeed=false
 username="ubuntu"
 terminate_cmd=false
 ssh_at_start=false
@@ -110,6 +112,10 @@ case $key in
     use_apex=true
     shift 1 # past argument value
     ;;
+    --deepspeed)
+    use_deepspeed=true
+    shift 1 # past argument value
+    ;;
     -o|--os-name)
     username="$2"
     shift 2 # past argument value
@@ -152,6 +158,10 @@ apex_setting=""
 if [ "$use_apex" == true ]; then
     apex_setting="--apex"
 fi
+deepspeed_setting=""
+if [ "$use_deepspeed" == true ]; then
+    deepspeed_setting="--deepspeed"
+fi
 
 terminate_setting=""
 if [ "$terminate_cmd" == true ]; then
@@ -192,7 +202,7 @@ ec2_instance_address=$(aws ec2 describe-instances --instance-ids $instance_id --
 ##############################
 echo "Preparing instance"
 ./prepare_instance.sh -k $key_path -a $ec2_instance_address \
-    -f $DL_framework -v $AIToolbox_version -p $local_project_path -d $dataset_name -r $preproc_dataset $apex_setting -o $username --no-ssh
+    -f $DL_framework -v $AIToolbox_version -p $local_project_path -d $dataset_name -r $preproc_dataset $apex_setting $deepspeed_setting -o $username --no-ssh
 
 
 #########################################################
