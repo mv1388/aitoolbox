@@ -17,7 +17,7 @@ class TTParallelBase:
         """torchtrain parallel base class used for transferring TTModel functions to the PyTorch Parallel wrappers level
 
         Args:
-            module (TTModel): neural network model
+            module (aitoolbox.torchtrain.model.TTModel): neural network model
             add_model_attributes (list or tuple or None): additional TTModel attributes which need to be transferred to
                 the TTDataParallel level to enable their use in the transferred/exposed class methods
             default_model_methods (list or tuple): list of core methods which are present also in TTModel abstract class
@@ -61,7 +61,7 @@ class TTDataParallel(nn.DataParallel, TTParallelBase):
         multi GPU training.
 
         Args:
-            module (TTModel): neural network model
+            module (aitoolbox.torchtrain.model.TTModel): neural network model
             add_model_attributes (list or tuple or None): additional TTModel attributes which need to be transferred to
                 the TTDataParallel level to enable their use in the transferred/exposed class methods
             default_model_methods (list or tuple): list of core methods which are present also in TTModel abstract class
@@ -77,7 +77,7 @@ class TTDistributedDataParallel(DistributedDataParallel, TTParallelBase):
         """torchtrain enabled DistributedDataParallel
 
         Args:
-            module (TTModel): neural network model
+            module (aitoolbox.torchtrain.model.TTModel): neural network model
             add_model_attributes (list or tuple or None): additional TTModel attributes which need to be transferred to
                 the TTDistributedDataParallel level to enable their use in the transferred/exposed class methods
             default_model_methods (list or tuple): list of core methods which are present also in TTModel abstract class
@@ -94,7 +94,7 @@ if APEX_AVAILABLE:
             """torchtrain enabled Nvidia Apex DistributedDataParallel
 
             Args:
-                module (TTModel): neural network model
+                module (aitoolbox.torchtrain.model.TTModel): neural network model
                 add_model_attributes (list or tuple or None): additional TTModel attributes which need to be
                 transferred to the TTDataParallel level to enable their use in the transferred/exposed class methods
                 default_model_methods (list or tuple): list of core methods which are present also in TTModel
@@ -115,7 +115,7 @@ class TTDataParallelExplicit(nn.DataParallel):
         multi GPU training.
 
         Args:
-            module (TTModel): neural network model
+            module (aitoolbox.torchtrain.model.TTModel): neural network model
             add_model_attributes (list or tuple or None): additional TTModel attributes which need to be transferred to
                 the TTDataParallel level to enable their use in the transferred/exposed class methods
             default_model_methods (list or tuple): list of core methods which are present also in TTModel abstract class
@@ -158,7 +158,7 @@ class TTDistributedDataParallelExplicit(DistributedDataParallel):
         """torchtrain enabled DistributedDataParallel
 
         Args:
-            module (TTModel): neural network model
+            module (aitoolbox.torchtrain.model.TTModel): neural network model
             add_model_attributes (list or tuple or None): additional TTModel attributes which need to be transferred to
                 the TTDistributedDataParallel level to enable their use in the transferred/exposed class methods
             default_model_methods (list or tuple): list of core methods which are present also in TTModel abstract class
@@ -201,7 +201,7 @@ class TTApexDistributedDataParallelExplicit(ApexDistributedDataParallel):
         """torchtrain enabled Nvidia Apex DistributedDataParallel
 
         Args:
-            module (TTModel): neural network model
+            module (aitoolbox.torchtrain.model.TTModel): neural network model
             add_model_attributes (list or tuple or None): additional TTModel attributes which need to be transferred to
                 the TTDataParallel level to enable their use in the transferred/exposed class methods
             default_model_methods (list or tuple): list of core methods which are present also in TTModel abstract class
