@@ -289,6 +289,7 @@ class TestCallbacksHandler(unittest.TestCase):
         self.assertEqual(train_loop.callbacks,
                          [batch_begin_train_begin_after_opti_cb, batch_begin_train_begin_cb,
                           batch_begin_cb_add, batch_begin_cb])
+        self.assertEqual(cb_handler.callbacks_cache, [])
 
     def test_handler_cache_empty_callbacks(self):
         train_loop = TrainLoop(NetUnifiedBatchFeed(), None, 100, None, None, None)

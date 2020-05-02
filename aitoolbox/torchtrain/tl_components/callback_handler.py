@@ -37,8 +37,8 @@ class BasicCallbacksHandler:
         else:
             if len(self.callbacks_cache) > 0:
                 callbacks = self.callbacks_cache + (callbacks if callbacks is not None else [])
-            # enable if not using the CallbacksHandler sitting on top
-            # self.callbacks_cache = []
+
+            self.callbacks_cache = []
 
             if callbacks is not None and len(callbacks) > 0:
                 self.enforce_callbacks_quality(callbacks)
@@ -217,9 +217,11 @@ class CallbacksHandler(BasicCallbacksHandler):
             # Just filling the self.callbacks_cache list with callbacks
             super().register_callbacks(callbacks, cache_callbacks=cache_callbacks)
         else:
+            # hack since self.callbacks_cache is emptied by the super().register_callbacks()
+            callbacks_cache = self.callbacks_cache
             super().register_callbacks(callbacks, cache_callbacks=cache_callbacks)
             # Retrieve cached callbacks from self.callbacks_cache and combine with current callbacks
-            callbacks = self.callbacks_cache + (callbacks if callbacks is not None else [])
+            callbacks = callbacks_cache + (callbacks if callbacks is not None else [])
             self.callbacks_cache = []
             self.split_on_execution_position(callbacks, register_train_loop=False)
 
