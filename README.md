@@ -25,7 +25,7 @@ automatically shut down when training is finished and all the results
 are safely stored on S3.
 
 
-## Install
+## Installation
 
 To install the AIToolbox package first clone this repository and then install via the `pip` command:
 ```bash
