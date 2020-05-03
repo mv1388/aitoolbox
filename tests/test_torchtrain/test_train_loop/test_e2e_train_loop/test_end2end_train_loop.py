@@ -276,6 +276,18 @@ class TestEnd2EndTrainLoop(unittest.TestCase):
         self.assertEqual(val_pred.argmax(dim=1).tolist(), val_pred_grad_acc.argmax(dim=1).tolist())
         self.assertEqual(test_pred.argmax(dim=1).tolist(), test_pred_grad_acc.argmax(dim=1).tolist())
 
+        train_loss = train_loop.evaluate_loss_on_train_set()
+        val_loss = train_loop.evaluate_loss_on_validation_set()
+        test_loss = train_loop.evaluate_loss_on_test_set()
+
+        train_loss_grad_acc = train_loop_grad_acc.evaluate_loss_on_train_set()
+        val_loss_grad_acc = train_loop_grad_acc.evaluate_loss_on_validation_set()
+        test_loss_grad_acc = train_loop_grad_acc.evaluate_loss_on_test_set()
+
+        self.assertAlmostEqual(train_loss, train_loss_grad_acc, places=6)
+        self.assertAlmostEqual(val_loss, val_loss_grad_acc, places=6)
+        self.assertAlmostEqual(test_loss, test_loss_grad_acc, places=6)
+
     @staticmethod
     def set_seeds():
         manual_seed = 0
