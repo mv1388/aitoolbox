@@ -107,7 +107,7 @@ class PyTorchLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
         model_local_path = os.path.join(experiment_model_local_path, model_name)
 
         if DEEPSPEED_AVAILABLE and isinstance(model, deepspeed.DeepSpeedLight):
-            model.save_checkpoint(model_local_path, epoch)
+            model.save_checkpoint(experiment_model_local_path, f'epoch_{epoch}' if self.checkpoint_model else 'final')
         else:
             import torch
             torch.save(model, model_local_path)
