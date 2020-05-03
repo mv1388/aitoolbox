@@ -31,7 +31,19 @@ class BaseDataSaver:
                                    self.bucket_name, cloud_file_path)
 
     def save_folder(self, local_folder_path, cloud_folder_path):
-        """Save / upload a folder on the local drive to AWS S3
+        """Save / upload the contents of the local folder on the local drive to AWS S3
+
+        This function uploads the *contents inside* the provided local folder. If the encapsulating folder should
+        also be created on the S3, specify the folder name at the end of the ``cloud_folder_path``.
+
+        For example if:
+
+            ``local_folder_path = '~/bla/my_folder'``
+
+            and we want to have the content of *my_folder* also placed into the folder *my_folder on S3* then append
+            *my_folder* at the end of the cloud_folder_path:
+
+            ``cloud_folder_path = 'cloud_bla/my_folder'``
 
         Args:
             local_folder_path (str): local path to the folder which should be uploaded
