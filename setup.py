@@ -6,7 +6,7 @@ setup(name='aitoolbox',
       author='Marko Vidoni',
       author_email='',
       url='https://github.com/mv1388/AIToolbox',
-      description='Toolbox of useful functions often needed in different AI oriented projects',
+      description='PyTorch Model Training and Experiment Tracking Framework',
       long_description=open('README.md').read(),
 
       python_requires='>=3.6.0',
