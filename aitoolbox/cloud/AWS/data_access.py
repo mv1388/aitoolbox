@@ -18,7 +18,7 @@ class BaseDataSaver:
         self.s3_client = boto3.client('s3')
 
     def save_file(self, local_file_path, cloud_file_path):
-        """Save file on local drive to the AWS S3
+        """Save / upload file on local drive to the AWS S3
 
         Args:
             local_file_path (str): path to the file on the local drive
@@ -29,6 +29,36 @@ class BaseDataSaver:
         """
         self.s3_client.upload_file(os.path.expanduser(local_file_path),
                                    self.bucket_name, cloud_file_path)
+
+    def save_folder(self, local_folder_path, cloud_folder_path):
+        """Save / upload the contents of the local folder on the local drive to AWS S3
+
+        This function uploads the *contents inside* the provided local folder. If the encapsulating folder should
+        also be created on the S3, specify the folder name at the end of the ``cloud_folder_path``.
+
+        For example if:
+
+            ``local_folder_path = '~/bla/my_folder'``
+
+            and we want to have the content of *my_folder* also placed into the folder *my_folder on S3* then append
+            *my_folder* at the end of the cloud_folder_path:
+
+            ``cloud_folder_path = 'cloud_bla/my_folder'``
+
+        Args:
+            local_folder_path (str): local path to the folder which should be uploaded
+            cloud_folder_path (str): destination path on S3 where the folder and its content should be uploaded
+
+        Returns:
+            None
+        """
+        for root, dirs, files in os.walk(local_folder_path):
+            for filename in files:
+                local_file_path = os.path.join(root, filename)
+                file_path_inside_folder = os.path.relpath(local_file_path, local_folder_path)
+                s3_file_path = os.path.join(cloud_folder_path, file_path_inside_folder)
+
+                self.s3_client.upload_file(local_file_path, self.bucket_name, s3_file_path)
 
 
 class BaseDataLoader:

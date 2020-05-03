@@ -51,6 +51,29 @@ class TestBaseDataSaver(unittest.TestCase):
         if os.path.exists(downloaded_file_path):
             os.remove(downloaded_file_path)
 
+    @mock_s3
+    def test_folder_upload(self):
+        s3 = boto3.resource('s3')
+        s3.create_bucket(Bucket=BUCKET_NAME)
+        s3_client = boto3.client('s3')
+
+        data_saver = BaseDataSaver(bucket_name=BUCKET_NAME)
+
+        data_saver.save_folder(os.path.join(THIS_DIR, 'resources'), 'resources')
+        bucket_content_1 = [el['Key'] for el in s3_client.list_objects(Bucket=BUCKET_NAME)['Contents']]
+        self.assertEqual(
+            bucket_content_1,
+            ['resources/file.txt', 'resources/upload_folder/file_2.txt', 'resources/upload_folder/some_file.txt']
+        )
+
+        data_saver.save_folder(os.path.join(THIS_DIR, 'resources'), '')
+        bucket_content_2 = [el['Key'] for el in s3_client.list_objects(Bucket=BUCKET_NAME)['Contents']]
+        self.assertEqual(
+            bucket_content_2,
+            ['file.txt', 'resources/file.txt', 'resources/upload_folder/file_2.txt',
+             'resources/upload_folder/some_file.txt', 'upload_folder/file_2.txt', 'upload_folder/some_file.txt']
+        )
+
 
 class TestBaseDataLoader(unittest.TestCase):
     @mock_s3
