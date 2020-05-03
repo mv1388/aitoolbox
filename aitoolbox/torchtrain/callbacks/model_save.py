@@ -140,7 +140,7 @@ class ModelTrainEndSave(AbstractCallback):
     def __init__(self, project_name, experiment_name, local_model_result_folder_path,
                  hyperparams, val_result_package=None, test_result_package=None,
                  cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix=''):
-        """At the end of training execute model performance evaluation, build result package repot and save it
+        """At the end of training execute model performance evaluation, build result package report and save it
             together with the final model to local disk and possibly to S3 / GCS cloud storage
 
         Args:
