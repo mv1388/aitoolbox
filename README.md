@@ -25,6 +25,22 @@ automatically shut down when training is finished and all the results
 are safely stored on S3.
 
 
+## Installation
+
+To install the AIToolbox package first clone this repository and then install via the `pip` command:
+```bash
+git clone https://github.com/mv1388/aitoolbox.git
+
+pip install ./aitoolbox
+```
+
+AIToolbox package can be also provided as a dependency in the `requirements.txt` file. To automatically
+download the current master branch from github include the following dependency specification in the requirements.txt:
+```bash
+git+https://github.com/mv1388/aitoolbox#egg=aitoolbox
+```  
+
+
 ## TrainLoop
 
 [`TrainLoop`](/aitoolbox/torchtrain/train_loop.py) is the main abstraction for PyTorch neural net training. At its core
@@ -201,10 +217,6 @@ class MyNeuralModel(TTModel):
         # Get loss during training stage, called from fit() in TrainLoop
         ...
         # return batch loss
-
-    def get_loss_eval(self, batch_data, criterion, device):
-        # Get loss during evaluation stage. Normally just calls get_loss()
-        return self.get_loss(batch_data, criterion, device)
 
     def get_predictions(self, batch_data, device):
         # Get predictions during evaluation stage 
