@@ -225,6 +225,57 @@ class TestEnd2EndTrainLoop(unittest.TestCase):
                     for el_model, el_expected in zip(row_model.tolist(), row_expected.tolist()):
                         self.assertAlmostEqual(el_model, el_expected, places=6)
 
+    def test_e2e_ff_net_train_loop_grad_accumulation(self):
+        num_epochs = 10
+
+        self.set_seeds()
+        model = FFNet()
+        optimizer = optim.Adam(model.parameters(), lr=0.001, betas=(0.9, 0.999))
+        criterion = nn.NLLLoss()
+
+        self.set_seeds()
+        model_grad_acc = FFNet()
+        optimizer_grad_acc = optim.Adam(model_grad_acc.parameters(), lr=0.001, betas=(0.9, 0.999))
+        criterion_grad_acc = nn.NLLLoss()
+
+        train_dataset = TensorDataset(torch.randn(1000, 50), torch.randint(low=0, high=10, size=(1000,)))
+        val_dataset = TensorDataset(torch.randn(300, 50), torch.randint(low=0, high=10, size=(300,)))
+        test_dataset = TensorDataset(torch.randn(300, 50), torch.randint(low=0, high=10, size=(300,)))
+
+        train_dataloader = DataLoader(train_dataset, batch_size=100)
+        val_dataloader = DataLoader(val_dataset, batch_size=100)
+        test_dataloader = DataLoader(test_dataset, batch_size=100)
+
+        train_dataloader_grad_acc = DataLoader(train_dataset, batch_size=20)
+        val_dataloader_grad_acc = DataLoader(val_dataset, batch_size=20)
+        test_dataloader_grad_acc = DataLoader(test_dataset, batch_size=20)
+
+        train_loop = TrainLoop(
+            model,
+            train_dataloader, val_dataloader, test_dataloader,
+            optimizer, criterion
+        )
+        train_loop.fit(num_epochs=num_epochs)
+
+        train_loop_grad_acc = TrainLoop(
+            model_grad_acc,
+            train_dataloader_grad_acc, val_dataloader_grad_acc, test_dataloader_grad_acc,
+            optimizer_grad_acc, criterion_grad_acc
+        )
+        train_loop_grad_acc.fit(num_epochs=num_epochs, grad_accumulation=5)
+
+        train_pred, _, _ = train_loop.predict_on_train_set()
+        val_pred, _, _ = train_loop.predict_on_validation_set()
+        test_pred, _, _ = train_loop.predict_on_test_set()
+
+        train_pred_grad_acc, _, _ = train_loop_grad_acc.predict_on_train_set()
+        val_pred_grad_acc, _, _ = train_loop_grad_acc.predict_on_validation_set()
+        test_pred_grad_acc, _, _ = train_loop_grad_acc.predict_on_test_set()
+
+        self.assertEqual(train_pred.argmax(dim=1).tolist(), train_pred_grad_acc.argmax(dim=1).tolist())
+        self.assertEqual(val_pred.argmax(dim=1).tolist(), val_pred_grad_acc.argmax(dim=1).tolist())
+        self.assertEqual(test_pred.argmax(dim=1).tolist(), test_pred_grad_acc.argmax(dim=1).tolist())
+
     @staticmethod
     def set_seeds():
         manual_seed = 0
