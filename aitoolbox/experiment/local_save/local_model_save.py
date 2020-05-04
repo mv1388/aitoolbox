@@ -9,6 +9,7 @@ except ImportError:
     DEEPSPEED_AVAILABLE = False
 
 from aitoolbox.experiment.local_save.folder_create import ExperimentFolder
+from aitoolbox.utils.file_system import zip_folder
 
 
 class AbstractLocalModelSaver(ABC):
@@ -99,16 +100,22 @@ class PyTorchLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
         experiment_model_local_path = self.create_experiment_local_models_folder(project_name, experiment_name,
                                                                                  experiment_timestamp)
 
-        if epoch is None:
-            model_name = f'model_{experiment_name}_{experiment_timestamp}.pth'
-        else:
-            model_name = f'model_{experiment_name}_{experiment_timestamp}_E{epoch}.pth'
-
-        model_local_path = os.path.join(experiment_model_local_path, model_name)
-
         if DEEPSPEED_AVAILABLE and isinstance(model, deepspeed.DeepSpeedLight):
-            model.save_checkpoint(experiment_model_local_path, f'epoch_{epoch}' if self.checkpoint_model else 'final')
+            tag = f'epoch_{epoch}' if self.checkpoint_model else 'final'
+
+            model.save_checkpoint(experiment_model_local_path, tag)
+
+            model_name = f'{tag}.zip'
+            model_local_path = zip_folder(os.path.join(experiment_model_local_path, tag),
+                                          os.path.join(experiment_model_local_path, model_name))
         else:
+            if epoch is None:
+                model_name = f'model_{experiment_name}_{experiment_timestamp}.pth'
+            else:
+                model_name = f'model_{experiment_name}_{experiment_timestamp}_E{epoch}.pth'
+
+            model_local_path = os.path.join(experiment_model_local_path, model_name)
+
             import torch
             torch.save(model, model_local_path)
 
