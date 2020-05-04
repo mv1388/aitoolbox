@@ -20,7 +20,7 @@ except ImportError:
     APEX_AVAILABLE = False
 try:
     import deepspeed
-    from aitoolbox.torchtrain.deepspeed import TTDeepSpeedLight
+    from aitoolbox.torchtrain.parallel import TTDeepSpeedLight
     DEEPSPEED_AVAILABLE = True
 except ImportError:
     DEEPSPEED_AVAILABLE = False
