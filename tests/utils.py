@@ -274,6 +274,7 @@ class DummyLoss:
 
     def to(self, device):
         self.device = device
+        return self
 
 
 class DummyResultPackage(AbstractResultPackage):
