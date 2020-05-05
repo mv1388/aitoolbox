@@ -20,7 +20,7 @@ esac
 done
 
 
-python setup.py sdist
+python setup.py sdist bdist_wheel
 
 rm -r aitoolbox.egg-info
 rm -r ./.eggs/
