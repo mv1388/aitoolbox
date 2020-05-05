@@ -342,6 +342,9 @@ class TrainLoop:
         Returns:
             float: loss
         """
+        self.model = self.model.to(self.device)
+        self.criterion = self.criterion.to(self.device)
+
         self.model.eval()
         loss_avg = []
 
@@ -426,9 +429,10 @@ class TrainLoop:
         Returns:
             (torch.Tensor, torch.Tensor, dict): y_pred, y_true, metadata
         """
-        y_pred, y_test, metadata_list = [], [], []
+        self.model = self.model.to(self.device)
 
         self.model.eval()
+        y_pred, y_test, metadata_list = [], [], []
 
         with torch.no_grad():
             for batch_data in tqdm(data_loader):
