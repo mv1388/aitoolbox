@@ -9,6 +9,7 @@ setup(
     url='https://github.com/mv1388/AIToolbox',
     description='PyTorch Model Training and Experiment Tracking Framework',
     long_description=open('README.md').read(),
+    long_description_content_type="text/markdown",
     license='MIT',
     keywords=['PyTorch', 'deep learning', 'research', 'train loop'],
 
