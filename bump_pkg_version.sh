@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# Using the bump2version package to search for version strings and bump them
+#
+#   https://github.com/c4urself/bump2version
+
+
 bump_type="patch"
 rebuild_pkg=false
 
@@ -22,7 +27,7 @@ case $key in
 esac
 done
 
-bumpversion ${bump_type} --config-file .bumpversion.cfg --allow-dirty
+bumpversion ${bump_type} --config-file .bumpversion.cfg
 
 if [[ ${rebuild_pkg} == true ]]; then
     mv dist/* dist_old
