@@ -44,3 +44,13 @@ install:
 
 script:
   - pytest
+
+deploy:
+  provider: pypi
+  server: https://testpypi.python.org/pypi
+  user: "__token__"
+  password:
+    secure: rkYkxdcqruvt2MGPyxlkEhIymWX0w61IP6a+eRv+OHPOw501sg7E5TLjTEka3wrMmaEM6kQ/ywzHQ1MmoCG6Q5DK6kqHpG3aAempW4q4/JM4hgClsH7z4k6DqNSHoXEkw4cCcn2mrT+ijxOQUFutl3V4wHyl5mYt8ndfuNIQIq3S+i4/kf63w2Gw9Gee4JSUqibG9SoUZQg8ifpj4kadLbylIocG6gV7qDgwzHlm2sz9q5rqf4+7zLyNIPAikFFWK6fRyZfh/1ePxCrwK05JeZ/nenz//6QSZ/ZI/mbHh6uHt31/xY/vQG7PjCF8sitYeXyi4q0mv/wjX5uG169iuxsAIxvLvJduv+IO/66oawZJBa4VtJlAKMD4yH0tVtq0JpB+fBZEtip909PadchUYrDl4S3LCacFqEQ5Q2pCDYm3OY5jj1olOxwVVhbIyzYB3CZXgsw0XMgOXn2qAIz+bQAIGSaJu9gbWDJNXuDtPaLKHFz0BiIY/vRhmeytCm22+S8OckiuG3WDH+3w8Bl9aZdaVZO9LbVlDMk3Zc62s9gmxWO8VpiHXqw1bfkKSfpd83hLPM+WIUPQw2y5AmIP2+oR1rr/Gw/JCEgddBO0oA0iadOJxLV/Gm9L34M/grU+wtxy8nA2PLAIQpf14KhowTRICZZWE/XuGqGPYFtxk48=
+  on:
+    tags: true
+  skip_existing: true
