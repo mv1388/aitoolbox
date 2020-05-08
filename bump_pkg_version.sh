@@ -12,7 +12,7 @@ bump2version --current-version ${current_version} ${bump_type} bin/AWS/submit_jo
 bump2version --current-version ${current_version} ${bump_type} bin/AWS/update_package_on_AWS.sh
 
 
-if [ $uninstallPrevious == true ]; then
+if [[ ${rebuild_pkg} == true ]]; then
     mv dist/* dist_old
     ./build_package.sh
 fi
