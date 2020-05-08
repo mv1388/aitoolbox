@@ -1,16 +1,28 @@
 #!/usr/bin/env bash
 
-current_version=1.0.2
 bump_type="patch"
-rebuild_pkg=true
+rebuild_pkg=false
 
-bump2version --current-version ${current_version} ${bump_type} setup.py
-bump2version --current-version ${current_version} ${bump_type} install_package.sh
-bump2version --current-version ${current_version} ${bump_type} bin/AWS/create_instance.sh
-bump2version --current-version ${current_version} ${bump_type} bin/AWS/prepare_instance.sh
-bump2version --current-version ${current_version} ${bump_type} bin/AWS/submit_job.sh
-bump2version --current-version ${current_version} ${bump_type} bin/AWS/update_package_on_AWS.sh
+while [[ $# -gt 0 ]]; do
+key="$1"
 
+case $key in
+    -t|--type)
+    bump_type=$2
+    shift 2 # past argument value
+    ;;
+    -b|--build)
+    rebuild_pkg=true
+    shift 1 # past argument value
+    ;;
+    *)    # unknown option
+    echo "Don't know the argument"
+    exit;
+    ;;
+esac
+done
+
+bumpversion ${bump_type} --config-file .bumpversion.cfg --allow-dirty
 
 if [[ ${rebuild_pkg} == true ]]; then
     mv dist/* dist_old
