@@ -58,6 +58,33 @@ the process of PyTorch model training and experiment tracking as much as possibl
 Most of this top-level API is exposed to the user via the functionality implemented in :mod:`aitoolbox.torchtrain`.
 
 
+Installation
+------------
+
+To install the AIToolbox package execute:
+
+::
+
+    pip install aitoolbox
+
+If you want to install the most recent version from github repository, first clone the package repository and
+then install via the `pip` command:
+
+::
+
+    git clone https://github.com/mv1388/aitoolbox.git
+
+    pip install ./aitoolbox
+
+AIToolbox package can be also provided as a dependency in the ``requirements.txt`` file. This can be done by
+just specifying the ``aitoolbox`` dependency. On the other hand, to automatically
+download the current master branch from github include the following dependency specification in the requirements.txt:
+
+::
+
+    git+https://github.com/mv1388/aitoolbox#egg=aitoolbox
+
+
 Documentation Sections:
 -----------------------
 

@@ -6,6 +6,7 @@ import inspect
 from typing import Optional
 import numpy as np
 import torch
+import torch.nn as nn
 from torch.nn.modules import Module
 import torch.multiprocessing as mp
 import torch.distributed as dist
@@ -19,6 +20,7 @@ except ImportError:
     APEX_AVAILABLE = False
 try:
     import deepspeed
+    from aitoolbox.torchtrain.parallel import TTDeepSpeedLight
     DEEPSPEED_AVAILABLE = True
 except ImportError:
     DEEPSPEED_AVAILABLE = False
@@ -43,7 +45,7 @@ class TrainLoop:
                  train_loader, validation_loader, test_loader,
                  optimizer, criterion,
                  collate_batch_pred_fn=append_predictions, pred_transform_fn=torch_cat_transf,
-                 end_auto_eval=True, cuda_device_idx=None, use_amp=False, use_deepspeed=False):
+                 end_auto_eval=True, cuda_device_idx=None, use_amp=False):
         """Core PyTorch TrainLoop supporting the model training and target prediction
 
         Implements core training procedures: batch feeding into the network as part of (multi)epoch train loop,
@@ -66,8 +68,14 @@ class TrainLoop:
                 Specify either True/False boolean to always run or never run after each epoch or specify an int to
                 execute only every specified number of epochs.
             cuda_device_idx (int or None): CUDA device index used when training on multiple GPUs
-            use_amp (bool): use Nvidia Apex 16-bit Automatic Mixed Precision (AMP)
-            use_deepspeed (bool): use Microsoft DeepSpeed
+            use_amp (bool or dict): use Nvidia Apex 16-bit Automatic Mixed Precision (AMP)
+
+                To switch to AMP mode either:
+
+                * set this parameter to ``True`` to use default AMP initialization parameters
+                * provide custom Apex AMP initialization parameters as a dict as this parameter
+
+                Available AMP initialization parameters: https://nvidia.github.io/apex/amp.html#apex.amp.initialize
         """
         if isinstance(model, TTModel) or isinstance(model, TTDataParallel):
             self.model = model
@@ -87,8 +95,10 @@ class TrainLoop:
         self.collate_batch_pred_fn = collate_batch_pred_fn
         self.pred_transform_fn = pred_transform_fn
         self.end_auto_eval = end_auto_eval
-        self.use_amp = use_amp
-        self.use_deepspeed = use_deepspeed
+
+        self.use_amp = use_amp is True or type(use_amp) == dict
+        self.amp_params = {} if use_amp is True else use_amp
+        self.use_deepspeed = False
 
         USE_CUDA = torch.cuda.is_available()
         cuda_suffix = ''
@@ -126,27 +136,14 @@ class TrainLoop:
         if self.use_amp and not APEX_AVAILABLE:
             raise ValueError('Trying to use Nvidia Apex AMP for 16-bit mixed precision. However, Nvidia Apex is not'
                              'installed.')
-        if self.use_deepspeed and not DEEPSPEED_AVAILABLE:
-            raise ValueError('Trying to use Microsoft DeepSpeed. However, DeepSpeed is not installed.')
 
-    def __call__(self, num_epochs, callbacks=None):
-        """Train the model using the train loop
-
-        Args:
-            num_epochs (int): how many epochs the network will be trained
-            callbacks (list): callbacks that are executed during the training run
-
-        Returns:
-            TTModel or torch.nn.modules.Module or TTDataParallel: trained model
-        """
-        return self.fit(num_epochs, callbacks)
-
-    def fit(self, num_epochs, callbacks=None):
+    def fit(self, num_epochs, callbacks=None, grad_accumulation=1):
         """Train the model using the train loop
 
         Args:
             num_epochs (int): how many epochs the network will be trained
             callbacks (list or None): callbacks that are executed during the training run
+            grad_accumulation (int): number of batches the gradients are accumulated before updating weights
 
         Returns:
             TTModel or torch.nn.modules.Module or TTDataParallel or deepspeed.DeepSpeedLight: trained model
@@ -154,6 +151,11 @@ class TrainLoop:
         self.callbacks_handler.register_callbacks(callbacks)
 
         self.model = self.model.to(self.device)
+        self.criterion = self.criterion.to(self.device)
+        # Initialize AMP when training with Nvidia APEX mixed precision
+        if self.use_amp and not self.ddp_training_mode:
+            self.model, self.optimizer = amp.initialize(self.model, self.optimizer, **self.amp_params)
+
         self.model.train()
 
         self.callbacks_handler.execute_train_begin()
@@ -165,7 +167,7 @@ class TrainLoop:
                 print(f'Epoch: {self.epoch}')
             self.callbacks_handler.execute_epoch_begin()
 
-            for batch_data in tqdm(self.train_loader):
+            for iteration, batch_data in enumerate(tqdm(self.train_loader)):
                 self.callbacks_handler.execute_batch_begin()
 
                 # Feed batch into the model
@@ -174,9 +176,8 @@ class TrainLoop:
                 else:
                     loss_batch = self.batch_model_feed_def.get_loss(self.model, batch_data, self.criterion, self.device)
                 self.loss_batch_accum.append(loss_batch.item())
-
-                if not self.use_deepspeed:
-                    self.optimizer.zero_grad()
+                # Need to divide by the number of accumulation steps if our loss is averaged over the training samples
+                loss_batch = loss_batch / grad_accumulation
 
                 # Backward pass through the model
                 if self.use_amp:
@@ -194,13 +195,20 @@ class TrainLoop:
 
                 if self.grad_cb_used:
                     self.callbacks_handler.execute_gradient_update()
-                # Optimizer step
-                if self.use_deepspeed:
-                    self.model.step()
-                else:
-                    self.optimizer.step()
-                if self.grad_cb_used:
-                    self.callbacks_handler.execute_optimizer_step()
+
+                # if (iteration + 1) % grad_accumulation == 0 or iteration == len(self.train_loader) - 1:
+                if (iteration + 1) % grad_accumulation == 0:
+                    # Optimizer step
+                    if self.use_deepspeed:
+                        self.model.step()
+                    else:
+                        self.optimizer.step()
+                    if self.grad_cb_used:
+                        self.callbacks_handler.execute_optimizer_step()
+
+                    # Optimizer zero grad
+                    if not self.use_deepspeed:
+                        self.optimizer.zero_grad()
 
                 self.callbacks_handler.execute_batch_end()
 
@@ -334,6 +342,9 @@ class TrainLoop:
         Returns:
             float: loss
         """
+        self.model = self.model.to(self.device)
+        self.criterion = self.criterion.to(self.device)
+
         self.model.eval()
         loss_avg = []
 
@@ -418,9 +429,10 @@ class TrainLoop:
         Returns:
             (torch.Tensor, torch.Tensor, dict): y_pred, y_true, metadata
         """
-        y_pred, y_test, metadata_list = [], [], []
+        self.model = self.model.to(self.device)
 
         self.model.eval()
+        y_pred, y_test, metadata_list = [], [], []
 
         with torch.no_grad():
             for batch_data in tqdm(data_loader):
@@ -450,8 +462,19 @@ class TrainLoop:
 
         return y_pred, y_test, metadata
 
-    def fit_distributed(self, num_epochs, callbacks=None,
-                        train_data_shuffle=True, ddp_model_args=None, amp_init_args=None, in_process_data_load=None,
+    def insert_metric_result_into_history(self, metric_name, metric_result):
+        """Insert a metric result into the train history
+
+        This is the main and preferred API function for metric insertion as part of the train loop.
+
+        Args:
+            metric_name (str): name of the metric to be inserted
+            metric_result (float or dict): new result for the corresponding metric
+        """
+        self.train_history.insert_single_result_into_history(metric_name, metric_result)
+
+    def fit_distributed(self, num_epochs, callbacks=None, grad_accumulation=1,
+                        train_data_shuffle=True, ddp_model_args=None, in_process_data_load=None,
                         num_nodes=1, node_rank=0, num_gpus=torch.cuda.device_count()):
         """Train the model using the train loop in the Distributed Data Parallel setting
 
@@ -460,14 +483,13 @@ class TrainLoop:
         Args:
             num_epochs (int): how many epochs the network will be trained
             callbacks (list or None): callbacks that are executed during the training run
+            grad_accumulation (int): number of batches the gradients are accumulated before updating weights
             train_data_shuffle (bool): should train loader return shuffled data
             ddp_model_args (dict or None): parameters for DistributedDataParallel / APEX DistributedDataParallel model
                 Available parameters for DistributedDataParallel:
                     https://pytorch.org/docs/master/nn.html#torch.nn.parallel.DistributedDataParallel
                 Available parameters for APEX DistributedDataParallel:
                     https://nvidia.github.io/apex/parallel.html#apex.parallel.DistributedDataParallel
-            amp_init_args (dict or None): Apex AMP initialization parameters
-                Available parameters: https://nvidia.github.io/apex/amp.html#apex.amp.initialize
             in_process_data_load (AbstractCallback or list or None):
                 in-process data loading logic implemented as a torchtrain callback. The logic should be placed inside
                 the on_multiprocess_start() callback function.
@@ -485,27 +507,20 @@ class TrainLoop:
             'num_gpus': num_gpus,
             'world_size': num_nodes * num_gpus,
             'train_data_shuffle': train_data_shuffle,
-            'ddp_model_args': ddp_model_args if ddp_model_args is not None else {},
-            'amp_init_args': amp_init_args if amp_init_args is not None else {}
+            'ddp_model_args': ddp_model_args if ddp_model_args is not None else {}
         }
 
         from aitoolbox.torchtrain.callbacks.abstract import AbstractCallback
         if isinstance(in_process_data_load, AbstractCallback):
             in_process_data_load = [in_process_data_load]
 
-        if amp_init_args is not None:
-            self.use_amp = True
-        if self.use_amp and not APEX_AVAILABLE:
-            raise ValueError('Trying to use Nvidia Apex AMP for 16-bit mixed precision. However, Nvidia Apex is not'
-                             'installed.')
-
         mp.spawn(self._spawn_fit,
                  args=(
-                     ddp_args, num_epochs, callbacks, in_process_data_load
+                     ddp_args, num_epochs, callbacks, grad_accumulation, in_process_data_load
                  ),
                  nprocs=ddp_args['world_size'])
 
-    def _spawn_fit(self, gpu, ddp_args, num_epochs, callbacks, in_process_data_load):
+    def _spawn_fit(self, gpu, ddp_args, num_epochs, callbacks, grad_accumulation, in_process_data_load):
         """Helper function that prepares the TrainLoop state inside each of the spawned processes and initiates training
 
         Args:
@@ -513,6 +528,7 @@ class TrainLoop:
             ddp_args (dict): parameters dict needed for the distributed training setup
             num_epochs (int): how many epochs the network will be trained
             callbacks (list or None): callbacks that are executed during the training run
+            grad_accumulation (int): number of batches the gradients are accumulated before updating weights
             in_process_data_load (list or None): in-process data loading logic implemented as a torchtrain callback.
                 The logic should be placed inside the on_multiprocess_start() callback function.
                 When using this data loading option bare in mind that loaded dataset will be replicated in memory for
@@ -533,12 +549,14 @@ class TrainLoop:
         self.ddp_handler.add_distributed_samplers(ddp_args['world_size'], rank, ddp_args['train_data_shuffle'])
 
         # Move to the GPU belonging to the process
-        self.criterion = self.criterion.to(self.device)
         self.model = self.model.to(self.device)
+        self.criterion = self.criterion.to(self.device)
 
         # Optionally initialize APEX
+        # Not using AMP initialization at the start of the fit() fn because in the multi-GPU setting the model has to
+        # be first AMP-initialized before it's wrapped into (APEX) DistributedDataParallel.
         if self.use_amp:
-            self.model, self.optimizer = amp.initialize(self.model, self.optimizer, **ddp_args['amp_init_args'])
+            self.model, self.optimizer = amp.initialize(self.model, self.optimizer, **self.amp_params)
 
         # Wrap models into DDP module
         if isinstance(self.model, TTModel):
@@ -552,18 +570,83 @@ class TrainLoop:
             else:
                 self.model = ApexDistributedDataParallel(self.model, **ddp_args['ddp_model_args'])
 
-        self.fit(num_epochs, callbacks)
+        self.fit(num_epochs, callbacks, grad_accumulation)
 
-    def insert_metric_result_into_history(self, metric_name, metric_result):
-        """Insert a metric result into the train history
-
-        This is the main and preferred API function for metric insertion as part of the train loop.
+    def fit_data_parallel(self, num_epochs, callbacks=None, dp_wrap_attributes=None):
+        """Train the model on multi-GPU with DataParallel auto wrapping
 
         Args:
-            metric_name (str): name of the metric to be inserted
-            metric_result (float or dict): new result for the corresponding metric
+            num_epochs (int): how many epochs the network will be trained
+            callbacks (list or None): callbacks that are executed during the training run
+            dp_wrap_attributes (list or tuple or None): additional TTModel attributes which need to be transferred to
+                the TTDataParallel level to enable their use in the transferred/exposed class methods
+
+        Returns:
+            TTDataParallel: trained model
         """
-        self.train_history.insert_single_result_into_history(metric_name, metric_result)
+        if not isinstance(self.model, TTDataParallel) and not isinstance(self.model, nn.DataParallel):
+            if isinstance(self.model, TTModel):
+                self.model = TTDataParallel(self.model, dp_wrap_attributes)
+            else:
+                self.model = nn.DataParallel(self.model)
+
+        return self.fit(num_epochs, callbacks)
+
+    def fit_deepspeed(self, deepspeed_args, num_epochs, callbacks=None,
+                      add_model_attributes=None, **ds_model_args):
+        """Train the model using Microsoft DeepSpeed package
+
+        Before starting the training the DeepSpeed library needs to be installed on the machine. Find the installation
+        instructions on this page: https://www.deepspeed.ai/getting-started/#installation.
+
+        If you want to manually install the DeepSpeed package execute the ``install.sh`` script:
+        https://github.com/microsoft/DeepSpeed/blob/master/install.sh
+
+        Args:
+            deepspeed_args (argparse.Namespace): argparser results structured as per DeepSpeed requirements.
+                A dictionary containing local_rank and deepspeed_config file location.
+            num_epochs (int): how many epochs the network will be trained
+            callbacks (list): callbacks that are executed during the training run
+            add_model_attributes (list or tuple or None): additional TTModel attributes which need to be transferred to
+                the TTDataParallel level to enable their use in the transferred/exposed class methods
+            **ds_model_args: additional parameters for the underlying ``deepspeed.DeepSpeedLight`` class
+
+                Possible arguments: https://deepspeed.readthedocs.io/en/latest/initialize.html
+
+        Returns:
+            deepspeed.DeepSpeedLight: DeepSpeed model engine
+        """
+        if not DEEPSPEED_AVAILABLE:
+            raise ValueError('Trying to use Microsoft DeepSpeed. However, DeepSpeed is not installed.')
+        if self.use_amp:
+            raise ValueError('Base Nvidia APEX AMP enabled. To use DeepSpeed first disable base AMP and specfiy '
+                             'the AMP as part of DeepSpeed config.')
+
+        self.use_deepspeed = True
+
+        self.model = TTDeepSpeedLight(
+            args=deepspeed_args,
+            model=self.model, model_parameters=self.model.parameters(), add_model_attributes=add_model_attributes,
+            training_data=self.train_loader.dataset,
+            **ds_model_args
+        )
+        self.optimizer = self.model.optimizer
+        self.train_loader = self.model.training_dataloader
+
+        return self.fit(num_epochs, callbacks)
+
+    def __call__(self, num_epochs, callbacks=None, grad_accumulation=1):
+        """Train the model using the train loop
+
+        Args:
+            num_epochs (int): how many epochs the network will be trained
+            callbacks (list): callbacks that are executed during the training run
+            grad_accumulation (int): number of batches the gradients are accumulated before updating weights
+
+        Returns:
+            TTModel or torch.nn.modules.Module or TTDataParallel: trained model
+        """
+        return self.fit(num_epochs, callbacks, grad_accumulation)
 
 
 class TrainLoopCheckpoint(TrainLoop):
@@ -575,7 +658,7 @@ class TrainLoopCheckpoint(TrainLoop):
                  cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix='', source_dirs=(),
                  rm_subopt_local_models=False, num_best_checkpoints_kept=2,
                  collate_batch_pred_fn=append_predictions, pred_transform_fn=torch_cat_transf,
-                 end_auto_eval=True, cuda_device_idx=None, use_amp=False, use_deepspeed=False):
+                 end_auto_eval=True, cuda_device_idx=None, use_amp=False):
         """TrainLoop with the automatic model check-pointing at the end of each epoch
 
         Args:
@@ -613,12 +696,18 @@ class TrainLoopCheckpoint(TrainLoop):
                 Specify either True/False boolean to always run or never run after each epoch or specify an int to
                 execute only every specified number of epochs.
             cuda_device_idx (int or None): CUDA device index used when training on multiple GPUs
-            use_amp (bool): use Nvidia Apex 16-bit Automatic Mixed Precision (AMP)
-            use_deepspeed (bool): use Microsoft DeepSpeed
+            use_amp (bool or dict): use Nvidia Apex 16-bit Automatic Mixed Precision (AMP)
+
+                To switch to AMP mode either:
+
+                * set this parameter to ``True`` to use default AMP initialization parameters
+                * provide custom Apex AMP initialization parameters as a dict as this parameter
+
+                Available AMP initialization parameters: https://nvidia.github.io/apex/amp.html#apex.amp.initialize
         """
         TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion,
                            collate_batch_pred_fn, pred_transform_fn,
-                           end_auto_eval, cuda_device_idx, use_amp, use_deepspeed)
+                           end_auto_eval, cuda_device_idx, use_amp)
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
@@ -640,7 +729,7 @@ class TrainLoopCheckpoint(TrainLoop):
                             bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
                             rm_subopt_local_models=self.rm_subopt_local_models,
                             num_best_checkpoints_kept=num_best_checkpoints_kept)
-        ])
+        ], cache_callbacks=True)
 
 
 class TrainLoopEndSave(TrainLoop):
@@ -651,7 +740,7 @@ class TrainLoopEndSave(TrainLoop):
                  hyperparams, val_result_package=None, test_result_package=None,
                  cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix='', source_dirs=(),
                  collate_batch_pred_fn=append_predictions, pred_transform_fn=torch_cat_transf,
-                 end_auto_eval=True, cuda_device_idx=None, use_amp=False, use_deepspeed=False):
+                 end_auto_eval=True, cuda_device_idx=None, use_amp=False):
         """TrainLoop with the model performance evaluation and final model saving at the end of the training process
 
         Args:
@@ -688,12 +777,18 @@ class TrainLoopEndSave(TrainLoop):
                 Specify either True/False boolean to always run or never run after each epoch or specify an int to
                 execute only every specified number of epochs.
             cuda_device_idx (int or None): CUDA device index used when training on multiple GPUs
-            use_amp (bool): use Nvidia Apex 16-bit Automatic Mixed Precision (AMP)
-            use_deepspeed (bool): use Microsoft DeepSpeed
+            use_amp (bool or dict): use Nvidia Apex 16-bit Automatic Mixed Precision (AMP)
+
+                To switch to AMP mode either:
+
+                * set this parameter to ``True`` to use default AMP initialization parameters
+                * provide custom Apex AMP initialization parameters as a dict as this parameter
+
+                Available AMP initialization parameters: https://nvidia.github.io/apex/amp.html#apex.amp.initialize
         """
         TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion,
                            collate_batch_pred_fn, pred_transform_fn,
-                           end_auto_eval, cuda_device_idx, use_amp, use_deepspeed)
+                           end_auto_eval, cuda_device_idx, use_amp)
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
@@ -715,7 +810,7 @@ class TrainLoopEndSave(TrainLoop):
                               self.hyperparams, self.val_result_package, self.test_result_package,
                               cloud_save_mode=self.cloud_save_mode,
                               bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix)
-        ])
+        ], cache_callbacks=True)
 
     def check_if_result_packages_possible(self):
         if self.val_result_package is not None and self.validation_loader is None:
@@ -746,7 +841,7 @@ class TrainLoopCheckpointEndSave(TrainLoopEndSave):
                  cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix='', source_dirs=(),
                  rm_subopt_local_models=False, num_best_checkpoints_kept=2,
                  collate_batch_pred_fn=append_predictions, pred_transform_fn=torch_cat_transf,
-                 end_auto_eval=True, cuda_device_idx=None, use_amp=False, use_deepspeed=False):
+                 end_auto_eval=True, cuda_device_idx=None, use_amp=False):
         """TrainLoop both saving model check-pointing at the end of each epoch and model performance reporting
             and model saving at the end of the training process
 
@@ -789,8 +884,14 @@ class TrainLoopCheckpointEndSave(TrainLoopEndSave):
                 Specify either True/False boolean to always run or never run after each epoch or specify an int to
                 execute only every specified number of epochs.
             cuda_device_idx (int or None): CUDA device index used when training on multiple GPUs
-            use_amp (bool): use Nvidia Apex 16-bit Automatic Mixed Precision (AMP)
-            use_deepspeed (bool): use Microsoft DeepSpeed
+            use_amp (bool or dict): use Nvidia Apex 16-bit Automatic Mixed Precision (AMP)
+
+                To switch to AMP mode either:
+
+                * set this parameter to ``True`` to use default AMP initialization parameters
+                * provide custom Apex AMP initialization parameters as a dict as this parameter
+
+                Available AMP initialization parameters: https://nvidia.github.io/apex/amp.html#apex.amp.initialize
         """
         if 'experiment_file_path' not in hyperparams:
             hyperparams['experiment_file_path'] = inspect.getframeinfo(inspect.currentframe().f_back).filename
@@ -803,7 +904,7 @@ class TrainLoopCheckpointEndSave(TrainLoopEndSave):
                                   hyperparams, val_result_package, test_result_package,
                                   cloud_save_mode, bucket_name, cloud_dir_prefix, source_dirs,
                                   collate_batch_pred_fn, pred_transform_fn,
-                                  end_auto_eval, cuda_device_idx, use_amp, use_deepspeed)
+                                  end_auto_eval, cuda_device_idx, use_amp)
         self.rm_subopt_local_models = rm_subopt_local_models
 
         self.callbacks_handler.register_callbacks([
@@ -813,4 +914,4 @@ class TrainLoopCheckpointEndSave(TrainLoopEndSave):
                             bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
                             rm_subopt_local_models=self.rm_subopt_local_models,
                             num_best_checkpoints_kept=num_best_checkpoints_kept)
-        ])
+        ], cache_callbacks=True)

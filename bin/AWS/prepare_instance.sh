@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Example how to run:
-# ./prepare_instance.sh -k <SSH_KEY_LOCATION> -a <INSTANCE_IP_ADDRESS> -f pytorch -v 1.0 -p ~/PycharmProjects/Transformer -d SQuAD2 -r orig
+# ./prepare_instance.sh -k <SSH_KEY_LOCATION> -a <INSTANCE_IP_ADDRESS> -f pytorch -v 1.0.7 -p ~/PycharmProjects/Transformer -d SQuAD2 -r orig
 
 # When you get ssh-ed to the instance finish the instance prep process by running:
 # ./finish_prepare_instance.sh
@@ -36,6 +36,7 @@ function usage()
      -d, --dataset STR      dataset to be optionally downloaded from the S3 storage directly to ec2 instance
      -r, --preproc STR      the preprocessed version of the main dataset
      -x, --apex             switch on to install Nvidia Apex library for mixed precision training
+     --deepspeed            install Microsoft DeepSpeed library
      -o, --os-name STR      username depending on the OS chosen. Default is ubuntu
      --no-ssh               disable auto ssh-ing to the instance
      -h, --help             show this help message and exit
@@ -46,11 +47,12 @@ HEREDOC
 key_path=$(jq -r '.key_path' configs/my_config.json)
 ec2_instance_address=
 DL_framework="pytorch"
-AIToolbox_version="1.0"
+AIToolbox_version="1.0.7"
 local_project_path="None"
 dataset_name="None"
 preproc_dataset="None"
 use_apex=false
+use_deepspeed=false
 username="ubuntu"
 auto_ssh_to_instance=true
 
@@ -88,6 +90,10 @@ case $key in
     ;;
     -x|--apex)
     use_apex=true
+    shift 1 # past argument value
+    ;;
+    --deepspeed)
+    use_deepspeed=true
     shift 1 # past argument value
     ;;
     -o|--os-name)
@@ -163,6 +169,13 @@ if [ $use_apex == true ]; then
     git clone https://github.com/NVIDIA/apex
     cd apex
     pip install -v --no-cache-dir --global-option=\"--cpp_ext\" --global-option=\"--cuda_ext\" ./
+    cd ..
+fi
+
+if [ $use_deepspeed == true ]; then
+    git clone https://github.com/microsoft/DeepSpeed
+    cd DeepSpeed
+    ./install.sh --local_only --skip_requirements
     cd ..
 fi
 

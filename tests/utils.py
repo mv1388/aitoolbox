@@ -237,6 +237,9 @@ class DummyBatch:
         self.item_ctr += 1
         return 1.
 
+    def __truediv__(self, other):
+        return self
+
 
 class MiniDummyOptimizer:
     def __init__(self):
@@ -263,6 +266,15 @@ class DummyOptimizer:
 
     def state_dict(self):
         print('In state_dict')
+
+
+class DummyLoss:
+    def __init__(self):
+        self.device = None
+
+    def to(self, device):
+        self.device = device
+        return self
 
 
 class DummyResultPackage(AbstractResultPackage):

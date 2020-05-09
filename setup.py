@@ -1,46 +1,59 @@
 from setuptools import setup, find_packages
 
 
-setup(name='aitoolbox',
-      version='1.0',
-      author='Marko Vidoni',
-      author_email='',
-      url='https://github.com/mv1388/AIToolbox',
-      description='Toolbox of useful functions often needed in different AI oriented projects',
-      long_description=open('README.md').read(),
+setup(
+    name='aitoolbox',
+    version='1.0.7',
+    author='Marko Vidoni',
+    author_email='',
+    url='https://github.com/mv1388/AIToolbox',
+    description='PyTorch Model Training and Experiment Tracking Framework',
+    long_description=open('README.md').read(),
+    long_description_content_type="text/markdown",
+    license='MIT',
+    keywords=['PyTorch', 'deep learning', 'research', 'train loop'],
 
-      python_requires='>=3.6.0',
+    python_requires='>=3.6.0',
 
-      packages=find_packages(exclude=['tests', 'examples', 'deprecated']),
+    packages=find_packages(exclude=['tests', 'examples', 'deprecated']),
 
-      install_requires=[
-          'numpy',
-          'pandas',
-          'scikit-learn',
-          'matplotlib',
-          'seaborn',
+    install_requires=[
+        'numpy',
+        'pandas',
+        'scikit-learn',
+        'matplotlib',
+        'seaborn',
 
-          'torch',
-          'torchvision',
-          'torchtext',
-          'pytorch-nlp',
+        'torch',
+        'torchvision',
+        'torchtext',
+        'pytorch-nlp',
 
-          'joblib',
-          'tqdm',
-          'awscli',
-          'boto3',
-          'botocore',
-          'google-cloud-storage',
+        'joblib',
+        'tqdm',
+        'awscli',
+        'boto3',
+        'botocore',
+        'google-cloud-storage',
 
-          'nltk',
-          'allennlp',
-          'pyrouge',
-          'rouge'
-      ],
+        'nltk',
+        'allennlp',
+        'pyrouge',
+        'rouge'
+    ],
 
-      test_suite='tests',
-      tests_require=['nose'],
+    test_suite='tests',
+    tests_require=['nose'],
 
-      # scripts=['bin/AWS/'],
+    zip_safe=False,
 
-      zip_safe=False)
+    classifiers=[
+        'Development Status :: 4 - Beta',
+        'Intended Audience :: Developers',
+        'Topic :: Scientific/Engineering :: Artificial Intelligence',
+        'License :: OSI Approved :: MIT License',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7'
+    ]
+)

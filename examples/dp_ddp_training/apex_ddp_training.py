@@ -80,6 +80,6 @@ if __name__ == '__main__':
     print('Starting train loop')
     TrainLoop(model,
               train_loader, val_loader, test_loader,
-              optimizer, criterion) \
-        .fit_distributed(num_epochs=10, callbacks=callbacks,
-                         amp_init_args={'opt_level': 'O1'})
+              optimizer, criterion,
+              use_amp={'opt_level': 'O1'}) \
+        .fit_distributed(num_epochs=10, callbacks=callbacks)

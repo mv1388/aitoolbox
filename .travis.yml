@@ -39,8 +39,25 @@ matrix:
 
 # command to install dependencies
 install:
-  - pip install tensorflow keras
+  - pip install tensorflow keras moto
   - pip install -r requirements.txt
 
 script:
   - pytest
+
+#deploy:
+#  - provider: pypi
+#    server: https://test.pypi.org/legacy/
+#    user: "__token__"
+#    password:
+#      secure: rkYkxdcqruvt2MGPyxlkEhIymWX0w61IP6a+eRv+OHPOw501sg7E5TLjTEka3wrMmaEM6kQ/ywzHQ1MmoCG6Q5DK6kqHpG3aAempW4q4/JM4hgClsH7z4k6DqNSHoXEkw4cCcn2mrT+ijxOQUFutl3V4wHyl5mYt8ndfuNIQIq3S+i4/kf63w2Gw9Gee4JSUqibG9SoUZQg8ifpj4kadLbylIocG6gV7qDgwzHlm2sz9q5rqf4+7zLyNIPAikFFWK6fRyZfh/1ePxCrwK05JeZ/nenz//6QSZ/ZI/mbHh6uHt31/xY/vQG7PjCF8sitYeXyi4q0mv/wjX5uG169iuxsAIxvLvJduv+IO/66oawZJBa4VtJlAKMD4yH0tVtq0JpB+fBZEtip909PadchUYrDl4S3LCacFqEQ5Q2pCDYm3OY5jj1olOxwVVhbIyzYB3CZXgsw0XMgOXn2qAIz+bQAIGSaJu9gbWDJNXuDtPaLKHFz0BiIY/vRhmeytCm22+S8OckiuG3WDH+3w8Bl9aZdaVZO9LbVlDMk3Zc62s9gmxWO8VpiHXqw1bfkKSfpd83hLPM+WIUPQw2y5AmIP2+oR1rr/Gw/JCEgddBO0oA0iadOJxLV/Gm9L34M/grU+wtxy8nA2PLAIQpf14KhowTRICZZWE/XuGqGPYFtxk48=
+#    on:
+#      tags: true
+#    skip_existing: true
+#  - provider: pypi
+#    user: "__token__"
+#    password:
+#      secure: N71m1pJNSpWdqBbKZo2yw5azfPLuY4uObrtK5HYvxlsKSmOb6QDQP/7UdOpJZtmXAMqwuebbGrhHDuXl401HIliGw07DB2brxgBIK0yL3efon1dvjEHpxCoM/V5y6rQc37WTFtwdrxCZEZEkjivIAFJb95EVdfb3GTyKOhPjbvVxSRi83EJnt7+xvWQflGPhn2ejqNizZisXJkQfeZ8tyhoRhoOdSNciQFczUdRRBDLF3Wat6vOpyO5N6RTJoua4SOJRbQy/yswVXjRXSPjHc2xh53/lsN7B2pHHRoCTzqh1BtV8VzBPFrhmnMF4L/FXMAR+SvPV0Zh3/i0okKCWD5I0LiBFdHnELALNVSsqBJGmAvQjzww7ZSnfkJq8Ty7JeqmN4bVryfuoOgdrjVjeWfOV1C4W2JBDsb9KWaFeXJPfutOQLCN5qng0C7jOL8n3XkUy7R3e8gEVLi8P+l+saHv25uL6CNZXtvSoZFW/ljdEF59IXOwf5eFo2OB/wz9cptgQe6lGab7J+UhyGMgEfahFoh0QPXqn+JnK9yRjvLFmjJjessZegxDrRQC8wukv5H7KjacTsj+kRl/Ww+G2Psl4wYwG8c1TGZL8cO+jPz7AaXQkPjbqHHyyZcCA/Dd3H6l7Fh+cjeYzxmfMZjKRjDEXDys06eW4ph0sK/Bjk0s=
+#    on:
+#      tags: true
+#    skip_existing: true
