@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='aitoolbox',
-    version='1.0.5',
+    version='1.0.6',
     author='Marko Vidoni',
     author_email='',
     url='https://github.com/mv1388/AIToolbox',
