@@ -9,7 +9,7 @@ on:
       - created
 
 jobs:
-  build-n-publish:
+  package-build-and-publish:
     name: Build and publish package to TestPyPI and then to PyPI
     runs-on: ubuntu-18.04
 
