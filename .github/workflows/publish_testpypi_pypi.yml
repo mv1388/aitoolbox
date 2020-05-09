@@ -30,13 +30,14 @@ jobs:
           python setup.py sdist bdist_wheel
 
       - name: Publish package to TestPyPI
+        if: startsWith(github.event.ref, 'refs/tags') && github.event_name == 'release'
         uses: pypa/gh-action-pypi-publish@master
         with:
           password: ${{ secrets.test_pypi_password }}
           repository_url: https://test.pypi.org/legacy/
 
       - name: Publish package to PyPI
-        if: startsWith(github.event.ref, 'refs/tags')
+        if: startsWith(github.event.ref, 'refs/tags') && github.event_name == 'release'
         uses: pypa/gh-action-pypi-publish@master
         with:
           password: ${{ secrets.pypi_password }}
