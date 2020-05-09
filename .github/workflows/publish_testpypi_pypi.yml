@@ -1,0 +1,42 @@
+name: Publish to PyPI and TestPyPI
+
+on:
+  release:
+    types:
+      - created
+
+jobs:
+  package-build-and-publish:
+    name: Build and publish package to TestPyPI and then to PyPI
+    runs-on: ubuntu-18.04
+
+    steps:
+      - uses: actions/checkout@master
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.7
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install --upgrade setuptools wheel
+
+      - name: Build package
+        run:
+          python setup.py sdist -d ./deploy_dist bdist_wheel -d ./deploy_dist
+
+      - name: Publish package to TestPyPI
+        if: startsWith(github.ref, 'refs/tags') && github.event_name == 'release'
+        uses: pypa/gh-action-pypi-publish@master
+        with:
+          password: ${{ secrets.test_pypi_password }}
+          repository_url: https://test.pypi.org/legacy/
+          packages_dir: ./deploy_dist/
+
+      - name: Publish package to PyPI
+        if: startsWith(github.ref, 'refs/tags') && github.event_name == 'release'
+        uses: pypa/gh-action-pypi-publish@master
+        with:
+          password: ${{ secrets.pypi_password }}
+          packages_dir: ./deploy_dist/
