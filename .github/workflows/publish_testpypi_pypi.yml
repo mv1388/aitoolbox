@@ -26,6 +26,9 @@ jobs:
         run:
           python setup.py sdist bdist_wheel
 
+      - name: Only do this when tagged
+        run: echo "Hello!!! github.ref - ${{ github.ref }}; github.event.ref - ${{ github.event.ref }}; github.event_name - ${{ github.event_name }}"
+
       - name: Publish package to TestPyPI
         if: startsWith(github.event.ref, 'refs/tags') && github.event_name == 'release'
         uses: pypa/gh-action-pypi-publish@master
