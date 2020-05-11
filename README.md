@@ -1,5 +1,6 @@
 # AI Toolbox
 
+[![PyPI version](https://badge.fury.io/py/aitoolbox.svg)](https://badge.fury.io/py/aitoolbox)
 [![Build Status](https://travis-ci.org/mv1388/AIToolbox.svg?branch=master)](https://travis-ci.org/mv1388/AIToolbox)
 [![Documentation Status](https://readthedocs.org/projects/aitoolbox/badge/?version=latest)](https://aitoolbox.readthedocs.io/en/latest/?badge=latest)
 &nbsp; &nbsp;
