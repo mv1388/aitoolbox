@@ -160,73 +160,79 @@ class TrainLoop:
 
         self.callbacks_handler.execute_train_begin()
 
-        for self.epoch in range(self.epoch, num_epochs):
-            if not self.ddp_training_mode or self.device.index == 0:
-                print('\n\n================================================================================')
-                print('================================================================================')
-                print(f'Epoch: {self.epoch}')
-            self.callbacks_handler.execute_epoch_begin()
+        try:
+            for self.epoch in range(self.epoch, num_epochs):
+                if not self.ddp_training_mode or self.device.index == 0:
+                    print('\n\n================================================================================')
+                    print('================================================================================')
+                    print(f'Epoch: {self.epoch}')
+                self.callbacks_handler.execute_epoch_begin()
 
-            for iteration, batch_data in enumerate(tqdm(self.train_loader)):
-                self.callbacks_handler.execute_batch_begin()
+                for iteration, batch_data in enumerate(tqdm(self.train_loader)):
+                    self.callbacks_handler.execute_batch_begin()
 
-                # Feed batch into the model
-                if self.batch_model_feed_def is None:
-                    loss_batch = self.model.get_loss(batch_data, self.criterion, self.device)
-                else:
-                    loss_batch = self.batch_model_feed_def.get_loss(self.model, batch_data, self.criterion, self.device)
-                self.loss_batch_accum.append(loss_batch.item())
-                # Need to divide by the number of accumulation steps if our loss is averaged over the training samples
-                loss_batch = loss_batch / grad_accumulation
-
-                # Backward pass through the model
-                if self.use_amp:
-                    if not isinstance(loss_batch, MultiLoss):
-                        # Single loss Apex AMP calculation
-                        with amp.scale_loss(loss_batch, self.optimizer) as scaled_loss:
-                            scaled_loss.backward()
+                    # Feed batch into the model
+                    if self.batch_model_feed_def is None:
+                        loss_batch = self.model.get_loss(batch_data, self.criterion, self.device)
                     else:
-                        # Multi-loss Apex AMP calculation
-                        loss_batch.backward_amp(self.optimizer.optimizer_list)
-                elif self.use_deepspeed:
-                    self.model.backward(loss_batch)
-                else:
-                    loss_batch.backward()
+                        loss_batch = self.batch_model_feed_def.get_loss(self.model, batch_data, self.criterion, self.device)
+                    self.loss_batch_accum.append(loss_batch.item())
+                    # Need to divide by the number of accumulation steps if our loss is averaged over
+                    # the training samples
+                    loss_batch = loss_batch / grad_accumulation
 
-                if self.grad_cb_used:
-                    self.callbacks_handler.execute_gradient_update()
-
-                # if (iteration + 1) % grad_accumulation == 0 or iteration == len(self.train_loader) - 1:
-                if (iteration + 1) % grad_accumulation == 0:
-                    # Optimizer step
-                    if self.use_deepspeed:
-                        self.model.step()
+                    # Backward pass through the model
+                    if self.use_amp:
+                        if not isinstance(loss_batch, MultiLoss):
+                            # Single loss Apex AMP calculation
+                            with amp.scale_loss(loss_batch, self.optimizer) as scaled_loss:
+                                scaled_loss.backward()
+                        else:
+                            # Multi-loss Apex AMP calculation
+                            loss_batch.backward_amp(self.optimizer.optimizer_list)
+                    elif self.use_deepspeed:
+                        self.model.backward(loss_batch)
                     else:
-                        self.optimizer.step()
+                        loss_batch.backward()
+
                     if self.grad_cb_used:
-                        self.callbacks_handler.execute_optimizer_step()
+                        self.callbacks_handler.execute_gradient_update()
 
-                    # Optimizer zero grad
-                    if not self.use_deepspeed:
-                        self.optimizer.zero_grad()
+                    # if (iteration + 1) % grad_accumulation == 0 or iteration == len(self.train_loader) - 1:
+                    if (iteration + 1) % grad_accumulation == 0:
+                        # Optimizer step
+                        if self.use_deepspeed:
+                            self.model.step()
+                        else:
+                            self.optimizer.step()
+                        if self.grad_cb_used:
+                            self.callbacks_handler.execute_optimizer_step()
 
-                self.callbacks_handler.execute_batch_end()
+                        # Optimizer zero grad
+                        if not self.use_deepspeed:
+                            self.optimizer.zero_grad()
 
-            # Automatic end of epoch code - reports the train and if available validation loss and executes callbacks
-            self.auto_execute_end_of_epoch()
-            self.callbacks_handler.execute_epoch_end()
+                    self.callbacks_handler.execute_batch_end()
 
-            self.message_service.end_of_epoch_trigger()
+                # Automatic end of epoch code - reports train and if available validation loss and executes callbacks
+                self.auto_execute_end_of_epoch()
+                self.callbacks_handler.execute_epoch_end()
 
-            if self.ddp_training_mode:
-                # Sync early stopping setting between multiple processes when using DDP
-                # Triggers overall early stopping if at least one of the processes has triggered early stopping
-                self.early_stop = sum(self.ddp_handler.mp_sync(self.early_stop).numpy()) > 0
-            # self.early_stop is changed from the early stopper callback
-            if self.early_stop:
-                break
+                self.message_service.end_of_epoch_trigger()
 
-        self.auto_execute_end_of_training()
+                if self.ddp_training_mode:
+                    # Sync early stopping setting between multiple processes when using DDP
+                    # Triggers overall early stopping if at least one of the processes has triggered early stopping
+                    self.early_stop = sum(self.ddp_handler.mp_sync(self.early_stop).numpy()) > 0
+                # self.early_stop is changed from the early stopper callback
+                if self.early_stop:
+                    break
+
+            self.auto_execute_end_of_training()
+
+        except KeyboardInterrupt:
+            print('KeyboardInterrupt issued, terminating the training')
+
         self.callbacks_handler.execute_train_end()
 
         return self.model
