@@ -1,5 +1,9 @@
 import unittest
 
+import os
+import shutil
+import random
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -8,6 +12,8 @@ from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
 
 from aitoolbox import TrainLoop, TTModel
+
+THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 class CNNNet(TTModel):
@@ -54,29 +60,104 @@ class CNNNet(TTModel):
         return y_pred.cpu(), y_test, {}
 
 
-class TestMnistCNN(unittest.TestCase):
-    def test_mnist_cnn(self):
+class TestMNISTCNN(unittest.TestCase):
+    def test_trainloop_core_pytorch_compare(self):
+        loss_tl, y_pred_tl, y_true_tl = self.train_eval_trainloop()
+        loss_pt, y_pred_pt, y_true_pt = self.train_eval_core_pytorch()
+
+        self.assertEqual(loss_tl, loss_pt)
+        self.assertEqual(y_pred_tl, y_pred_pt)
+        self.assertEqual(y_true_tl, y_true_pt)
+
+        # project_path = os.path.join(THIS_DIR, 'data')
+        # if os.path.exists(project_path):
+        #     shutil.rmtree(project_path)
+
+    def train_eval_trainloop(self):
+        self.set_seeds()
         train_loader = torch.utils.data.DataLoader(
             datasets.MNIST('./data', train=True, download=True,
                            transform=transforms.Compose([
                                transforms.ToTensor(),
                                transforms.Normalize((0.1307,), (0.3081,))
                            ])),
-            batch_size=100, shuffle=True, num_workers=4)
+            batch_size=100, shuffle=True, num_workers=2)
         val_loader = torch.utils.data.DataLoader(
             datasets.MNIST('./data', train=False, transform=transforms.Compose([
                 transforms.ToTensor(),
                 transforms.Normalize((0.1307,), (0.3081,))
             ])),
-            batch_size=100, num_workers=4)
+            batch_size=100, num_workers=2)
 
         model = CNNNet()
         optimizer = optim.Adam(model.parameters(), lr=0.001, betas=(0.9, 0.999))
         criterion = nn.NLLLoss()
 
         print('Starting train loop')
-        TrainLoop(
+        tl = TrainLoop(
             model,
             train_loader, val_loader, None,
             optimizer, criterion
-        ).fit(num_epochs=5)
+        )
+        tl.fit(num_epochs=5)
+
+        loss = tl.evaluate_loss_on_validation_set(force_prediction=True)
+        y_pred, y_true, _ = tl.predict_on_validation_set(force_prediction=True)
+
+        return loss, y_pred, y_true
+
+    def train_eval_core_pytorch(self):
+        self.set_seeds()
+        train_loader = torch.utils.data.DataLoader(
+            datasets.MNIST('./data', train=True, download=True,
+                           transform=transforms.Compose([
+                               transforms.ToTensor(),
+                               transforms.Normalize((0.1307,), (0.3081,))
+                           ])),
+            batch_size=100, shuffle=True, num_workers=2)
+        val_loader = torch.utils.data.DataLoader(
+            datasets.MNIST('./data', train=False, transform=transforms.Compose([
+                transforms.ToTensor(),
+                transforms.Normalize((0.1307,), (0.3081,))
+            ])),
+            batch_size=100, num_workers=2)
+
+        model = CNNNet()
+        optimizer = optim.Adam(model.parameters(), lr=0.001, betas=(0.9, 0.999))
+        criterion = nn.NLLLoss()
+
+        model.train()
+        for epoch in range(5):
+            for i, (input_data, target) in enumerate(train_loader):
+                predicted = model(input_data)
+                loss = criterion(predicted, target)
+                loss.backward()
+                optimizer.step()
+                optimizer.zero_grad()
+
+        val_pred, val_true, val_loss = [], [], []
+        model.eval()
+        with torch.no_grad():
+            for input_data, target in val_loader:
+                predicted = model(input_data)
+                loss_batch = criterion(predicted, target).item()
+                val_loss.append(loss_batch)
+                val_pred += predicted.argmax(dim=1, keepdim=False).tolist()
+                val_true += target.tolist()
+            val_loss = np.mean(val_loss)
+
+        return val_loss, val_pred, val_true
+
+    @staticmethod
+    def set_seeds():
+        manual_seed = 0
+        np.random.seed(manual_seed)
+        random.seed(manual_seed)
+        torch.manual_seed(manual_seed)
+        # if you are suing GPU
+        torch.cuda.manual_seed(manual_seed)
+        torch.cuda.manual_seed_all(manual_seed)
+
+        torch.backends.cudnn.enabled = False
+        torch.backends.cudnn.benchmark = False
+        torch.backends.cudnn.deterministic = True
