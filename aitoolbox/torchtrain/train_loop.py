@@ -126,6 +126,7 @@ class TrainLoop:
         self.early_stop = False
 
         self.grad_cb_used = False
+        self.keyboard_interrupt = False
 
         if not isinstance(self.model, TTModel) and not isinstance(self.model, TTDataParallel) and \
                 not isinstance(self.model, Module):
@@ -232,6 +233,7 @@ class TrainLoop:
 
         except KeyboardInterrupt:
             print('KeyboardInterrupt issued, terminating the training')
+            self.keyboard_interrupt = True
 
         self.callbacks_handler.execute_train_end()
 

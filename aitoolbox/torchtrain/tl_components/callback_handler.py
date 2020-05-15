@@ -65,7 +65,8 @@ class BasicCallbacksHandler:
 
     def execute_train_end(self):
         for callback in self.train_loop_obj.callbacks:
-            callback.on_train_end()
+            if not self.train_loop_obj.keyboard_interrupt or callback.run_after_keyboard_interrupt:
+                callback.on_train_end()
 
     def execute_batch_begin(self):
         for callback in self.train_loop_obj.callbacks:
@@ -239,7 +240,8 @@ class CallbacksHandler(BasicCallbacksHandler):
 
     def execute_train_end(self):
         for callback in self.cbs_on_train_end:
-            callback.on_train_end()
+            if not self.train_loop_obj.keyboard_interrupt or callback.run_after_keyboard_interrupt:
+                callback.on_train_end()
 
     def execute_batch_begin(self):
         for callback in self.cbs_on_batch_begin:

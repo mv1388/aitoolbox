@@ -242,7 +242,8 @@ class LogUpload(AbstractExperimentCallback):
         AbstractExperimentCallback.__init__(self, "Upload Tmux logging file to cloud",
                                             project_name, experiment_name, local_model_result_folder_path,
                                             cloud_save_mode, bucket_name, cloud_dir_prefix,
-                                            execution_order=1500, device_idx_execution=0)
+                                            execution_order=1500, device_idx_execution=0,
+                                            run_after_keyboard_interrupt=True)
         self.log_file_path = os.path.expanduser(log_file_path)
         self.log_filename = os.path.basename(self.log_file_path)
         self.fail_if_cloud_missing = fail_if_cloud_missing
@@ -333,7 +334,8 @@ class FunctionOnTrainLoop(AbstractCallback):
     def __init__(self, fn_to_execute,
                  tl_registration=False,
                  epoch_begin=False, epoch_end=False, train_begin=False, train_end=False, batch_begin=False, batch_end=False,
-                 after_gradient_update=False, after_optimizer_step=False, execution_order=0, device_idx_execution=None):
+                 after_gradient_update=False, after_optimizer_step=False, execution_order=0, device_idx_execution=None,
+                 run_after_keyboard_interrupt=False):
         """Execute given function as a callback in the TrainLoop
 
         Args:
@@ -351,8 +353,13 @@ class FunctionOnTrainLoop(AbstractCallback):
             after_optimizer_step (bool): should execute after the optimizer step
             execution_order (int): order of the callback execution. If all the used callbacks have the orders set to 0,
                 than the callbacks are executed in the order they were registered.
+            run_after_keyboard_interrupt (bool): should callback's ``on_train_end()`` method still be executed in case
+                that ``KeyboardInterrupt`` was issued during the train loop operation. If this parameter is False,
+                in the case of KeyboardInterrupt, the logic implemented in on_train_end() is ignored and the training
+                just ends when interrupt happens.
         """
-        AbstractCallback.__init__(self, 'Execute given function as a callback', execution_order, device_idx_execution)
+        AbstractCallback.__init__(self, 'Execute given function as a callback', execution_order,
+                                  device_idx_execution, run_after_keyboard_interrupt)
         self.fn_to_execute = fn_to_execute
         self.tl_registration = tl_registration
         self.epoch_begin = epoch_begin

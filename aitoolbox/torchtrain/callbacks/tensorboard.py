@@ -27,7 +27,7 @@ class TensorboardReporterBaseCB(AbstractExperimentCallback):
         """
         AbstractExperimentCallback.__init__(self, callback_name,
                                             project_name, experiment_name, local_model_result_folder_path,
-                                            device_idx_execution=0)
+                                            device_idx_execution=0, run_after_keyboard_interrupt=True)
         self.log_dir = log_dir
         self.is_project = is_project
         self.fallback_log_dir = 'tensorboard'

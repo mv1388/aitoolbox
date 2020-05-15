@@ -3,7 +3,7 @@ from typing import Optional
 
 
 class AbstractCallback:
-    def __init__(self, callback_name, execution_order=0, device_idx_execution=None):
+    def __init__(self, callback_name, execution_order=0, device_idx_execution=None, run_after_keyboard_interrupt=False):
         """Abstract callback class that all actual callback classes have to inherit from
 
         In the inherited callback classes the callback methods should be overwritten and used to implement desired
@@ -15,6 +15,10 @@ class AbstractCallback:
                 than the callbacks are executed in the order they were registered.
             device_idx_execution (int or None): index of the (CUDA GPU) device DDP process inside which the callback
                 should be executed
+            run_after_keyboard_interrupt (bool): should callback's ``on_train_end()`` method still be executed in case
+                that ``KeyboardInterrupt`` was issued during the train loop operation. If this parameter is False,
+                in the case of KeyboardInterrupt, the logic implemented in on_train_end() is ignored and the training
+                just ends when interrupt happens.
         """
         from aitoolbox.torchtrain.train_loop import TrainLoop
         from aitoolbox.torchtrain.tl_components.message_passing import MessageService
@@ -24,6 +28,7 @@ class AbstractCallback:
         self.train_loop_obj: Optional[TrainLoop] = None
         self.message_service: Optional[MessageService] = None
         self.device_idx_execution = device_idx_execution
+        self.run_after_keyboard_interrupt = run_after_keyboard_interrupt
 
     def register_train_loop_object(self, train_loop_obj):
         """Introduce the reference to the encapsulating trainloop so that the callback has access to the
@@ -77,6 +82,11 @@ class AbstractCallback:
 
     def on_train_end(self):
         """Logic executed at the end of the overall training
+
+        Set the ``run_after_keyboard_interrupt`` argument of the callback to True if this method should be executed
+        *after* the ``KeyboardInterrupt`` is triggered during the training loop operation in order to stop training.
+        If the argument is left as False, the training will just break and stop, ignoring the callback's logic for
+        the end of training.
 
         Returns:
             None
@@ -134,7 +144,7 @@ class AbstractExperimentCallback(AbstractCallback):
     def __init__(self, callback_name,
                  project_name=None, experiment_name=None, local_model_result_folder_path=None,
                  cloud_save_mode=None, bucket_name=None, cloud_dir_prefix=None,
-                 execution_order=0, device_idx_execution=None):
+                 execution_order=0, device_idx_execution=None, run_after_keyboard_interrupt=False):
         """Extension of the AbstractCallback implementing the automatic experiment details inference from TrainLoop
 
         This abstract callback is inherited from when the implemented callbacks intend to save results files into the
@@ -155,9 +165,14 @@ class AbstractExperimentCallback(AbstractCallback):
                 than the callbacks are executed in the order they were registered.
             device_idx_execution (int or None): index of the (CUDA GPU) device DDP process inside which the callback
                 should be executed
+            run_after_keyboard_interrupt (bool): should callback's ``on_train_end()`` method still be executed in case
+                that ``KeyboardInterrupt`` was issued during the train loop operation. If this parameter is False,
+                in the case of KeyboardInterrupt, the logic implemented in on_train_end() is ignored and the training
+                just ends when interrupt happens.
         """
         AbstractCallback.__init__(self, callback_name, execution_order=execution_order,
-                                  device_idx_execution=device_idx_execution)
+                                  device_idx_execution=device_idx_execution,
+                                  run_after_keyboard_interrupt=run_after_keyboard_interrupt)
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path) \

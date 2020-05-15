@@ -382,3 +382,82 @@ class TestTrainLoop(unittest.TestCase):
         y_pred, y_test, metadata = train_loop.predict_on_validation_set()
         self.assertEqual(train_loop.prediction_store.prediction_store['epoch'], 1)
         self.assertEqual(list(train_loop.prediction_store.prediction_store.keys()), ['epoch', 'val_pred'])
+
+    def test_keyboard_interrupt(self):
+        for epoch in range(1, 10):
+            self.interrupt_in_epoch(epoch)
+
+    def interrupt_in_epoch(self, interrupt_epoch):
+        dummy_optimizer = DummyOptimizer()
+        dummy_loss = DummyLoss()
+        dummy_train_loader = list(range(4))
+        dummy_val_loader = list(range(3))
+        dummy_test_loader = list(range(2))
+
+        model = NetUnifiedBatchFeed()
+        callbacks = [KeyboardInterruptCallback(interrupt_epoch=interrupt_epoch)]
+        train_loop = TrainLoop(model, dummy_train_loader, dummy_val_loader, dummy_test_loader,
+                               dummy_optimizer, dummy_loss)
+
+        exception_raised = False
+        try:
+            train_loop.fit(num_epochs=10, callbacks=callbacks)
+        except KeyboardInterrupt:
+            exception_raised = True
+        self.assertFalse(exception_raised)
+        self.assertEqual(train_loop.epoch, interrupt_epoch)
+
+    def test_callback_no_run_after_keyboard_interrupt(self):
+        num_epochs = 5
+        dummy_optimizer = DummyOptimizer()
+        dummy_loss = DummyLoss()
+        dummy_train_loader = list(range(4))
+        dummy_val_loader = list(range(3))
+        dummy_test_loader = list(range(2))
+        model = NetUnifiedBatchFeed()
+
+        callback_short = CallbackTrackerShort()
+        callbacks = [callback_short, KeyboardInterruptCallback(interrupt_epoch=2)]
+
+        train_loop = TrainLoop(model, dummy_train_loader, dummy_val_loader, dummy_test_loader,
+                               dummy_optimizer, dummy_loss)
+        train_loop.fit(num_epochs=num_epochs, callbacks=callbacks)
+
+        self.assertEqual(callback_short.callback_calls,
+                         ['on_epoch_begin', 'on_batch_begin', 'on_after_gradient_update', 'on_after_optimizer_step',
+                          'on_batch_begin', 'on_after_gradient_update', 'on_after_optimizer_step', 'on_batch_begin',
+                          'on_after_gradient_update', 'on_after_optimizer_step', 'on_batch_begin',
+                          'on_after_gradient_update', 'on_after_optimizer_step', 'on_epoch_end', 'on_epoch_begin',
+                          'on_batch_begin', 'on_after_gradient_update', 'on_after_optimizer_step', 'on_batch_begin',
+                          'on_after_gradient_update', 'on_after_optimizer_step', 'on_batch_begin',
+                          'on_after_gradient_update', 'on_after_optimizer_step', 'on_batch_begin',
+                          'on_after_gradient_update', 'on_after_optimizer_step', 'on_epoch_end', 'on_epoch_begin',
+                          'on_batch_begin', 'on_after_gradient_update', 'on_after_optimizer_step'])
+
+    def test_callback_run_after_keyboard_interrupt(self):
+        num_epochs = 5
+        dummy_optimizer = DummyOptimizer()
+        dummy_loss = DummyLoss()
+        dummy_train_loader = list(range(4))
+        dummy_val_loader = list(range(3))
+        dummy_test_loader = list(range(2))
+        model = NetUnifiedBatchFeed()
+
+        callback_short = CallbackTrackerShortInterruptRun()
+        callbacks = [callback_short, KeyboardInterruptCallback(interrupt_epoch=2)]
+
+        train_loop = TrainLoop(model, dummy_train_loader, dummy_val_loader, dummy_test_loader,
+                               dummy_optimizer, dummy_loss)
+        train_loop.fit(num_epochs=num_epochs, callbacks=callbacks)
+
+        self.assertEqual(callback_short.callback_calls,
+                         ['on_epoch_begin', 'on_batch_begin', 'on_after_gradient_update', 'on_after_optimizer_step',
+                          'on_batch_begin', 'on_after_gradient_update', 'on_after_optimizer_step', 'on_batch_begin',
+                          'on_after_gradient_update', 'on_after_optimizer_step', 'on_batch_begin',
+                          'on_after_gradient_update', 'on_after_optimizer_step', 'on_epoch_end', 'on_epoch_begin',
+                          'on_batch_begin', 'on_after_gradient_update', 'on_after_optimizer_step', 'on_batch_begin',
+                          'on_after_gradient_update', 'on_after_optimizer_step', 'on_batch_begin',
+                          'on_after_gradient_update', 'on_after_optimizer_step', 'on_batch_begin',
+                          'on_after_gradient_update', 'on_after_optimizer_step', 'on_epoch_end', 'on_epoch_begin',
+                          'on_batch_begin', 'on_after_gradient_update', 'on_after_optimizer_step',
+                          'on_train_end'])

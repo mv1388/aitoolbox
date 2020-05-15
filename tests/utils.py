@@ -187,6 +187,12 @@ class CallbackTrackerShort(AbstractCallback):
         self.call_ctr['on_after_optimizer_step'] += 1
 
 
+class CallbackTrackerShortInterruptRun(CallbackTrackerShort):
+    def __init__(self):
+        super().__init__()
+        self.run_after_keyboard_interrupt = True
+
+
 class DeactivateModelFeedDefinition(AbstractModelFeedDefinition):
     def __init__(self):
         self.dummy_batch = DummyBatch()
@@ -223,6 +229,16 @@ class DeactivateModelFeedDefinition(AbstractModelFeedDefinition):
         self.prediction_count += 1
         return torch.FloatTensor([self.prediction_count + 100] * 64).cpu(), \
                torch.FloatTensor([self.prediction_count] * 64).cpu(), {'bla': [self.prediction_count + 200] * 64}
+
+
+class KeyboardInterruptCallback(AbstractCallback):
+    def __init__(self, interrupt_epoch):
+        super().__init__('keyboard interrupt cb')
+        self.interrupt_epoch = interrupt_epoch
+
+    def on_batch_end(self):
+        if self.train_loop_obj.epoch == self.interrupt_epoch:
+            raise KeyboardInterrupt
 
 
 class DummyBatch:
