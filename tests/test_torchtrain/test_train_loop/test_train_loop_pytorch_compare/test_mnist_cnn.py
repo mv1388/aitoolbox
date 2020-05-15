@@ -62,8 +62,8 @@ class CNNNet(TTModel):
 
 class TestMNISTCNN(unittest.TestCase):
     def test_trainloop_core_pytorch_compare(self):
-        loss_tl, y_pred_tl, y_true_tl = self.train_eval_trainloop()
-        loss_pt, y_pred_pt, y_true_pt = self.train_eval_core_pytorch()
+        loss_tl, y_pred_tl, y_true_tl = self.train_eval_trainloop(num_epochs=5)
+        loss_pt, y_pred_pt, y_true_pt = self.train_eval_core_pytorch(num_epochs=5)
 
         self.assertEqual(loss_tl, loss_pt)
         self.assertEqual(y_pred_tl, y_pred_pt)
@@ -73,10 +73,10 @@ class TestMNISTCNN(unittest.TestCase):
         # if os.path.exists(project_path):
         #     shutil.rmtree(project_path)
 
-    def train_eval_trainloop(self):
+    def train_eval_trainloop(self, num_epochs):
         self.set_seeds()
         train_loader = torch.utils.data.DataLoader(
-            datasets.MNIST('./data', train=True, download=True,
+            datasets.MNIST('./data', train=False, download=True,
                            transform=transforms.Compose([
                                transforms.ToTensor(),
                                transforms.Normalize((0.1307,), (0.3081,))
@@ -89,6 +89,7 @@ class TestMNISTCNN(unittest.TestCase):
             ])),
             batch_size=100, num_workers=2)
 
+        self.set_seeds()
         model = CNNNet()
         optimizer = optim.Adam(model.parameters(), lr=0.001, betas=(0.9, 0.999))
         criterion = nn.NLLLoss()
@@ -99,17 +100,17 @@ class TestMNISTCNN(unittest.TestCase):
             train_loader, val_loader, None,
             optimizer, criterion
         )
-        tl.fit(num_epochs=5)
+        tl.fit(num_epochs=num_epochs)
 
         loss = tl.evaluate_loss_on_validation_set(force_prediction=True)
         y_pred, y_true, _ = tl.predict_on_validation_set(force_prediction=True)
 
-        return loss, y_pred, y_true
+        return loss, y_pred.tolist(), y_true.tolist()
 
-    def train_eval_core_pytorch(self):
+    def train_eval_core_pytorch(self, num_epochs):
         self.set_seeds()
         train_loader = torch.utils.data.DataLoader(
-            datasets.MNIST('./data', train=True, download=True,
+            datasets.MNIST('./data', train=False, download=True,
                            transform=transforms.Compose([
                                transforms.ToTensor(),
                                transforms.Normalize((0.1307,), (0.3081,))
@@ -122,12 +123,14 @@ class TestMNISTCNN(unittest.TestCase):
             ])),
             batch_size=100, num_workers=2)
 
+        self.set_seeds()
         model = CNNNet()
         optimizer = optim.Adam(model.parameters(), lr=0.001, betas=(0.9, 0.999))
         criterion = nn.NLLLoss()
 
         model.train()
-        for epoch in range(5):
+        for epoch in range(num_epochs):
+            print(f'Epoch: {epoch}')
             for i, (input_data, target) in enumerate(train_loader):
                 predicted = model(input_data)
                 loss = criterion(predicted, target)
@@ -135,6 +138,7 @@ class TestMNISTCNN(unittest.TestCase):
                 optimizer.step()
                 optimizer.zero_grad()
 
+        print('Evaluating')
         val_pred, val_true, val_loss = [], [], []
         model.eval()
         with torch.no_grad():
