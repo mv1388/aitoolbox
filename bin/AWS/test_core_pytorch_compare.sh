@@ -9,6 +9,7 @@ function usage()
 
    optional arguments:
      -k, --key STR                  path to ssh key
+     --multi, --multi-gpu           execute tests in the multi GPU setting instead of the default single GPU
      -i, --instance-config STR      instance configuration json filename
      --instance-type STR            instance type label; if this is provided the value from --instance-config is ignored
      -o, --os-name STR              username depending on the OS chosen. Default is ubuntu
@@ -23,6 +24,8 @@ instance_type=
 username="ubuntu"
 py_env="pytorch_p36"
 
+gpu_mode="single"
+
 job_timestamp=$(date +"%Y%m%d_%H_%M_%S")
 logging_filename="comparison_test_$job_timestamp.log"
 logging_path="~/package_test/$logging_filename"
@@ -35,6 +38,10 @@ case $key in
     -k|--key)
     key_path="$2"
     shift 2 # past argument value
+    ;;
+    --multi|--multi-gpu)
+    gpu_mode="multi"
+    shift 1 # past argument value
     ;;
     -i|--instance-config)
     instance_config="$2"
@@ -62,6 +69,11 @@ done
 
 if [[ "$instance_type" != "" ]]; then
     instance_config=config_$(tr . _ <<< $instance_type).json
+fi
+
+pytest_dir="tests_gpu/test_single_gpu"
+if [[ "$gpu_mode" == "multi" ]]; then
+    pytest_dir="tests_gpu/test_multi_gpu"
 fi
 
 
@@ -95,7 +107,7 @@ scp -i $key_path ../../requirements.txt $username@$ec2_instance_address:~/packag
 #########################################################
 echo "Running the comparison tests"
 ssh -i $key_path $username@$ec2_instance_address \
-    "source activate $py_env ; tmux new-session -d -s 'training' 'export AWS_DEFAULT_REGION=eu-west-1 ; cd package_test ; pip install pytest ; pip install -r requirements.txt ; pytest tests_gpu -s ; aws s3 cp $logging_path s3://aitoolbox-testing/core_pytorch_comparisson_testing/$logging_filename ; aws ec2 terminate-instances --instance-ids $instance_id' \; pipe-pane 'cat > $logging_path'"
+    "source activate $py_env ; tmux new-session -d -s 'training' 'export AWS_DEFAULT_REGION=eu-west-1 ; cd package_test ; pip install pytest ; pip install -r requirements.txt ; pytest $pytest_dir -s ; aws s3 cp $logging_path s3://aitoolbox-testing/core_pytorch_comparisson_testing/$logging_filename ; aws ec2 terminate-instances --instance-ids $instance_id' \; pipe-pane 'cat > $logging_path'"
 
 echo "Instance IP: $ec2_instance_address"
 
