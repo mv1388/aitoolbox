@@ -76,14 +76,14 @@ class TestMNISTCNN(unittest.TestCase):
     def train_eval_trainloop(self, num_epochs, use_real_train_data=False):
         self.set_seeds()
         train_loader = torch.utils.data.DataLoader(
-            datasets.MNIST('./data', train=use_real_train_data, download=True,
+            datasets.MNIST(os.path.join(THIS_DIR, 'data'), train=use_real_train_data, download=True,
                            transform=transforms.Compose([
                                transforms.ToTensor(),
                                transforms.Normalize((0.1307,), (0.3081,))
                            ])),
             batch_size=100, shuffle=True)
         val_loader = torch.utils.data.DataLoader(
-            datasets.MNIST('./data', train=False, transform=transforms.Compose([
+            datasets.MNIST(os.path.join(THIS_DIR, 'data'), train=False, transform=transforms.Compose([
                 transforms.ToTensor(),
                 transforms.Normalize((0.1307,), (0.3081,))
             ])),
@@ -114,14 +114,14 @@ class TestMNISTCNN(unittest.TestCase):
     def train_eval_core_pytorch(self, num_epochs, use_real_train_data=False):
         self.set_seeds()
         train_loader = torch.utils.data.DataLoader(
-            datasets.MNIST('./data', train=use_real_train_data, download=True,
+            datasets.MNIST(os.path.join(THIS_DIR, 'data'), train=use_real_train_data, download=True,
                            transform=transforms.Compose([
                                transforms.ToTensor(),
                                transforms.Normalize((0.1307,), (0.3081,))
                            ])),
             batch_size=100, shuffle=True)
         val_loader = torch.utils.data.DataLoader(
-            datasets.MNIST('./data', train=False, transform=transforms.Compose([
+            datasets.MNIST(os.path.join(THIS_DIR, 'data'), train=False, transform=transforms.Compose([
                 transforms.ToTensor(),
                 transforms.Normalize((0.1307,), (0.3081,))
             ])),
