@@ -43,5 +43,5 @@ install:
   - pip install -r requirements.txt
 
 script:
-  - pytest /tests
-  - travis_wait 40 pytest /tests_core_pytorch_compare
+  - pytest tests
+  - travis_wait 40 pytest tests_core_pytorch_compare
