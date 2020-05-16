@@ -44,4 +44,4 @@ install:
 
 script:
   - pytest tests
-  - travis_wait 40 pytest tests_core_pytorch_compare
+#  - travis_wait 50 pytest tests_core_pytorch_compare
