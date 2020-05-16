@@ -37,6 +37,6 @@ jobs:
       run: |
         pytest tests
 
-    - name: Test comparison with core PyTorch
-      run: |
-        pytest tests_core_pytorch_compare
+#    - name: Test comparison with core PyTorch
+#      run: |
+#        pytest tests_core_pytorch_compare
