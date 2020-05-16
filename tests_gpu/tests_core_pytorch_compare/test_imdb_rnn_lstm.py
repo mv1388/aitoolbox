@@ -228,7 +228,7 @@ class TestIMDBRNN(unittest.TestCase):
 
         train_data, test_data = torchtext.datasets.IMDB.splits(
             text_field=TEXT, label_field=LABEL,
-            root='./data',
+            root=os.path.join(THIS_DIR, 'data'),
             train='train', test='test'
         )
 
@@ -382,7 +382,7 @@ class TestIMDBLSTM(unittest.TestCase):
 
         train_data, test_data = torchtext.datasets.IMDB.splits(
             text_field=TEXT, label_field=LABEL,
-            root='./data',
+            root=os.path.join(THIS_DIR, 'data'),
             train='train', test='test'
         )
 
