@@ -258,137 +258,155 @@ class TestIMDBRNN(unittest.TestCase):
         torch.cuda.manual_seed_all(manual_seed)
 
 
-# class TestIMDBLSTM(unittest.TestCase):
-#     def test_trainloop_core_pytorch_compare(self):
-#         train_data, test_data, INPUT_DIM = self.get_data_loaders()
-#
-#         val_loss_tl, y_pred_tl, y_true_tl = self.train_eval_trainloop(train_data, test_data, INPUT_DIM, num_epochs=5)
-#         val_loss_pt, y_pred_pt, y_true_pt = self.train_eval_core_pytorch(train_data, test_data, INPUT_DIM, num_epochs=5)
-#
-#         self.assertEqual(val_loss_tl, val_loss_pt)
-#         self.assertEqual(y_pred_tl, y_pred_pt)
-#         self.assertEqual(y_true_tl, y_true_pt)
-#
-#         project_path = os.path.join(THIS_DIR, 'data')
-#         if os.path.exists(project_path):
-#             shutil.rmtree(project_path)
-#
-#     def train_eval_trainloop(self, train_data, test_data, INPUT_DIM, num_epochs):
-#         self.set_seeds()
-#         LEARNING_RATE = 1e-3
-#         BATCH_SIZE = 128
-#
-#         EMBEDDING_DIM = 100
-#         HIDDEN_DIM = 100
-#         OUTPUT_DIM = 1
-#
-#         train_loader, val_loader = torchtext.data.BucketIterator.splits(
-#             (train_data, test_data),
-#             batch_size=BATCH_SIZE, sort_within_batch=True
-#         )
-#
-#         model = LSTMClassifier(INPUT_DIM, EMBEDDING_DIM, HIDDEN_DIM, OUTPUT_DIM)
-#         optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
-#         criterion = nn.BCEWithLogitsLoss()
-#
-#         print('Start TrainLoop')
-#         train_loop = TrainLoop(
-#             model,
-#             train_loader, val_loader, None,
-#             optimizer, criterion
-#         )
-#         train_loop.fit(num_epochs=num_epochs)
-#
-#         val_loss = train_loop.evaluate_loss_on_validation_set(force_prediction=True)
-#         y_pred, y_true, _ = train_loop.predict_on_validation_set(force_prediction=True)
-#
-#         return val_loss, y_pred.tolist(), y_true.tolist()
-#
-#     def train_eval_core_pytorch(self, train_data, test_data, INPUT_DIM, num_epochs):
-#         self.set_seeds()
-#         LEARNING_RATE = 1e-3
-#         BATCH_SIZE = 128
-#
-#         EMBEDDING_DIM = 100
-#         HIDDEN_DIM = 100
-#         OUTPUT_DIM = 1
-#
-#         train_loader, val_loader = torchtext.data.BucketIterator.splits(
-#             (train_data, test_data),
-#             batch_size=BATCH_SIZE, sort_within_batch=True
-#         )
-#
-#         model = RNNClassifier(INPUT_DIM, EMBEDDING_DIM, HIDDEN_DIM, OUTPUT_DIM)
-#         optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
-#         criterion = nn.BCEWithLogitsLoss()
-#
-#         print('Starting manual PyTorch training')
-#         model.train()
-#         for epoch in range(num_epochs):
-#             print(f'Epoch: {epoch}')
-#             for i, batch_data in enumerate(train_loader):
-#                 text, text_lengths = batch_data.text
-#                 logits = model(text, text_lengths)
-#                 loss = criterion(logits, batch_data.label)
-#                 loss.backward()
-#                 optimizer.step()
-#                 optimizer.zero_grad()
-#
-#             # Imitate what happens in auto_execute_end_of_epoch() in TrainLoop
-#             for _ in train_loader:
-#                 pass
-#             for _ in val_loader:
-#                 pass
-#
-#         print('Evaluating')
-#         val_loss, val_pred, val_true = [], [], []
-#         model.eval()
-#         with torch.no_grad():
-#             for batch_data in val_loader:
-#                 text, text_lengths = batch_data.text
-#                 logits = model(text, text_lengths)
-#                 loss_batch = criterion(logits, batch_data.label).item()
-#                 val_pred += (torch.sigmoid(logits) > 0.5).long().tolist()
-#                 val_true += batch_data.label.tolist()
-#                 val_loss.append(loss_batch)
-#             val_loss = np.mean(val_loss)
-#
-#         return val_loss, val_pred, val_true
-#
-#     def get_data_loaders(self, ds_sample_ratio=1.):
-#         self.set_seeds()
-#         VOCABULARY_SIZE = 20000
-#
-#         TEXT = torchtext.data.Field(lower=True, include_lengths=True)  # necessary for packed_padded_sequence
-#         LABEL = torchtext.data.LabelField(dtype=torch.float)
-#
-#         train_data, test_data = torchtext.datasets.IMDB.splits(
-#             text_field=TEXT, label_field=LABEL,
-#             root='./data',
-#             train='train', test='test'
-#         )
-#
-#         if ds_sample_ratio < 1.0:
-#             _, train_data = train_data.split(split_ratio=1. - ds_sample_ratio)
-#             _, test_data = test_data.split(split_ratio=1. - ds_sample_ratio)
-#
-#         TEXT.build_vocab(train_data, max_size=VOCABULARY_SIZE)
-#         LABEL.build_vocab(train_data)
-#
-#         INPUT_DIM = len(TEXT.vocab)
-#
-#         return train_data, test_data, INPUT_DIM
-#
-#     @staticmethod
-#     def set_seeds():
-#         manual_seed = 0
-#         torch.backends.cudnn.enabled = False
-#         torch.backends.cudnn.benchmark = False
-#         torch.backends.cudnn.deterministic = True
-#
-#         np.random.seed(manual_seed)
-#         random.seed(manual_seed)
-#         torch.manual_seed(manual_seed)
-#         # if you are suing GPU
-#         torch.cuda.manual_seed(manual_seed)
-#         torch.cuda.manual_seed_all(manual_seed)
+class TestIMDBLSTM(unittest.TestCase):
+    def test_trainloop_core_pytorch_compare(self):
+        train_data, test_data, INPUT_DIM = self.get_data_loaders()
+
+        val_loss_tl, y_pred_tl, y_true_tl = self.train_eval_trainloop(train_data, test_data, INPUT_DIM, num_epochs=5)
+        val_loss_pt, y_pred_pt, y_true_pt = self.train_eval_core_pytorch(train_data, test_data, INPUT_DIM, num_epochs=5)
+
+        self.assertEqual(val_loss_tl, val_loss_pt)
+        self.assertEqual(y_pred_tl, y_pred_pt)
+        self.assertEqual(y_true_tl, y_true_pt)
+
+        project_path = os.path.join(THIS_DIR, 'data')
+        if os.path.exists(project_path):
+            shutil.rmtree(project_path)
+
+    def train_eval_trainloop(self, train_data, test_data, INPUT_DIM, num_epochs):
+        self.set_seeds()
+        LEARNING_RATE = 1e-3
+        BATCH_SIZE = 128
+
+        EMBEDDING_DIM = 100
+        HIDDEN_DIM = 100
+        OUTPUT_DIM = 1
+
+        train_loader, val_loader = torchtext.data.BucketIterator.splits(
+            (train_data, test_data),
+            batch_size=BATCH_SIZE, sort_within_batch=True
+        )
+
+        model = LSTMClassifier(INPUT_DIM, EMBEDDING_DIM, HIDDEN_DIM, OUTPUT_DIM)
+        optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
+        criterion = nn.BCEWithLogitsLoss()
+
+        print('Start TrainLoop')
+        train_loop = TrainLoop(
+            model,
+            train_loader, val_loader, None,
+            optimizer, criterion
+        )
+        USE_CUDA = torch.cuda.is_available()
+        self.assertEqual(train_loop.device.type, "cuda" if USE_CUDA else "cpu")
+        self.assertEqual(train_loop.device.type, "cuda")
+
+        train_loop.fit(num_epochs=num_epochs)
+
+        val_loss = train_loop.evaluate_loss_on_validation_set(force_prediction=True)
+        y_pred, y_true, _ = train_loop.predict_on_validation_set(force_prediction=True)
+
+        return val_loss, y_pred.tolist(), y_true.tolist()
+
+    def train_eval_core_pytorch(self, train_data, test_data, INPUT_DIM, num_epochs):
+        self.set_seeds()
+        LEARNING_RATE = 1e-3
+        BATCH_SIZE = 128
+
+        EMBEDDING_DIM = 100
+        HIDDEN_DIM = 100
+        OUTPUT_DIM = 1
+
+        train_loader, val_loader = torchtext.data.BucketIterator.splits(
+            (train_data, test_data),
+            batch_size=BATCH_SIZE, sort_within_batch=True
+        )
+
+        USE_CUDA = torch.cuda.is_available()
+        device = torch.device(f"cuda" if USE_CUDA else "cpu")
+        self.assertEqual(device.type, "cuda")
+
+        model = LSTMClassifier(INPUT_DIM, EMBEDDING_DIM, HIDDEN_DIM, OUTPUT_DIM).to(device)
+        optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
+        criterion = nn.BCEWithLogitsLoss()
+
+        print('Starting manual PyTorch training')
+        model.train()
+        for epoch in range(num_epochs):
+            print(f'Epoch: {epoch}')
+            for i, batch_data in enumerate(train_loader):
+                text, text_lengths = batch_data.text
+                target = batch_data.label
+                text = text.to(device)
+                text_lengths = text_lengths.to(device)
+                target = target.to(device)
+
+                logits = model(text, text_lengths)
+                loss = criterion(logits, target)
+                loss.backward()
+                optimizer.step()
+                optimizer.zero_grad()
+
+            # Imitate what happens in auto_execute_end_of_epoch() in TrainLoop
+            for _ in train_loader:
+                pass
+            for _ in val_loader:
+                pass
+
+        print('Evaluating')
+        val_loss, val_pred, val_true = [], [], []
+        model.eval()
+        with torch.no_grad():
+            for batch_data in val_loader:
+                text, text_lengths = batch_data.text
+                target = batch_data.label
+                text = text.to(device)
+                text_lengths = text_lengths.to(device)
+                target = target.to(device)
+
+                logits = model(text, text_lengths)
+                loss_batch = criterion(logits, target).cpu().item()
+                val_pred += (torch.sigmoid(logits) > 0.5).long().cpu().tolist()
+                val_true += target.cpu().tolist()
+                val_loss.append(loss_batch)
+            val_loss = np.mean(val_loss)
+
+        return val_loss, val_pred, val_true
+
+    def get_data_loaders(self, ds_sample_ratio=1.):
+        self.set_seeds()
+        VOCABULARY_SIZE = 20000
+
+        TEXT = torchtext.data.Field(lower=True, include_lengths=True)  # necessary for packed_padded_sequence
+        LABEL = torchtext.data.LabelField(dtype=torch.float)
+
+        train_data, test_data = torchtext.datasets.IMDB.splits(
+            text_field=TEXT, label_field=LABEL,
+            root='./data',
+            train='train', test='test'
+        )
+
+        if ds_sample_ratio < 1.0:
+            _, train_data = train_data.split(split_ratio=1. - ds_sample_ratio)
+            _, test_data = test_data.split(split_ratio=1. - ds_sample_ratio)
+
+        TEXT.build_vocab(train_data, max_size=VOCABULARY_SIZE)
+        LABEL.build_vocab(train_data)
+
+        INPUT_DIM = len(TEXT.vocab)
+
+        return train_data, test_data, INPUT_DIM
+
+    @staticmethod
+    def set_seeds():
+        manual_seed = 0
+        torch.backends.cudnn.enabled = False
+        torch.backends.cudnn.benchmark = False
+        torch.backends.cudnn.deterministic = True
+
+        np.random.seed(manual_seed)
+        random.seed(manual_seed)
+        torch.manual_seed(manual_seed)
+        # if you are suing GPU
+        torch.cuda.manual_seed(manual_seed)
+        torch.cuda.manual_seed_all(manual_seed)
