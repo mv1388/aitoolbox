@@ -86,7 +86,7 @@ echo "Preparing instance"
 ssh -i $key_path -o "StrictHostKeyChecking no" $username@$ec2_instance_address 'mkdir ~/package_test'
 
 scp -i $key_path -r ../../aitoolbox $username@$ec2_instance_address:~/package_test
-scp -i $key_path -r ../../tests_core_pytorch_compare $username@$ec2_instance_address:~/package_test
+scp -i $key_path -r ../../tests_gpu $username@$ec2_instance_address:~/package_test
 scp -i $key_path ../../requirements.txt $username@$ec2_instance_address:~/package_test
 
 
@@ -95,7 +95,7 @@ scp -i $key_path ../../requirements.txt $username@$ec2_instance_address:~/packag
 #########################################################
 echo "Running the comparison tests"
 ssh -i $key_path $username@$ec2_instance_address \
-    "source activate $py_env ; tmux new-session -d -s 'training' 'export AWS_DEFAULT_REGION=eu-west-1 ; cd package_test ; pip install pytest ; pip install -r requirements.txt ; pytest tests_core_pytorch_compare -s ; aws s3 cp $logging_path s3://aitoolbox-testing/core_pytorch_comparisson_testing/$logging_filename ; aws ec2 terminate-instances --instance-ids $instance_id' \; pipe-pane 'cat > $logging_path'"
+    "source activate $py_env ; tmux new-session -d -s 'training' 'export AWS_DEFAULT_REGION=eu-west-1 ; cd package_test ; pip install pytest ; pip install -r requirements.txt ; pytest tests_gpu -s ; aws s3 cp $logging_path s3://aitoolbox-testing/core_pytorch_comparisson_testing/$logging_filename ; aws ec2 terminate-instances --instance-ids $instance_id' \; pipe-pane 'cat > $logging_path'"
 
 echo "Instance IP: $ec2_instance_address"
 
