@@ -31,8 +31,8 @@ phases:
       # - command
   build:
     commands:
-#       - pytest tests
        - pytest tests_core_pytorch_compare
+#       - pytest tests
   #post_build:
     #commands:
       # - command
