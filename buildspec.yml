@@ -23,6 +23,7 @@ phases:
        python: 3.7
       # name: version
     commands:
+       - conda install -c conda-forge jsonnet
        - pip install tensorflow keras moto pytest
        - pip install -r requirements.txt
   #pre_build:
@@ -31,8 +32,8 @@ phases:
       # - command
   build:
     commands:
-       - pytest tests
-      # - command
+       - pytest tests_core_pytorch_compare -s
+#       - pytest tests
   #post_build:
     #commands:
       # - command
