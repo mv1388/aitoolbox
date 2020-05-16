@@ -9,8 +9,7 @@ function usage()
 
    optional arguments:
      -k, --key STR                  path to ssh key
-     --single, --single-gpu         execute tests in the single GPU setting
-     --multi, --multi-gpu           execute tests in the multi GPU setting
+     --multi, --multi-gpu           execute tests in the multi GPU setting instead of the default single GPU
      -i, --instance-config STR      instance configuration json filename
      --instance-type STR            instance type label; if this is provided the value from --instance-config is ignored
      -o, --os-name STR              username depending on the OS chosen. Default is ubuntu
@@ -39,10 +38,6 @@ case $key in
     -k|--key)
     key_path="$2"
     shift 2 # past argument value
-    ;;
-    --single|--single-gpu)
-    gpu_mode="single"
-    shift 1 # past argument value
     ;;
     --multi|--multi-gpu)
     gpu_mode="multi"
