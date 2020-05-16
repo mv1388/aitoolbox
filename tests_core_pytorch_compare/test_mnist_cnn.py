@@ -122,7 +122,10 @@ class TestMNISTCNN(unittest.TestCase):
             ])),
             batch_size=100)
 
-        model_pt = CNNNet()
+        USE_CUDA = torch.cuda.is_available()
+        device = torch.device(f"cuda" if USE_CUDA else "cpu")
+
+        model_pt = CNNNet().to(device)
         optimizer_pt = optim.Adam(model_pt.parameters(), lr=0.001, betas=(0.9, 0.999))
         criterion_pt = nn.NLLLoss()
 
@@ -130,6 +133,9 @@ class TestMNISTCNN(unittest.TestCase):
         for epoch in range(num_epochs):
             print(f'Epoch: {epoch}')
             for i, (input_data, target) in enumerate(train_loader):
+                input_data = input_data.to(device)
+                target = target.to(device)
+
                 predicted = model_pt(input_data)
                 loss = criterion_pt(predicted, target)
                 loss.backward()
@@ -147,10 +153,13 @@ class TestMNISTCNN(unittest.TestCase):
         model_pt.eval()
         with torch.no_grad():
             for input_data, target in val_loader:
+                input_data = input_data.to(device)
+                target = target.to(device)
+
                 predicted = model_pt(input_data)
-                loss_batch = criterion_pt(predicted, target).item()
-                val_pred += predicted.argmax(dim=1, keepdim=False).tolist()
-                val_true += target.tolist()
+                loss_batch = criterion_pt(predicted, target).cpu().item()
+                val_pred += predicted.argmax(dim=1, keepdim=False).cpu().tolist()
+                val_true += target.cpu().tolist()
                 val_loss.append(loss_batch)
             val_loss = np.mean(val_loss)
 
