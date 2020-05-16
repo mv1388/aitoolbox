@@ -39,6 +39,6 @@ jobs:
         pytest
 
     - name: Test comparison with core PyTorch
-        run: |
-          pip install pytest
-          pytest /tests_core_pytorch_compare
+      run: |
+        pip install pytest
+        pytest /tests_core_pytorch_compare
