@@ -99,6 +99,10 @@ class TestMNISTCNN(unittest.TestCase):
             train_loader, val_loader, None,
             optimizer, criterion
         )
+
+        USE_CUDA = torch.cuda.is_available()
+        self.assertEqual(tl.device.type, "cuda" if USE_CUDA else "cpu")
+
         tl.fit(num_epochs=num_epochs)
 
         val_loss = tl.evaluate_loss_on_validation_set(force_prediction=True)
