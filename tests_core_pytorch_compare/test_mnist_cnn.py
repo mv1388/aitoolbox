@@ -62,18 +62,16 @@ class CNNNet(TTModel):
 
 class TestMNISTCNN(unittest.TestCase):
     def test_trainloop_core_pytorch_compare(self):
-        print(f'====================\ntorch.cuda.is_available(): {torch.cuda.is_available()}\n===============')
+        val_loss_tl, y_pred_tl, y_true_tl = self.train_eval_trainloop(num_epochs=5, use_real_train_data=True)
+        val_loss_pt, y_pred_pt, y_true_pt = self.train_eval_core_pytorch(num_epochs=5, use_real_train_data=True)
 
-        # val_loss_tl, y_pred_tl, y_true_tl = self.train_eval_trainloop(num_epochs=5, use_real_train_data=True)
-        # val_loss_pt, y_pred_pt, y_true_pt = self.train_eval_core_pytorch(num_epochs=5, use_real_train_data=True)
-        #
-        # self.assertEqual(val_loss_tl, val_loss_pt)
-        # self.assertEqual(y_pred_tl, y_pred_pt)
-        # self.assertEqual(y_true_tl, y_true_pt)
-        #
-        # project_path = os.path.join(THIS_DIR, 'data')
-        # if os.path.exists(project_path):
-        #     shutil.rmtree(project_path)
+        self.assertEqual(val_loss_tl, val_loss_pt)
+        self.assertEqual(y_pred_tl, y_pred_pt)
+        self.assertEqual(y_true_tl, y_true_pt)
+
+        project_path = os.path.join(THIS_DIR, 'data')
+        if os.path.exists(project_path):
+            shutil.rmtree(project_path)
 
     def train_eval_trainloop(self, num_epochs, use_real_train_data=False):
         self.set_seeds()
