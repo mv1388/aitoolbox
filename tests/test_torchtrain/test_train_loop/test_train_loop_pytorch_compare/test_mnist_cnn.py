@@ -62,16 +62,15 @@ class CNNNet(TTModel):
 
 class TestMNISTCNN(unittest.TestCase):
     def test_trainloop_core_pytorch_compare(self):
-        loss_tl, y_pred_tl, y_true_tl = self.train_eval_trainloop(num_epochs=5)
-        loss_pt, y_pred_pt, y_true_pt = self.train_eval_core_pytorch(num_epochs=5)
+        y_pred_tl, y_true_tl = self.train_eval_trainloop(num_epochs=5)
+        y_pred_pt, y_true_pt = self.train_eval_core_pytorch(num_epochs=5)
 
-        self.assertEqual(loss_tl, loss_pt)
         self.assertEqual(y_pred_tl, y_pred_pt)
         self.assertEqual(y_true_tl, y_true_pt)
 
-        # project_path = os.path.join(THIS_DIR, 'data')
-        # if os.path.exists(project_path):
-        #     shutil.rmtree(project_path)
+        project_path = os.path.join(THIS_DIR, 'data')
+        if os.path.exists(project_path):
+            shutil.rmtree(project_path)
 
     def train_eval_trainloop(self, num_epochs):
         self.set_seeds()
@@ -89,7 +88,6 @@ class TestMNISTCNN(unittest.TestCase):
             ])),
             batch_size=100, num_workers=2)
 
-        self.set_seeds()
         model = CNNNet()
         optimizer = optim.Adam(model.parameters(), lr=0.001, betas=(0.9, 0.999))
         criterion = nn.NLLLoss()
@@ -102,10 +100,9 @@ class TestMNISTCNN(unittest.TestCase):
         )
         tl.fit(num_epochs=num_epochs)
 
-        loss = tl.evaluate_loss_on_validation_set(force_prediction=True)
         y_pred, y_true, _ = tl.predict_on_validation_set(force_prediction=True)
 
-        return loss, y_pred.tolist(), y_true.tolist()
+        return y_pred.tolist(), y_true.tolist()
 
     def train_eval_core_pytorch(self, num_epochs):
         self.set_seeds()
@@ -123,45 +120,46 @@ class TestMNISTCNN(unittest.TestCase):
             ])),
             batch_size=100, num_workers=2)
 
-        self.set_seeds()
-        model = CNNNet()
-        optimizer = optim.Adam(model.parameters(), lr=0.001, betas=(0.9, 0.999))
-        criterion = nn.NLLLoss()
+        model_pt = CNNNet()
+        optimizer_pt = optim.Adam(model_pt.parameters(), lr=0.001, betas=(0.9, 0.999))
+        criterion_pt = nn.NLLLoss()
 
-        model.train()
+        model_pt.train()
         for epoch in range(num_epochs):
             print(f'Epoch: {epoch}')
             for i, (input_data, target) in enumerate(train_loader):
-                predicted = model(input_data)
-                loss = criterion(predicted, target)
+                predicted = model_pt(input_data)
+                loss = criterion_pt(predicted, target)
                 loss.backward()
-                optimizer.step()
-                optimizer.zero_grad()
+                optimizer_pt.step()
+                optimizer_pt.zero_grad()
+
+            for _ in train_loader:
+                pass
+            for _ in val_loader:
+                pass
 
         print('Evaluating')
-        val_pred, val_true, val_loss = [], [], []
-        model.eval()
+        val_pred, val_true = [], []
+        model_pt.eval()
         with torch.no_grad():
             for input_data, target in val_loader:
-                predicted = model(input_data)
-                loss_batch = criterion(predicted, target).item()
-                val_loss.append(loss_batch)
+                predicted = model_pt(input_data)
                 val_pred += predicted.argmax(dim=1, keepdim=False).tolist()
                 val_true += target.tolist()
-            val_loss = np.mean(val_loss)
 
-        return val_loss, val_pred, val_true
+        return val_pred, val_true
 
     @staticmethod
     def set_seeds():
         manual_seed = 0
+        torch.backends.cudnn.enabled = False
+        torch.backends.cudnn.benchmark = False
+        torch.backends.cudnn.deterministic = True
+
         np.random.seed(manual_seed)
         random.seed(manual_seed)
         torch.manual_seed(manual_seed)
         # if you are suing GPU
         torch.cuda.manual_seed(manual_seed)
         torch.cuda.manual_seed_all(manual_seed)
-
-        torch.backends.cudnn.enabled = False
-        torch.backends.cudnn.benchmark = False
-        torch.backends.cudnn.deterministic = True
