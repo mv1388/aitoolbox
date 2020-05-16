@@ -11,5 +11,5 @@
 #
 #  build:
 #    commands:
-#       - pytest tests_core_pytorch_compare -s
+#       - pytest tests_gpu -s
 ##       - pytest tests
