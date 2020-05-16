@@ -23,8 +23,7 @@ phases:
        python: 3.7
       # name: version
     commands:
-       - python -m pip install --upgrade pip
-       - pip install jsonnet
+       - conda install -c conda-forge jsonnet
        - pip install tensorflow keras moto pytest
        - pip install -r requirements.txt
   #pre_build:
