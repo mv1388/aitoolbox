@@ -39,8 +39,9 @@ matrix:
 
 # command to install dependencies
 install:
-  - pip install tensorflow keras moto
+  - pip install tensorflow keras moto pytest
   - pip install -r requirements.txt
 
 script:
-  - pytest
+  - pytest tests
+  - travis_wait 40 pytest tests_core_pytorch_compare

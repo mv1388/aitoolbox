@@ -31,5 +31,5 @@ bumpversion ${bump_type} --config-file .bumpversion.cfg
 
 if [[ ${rebuild_pkg} == true ]]; then
     mv dist/* dist_old
-    ./build_package.sh
+    ./build_package.sh --no-test
 fi
