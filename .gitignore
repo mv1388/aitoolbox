@@ -9,6 +9,8 @@
 
 /bin/AWS/configs
 
+/dist_old
+
 /docs/build
 /docs/source/api/aitoolbox*
 /docs/source/api/modules.rst
