@@ -14,6 +14,11 @@ from aitoolbox import TrainLoop, TTModel
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
+"""
+Training taken from: 
+    https://github.com/rasbt/deeplearning-models/blob/master/pytorch_ipynb/rnn/rnn_simple_packed_imdb.ipynb
+"""
+
 
 class RNNClassifier(TTModel):
     def __init__(self, input_dim, embedding_dim, hidden_dim, output_dim):
