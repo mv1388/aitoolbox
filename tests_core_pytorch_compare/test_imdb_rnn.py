@@ -61,8 +61,8 @@ class TestIMDBLSTM(unittest.TestCase):
     def test_trainloop_core_pytorch_compare(self):
         train_data, test_data, INPUT_DIM = self.get_data_loaders()
 
-        val_loss_tl, y_pred_tl, y_true_tl = self.train_eval_trainloop(train_data, test_data, INPUT_DIM, num_epochs=2)
-        val_loss_pt, y_pred_pt, y_true_pt = self.train_eval_core_pytorch(train_data, test_data, INPUT_DIM, num_epochs=2)
+        val_loss_tl, y_pred_tl, y_true_tl = self.train_eval_trainloop(train_data, test_data, INPUT_DIM, num_epochs=5)
+        val_loss_pt, y_pred_pt, y_true_pt = self.train_eval_core_pytorch(train_data, test_data, INPUT_DIM, num_epochs=5)
 
         self.assertEqual(val_loss_tl, val_loss_pt)
         self.assertEqual(y_pred_tl, y_pred_pt)
