@@ -1,5 +1,17 @@
 #!/usr/bin/env bash
 
+# Example how to run two most common use-cases:
+#   Single GPU tests:
+#       ./test_core_pytorch_compare.sh
+#       Or to speed it up:
+#       ./test_core_pytorch_compare.sh --instance-type p3.2xlarge
+#
+#   Multi GPU tests:
+#       ./test_core_pytorch_compare.sh --multi-gpu --instance-type p2.8xlarge
+#       Or to speed it up:
+#       ./test_core_pytorch_compare.sh --multi-gpu --instance-type p3.8xlarge
+
+
 # usage function
 function usage()
 {
@@ -7,11 +19,22 @@ function usage()
 
    Usage: ./test_core_pytorch_compare.sh ...
 
+   Example how to run two most common use-cases:
+       Single GPU tests:
+           ./test_core_pytorch_compare.sh
+           Or to speed it up:
+           ./test_core_pytorch_compare.sh --instance-type p3.2xlarge
+
+       Multi GPU tests:
+           ./test_core_pytorch_compare.sh --multi-gpu --instance-type p2.8xlarge
+           Or to speed it up:
+           ./test_core_pytorch_compare.sh --multi-gpu --instance-type p3.8xlarge
+
    optional arguments:
-     -k, --key STR                  path to ssh key
      --multi, --multi-gpu           execute tests in the multi GPU setting instead of the default single GPU
-     -i, --instance-config STR      instance configuration json filename
      --instance-type STR            instance type label; if this is provided the value from --instance-config is ignored
+     -i, --instance-config STR      instance configuration json filename
+     -k, --key STR                  path to ssh key
      -o, --os-name STR              username depending on the OS chosen. Default is ubuntu
      -h, --help                     show this help message and exit
 
