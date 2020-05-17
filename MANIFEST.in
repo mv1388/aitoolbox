@@ -1,2 +1,3 @@
 include README.md
 prune tests/
+prune tests_gpu/

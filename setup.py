@@ -15,7 +15,7 @@ setup(
 
     python_requires='>=3.6.0',
 
-    packages=find_packages(exclude=['tests', 'examples', 'deprecated']),
+    packages=find_packages(exclude=['tests', 'tests_gpu', 'examples', 'deprecated']),
 
     install_requires=[
         'numpy',
