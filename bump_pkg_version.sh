@@ -46,12 +46,20 @@ fi
 
 if [[ ${gpu_test} == true ]]; then
     cd bin/AWS
+    echo "Submitting GPU tests"
 
     if [[ ${fast_gpu_test} == false ]]; then
+        echo "Submitting Single GPU tests"
         ./test_core_pytorch_compare.sh
+        echo "Submitting Multi GPU tests"
         ./test_core_pytorch_compare.sh --multi-gpu --instance-type p2.8xlarge
     else
+        echo "Submitting Single GPU tests"
         ./test_core_pytorch_compare.sh --instance-type p3.2xlarge
+        echo "Submitting Multi GPU tests"
         ./test_core_pytorch_compare.sh --multi-gpu --instance-type p3.8xlarge
     fi
+
+    echo "GPU test submissions done!"
+    echo "Wait for these tests to finish successfully before creating the new package release on GitHub and deployment!"
 fi
