@@ -50,14 +50,14 @@ if [[ ${gpu_test} == true ]]; then
 
     if [[ ${fast_gpu_test} == false ]]; then
         echo "Submitting Single GPU tests"
-        ./test_core_pytorch_compare.sh
+        ./test_core_pytorch_compare.sh --no-ssh
         echo "Submitting Multi GPU tests"
-        ./test_core_pytorch_compare.sh --multi-gpu --instance-type p2.8xlarge
+        ./test_core_pytorch_compare.sh --multi-gpu --instance-type p2.8xlarge --no-ssh
     else
         echo "Submitting Single GPU tests"
-        ./test_core_pytorch_compare.sh --instance-type p3.2xlarge
+        ./test_core_pytorch_compare.sh --instance-type p3.2xlarge --no-ssh
         echo "Submitting Multi GPU tests"
-        ./test_core_pytorch_compare.sh --multi-gpu --instance-type p3.8xlarge
+        ./test_core_pytorch_compare.sh --multi-gpu --instance-type p3.8xlarge --no-ssh
     fi
 
     echo "GPU test submissions done!"

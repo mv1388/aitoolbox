@@ -34,6 +34,7 @@ function usage()
      --multi, --multi-gpu           execute tests in the multi GPU setting instead of the default single GPU
      --instance-type STR            instance type label; if this is provided the value from --instance-config is ignored
      -i, --instance-config STR      instance configuration json filename
+     --no-ssh                       after test job is submitted don't automatically ssh into the running instance
      -k, --key STR                  path to ssh key
      -o, --os-name STR              username depending on the OS chosen. Default is ubuntu
      -h, --help                     show this help message and exit
@@ -46,6 +47,7 @@ instance_config="config_p2_xlarge.json"
 instance_type=
 username="ubuntu"
 py_env="pytorch_p36"
+ssh_at_start=true
 
 gpu_mode="single"
 
@@ -73,6 +75,10 @@ case $key in
     --instance-type)
     instance_type="$2"
     shift 2 # past argument value
+    ;;
+    --no-ssh)
+    ssh_at_start=false
+    shift 1 # past argument value
     ;;
     -o|--os-name)
     username="$2"
@@ -134,4 +140,6 @@ ssh -i $key_path $username@$ec2_instance_address \
 
 echo "Instance IP: $ec2_instance_address"
 
-./ssh_to_instance.sh $ec2_instance_address --os-name $username --ssh-tmux
+if [[ ${ssh_at_start} == true ]]; then
+    ./ssh_to_instance.sh $ec2_instance_address --os-name $username --ssh-tmux
+fi
