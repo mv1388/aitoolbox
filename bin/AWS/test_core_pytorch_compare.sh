@@ -1,5 +1,17 @@
 #!/usr/bin/env bash
 
+# Example how to run two most common use-cases:
+#   Single GPU tests:
+#       ./test_core_pytorch_compare.sh
+#       Or to speed it up:
+#       ./test_core_pytorch_compare.sh --instance-type p3.2xlarge
+#
+#   Multi GPU tests:
+#       ./test_core_pytorch_compare.sh --multi-gpu --instance-type p2.8xlarge
+#       Or to speed it up:
+#       ./test_core_pytorch_compare.sh --multi-gpu --instance-type p3.8xlarge
+
+
 # usage function
 function usage()
 {
@@ -7,10 +19,23 @@ function usage()
 
    Usage: ./test_core_pytorch_compare.sh ...
 
+   Example how to run two most common use-cases:
+       Single GPU tests:
+           ./test_core_pytorch_compare.sh
+           Or to speed it up:
+           ./test_core_pytorch_compare.sh --instance-type p3.2xlarge
+
+       Multi GPU tests:
+           ./test_core_pytorch_compare.sh --multi-gpu --instance-type p2.8xlarge
+           Or to speed it up:
+           ./test_core_pytorch_compare.sh --multi-gpu --instance-type p3.8xlarge
+
    optional arguments:
-     -k, --key STR                  path to ssh key
-     -i, --instance-config STR      instance configuration json filename
+     --multi, --multi-gpu           execute tests in the multi GPU setting instead of the default single GPU
      --instance-type STR            instance type label; if this is provided the value from --instance-config is ignored
+     -i, --instance-config STR      instance configuration json filename
+     --no-ssh                       after test job is submitted don't automatically ssh into the running instance
+     -k, --key STR                  path to ssh key
      -o, --os-name STR              username depending on the OS chosen. Default is ubuntu
      -h, --help                     show this help message and exit
 
@@ -22,6 +47,9 @@ instance_config="config_p2_xlarge.json"
 instance_type=
 username="ubuntu"
 py_env="pytorch_p36"
+ssh_at_start=true
+
+gpu_mode="single"
 
 job_timestamp=$(date +"%Y%m%d_%H_%M_%S")
 logging_filename="comparison_test_$job_timestamp.log"
@@ -36,6 +64,10 @@ case $key in
     key_path="$2"
     shift 2 # past argument value
     ;;
+    --multi|--multi-gpu)
+    gpu_mode="multi"
+    shift 1 # past argument value
+    ;;
     -i|--instance-config)
     instance_config="$2"
     shift 2 # past argument value
@@ -43,6 +75,10 @@ case $key in
     --instance-type)
     instance_type="$2"
     shift 2 # past argument value
+    ;;
+    --no-ssh)
+    ssh_at_start=false
+    shift 1 # past argument value
     ;;
     -o|--os-name)
     username="$2"
@@ -62,6 +98,11 @@ done
 
 if [[ "$instance_type" != "" ]]; then
     instance_config=config_$(tr . _ <<< $instance_type).json
+fi
+
+pytest_dir="tests_gpu/test_single_gpu"
+if [[ "$gpu_mode" == "multi" ]]; then
+    pytest_dir="tests_gpu/test_multi_gpu"
 fi
 
 
@@ -95,8 +136,10 @@ scp -i $key_path ../../requirements.txt $username@$ec2_instance_address:~/packag
 #########################################################
 echo "Running the comparison tests"
 ssh -i $key_path $username@$ec2_instance_address \
-    "source activate $py_env ; tmux new-session -d -s 'training' 'export AWS_DEFAULT_REGION=eu-west-1 ; cd package_test ; pip install pytest ; pip install -r requirements.txt ; pytest tests_gpu -s ; aws s3 cp $logging_path s3://aitoolbox-testing/core_pytorch_comparisson_testing/$logging_filename ; aws ec2 terminate-instances --instance-ids $instance_id' \; pipe-pane 'cat > $logging_path'"
+    "source activate $py_env ; tmux new-session -d -s 'training' 'export AWS_DEFAULT_REGION=eu-west-1 ; cd package_test ; pip install pytest seaborn==0.9.0 ; pip install -r requirements.txt ; pytest $pytest_dir -s ; aws s3 cp $logging_path s3://aitoolbox-testing/core_pytorch_comparisson_testing/$logging_filename ; aws ec2 terminate-instances --instance-ids $instance_id' \; pipe-pane 'cat > $logging_path'"
 
 echo "Instance IP: $ec2_instance_address"
 
-./ssh_to_instance.sh $ec2_instance_address --os-name $username --ssh-tmux
+if [[ ${ssh_at_start} == true ]]; then
+    ./ssh_to_instance.sh $ec2_instance_address --os-name $username --ssh-tmux
+fi
