@@ -18,7 +18,7 @@ from torch.nn.parallel import DistributedDataParallel
 from torch.utils.data.distributed import DistributedSampler
 
 from aitoolbox import TrainLoop, TTModel
-from tests_gpu.test_multi_gpu.test_core_pytorch_compare.test_ddp.ddp_prediction_saver import DDPPredictionSave
+from tests_gpu.test_multi_gpu.ddp_prediction_saver import DDPPredictionSave
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -74,7 +74,7 @@ class TestMNISTCNN(unittest.TestCase):
         val_loss_tl, y_pred_tl, y_true_tl = self.train_eval_trainloop(num_epochs=5, use_real_train_data=True)
         val_loss_pt, y_pred_pt, y_true_pt = self.train_eval_core_pytorch(num_epochs=5, use_real_train_data=True)
 
-        self.assertEqual(val_loss_tl, val_loss_pt)
+        self.assertAlmostEqual(val_loss_tl, val_loss_pt, places=8)
         self.assertEqual(y_pred_tl, y_pred_pt)
         self.assertEqual(y_true_tl, y_true_pt)
 
@@ -93,7 +93,7 @@ class TestMNISTCNN(unittest.TestCase):
                                transforms.ToTensor(),
                                transforms.Normalize((0.1307,), (0.3081,))
                            ])),
-            batch_size=100, shuffle=True)
+            batch_size=100)
         val_loader = torch.utils.data.DataLoader(
             datasets.MNIST(os.path.join(THIS_DIR, 'data'), train=False, transform=transforms.Compose([
                 transforms.ToTensor(),
@@ -130,7 +130,7 @@ class TestMNISTCNN(unittest.TestCase):
                                transforms.ToTensor(),
                                transforms.Normalize((0.1307,), (0.3081,))
                            ])),
-            batch_size=100, shuffle=True)
+            batch_size=100)
         val_loader = torch.utils.data.DataLoader(
             datasets.MNIST(os.path.join(THIS_DIR, 'data'), train=False, transform=transforms.Compose([
                 transforms.ToTensor(),
@@ -145,6 +145,8 @@ class TestMNISTCNN(unittest.TestCase):
         os.environ['MASTER_ADDR'] = 'localhost'
         os.environ['MASTER_PORT'] = '8888'
 
+        print('Starting the manual DDP training')
+
         mp.spawn(
             self.manual_ddp_training,
             args=(num_epochs, model_pt, optimizer_pt, criterion_pt, train_loader, val_loader),
@@ -155,10 +157,11 @@ class TestMNISTCNN(unittest.TestCase):
         for idx in range(torch.cuda.device_count()):
             with open(f'{THIS_DIR}/ddp_cnn_save/pt_ddp_predictions_{idx}.p', 'rb') as f:
                 val_loss_f, y_pred_f, y_true_f = pickle.load(f)
-                val_loss.append(val_loss_f)
+                val_loss += val_loss_f
                 y_pred += y_pred_f
                 y_true += y_true_f
 
+        val_loss = np.mean(val_loss)
         return val_loss, y_pred, y_true
 
     @staticmethod
@@ -215,7 +218,6 @@ class TestMNISTCNN(unittest.TestCase):
                 val_pred += predicted.argmax(dim=1, keepdim=False).cpu().tolist()
                 val_true += target.cpu().tolist()
                 val_loss.append(loss_batch)
-            val_loss = np.mean(val_loss)
 
         with open(f'{THIS_DIR}/ddp_cnn_save/pt_ddp_predictions_{gpu}.p', 'wb') as f:
             pickle.dump([val_loss, val_pred, val_true], f)

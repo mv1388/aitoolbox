@@ -4,6 +4,12 @@ from aitoolbox.torchtrain.callbacks.abstract import AbstractCallback
 
 class DDPPredictionSave(AbstractCallback):
     def __init__(self, dir_path, file_name):
+        """Save predictions to pickle file for testing DDP
+
+        Args:
+            dir_path (str): folder path
+            file_name (str): pickle results save file name
+        """
         super().__init__('DDP prediction saver')
         self.dir_path = dir_path
         self.file_name = file_name
