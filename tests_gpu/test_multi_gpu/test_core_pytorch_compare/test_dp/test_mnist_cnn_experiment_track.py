@@ -71,6 +71,16 @@ class TestMNISTCNNExperimentTrack(unittest.TestCase):
         self.assertEqual(y_pred_tl, y_pred_pt)
         self.assertEqual(y_true_tl, y_true_pt)
 
+        val_dataset = datasets.MNIST(
+            os.path.join(THIS_DIR, 'data'), train=False,
+            transform=transforms.Compose([
+                transforms.ToTensor(),
+                transforms.Normalize((0.1307,), (0.3081,))
+            ])
+        )
+        self.assertEqual(val_dataset.targets.tolist(), y_true_tl)
+        self.assertEqual(val_dataset.targets.tolist(), y_true_pt)
+
         project_path = os.path.join(THIS_DIR, 'data')
         if os.path.exists(project_path):
             shutil.rmtree(project_path)
