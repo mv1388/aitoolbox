@@ -111,9 +111,7 @@ class TestMNISTCNN(unittest.TestCase):
             optimizer, criterion
         )
 
-        USE_CUDA = torch.cuda.is_available()
-        self.assertEqual(tl.device.type, "cuda" if USE_CUDA else "cpu")
-        # self.assertEqual(tl.device.type, "cuda")
+        self.assertEqual(tl.device.type, "cuda")
 
         tl.fit(num_epochs=num_epochs)
 
@@ -139,8 +137,8 @@ class TestMNISTCNN(unittest.TestCase):
             batch_size=100)
 
         USE_CUDA = torch.cuda.is_available()
-        device = torch.device(f"cuda" if USE_CUDA else "cpu")
-        # self.assertEqual(device.type, "cuda")
+        device = torch.device("cuda" if USE_CUDA else "cpu")
+        self.assertEqual(device.type, "cuda")
 
         model_pt = CNNNet()
         model_pt = nn.DataParallel(model_pt).to(device)

@@ -183,9 +183,7 @@ class TestIMDBRNNExperimentTrack(unittest.TestCase):
             val_result_package=BinaryClassificationResultPackage(),
             cloud_save_mode=None
         )
-        USE_CUDA = torch.cuda.is_available()
-        self.assertEqual(train_loop.device.type, "cuda" if USE_CUDA else "cpu")
-        # self.assertEqual(train_loop.device.type, "cuda")
+        self.assertEqual(train_loop.device.type, "cuda")
 
         train_loop.fit(num_epochs=num_epochs, callbacks=callbacks)
 
@@ -209,8 +207,8 @@ class TestIMDBRNNExperimentTrack(unittest.TestCase):
         )
 
         USE_CUDA = torch.cuda.is_available()
-        device = torch.device(f"cuda" if USE_CUDA else "cpu")
-        # self.assertEqual(device.type, "cuda")
+        device = torch.device("cuda" if USE_CUDA else "cpu")
+        self.assertEqual(device.type, "cuda")
 
         model = RNNClassifier(INPUT_DIM, EMBEDDING_DIM, HIDDEN_DIM, OUTPUT_DIM)
         model = nn.DataParallel(model).to(device)
@@ -370,9 +368,7 @@ class TestIMDBLSTMExperimentTrack(unittest.TestCase):
             val_result_package=BinaryClassificationResultPackage(),
             cloud_save_mode=None
         )
-        USE_CUDA = torch.cuda.is_available()
-        self.assertEqual(train_loop.device.type, "cuda" if USE_CUDA else "cpu")
-        # self.assertEqual(train_loop.device.type, "cuda")
+        self.assertEqual(train_loop.device.type, "cuda")
 
         train_loop.fit(num_epochs=num_epochs, callbacks=callbacks)
 
@@ -396,8 +392,8 @@ class TestIMDBLSTMExperimentTrack(unittest.TestCase):
         )
 
         USE_CUDA = torch.cuda.is_available()
-        device = torch.device(f"cuda" if USE_CUDA else "cpu")
-        # self.assertEqual(device.type, "cuda")
+        device = torch.device("cuda" if USE_CUDA else "cpu")
+        self.assertEqual(device.type, "cuda")
 
         model = LSTMClassifier(INPUT_DIM, EMBEDDING_DIM, HIDDEN_DIM, OUTPUT_DIM)
         model = nn.DataParallel(model).to(device)
