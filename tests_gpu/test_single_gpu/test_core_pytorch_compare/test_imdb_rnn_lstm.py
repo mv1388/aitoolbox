@@ -106,7 +106,7 @@ class LSTMClassifier(TTModel):
 
 class TestIMDBRNN(unittest.TestCase):
     def test_trainloop_core_pytorch_compare(self):
-        train_data, test_data, INPUT_DIM = self.get_data_loaders()
+        train_data, test_data, INPUT_DIM = self.get_data_sets()
 
         val_loss_tl, y_pred_tl, y_true_tl = self.train_eval_trainloop(train_data, test_data, INPUT_DIM, num_epochs=5)
         val_loss_pt, y_pred_pt, y_true_pt = self.train_eval_core_pytorch(train_data, test_data, INPUT_DIM, num_epochs=5)
@@ -143,9 +143,7 @@ class TestIMDBRNN(unittest.TestCase):
             train_loader, val_loader, None,
             optimizer, criterion
         )
-        USE_CUDA = torch.cuda.is_available()
-        self.assertEqual(train_loop.device.type, "cuda" if USE_CUDA else "cpu")
-        # self.assertEqual(train_loop.device.type, "cuda")
+        self.assertEqual(train_loop.device.type, "cuda")
 
         train_loop.fit(num_epochs=num_epochs)
 
@@ -169,8 +167,8 @@ class TestIMDBRNN(unittest.TestCase):
         )
 
         USE_CUDA = torch.cuda.is_available()
-        device = torch.device(f"cuda" if USE_CUDA else "cpu")
-        # self.assertEqual(device.type, "cuda")
+        device = torch.device("cuda" if USE_CUDA else "cpu")
+        self.assertEqual(device.type, "cuda")
 
         model = RNNClassifier(INPUT_DIM, EMBEDDING_DIM, HIDDEN_DIM, OUTPUT_DIM).to(device)
         optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
@@ -219,7 +217,7 @@ class TestIMDBRNN(unittest.TestCase):
 
         return val_loss, val_pred, val_true
 
-    def get_data_loaders(self, ds_sample_ratio=1.):
+    def get_data_sets(self, ds_sample_ratio=1.):
         self.set_seeds()
         VOCABULARY_SIZE = 20000
 
@@ -260,7 +258,7 @@ class TestIMDBRNN(unittest.TestCase):
 
 class TestIMDBLSTM(unittest.TestCase):
     def test_trainloop_core_pytorch_compare(self):
-        train_data, test_data, INPUT_DIM = self.get_data_loaders()
+        train_data, test_data, INPUT_DIM = self.get_data_sets()
 
         val_loss_tl, y_pred_tl, y_true_tl = self.train_eval_trainloop(train_data, test_data, INPUT_DIM, num_epochs=5)
         val_loss_pt, y_pred_pt, y_true_pt = self.train_eval_core_pytorch(train_data, test_data, INPUT_DIM, num_epochs=5)
@@ -297,9 +295,7 @@ class TestIMDBLSTM(unittest.TestCase):
             train_loader, val_loader, None,
             optimizer, criterion
         )
-        USE_CUDA = torch.cuda.is_available()
-        self.assertEqual(train_loop.device.type, "cuda" if USE_CUDA else "cpu")
-        # self.assertEqual(train_loop.device.type, "cuda")
+        self.assertEqual(train_loop.device.type, "cuda")
 
         train_loop.fit(num_epochs=num_epochs)
 
@@ -323,8 +319,8 @@ class TestIMDBLSTM(unittest.TestCase):
         )
 
         USE_CUDA = torch.cuda.is_available()
-        device = torch.device(f"cuda" if USE_CUDA else "cpu")
-        # self.assertEqual(device.type, "cuda")
+        device = torch.device("cuda" if USE_CUDA else "cpu")
+        self.assertEqual(device.type, "cuda")
 
         model = LSTMClassifier(INPUT_DIM, EMBEDDING_DIM, HIDDEN_DIM, OUTPUT_DIM).to(device)
         optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
@@ -373,7 +369,7 @@ class TestIMDBLSTM(unittest.TestCase):
 
         return val_loss, val_pred, val_true
 
-    def get_data_loaders(self, ds_sample_ratio=1.):
+    def get_data_sets(self, ds_sample_ratio=1.):
         self.set_seeds()
         VOCABULARY_SIZE = 20000
 

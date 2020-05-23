@@ -624,25 +624,31 @@ class TrainLoop:
 
         self.fit(num_epochs, callbacks, grad_accumulation)
 
-    def fit_data_parallel(self, num_epochs, callbacks=None, dp_wrap_attributes=None):
+    def fit_data_parallel(self, num_epochs, callbacks=None, grad_accumulation=1, dp_model_args=None):
         """Train the model on multi-GPU with DataParallel auto wrapping
 
         Args:
             num_epochs (int): how many epochs the network will be trained
             callbacks (list or None): callbacks that are executed during the training run
-            dp_wrap_attributes (list or tuple or None): additional TTModel attributes which need to be transferred to
-                the TTDataParallel level to enable their use in the transferred/exposed class methods
+            grad_accumulation (int): number of batches the gradients are accumulated before updating weights
+            dp_model_args (dict or None): parameters for :class:`aitoolbox.torchtrain.parallel.TTDataParallel` /
+                ``nn.DataParallel`` DP model wrap.
+                Probably the most common optional parameter to set is ``TTDataParallel``'s ``add_model_attributes``
+                list. In this list the user can list any additional TTModel attributes which need to be transferred to
+                the TTDataParallel level to enable their use in the transferred/exposed class methods.
 
         Returns:
-            TTDataParallel: trained model
+            TTDataParallel or nn.DataParallel: trained model
         """
+        dp_model_args = dp_model_args if dp_model_args is not None else {}
+
         if not isinstance(self.model, TTDataParallel) and not isinstance(self.model, nn.DataParallel):
             if isinstance(self.model, TTModel):
-                self.model = TTDataParallel(self.model, dp_wrap_attributes)
+                self.model = TTDataParallel(self.model, **dp_model_args)
             else:
-                self.model = nn.DataParallel(self.model)
+                self.model = nn.DataParallel(self.model, **dp_model_args)
 
-        return self.fit(num_epochs, callbacks)
+        return self.fit(num_epochs, callbacks, grad_accumulation)
 
     def fit_deepspeed(self, deepspeed_args, num_epochs, callbacks=None,
                       add_model_attributes=None, **ds_model_args):
