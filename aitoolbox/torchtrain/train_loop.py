@@ -763,10 +763,10 @@ class TrainLoopEndSave(TrainLoop):
                 ensure the python experiment file copying to the experiment folder, the user needs to manually
                 specify the python file path as the value for the `experiment_file_path` key. If running the training
                 directly from the terminal the path deduction is done automatically.
-            val_result_package (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or None):
-                result package evaluated on validation data at the end of training
-            test_result_package (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or None):
-                result package evaluated on test data at the end of training
+            val_result_package (AbstractResultPackage or None): result package evaluated on validation data at  the end
+                of the training
+            test_result_package (AbstractResultPackage or None): result package evaluated on test data at the end
+                of the training
             cloud_save_mode (str or None): Storage destination selector.
                 For AWS S3: 's3' / 'aws_s3' / 'aws'
                 For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
@@ -865,10 +865,10 @@ class TrainLoopCheckpointEndSave(TrainLoopEndSave):
                 ensure the python experiment file copying to the experiment folder, the user needs to manually
                 specify the python file path as the value for the `experiment_file_path` key. If running the training
                 directly from the terminal the path deduction is done automatically.
-            val_result_package (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or None):
-                result package evaluated on validation data at the end of training
-            test_result_package (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or None):
-                result package evaluated on test data at the end of training
+            val_result_package (AbstractResultPackage or None): result package evaluated on validation data at the end
+                of the training
+            test_result_package (AbstractResultPackage or None): result package evaluated on test data at the end
+                of the training
             cloud_save_mode (str or None): Storage destination selector.
                 For AWS S3: 's3' / 'aws_s3' / 'aws'
                 For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
