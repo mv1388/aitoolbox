@@ -145,7 +145,26 @@ class TestIMDBRNNExperimentTrack(unittest.TestCase):
         if os.path.exists(project_path):
             shutil.rmtree(project_path)
 
-    def train_eval_trainloop(self, train_data, test_data, INPUT_DIM, num_epochs):
+    def test_dp_auto_wrap_trainloop_core_pytorch_compare(self):
+        train_data, test_data, INPUT_DIM = self.get_data_sets()
+
+        val_loss_tl, y_pred_tl, y_true_tl = self.train_eval_trainloop(train_data, test_data, INPUT_DIM, num_epochs=5,
+                                                                      tl_dp_auto_wrap=True)
+        val_loss_pt, y_pred_pt, y_true_pt = self.train_eval_core_pytorch(train_data, test_data, INPUT_DIM, num_epochs=5)
+
+        self.assertEqual(val_loss_tl, val_loss_pt)
+        self.assertEqual(y_pred_tl, y_pred_pt)
+        self.assertEqual(y_true_tl, y_true_pt)
+
+        project_path = os.path.join(THIS_DIR, 'data')
+        if os.path.exists(project_path):
+            shutil.rmtree(project_path)
+
+        project_path = os.path.join(THIS_DIR, 'tl_full_experiment_tracking')
+        if os.path.exists(project_path):
+            shutil.rmtree(project_path)
+
+    def train_eval_trainloop(self, train_data, test_data, INPUT_DIM, num_epochs, tl_dp_auto_wrap=False):
         self.set_seeds()
         LEARNING_RATE = 1e-3
         BATCH_SIZE = 128
@@ -160,7 +179,8 @@ class TestIMDBRNNExperimentTrack(unittest.TestCase):
         )
 
         model = RNNClassifier(INPUT_DIM, EMBEDDING_DIM, HIDDEN_DIM, OUTPUT_DIM)
-        model = TTDataParallel(model)
+        if not tl_dp_auto_wrap:
+            model = TTDataParallel(model)
         optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
         criterion = nn.BCEWithLogitsLoss()
 
@@ -185,7 +205,10 @@ class TestIMDBRNNExperimentTrack(unittest.TestCase):
         )
         self.assertEqual(train_loop.device.type, "cuda")
 
-        train_loop.fit(num_epochs=num_epochs, callbacks=callbacks)
+        if not tl_dp_auto_wrap:
+            train_loop.fit(num_epochs=num_epochs, callbacks=callbacks)
+        else:
+            train_loop.fit_data_parallel(num_epochs=num_epochs, callbacks=callbacks)
 
         val_loss = train_loop.evaluate_loss_on_validation_set(force_prediction=True)
         y_pred, y_true, _ = train_loop.predict_on_validation_set(force_prediction=True)
@@ -330,7 +353,26 @@ class TestIMDBLSTMExperimentTrack(unittest.TestCase):
         if os.path.exists(project_path):
             shutil.rmtree(project_path)
 
-    def train_eval_trainloop(self, train_data, test_data, INPUT_DIM, num_epochs):
+    def test_dp_auto_wrap_trainloop_core_pytorch_compare(self):
+        train_data, test_data, INPUT_DIM = self.get_data_sets()
+
+        val_loss_tl, y_pred_tl, y_true_tl = self.train_eval_trainloop(train_data, test_data, INPUT_DIM, num_epochs=5,
+                                                                      tl_dp_auto_wrap=True)
+        val_loss_pt, y_pred_pt, y_true_pt = self.train_eval_core_pytorch(train_data, test_data, INPUT_DIM, num_epochs=5)
+
+        self.assertEqual(val_loss_tl, val_loss_pt)
+        self.assertEqual(y_pred_tl, y_pred_pt)
+        self.assertEqual(y_true_tl, y_true_pt)
+
+        project_path = os.path.join(THIS_DIR, 'data')
+        if os.path.exists(project_path):
+            shutil.rmtree(project_path)
+
+        project_path = os.path.join(THIS_DIR, 'tl_full_experiment_tracking')
+        if os.path.exists(project_path):
+            shutil.rmtree(project_path)
+
+    def train_eval_trainloop(self, train_data, test_data, INPUT_DIM, num_epochs, tl_dp_auto_wrap=False):
         self.set_seeds()
         LEARNING_RATE = 1e-3
         BATCH_SIZE = 128
@@ -345,7 +387,8 @@ class TestIMDBLSTMExperimentTrack(unittest.TestCase):
         )
 
         model = LSTMClassifier(INPUT_DIM, EMBEDDING_DIM, HIDDEN_DIM, OUTPUT_DIM)
-        model = TTDataParallel(model)
+        if not tl_dp_auto_wrap:
+            model = TTDataParallel(model)
         optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
         criterion = nn.BCEWithLogitsLoss()
 
@@ -370,7 +413,10 @@ class TestIMDBLSTMExperimentTrack(unittest.TestCase):
         )
         self.assertEqual(train_loop.device.type, "cuda")
 
-        train_loop.fit(num_epochs=num_epochs, callbacks=callbacks)
+        if not tl_dp_auto_wrap:
+            train_loop.fit(num_epochs=num_epochs, callbacks=callbacks)
+        else:
+            train_loop.fit_data_parallel(num_epochs=num_epochs, callbacks=callbacks)
 
         val_loss = train_loop.evaluate_loss_on_validation_set(force_prediction=True)
         y_pred, y_true, _ = train_loop.predict_on_validation_set(force_prediction=True)
