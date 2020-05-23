@@ -99,7 +99,7 @@ Following the core PyTorch setup, two multi-GPU training approaches are availabl
 
 ### DataParallel - via TTDataParallel
 
-To use DataParallel-like multiGPU training with TrainLoop just switch the TrainLoop's `gpu_mode` parameter to `'dp'`:
+To use DataParallel-like multiGPU training with TrainLoop just set the TrainLoop's `gpu_mode` parameter to `'dp'`:
 ```python
 from aitoolbox.torchtrain.train_loop import *
 from aitoolbox.torchtrain.parallel import TTDataParallel
@@ -125,7 +125,7 @@ the model and all other necessary training components are moved to the correct G
 process. Lastly, TrainLoop also automatically adds the PyTorch `DistributedSampler` to each of the provided
 data loaders in order to ensure different data batches go to different GPUs and there is no overlap.
 
-To enable distributed training via DistributedDataParallel, all the user has to switch the TrainLoop's `gpu_mode` 
+To enable distributed training via DistributedDataParallel, the user has to set the TrainLoop's `gpu_mode` 
 parameter to `'ddp'`.
 ```python
 from aitoolbox.torchtrain.train_loop import *
@@ -175,7 +175,7 @@ Check out a full [Apex AMP training example](https://github.com/mv1388/aitoolbox
 
 ### Multi-GPU DDP mixed precision training
 When training in the multi-GPU setting, the setup is mostly the same as in the single-GPU. 
-All the user has to do is set accordingly the `use_amp` parameter of the TrainLoop and to switch its  `gpu_mode` 
+All the user has to do is set accordingly the `use_amp` parameter of the TrainLoop and to switch its `gpu_mode`
 parameter to `'ddp'`. 
 Under the hood, TrainLoop will initialize the model and the optimizer for AMP and start training using 
 DistributedDataParallel approach (DDP is currently only multi-GPU training setup supported by Apex AMP).
