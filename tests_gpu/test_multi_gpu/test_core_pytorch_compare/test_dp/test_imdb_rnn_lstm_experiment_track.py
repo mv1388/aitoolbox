@@ -128,7 +128,7 @@ class LSTMClassifier(TTModel):
 
 class TestIMDBRNNExperimentTrack(unittest.TestCase):
     def test_trainloop_core_pytorch_compare(self):
-        train_data, test_data, INPUT_DIM = self.get_data_loaders()
+        train_data, test_data, INPUT_DIM = self.get_data_sets()
 
         val_loss_tl, y_pred_tl, y_true_tl = self.train_eval_trainloop(train_data, test_data, INPUT_DIM, num_epochs=5)
         val_loss_pt, y_pred_pt, y_true_pt = self.train_eval_core_pytorch(train_data, test_data, INPUT_DIM, num_epochs=5)
@@ -272,7 +272,7 @@ class TestIMDBRNNExperimentTrack(unittest.TestCase):
 
         return val_loss, val_pred, val_true
 
-    def get_data_loaders(self, ds_sample_ratio=1.):
+    def get_data_sets(self, ds_sample_ratio=1.):
         self.set_seeds()
         VOCABULARY_SIZE = 20000
 
@@ -313,7 +313,7 @@ class TestIMDBRNNExperimentTrack(unittest.TestCase):
 
 class TestIMDBLSTMExperimentTrack(unittest.TestCase):
     def test_trainloop_core_pytorch_compare(self):
-        train_data, test_data, INPUT_DIM = self.get_data_loaders()
+        train_data, test_data, INPUT_DIM = self.get_data_sets()
 
         val_loss_tl, y_pred_tl, y_true_tl = self.train_eval_trainloop(train_data, test_data, INPUT_DIM, num_epochs=5)
         val_loss_pt, y_pred_pt, y_true_pt = self.train_eval_core_pytorch(train_data, test_data, INPUT_DIM, num_epochs=5)
@@ -457,7 +457,7 @@ class TestIMDBLSTMExperimentTrack(unittest.TestCase):
 
         return val_loss, val_pred, val_true
 
-    def get_data_loaders(self, ds_sample_ratio=1.):
+    def get_data_sets(self, ds_sample_ratio=1.):
         self.set_seeds()
         VOCABULARY_SIZE = 20000
 
