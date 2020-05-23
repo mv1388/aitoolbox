@@ -17,7 +17,7 @@ from aitoolbox import TrainLoopCheckpointEndSave, TTModel, TTDataParallel, \
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
 """
-Training taken from: 
+Training taken from:
     https://github.com/rasbt/deeplearning-models/blob/master/pytorch_ipynb/rnn/rnn_simple_packed_imdb.ipynb
 """
 
@@ -128,7 +128,7 @@ class LSTMClassifier(TTModel):
 
 class TestIMDBRNNExperimentTrack(unittest.TestCase):
     def test_trainloop_core_pytorch_compare(self):
-        train_data, test_data, INPUT_DIM = self.get_data_loaders()
+        train_data, test_data, INPUT_DIM = self.get_data_sets()
 
         val_loss_tl, y_pred_tl, y_true_tl = self.train_eval_trainloop(train_data, test_data, INPUT_DIM, num_epochs=5)
         val_loss_pt, y_pred_pt, y_true_pt = self.train_eval_core_pytorch(train_data, test_data, INPUT_DIM, num_epochs=5)
@@ -145,7 +145,26 @@ class TestIMDBRNNExperimentTrack(unittest.TestCase):
         if os.path.exists(project_path):
             shutil.rmtree(project_path)
 
-    def train_eval_trainloop(self, train_data, test_data, INPUT_DIM, num_epochs):
+    def test_dp_auto_wrap_trainloop_core_pytorch_compare(self):
+        train_data, test_data, INPUT_DIM = self.get_data_sets()
+
+        val_loss_tl, y_pred_tl, y_true_tl = self.train_eval_trainloop(train_data, test_data, INPUT_DIM, num_epochs=5,
+                                                                      tl_dp_auto_wrap=True)
+        val_loss_pt, y_pred_pt, y_true_pt = self.train_eval_core_pytorch(train_data, test_data, INPUT_DIM, num_epochs=5)
+
+        self.assertEqual(val_loss_tl, val_loss_pt)
+        self.assertEqual(y_pred_tl, y_pred_pt)
+        self.assertEqual(y_true_tl, y_true_pt)
+
+        project_path = os.path.join(THIS_DIR, 'data')
+        if os.path.exists(project_path):
+            shutil.rmtree(project_path)
+
+        project_path = os.path.join(THIS_DIR, 'tl_full_experiment_tracking')
+        if os.path.exists(project_path):
+            shutil.rmtree(project_path)
+
+    def train_eval_trainloop(self, train_data, test_data, INPUT_DIM, num_epochs, tl_dp_auto_wrap=False):
         self.set_seeds()
         LEARNING_RATE = 1e-3
         BATCH_SIZE = 128
@@ -160,7 +179,8 @@ class TestIMDBRNNExperimentTrack(unittest.TestCase):
         )
 
         model = RNNClassifier(INPUT_DIM, EMBEDDING_DIM, HIDDEN_DIM, OUTPUT_DIM)
-        model = TTDataParallel(model)
+        if not tl_dp_auto_wrap:
+            model = TTDataParallel(model)
         optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
         criterion = nn.BCEWithLogitsLoss()
 
@@ -183,11 +203,12 @@ class TestIMDBRNNExperimentTrack(unittest.TestCase):
             val_result_package=BinaryClassificationResultPackage(),
             cloud_save_mode=None
         )
-        USE_CUDA = torch.cuda.is_available()
-        self.assertEqual(train_loop.device.type, "cuda" if USE_CUDA else "cpu")
-        # self.assertEqual(train_loop.device.type, "cuda")
+        self.assertEqual(train_loop.device.type, "cuda")
 
-        train_loop.fit(num_epochs=num_epochs, callbacks=callbacks)
+        if not tl_dp_auto_wrap:
+            train_loop.fit(num_epochs=num_epochs, callbacks=callbacks)
+        else:
+            train_loop.fit_data_parallel(num_epochs=num_epochs, callbacks=callbacks)
 
         val_loss = train_loop.evaluate_loss_on_validation_set(force_prediction=True)
         y_pred, y_true, _ = train_loop.predict_on_validation_set(force_prediction=True)
@@ -209,8 +230,8 @@ class TestIMDBRNNExperimentTrack(unittest.TestCase):
         )
 
         USE_CUDA = torch.cuda.is_available()
-        device = torch.device(f"cuda" if USE_CUDA else "cpu")
-        # self.assertEqual(device.type, "cuda")
+        device = torch.device("cuda" if USE_CUDA else "cpu")
+        self.assertEqual(device.type, "cuda")
 
         model = RNNClassifier(INPUT_DIM, EMBEDDING_DIM, HIDDEN_DIM, OUTPUT_DIM)
         model = nn.DataParallel(model).to(device)
@@ -274,7 +295,7 @@ class TestIMDBRNNExperimentTrack(unittest.TestCase):
 
         return val_loss, val_pred, val_true
 
-    def get_data_loaders(self, ds_sample_ratio=1.):
+    def get_data_sets(self, ds_sample_ratio=1.):
         self.set_seeds()
         VOCABULARY_SIZE = 20000
 
@@ -315,7 +336,7 @@ class TestIMDBRNNExperimentTrack(unittest.TestCase):
 
 class TestIMDBLSTMExperimentTrack(unittest.TestCase):
     def test_trainloop_core_pytorch_compare(self):
-        train_data, test_data, INPUT_DIM = self.get_data_loaders()
+        train_data, test_data, INPUT_DIM = self.get_data_sets()
 
         val_loss_tl, y_pred_tl, y_true_tl = self.train_eval_trainloop(train_data, test_data, INPUT_DIM, num_epochs=5)
         val_loss_pt, y_pred_pt, y_true_pt = self.train_eval_core_pytorch(train_data, test_data, INPUT_DIM, num_epochs=5)
@@ -332,7 +353,26 @@ class TestIMDBLSTMExperimentTrack(unittest.TestCase):
         if os.path.exists(project_path):
             shutil.rmtree(project_path)
 
-    def train_eval_trainloop(self, train_data, test_data, INPUT_DIM, num_epochs):
+    def test_dp_auto_wrap_trainloop_core_pytorch_compare(self):
+        train_data, test_data, INPUT_DIM = self.get_data_sets()
+
+        val_loss_tl, y_pred_tl, y_true_tl = self.train_eval_trainloop(train_data, test_data, INPUT_DIM, num_epochs=5,
+                                                                      tl_dp_auto_wrap=True)
+        val_loss_pt, y_pred_pt, y_true_pt = self.train_eval_core_pytorch(train_data, test_data, INPUT_DIM, num_epochs=5)
+
+        self.assertEqual(val_loss_tl, val_loss_pt)
+        self.assertEqual(y_pred_tl, y_pred_pt)
+        self.assertEqual(y_true_tl, y_true_pt)
+
+        project_path = os.path.join(THIS_DIR, 'data')
+        if os.path.exists(project_path):
+            shutil.rmtree(project_path)
+
+        project_path = os.path.join(THIS_DIR, 'tl_full_experiment_tracking')
+        if os.path.exists(project_path):
+            shutil.rmtree(project_path)
+
+    def train_eval_trainloop(self, train_data, test_data, INPUT_DIM, num_epochs, tl_dp_auto_wrap=False):
         self.set_seeds()
         LEARNING_RATE = 1e-3
         BATCH_SIZE = 128
@@ -347,7 +387,8 @@ class TestIMDBLSTMExperimentTrack(unittest.TestCase):
         )
 
         model = LSTMClassifier(INPUT_DIM, EMBEDDING_DIM, HIDDEN_DIM, OUTPUT_DIM)
-        model = TTDataParallel(model)
+        if not tl_dp_auto_wrap:
+            model = TTDataParallel(model)
         optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
         criterion = nn.BCEWithLogitsLoss()
 
@@ -370,11 +411,12 @@ class TestIMDBLSTMExperimentTrack(unittest.TestCase):
             val_result_package=BinaryClassificationResultPackage(),
             cloud_save_mode=None
         )
-        USE_CUDA = torch.cuda.is_available()
-        self.assertEqual(train_loop.device.type, "cuda" if USE_CUDA else "cpu")
-        # self.assertEqual(train_loop.device.type, "cuda")
+        self.assertEqual(train_loop.device.type, "cuda")
 
-        train_loop.fit(num_epochs=num_epochs, callbacks=callbacks)
+        if not tl_dp_auto_wrap:
+            train_loop.fit(num_epochs=num_epochs, callbacks=callbacks)
+        else:
+            train_loop.fit_data_parallel(num_epochs=num_epochs, callbacks=callbacks)
 
         val_loss = train_loop.evaluate_loss_on_validation_set(force_prediction=True)
         y_pred, y_true, _ = train_loop.predict_on_validation_set(force_prediction=True)
@@ -396,8 +438,8 @@ class TestIMDBLSTMExperimentTrack(unittest.TestCase):
         )
 
         USE_CUDA = torch.cuda.is_available()
-        device = torch.device(f"cuda" if USE_CUDA else "cpu")
-        # self.assertEqual(device.type, "cuda")
+        device = torch.device("cuda" if USE_CUDA else "cpu")
+        self.assertEqual(device.type, "cuda")
 
         model = LSTMClassifier(INPUT_DIM, EMBEDDING_DIM, HIDDEN_DIM, OUTPUT_DIM)
         model = nn.DataParallel(model).to(device)
@@ -461,7 +503,7 @@ class TestIMDBLSTMExperimentTrack(unittest.TestCase):
 
         return val_loss, val_pred, val_true
 
-    def get_data_loaders(self, ds_sample_ratio=1.):
+    def get_data_sets(self, ds_sample_ratio=1.):
         self.set_seeds()
         VOCABULARY_SIZE = 20000
 
