@@ -73,8 +73,6 @@ if __name__ == '__main__':
         batch_size=batch_size_multi_gpu)
 
     model = Net()
-    model = TTDataParallel(model)
-
     optimizer = optim.Adam(model.parameters(), lr=0.001, betas=(0.9, 0.999))
     criterion = nn.NLLLoss()
 
@@ -85,5 +83,6 @@ if __name__ == '__main__':
     print('Starting train loop')
     TrainLoop(model,
               train_loader, val_loader, test_loader,
-              optimizer, criterion) \
+              optimizer, criterion,
+              gpu_mode='dp') \
         .fit(num_epochs=10, callbacks=callbacks)

@@ -80,5 +80,6 @@ if __name__ == '__main__':
     print('Starting train loop')
     TrainLoop(model,
               train_loader, val_loader, test_loader,
-              optimizer, criterion) \
-        .fit_distributed(num_epochs=10, callbacks=callbacks)
+              optimizer, criterion,
+              gpu_mode='ddp') \
+        .fit(num_epochs=10, callbacks=callbacks)

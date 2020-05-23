@@ -116,6 +116,7 @@ if __name__ == '__main__':
                                rm_subopt_local_models=True, num_best_checkpoints_kept=3,
                                collate_batch_pred_fn=collate_fns.append_predictions,
                                pred_transform_fn=collate_fns.torch_cat_transf,
+                               gpu_mode='ddp',
                                use_amp=False)\
-        .fit_distributed(num_epochs=int(num_train_epochs), callbacks=callbacks,
-                         ddp_model_args={'find_unused_parameters': True})
+        .fit(num_epochs=int(num_train_epochs), callbacks=callbacks,
+             ddp_model_args={'find_unused_parameters': True})
