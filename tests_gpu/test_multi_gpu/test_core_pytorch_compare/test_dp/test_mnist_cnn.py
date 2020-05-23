@@ -11,7 +11,7 @@ import torch.optim as optim
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
 
-from aitoolbox import TrainLoop, TTModel
+from aitoolbox import TrainLoop, TTModel, TTDataParallel
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -69,11 +69,44 @@ class TestMNISTCNN(unittest.TestCase):
         self.assertEqual(y_pred_tl, y_pred_pt)
         self.assertEqual(y_true_tl, y_true_pt)
 
+        val_dataset = datasets.MNIST(
+            os.path.join(THIS_DIR, 'data'), train=False,
+            transform=transforms.Compose([
+                transforms.ToTensor(),
+                transforms.Normalize((0.1307,), (0.3081,))
+            ])
+        )
+        self.assertEqual(val_dataset.targets.tolist(), y_true_tl)
+        self.assertEqual(val_dataset.targets.tolist(), y_true_pt)
+
         project_path = os.path.join(THIS_DIR, 'data')
         if os.path.exists(project_path):
             shutil.rmtree(project_path)
 
-    def train_eval_trainloop(self, num_epochs, use_real_train_data=False):
+    def test_dp_auto_wrap_trainloop_core_pytorch_compare(self):
+        val_loss_tl, y_pred_tl, y_true_tl = self.train_eval_trainloop(num_epochs=5, tl_dp_auto_wrap=True,
+                                                                      use_real_train_data=True)
+        val_loss_pt, y_pred_pt, y_true_pt = self.train_eval_core_pytorch(num_epochs=5, use_real_train_data=True)
+
+        self.assertEqual(val_loss_tl, val_loss_pt)
+        self.assertEqual(y_pred_tl, y_pred_pt)
+        self.assertEqual(y_true_tl, y_true_pt)
+
+        val_dataset = datasets.MNIST(
+            os.path.join(THIS_DIR, 'data'), train=False,
+            transform=transforms.Compose([
+                transforms.ToTensor(),
+                transforms.Normalize((0.1307,), (0.3081,))
+            ])
+        )
+        self.assertEqual(val_dataset.targets.tolist(), y_true_tl)
+        self.assertEqual(val_dataset.targets.tolist(), y_true_pt)
+
+        project_path = os.path.join(THIS_DIR, 'data')
+        if os.path.exists(project_path):
+            shutil.rmtree(project_path)
+
+    def train_eval_trainloop(self, num_epochs, tl_dp_auto_wrap=False, use_real_train_data=False):
         self.set_seeds()
         train_loader = torch.utils.data.DataLoader(
             datasets.MNIST(os.path.join(THIS_DIR, 'data'), train=use_real_train_data, download=True,
@@ -90,6 +123,8 @@ class TestMNISTCNN(unittest.TestCase):
             batch_size=100)
 
         model = CNNNet()
+        if not tl_dp_auto_wrap:
+            model = TTDataParallel(model)
         optimizer = optim.Adam(model.parameters(), lr=0.001, betas=(0.9, 0.999))
         criterion = nn.NLLLoss()
 
@@ -100,11 +135,12 @@ class TestMNISTCNN(unittest.TestCase):
             optimizer, criterion
         )
 
-        USE_CUDA = torch.cuda.is_available()
-        self.assertEqual(tl.device.type, "cuda" if USE_CUDA else "cpu")
-        # self.assertEqual(tl.device.type, "cuda")
+        self.assertEqual(tl.device.type, "cuda")
 
-        tl.fit(num_epochs=num_epochs)
+        if not tl_dp_auto_wrap:
+            tl.fit(num_epochs=num_epochs)
+        else:
+            tl.fit_data_parallel(num_epochs=num_epochs)
 
         val_loss = tl.evaluate_loss_on_validation_set(force_prediction=True)
         y_pred, y_true, _ = tl.predict_on_validation_set(force_prediction=True)
@@ -128,10 +164,11 @@ class TestMNISTCNN(unittest.TestCase):
             batch_size=100)
 
         USE_CUDA = torch.cuda.is_available()
-        device = torch.device(f"cuda" if USE_CUDA else "cpu")
-        # self.assertEqual(device.type, "cuda")
+        device = torch.device("cuda" if USE_CUDA else "cpu")
+        self.assertEqual(device.type, "cuda")
 
-        model_pt = CNNNet().to(device)
+        model_pt = CNNNet()
+        model_pt = nn.DataParallel(model_pt).to(device)
         optimizer_pt = optim.Adam(model_pt.parameters(), lr=0.001, betas=(0.9, 0.999))
         criterion_pt = nn.NLLLoss()
 

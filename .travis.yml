@@ -44,4 +44,3 @@ install:
 
 script:
   - pytest tests
-#  - travis_wait 50 pytest tests_gpu
