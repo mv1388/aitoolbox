@@ -74,7 +74,7 @@ if __name__ == '__main__':
                                 model_name_or_path=model_name_or_path,
                                 max_seq_length=max_seq_length, max_query_length=max_query_length, doc_stride=doc_stride,
                                 overwrite_cache=True, evaluate=False, output_examples=False)
-    train_dataloader = DataLoader(train_dataset, batch_size=train_batch_size)
+    train_dataloader = DataLoader(train_dataset, batch_size=train_batch_size, shuffle=True)
 
     test_dataset, test_examples, test_features = \
         load_and_cache_examples(tokenizer,

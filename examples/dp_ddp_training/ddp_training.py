@@ -53,7 +53,7 @@ if __name__ == '__main__':
             './data', train=True, download=True,
             transform=transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))])
         ),
-        batch_size=100)
+        batch_size=100, shuffle=True)
 
     val_loader = DataLoader(
         datasets.MNIST(
