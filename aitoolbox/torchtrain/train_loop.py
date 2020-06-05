@@ -539,7 +539,7 @@ class TrainLoop:
         return self._train(num_epochs, callbacks, grad_accumulation)
 
     def _train_ddp(self, num_epochs, callbacks=None, grad_accumulation=1,
-                   train_data_shuffle=True, ddp_model_args=None, in_process_data_load=None,
+                   ddp_model_args=None, in_process_data_load=None,
                    num_nodes=1, node_rank=0, num_gpus=torch.cuda.device_count()):
         """Train the model using the train loop in the Distributed Data Parallel setting
 
@@ -549,7 +549,6 @@ class TrainLoop:
             num_epochs (int): how many epochs the network will be trained
             callbacks (list or None): callbacks that are executed during the training run
             grad_accumulation (int): number of batches the gradients are accumulated before updating weights
-            train_data_shuffle (bool): should train loader return shuffled data
             ddp_model_args (dict or None): parameters for DistributedDataParallel / APEX DistributedDataParallel model
                 Available parameters for DistributedDataParallel:
                     https://pytorch.org/docs/master/nn.html#torch.nn.parallel.DistributedDataParallel
@@ -571,7 +570,6 @@ class TrainLoop:
             'node_rank': node_rank,
             'num_gpus': num_gpus,
             'world_size': num_nodes * num_gpus,
-            'train_data_shuffle': train_data_shuffle,
             'ddp_model_args': ddp_model_args if ddp_model_args is not None else {}
         }
 
@@ -611,7 +609,7 @@ class TrainLoop:
         self.callbacks_handler.execute_multiprocess_start()
         # Add DistributedSampler to the data loaders
         self.ddp_handler = DDPHandler(self)
-        self.ddp_handler.add_distributed_samplers(ddp_args['world_size'], rank, ddp_args['train_data_shuffle'])
+        self.ddp_handler.add_distributed_samplers(ddp_args['world_size'], rank)
 
         # Move to the GPU belonging to the process
         self.model = self.model.to(self.device)
