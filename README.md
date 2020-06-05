@@ -138,7 +138,7 @@ TrainLoop(
     optimizer, criterion,
     gpu_mode='ddp'
 ).fit(num_epochs=10, callbacks=None,
-      train_data_shuffle=True, ddp_model_args=None,
+      ddp_model_args=None,
       num_nodes=1, node_rank=0, num_gpus=torch.cuda.device_count())
 ```
 
@@ -167,7 +167,8 @@ model = ... # TTModel
 
 TrainLoop(
     model, ...,
-    optimizer, criterion, use_amp={'opt_level': 'O1'}
+    optimizer, criterion, 
+    use_amp={'opt_level': 'O1'}
 ).fit(num_epochs=10)
 ``` 
 

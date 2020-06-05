@@ -75,7 +75,7 @@ parameter to ``'ddp'``.
         gpu_mode='ddp'
     )
 
-    model = tl.fit(num_epochs=10, train_data_shuffle=True,
+    model = tl.fit(num_epochs=10,
                    num_nodes=1, node_rank=0, num_gpus=torch.cuda.device_count())
 
 
