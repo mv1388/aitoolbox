@@ -153,13 +153,27 @@ class TrainLoop:
     def fit(self, num_epochs, callbacks=None, grad_accumulation=1, **kwargs):
         """Train the model using the train loop
 
+        This is the general API method which starts the model training. By calling this method and depending on
+        the selected training mode provided as the TrainLoop's ``gpu_mode`` parameter the training will start in one
+        of the following training modes:
+
+        * Basic (CPU or single GPU) mode
+        * DataParallel mode
+        * DistributedDataParallel mode
+        * Microsoft DeepSpeed mode
+
         Args:
             num_epochs (int): how many epochs the network will be trained
             callbacks (list or None): callbacks that are executed during the training run
             grad_accumulation (int): number of batches the gradients are accumulated before updating weights
-            **kwargs: additional parameters for :meth:`aitoolbox.torchtrain.train_loop.TrainLoop._train_dp`,
-                :meth:`aitoolbox.torchtrain.train_loop.TrainLoop._train_ddp`,
-                :meth:`aitoolbox.torchtrain.train_loop.TrainLoop._train_deepspeed` methods.
+            **kwargs: additional parameters for training methods:
+
+                * :meth:`aitoolbox.torchtrain.train_loop.TrainLoop._train_dp`
+                * :meth:`aitoolbox.torchtrain.train_loop.TrainLoop._train_ddp`
+                * :meth:`aitoolbox.torchtrain.train_loop.TrainLoop._train_deepspeed`
+
+                These training methods are called by the TrainLoop depending on the specified setting of the TrainLoop's
+                ``gpu_mode`` parameter.
 
         Returns:
             TTModel or torch.nn.modules.Module or TTDataParallel or deepspeed.DeepSpeedLight: trained model
