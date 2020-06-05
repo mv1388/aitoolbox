@@ -97,7 +97,7 @@ class TestMNISTCNN(unittest.TestCase):
                                transforms.ToTensor(),
                                transforms.Normalize((0.1307,), (0.3081,))
                            ])),
-            batch_size=100)
+            batch_size=100, shuffle=True)
         val_loader = torch.utils.data.DataLoader(
             datasets.MNIST(os.path.join(THIS_DIR, 'data'), train=False, transform=transforms.Compose([
                 transforms.ToTensor(),
