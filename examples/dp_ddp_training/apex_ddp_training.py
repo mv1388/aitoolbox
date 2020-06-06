@@ -53,7 +53,7 @@ if __name__ == '__main__':
             './data', train=True, download=True,
             transform=transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))])
         ),
-        batch_size=100)
+        batch_size=100, shuffle=True)
 
     val_loader = DataLoader(
         datasets.MNIST(
@@ -81,5 +81,6 @@ if __name__ == '__main__':
     TrainLoop(model,
               train_loader, val_loader, test_loader,
               optimizer, criterion,
+              gpu_mode='ddp',
               use_amp={'opt_level': 'O1'}) \
-        .fit_distributed(num_epochs=10, callbacks=callbacks)
+        .fit(num_epochs=10, callbacks=callbacks)

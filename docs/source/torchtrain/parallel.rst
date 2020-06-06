@@ -11,9 +11,8 @@ Following the core *PyTorch* setup, two multi-GPU training approaches are availa
 TTDataParallel
 --------------
 
-To use ``DataParallel``-like multiGPU training with TrainLoop just wrap the :doc:`model`-based model into the
-:class:`aitoolbox.torchtrain.parallel.TTDataParallel` object, the same way it would done in
-core *PyTorch* with *DataParallel*:
+To use ``DataParallel``-like multiGPU training with TrainLoop just switch the TrainLoop's ``gpu_mode`` parameter to
+``'dp'``:
 
 .. code-block:: python
 
@@ -22,7 +21,6 @@ core *PyTorch* with *DataParallel*:
 
 
     model = CNNModel()  # TTModel based neural model
-    model = TTDataParallel(model)
 
     train_loader = DataLoader(...)
     val_loader = DataLoader(...)
@@ -33,7 +31,8 @@ core *PyTorch* with *DataParallel*:
 
     tl = TrainLoop(model,
                    train_loader, val_loader, test_loader,
-                   optimizer, criterion)
+                   optimizer, criterion,
+                   gpu_mode='dp')
 
     model = tl.fit(num_epochs=10)
 
@@ -52,10 +51,8 @@ all other necessary training components are moved to the correct GPU belonging t
 Lastly, TrainLoop also automatically adds the *PyTorch* ``DistributedSampler`` to each of the provided data loaders
 in order to ensure different data batches go to different GPUs and there is no overlap.
 
-To enable distributed training via DistributedDataParallel, all the user has to do is to initialize TrainLoop where
-:doc:`model`-based should be provided and then call train loop's dedicated
-:meth:`aitoolbox.torchtrain.train_loop.TrainLoop.fit_distributed` method (instead of ``fit()`` used
-otherwise when not training distributed).
+To enable distributed training via DistributedDataParallel, the user has to set the TrainLoop's ``gpu_mode``
+parameter to ``'ddp'``.
 
 .. code-block:: python
 
@@ -74,11 +71,12 @@ otherwise when not training distributed).
     tl = TrainLoop(
         model,
         train_loader, val_loader, test_loader,
-        optimizer, criterion
+        optimizer, criterion,
+        gpu_mode='ddp'
     )
 
-    model = tl.fit_distributed(num_epochs=10, train_data_shuffle=True,
-                               num_nodes=1, node_rank=0, num_gpus=torch.cuda.device_count())
+    model = tl.fit(num_epochs=10,
+                   num_nodes=1, node_rank=0, num_gpus=torch.cuda.device_count())
 
 
 Check out a full

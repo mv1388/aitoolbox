@@ -99,19 +99,18 @@ Following the core PyTorch setup, two multi-GPU training approaches are availabl
 
 ### DataParallel - via TTDataParallel
 
-To use DataParallel-like multiGPU training with TrainLoop just wrap the model (`TTModel`, [more in Model section](#model))
-into the `TTDataParallel` object, the same way it would done in core PyTorch:
+To use DataParallel-like multiGPU training with TrainLoop just set the TrainLoop's `gpu_mode` parameter to `'dp'`:
 ```python
 from aitoolbox.torchtrain.train_loop import *
 from aitoolbox.torchtrain.parallel import TTDataParallel
 
 model = ... # TTModel
-model = TTDataParallel(model)
 
 TrainLoop(
     model,
     train_loader, val_loader, test_loader,
-    optimizer, criterion
+    optimizer, criterion,
+    gpu_mode='dp'
 ).fit(num_epochs=10)
 ```
 
@@ -126,9 +125,8 @@ the model and all other necessary training components are moved to the correct G
 process. Lastly, TrainLoop also automatically adds the PyTorch `DistributedSampler` to each of the provided
 data loaders in order to ensure different data batches go to different GPUs and there is no overlap.
 
-To enable distributed training via DistributedDataParallel, all the user has to do is to initialize
-TrainLoop where `TTModel` should be provided and then call train loop's dedicated `fit_distributed()` 
-function (instead of `fit()` used otherwise when not training distributed).
+To enable distributed training via DistributedDataParallel, the user has to set the TrainLoop's `gpu_mode` 
+parameter to `'ddp'`.
 ```python
 from aitoolbox.torchtrain.train_loop import *
 
@@ -137,10 +135,11 @@ model = ... # TTModel
 TrainLoop(
     model,
     train_loader, val_loader, test_loader,
-    optimizer, criterion
-).fit_distributed(num_epochs=10, callbacks=None,
-                  train_data_shuffle=True, ddp_model_args=None,
-                  num_nodes=1, node_rank=0, num_gpus=torch.cuda.device_count())
+    optimizer, criterion,
+    gpu_mode='ddp'
+).fit(num_epochs=10, callbacks=None,
+      ddp_model_args=None,
+      num_nodes=1, node_rank=0, num_gpus=torch.cuda.device_count())
 ```
 
 Check out a full [DistributedDataParallel training example](https://github.com/mv1388/aitoolbox/blob/master/examples/dp_ddp_training/ddp_training.py).
@@ -168,7 +167,8 @@ model = ... # TTModel
 
 TrainLoop(
     model, ...,
-    optimizer, criterion, use_amp={'opt_level': 'O1'}
+    optimizer, criterion, 
+    use_amp={'opt_level': 'O1'}
 ).fit(num_epochs=10)
 ``` 
 
@@ -176,8 +176,8 @@ Check out a full [Apex AMP training example](https://github.com/mv1388/aitoolbox
 
 ### Multi-GPU DDP mixed precision training
 When training in the multi-GPU setting, the setup is mostly the same as in the single-GPU. 
-All the user has to do is set accordingly the `use_amp` parameter of the TrainLoop and to instead call 
-`fit_distributed()` in order to start the distributed training. 
+All the user has to do is set accordingly the `use_amp` parameter of the TrainLoop and to switch its `gpu_mode`
+parameter to `'ddp'`. 
 Under the hood, TrainLoop will initialize the model and the optimizer for AMP and start training using 
 DistributedDataParallel approach (DDP is currently only multi-GPU training setup supported by Apex AMP).
 ```python
@@ -187,8 +187,10 @@ model = ... # TTModel
 
 TrainLoop(
     model, ...,
-    optimizer, criterion, use_amp={'opt_level': 'O1'}
-).fit_distributed(num_epochs=10)
+    optimizer, criterion,
+    gpu_mode='ddp',
+    use_amp={'opt_level': 'O1'}
+).fit(num_epochs=10)
 ``` 
 
 Check out a full [Apex AMP DistributedDataParallel training example](https://github.com/mv1388/aitoolbox/blob/master/examples/apex_amp_training/apex_mutli_GPU_training.py).

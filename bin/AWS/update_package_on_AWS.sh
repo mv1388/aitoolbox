@@ -23,7 +23,7 @@ HEREDOC
 key_path=$(jq -r '.key_path' configs/my_config.json)
 ec2_instance_address=
 DL_framework="pytorch"
-AIToolbox_version="1.0.10"
+AIToolbox_version="1.1.0"
 username="ubuntu"
 
 while [[ $# -gt 0 ]]; do
