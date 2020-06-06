@@ -224,17 +224,17 @@ class TrainLoop:
                 self.callbacks_handler.execute_batch_begin()
 
                 # Feed batch into the model
-                loss_batch = self.calculate_batch_loss(batch_data, grad_accumulation)
+                loss_batch = self._calculate_batch_loss(batch_data, grad_accumulation)
 
                 # Backward pass through the model
-                self.backward_pass(loss_batch)
+                self._backward_pass(loss_batch)
                 if self.grad_cb_used:
                     self.callbacks_handler.execute_gradient_update()
 
                 # Optimizer step
-                self.optimizer_step(iteration, grad_accumulation)
+                self._optimizer_step(iteration, grad_accumulation)
                 # Optimizer zero grad
-                self.optimizer_zero_grad(iteration, grad_accumulation)
+                self._optimizer_zero_grad(iteration, grad_accumulation)
 
                 self.callbacks_handler.execute_batch_end()
 
@@ -257,7 +257,7 @@ class TrainLoop:
 
         return self.model
 
-    def calculate_batch_loss(self, batch_data, grad_accumulation):
+    def _calculate_batch_loss(self, batch_data, grad_accumulation):
         """Push batch data through the model and calculate the batch loss
 
         Args:
@@ -279,7 +279,7 @@ class TrainLoop:
 
         return loss_batch
 
-    def backward_pass(self, loss_batch):
+    def _backward_pass(self, loss_batch):
         """Execute backward pass from the current batch loss
 
         Args:
@@ -301,7 +301,7 @@ class TrainLoop:
         else:
             loss_batch.backward()
 
-    def optimizer_step(self, iteration, grad_accumulation):
+    def _optimizer_step(self, iteration, grad_accumulation):
         """Execute the optimizer step
 
         Args:
@@ -321,7 +321,7 @@ class TrainLoop:
             if self.grad_cb_used:
                 self.callbacks_handler.execute_optimizer_step()
 
-    def optimizer_zero_grad(self, iteration, grad_accumulation):
+    def _optimizer_zero_grad(self, iteration, grad_accumulation):
         """Execute optimizer zero grad
 
         Args:
