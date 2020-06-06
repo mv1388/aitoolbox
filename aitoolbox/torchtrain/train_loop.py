@@ -45,7 +45,8 @@ class TrainLoop:
                  train_loader, validation_loader, test_loader,
                  optimizer, criterion,
                  collate_batch_pred_fn=append_predictions, pred_transform_fn=torch_cat_transf,
-                 end_auto_eval=True, cuda_device_idx=None, use_amp=False):
+                 end_auto_eval=True,
+                 gpu_mode='single', cuda_device_idx=None, use_amp=False):
         """Core PyTorch TrainLoop supporting the model training and target prediction
 
         Implements core training procedures: batch feeding into the network as part of (multi)epoch train loop,
@@ -67,6 +68,14 @@ class TrainLoop:
                 loss calculations. This is useful when conducting very costly experiments to save on compute time.
                 Specify either True/False boolean to always run or never run after each epoch or specify an int to
                 execute only every specified number of epochs.
+            gpu_mode (str): GPU training mode selection. TrainLoop supports different GPU training modes by
+                specifying one of the following:
+
+                * ``'single'``: single GPU training
+                * ``'dp'``: multi-GPU training via DataParallel
+                * ``'ddp'``: multi-GPU training via DistributedDataParallel
+                * ``'deepspeed'``: training via the Microsoft DeepSpeed
+
             cuda_device_idx (int or None): CUDA device index used when training on multiple GPUs
             use_amp (bool or dict): use Nvidia Apex 16-bit Automatic Mixed Precision (AMP)
 
@@ -96,6 +105,7 @@ class TrainLoop:
         self.pred_transform_fn = pred_transform_fn
         self.end_auto_eval = end_auto_eval
 
+        self.gpu_mode = gpu_mode
         self.use_amp = use_amp is True or type(use_amp) == dict
         self.amp_params = {} if use_amp is True else use_amp
         self.use_deepspeed = False
@@ -134,11 +144,54 @@ class TrainLoop:
         if not isinstance(self.model, TTModel) and not isinstance(self.model, TTDataParallel) and \
                 isinstance(self.model, Module) and not isinstance(self.batch_model_feed_def, AbstractModelFeedDefinition):
             raise TypeError('Provided the base PyTorch model but did not give the batch_model_feed_def')
+        if self.gpu_mode not in ['single', 'dp', 'ddp', 'deepspeed']:
+            raise ValueError("gpu_mode parameter set to the non-supported value. Can use only the following values: "
+                             "'single', 'dp', 'ddp' and 'deepspeed'")
         if self.use_amp and not APEX_AVAILABLE:
             raise ValueError('Trying to use Nvidia Apex AMP for 16-bit mixed precision. However, Nvidia Apex is not'
                              'installed.')
 
-    def fit(self, num_epochs, callbacks=None, grad_accumulation=1):
+    def fit(self, num_epochs, callbacks=None, grad_accumulation=1, **kwargs):
+        """Train the model using the train loop
+
+        This is the general API method which starts the model training. By calling this method and depending on
+        the selected training mode provided as the TrainLoop's ``gpu_mode`` parameter the training will start in one
+        of the following training modes:
+
+        * Basic (CPU or single GPU) mode
+        * DataParallel mode
+        * DistributedDataParallel mode
+        * Microsoft DeepSpeed mode
+
+        Args:
+            num_epochs (int): how many epochs the network will be trained
+            callbacks (list or None): callbacks that are executed during the training run
+            grad_accumulation (int): number of batches the gradients are accumulated before updating weights
+            **kwargs: additional parameters for training methods:
+
+                * :meth:`aitoolbox.torchtrain.train_loop.TrainLoop._train_dp`
+                * :meth:`aitoolbox.torchtrain.train_loop.TrainLoop._train_ddp`
+                * :meth:`aitoolbox.torchtrain.train_loop.TrainLoop._train_deepspeed`
+
+                These training methods are called by the TrainLoop depending on the specified setting of the TrainLoop's
+                ``gpu_mode`` parameter.
+
+        Returns:
+            TTModel or torch.nn.modules.Module or TTDataParallel or deepspeed.DeepSpeedLight: trained model
+        """
+        if self.gpu_mode == 'single':
+            return self._train(num_epochs, callbacks=callbacks, grad_accumulation=grad_accumulation)
+        elif self.gpu_mode == 'dp':
+            return self._train_dp(num_epochs, callbacks=callbacks, grad_accumulation=grad_accumulation, **kwargs)
+        elif self.gpu_mode == 'ddp':
+            return self._train_ddp(num_epochs, callbacks=callbacks, grad_accumulation=grad_accumulation, **kwargs)
+        elif self.gpu_mode == 'deepspeed':
+            return self._train_deepspeed(num_epochs=num_epochs, callbacks=callbacks, **kwargs)
+        else:
+            raise ValueError("gpu_mode parameter set to the non-supported value. Can use only the following values: "
+                             "'single', 'dp', 'ddp' and 'deepspeed'")
+
+    def _train(self, num_epochs, callbacks=None, grad_accumulation=1):
         """Train the model using the train loop
 
         Args:
@@ -481,9 +534,35 @@ class TrainLoop:
         """
         self.train_history.insert_single_result_into_history(metric_name, metric_result)
 
-    def fit_distributed(self, num_epochs, callbacks=None, grad_accumulation=1,
-                        train_data_shuffle=True, ddp_model_args=None, in_process_data_load=None,
-                        num_nodes=1, node_rank=0, num_gpus=torch.cuda.device_count()):
+    def _train_dp(self, num_epochs, callbacks=None, grad_accumulation=1, dp_model_args=None):
+        """Train the model on multi-GPU with DataParallel auto wrapping
+
+        Args:
+            num_epochs (int): how many epochs the network will be trained
+            callbacks (list or None): callbacks that are executed during the training run
+            grad_accumulation (int): number of batches the gradients are accumulated before updating weights
+            dp_model_args (dict or None): parameters for :class:`aitoolbox.torchtrain.parallel.TTDataParallel` /
+                ``nn.DataParallel`` DP model wrap.
+                Probably the most common optional parameter to set is ``TTDataParallel``'s ``add_model_attributes``
+                list. In this list the user can list any additional TTModel attributes which need to be transferred to
+                the TTDataParallel level to enable their use in the transferred/exposed class methods.
+
+        Returns:
+            TTDataParallel or nn.DataParallel: trained model
+        """
+        dp_model_args = dp_model_args if dp_model_args is not None else {}
+
+        if not isinstance(self.model, TTDataParallel) and not isinstance(self.model, nn.DataParallel):
+            if isinstance(self.model, TTModel):
+                self.model = TTDataParallel(self.model, **dp_model_args)
+            else:
+                self.model = nn.DataParallel(self.model, **dp_model_args)
+
+        return self._train(num_epochs, callbacks, grad_accumulation)
+
+    def _train_ddp(self, num_epochs, callbacks=None, grad_accumulation=1,
+                   ddp_model_args=None, in_process_data_load=None,
+                   num_nodes=1, node_rank=0, num_gpus=torch.cuda.device_count()):
         """Train the model using the train loop in the Distributed Data Parallel setting
 
         During the training, multiple processes will be spawned, one for each of the available GPUs.
@@ -492,7 +571,6 @@ class TrainLoop:
             num_epochs (int): how many epochs the network will be trained
             callbacks (list or None): callbacks that are executed during the training run
             grad_accumulation (int): number of batches the gradients are accumulated before updating weights
-            train_data_shuffle (bool): should train loader return shuffled data
             ddp_model_args (dict or None): parameters for DistributedDataParallel / APEX DistributedDataParallel model
                 Available parameters for DistributedDataParallel:
                     https://pytorch.org/docs/master/nn.html#torch.nn.parallel.DistributedDataParallel
@@ -514,7 +592,6 @@ class TrainLoop:
             'node_rank': node_rank,
             'num_gpus': num_gpus,
             'world_size': num_nodes * num_gpus,
-            'train_data_shuffle': train_data_shuffle,
             'ddp_model_args': ddp_model_args if ddp_model_args is not None else {}
         }
 
@@ -554,7 +631,7 @@ class TrainLoop:
         self.callbacks_handler.execute_multiprocess_start()
         # Add DistributedSampler to the data loaders
         self.ddp_handler = DDPHandler(self)
-        self.ddp_handler.add_distributed_samplers(ddp_args['world_size'], rank, ddp_args['train_data_shuffle'])
+        self.ddp_handler.add_distributed_samplers(ddp_args['world_size'], rank)
 
         # Move to the GPU belonging to the process
         self.model = self.model.to(self.device)
@@ -578,36 +655,10 @@ class TrainLoop:
             else:
                 self.model = ApexDistributedDataParallel(self.model, **ddp_args['ddp_model_args'])
 
-        self.fit(num_epochs, callbacks, grad_accumulation)
+        self._train(num_epochs, callbacks, grad_accumulation)
 
-    def fit_data_parallel(self, num_epochs, callbacks=None, grad_accumulation=1, dp_model_args=None):
-        """Train the model on multi-GPU with DataParallel auto wrapping
-
-        Args:
-            num_epochs (int): how many epochs the network will be trained
-            callbacks (list or None): callbacks that are executed during the training run
-            grad_accumulation (int): number of batches the gradients are accumulated before updating weights
-            dp_model_args (dict or None): parameters for :class:`aitoolbox.torchtrain.parallel.TTDataParallel` /
-                ``nn.DataParallel`` DP model wrap.
-                Probably the most common optional parameter to set is ``TTDataParallel``'s ``add_model_attributes``
-                list. In this list the user can list any additional TTModel attributes which need to be transferred to
-                the TTDataParallel level to enable their use in the transferred/exposed class methods.
-
-        Returns:
-            TTDataParallel or nn.DataParallel: trained model
-        """
-        dp_model_args = dp_model_args if dp_model_args is not None else {}
-
-        if not isinstance(self.model, TTDataParallel) and not isinstance(self.model, nn.DataParallel):
-            if isinstance(self.model, TTModel):
-                self.model = TTDataParallel(self.model, **dp_model_args)
-            else:
-                self.model = nn.DataParallel(self.model, **dp_model_args)
-
-        return self.fit(num_epochs, callbacks, grad_accumulation)
-
-    def fit_deepspeed(self, deepspeed_args, num_epochs, callbacks=None,
-                      add_model_attributes=None, **ds_model_args):
+    def _train_deepspeed(self, deepspeed_args, num_epochs, callbacks=None,
+                         add_model_attributes=None, **ds_model_args):
         """Train the model using Microsoft DeepSpeed package
 
         Before starting the training the DeepSpeed library needs to be installed on the machine. Find the installation
@@ -647,20 +698,21 @@ class TrainLoop:
         self.optimizer = self.model.optimizer
         self.train_loader = self.model.training_dataloader
 
-        return self.fit(num_epochs, callbacks)
+        return self._train(num_epochs, callbacks)
 
-    def __call__(self, num_epochs, callbacks=None, grad_accumulation=1):
+    def __call__(self, num_epochs, callbacks=None, grad_accumulation=1, **kwargs):
         """Train the model using the train loop
 
         Args:
             num_epochs (int): how many epochs the network will be trained
             callbacks (list): callbacks that are executed during the training run
             grad_accumulation (int): number of batches the gradients are accumulated before updating weights
+            **kwargs: additional parameters for ``_train_dp()``, ``_train_ddp()`` and ``_train_deepspeed()`` methods.
 
         Returns:
             TTModel or torch.nn.modules.Module or TTDataParallel: trained model
         """
-        return self.fit(num_epochs, callbacks, grad_accumulation)
+        return self.fit(num_epochs, callbacks, grad_accumulation, **kwargs)
 
 
 class TrainLoopCheckpoint(TrainLoop):
@@ -672,7 +724,8 @@ class TrainLoopCheckpoint(TrainLoop):
                  cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix='', source_dirs=(),
                  rm_subopt_local_models=False, num_best_checkpoints_kept=2,
                  collate_batch_pred_fn=append_predictions, pred_transform_fn=torch_cat_transf,
-                 end_auto_eval=True, cuda_device_idx=None, use_amp=False):
+                 end_auto_eval=True,
+                 gpu_mode='single', cuda_device_idx=None, use_amp=False):
         """TrainLoop with the automatic model check-pointing at the end of each epoch
 
         Args:
@@ -709,6 +762,14 @@ class TrainLoopCheckpoint(TrainLoop):
                 loss calculations. This is useful when conducting very costly experiments to save on compute time.
                 Specify either True/False boolean to always run or never run after each epoch or specify an int to
                 execute only every specified number of epochs.
+            gpu_mode (str): GPU training mode selection. TrainLoop supports different GPU training modes by
+                specifying one of the following:
+
+                * ``'single'``: single GPU training
+                * ``'dp'``: multi-GPU training via DataParallel
+                * ``'ddp'``: multi-GPU training via DistributedDataParallel
+                * ``'deepspeed'``: training via the Microsoft DeepSpeed
+
             cuda_device_idx (int or None): CUDA device index used when training on multiple GPUs
             use_amp (bool or dict): use Nvidia Apex 16-bit Automatic Mixed Precision (AMP)
 
@@ -721,7 +782,7 @@ class TrainLoopCheckpoint(TrainLoop):
         """
         TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion,
                            collate_batch_pred_fn, pred_transform_fn,
-                           end_auto_eval, cuda_device_idx, use_amp)
+                           end_auto_eval, gpu_mode, cuda_device_idx, use_amp)
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
@@ -754,7 +815,8 @@ class TrainLoopEndSave(TrainLoop):
                  hyperparams, val_result_package=None, test_result_package=None,
                  cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix='', source_dirs=(),
                  collate_batch_pred_fn=append_predictions, pred_transform_fn=torch_cat_transf,
-                 end_auto_eval=True, cuda_device_idx=None, use_amp=False):
+                 end_auto_eval=True,
+                 gpu_mode='single', cuda_device_idx=None, use_amp=False):
         """TrainLoop with the model performance evaluation and final model saving at the end of the training process
 
         Args:
@@ -771,10 +833,10 @@ class TrainLoopEndSave(TrainLoop):
                 ensure the python experiment file copying to the experiment folder, the user needs to manually
                 specify the python file path as the value for the `experiment_file_path` key. If running the training
                 directly from the terminal the path deduction is done automatically.
-            val_result_package (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or None):
-                result package evaluated on validation data at the end of training
-            test_result_package (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or None):
-                result package evaluated on test data at the end of training
+            val_result_package (AbstractResultPackage or None): result package evaluated on validation data at  the end
+                of the training
+            test_result_package (AbstractResultPackage or None): result package evaluated on test data at the end
+                of the training
             cloud_save_mode (str or None): Storage destination selector.
                 For AWS S3: 's3' / 'aws_s3' / 'aws'
                 For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
@@ -790,6 +852,14 @@ class TrainLoopEndSave(TrainLoop):
                 loss calculations. This is useful when conducting very costly experiments to save on compute time.
                 Specify either True/False boolean to always run or never run after each epoch or specify an int to
                 execute only every specified number of epochs.
+            gpu_mode (str): GPU training mode selection. TrainLoop supports different GPU training modes by
+                specifying one of the following:
+
+                * ``'single'``: single GPU training
+                * ``'dp'``: multi-GPU training via DataParallel
+                * ``'ddp'``: multi-GPU training via DistributedDataParallel
+                * ``'deepspeed'``: training via the Microsoft DeepSpeed
+
             cuda_device_idx (int or None): CUDA device index used when training on multiple GPUs
             use_amp (bool or dict): use Nvidia Apex 16-bit Automatic Mixed Precision (AMP)
 
@@ -802,7 +872,7 @@ class TrainLoopEndSave(TrainLoop):
         """
         TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion,
                            collate_batch_pred_fn, pred_transform_fn,
-                           end_auto_eval, cuda_device_idx, use_amp)
+                           end_auto_eval, gpu_mode, cuda_device_idx, use_amp)
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
@@ -855,7 +925,8 @@ class TrainLoopCheckpointEndSave(TrainLoopEndSave):
                  cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix='', source_dirs=(),
                  rm_subopt_local_models=False, num_best_checkpoints_kept=2,
                  collate_batch_pred_fn=append_predictions, pred_transform_fn=torch_cat_transf,
-                 end_auto_eval=True, cuda_device_idx=None, use_amp=False):
+                 end_auto_eval=True,
+                 gpu_mode='single', cuda_device_idx=None, use_amp=False):
         """TrainLoop both saving model check-pointing at the end of each epoch and model performance reporting
             and model saving at the end of the training process
 
@@ -873,10 +944,10 @@ class TrainLoopCheckpointEndSave(TrainLoopEndSave):
                 ensure the python experiment file copying to the experiment folder, the user needs to manually
                 specify the python file path as the value for the `experiment_file_path` key. If running the training
                 directly from the terminal the path deduction is done automatically.
-            val_result_package (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or None):
-                result package evaluated on validation data at the end of training
-            test_result_package (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or None):
-                result package evaluated on test data at the end of training
+            val_result_package (AbstractResultPackage or None): result package evaluated on validation data at the end
+                of the training
+            test_result_package (AbstractResultPackage or None): result package evaluated on test data at the end
+                of the training
             cloud_save_mode (str or None): Storage destination selector.
                 For AWS S3: 's3' / 'aws_s3' / 'aws'
                 For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
@@ -897,6 +968,14 @@ class TrainLoopCheckpointEndSave(TrainLoopEndSave):
                 loss calculations. This is useful when conducting very costly experiments to save on compute time.
                 Specify either True/False boolean to always run or never run after each epoch or specify an int to
                 execute only every specified number of epochs.
+            gpu_mode (str): GPU training mode selection. TrainLoop supports different GPU training modes by
+                specifying one of the following:
+
+                * ``'single'``: single GPU training
+                * ``'dp'``: multi-GPU training via DataParallel
+                * ``'ddp'``: multi-GPU training via DistributedDataParallel
+                * ``'deepspeed'``: training via the Microsoft DeepSpeed
+
             cuda_device_idx (int or None): CUDA device index used when training on multiple GPUs
             use_amp (bool or dict): use Nvidia Apex 16-bit Automatic Mixed Precision (AMP)
 
@@ -918,7 +997,7 @@ class TrainLoopCheckpointEndSave(TrainLoopEndSave):
                                   hyperparams, val_result_package, test_result_package,
                                   cloud_save_mode, bucket_name, cloud_dir_prefix, source_dirs,
                                   collate_batch_pred_fn, pred_transform_fn,
-                                  end_auto_eval, cuda_device_idx, use_amp)
+                                  end_auto_eval, gpu_mode, cuda_device_idx, use_amp)
         self.rm_subopt_local_models = rm_subopt_local_models
 
         self.callbacks_handler.register_callbacks([

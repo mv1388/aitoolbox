@@ -50,8 +50,8 @@ Multi-GPU DDP mixed precision training
 --------------------------------------
 
 When training in the multi-GPU setting, the setup is mostly the same as in the single-GPU.
-All the user has to do is set accordingly the ``use_amp`` parameter of the TrainLoop and to instead call
-:meth:`aitoolbox.torchtrain.train_loop.TrainLoop.fit_distributed` in order to start the distributed training.
+All the user has to do is set accordingly the ``use_amp`` parameter of the TrainLoop and to switch its ``gpu_mode``
+parameter to ``'ddp'``.
 Under the hood, TrainLoop will initialize the model and the optimizer for AMP and start training using
 DistributedDataParallel approach (DDP is currently only multi-GPU training setup supported by Apex AMP).
 
@@ -72,10 +72,11 @@ DistributedDataParallel approach (DDP is currently only multi-GPU training setup
     tl = TrainLoop(model,
                    train_loader, val_loader, test_loader,
                    optimizer, criterion,
+                   gpu_mode='ddp',
                    use_amp={'opt_level': 'O1'})
 
-    model = tl.fit_distributed(num_epochs=10,
-                               num_nodes=1, node_rank=0, num_gpus=torch.cuda.device_count())
+    model = tl.fit(num_epochs=10,
+                   num_nodes=1, node_rank=0, num_gpus=torch.cuda.device_count())
 
 
 Check out a full
