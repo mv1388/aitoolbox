@@ -8,8 +8,8 @@ Following the core *PyTorch* setup, two multi-GPU training approaches are availa
 * ``DistributedDataParallel`` done via :class:`aitoolbox.torchtrain.parallel.TTDistributedDataParallel`
 
 
-TTDataParallel
---------------
+DataParallel
+------------
 
 To use ``DataParallel``-like multiGPU training with TrainLoop just switch the TrainLoop's ``gpu_mode`` parameter to
 ``'dp'``:
@@ -41,8 +41,8 @@ Check out a full
 `DataParallel training example <https://github.com/mv1388/aitoolbox/blob/master/examples/dp_ddp_training/dp_training.py#L76>`_.
 
 
-TTDistributedDataParallel
--------------------------
+DistributedDataParallel
+-----------------------
 
 Distributed training on multiple GPUs via ``DistributedDataParallel`` is enabled by the TrainLoop itself under the hood
 by wrapping the :doc:`model`-based model into :class:`aitoolbox.torchtrain.parallel.TTDistributedDataParallel`.
