@@ -95,14 +95,13 @@ Check out a full [TrainLoop training & experiment tracking example](https://gith
 
 All TrainLoop versions in addition to single GPU also support multi-GPU training to achieve even faster training.
 Following the core PyTorch setup, two multi-GPU training approaches are available: 
-`DataParallel` implemented via `TTDataParallel` and `DistributedDataParallel` implemented via `TTDistributedDataParallel`.
+`DataParallel` and `DistributedDataParallel`.
 
-### DataParallel - via TTDataParallel
+### DataParallel (DP)
 
 To use DataParallel-like multiGPU training with TrainLoop just set the TrainLoop's `gpu_mode` parameter to `'dp'`:
 ```python
 from aitoolbox.torchtrain.train_loop import *
-from aitoolbox.torchtrain.parallel import TTDataParallel
 
 model = ... # TTModel
 
@@ -116,10 +115,10 @@ TrainLoop(
 
 Check out a full [DataParallel training example](https://github.com/mv1388/aitoolbox/blob/master/examples/dp_ddp_training/dp_training.py).
 
-### DistributedDataParallel - via TTDistributedDataParallel
+### DistributedDataParallel (DDP)
 
 Distributed training on multiple GPUs via DistributedDataParallel is enabled by the TrainLoop itself under
-the hood by wrapping the model (`TTModel`, [more in Model section](#model)) into `TTDistributedDataParallel`.
+the hood by wrapping the model (`TTModel`, [more in Model section](#model)) into `DistributedDataParallel`.
 TrainLoop also automatically spawns multiple processes and initializes them. Inside each spawned process
 the model and all other necessary training components are moved to the correct GPU belonging to a specific
 process. Lastly, TrainLoop also automatically adds the PyTorch `DistributedSampler` to each of the provided
