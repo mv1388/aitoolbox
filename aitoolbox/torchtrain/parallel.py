@@ -5,7 +5,6 @@ try:
     from apex.parallel import DistributedDataParallel as ApexDistributedDataParallel
     APEX_AVAILABLE = True
 except ImportError:
-    # ApexDistributedDataParallel = object
     APEX_AVAILABLE = False
 try:
     from deepspeed import DeepSpeedLight
@@ -14,6 +13,8 @@ except ImportError:
     DEEPSPEED_AVAILABLE = False
 
 from aitoolbox.utils.util import copy_function
+
+# Removed old Parallel wrapper implementations in: https://github.com/mv1388/aitoolbox/pull/583
 
 
 class TTParallelBase:
@@ -131,6 +132,3 @@ if DEEPSPEED_AVAILABLE:
             """
             DeepSpeedLight.__init__(self, args, model, **kwargs)
             TTParallelBase.__init__(self, model, add_model_attributes, default_model_methods)
-
-
-# Removed old Parallel wrapper implementations in: https://github.com/mv1388/aitoolbox/pull/583
