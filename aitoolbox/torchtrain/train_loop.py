@@ -703,6 +703,8 @@ class TrainLoop:
     def __call__(self, num_epochs, callbacks=None, grad_accumulation=1, **kwargs):
         """Train the model using the train loop
 
+        This is a convenience function which calls the main TrainLoop model training method fit().
+
         Args:
             num_epochs (int): how many epochs the network will be trained
             callbacks (list): callbacks that are executed during the training run

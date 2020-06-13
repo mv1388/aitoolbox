@@ -52,7 +52,14 @@ class MessageService:
         Args:
             key (str): message key
             value: message content
-            msg_handling_settings (str or list): setting how to handle the lifespan of the message
+            msg_handling_settings (str or list): setting how to handle the lifespan of the message.
+                Can use one of the following message lifecycle handling settings which are variables imported from this
+                script file and can be found defined at the beginning of the script:
+
+                * ``KEEP_FOREVER``
+                * ``UNTIL_END_OF_EPOCH``
+                * ``UNTIL_READ``
+                * ``OVERWRITE``
 
         Returns:
             None
