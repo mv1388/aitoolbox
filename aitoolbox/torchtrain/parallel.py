@@ -133,4 +133,4 @@ if DEEPSPEED_AVAILABLE:
             TTParallelBase.__init__(self, model, add_model_attributes, default_model_methods)
 
 
-# Removed old Parallel wrapper implementations in:
+# Removed old Parallel wrapper implementations in: https://github.com/mv1388/aitoolbox/pull/583
