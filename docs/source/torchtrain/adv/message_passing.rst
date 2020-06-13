@@ -20,10 +20,16 @@ were saved) the sender callback has to send it into the *MessageService* by call
 implementation that would be ``self.message_service.write_message()``). Messages can be considered as a key-value pair
 with added message lifecycle setting.
 
-Depending on the message lifecycle setting, the messages can be kept in the message service until the end of training,
+Depending on the **message lifecycle setting**, the messages can be kept in the message service until the end of training,
 end of epoch or until first read. As such the message service allows the asynchronous and independent operation of
 callbacks enabling the users to add or remove callbacks from the training process as they will without running into
-interdependency issues.
+interdependency issues. The message lifecycle settings can be imported from the
+:mod:`aitoolbox.torchtrain.tl_components.message_passing`. Currently supported settings are:
+
+* ``KEEP_FOREVER``
+* ``UNTIL_END_OF_EPOCH``
+* ``UNTIL_READ``
+* ``OVERWRITE``
 
 In addition to writing messages, the message service of course also supports the reading of the accumulated messages.
 This can be achieved in any TrainLoop component having access to the *MessageService* (callbacks included) by calling
