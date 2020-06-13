@@ -12,6 +12,10 @@ of the same epoch another calculation of predictions on the same data set is req
 the cached results instead of recomputing them again. Currently the ``ModelPredictionStore`` supports caching the model
 loss and model prediction caching on the train, validation and test data sets.
 
+As part of the TrainLoop the model prediction store cache lifecycle ends at the end of the epoch. All the cached model
+outputs are removed at the end of the epoch and the new epoch where the weights of the model will change is started
+with the clean prediction cache.
+
 To most users this caching is visible as part of the TrainLoop's loss calculation methods:
 
 * :meth:`aitoolbox.torchtrain.train_loop.TrainLoop.evaluate_loss_on_train_set`
