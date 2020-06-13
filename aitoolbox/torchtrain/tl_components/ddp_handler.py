@@ -15,36 +15,50 @@ class DDPHandler:
         """
         self.train_loop_obj = train_loop_obj
 
-        from torch.utils.data import RandomSampler
-        if (self.train_loop_obj.train_loader is not None and isinstance(self.train_loop_obj.train_loader.sampler, RandomSampler)) or \
-                (self.train_loop_obj.validation_loader is not None and isinstance(self.train_loop_obj.validation_loader.sampler, RandomSampler)) or \
-                (self.train_loop_obj.test_loader is not None and isinstance(self.train_loop_obj.test_loader.sampler, RandomSampler)):
-            raise ValueError('sampler option is mutually exclusive with shuffle')
+        from torch.utils.data import SequentialSampler, RandomSampler
+        if (self.train_loop_obj.train_loader is not None and
+            not isinstance(self.train_loop_obj.train_loader.sampler, (SequentialSampler, RandomSampler))) or \
+                (self.train_loop_obj.validation_loader is not None and
+                 not isinstance(self.train_loop_obj.validation_loader.sampler, (SequentialSampler, RandomSampler))) or \
+                (self.train_loop_obj.test_loader is not None and
+                 not isinstance(self.train_loop_obj.test_loader.sampler, (SequentialSampler, RandomSampler))):
+            print('Provided DataLoaders have a non-standard data sampler (SequentialSampler or RandomSampler). '
+                  'DDP required DistributedSampler only supports sequential data reading or randomly shuffled '
+                  'data reading.')
 
-    def add_distributed_samplers(self, world_size, rank, train_data_shuffle):
+    def add_distributed_samplers(self, world_size, rank):
         """Add Distributed Samplers needed for DDP to the normal single process DataLoader provided to the TrainLoop
 
         Args:
             world_size (int): world size of for the distributed training
             rank (int): rank of the current process
-            train_data_shuffle (bool): should train loader return shuffled data
         """
+        from torch.utils.data import RandomSampler
         train_sampler = val_sampler = test_sampler = None
 
         if self.train_loop_obj.train_loader is not None:
             self.train_loop_obj.train_loader, train_sampler = \
-                self.build_loader_sampler(self.train_loop_obj.train_loader, shuffle=train_data_shuffle,
-                                          world_size=world_size, rank=rank)
+                self.build_loader_sampler(
+                    self.train_loop_obj.train_loader,
+                    shuffle=isinstance(self.train_loop_obj.train_loader.sampler, RandomSampler),
+                    world_size=world_size, rank=rank
+                )
 
         if self.train_loop_obj.validation_loader is not None:
             self.train_loop_obj.validation_loader, val_sampler = \
-                self.build_loader_sampler(self.train_loop_obj.validation_loader, shuffle=False,
-                                          world_size=world_size, rank=rank)
+                self.build_loader_sampler(
+                    self.train_loop_obj.validation_loader,
+                    shuffle=isinstance(self.train_loop_obj.validation_loader.sampler, RandomSampler),
+                    world_size=world_size, rank=rank
+                )
 
         if self.train_loop_obj.test_loader is not None:
             self.train_loop_obj.test_loader, test_sampler = \
-                self.build_loader_sampler(self.train_loop_obj.test_loader, shuffle=False,
-                                          world_size=world_size, rank=rank)
+                self.build_loader_sampler(
+                    self.train_loop_obj.test_loader,
+                    shuffle=isinstance(self.train_loop_obj.test_loader.sampler, RandomSampler),
+                    world_size=world_size, rank=rank
+                )
 
         self.train_loop_obj.callbacks_handler.register_callbacks([
             DistributedSamplerSetEpoch(train_sampler, val_sampler, test_sampler)

@@ -93,7 +93,7 @@ class TestMNISTCNN(unittest.TestCase):
                                transforms.ToTensor(),
                                transforms.Normalize((0.1307,), (0.3081,))
                            ])),
-            batch_size=100)
+            batch_size=100, shuffle=True)
         val_loader = torch.utils.data.DataLoader(
             datasets.MNIST(os.path.join(THIS_DIR, 'data'), train=False, transform=transforms.Compose([
                 transforms.ToTensor(),
@@ -109,13 +109,14 @@ class TestMNISTCNN(unittest.TestCase):
         tl = TrainLoop(
             model,
             train_loader, val_loader, None,
-            optimizer, criterion
+            optimizer, criterion,
+            gpu_mode='ddp'
         )
         self.assertEqual(tl.device.type, "cuda")
 
-        tl.fit_distributed(num_epochs=num_epochs,
-                           callbacks=[DDPPredictionSave(dir_path=f'{THIS_DIR}/ddp_cnn_save',
-                                                        file_name='tl_ddp_predictions.p')])
+        tl.fit(num_epochs=num_epochs,
+               callbacks=[DDPPredictionSave(dir_path=f'{THIS_DIR}/ddp_cnn_save',
+                                            file_name='tl_ddp_predictions.p')])
 
         with open(f'{THIS_DIR}/ddp_cnn_save/tl_ddp_predictions.p', 'rb') as f:
             val_loss, y_pred, y_true = pickle.load(f)
