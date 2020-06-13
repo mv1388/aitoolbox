@@ -31,8 +31,8 @@ the training dataloader for the specified number of epochs.
 
 
 
-TrainLoop Variations:
----------------------
+TrainLoop Variations
+--------------------
 
 :mod:`aitoolbox.torchtrain.train_loop` module consists of four different ``TrainLoop`` variations:
 
