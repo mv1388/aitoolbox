@@ -138,6 +138,17 @@ class MultiGPUModelWrap(TTBasicMultiGPUModel):
         self.model = model
 
     def forward(self, *input_data, targets=None, criterion=None):
+        """DP friendly forward abstraction on top of the wrapped model's usual forward() function
+
+        Args:
+            *input_data: whatever input data should be passed into the wrapped model's forward() function
+            targets: target variables which the model is training to fit
+            criterion: loss function
+
+        Returns:
+            PyTorch loss or model output predictions. If loss function criterion is provided this function returns the
+                calculated loss, otherwise the model output predictions are returned
+        """
         predictions = self.model(*input_data)
 
         if criterion is not None:
