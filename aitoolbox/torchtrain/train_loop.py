@@ -684,7 +684,7 @@ class TrainLoop:
         if not DEEPSPEED_AVAILABLE:
             raise ValueError('Trying to use Microsoft DeepSpeed. However, DeepSpeed is not installed.')
         if self.use_amp:
-            raise ValueError('Base Nvidia APEX AMP enabled. To use DeepSpeed first disable base AMP and specfiy '
+            raise ValueError('Base Nvidia APEX AMP enabled. To use DeepSpeed first disable base AMP and specify '
                              'the AMP as part of DeepSpeed config.')
 
         self.use_deepspeed = True
