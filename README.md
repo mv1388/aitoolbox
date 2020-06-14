@@ -68,7 +68,7 @@ model = tl.fit(num_epochs=10)
 AIToolbox includes a few more advanced derivations of the basic TrainLoop
 which automatically handle the experiment tracking by creating model
 checkpoints, performance reports, example predictions, etc. All of this can be saved just on the local drive
-or can also be automatically also stored on AWS S3.  Currently implemented advanced 
+or can also be automatically stored on AWS S3. Currently implemented advanced 
 [`TrainLoops`](/aitoolbox/torchtrain/train_loop.py) are `TrainLoopCheckpoint`, `TrainLoopEndSave` and `TrainLoopCheckpointEndSave`.
 Here, 'Checkpoint' stands for checkpointing after each epoch, while 'EndSave' will only persist and evaluate at the very end of the training. 
 
