@@ -68,7 +68,7 @@ model = tl.fit(num_epochs=10)
 AIToolbox includes a few more advanced derivations of the basic TrainLoop
 which automatically handle the experiment tracking by creating model
 checkpoints, performance reports, example predictions, etc. All of this can be saved just on the local drive
-or can also be automatically also stored on AWS S3.  Currently implemented advanced 
+or can also be automatically stored on AWS S3. Currently implemented advanced 
 [`TrainLoops`](/aitoolbox/torchtrain/train_loop.py) are `TrainLoopCheckpoint`, `TrainLoopEndSave` and `TrainLoopCheckpointEndSave`.
 Here, 'Checkpoint' stands for checkpointing after each epoch, while 'EndSave' will only persist and evaluate at the very end of the training. 
 
@@ -314,9 +314,9 @@ Lastly, the nlp module also provides several rudimentary NLP data processing fun
 
 ## AWS GPU instance prep and management bash scripts
 
-As some of the tasks when training models on the cloud GPU are quite repetitive, the package
-also includes several useful bash scripts to automatize tasks such as instance init preparation,
-experiment file updating, remote AIToolbox installation updating, etc.
+As some of the tasks when training models on the AWS cloud GPU are quite repetitive, the package
+also includes several useful bash scripts to automatize tasks such as instance initialization and
+bootstrapping, experiment file updating, remote AIToolbox installation updating, etc.
 
 For further information look into the [`/bin/AWS`](/bin/AWS/) folder and read 
 the provided [README](/bin/AWS/README.md).

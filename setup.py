@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='aitoolbox',
-    version='1.1.0',
+    version='1.1.1',
     author='Marko Vidoni',
     author_email='',
     url='https://github.com/mv1388/AIToolbox',
@@ -37,7 +37,7 @@ setup(
         'google-cloud-storage',
 
         'nltk',
-        'allennlp',
+        'allennlp==0.9',
         'pyrouge',
         'rouge'
     ],
