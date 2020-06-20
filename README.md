@@ -314,9 +314,9 @@ Lastly, the nlp module also provides several rudimentary NLP data processing fun
 
 ## AWS GPU instance prep and management bash scripts
 
-As some of the tasks when training models on the cloud GPU are quite repetitive, the package
-also includes several useful bash scripts to automatize tasks such as instance init preparation,
-experiment file updating, remote AIToolbox installation updating, etc.
+As some of the tasks when training models on the AWS cloud GPU are quite repetitive, the package
+also includes several useful bash scripts to automatize tasks such as instance initialization and
+bootstrapping, experiment file updating, remote AIToolbox installation updating, etc.
 
 For further information look into the [`/bin/AWS`](/bin/AWS/) folder and read 
 the provided [README](/bin/AWS/README.md).
