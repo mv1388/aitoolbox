@@ -78,14 +78,7 @@ class TrainLoop:
                 * ``'deepspeed'``: training via the Microsoft DeepSpeed
 
             cuda_device_idx (int or None): CUDA device index used when training on multiple GPUs
-            use_amp (bool or dict): use Nvidia Apex 16-bit Automatic Mixed Precision (AMP)
-
-                To switch to AMP mode either:
-
-                * set this parameter to ``True`` to use default AMP initialization parameters
-                * provide custom Apex AMP initialization parameters as a dict as this parameter
-
-                Available AMP initialization parameters: https://nvidia.github.io/apex/amp.html#apex.amp.initialize
+            use_amp (bool): use 16-bit Automatic Mixed Precision (AMP)
         """
         if isinstance(model, TTModel) or isinstance(model, TTDataParallel):
             self.model = model
@@ -107,8 +100,8 @@ class TrainLoop:
         self.end_auto_eval = end_auto_eval
 
         self.gpu_mode = gpu_mode
-        self.use_amp = use_amp is True or type(use_amp) == dict
-        self.amp_params = {} if use_amp is True else use_amp
+        self.use_amp = use_amp
+        self.amp_scaler = GradScaler() if self.use_amp else None
         self.use_deepspeed = False
 
         USE_CUDA = torch.cuda.is_available()
@@ -206,9 +199,6 @@ class TrainLoop:
 
         self.model = self.model.to(self.device)
         self.criterion = self.criterion.to(self.device)
-        # Initialize AMP when training with Nvidia APEX mixed precision
-        if self.use_amp and not self.ddp_training_mode:
-            self.model, self.optimizer = amp.initialize(self.model, self.optimizer, **self.amp_params)
 
         self.model.train()
 
@@ -225,10 +215,12 @@ class TrainLoop:
                 self.callbacks_handler.execute_batch_begin()
 
                 # Feed batch into the model
-                if self.batch_model_feed_def is None:
-                    loss_batch = self.model.get_loss(batch_data, self.criterion, self.device)
-                else:
-                    loss_batch = self.batch_model_feed_def.get_loss(self.model, batch_data, self.criterion, self.device)
+                with autocast(enabled=self.use_amp):
+                    if self.batch_model_feed_def is None:
+                        loss_batch = self.model.get_loss(batch_data, self.criterion, self.device)
+                    else:
+                        loss_batch = self.batch_model_feed_def.get_loss(self.model, batch_data,
+                                                                        self.criterion, self.device)
                 self.loss_batch_accum.append(loss_batch.item())
                 # Need to divide by the number of accumulation steps if our loss is averaged over the training samples
                 loss_batch = loss_batch / grad_accumulation
@@ -236,9 +228,7 @@ class TrainLoop:
                 # Backward pass through the model
                 if self.use_amp:
                     if not isinstance(loss_batch, MultiLoss):
-                        # Single loss Apex AMP calculation
-                        with amp.scale_loss(loss_batch, self.optimizer) as scaled_loss:
-                            scaled_loss.backward()
+                        self.amp_scaler.scale(loss_batch).backward()
                     else:
                         # Multi-loss Apex AMP calculation
                         loss_batch.backward_amp(self.optimizer.optimizer_list)
@@ -255,10 +245,15 @@ class TrainLoop:
                     # Optimizer step
                     if self.use_deepspeed:
                         self.model.step()
+                    elif self.use_amp:
+                        self.amp_scaler.step(self.optimizer)
                     else:
                         self.optimizer.step()
                     if self.grad_cb_used:
                         self.callbacks_handler.execute_optimizer_step()
+
+                    if self.use_amp:
+                        self.amp_scaler.update()
 
                     # Optimizer zero grad
                     if not self.use_deepspeed:
@@ -766,14 +761,7 @@ class TrainLoopCheckpoint(TrainLoop):
                 * ``'deepspeed'``: training via the Microsoft DeepSpeed
 
             cuda_device_idx (int or None): CUDA device index used when training on multiple GPUs
-            use_amp (bool or dict): use Nvidia Apex 16-bit Automatic Mixed Precision (AMP)
-
-                To switch to AMP mode either:
-
-                * set this parameter to ``True`` to use default AMP initialization parameters
-                * provide custom Apex AMP initialization parameters as a dict as this parameter
-
-                Available AMP initialization parameters: https://nvidia.github.io/apex/amp.html#apex.amp.initialize
+            use_amp (bool): use 16-bit Automatic Mixed Precision (AMP)
         """
         TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion,
                            collate_batch_pred_fn, pred_transform_fn,
@@ -856,14 +844,7 @@ class TrainLoopEndSave(TrainLoop):
                 * ``'deepspeed'``: training via the Microsoft DeepSpeed
 
             cuda_device_idx (int or None): CUDA device index used when training on multiple GPUs
-            use_amp (bool or dict): use Nvidia Apex 16-bit Automatic Mixed Precision (AMP)
-
-                To switch to AMP mode either:
-
-                * set this parameter to ``True`` to use default AMP initialization parameters
-                * provide custom Apex AMP initialization parameters as a dict as this parameter
-
-                Available AMP initialization parameters: https://nvidia.github.io/apex/amp.html#apex.amp.initialize
+            use_amp (bool): use 16-bit Automatic Mixed Precision (AMP)
         """
         TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion,
                            collate_batch_pred_fn, pred_transform_fn,
@@ -972,14 +953,7 @@ class TrainLoopCheckpointEndSave(TrainLoopEndSave):
                 * ``'deepspeed'``: training via the Microsoft DeepSpeed
 
             cuda_device_idx (int or None): CUDA device index used when training on multiple GPUs
-            use_amp (bool or dict): use Nvidia Apex 16-bit Automatic Mixed Precision (AMP)
-
-                To switch to AMP mode either:
-
-                * set this parameter to ``True`` to use default AMP initialization parameters
-                * provide custom Apex AMP initialization parameters as a dict as this parameter
-
-                Available AMP initialization parameters: https://nvidia.github.io/apex/amp.html#apex.amp.initialize
+            use_amp (bool): use 16-bit Automatic Mixed Precision (AMP)
         """
         if 'experiment_file_path' not in hyperparams:
             hyperparams['experiment_file_path'] = inspect.getframeinfo(inspect.currentframe().f_back).filename
