@@ -11,6 +11,7 @@ from torch.nn.modules import Module
 import torch.multiprocessing as mp
 import torch.distributed as dist
 from torch.nn.parallel import DistributedDataParallel
+from torch.cuda.amp import autocast, GradScaler
 try:
     from apex import amp
     from apex.parallel import DistributedDataParallel as ApexDistributedDataParallel
