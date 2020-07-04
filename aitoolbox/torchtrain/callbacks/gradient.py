@@ -40,6 +40,9 @@ class GradValueClip(GradientCallbackBase):
         self.max_grad_value = max_grad_value
 
     def on_after_gradient_update(self):
+        if self.train_loop_obj.use_amp:
+            self.train_loop_obj.amp_scaler.unscale_(self.train_loop_obj.optimizer)
+
         torch.nn.utils.clip_grad_value_(self.train_loop_obj.model.parameters(), self.max_grad_value)
 
 
@@ -56,6 +59,9 @@ class GradNormClip(GradientCallbackBase):
         self.kwargs = kwargs
 
     def on_after_gradient_update(self):
+        if self.train_loop_obj.use_amp:
+            self.train_loop_obj.amp_scaler.unscale_(self.train_loop_obj.optimizer)
+
         torch.nn.utils.clip_grad_norm_(self.train_loop_obj.model.parameters(), self.max_grad_norm, **self.kwargs)
 
 
