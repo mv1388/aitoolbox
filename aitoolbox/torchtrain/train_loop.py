@@ -71,7 +71,12 @@ class TrainLoop:
                 * ``'deepspeed'``: training via the Microsoft DeepSpeed
 
             cuda_device_idx (int or None): CUDA device index used when training on multiple GPUs
-            use_amp (bool): use 16-bit Automatic Mixed Precision (AMP)
+            use_amp (bool or dict): use 16-bit Automatic Mixed Precision (AMP)
+
+                To switch to AMP mode either:
+
+                * set this parameter to ``True`` to use default AMP ``torch.cuda.amp.GradScaler`` initialization params
+                * provide custom AMP ``torch.cuda.amp.GradScaler`` initialization parameters as a dict as this parameter
         """
         if isinstance(model, TTModel) or isinstance(model, TTDataParallel):
             self.model = model
@@ -93,8 +98,9 @@ class TrainLoop:
         self.end_auto_eval = end_auto_eval
 
         self.gpu_mode = gpu_mode
-        self.use_amp = use_amp
-        self.amp_scaler = GradScaler() if self.use_amp and self.gpu_mode != 'ddp' else None
+        self.use_amp = use_amp is True or type(use_amp) == dict
+        self.amp_scaler_init = {} if use_amp is True else use_amp
+        self.amp_scaler = GradScaler(**self.amp_scaler_init) if self.use_amp and self.gpu_mode != 'ddp' else None
         self.use_deepspeed = False
 
         USE_CUDA = torch.cuda.is_available()
@@ -615,7 +621,7 @@ class TrainLoop:
 
         # Optionally initialize AMP scaler inside each of the processes
         if self.use_amp:
-            self.amp_scaler = GradScaler()
+            self.amp_scaler = GradScaler(**self.amp_scaler_init)
 
         # Wrap models into DDP module
         if isinstance(self.model, TTModel):
@@ -741,7 +747,12 @@ class TrainLoopCheckpoint(TrainLoop):
                 * ``'deepspeed'``: training via the Microsoft DeepSpeed
 
             cuda_device_idx (int or None): CUDA device index used when training on multiple GPUs
-            use_amp (bool): use 16-bit Automatic Mixed Precision (AMP)
+            use_amp (bool or dict): use 16-bit Automatic Mixed Precision (AMP)
+
+                To switch to AMP mode either:
+
+                * set this parameter to ``True`` to use default AMP ``torch.cuda.amp.GradScaler`` initialization params
+                * provide custom AMP ``torch.cuda.amp.GradScaler`` initialization parameters as a dict as this parameter
         """
         TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion,
                            collate_batch_pred_fn, pred_transform_fn,
@@ -824,7 +835,12 @@ class TrainLoopEndSave(TrainLoop):
                 * ``'deepspeed'``: training via the Microsoft DeepSpeed
 
             cuda_device_idx (int or None): CUDA device index used when training on multiple GPUs
-            use_amp (bool): use 16-bit Automatic Mixed Precision (AMP)
+            use_amp (bool or dict): use 16-bit Automatic Mixed Precision (AMP)
+
+                To switch to AMP mode either:
+
+                * set this parameter to ``True`` to use default AMP ``torch.cuda.amp.GradScaler`` initialization params
+                * provide custom AMP ``torch.cuda.amp.GradScaler`` initialization parameters as a dict as this parameter
         """
         TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion,
                            collate_batch_pred_fn, pred_transform_fn,
@@ -933,7 +949,12 @@ class TrainLoopCheckpointEndSave(TrainLoopEndSave):
                 * ``'deepspeed'``: training via the Microsoft DeepSpeed
 
             cuda_device_idx (int or None): CUDA device index used when training on multiple GPUs
-            use_amp (bool): use 16-bit Automatic Mixed Precision (AMP)
+            use_amp (bool or dict): use 16-bit Automatic Mixed Precision (AMP)
+
+                To switch to AMP mode either:
+
+                * set this parameter to ``True`` to use default AMP ``torch.cuda.amp.GradScaler`` initialization params
+                * provide custom AMP ``torch.cuda.amp.GradScaler`` initialization parameters as a dict as this parameter
         """
         if 'experiment_file_path' not in hyperparams:
             hyperparams['experiment_file_path'] = inspect.getframeinfo(inspect.currentframe().f_back).filename
