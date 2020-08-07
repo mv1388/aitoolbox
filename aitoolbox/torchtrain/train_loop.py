@@ -580,6 +580,7 @@ class TrainLoop:
         self.ddp_training_mode = True
         os.environ['MASTER_ADDR'] = 'localhost'
         os.environ['MASTER_PORT'] = '8888'
+        os.environ['MKL_THREADING_LAYER'] = 'GNU'
         ddp_args = {
             'node_rank': node_rank,
             'num_gpus': num_gpus,
