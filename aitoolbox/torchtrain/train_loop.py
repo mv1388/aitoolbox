@@ -580,6 +580,9 @@ class TrainLoop:
         self.ddp_training_mode = True
         os.environ['MASTER_ADDR'] = 'localhost'
         os.environ['MASTER_PORT'] = '8888'
+        # Based on:
+        # https://blog.exxactcorp.com/pytorch-1-5-1-bug-fix-release/
+        # https://github.com/pytorch/pytorch/issues/37377
         os.environ['MKL_THREADING_LAYER'] = 'GNU'
         ddp_args = {
             'node_rank': node_rank,
