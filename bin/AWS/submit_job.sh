@@ -41,7 +41,7 @@ local_project_path="None"
 dataset_name="None"
 preproc_dataset="None"
 DL_framework="pytorch"
-AIToolbox_version="1.1.1"
+AIToolbox_version="1.1.2"
 instance_config="config_p2_xlarge.json"
 instance_type=
 experiment_script_file="aws_run_experiments_project.sh"
@@ -149,9 +149,9 @@ fi
 if [ "$DL_framework" == "TF" ]; then
     py_env="tensorflow_p36"
 elif [ "$DL_framework" == "pytorch" ]; then
-    py_env="pytorch_p36"
+    py_env="pytorch_latest_p36"
 else
-    py_env="tensorflow_p36"
+    py_env="pytorch_latest_p36"
 fi
 
 apex_setting=""

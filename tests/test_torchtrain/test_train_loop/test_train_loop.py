@@ -1,4 +1,5 @@
 import unittest
+import os
 
 from tests.utils import *
 
@@ -19,6 +20,55 @@ class TestTrainLoop(unittest.TestCase):
         self.assertIsInstance(train_loop.callbacks_handler, CallbacksHandler)
         self.assertEqual(train_loop.callbacks_handler.train_loop_obj, train_loop)
         self.assertFalse(train_loop.early_stop)
+
+    def test_fit_mode_selection_single_gpu(self):
+        gpu_mode, num_epochs, callbacks, grad_accumulation = self.execute_train_loop_fit_in_mode('single')
+
+        self.assertEqual(gpu_mode, 'train_single')
+        self.assertEqual(num_epochs, 5)
+        self.assertEqual(callbacks, [10])
+        self.assertEqual(grad_accumulation, 1)
+
+    def test_fit_mode_selection_dp(self):
+        gpu_mode, num_epochs, callbacks, grad_accumulation, dp_model_args = \
+            self.execute_train_loop_fit_in_mode('dp', dp_model_args={'aaa': 1})
+
+        self.assertEqual(gpu_mode, 'train_dp')
+        self.assertEqual(num_epochs, 5)
+        self.assertEqual(callbacks, [10])
+        self.assertEqual(grad_accumulation, 1)
+        self.assertEqual(dp_model_args, {'aaa': 1})
+
+    def test_fit_mode_selection_ddp(self):
+        gpu_mode, num_epochs, callbacks, grad_accumulation, ddp_model_args, in_process_data_load, num_nodes = \
+            self.execute_train_loop_fit_in_mode(
+                'ddp',
+                ddp_model_args={'aaa': 1}, in_process_data_load='bla', num_nodes=5
+            )
+
+        self.assertEqual(gpu_mode, 'train_ddp')
+        self.assertEqual(num_epochs, 5)
+        self.assertEqual(callbacks, [10])
+        self.assertEqual(grad_accumulation, 1)
+        self.assertEqual(ddp_model_args, {'aaa': 1})
+        self.assertEqual(in_process_data_load, 'bla')
+        self.assertEqual(num_nodes, 5)
+
+    @staticmethod
+    def execute_train_loop_fit_in_mode(gpu_mode, **fit_kwargs):
+        dummy_optimizer = DummyOptimizer()
+        dummy_loss = DummyLoss()
+        dummy_train_loader = list(range(4))
+        dummy_val_loader = list(range(3))
+        dummy_test_loader = list(range(2))
+        model = NetUnifiedBatchFeed()
+
+        tl = TrainLoopFitMethodTracking(
+            model, dummy_train_loader, dummy_val_loader, dummy_test_loader,
+            dummy_optimizer, dummy_loss,
+            gpu_mode=gpu_mode
+        )
+        return tl.fit(5, callbacks=[10], **fit_kwargs)
 
     def test_callback_registration(self):
         train_loop = TrainLoop(NetUnifiedBatchFeed(), None, 100, None, None, None)
@@ -382,3 +432,24 @@ class TestTrainLoop(unittest.TestCase):
         y_pred, y_test, metadata = train_loop.predict_on_validation_set()
         self.assertEqual(train_loop.prediction_store.prediction_store['epoch'], 1)
         self.assertEqual(list(train_loop.prediction_store.prediction_store.keys()), ['epoch', 'val_pred'])
+
+    def test_ddp_env_settings(self):
+        dummy_optimizer = DummyOptimizer()
+        dummy_loss = DummyLoss()
+        dummy_train_loader = list(range(4))
+        dummy_val_loader = list(range(3))
+        dummy_test_loader = list(range(2))
+
+        model = NetUnifiedBatchFeed()
+        train_loop = TrainLoop(
+            model, dummy_train_loader, dummy_val_loader, dummy_test_loader,
+            dummy_optimizer, dummy_loss,
+            gpu_mode='ddp'
+        )
+        train_loop.fit(num_epochs=1)
+
+        self.assertTrue(train_loop.ddp_training_mode)
+
+        self.assertEqual(os.environ['MASTER_ADDR'], 'localhost')
+        self.assertEqual(os.environ['MASTER_PORT'], '8888')
+        self.assertEqual(os.environ['MKL_THREADING_LAYER'], 'GNU')

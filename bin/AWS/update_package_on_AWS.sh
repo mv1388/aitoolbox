@@ -23,7 +23,7 @@ HEREDOC
 key_path=$(jq -r '.key_path' configs/my_config.json)
 ec2_instance_address=
 DL_framework="pytorch"
-AIToolbox_version="1.1.1"
+AIToolbox_version="1.1.2"
 username="ubuntu"
 
 while [[ $# -gt 0 ]]; do
@@ -72,9 +72,9 @@ fi
 if [ $DL_framework == "TF" ]; then
     py_env="tensorflow_p36"
 elif [ $DL_framework == "pytorch" ]; then
-    py_env="pytorch_p36"
+    py_env="pytorch_latest_p36"
 else
-    py_env="tensorflow_p36"
+    py_env="pytorch_latest_p36"
 fi
 
 
