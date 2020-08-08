@@ -1,4 +1,5 @@
 import unittest
+import os
 
 from tests.utils import *
 
@@ -431,3 +432,24 @@ class TestTrainLoop(unittest.TestCase):
         y_pred, y_test, metadata = train_loop.predict_on_validation_set()
         self.assertEqual(train_loop.prediction_store.prediction_store['epoch'], 1)
         self.assertEqual(list(train_loop.prediction_store.prediction_store.keys()), ['epoch', 'val_pred'])
+
+    def test_ddp_env_settings(self):
+        dummy_optimizer = DummyOptimizer()
+        dummy_loss = DummyLoss()
+        dummy_train_loader = list(range(4))
+        dummy_val_loader = list(range(3))
+        dummy_test_loader = list(range(2))
+
+        model = NetUnifiedBatchFeed()
+        train_loop = TrainLoop(
+            model, dummy_train_loader, dummy_val_loader, dummy_test_loader,
+            dummy_optimizer, dummy_loss,
+            gpu_mode='ddp'
+        )
+        train_loop.fit(num_epochs=1)
+
+        self.assertTrue(train_loop.ddp_training_mode)
+
+        self.assertEqual(os.environ['MASTER_ADDR'], 'localhost')
+        self.assertEqual(os.environ['MASTER_PORT'], '8888')
+        self.assertEqual(os.environ['MKL_THREADING_LAYER'], 'GNU')
