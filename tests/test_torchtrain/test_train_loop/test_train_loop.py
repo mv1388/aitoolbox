@@ -40,8 +40,10 @@ class TestTrainLoop(unittest.TestCase):
 
     def test_fit_mode_selection_ddp(self):
         gpu_mode, num_epochs, callbacks, grad_accumulation, ddp_model_args, in_process_data_load, num_nodes = \
-            self.execute_train_loop_fit_in_mode('ddp',
-                                                ddp_model_args={'aaa': 1}, in_process_data_load='bla', num_nodes=5)
+            self.execute_train_loop_fit_in_mode(
+                'ddp',
+                ddp_model_args={'aaa': 1}, in_process_data_load='bla', num_nodes=5
+            )
 
         self.assertEqual(gpu_mode, 'train_ddp')
         self.assertEqual(num_epochs, 5)
