@@ -20,6 +20,7 @@ function usage()
      -e, --experiment-script STR    name of the experiment bash script to be executed in order to start the training
      -l, --log-path STR             path to the local log file which will be uploaded to s3
      --log-s3-upload-dir STR        path to the logs folder on S3 to which the training log should be uploaded
+     -c, --cleanup-script STR       post execution cleanup script
      -h, --help                     show this help message and exit
 
 HEREDOC
@@ -29,6 +30,7 @@ terminate_cmd=false
 experiment_script_file="aws_run_experiments_project.sh"
 log_file_path=
 log_s3_dir_path="s3://model-result/training_logs"
+post_experiment_run_cleanup=false
 
 while [[ $# -gt 0 ]]; do
 key="$1"
@@ -49,6 +51,10 @@ case $key in
     --log-s3-upload-dir)
     log_s3_dir_path="$2"
     shift 2 # past argument value
+    ;;
+    -c|--cleanup-script)
+    post_experiment_run_cleanup=true
+    shift 1 # past argument value
     ;;
     -h|--help )
     usage;
@@ -75,6 +81,11 @@ if [[ $log_file_path != "" && -f $log_file_path ]]; then
 
     s3_filtered_log_path="$log_s3_dir_path/$(basename $filtered_log_file_path)"
     aws s3 cp $filtered_log_file_path $s3_filtered_log_path
+fi
+
+if [[ $post_experiment_run_cleanup == true ]]; then
+    echo Running post execution cleanup script
+    source $project_root_path/AWS_run_scripts/AWS_bootstrap/post_run_cleanup.sh $project_root_path
 fi
 
 if [[ $terminate_cmd == true ]]; then
