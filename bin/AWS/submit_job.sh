@@ -210,7 +210,7 @@ echo "Preparing instance"
 #########################################################
 echo "Running the job"
 ssh -i $key_path $username@$ec2_instance_address \
-    "source activate $py_env ; tmux new-session -d -s 'training' './finish_prepare_instance.sh ; cd project ; ./run_experiment.sh $terminate_setting --experiment-script $experiment_script_file $log_upload_setting' \; pipe-pane 'cat > $logging_path'"
+    "source activate $py_env ; tmux new-session -d -s 'training' './finish_prepare_instance.sh ; cd project ; ./run_experiment.sh $terminate_setting --experiment-script $experiment_script_file $log_upload_setting --cleanup-script' \; pipe-pane 'cat > $logging_path'"
 
 echo "Instance IP: $ec2_instance_address"
 

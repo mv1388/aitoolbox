@@ -28,3 +28,6 @@ touch $project_root_path/$project_name/AWS_run_scripts/AWS_bootstrap/requirement
 
 touch $project_root_path/$project_name/AWS_run_scripts/AWS_bootstrap/bootstrap.sh
 chmod u+x $project_root_path/$project_name/AWS_run_scripts/AWS_bootstrap/bootstrap.sh
+
+touch $project_root_path/$project_name/AWS_run_scripts/AWS_bootstrap/post_run_cleanup.sh
+chmod u+x $project_root_path/$project_name/AWS_run_scripts/AWS_bootstrap/post_run_cleanup.sh
