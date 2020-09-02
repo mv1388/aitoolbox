@@ -185,7 +185,8 @@ class EmailNotification(AbstractCallback):
         """
         performance_list = '<ul>' + \
                            '\n'.join([f'<li><p>{metric_name}: {hist[-1]}</p></li>'
-                                      for metric_name, hist in self.train_loop_obj.train_history.items()]) + \
+                                      for metric_name, hist in self.train_loop_obj.train_history.items()
+                                      if len(hist) > 0]) + \
                            '</ul>'
 
         return performance_list
@@ -398,7 +399,7 @@ class FunctionOnTrainLoop(AbstractCallback):
         if self.batch_end:
             self.execute_callback()
 
-    def on_after_gradient_update(self):
+    def on_after_gradient_update(self, optimizer_idx):
         if self.after_gradient_update:
             self.execute_callback()
 

@@ -99,11 +99,15 @@ class AbstractCallback:
         """
         pass
 
-    def on_after_gradient_update(self):
+    def on_after_gradient_update(self, optimizer_idx):
         """Logic executed after the model gradients are updated
 
         To ensure the execution of this callback enable the `self.train_loop_obj.grad_cb_used = True` option in the
         on_train_loop_registration(). Otherwise logic implemented here will not be executed by the TrainLoop.
+
+        Args:
+            optimizer_idx (int): index of the current optimizer. Mostly useful when using multiple optimizers.
+                When only a single optimizer is used this parameter can be ignored.
 
         Returns:
             None

@@ -143,7 +143,7 @@ class CallbackTracker(AbstractCallback):
         self.callback_calls.append('on_batch_end')
         self.call_ctr['on_batch_end'] += 1
 
-    def on_after_gradient_update(self):
+    def on_after_gradient_update(self, optimizer_idx):
         self.callback_calls.append('on_after_gradient_update')
         self.call_ctr['on_after_gradient_update'] += 1
 
@@ -179,7 +179,7 @@ class CallbackTrackerShort(AbstractCallback):
         self.callback_calls.append('on_batch_begin')
         self.call_ctr['on_batch_begin'] += 1
 
-    def on_after_gradient_update(self):
+    def on_after_gradient_update(self, optimizer_idx):
         self.callback_calls.append('on_after_gradient_update')
         self.call_ctr['on_after_gradient_update'] += 1
 

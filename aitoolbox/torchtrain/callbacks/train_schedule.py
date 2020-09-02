@@ -4,17 +4,20 @@ from aitoolbox.torchtrain.callbacks.abstract import AbstractCallback
 
 
 class GeneralLRScheduler(AbstractCallback):
-    def __init__(self, scheduler_class, **kwargs):
+    def __init__(self, scheduler_class, optimizer_idx=None, **kwargs):
         """Learning rate scheduler base class
 
         Args:
             scheduler_class: PyTorch learning rate scheduler class
+            optimizer_idx (int or torch.optim.optimizer.Optimizer or None): index or the actual object reference
+                of the paired optimizer when using multiple optimizers
             **kwargs: learning rate scheduler additional parameters
         """
         AbstractCallback.__init__(self, 'General learn rate scheduler')
         self.scheduler_args = kwargs
         self.scheduler_class = scheduler_class
         self.scheduler = None
+        self.optimizer_idx = optimizer_idx
 
     def register_train_loop_object(self, train_loop_obj):
         """Modified register_train_loop_object method to support scheduler creation
@@ -27,7 +30,15 @@ class GeneralLRScheduler(AbstractCallback):
         """
         self.train_loop_obj = train_loop_obj
         self.message_service = train_loop_obj.message_service
-        self.scheduler = self.scheduler_class(self.train_loop_obj.optimizer, **self.scheduler_args)
+
+        if self.optimizer_idx is None:
+            optimizer = self.train_loop_obj.optimizer
+        elif type(self.optimizer_idx) == int:
+            optimizer = self.train_loop_obj.optimizer[self.optimizer_idx]
+        else:
+            optimizer = self.optimizer_idx
+
+        self.scheduler = self.scheduler_class(optimizer, **self.scheduler_args)
         self.on_train_loop_registration()
         return self
 
@@ -76,7 +87,7 @@ class ReduceLROnPlateauMetricScheduler(GeneralLRScheduler):
 
 
 class LambdaLRScheduler(GeneralLRScheduler):
-    def __init__(self, lr_lambda_list, **kwargs):
+    def __init__(self, lr_lambda_list, execute_epoch_end=True, execute_batch_end=False, **kwargs):
         """Sets the learning rate of each parameter group to the initial lr times a given function
 
         When last_epoch=-1, sets initial lr as lr.
@@ -84,10 +95,22 @@ class LambdaLRScheduler(GeneralLRScheduler):
         Args:
             lr_lambda_list (list): A function list which computes a multiplicative factor given an integer parameter
                 epoch, or a list of such functions, one for each group in optimizer.param_groups.
+            execute_epoch_end (bool): should scheduler step be executed at the end of the epoch
+            execute_batch_end (bool): should scheduler step be executed at the end of each batch
             **kwargs: learning rate scheduler additional parameters
         """
         GeneralLRScheduler.__init__(self, LambdaLR, **dict(kwargs, lr_lambda=lr_lambda_list))
         self.callback_name = ''
+        self.execute_epoch_end = execute_epoch_end
+        self.execute_batch_end = execute_batch_end
+
+    def on_epoch_end(self):
+        if self.execute_epoch_end:
+            self.scheduler.step()
+
+    def on_batch_end(self):
+        if self.execute_batch_end:
+            self.scheduler.step()
 
 
 class StepLRScheduler(GeneralLRScheduler):

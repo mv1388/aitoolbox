@@ -6,49 +6,72 @@ except ImportError:
 
 
 class MultiLoss:
-    def __init__(self, loss_list, amp_optimizer_order=None):
+    def __init__(self, loss_dict, loss_optimizer_map=None, retain_graph_until_last=True):
         """Multiple loss wrapper for TrainLoop based training
 
         Args:
-            loss_list (list): list of loss objects which are used to calculate losses in the TrainLoop
-            amp_optimizer_order (callable or lambda or function or None): when using Nvidia Apex AMP, construct
-                a list of optimizers where the optimizer's position matches the position of the corresponding loss
-                in the loss_list. This is useful in cases similar to this:
-                https://github.com/NVIDIA/apex/tree/master/examples/dcgan#mixed-precision-dcgan-training-in-pytorch
-
-                When not using Nvidia Apex AMP this can be ignored as losses and optimizers don't need to be
-                explicitly paired.
+            loss_dict (dict): dict of loss objects which are used to calculate losses in the TrainLoop
+            loss_optimizer_map (dict or None): dict mapping the loss name to the corresponding optimizer's index
+                in the ``MultiOptimizer``. If this parameter is left to ``None`` the mapping is automatically created
+                by assigning values from ``range(len(loss_dict))`` as corresponding optimizer indices.
+            retain_graph_until_last (bool): when calling backward should ``retain_graph`` option be enabled for all but
+                last loss tensor
         """
-        self.loss_list = loss_list
-        self.amp_optimizer_order = amp_optimizer_order
+        self.loss_dict = loss_dict
 
-        if self.amp_optimizer_order is not None:
-            if not callable(self.amp_optimizer_order):
-                raise TypeError('Provided amp_optimizer_order is not callable. When providing amp_optimizer_order '
-                                'it should be a callable function taking the optimizer list and returning '
-                                'the ordered list of loss-matching optimizers.')
+        self.loss_backward_remaining = len(self.loss_dict)
+        self.retain_graph_until_last = retain_graph_until_last
 
-    def backward(self):
-        for loss in self.loss_list:
-            loss.backward()
+        if loss_optimizer_map is None:
+            self.optimizer_loss_map = {i: k for i, k in enumerate(loss_dict.keys())}
+        else:
+            if len(loss_optimizer_map) != len(self.loss_dict):
+                raise ValueError('loss_optimizer_map length not the same as loss_dict')
 
-    def backward_amp(self, optimizers):
-        """Executes backward() over all the losses using the list o optimizers
+            self.optimizer_loss_map = {int(v): str(k) for k, v in loss_optimizer_map.items()}
+
+    def backward(self, optimizer_idx):
+        """Executes backward() for the specific loss based on provided optimizer_idx
 
         Args:
-            optimizers (list): list of optimizers all used optimizers
+            optimizer_idx (int): index of the current optimizer. Mostly useful when using multiple optimizers. When
+                only a single optimizer is used this parameter can be ignored.
 
         Returns:
             None
         """
-        optimizers_list = optimizers if self.amp_optimizer_order is None else self.amp_optimizer_order(optimizers)
+        if self.retain_graph_until_last and self.loss_backward_remaining > 1:
+            self.loss_dict[self.optimizer_loss_map[optimizer_idx]].backward(retain_graph=True)
+        else:
+            self.loss_dict[self.optimizer_loss_map[optimizer_idx]].backward()
 
-        for i, (loss, optimizer) in enumerate(zip(self.loss_list, optimizers_list)):
-            with amp.scale_loss(loss, optimizer, loss_id=i) as scaled_loss:
-                scaled_loss.backward()
+        self.loss_backward_remaining -= 1
+
+    def backward_amp(self, optimizers, optimizer_idx):
+        """When training with AMP xecutes backward() for the specific loss based on provided optimizer_idx
+
+        Args:
+            optimizers (MultiOptimizer): list of optimizers all used optimizers
+            optimizer_idx (int): index of the current optimizer. Mostly useful when using multiple optimizers. When
+                only a single optimizer is used this parameter can be ignored.
+
+        Returns:
+            None
+        """
+        loss = self.loss_dict[self.optimizer_loss_map[optimizer_idx]]
+        optimizer = optimizers[optimizer_idx]
+
+        with amp.scale_loss(loss, optimizer, loss_id=self.loss_backward_remaining) as scaled_loss:
+            scaled_loss.backward()
+
+        self.loss_backward_remaining -= 1
 
     def item(self):
-        return [loss.item() for loss in self.loss_list]
+        return {k: loss.item() for k, loss in self.loss_dict.items()}
+
+    def __truediv__(self, grad_accumulation):
+        self.loss_dict = {k: loss / grad_accumulation for k, loss in self.loss_dict.items()}
+        return self
 
 
 class MultiOptimizer:
@@ -60,13 +83,17 @@ class MultiOptimizer:
         """
         self.optimizer_list = optimizer_list
 
-    def zero_grad(self):
-        for optimizer in self.optimizer_list:
-            optimizer.zero_grad()
+    def zero_grad(self, optimizer_idx):
+        self.optimizer_list[optimizer_idx].zero_grad()
 
-    def step(self):
-        for optimizer in self.optimizer_list:
-            optimizer.step()
+    def step(self, optimizer_idx):
+        self.optimizer_list[optimizer_idx].step()
 
     def state_dict(self):
         return [optimizer.state_dict() for optimizer in self.optimizer_list]
+
+    def __len__(self):
+        return len(self.optimizer_list)
+
+    def __getitem__(self, idx):
+        return self.optimizer_list[idx]
