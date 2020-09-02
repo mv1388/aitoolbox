@@ -211,49 +211,17 @@ class TrainLoop:
                 self.callbacks_handler.execute_batch_begin()
 
                 # Feed batch into the model
-                with autocast(enabled=self.use_amp):
-                    if self.batch_model_feed_def is None:
-                        loss_batch = self.model.get_loss(batch_data, self.criterion, self.device)
-                    else:
-                        loss_batch = self.batch_model_feed_def.get_loss(self.model, batch_data,
-                                                                        self.criterion, self.device)
-                self.loss_batch_accum.append(loss_batch.item())
-                # Need to divide by the number of accumulation steps if our loss is averaged over the training samples
-                loss_batch = loss_batch / grad_accumulation
+                loss_batch = self._calculate_batch_loss(batch_data, grad_accumulation)
 
                 # Backward pass through the model
-                if self.use_amp:
-                    if not isinstance(loss_batch, MultiLoss):
-                        self.amp_scaler.scale(loss_batch).backward()
-                    else:
-                        # Multi-loss Apex AMP calculation
-                        loss_batch.backward_amp(self.optimizer.optimizer_list)
-                elif self.use_deepspeed:
-                    self.model.backward(loss_batch)
-                else:
-                    loss_batch.backward()
-
+                self._backward_pass(loss_batch)
                 if self.grad_cb_used:
                     self.callbacks_handler.execute_gradient_update()
 
-                # if (iteration + 1) % grad_accumulation == 0 or iteration == len(self.train_loader) - 1:
-                if (iteration + 1) % grad_accumulation == 0:
-                    # Optimizer step
-                    if self.use_deepspeed:
-                        self.model.step()
-                    elif self.use_amp:
-                        self.amp_scaler.step(self.optimizer)
-                    else:
-                        self.optimizer.step()
-                    if self.grad_cb_used:
-                        self.callbacks_handler.execute_optimizer_step()
-
-                    if self.use_amp:
-                        self.amp_scaler.update()
-
-                    # Optimizer zero grad
-                    if not self.use_deepspeed:
-                        self.optimizer.zero_grad()
+                # Optimizer step
+                self._optimizer_step(iteration, grad_accumulation)
+                # Optimizer zero grad
+                self._optimizer_zero_grad(iteration, grad_accumulation)
 
                 self.callbacks_handler.execute_batch_end()
 
@@ -275,6 +243,84 @@ class TrainLoop:
         self.callbacks_handler.execute_train_end()
 
         return self.model
+
+    def _calculate_batch_loss(self, batch_data, grad_accumulation):
+        """Push batch data through the model and calculate the batch loss
+
+        Args:
+            batch_data: input data batch
+            grad_accumulation (int): number of batches the gradients are accumulated before updating weights
+
+        Returns:
+            loss: loss calculated on current batch
+        """
+        with autocast(enabled=self.use_amp):
+            if self.batch_model_feed_def is None:
+                loss_batch = self.model.get_loss(batch_data, self.criterion, self.device)
+            else:
+                loss_batch = self.batch_model_feed_def.get_loss(self.model, batch_data,
+                                                                self.criterion, self.device)
+        self.loss_batch_accum.append(loss_batch.item())
+
+        # Need to divide by the number of accumulation steps if our loss is averaged over the training samples
+        loss_batch = loss_batch / grad_accumulation
+
+        return loss_batch
+
+    def _backward_pass(self, loss_batch):
+        """Execute backward pass from the current batch loss
+
+        Args:
+            loss_batch: loss calculated on current batch
+
+        Returns:
+            None
+        """
+        if self.use_amp:
+            if not isinstance(loss_batch, MultiLoss):
+                self.amp_scaler.scale(loss_batch).backward()
+            else:
+                # Multi-loss Apex AMP calculation
+                loss_batch.backward_amp(self.optimizer.optimizer_list)
+        elif self.use_deepspeed:
+            self.model.backward(loss_batch)
+        else:
+            loss_batch.backward()
+
+    def _optimizer_step(self, iteration, grad_accumulation):
+        """Execute the optimizer step
+
+        Args:
+            iteration (int): current iteration index
+            grad_accumulation (int): number of batches the gradients are accumulated before updating weights
+
+        Returns:
+            None
+        """
+        # if (iteration + 1) % grad_accumulation == 0 or iteration == len(self.train_loader) - 1:
+        if (iteration + 1) % grad_accumulation == 0:
+            if self.use_deepspeed:
+                self.model.step()
+            else:
+                self.optimizer.step()
+
+            if self.grad_cb_used:
+                self.callbacks_handler.execute_optimizer_step()
+
+    def _optimizer_zero_grad(self, iteration, grad_accumulation):
+        """Execute optimizer zero grad
+
+        Args:
+            iteration (int): current iteration index
+            grad_accumulation (int): number of batches the gradients are accumulated before updating weights
+
+        Returns:
+            None
+        """
+        # if (iteration + 1) % grad_accumulation == 0 or iteration == len(self.train_loader) - 1:
+        if (iteration + 1) % grad_accumulation == 0:
+            if not self.use_deepspeed:
+                self.optimizer.zero_grad()
 
     def auto_execute_end_of_epoch(self):
         """Basic performance evaluation executed by default at the end of each epoch
