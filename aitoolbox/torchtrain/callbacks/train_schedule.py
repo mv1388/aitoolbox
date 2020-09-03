@@ -146,7 +146,8 @@ class LinearWithWarmupScheduler(LambdaLRScheduler):
     def __init__(self, num_warmup_steps, num_training_steps, last_epoch=-1, **kwargs):
         """Linear scheduler with the initial warmup
 
-        Especially useful in the context of BERT-like models. Implementation based on HuggingFace Transformers library.
+        Especially useful in the context of BERT-like models.
+        Implementation based on HuggingFace Transformers library's ``get_linear_schedule_with_warmup()`` method.
 
         Args:
             num_warmup_steps (int): The number of steps for the warmup phase
