@@ -87,19 +87,19 @@ class ReduceLROnPlateauMetricScheduler(GeneralLRScheduler):
 
 
 class LambdaLRScheduler(GeneralLRScheduler):
-    def __init__(self, lr_lambda_list, execute_epoch_end=True, execute_batch_end=False, **kwargs):
+    def __init__(self, lr_lambda, execute_epoch_end=True, execute_batch_end=False, **kwargs):
         """Sets the learning rate of each parameter group to the initial lr times a given function
 
         When last_epoch=-1, sets initial lr as lr.
 
         Args:
-            lr_lambda_list (list): A function list which computes a multiplicative factor given an integer parameter
-                epoch, or a list of such functions, one for each group in optimizer.param_groups.
+            lr_lambda (callable or list): A function or a list of functions which computes a multiplicative factor given
+                an integer parameter epoch, or a list of such functions, one for each group in optimizer.param_groups.
             execute_epoch_end (bool): should scheduler step be executed at the end of the epoch
             execute_batch_end (bool): should scheduler step be executed at the end of each batch
             **kwargs: learning rate scheduler additional parameters
         """
-        GeneralLRScheduler.__init__(self, LambdaLR, **dict(kwargs, lr_lambda=lr_lambda_list))
+        GeneralLRScheduler.__init__(self, LambdaLR, **dict(kwargs, lr_lambda=lr_lambda))
         self.callback_name = ''
         self.execute_epoch_end = execute_epoch_end
         self.execute_batch_end = execute_batch_end
@@ -139,4 +139,28 @@ class MultiStepLRScheduler(GeneralLRScheduler):
             **kwargs: learning rate scheduler additional parameters
         """
         GeneralLRScheduler.__init__(self, MultiStepLR, **dict(kwargs, milestones=milestones_list))
+        self.callback_name = ''
+
+
+class LinearWithWarmupScheduler(LambdaLRScheduler):
+    def __init__(self, num_warmup_steps, num_training_steps, last_epoch=-1, **kwargs):
+        """Linear scheduler with the initial warmup
+
+        Especially useful in the context of BERT-like models. Implementation based on HuggingFace Transformers library.
+
+        Args:
+            num_warmup_steps (int): The number of steps for the warmup phase
+            num_training_steps (int): The total number of training steps
+            last_epoch (int): The index of the last epoch when resuming training
+            **kwargs: learning rate scheduler additional parameters
+        """
+        def lr_lambda(current_step: int):
+            if current_step < num_warmup_steps:
+                return float(current_step) / float(max(1, num_warmup_steps))
+            return max(
+                0.0, float(num_training_steps - current_step) / float(max(1, num_training_steps - num_warmup_steps))
+            )
+
+        super().__init__(lr_lambda=lr_lambda,
+                         execute_epoch_end=False, execute_batch_end=True, last_epoch=last_epoch, **kwargs)
         self.callback_name = ''
