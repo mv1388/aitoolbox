@@ -6,7 +6,7 @@ from aitoolbox.experiment.result_package.abstract_result_packages import Abstrac
 from aitoolbox.experiment.core_metrics.classification import AccuracyMetric
 from aitoolbox.nlp.experiment_evaluation.NLP_metrics import ROUGEMetric, ROUGEPerlMetric, \
     ExactMatchTextMetric, F1TextMetric, \
-    BLEUSentenceScoreMetric, BLEUCorpusScoreMetric, BLEUScoreStrTorchNLPMetric, PerplexityMetric
+    BLEUSentenceScoreMetric, BLEUCorpusScoreMetric, BLEUScoreStrTorchNLPMetric, PerplexityMetric, GLUEMetric
 from aitoolbox.nlp.experiment_evaluation.attention_heatmap import AttentionHeatMap
 
 
@@ -266,3 +266,20 @@ class MachineTranslationResultPackage(AbstractResultPackage):
 
         if len(additional_results_paths) > 0:
             return additional_results_paths
+
+
+class GLUEResultPackage(AbstractResultPackage):
+    def __init__(self, task_name):
+        """GLUE task result package
+
+        Wrapper around HF Transformers ``glue_compute_metrics()``
+
+        Args:
+            task_name (str): name of the GLUE task
+        """
+        super().__init__('GLUE benchmark')
+        self.task_name = task_name
+
+    def prepare_results_dict(self):
+        glue_result = GLUEMetric(self.y_true, self.y_predicted, self.task_name).get_metric_dict()
+        return glue_result
