@@ -48,7 +48,7 @@ class MultiLoss:
         self.loss_backward_remaining -= 1
 
     def backward_amp(self, optimizers, optimizer_idx):
-        """When training with AMP xecutes backward() for the specific loss based on provided optimizer_idx
+        """When training with AMP executes backward() for the specific loss based on provided optimizer_idx
 
         Args:
             optimizers (MultiOptimizer): list of optimizers all used optimizers
