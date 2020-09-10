@@ -183,7 +183,7 @@ class TestMultiLossOptimizerMNISTCNN(unittest.TestCase):
                 optimizer_pt_1.step()
                 optimizer_pt_1.zero_grad()
 
-                loss_2.backward(retain_graph=True)
+                loss_2.backward()
                 optimizer_pt_2.step()
                 optimizer_pt_2.zero_grad()
 
