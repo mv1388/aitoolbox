@@ -25,6 +25,18 @@ class TestMultiLoss(unittest.TestCase):
             self.assertEqual(loss_2.back_ctr, i)
             self.assertEqual(loss_3.back_ctr, i)
 
+    def test_backward_backward_remaining(self):
+        loss_1, loss_2, loss_3, multi_loss = self.build_loss()
+        multi_loss.retain_graph_until_last = True
+
+        for opti_idx in range(3):
+            multi_loss.backward(opti_idx)
+            self.assertEqual(multi_loss.loss_backward_remaining, 2-opti_idx)
+
+        self.assertEqual(loss_1.retain_graph_ctr, 1)
+        self.assertEqual(loss_2.retain_graph_ctr, 1)
+        self.assertEqual(loss_3.retain_graph_ctr, 0)
+
     def test_item(self):
         loss_1, loss_2, loss_3, multi_loss = self.build_loss()
 
@@ -35,6 +47,17 @@ class TestMultiLoss(unittest.TestCase):
             self.assertEqual(loss_1.item_ctr, i)
             self.assertEqual(loss_2.item_ctr, i)
             self.assertEqual(loss_3.item_ctr, i)
+
+    def test_object_div(self):
+        loss_1, loss_2, loss_3, multi_loss = self.build_loss()
+        loss_1.value = 10.
+        loss_2.value = 20.
+        loss_3.value = 30.
+
+        multi_loss = multi_loss / 10.
+
+        self.assertEqual({k: v.value for k, v in multi_loss.loss_dict.items()},
+                         {'loss1': 1.0, 'loss2': 2.0, 'loss3': 3.0})
 
     @staticmethod
     def build_loss():
@@ -95,9 +118,20 @@ class DummyOptimizerStateD(DummyOptimizer):
 
 
 class DummyLossItemChg(DummyLoss):
-    def __init__(self):
+    def __init__(self, value=0):
         super().__init__()
+        self.value = value
+        self.retain_graph_ctr = 0
+
+    def backward(self, retain_graph=False):
+        self.back_ctr += 1
+        if retain_graph:
+            self.retain_graph_ctr += 1
 
     def item(self):
         self.item_ctr += 1
         return self.item_ctr
+
+    def __truediv__(self, other):
+        self.value = self.value / other
+        return self
