@@ -25,6 +25,10 @@ class TestMultiLoss(unittest.TestCase):
             self.assertEqual(loss_2.back_ctr, i)
             self.assertEqual(loss_3.back_ctr, i)
 
+        self.assertEqual(loss_1.retain_graph_ctr, 0)
+        self.assertEqual(loss_2.retain_graph_ctr, 0)
+        self.assertEqual(loss_3.retain_graph_ctr, 0)
+
     def test_backward_backward_remaining(self):
         loss_1, loss_2, loss_3, multi_loss = self.build_loss()
         multi_loss.retain_graph_until_last = True
