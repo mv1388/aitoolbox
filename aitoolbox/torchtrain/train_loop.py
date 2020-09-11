@@ -97,6 +97,8 @@ class TrainLoop:
         self.pred_transform_fn = pred_transform_fn
         self.end_auto_eval = end_auto_eval
 
+        self.num_optimizers = 1 if not isinstance(self.optimizer, MultiOptimizer) else len(self.optimizer)
+
         self.gpu_mode = gpu_mode
         self.use_amp = use_amp is True or type(use_amp) == dict
         self.amp_scaler_init = {} if use_amp is True else use_amp
@@ -213,15 +215,17 @@ class TrainLoop:
                 # Feed batch into the model
                 loss_batch = self._calculate_batch_loss(batch_data, grad_accumulation)
 
-                # Backward pass through the model
-                self._backward_pass(loss_batch)
-                if self.grad_cb_used:
-                    self.callbacks_handler.execute_gradient_update()
+                # Iterate over potentially multiple optimizers
+                for optimizer_idx in range(self.num_optimizers):
+                    # Backward pass through the model
+                    self._backward_pass(loss_batch, optimizer_idx)
+                    if self.grad_cb_used:
+                        self.callbacks_handler.execute_gradient_update(optimizer_idx)
 
-                # Optimizer step
-                self._optimizer_step(iteration, grad_accumulation)
-                # Optimizer zero grad
-                self._optimizer_zero_grad(iteration, grad_accumulation)
+                    # Optimizer step
+                    self._optimizer_step(iteration, grad_accumulation, optimizer_idx)
+                    # Optimizer zero grad
+                    self._optimizer_zero_grad(iteration, grad_accumulation, optimizer_idx)
 
                 self.callbacks_handler.execute_batch_end()
 
@@ -267,11 +271,13 @@ class TrainLoop:
 
         return loss_batch
 
-    def _backward_pass(self, loss_batch):
+    def _backward_pass(self, loss_batch, optimizer_idx):
         """Execute backward pass from the current batch loss
 
         Args:
             loss_batch: loss calculated on current batch
+            optimizer_idx (int): index of the current optimizer. Mostly useful when using multiple optimizers. When
+                only a single optimizer is used this parameter can be ignored.
 
         Returns:
             None
@@ -281,18 +287,23 @@ class TrainLoop:
                 self.amp_scaler.scale(loss_batch).backward()
             else:
                 # Multi-loss Apex AMP calculation
-                loss_batch.backward_amp(self.optimizer.optimizer_list)
+                loss_batch.backward_amp(self.optimizer, optimizer_idx)
         elif self.use_deepspeed:
             self.model.backward(loss_batch)
         else:
-            loss_batch.backward()
+            if not isinstance(loss_batch, MultiLoss):
+                loss_batch.backward()
+            else:
+                loss_batch.backward(optimizer_idx)
 
-    def _optimizer_step(self, iteration, grad_accumulation):
+    def _optimizer_step(self, iteration, grad_accumulation, optimizer_idx):
         """Execute the optimizer step
 
         Args:
             iteration (int): current iteration index
             grad_accumulation (int): number of batches the gradients are accumulated before updating weights
+            optimizer_idx (int): index of the current optimizer. Mostly useful when using multiple optimizers. When
+                only a single optimizer is used this parameter can be ignored.
 
         Returns:
             None
@@ -302,17 +313,22 @@ class TrainLoop:
             if self.use_deepspeed:
                 self.model.step()
             else:
-                self.optimizer.step()
+                if not isinstance(self.optimizer, MultiOptimizer):
+                    self.optimizer.step()
+                else:
+                    self.optimizer.step(optimizer_idx)
 
             if self.grad_cb_used:
                 self.callbacks_handler.execute_optimizer_step()
 
-    def _optimizer_zero_grad(self, iteration, grad_accumulation):
+    def _optimizer_zero_grad(self, iteration, grad_accumulation, optimizer_idx):
         """Execute optimizer zero grad
 
         Args:
             iteration (int): current iteration index
             grad_accumulation (int): number of batches the gradients are accumulated before updating weights
+            optimizer_idx (int): index of the current optimizer. Mostly useful when using multiple optimizers. When
+                only a single optimizer is used this parameter can be ignored.
 
         Returns:
             None
@@ -320,7 +336,10 @@ class TrainLoop:
         # if (iteration + 1) % grad_accumulation == 0 or iteration == len(self.train_loader) - 1:
         if (iteration + 1) % grad_accumulation == 0:
             if not self.use_deepspeed:
-                self.optimizer.zero_grad()
+                if not isinstance(self.optimizer, MultiOptimizer):
+                    self.optimizer.zero_grad()
+                else:
+                    self.optimizer.zero_grad(optimizer_idx)
 
     def auto_execute_end_of_epoch(self):
         """Basic performance evaluation executed by default at the end of each epoch
@@ -330,30 +349,20 @@ class TrainLoop:
         Returns:
             None
         """
-        if type(self.optimizer) == MultiOptimizer:
-            train_loss_batch_accum_avg = np.mean(self.loss_batch_accum, axis=0).tolist()
-        else:
-            train_loss_batch_accum_avg = np.mean(self.loss_batch_accum).item()
-        if self.ddp_training_mode:
-            train_loss_batch_accum_avg = np.mean(self.ddp_handler.mp_sync(train_loss_batch_accum_avg).numpy()).item()
-
-        if not self.ddp_training_mode or self.device.index == 0:
-            print(f'AVG BATCH ACCUMULATED TRAIN LOSS: {train_loss_batch_accum_avg}')
-        self.insert_metric_result_into_history('accumulated_loss', train_loss_batch_accum_avg)
+        loss_parsed = self._parse_loss(self.loss_batch_accum)
+        self._print_save_loss(loss_parsed,
+                              loss_type_name='accumulated_loss',
+                              loss_print_description='AVG BATCH ACCUMULATED TRAIN LOSS')
         self.loss_batch_accum = []
 
         if (type(self.end_auto_eval) is bool and self.end_auto_eval) or \
                 (type(self.end_auto_eval) is int and self.epoch % self.end_auto_eval == 0):
             train_loss = self.evaluate_loss_on_train_set()
-            if not self.ddp_training_mode or self.device.index == 0:
-                print(f'TRAIN LOSS: {train_loss}')
-            self.insert_metric_result_into_history('loss', train_loss)
+            self._print_save_loss(train_loss, loss_type_name='loss', loss_print_description='TRAIN LOSS')
 
             if self.validation_loader is not None:
                 val_loss = self.evaluate_loss_on_validation_set()
-                if not self.ddp_training_mode or self.device.index == 0:
-                    print(f'VAL LOSS: {val_loss}')
-                self.insert_metric_result_into_history('val_loss', val_loss)
+                self._print_save_loss(val_loss, loss_type_name='val_loss', loss_print_description='VAL LOSS')
 
     def auto_execute_end_of_training(self):
         """Basic performance evaluation executed by default at the end of the training process
@@ -364,11 +373,71 @@ class TrainLoop:
         if self.test_loader is not None and \
                 ((type(self.end_auto_eval) is bool and self.end_auto_eval) or type(self.end_auto_eval) is int):
             test_loss = self.evaluate_loss_on_test_set()
-            if not self.ddp_training_mode or self.device.index == 0:
-                print(f'TEST LOSS: {test_loss}')
             # To keep TrainingHistory from complaining due to the non-matching metric result lengths the checking
             # has been turned off
-            self.insert_metric_result_into_history('train_end_test_loss', test_loss)
+            self._print_save_loss(test_loss, loss_type_name='train_end_test_loss', loss_print_description='TEST LOSS')
+
+    def _parse_loss(self, loss_record):
+        """Helper function to process different possible loss formats
+
+        Primarily useful for parsing between single loss representation and the multi-loss representation.
+
+        Args:
+            loss_record (list): list losses from each processed batch
+
+        Returns:
+            np.array or dict: in the case of single loss numpy array is returned, otherwise the dict of multiple losses
+                is returned
+        """
+        loss_names = None
+
+        if type(self.optimizer) == MultiOptimizer:
+            loss_names = sorted(loss_record[0].keys())
+            loss_record = [[loss_dict[k] for k in loss_names] for loss_dict in loss_record]
+
+            loss_batch_accum_avg = np.mean(loss_record, axis=0)
+        else:
+            loss_batch_accum_avg = np.mean(loss_record)
+
+        if self.ddp_training_mode:
+            loss_ddp_synced = self.ddp_handler.mp_sync(loss_batch_accum_avg).numpy()
+            if type(self.optimizer) == MultiOptimizer:
+                loss_batch_accum_avg = np.mean(loss_ddp_synced, axis=0)
+            else:
+                loss_batch_accum_avg = np.mean(loss_ddp_synced)
+
+        if loss_names is None:
+            return loss_batch_accum_avg
+        else:
+            return dict(zip(loss_names, loss_batch_accum_avg))
+
+    def _print_save_loss(self, loss_parsed, loss_type_name, loss_print_description):
+        """Helper function which prints information about parsed loss and saves the loss results into the history
+
+        Args:
+            loss_parsed (np.array or dict): parsed loss result either as a single value or as a dict of multiple losses
+            loss_type_name (str): type of the provided loss result
+            loss_print_description (str): presentation description text of the provided loss result
+
+        Returns:
+            None
+        """
+        # Results reporting to terminal
+        if not self.ddp_training_mode or self.device.index == 0:
+            loss_avg = np.mean(list(loss_parsed.values())) if type(loss_parsed) == dict else loss_parsed
+            print(f'{loss_print_description}: {loss_avg}')
+
+            if type(self.optimizer) == MultiOptimizer and type(loss_parsed) == dict:
+                print(f'MULTI-LOSS {loss_print_description}:')
+                for loss_name, loss_val in loss_parsed.items():
+                    print(f'\t{loss_name}: {loss_val}')
+
+        # Insert results into history
+        if type(self.optimizer) == MultiOptimizer and type(loss_parsed) == dict:
+            for loss_name, loss_val in loss_parsed.items():
+                self.insert_metric_result_into_history(f'{loss_type_name}_{loss_name}', loss_val)
+        else:
+            self.insert_metric_result_into_history(loss_type_name, loss_parsed)
 
     def evaluate_loss_on_train_set(self, force_prediction=False):
         """Run train dataset through the network without updating the weights and return the loss
@@ -378,7 +447,7 @@ class TrainLoop:
                 the old cached value to be overwritten.
 
         Returns:
-            float: loss
+            float or dict: loss, in the case of multi loss, the dict gets returned
         """
         if not self.prediction_store.has_train_loss(self.epoch) or force_prediction:
             loss = self.evaluate_model_loss(self.train_loader)
@@ -396,7 +465,7 @@ class TrainLoop:
                 the old cached value to be overwritten.
 
         Returns:
-            float: loss
+            float or dict: loss, in the case of multi loss, the dict gets returned
         """
         if not self.prediction_store.has_val_loss(self.epoch) or force_prediction:
             loss = self.evaluate_model_loss(self.validation_loader)
@@ -414,7 +483,7 @@ class TrainLoop:
                 the old cached value to be overwritten.
 
         Returns:
-            float: loss
+            float or dict: loss, in the case of multi loss, the dict gets returned
         """
         if not self.prediction_store.has_test_loss(self.epoch) or force_prediction:
             loss = self.evaluate_model_loss(self.test_loader)
@@ -431,7 +500,7 @@ class TrainLoop:
             data_loader (torch.utils.data.DataLoader): dataloader containing the data on which the loss is calculated
 
         Returns:
-            float: loss
+            float or dict: loss, in the case of multi loss, the dict gets returned
         """
         self.model = self.model.to(self.device)
         self.criterion = self.criterion.to(self.device)
@@ -449,12 +518,11 @@ class TrainLoop:
 
                 loss_avg.append(loss_batch.item())
 
-            if self.ddp_training_mode:
-                loss_avg = self.ddp_handler.mp_sync(loss_avg).numpy()
+            loss_avg = self._parse_loss(loss_avg)
 
         self.model.train()
 
-        return np.mean(loss_avg, axis=0)
+        return loss_avg
 
     def predict_on_train_set(self, force_prediction=False):
         """Run train dataset through the network and return true target values, target predictions and metadata

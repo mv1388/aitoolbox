@@ -75,9 +75,9 @@ class BasicCallbacksHandler:
         for callback in self.train_loop_obj.callbacks:
             callback.on_batch_end()
 
-    def execute_gradient_update(self):
+    def execute_gradient_update(self, optimizer_idx=0):
         for callback in self.train_loop_obj.callbacks:
-            callback.on_after_gradient_update()
+            callback.on_after_gradient_update(optimizer_idx)
 
     def execute_optimizer_step(self):
         for callback in self.train_loop_obj.callbacks:
@@ -249,9 +249,9 @@ class CallbacksHandler(BasicCallbacksHandler):
         for callback in self.cbs_on_batch_end:
             callback.on_batch_end()
 
-    def execute_gradient_update(self):
+    def execute_gradient_update(self, optimizer_idx=0):
         for callback in self.cbs_on_after_gradient_update:
-            callback.on_after_gradient_update()
+            callback.on_after_gradient_update(optimizer_idx)
 
     def execute_optimizer_step(self):
         for callback in self.cbs_on_after_optimizer_step:

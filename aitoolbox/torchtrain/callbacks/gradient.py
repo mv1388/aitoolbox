@@ -39,7 +39,7 @@ class GradValueClip(GradientCallbackBase):
         GradientCallbackBase.__init__(self, 'Gradient value clipping')
         self.max_grad_value = max_grad_value
 
-    def on_after_gradient_update(self):
+    def on_after_gradient_update(self, optimizer_idx):
         if self.train_loop_obj.use_amp:
             self.train_loop_obj.amp_scaler.unscale_(self.train_loop_obj.optimizer)
 
@@ -58,7 +58,7 @@ class GradNormClip(GradientCallbackBase):
         self.max_grad_norm = max_grad_norm
         self.kwargs = kwargs
 
-    def on_after_gradient_update(self):
+    def on_after_gradient_update(self, optimizer_idx):
         if self.train_loop_obj.use_amp:
             self.train_loop_obj.amp_scaler.unscale_(self.train_loop_obj.optimizer)
 

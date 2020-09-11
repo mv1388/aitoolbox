@@ -3,9 +3,13 @@ import os
 
 from tests.utils import *
 
+from torch.utils.data.dataset import TensorDataset
+from torch.utils.data.dataloader import DataLoader
+
 from aitoolbox.torchtrain.train_loop import TrainLoop
 from aitoolbox.torchtrain.model import ModelWrap
 from aitoolbox.torchtrain.tl_components.callback_handler import CallbacksHandler
+from aitoolbox.torchtrain.multi_loss_optim import MultiOptimizer
 
 
 class TestTrainLoop(unittest.TestCase):
@@ -453,3 +457,77 @@ class TestTrainLoop(unittest.TestCase):
         self.assertEqual(os.environ['MASTER_ADDR'], 'localhost')
         self.assertEqual(os.environ['MASTER_PORT'], '8888')
         self.assertEqual(os.environ['MKL_THREADING_LAYER'], 'GNU')
+
+
+class TestMultiLossOptiTrainLoop(unittest.TestCase):
+    def test_multi_loss_in_train_loop(self):
+        self.run_multi_loss_for_epochs(num_epochs=1)
+        self.run_multi_loss_for_epochs(num_epochs=2)
+        self.run_multi_loss_for_epochs(num_epochs=3)
+        self.run_multi_loss_for_epochs(num_epochs=5)
+        self.run_multi_loss_for_epochs(num_epochs=10)
+
+    def run_multi_loss_for_epochs(self, num_epochs):
+        train_dataset = TensorDataset(torch.randn(100, 10), torch.randint(low=0, high=10, size=(100,)))
+        val_dataset = TensorDataset(torch.randn(30, 10), torch.randint(low=0, high=10, size=(30,)))
+        test_dataset = TensorDataset(torch.randn(30, 10), torch.randint(low=0, high=10, size=(30,)))
+
+        train_dataloader = DataLoader(train_dataset, batch_size=20)
+        val_dataloader = DataLoader(val_dataset, batch_size=10)
+        test_dataloader = DataLoader(test_dataset, batch_size=10)
+
+        loss_1, loss_2 = MultiLossDummy(), MultiLossDummy()
+        optimizer_1, optimizer_2 = DummyOptimizer(), DummyOptimizer()
+
+        optimizers = MultiOptimizer([optimizer_1, optimizer_2])
+        criterion = DummyLoss()
+        model = MultiLossModel(loss_1, loss_2)
+
+        train_loop = TrainLoop(
+            model,
+            train_dataloader, val_dataloader, test_dataloader,
+            optimizers, criterion
+        )
+        train_loop.fit(num_epochs=num_epochs)
+
+        self.assertEqual(loss_1.backward_ctr, 5 * num_epochs)
+        self.assertEqual(loss_1.call_ctr, (5 + 5 + 3) * num_epochs + 3)
+        self.assertEqual(loss_1.div_ctr, 5 * num_epochs)
+        self.assertEqual(loss_1.retain_graph_ctr, 5 * num_epochs)
+
+        self.assertEqual(loss_2.backward_ctr, 5 * num_epochs)
+        self.assertEqual(loss_2.call_ctr, (5 + 5 + 3) * num_epochs + 3)
+        self.assertEqual(loss_2.div_ctr, 5 * num_epochs)
+        self.assertEqual(loss_2.retain_graph_ctr, 0)
+
+        self.assertEqual(optimizer_1.step_ctr, 5 * num_epochs)
+        self.assertEqual(optimizer_1.zero_grad_ctr, 5 * num_epochs)
+
+        self.assertEqual(optimizer_2.step_ctr, 5 * num_epochs)
+        self.assertEqual(optimizer_2.zero_grad_ctr, 5 * num_epochs)
+
+    def test_returned_multi_loss_format(self):
+        train_dataset = TensorDataset(torch.randn(100, 10), torch.randint(low=0, high=10, size=(100,)))
+        val_dataset = TensorDataset(torch.randn(30, 10), torch.randint(low=0, high=10, size=(30,)))
+        test_dataset = TensorDataset(torch.randn(30, 10), torch.randint(low=0, high=10, size=(30,)))
+
+        train_dataloader = DataLoader(train_dataset, batch_size=20)
+        val_dataloader = DataLoader(val_dataset, batch_size=10)
+        test_dataloader = DataLoader(test_dataset, batch_size=10)
+
+        loss_1, loss_2 = MultiLossDummy(), MultiLossDummy()
+        optimizer_1, optimizer_2 = DummyOptimizer(), DummyOptimizer()
+
+        optimizers = MultiOptimizer([optimizer_1, optimizer_2])
+        criterion = DummyLoss()
+        model = MultiLossModel(loss_1, loss_2)
+
+        train_loop = TrainLoop(
+            model,
+            train_dataloader, val_dataloader, test_dataloader,
+            optimizers, criterion
+        )
+        train_loop.fit(num_epochs=2)
+        loss_result = train_loop.evaluate_loss_on_train_set(force_prediction=True)
+
+        self.assertEqual(loss_result, {'loss_1': 32.0, 'loss_2': 32.0})

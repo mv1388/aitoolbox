@@ -8,6 +8,7 @@ from pyrouge import Rouge155
 from rouge import Rouge
 from nltk.translate.bleu_score import sentence_bleu, corpus_bleu
 from torchnlp.metrics import bleu
+from transformers import glue_compute_metrics
 
 from aitoolbox.experiment.core_metrics.abstract_metric import AbstractBaseMetric
 
@@ -523,3 +524,21 @@ class PerplexityMetric(AbstractBaseMetric):
 
     def calculate_metric(self):
         return np.exp(np.mean(self.y_predicted))
+
+
+class GLUEMetric(AbstractBaseMetric):
+    def __init__(self, y_true, y_predicted, task_name):
+        """GLUE evaluation metrics
+
+        Wrapper around HF Transformers ``glue_compute_metrics()``
+
+        Args:
+            y_true:
+            y_predicted:
+            task_name (str): name of the GLUE task
+        """
+        self.task_name = task_name
+        super().__init__(y_true, y_predicted, metric_name=f'GLUE_{task_name}')
+
+    def calculate_metric(self):
+        return glue_compute_metrics(task_name=self.task_name, preds=self.y_predicted, labels=self.y_true)

@@ -8,6 +8,7 @@ from aitoolbox.experiment.result_package.abstract_result_packages import Abstrac
 from aitoolbox.experiment.core_metrics.abstract_metric import AbstractBaseMetric
 from aitoolbox.torchtrain.model import TTModel
 from aitoolbox.torchtrain.train_loop import TrainLoop
+from aitoolbox.torchtrain.multi_loss_optim import MultiLoss
 
 
 def function_exists(object_to_check, fn_name):
@@ -91,6 +92,38 @@ class SmallFFNet(TTModel):
         x, y = batch_data
         pred_y = self(x)
         return pred_y, y, {}
+
+
+class MultiLossModel(TTModel):
+    def __init__(self, loss_1, loss_2):
+        super().__init__()
+        self.l1 = nn.Linear(10, 10)
+        self.l2_1 = nn.Linear(10, 1)
+        self.l2_2 = nn.Linear(10, 1)
+        self.out_act = nn.Sigmoid()
+
+        self.loss_1 = loss_1
+        self.loss_2 = loss_2
+
+    def forward(self, x):
+        out = F.relu(self.l1(x.float()))
+        out_1 = self.l2_1(out)
+        out_2 = self.l2_2(out)
+        return self.out_act(out_1), self.out_act(out_2)
+
+    def get_loss(self, batch_data, criterion, device):
+        x, y = batch_data
+        pred_y_1, pred_y_2 = self(x)
+        loss_1 = self.loss_1(pred_y_1, y)
+        loss_2 = self.loss_2(pred_y_2, y)
+
+        loss = MultiLoss({'loss_1': loss_1, 'loss_2': loss_2})
+        return loss
+
+    def get_predictions(self, batch_data, device):
+        x, y = batch_data
+        pred_y, _ = self(x)
+        return pred_y, y, {}
     
     
 def keras_dummy_model():
@@ -143,7 +176,7 @@ class CallbackTracker(AbstractCallback):
         self.callback_calls.append('on_batch_end')
         self.call_ctr['on_batch_end'] += 1
 
-    def on_after_gradient_update(self):
+    def on_after_gradient_update(self, optimizer_idx):
         self.callback_calls.append('on_after_gradient_update')
         self.call_ctr['on_after_gradient_update'] += 1
 
@@ -179,7 +212,7 @@ class CallbackTrackerShort(AbstractCallback):
         self.callback_calls.append('on_batch_begin')
         self.call_ctr['on_batch_begin'] += 1
 
-    def on_after_gradient_update(self):
+    def on_after_gradient_update(self, optimizer_idx):
         self.callback_calls.append('on_after_gradient_update')
         self.call_ctr['on_after_gradient_update'] += 1
 
@@ -275,6 +308,33 @@ class DummyLoss:
 
     def to(self, device):
         self.device = device
+        return self
+
+
+class MultiLossDummy(DummyLoss):
+    def __init__(self):
+        super().__init__()
+        self.backward_ctr = 0
+        self.retain_graph_ctr = 0
+
+        self.call_ctr = 0
+        self.div_ctr = 0
+
+    def backward(self, retain_graph=False):
+        self.backward_ctr += 1
+
+        if retain_graph:
+            self.retain_graph_ctr += 1
+
+    def item(self):
+        return self.call_ctr
+
+    def __call__(self, predicted, true):
+        self.call_ctr += 1
+        return self
+
+    def __truediv__(self, other):
+        self.div_ctr += 1
         return self
 
 
