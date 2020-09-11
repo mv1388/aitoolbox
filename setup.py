@@ -28,6 +28,7 @@ setup(
         'torchvision',
         'torchtext',
         'pytorch-nlp',
+        'transformers',
 
         'joblib',
         'tqdm',

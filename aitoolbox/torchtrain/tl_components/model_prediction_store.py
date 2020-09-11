@@ -126,7 +126,7 @@ class ModelPredictionStore:
         """Insert training dataset loss into the cache
 
         Args:
-            loss (float):  model train dataset loss
+            loss (float or dict):  model train dataset loss
             epoch (int): current epoch of the TrainLoop
             force_prediction (bool): insert the loss value even if it is available in the loss cache.
                 This causes the old cached loss value to be overwritten.
@@ -140,7 +140,7 @@ class ModelPredictionStore:
         """Insert validation dataset loss into the cache
 
         Args:
-            loss (float): model validation dataset loss
+            loss (float or dict): model validation dataset loss
             epoch (int): current epoch of the TrainLoop
             force_prediction (bool): insert the loss value even if it is available in the loss cache.
                 This causes the old cached loss value to be overwritten.
@@ -154,7 +154,7 @@ class ModelPredictionStore:
         """Insert test dataset loss into the cache
 
         Args:
-            loss (float): model test dataset loss
+            loss (float or dict): model test dataset loss
             epoch (int): current epoch of the TrainLoop
             force_prediction (bool): insert the loss value even if it is available in the loss cache.
                 This causes the old cached loss value to be overwritten.
@@ -171,7 +171,7 @@ class ModelPredictionStore:
             epoch (int): current epoch of the TrainLoop
 
         Returns:
-            float: cached model train dataset loss
+            float or dict: cached model train dataset loss
         """
         return self._get_data('train_loss', epoch)
 
@@ -182,7 +182,7 @@ class ModelPredictionStore:
             epoch (int): current epoch of the TrainLoop
 
         Returns:
-            float: cached model validation dataset loss
+            float or dict: cached model validation dataset loss
         """
         return self._get_data('val_loss', epoch)
 
@@ -193,7 +193,7 @@ class ModelPredictionStore:
             epoch (int): current epoch of the TrainLoop
 
         Returns:
-            float: cached model test dataset loss
+            float or dict: cached model test dataset loss
         """
         return self._get_data('test_loss', epoch)
 
@@ -235,7 +235,7 @@ class ModelPredictionStore:
 
         Args:
             source_name (str): data source name
-            data (tuple or float): data to be cached
+            data (tuple or float or dict): data to be cached
             epoch (int): current epoch of the TrainLoop
             force_prediction (bool): insert the data into the cache even if it is already available in the cache.
                 This causes the old cached data under the same ``source_name`` to be overwritten.
@@ -258,7 +258,7 @@ class ModelPredictionStore:
             epoch (int): current epoch of the TrainLoop
 
         Returns:
-            tuple or float: cached data
+            tuple or float or dict: cached data
         """
         if self._has_data(source_name, epoch):
             print(f'Getting {source_name} predictions/loss from store')
