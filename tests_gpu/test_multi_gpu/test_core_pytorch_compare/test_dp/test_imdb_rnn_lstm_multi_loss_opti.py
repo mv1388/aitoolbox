@@ -34,6 +34,10 @@ class LSTMClassifier(TTModel):
         self.fc_2_2 = nn.Linear(12, output_dim)
 
     def forward(self, text, text_length):
+        # Dirty non optimal fix for DP to work as it cuts batches on 0-th dimension
+        # Transpose back into sequence length first
+        text = text.transpose(0, 1)
+
         # [sentence len, batch size] => [sentence len, batch size, embedding size]
         embedded = self.embedding(text)
 
@@ -56,6 +60,9 @@ class LSTMClassifier(TTModel):
         text = text.to(device)
         text_lengths = text_lengths.to(device)
 
+        # Fix for DP to work as it cuts batches on 0-th dimension
+        text = text.transpose(0, 1)
+
         logits_1, logits_2 = self(text, text_lengths)
 
         loss_1 = criterion(logits_1, batch_data.label.to(device))
@@ -69,6 +76,9 @@ class LSTMClassifier(TTModel):
         text, text_lengths = batch_data.text
         text = text.to(device)
         text_lengths = text_lengths.to(device)
+
+        # Fix for DP to work as it cuts batches on 0-th dimension
+        text = text.transpose(0, 1)
 
         logits, _ = self(text, text_lengths)
         predictions = (torch.sigmoid(logits) > 0.5).long()
@@ -163,6 +173,9 @@ class TestMutliLossMutliOptiIMDBLSTM(unittest.TestCase):
                 text_lengths = text_lengths.to(device)
                 target = target.to(device)
 
+                # Fix for DP to work as it cuts batches on 0-th dimension
+                text = text.transpose(0, 1)
+
                 logits_1, logits_2 = model(text, text_lengths)
 
                 loss_1 = criterion(logits_1, target)
@@ -192,6 +205,9 @@ class TestMutliLossMutliOptiIMDBLSTM(unittest.TestCase):
                 text = text.to(device)
                 text_lengths = text_lengths.to(device)
                 target = target.to(device)
+
+                # Fix for DP to work as it cuts batches on 0-th dimension
+                text = text.transpose(0, 1)
 
                 logits_1, logits_2 = model(text, text_lengths)
                 loss_batch_1 = criterion(logits_1, target).cpu().item()
