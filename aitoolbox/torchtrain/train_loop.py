@@ -391,7 +391,7 @@ class TrainLoop:
         """
         loss_names = None
 
-        if type(self.optimizer) == MultiOptimizer:
+        if isinstance(self.optimizer, MultiOptimizer):
             loss_names = sorted(loss_record[0].keys())
             loss_record = [[loss_dict[k] for k in loss_names] for loss_dict in loss_record]
 
@@ -401,7 +401,7 @@ class TrainLoop:
 
         if self.ddp_training_mode:
             loss_ddp_synced = self.ddp_handler.mp_sync(loss_batch_accum_avg).numpy()
-            if type(self.optimizer) == MultiOptimizer:
+            if isinstance(self.optimizer, MultiOptimizer):
                 loss_batch_accum_avg = np.mean(loss_ddp_synced, axis=0)
             else:
                 loss_batch_accum_avg = np.mean(loss_ddp_synced)
@@ -424,16 +424,16 @@ class TrainLoop:
         """
         # Results reporting to terminal
         if not self.ddp_training_mode or self.device.index == 0:
-            loss_avg = np.mean(list(loss_parsed.values())) if type(loss_parsed) == dict else loss_parsed
+            loss_avg = np.mean(list(loss_parsed.values())) if isinstance(loss_parsed, dict) else loss_parsed
             print(f'{loss_print_description}: {loss_avg}')
 
-            if type(self.optimizer) == MultiOptimizer and type(loss_parsed) == dict:
+            if isinstance(self.optimizer, MultiOptimizer) and isinstance(loss_parsed, dict):
                 print(f'MULTI-LOSS {loss_print_description}:')
                 for loss_name, loss_val in loss_parsed.items():
                     print(f'\t{loss_name}: {loss_val}')
 
         # Insert results into history
-        if type(self.optimizer) == MultiOptimizer and type(loss_parsed) == dict:
+        if isinstance(self.optimizer, MultiOptimizer) and isinstance(loss_parsed, dict):
             for loss_name, loss_val in loss_parsed.items():
                 self.insert_metric_result_into_history(f'{loss_type_name}_{loss_name}', loss_val)
         else:
