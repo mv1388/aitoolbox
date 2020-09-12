@@ -2,11 +2,6 @@ from abc import ABC, abstractmethod
 import os
 import time
 import datetime
-try:
-    import deepspeed
-    DEEPSPEED_AVAILABLE = True
-except ImportError:
-    DEEPSPEED_AVAILABLE = False
 
 from aitoolbox.experiment.local_save.folder_create import ExperimentFolder
 from aitoolbox.utils.file_system import zip_folder
@@ -81,8 +76,7 @@ class PyTorchLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
         """Save the PyTorch model representation dict to the local drive
 
         Args:
-            model (dict or deepspeed.DeepSpeedLight): PyTorch model represented as a dict of weights,
-                optimizer state and other necessary info. Or a DeepSpeed "engine" all-in-one model representation.
+            model (dict): PyTorch model represented as a dict of weights, optimizer state and other necessary info.
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             experiment_timestamp (str or None): time stamp at the start of training
@@ -100,24 +94,15 @@ class PyTorchLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
         experiment_model_local_path = self.create_experiment_local_models_folder(project_name, experiment_name,
                                                                                  experiment_timestamp)
 
-        if DEEPSPEED_AVAILABLE and isinstance(model, deepspeed.DeepSpeedLight):
-            tag = f'epoch_{epoch}' if self.checkpoint_model else 'final'
-
-            model.save_checkpoint(experiment_model_local_path, tag)
-
-            model_name = f'{tag}.zip'
-            model_local_path = zip_folder(os.path.join(experiment_model_local_path, tag),
-                                          os.path.join(experiment_model_local_path, model_name))
+        if epoch is None:
+            model_name = f'model_{experiment_name}_{experiment_timestamp}.pth'
         else:
-            if epoch is None:
-                model_name = f'model_{experiment_name}_{experiment_timestamp}.pth'
-            else:
-                model_name = f'model_{experiment_name}_{experiment_timestamp}_E{epoch}.pth'
+            model_name = f'model_{experiment_name}_{experiment_timestamp}_E{epoch}.pth'
 
-            model_local_path = os.path.join(experiment_model_local_path, model_name)
+        model_local_path = os.path.join(experiment_model_local_path, model_name)
 
-            import torch
-            torch.save(model, model_local_path)
+        import torch
+        torch.save(model, model_local_path)
 
         return model_name, model_local_path
 
@@ -126,8 +111,7 @@ class PyTorchLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
         """Check if PyTorch model save dict contains all the necessary elements for the training state reconstruction
 
         Args:
-            model (dict or deepspeed.DeepSpeedLight): PyTorch model represented as a dict of weights,
-                optimizer state and other necessary info. Or a DeepSpeed "engine" all-in-one model representation.
+            model (dict): PyTorch model represented as a dict of weights, optimizer state and other necessary info.
 
         Raises:
             ValueError
@@ -136,12 +120,10 @@ class PyTorchLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
             None
         """
         # TODO: maybe add some check about the actual values/content of the dict as well
-        if not DEEPSPEED_AVAILABLE or \
-                (DEEPSPEED_AVAILABLE and not isinstance(model, deepspeed.DeepSpeedLight)):
-            for required_element in ['model_state_dict', 'optimizer_state_dict', 'epoch', 'hyperparams']:
-                if required_element not in model:
-                    raise ValueError(f'Required element of the model dict {required_element} is missing. Given model'
-                                     f'dict has the following elements: {model.keys()}')
+        for required_element in ['model_state_dict', 'optimizer_state_dict', 'epoch', 'hyperparams']:
+            if required_element not in model:
+                raise ValueError(f'Required element of the model dict {required_element} is missing. Given model'
+                                 f'dict has the following elements: {model.keys()}')
 
 
 class KerasLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):

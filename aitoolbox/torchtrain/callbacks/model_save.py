@@ -64,16 +64,13 @@ class ModelCheckpoint(AbstractCallback):
 
     def on_epoch_end(self):
         self.save_hyperparams()
-        if not self.train_loop_obj.use_deepspeed:
-            model_checkpoint = {'model_state_dict': self.train_loop_obj.model.state_dict(),
-                                'optimizer_state_dict': self.train_loop_obj.optimizer.state_dict(),
-                                'epoch': self.train_loop_obj.epoch,
-                                'hyperparams': self.hyperparams}
-            # If Nvidia apex amp is used
-            if self.train_loop_obj.use_amp:
-                model_checkpoint['amp'] = amp.state_dict()
-        else:
-            model_checkpoint = self.train_loop_obj.model
+        model_checkpoint = {'model_state_dict': self.train_loop_obj.model.state_dict(),
+                            'optimizer_state_dict': self.train_loop_obj.optimizer.state_dict(),
+                            'epoch': self.train_loop_obj.epoch,
+                            'hyperparams': self.hyperparams}
+        # If Nvidia apex amp is used
+        if self.train_loop_obj.use_amp:
+            model_checkpoint['amp'] = amp.state_dict()
 
         model_paths = self.model_checkpointer.save_model(model=model_checkpoint,
                                                          project_name=self.project_name,
@@ -182,16 +179,13 @@ class ModelTrainEndSave(AbstractCallback):
     def on_train_end(self):
         if not self.train_loop_obj.ddp_training_mode or self.train_loop_obj.device.index == 0:
             self.save_hyperparams()
-        if not self.train_loop_obj.use_deepspeed:
-            model_final_state = {'model_state_dict': self.train_loop_obj.model.state_dict(),
-                                 'optimizer_state_dict': self.train_loop_obj.optimizer.state_dict(),
-                                 'epoch': self.train_loop_obj.epoch,
-                                 'hyperparams': self.hyperparams}
-            # If Nvidia apex amp is used
-            if self.train_loop_obj.use_amp:
-                model_final_state['amp'] = amp.state_dict()
-        else:
-            model_final_state = self.train_loop_obj.model
+        model_final_state = {'model_state_dict': self.train_loop_obj.model.state_dict(),
+                             'optimizer_state_dict': self.train_loop_obj.optimizer.state_dict(),
+                             'epoch': self.train_loop_obj.epoch,
+                             'hyperparams': self.hyperparams}
+        # If Nvidia apex amp is used
+        if self.train_loop_obj.use_amp:
+            model_final_state['amp'] = amp.state_dict()
 
         if self.val_result_package is not None:
             y_pred, y_test, additional_results = self.train_loop_obj.predict_on_validation_set()
