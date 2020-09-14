@@ -68,6 +68,14 @@ case $key in
 esac
 done
 
+echo "
+************************************************************
+***                                                      ***
+***              STARTING THE TRAINING JOB               ***
+***                                                      ***
+************************************************************
+"
+
 
 source $project_root_path/AWS_run_scripts/AWS_core_scripts/$experiment_script_file $project_root_path
 
