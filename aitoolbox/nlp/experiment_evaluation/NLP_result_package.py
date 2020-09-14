@@ -6,7 +6,8 @@ from aitoolbox.experiment.result_package.abstract_result_packages import Abstrac
 from aitoolbox.experiment.core_metrics.classification import AccuracyMetric
 from aitoolbox.nlp.experiment_evaluation.NLP_metrics import ROUGEMetric, ROUGEPerlMetric, \
     ExactMatchTextMetric, F1TextMetric, \
-    BLEUSentenceScoreMetric, BLEUCorpusScoreMetric, BLEUScoreStrTorchNLPMetric, PerplexityMetric, GLUEMetric
+    BLEUSentenceScoreMetric, BLEUCorpusScoreMetric, BLEUScoreStrTorchNLPMetric, PerplexityMetric, \
+    GLUEMetric, XNLIMetric
 from aitoolbox.nlp.experiment_evaluation.attention_heatmap import AttentionHeatMap
 
 
@@ -283,3 +284,16 @@ class GLUEResultPackage(AbstractResultPackage):
     def prepare_results_dict(self):
         glue_result = GLUEMetric(self.y_true, self.y_predicted, self.task_name).get_metric_dict()
         return glue_result
+
+
+class XNLIResultPackage(AbstractResultPackage):
+    def __init__(self):
+        """XNLI task result package
+
+        Wrapper around HF Transformers ``xnli_compute_metrics()``
+        """
+        super().__init__('XNLI benchmark')
+
+    def prepare_results_dict(self):
+        xnli_result = XNLIMetric(self.y_true, self.y_predicted).get_metric_dict()
+        return xnli_result

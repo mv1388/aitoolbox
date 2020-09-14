@@ -8,7 +8,7 @@ from pyrouge import Rouge155
 from rouge import Rouge
 from nltk.translate.bleu_score import sentence_bleu, corpus_bleu
 from torchnlp.metrics import bleu
-from transformers import glue_compute_metrics
+from transformers import glue_compute_metrics, xnli_compute_metrics
 
 from aitoolbox.experiment.core_metrics.abstract_metric import AbstractBaseMetric
 
@@ -542,3 +542,19 @@ class GLUEMetric(AbstractBaseMetric):
 
     def calculate_metric(self):
         return glue_compute_metrics(task_name=self.task_name, preds=self.y_predicted, labels=self.y_true)
+
+
+class XNLIMetric(AbstractBaseMetric):
+    def __init__(self, y_true, y_predicted):
+        """XNLI evaluation metrics
+
+        Wrapper around HF Transformers ``xnli_compute_metrics()``
+
+        Args:
+            y_true:
+            y_predicted:
+        """
+        super().__init__(y_true, y_predicted, metric_name='xnli_accuracy')
+
+    def calculate_metric(self):
+        return xnli_compute_metrics(task_name='xnli', preds=self.y_predicted, labels=self.y_true)
