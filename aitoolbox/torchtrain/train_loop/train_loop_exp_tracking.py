@@ -26,8 +26,7 @@ class TrainLoopCheckpoint(TrainLoop):
             validation_loader (torch.utils.data.DataLoader or None): data loader for validation data set
             test_loader (torch.utils.data.DataLoader or None): data loader for test data set
             optimizer (torch.optim.optimizer.Optimizer or MultiOptimizer): optimizer algorithm.
-            criterion (torch.nn.modules.loss._Loss or MultiLoss or None): criterion criterion during the training
-                procedure.
+            criterion (torch.nn.modules.loss._Loss or MultiLoss or None): criterion during the training procedure
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             local_model_result_folder_path (str): root local path where project folder will be created
@@ -118,8 +117,7 @@ class TrainLoopEndSave(TrainLoop):
             validation_loader (torch.utils.data.DataLoader or None): data loader for validation data set
             test_loader (torch.utils.data.DataLoader or None): data loader for test data set
             optimizer (torch.optim.optimizer.Optimizer or MultiOptimizer): optimizer algorithm.
-            criterion (torch.nn.modules.loss._Loss or MultiLoss or None): criterion criterion during the training
-                procedure.
+            criterion (torch.nn.modules.loss._Loss or MultiLoss or None): criterion during the training procedure
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             local_model_result_folder_path (str): root local path where project folder will be created
@@ -230,8 +228,7 @@ class TrainLoopCheckpointEndSave(TrainLoopEndSave):
             validation_loader (torch.utils.data.DataLoader or None): data loader for validation data set
             test_loader (torch.utils.data.DataLoader or None): data loader for test data set
             optimizer (torch.optim.optimizer.Optimizer or MultiOptimizer): optimizer algorithm.
-            criterion (torch.nn.modules.loss._Loss or MultiLoss or None): criterion criterion during the training
-                procedure.
+            criterion (torch.nn.modules.loss._Loss or MultiLoss or None): criterion during the training procedure
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             local_model_result_folder_path (str): root local path where project folder will be created
