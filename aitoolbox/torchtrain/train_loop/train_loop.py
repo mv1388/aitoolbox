@@ -56,7 +56,8 @@ class TrainLoop:
             validation_loader (torch.utils.data.DataLoader or None): data loader for validation data set
             test_loader (torch.utils.data.DataLoader or None): data loader for test data set
             optimizer (torch.optim.optimizer.Optimizer or MultiOptimizer): optimizer algorithm.
-            criterion (torch.nn.modules.loss._Loss or MultiLoss): criterion criterion during the training procedure.
+            criterion (torch.nn.modules.loss._Loss or MultiLoss or None): criterion criterion during the training
+                procedure.
             collate_batch_pred_fn (callable): collate function transforming batch predictions as they come out from the
                 model
             pred_transform_fn (callable): function transforming all the produced predictions after all the batches have
@@ -203,7 +204,8 @@ class TrainLoop:
         self.callbacks_handler.register_callbacks(callbacks)
 
         self.model = self.model.to(self.device)
-        self.criterion = self.criterion.to(self.device)
+        if self.criterion is not None:
+            self.criterion = self.criterion.to(self.device)
         # Initialize AMP when training with Nvidia APEX mixed precision
         if self.use_amp and not self.ddp_training_mode:
             self.model, self.optimizer = amp.initialize(self.model, self.optimizer, **self.amp_params)
@@ -514,7 +516,8 @@ class TrainLoop:
             float or dict: loss, in the case of multi loss, the dict gets returned
         """
         self.model = self.model.to(self.device)
-        self.criterion = self.criterion.to(self.device)
+        if self.criterion is not None:
+            self.criterion = self.criterion.to(self.device)
 
         self.model.eval()
         loss_avg = []
@@ -748,7 +751,8 @@ class TrainLoop:
 
         # Move to the GPU belonging to the process
         self.model = self.model.to(self.device)
-        self.criterion = self.criterion.to(self.device)
+        if self.criterion is not None:
+            self.criterion = self.criterion.to(self.device)
 
         # Optionally initialize APEX
         # Not using AMP initialization at the start of the fit() fn because in the multi-GPU setting the model has to
