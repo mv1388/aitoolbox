@@ -17,7 +17,7 @@ class AbstractCallback:
                 should be executed
         """
         from aitoolbox.torchtrain.train_loop import TrainLoop
-        from aitoolbox.torchtrain.tl_components.message_passing import MessageService
+        from aitoolbox.torchtrain.train_loop.components.message_passing import MessageService
 
         self.callback_name = callback_name
         self.execution_order = execution_order

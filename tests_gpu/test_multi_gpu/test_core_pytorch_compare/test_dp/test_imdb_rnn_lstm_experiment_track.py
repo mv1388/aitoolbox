@@ -10,9 +10,10 @@ import torch.nn as nn
 import torchtext
 import torchtext.data
 
-from aitoolbox import TrainLoopCheckpointEndSave, TTModel, TTDataParallel, \
+from aitoolbox import TTModel, TTDataParallel, \
     ModelPerformanceEvaluation, ModelPerformancePrintReport, \
     ModelTrainHistoryPlot, ModelTrainHistoryFileWriter, BinaryClassificationResultPackage
+from aitoolbox.torchtrain.train_loop import TrainLoopCheckpointEndSave
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 

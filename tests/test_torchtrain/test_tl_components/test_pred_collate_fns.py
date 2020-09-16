@@ -1,8 +1,7 @@
 import unittest
 import numpy as np
-import torch
 
-from aitoolbox.torchtrain.tl_components.pred_collate_fns import *
+from aitoolbox.torchtrain.train_loop.components.pred_collate_fns import *
 
 
 class TestBatchPredCollateFns(unittest.TestCase):
