@@ -20,7 +20,7 @@ class TestMultiLoss(unittest.TestCase):
 
         for i in range(1, 100):
             for opti_idx in range(3):
-                multi_loss.backward(opti_idx)
+                multi_loss.backward(opti_idx, i)
             self.assertEqual(loss_1.back_ctr, i)
             self.assertEqual(loss_2.back_ctr, i)
             self.assertEqual(loss_3.back_ctr, i)
@@ -34,7 +34,7 @@ class TestMultiLoss(unittest.TestCase):
         multi_loss.retain_graph_until_last = True
 
         for opti_idx in range(3):
-            multi_loss.backward(opti_idx)
+            multi_loss.backward(opti_idx, 0)
             self.assertEqual(multi_loss.loss_backward_remaining, 2-opti_idx)
 
         self.assertEqual(loss_1.retain_graph_ctr, 1)
@@ -78,7 +78,7 @@ class TestMultiOptimizer(unittest.TestCase):
 
         for i in range(1, 100):
             for j in range(3):
-                multi_opti.zero_grad(j)
+                multi_opti.zero_grad(j, i)
             self.assertEqual(opti_1.zero_grad_ctr, i)
             self.assertEqual(opti_2.zero_grad_ctr, i)
             self.assertEqual(opti_3.zero_grad_ctr, i)
@@ -88,17 +88,17 @@ class TestMultiOptimizer(unittest.TestCase):
 
         for i in range(1, 100):
             for j in range(3):
-                multi_opti.step(j)
+                multi_opti.step(j, i)
             self.assertEqual(opti_1.step_ctr, i)
             self.assertEqual(opti_2.step_ctr, i)
             self.assertEqual(opti_3.step_ctr, i)
 
     def test_state_dict(self):
         _, _, _, multi_opti = self.build_optimizers()
-        for _ in range(1, 100):
-            for i in range(3):
-                multi_opti.zero_grad(i)
-                multi_opti.step(i)
+        for i in range(1, 100):
+            for j in range(3):
+                multi_opti.zero_grad(j, i)
+                multi_opti.step(j, i)
 
         self.assertEqual(multi_opti.state_dict(),
                          [{'zero_grad_ctr': 99, 'step_ctr': 99}, {'zero_grad_ctr': 99, 'step_ctr': 99},
