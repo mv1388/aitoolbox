@@ -1,9 +1,9 @@
 import unittest
 
-from aitoolbox.torchtrain.train_loop import TrainLoopCheckpoint, TrainLoopEndSave, TrainLoopCheckpointEndSave
+from aitoolbox.torchtrain import TrainLoopCheckpoint, TrainLoopEndSave, TrainLoopCheckpointEndSave
 from aitoolbox.torchtrain.callbacks.abstract import AbstractCallback
 from aitoolbox.torchtrain.callbacks.model_save import ModelCheckpoint, ModelTrainEndSave
-from aitoolbox.torchtrain.train_loop.components.callback_handler import CallbacksHandler
+from aitoolbox.torchtrain.tl_components.callback_handler import CallbacksHandler
 from tests.utils import NetUnifiedBatchFeed, DummyOptimizer, MiniDummyOptimizer, DummyResultPackage
 
 

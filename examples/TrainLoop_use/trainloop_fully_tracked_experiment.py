@@ -6,8 +6,7 @@ import torch.optim as optim
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
 
-from aitoolbox import TTModel
-from aitoolbox.torchtrain.train_loop import TrainLoopCheckpointEndSave
+from aitoolbox import TrainLoopCheckpointEndSave, TTModel
 from aitoolbox.torchtrain.callbacks.performance_eval import (ModelPerformanceEvaluation, ModelPerformancePrintReport,
                                                              ModelTrainHistoryPlot, ModelTrainHistoryFileWriter)
 from aitoolbox.torchtrain.callbacks.basic import EarlyStopping

@@ -1,4 +1,6 @@
 import os
+import numpy as np
+import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 from transformers import (
@@ -12,7 +14,7 @@ from .lib.data_prep import load_and_cache_examples
 from .lib.transformers_qa_bert_eval import DDPBERTQAResultPackage
 
 from aitoolbox.torchtrain.train_loop import TrainLoopCheckpointEndSave
-import aitoolbox.torchtrain.train_loop.components.pred_collate_fns as collate_fns
+import aitoolbox.torchtrain.tl_components.pred_collate_fns as collate_fns
 from aitoolbox.torchtrain.callbacks.train_schedule import LambdaLRScheduler
 from aitoolbox.torchtrain.callbacks.performance_eval import (
     ModelPerformanceEvaluation, ModelPerformancePrintReport, ModelTrainHistoryPlot, ModelTrainHistoryFileWriter)

@@ -11,8 +11,7 @@ import torch.optim as optim
 from torch.utils.data.dataloader import DataLoader
 from torch.utils.data.dataset import TensorDataset
 
-from aitoolbox import ClassificationResultPackage, TrainLoop
-from aitoolbox.torchtrain.train_loop import TrainLoopCheckpointEndSave
+from aitoolbox import TrainLoopCheckpointEndSave, ClassificationResultPackage, TrainLoop
 from aitoolbox.torchtrain.model import TTModel
 from aitoolbox.experiment.local_load.local_model_load import PyTorchLocalModelLoader
 from aitoolbox.torchtrain.callbacks.model_load import ModelLoadContinueTraining
