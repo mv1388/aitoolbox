@@ -232,7 +232,7 @@ class TrainLoop:
                 # Iterate over potentially multiple optimizers
                 for optimizer_idx in range(self.num_optimizers):
                     # Backward pass through the model
-                    self._backward_pass(loss_batch, optimizer_idx)
+                    self._backward_pass(loss_batch, iteration, optimizer_idx)
                     if self.grad_cb_used:
                         self.callbacks_handler.execute_gradient_update(optimizer_idx)
 
@@ -284,11 +284,12 @@ class TrainLoop:
 
         return loss_batch
 
-    def _backward_pass(self, loss_batch, optimizer_idx):
+    def _backward_pass(self, loss_batch, iteration, optimizer_idx):
         """Execute backward pass from the current batch loss
 
         Args:
             loss_batch: loss calculated on current batch
+            iteration (int): current iteration index
             optimizer_idx (int): index of the current optimizer. Mostly useful when using multiple optimizers. When
                 only a single optimizer is used this parameter can be ignored.
 
@@ -302,14 +303,14 @@ class TrainLoop:
                     scaled_loss.backward()
             else:
                 # Multi-loss Apex AMP calculation
-                loss_batch.backward_amp(self.optimizer, optimizer_idx)
+                loss_batch.backward_amp(self.optimizer, optimizer_idx, iteration)
         elif self.use_deepspeed:
             self.model.backward(loss_batch)
         else:
             if not isinstance(loss_batch, MultiLoss):
                 loss_batch.backward()
             else:
-                loss_batch.backward(optimizer_idx)
+                loss_batch.backward(optimizer_idx, iteration)
 
     def _optimizer_step(self, iteration, grad_accumulation, optimizer_idx):
         """Execute the optimizer step
@@ -331,7 +332,7 @@ class TrainLoop:
                 if not isinstance(self.optimizer, MultiOptimizer):
                     self.optimizer.step()
                 else:
-                    self.optimizer.step(optimizer_idx)
+                    self.optimizer.step(optimizer_idx, iteration)
 
             if self.grad_cb_used:
                 self.callbacks_handler.execute_optimizer_step()
@@ -354,7 +355,7 @@ class TrainLoop:
                 if not isinstance(self.optimizer, MultiOptimizer):
                     self.optimizer.zero_grad()
                 else:
-                    self.optimizer.zero_grad(optimizer_idx)
+                    self.optimizer.zero_grad(optimizer_idx, iteration)
 
     def auto_execute_end_of_epoch(self):
         """Basic performance evaluation executed by default at the end of each epoch
