@@ -83,10 +83,10 @@ class TrainLoop:
 
                 Available AMP initialization parameters: https://nvidia.github.io/apex/amp.html#apex.amp.initialize
         """
-        if isinstance(model, TTModel) or isinstance(model, TTDataParallel):
+        if isinstance(model, (TTModel, TTDataParallel)):
             self.model = model
             self.batch_model_feed_def = None
-        elif type(model) == ModelWrap:
+        elif isinstance(model, ModelWrap):
             self.model = model.model
             self.batch_model_feed_def = model.batch_model_feed_def
         else:
