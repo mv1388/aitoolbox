@@ -17,9 +17,8 @@ import torch.distributed as dist
 from torch.nn.parallel import DistributedDataParallel
 from torch.utils.data.distributed import DistributedSampler
 
-from aitoolbox import TTModel, ModelPerformanceEvaluation, ModelPerformancePrintReport, \
+from aitoolbox import TrainLoopCheckpointEndSave, TTModel, ModelPerformanceEvaluation, ModelPerformancePrintReport, \
     ModelTrainHistoryPlot, ModelTrainHistoryFileWriter, ClassificationResultPackage
-from aitoolbox.torchtrain.train_loop import TrainLoopCheckpointEndSave
 from tests_gpu.test_multi_gpu.ddp_prediction_saver import DDPPredictionSave
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))

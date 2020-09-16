@@ -11,10 +11,9 @@ import torch.optim as optim
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
 
-from aitoolbox import TTModel, TTDataParallel, \
+from aitoolbox import TrainLoopCheckpointEndSave, TTModel, TTDataParallel, \
     ModelPerformanceEvaluation, ModelPerformancePrintReport, \
     ModelTrainHistoryPlot, ModelTrainHistoryFileWriter, ClassificationResultPackage
-from aitoolbox.torchtrain.train_loop import TrainLoopCheckpointEndSave
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 

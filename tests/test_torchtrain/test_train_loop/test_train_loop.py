@@ -8,7 +8,7 @@ from torch.utils.data.dataloader import DataLoader
 
 from aitoolbox.torchtrain.train_loop import TrainLoop
 from aitoolbox.torchtrain.model import ModelWrap
-from aitoolbox.torchtrain.train_loop.components.callback_handler import CallbacksHandler
+from aitoolbox.torchtrain.tl_components.callback_handler import CallbacksHandler
 from aitoolbox.torchtrain.multi_loss_optim import MultiOptimizer
 
 
