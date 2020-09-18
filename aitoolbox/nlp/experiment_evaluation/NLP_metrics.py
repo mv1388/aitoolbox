@@ -541,7 +541,9 @@ class GLUEMetric(AbstractBaseMetric):
         super().__init__(y_true, y_predicted, metric_name=f'GLUE_{task_name}')
 
     def calculate_metric(self):
-        return glue_compute_metrics(task_name=self.task_name, preds=self.y_predicted, labels=self.y_true)
+        metric_dict = glue_compute_metrics(task_name=self.task_name, preds=self.y_predicted, labels=self.y_true)
+        metric_dict = {k.replace('/', '_'): v for k, v in metric_dict.items()}
+        return metric_dict
 
 
 class XNLIMetric(AbstractBaseMetric):
@@ -557,4 +559,6 @@ class XNLIMetric(AbstractBaseMetric):
         super().__init__(y_true, y_predicted, metric_name='xnli_accuracy')
 
     def calculate_metric(self):
-        return xnli_compute_metrics(task_name='xnli', preds=self.y_predicted, labels=self.y_true)
+        metric_dict = xnli_compute_metrics(task_name='xnli', preds=self.y_predicted, labels=self.y_true)
+        metric_dict = {k.replace('/', '_'): v for k, v in metric_dict.items()}
+        return metric_dict
