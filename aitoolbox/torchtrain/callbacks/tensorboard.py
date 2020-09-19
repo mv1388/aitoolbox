@@ -279,4 +279,5 @@ class TensorboardFullTracking(TensorboardReporterBaseCB):
         metric_names = self.metric_names if self.metric_names is not None else self.train_loop_obj.train_history.keys()
         self.log_train_history_metrics(metric_names)
 
+        self.tb_writer.flush()
         self.upload_to_cloud()
