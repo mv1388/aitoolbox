@@ -87,6 +87,7 @@ class TBReporterBaseCB(AbstractExperimentCallback):
 
     def on_train_end(self):
         self.tb_writer.close()
+        self.upload_to_cloud()
 
     def on_train_loop_registration(self):
         if self.is_project:
