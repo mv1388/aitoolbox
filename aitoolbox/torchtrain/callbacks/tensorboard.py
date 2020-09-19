@@ -9,7 +9,7 @@ from aitoolbox.cloud.AWS.results_save import BaseResultsSaver as BaseResultsS3Sa
 from aitoolbox.cloud.GoogleCloud.results_save import BaseResultsGoogleStorageSaver
 
 
-class TBReporterBaseCB(AbstractExperimentCallback):
+class TensorboardReporterBaseCB(AbstractExperimentCallback):
     def __init__(self, callback_name, log_dir=None, is_project=True,
                  project_name=None, experiment_name=None, local_model_result_folder_path=None,
                  cloud_save_mode=None, bucket_name=None, cloud_dir_prefix=None,
@@ -146,7 +146,7 @@ class TBReporterBaseCB(AbstractExperimentCallback):
                                                        cloud_file_path=cloud_file_path)
 
 
-class TensorboardTrainBatchLoss(TBReporterBaseCB):
+class TensorboardTrainBatchLoss(TensorboardReporterBaseCB):
     def __init__(self, batch_log_frequency=1,
                  log_dir=None, is_project=True,
                  project_name=None, experiment_name=None, local_model_result_folder_path=None,
@@ -171,11 +171,11 @@ class TensorboardTrainBatchLoss(TBReporterBaseCB):
             cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
             **kwargs: additional arguments for ``torch.utils.tensorboard.SummaryWriter`` wrapped inside this callback
         """
-        TBReporterBaseCB.__init__(self, 'Tensorboard end of batch report of batch loss',
-                                  log_dir, is_project,
-                                  project_name, experiment_name, local_model_result_folder_path,
-                                  cloud_save_mode, bucket_name, cloud_dir_prefix,
-                                  **kwargs)
+        TensorboardReporterBaseCB.__init__(self, 'Tensorboard end of batch report of batch loss',
+                                           log_dir, is_project,
+                                           project_name, experiment_name, local_model_result_folder_path,
+                                           cloud_save_mode, bucket_name, cloud_dir_prefix,
+                                           **kwargs)
         self.batch_log_frequency = batch_log_frequency
 
     def on_batch_end(self):
@@ -188,7 +188,7 @@ class TensorboardTrainBatchLoss(TBReporterBaseCB):
         self.upload_to_cloud()
 
 
-class TensorboardTrainHistoryMetric(TBReporterBaseCB):
+class TensorboardTrainHistoryMetric(TensorboardReporterBaseCB):
     def __init__(self, metric_names=None,
                  log_dir=None, is_project=True,
                  project_name=None, experiment_name=None, local_model_result_folder_path=None,
@@ -216,11 +216,11 @@ class TensorboardTrainHistoryMetric(TBReporterBaseCB):
             cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
             **kwargs: additional arguments for ``torch.utils.tensorboard.SummaryWriter`` wrapped inside this callback
         """
-        TBReporterBaseCB.__init__(self, 'Tensorboard end of batch report of batch loss',
-                                  log_dir, is_project,
-                                  project_name, experiment_name, local_model_result_folder_path,
-                                  cloud_save_mode, bucket_name, cloud_dir_prefix,
-                                  **kwargs)
+        TensorboardReporterBaseCB.__init__(self, 'Tensorboard end of batch report of batch loss',
+                                           log_dir, is_project,
+                                           project_name, experiment_name, local_model_result_folder_path,
+                                           cloud_save_mode, bucket_name, cloud_dir_prefix,
+                                           **kwargs)
         self.metric_names = metric_names
 
         if 'flush_secs' not in self.tb_writer_kwargs:
@@ -233,7 +233,7 @@ class TensorboardTrainHistoryMetric(TBReporterBaseCB):
         self.upload_to_cloud()
 
 
-class TensorboardFullTracking(TBReporterBaseCB):
+class TensorboardFullTracking(TensorboardReporterBaseCB):
     def __init__(self, metric_names=None, batch_log_frequency=1,
                  log_dir=None, is_project=True,
                  project_name=None, experiment_name=None, local_model_result_folder_path=None,
@@ -263,11 +263,11 @@ class TensorboardFullTracking(TBReporterBaseCB):
             cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
             **kwargs: additional arguments for ``torch.utils.tensorboard.SummaryWriter`` wrapped inside this callback
         """
-        TBReporterBaseCB.__init__(self, 'Tensorboard full tracking',
-                                  log_dir, is_project,
-                                  project_name, experiment_name, local_model_result_folder_path,
-                                  cloud_save_mode, bucket_name, cloud_dir_prefix,
-                                  **kwargs)
+        TensorboardReporterBaseCB.__init__(self, 'Tensorboard full tracking',
+                                           log_dir, is_project,
+                                           project_name, experiment_name, local_model_result_folder_path,
+                                           cloud_save_mode, bucket_name, cloud_dir_prefix,
+                                           **kwargs)
         self.metric_names = metric_names
         self.batch_log_frequency = batch_log_frequency
 
