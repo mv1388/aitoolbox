@@ -1,5 +1,4 @@
 import os
-import numpy as np
 from torch.utils.tensorboard import SummaryWriter
 
 from aitoolbox.torchtrain.callbacks.abstract import AbstractExperimentCallback
@@ -61,12 +60,22 @@ class TensorboardReporterBaseCB(AbstractExperimentCallback):
         Returns:
             None
         """
-        self.tb_writer.add_scalar(
-            'train_loss/last_batch_loss', self.train_loop_obj.loss_batch_accum[-1], self.global_step
-        )
-        self.tb_writer.add_scalar(
-            'train_loss/accumulated_batch_loss', np.mean(self.train_loop_obj.loss_batch_accum).item(), self.global_step
-        )
+        last_batch_loss = self.train_loop_obj.parse_loss(self.train_loop_obj.loss_batch_accum[-1:])
+        accum_mean_batch_loss = self.train_loop_obj.parse_loss(self.train_loop_obj.loss_batch_accum)
+
+        if not isinstance(last_batch_loss, dict) and not isinstance(accum_mean_batch_loss, dict):
+            last_batch_loss = {'loss': last_batch_loss}
+            accum_mean_batch_loss = {'loss': accum_mean_batch_loss}
+
+        for loss_name in last_batch_loss.keys():
+            self.tb_writer.add_scalar(
+                f'train_loss/last_batch_{loss_name}', last_batch_loss[loss_name],
+                self.global_step
+            )
+            self.tb_writer.add_scalar(
+                f'train_loss/accumulated_batch_{loss_name}', accum_mean_batch_loss[loss_name],
+                self.global_step
+            )
 
     def log_train_history_metrics(self, metric_names):
         """Log the train history metrics at the end of the epoch
