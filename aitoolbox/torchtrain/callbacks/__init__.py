@@ -9,4 +9,4 @@ from aitoolbox.torchtrain.callbacks.train_schedule import (
     ReduceLROnPlateauScheduler, ReduceLROnPlateauMetricScheduler, LinearWithWarmupScheduler
 )
 from aitoolbox.torchtrain.callbacks.gradient import GradNormClip, GradValueClip
-from aitoolbox.torchtrain.callbacks.tensorboard import TensorboardFullTracking
+from aitoolbox.torchtrain.callbacks.tensorboard import TensorboardFullTracking, TensorboardTrainHistoryMetric
