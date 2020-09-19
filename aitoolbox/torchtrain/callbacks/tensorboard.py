@@ -54,6 +54,13 @@ class TBReporterBaseCB(AbstractExperimentCallback):
         self.cloud_results_saver = None
 
     def log_mid_train_loss(self):
+        """Log the training loss at the batch iteration level
+
+        Logs current batch loss and the accumulated average loss.
+
+        Returns:
+            None
+        """
         self.tb_writer.add_scalar(
             'train_loss/last_batch_loss', self.train_loop_obj.loss_batch_accum[-1], self.global_step
         )
@@ -62,9 +69,14 @@ class TBReporterBaseCB(AbstractExperimentCallback):
         )
 
     def log_train_history_metrics(self, metric_names):
-        if metric_names is None:
-            metric_names = self.train_loop_obj.train_history.keys()
+        """Log the train history metrics at the end of the epoch
 
+        Args:
+            metric_names (list): list of train history tracked metrics to be logged
+
+        Returns:
+            None
+        """
         for metric_name in metric_names:
             prefix_name = 'metrics'
             if 'loss' in metric_name:
@@ -134,7 +146,7 @@ class TBReporterBaseCB(AbstractExperimentCallback):
 
 
 class TensorboardTrainBatchLoss(TBReporterBaseCB):
-    def __init__(self, log_frequency=1,
+    def __init__(self, batch_log_frequency=1,
                  log_dir=None, is_project=True,
                  project_name=None, experiment_name=None, local_model_result_folder_path=None,
                  cloud_save_mode=None, bucket_name=None, cloud_dir_prefix=None,
@@ -142,7 +154,7 @@ class TensorboardTrainBatchLoss(TBReporterBaseCB):
         """Tensorboard training loss logger
 
         Args:
-            log_frequency (int): frequency of logging
+            batch_log_frequency (int): frequency of logging
             log_dir (str or None): save directory location
             is_project (bool): set to ``True`` if the results should be saved into the TrainLoop-created project
                 folder structure or to ``False`` if you want to save into a specific full path given in the log_dir
@@ -163,17 +175,12 @@ class TensorboardTrainBatchLoss(TBReporterBaseCB):
                                   project_name, experiment_name, local_model_result_folder_path,
                                   cloud_save_mode, bucket_name, cloud_dir_prefix,
                                   **kwargs)
-        self.log_frequency = log_frequency
-        self.global_step = 0
+        self.batch_log_frequency = batch_log_frequency
 
     def on_batch_end(self):
-        if self.global_step % self.log_frequency == 0:
-            self.tb_writer.add_scalar(
-                'train_loss/last_batch_loss', self.train_loop_obj.loss_batch_accum[-1], self.global_step
-            )
-            self.tb_writer.add_scalar(
-                'train_loss/accumulated_batch_loss', np.mean(self.train_loop_obj.loss_batch_accum).item(), self.global_step
-            )
+        if self.global_step % self.batch_log_frequency == 0:
+            self.log_mid_train_loss()
+
         self.global_step += 1
 
     def on_epoch_end(self):
@@ -220,14 +227,7 @@ class TensorboardTrainHistoryMetric(TBReporterBaseCB):
 
     def on_epoch_end(self):
         metric_names = self.metric_names if self.metric_names is not None else self.train_loop_obj.train_history.keys()
-
-        for metric_name in metric_names:
-            prefix_name = 'metrics'
-            if 'loss' in metric_name:
-                prefix_name = 'loss'
-
-            metric_results = self.train_loop_obj.train_history[metric_name]
-            self.tb_writer.add_scalar(f'{prefix_name}/{metric_name}', metric_results[-1], self.train_loop_obj.epoch)
+        self.log_train_history_metrics(metric_names)
 
         self.upload_to_cloud()
 
@@ -238,6 +238,30 @@ class TensorboardFullTracking(TBReporterBaseCB):
                  project_name=None, experiment_name=None, local_model_result_folder_path=None,
                  cloud_save_mode=None, bucket_name=None, cloud_dir_prefix=None,
                  **kwargs):
+        """Full Tensorboard logger
+
+        At each end of epoch logs to tensorboard the last value in the training history stored for some tracked metric.
+        Also logs the training loss at the batch iteration level.
+
+        Args:
+            metric_names (list or None): list of metric names tracked in the training history. If left to ``None``,
+                all the metrics in the training history will be logged.
+            batch_log_frequency (int): frequency of logging
+            log_dir (str or None): save directory location
+            is_project (bool): set to ``True`` if the results should be saved into the TrainLoop-created project
+                folder structure or to ``False`` if you want to save into a specific full path given in the log_dir
+                parameter.
+            project_name (str or None): root name of the project
+            experiment_name (str or None): name of the particular experiment
+            local_model_result_folder_path (str or None): root local path where project folder will be created
+            cloud_save_mode (str or None): Storage destination selector.
+                For AWS S3: 's3' / 'aws_s3' / 'aws'
+                For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
+                Everything else results just in local storage to disk
+            bucket_name (str): name of the bucket in the cloud storage
+            cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
+            **kwargs: additional arguments for ``torch.utils.tensorboard.SummaryWriter`` wrapped inside this callback
+        """
         TBReporterBaseCB.__init__(self, 'Tensorboard full tracking',
                                   log_dir, is_project,
                                   project_name, experiment_name, local_model_result_folder_path,
@@ -245,27 +269,15 @@ class TensorboardFullTracking(TBReporterBaseCB):
                                   **kwargs)
         self.metric_names = metric_names
         self.batch_log_frequency = batch_log_frequency
-        self.global_step = 0
 
     def on_batch_end(self):
         if self.global_step % self.batch_log_frequency == 0:
-            self.tb_writer.add_scalar(
-                'train_loss/last_batch_loss', self.train_loop_obj.loss_batch_accum[-1], self.global_step
-            )
-            self.tb_writer.add_scalar(
-                'train_loss/accumulated_batch_loss', np.mean(self.train_loop_obj.loss_batch_accum).item(), self.global_step
-            )
+            self.log_mid_train_loss()
+
         self.global_step += 1
 
     def on_epoch_end(self):
         metric_names = self.metric_names if self.metric_names is not None else self.train_loop_obj.train_history.keys()
-
-        for metric_name in metric_names:
-            prefix_name = 'metrics'
-            if 'loss' in metric_name:
-                prefix_name = 'loss'
-
-            metric_results = self.train_loop_obj.train_history[metric_name]
-            self.tb_writer.add_scalar(f'{prefix_name}/{metric_name}', metric_results[-1], self.train_loop_obj.epoch)
+        self.log_train_history_metrics(metric_names)
 
         self.upload_to_cloud()
