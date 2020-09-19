@@ -1,5 +1,4 @@
 import os
-import numpy as np
 from torch.utils.tensorboard import SummaryWriter
 
 from aitoolbox.torchtrain.callbacks.abstract import AbstractExperimentCallback
@@ -65,7 +64,7 @@ class TensorboardReporterBaseCB(AbstractExperimentCallback):
         accum_mean_batch_loss = self.train_loop_obj.parse_loss(self.train_loop_obj.loss_batch_accum)
 
         if not isinstance(last_batch_loss, dict) and not isinstance(accum_mean_batch_loss, dict):
-            last_batch_loss = {'loss', last_batch_loss}
+            last_batch_loss = {'loss': last_batch_loss}
             accum_mean_batch_loss = {'loss': accum_mean_batch_loss}
 
         for loss_name in last_batch_loss.keys():
