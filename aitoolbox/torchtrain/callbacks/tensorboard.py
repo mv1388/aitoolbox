@@ -223,13 +223,11 @@ class TensorboardTrainHistoryMetric(TensorboardReporterBaseCB):
                                            **kwargs)
         self.metric_names = metric_names
 
-        if 'flush_secs' not in self.tb_writer_kwargs:
-            self.tb_writer_kwargs['flush_secs'] = 10
-
     def on_epoch_end(self):
         metric_names = self.metric_names if self.metric_names is not None else self.train_loop_obj.train_history.keys()
         self.log_train_history_metrics(metric_names)
 
+        self.tb_writer.flush()
         self.upload_to_cloud()
 
 
