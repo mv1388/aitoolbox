@@ -365,7 +365,7 @@ class TrainLoop:
         Returns:
             None
         """
-        loss_parsed = self._parse_loss(self.loss_batch_accum)
+        loss_parsed = self.parse_loss(self.loss_batch_accum)
         self._print_save_loss(loss_parsed,
                               loss_type_name='accumulated_loss',
                               loss_print_description='AVG BATCH ACCUMULATED TRAIN LOSS')
@@ -393,7 +393,7 @@ class TrainLoop:
             # has been turned off
             self._print_save_loss(test_loss, loss_type_name='train_end_test_loss', loss_print_description='TEST LOSS')
 
-    def _parse_loss(self, loss_record):
+    def parse_loss(self, loss_record):
         """Helper function to process different possible loss formats
 
         Primarily useful for parsing between single loss representation and the multi-loss representation.
@@ -535,7 +535,7 @@ class TrainLoop:
 
                 loss_avg.append(loss_batch.item())
 
-            loss_avg = self._parse_loss(loss_avg)
+            loss_avg = self.parse_loss(loss_avg)
 
         self.model.train()
 
