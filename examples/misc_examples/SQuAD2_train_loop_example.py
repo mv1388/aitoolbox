@@ -10,7 +10,7 @@ from aitoolbox.nlp.dataset.torch_collate_fns import qa_concat_ctx_span_collate_f
 from aitoolbox.torchtrain.train_loop import TrainLoop, TrainLoopCheckpointEndSave
 from aitoolbox.torchtrain.callbacks.performance_eval import ModelPerformanceEvaluation, \
     ModelPerformancePrintReport, ModelTrainHistoryPlot
-from aitoolbox.torchtrain.callbacks.train_schedule import ReduceLROnPlateauScheduler
+from aitoolbox.torchtrain.schedulers.basic import ReduceLROnPlateauScheduler
 from aitoolbox.nlp.experiment_evaluation.NLP_result_package import QuestionAnswerResultPackage
 
 from aitoolbox.nlp.models.torch.unified_qa_model import UnifiedQABasicRNN
