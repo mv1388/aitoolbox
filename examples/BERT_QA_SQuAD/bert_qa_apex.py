@@ -15,7 +15,7 @@ from .lib.transformers_qa_bert_eval import DDPBERTQAResultPackage
 
 from aitoolbox.torchtrain.train_loop import TrainLoopCheckpointEndSave
 import aitoolbox.torchtrain.tl_components.pred_collate_fns as collate_fns
-from aitoolbox.torchtrain.callbacks.train_schedule import LambdaLRScheduler
+from aitoolbox.torchtrain.schedulers.basic import LambdaLRScheduler
 from aitoolbox.torchtrain.callbacks.performance_eval import (
     ModelPerformanceEvaluation, ModelPerformancePrintReport, ModelTrainHistoryPlot, ModelTrainHistoryFileWriter)
 from aitoolbox.torchtrain.callbacks.basic import EarlyStopping
@@ -102,7 +102,7 @@ def lr_lambda(current_step):
     return max(0.0, float(t_total - current_step) / float(max(1, t_total - warmup_steps)))
 
 
-callbacks = [LambdaLRScheduler(lr_lambda, last_epoch=-1),
+callbacks = [LambdaLRScheduler(lr_lambda, execute_epoch_end=False, execute_batch_end=True, last_epoch=-1),
              ModelPerformanceEvaluation(DDPBERTQAResultPackage(test_examples, test_features, project_root, tokenizer), {}),
              ModelPerformancePrintReport(['val_exact', 'val_f1']),
              ModelTrainHistoryPlot(),
