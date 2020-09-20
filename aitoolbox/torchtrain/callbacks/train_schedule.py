@@ -142,12 +142,44 @@ class MultiStepLRScheduler(GeneralLRScheduler):
         self.callback_name = ''
 
 
+class ConstantWithWarmupScheduler(LambdaLRScheduler):
+    def __init__(self, num_warmup_steps, last_epoch=-1, **kwargs):
+        """Constant scheduler with the initial warmup
+
+        Schedule with a constant learning rate preceded by a warmup period during which the learning rate increases
+        linearly between 0 and the initial lr set in the optimizer.
+
+        Especially useful in the context of BERT-like models.
+        Implementation based on HuggingFace Transformers library's ``get_constant_schedule_with_warmup()`` method.
+
+        https://huggingface.co/transformers/main_classes/optimizer_schedules.html#transformers.get_constant_schedule_with_warmup
+
+        Args:
+            num_warmup_steps (int): The number of steps for the warmup phase
+            last_epoch (int): The index of the last epoch when resuming training
+            **kwargs: learning rate scheduler additional parameters
+        """
+        def lr_lambda(current_step: int):
+            if current_step < num_warmup_steps:
+                return float(current_step) / float(max(1.0, num_warmup_steps))
+            return 1.0
+
+        super().__init__(lr_lambda=lr_lambda,
+                         execute_epoch_end=False, execute_batch_end=True, last_epoch=last_epoch, **kwargs)
+        self.callback_name = 'Warmed up constant learning rate scheduler'
+
+
 class LinearWithWarmupScheduler(LambdaLRScheduler):
     def __init__(self, num_warmup_steps, num_training_steps, last_epoch=-1, **kwargs):
         """Linear scheduler with the initial warmup
 
+        Schedule with a learning rate that decreases linearly from the initial lr set in the optimizer to 0,
+        after a warmup period during which it increases linearly from 0 to the initial lr set in the optimizer.
+
         Especially useful in the context of BERT-like models.
         Implementation based on HuggingFace Transformers library's ``get_linear_schedule_with_warmup()`` method.
+
+        https://huggingface.co/transformers/main_classes/optimizer_schedules.html#transformers.get_linear_schedule_with_warmup
 
         Args:
             num_warmup_steps (int): The number of steps for the warmup phase
@@ -164,4 +196,4 @@ class LinearWithWarmupScheduler(LambdaLRScheduler):
 
         super().__init__(lr_lambda=lr_lambda,
                          execute_epoch_end=False, execute_batch_end=True, last_epoch=last_epoch, **kwargs)
-        self.callback_name = ''
+        self.callback_name = 'Warmed up linearly decreasing learning rate scheduler'
