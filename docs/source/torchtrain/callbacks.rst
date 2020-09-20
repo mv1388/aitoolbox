@@ -16,7 +16,6 @@ module. There are several general categories of available callbacks:
 * :mod:`aitoolbox.torchtrain.callbacks.basic` - general training augmentation
 * :mod:`aitoolbox.torchtrain.callbacks.performance_eval` - model performance evaluation
 * :mod:`aitoolbox.torchtrain.callbacks.model_save` - local / cloud based model saving
-* :mod:`aitoolbox.torchtrain.callbacks.train_schedule` - learning rate schedulers
 * :mod:`aitoolbox.torchtrain.callbacks.gradient` - model gradient reporting
 * :mod:`aitoolbox.torchtrain.callbacks.model_load` - existing model loading at train start
 * :mod:`aitoolbox.torchtrain.callbacks.tensorboard` - tensorboard training tracking
