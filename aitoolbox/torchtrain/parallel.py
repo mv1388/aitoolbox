@@ -41,8 +41,8 @@ class TTParallelBase:
                     functools.partial(copy_function(getattr(module, method_name)), self))
 
         # Optionally transfer additional TTModel attributes to the TTDataParallel level
-        if module.add_model_attributes is not None and isinstance(module.add_model_attributes, (list, tuple)):
-            for attr_name in module.add_model_attributes:
+        if module.transfer_model_attributes is not None and isinstance(module.transfer_model_attributes, (list, tuple)):
+            for attr_name in module.transfer_model_attributes:
                 setattr(self, attr_name, getattr(module, attr_name))
 
     def get_loss(self, batch_data, criterion, device):

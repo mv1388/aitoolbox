@@ -19,11 +19,9 @@ class TestTTParallelBase(unittest.TestCase):
         self.assertTrue(hasattr(model_parallel, 'my_new_fn'))
         self.assertTrue(hasattr(model_parallel, 'get_model_level_str'))
 
-        self.assertFalse(hasattr(model_parallel, 'model_level_str'))
-
     def test_init_attr_transfer(self):
         model = MyModel()
-        model_parallel = TTParallelBase(model, add_model_attributes=['model_level_str'])
+        model_parallel = TTParallelBase(model)
 
         self.assertTrue(hasattr(model_parallel, 'model_level_str'))
 
@@ -51,8 +49,6 @@ class TestTTDataParallel(unittest.TestCase):
         self.assertTrue(hasattr(model_parallel, 'my_new_fn'))
         self.assertTrue(hasattr(model_parallel, 'get_model_level_str'))
 
-        self.assertFalse(hasattr(model_parallel, 'model_level_str'))
-
     def test_inheritance(self):
         model = MyModel()
         model_parallel = TTDataParallel(model)
@@ -62,7 +58,7 @@ class TestTTDataParallel(unittest.TestCase):
 
     def test_init_attr_transfer(self):
         model = MyModel()
-        model_parallel = TTDataParallel(model, add_model_attributes=['model_level_str'])
+        model_parallel = TTDataParallel(model)
 
         self.assertTrue(hasattr(model_parallel, 'model_level_str'))
 
