@@ -92,7 +92,9 @@ class TensorboardReporterBaseCB(AbstractExperimentCallback):
                 prefix_name = 'loss'
 
             metric_results = self.train_loop_obj.train_history[metric_name]
-            self.tb_writer.add_scalar(f'{prefix_name}/{metric_name}', metric_results[-1], self.train_loop_obj.epoch)
+            if len(metric_results) > 0:
+                self.tb_writer.add_scalar(f'{prefix_name}/{metric_name}', metric_results[-1],
+                                          self.train_loop_obj.epoch)
 
     def on_train_end(self):
         self.tb_writer.close()
