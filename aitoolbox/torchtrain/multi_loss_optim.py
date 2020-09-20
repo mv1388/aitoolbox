@@ -30,12 +30,14 @@ class MultiLoss:
 
             self.optimizer_loss_map = {int(v): str(k) for k, v in loss_optimizer_map.items()}
 
-    def backward(self, optimizer_idx):
+    def backward(self, optimizer_idx, iteration):
         """Executes backward() for the specific loss based on provided optimizer_idx
 
         Args:
             optimizer_idx (int): index of the current optimizer. Mostly useful when using multiple optimizers. When
                 only a single optimizer is used this parameter can be ignored.
+            iteration (int): Current iteration index. Not used in the most simple setup but provided in case of more
+                elaborate loss backward logic is devised.
 
         Returns:
             None
@@ -47,13 +49,15 @@ class MultiLoss:
 
         self.loss_backward_remaining -= 1
 
-    def backward_amp(self, optimizers, optimizer_idx):
+    def backward_amp(self, optimizers, optimizer_idx, iteration):
         """When training with AMP executes backward() for the specific loss based on provided optimizer_idx
 
         Args:
             optimizers (MultiOptimizer): list of optimizers all used optimizers
             optimizer_idx (int): index of the current optimizer. Mostly useful when using multiple optimizers. When
                 only a single optimizer is used this parameter can be ignored.
+            iteration (int): Current iteration index. Not used in the most simple setup but provided in case of more
+                elaborate loss backward logic is devised.
 
         Returns:
             None
@@ -83,11 +87,33 @@ class MultiOptimizer:
         """
         self.optimizer_list = optimizer_list
 
-    def zero_grad(self, optimizer_idx):
-        self.optimizer_list[optimizer_idx].zero_grad()
+    def step(self, optimizer_idx, iteration):
+        """Execute step for optimizer at the specified index
 
-    def step(self, optimizer_idx):
+        Args:
+            optimizer_idx (int): index of the current optimizer. Mostly useful when using multiple optimizers. When
+                only a single optimizer is used this parameter can be ignored.
+            iteration (int): Current iteration index. Not used in the most simple setup but provided in case of more
+                elaborate loss backward logic is devised.
+
+        Returns:
+            None
+        """
         self.optimizer_list[optimizer_idx].step()
+
+    def zero_grad(self, optimizer_idx, iteration):
+        """Execute zero_grad for optimizer at the specified index
+
+        Args:
+            optimizer_idx (int): index of the current optimizer. Mostly useful when using multiple optimizers. When
+                only a single optimizer is used this parameter can be ignored.
+            iteration (int): Current iteration index. Not used in the most simple setup but provided in case of more
+                elaborate loss backward logic is devised.
+
+        Returns:
+            None
+        """
+        self.optimizer_list[optimizer_idx].zero_grad()
 
     def state_dict(self):
         return [optimizer.state_dict() for optimizer in self.optimizer_list]

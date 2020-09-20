@@ -53,7 +53,7 @@ class TrainLoop:
             validation_loader (torch.utils.data.DataLoader or None): data loader for validation data set
             test_loader (torch.utils.data.DataLoader or None): data loader for test data set
             optimizer (torch.optim.optimizer.Optimizer or MultiOptimizer): optimizer algorithm.
-            criterion (torch.nn.modules.loss._Loss or MultiLoss): criterion criterion during the training procedure.
+            criterion (torch.nn.modules.loss._Loss or MultiLoss or None): criterion during the training procedure
             collate_batch_pred_fn (callable): collate function transforming batch predictions as they come out from the
                 model
             pred_transform_fn (callable): function transforming all the produced predictions after all the batches have
@@ -196,7 +196,8 @@ class TrainLoop:
         self.callbacks_handler.register_callbacks(callbacks)
 
         self.model = self.model.to(self.device)
-        self.criterion = self.criterion.to(self.device)
+        if self.criterion is not None:
+            self.criterion = self.criterion.to(self.device)
 
         self.model.train()
 
@@ -218,7 +219,7 @@ class TrainLoop:
                 # Iterate over potentially multiple optimizers
                 for optimizer_idx in range(self.num_optimizers):
                     # Backward pass through the model
-                    self._backward_pass(loss_batch, optimizer_idx)
+                    self._backward_pass(loss_batch, iteration, optimizer_idx)
                     if self.grad_cb_used:
                         self.callbacks_handler.execute_gradient_update(optimizer_idx)
 
@@ -271,11 +272,12 @@ class TrainLoop:
 
         return loss_batch
 
-    def _backward_pass(self, loss_batch, optimizer_idx):
+    def _backward_pass(self, loss_batch, iteration, optimizer_idx):
         """Execute backward pass from the current batch loss
 
         Args:
             loss_batch: loss calculated on current batch
+            iteration (int): current iteration index
             optimizer_idx (int): index of the current optimizer. Mostly useful when using multiple optimizers. When
                 only a single optimizer is used this parameter can be ignored.
 
@@ -287,14 +289,14 @@ class TrainLoop:
                 self.amp_scaler.scale(loss_batch).backward()
             else:
                 # Multi-loss Apex AMP calculation
-                loss_batch.backward_amp(self.optimizer, optimizer_idx)
+                loss_batch.backward_amp(self.optimizer, optimizer_idx, iteration)
         elif self.use_deepspeed:
             self.model.backward(loss_batch)
         else:
             if not isinstance(loss_batch, MultiLoss):
                 loss_batch.backward()
             else:
-                loss_batch.backward(optimizer_idx)
+                loss_batch.backward(optimizer_idx, iteration)
 
     def _optimizer_step(self, iteration, grad_accumulation, optimizer_idx):
         """Execute the optimizer step
@@ -316,7 +318,7 @@ class TrainLoop:
                 if not isinstance(self.optimizer, MultiOptimizer):
                     self.optimizer.step()
                 else:
-                    self.optimizer.step(optimizer_idx)
+                    self.optimizer.step(optimizer_idx, iteration)
 
             if self.grad_cb_used:
                 self.callbacks_handler.execute_optimizer_step()
@@ -339,7 +341,7 @@ class TrainLoop:
                 if not isinstance(self.optimizer, MultiOptimizer):
                     self.optimizer.zero_grad()
                 else:
-                    self.optimizer.zero_grad(optimizer_idx)
+                    self.optimizer.zero_grad(optimizer_idx, iteration)
 
     def auto_execute_end_of_epoch(self):
         """Basic performance evaluation executed by default at the end of each epoch
@@ -349,7 +351,7 @@ class TrainLoop:
         Returns:
             None
         """
-        loss_parsed = self._parse_loss(self.loss_batch_accum)
+        loss_parsed = self.parse_loss(self.loss_batch_accum)
         self._print_save_loss(loss_parsed,
                               loss_type_name='accumulated_loss',
                               loss_print_description='AVG BATCH ACCUMULATED TRAIN LOSS')
@@ -377,7 +379,7 @@ class TrainLoop:
             # has been turned off
             self._print_save_loss(test_loss, loss_type_name='train_end_test_loss', loss_print_description='TEST LOSS')
 
-    def _parse_loss(self, loss_record):
+    def parse_loss(self, loss_record):
         """Helper function to process different possible loss formats
 
         Primarily useful for parsing between single loss representation and the multi-loss representation.
@@ -503,7 +505,8 @@ class TrainLoop:
             float or dict: loss, in the case of multi loss, the dict gets returned
         """
         self.model = self.model.to(self.device)
-        self.criterion = self.criterion.to(self.device)
+        if self.criterion is not None:
+            self.criterion = self.criterion.to(self.device)
 
         self.model.eval()
         loss_avg = []
@@ -518,7 +521,7 @@ class TrainLoop:
 
                 loss_avg.append(loss_batch.item())
 
-            loss_avg = self._parse_loss(loss_avg)
+            loss_avg = self.parse_loss(loss_avg)
 
         self.model.train()
 
@@ -735,7 +738,8 @@ class TrainLoop:
 
         # Move to the GPU belonging to the process
         self.model = self.model.to(self.device)
-        self.criterion = self.criterion.to(self.device)
+        if self.criterion is not None:
+            self.criterion = self.criterion.to(self.device)
 
         # Optionally initialize AMP scaler inside each of the processes
         if self.use_amp:
@@ -828,7 +832,7 @@ class TrainLoopCheckpoint(TrainLoop):
             validation_loader (torch.utils.data.DataLoader or None): data loader for validation data set
             test_loader (torch.utils.data.DataLoader or None): data loader for test data set
             optimizer (torch.optim.optimizer.Optimizer or MultiOptimizer): optimizer algorithm.
-            criterion (torch.nn.modules.loss._Loss or MultiLoss): criterion criterion during the training procedure.
+            criterion (torch.nn.modules.loss._Loss or MultiLoss or None): criterion during the training procedure
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             local_model_result_folder_path (str): root local path where project folder will be created
@@ -917,7 +921,7 @@ class TrainLoopEndSave(TrainLoop):
             validation_loader (torch.utils.data.DataLoader or None): data loader for validation data set
             test_loader (torch.utils.data.DataLoader or None): data loader for test data set
             optimizer (torch.optim.optimizer.Optimizer or MultiOptimizer): optimizer algorithm.
-            criterion (torch.nn.modules.loss._Loss or MultiLoss): criterion criterion during the training procedure.
+            criterion (torch.nn.modules.loss._Loss or MultiLoss or None): criterion during the training procedure
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             local_model_result_folder_path (str): root local path where project folder will be created
@@ -1026,7 +1030,7 @@ class TrainLoopCheckpointEndSave(TrainLoopEndSave):
             validation_loader (torch.utils.data.DataLoader or None): data loader for validation data set
             test_loader (torch.utils.data.DataLoader or None): data loader for test data set
             optimizer (torch.optim.optimizer.Optimizer or MultiOptimizer): optimizer algorithm.
-            criterion (torch.nn.modules.loss._Loss or MultiLoss): criterion criterion during the training procedure.
+            criterion (torch.nn.modules.loss._Loss or MultiLoss or None): criterion during the training procedure
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             local_model_result_folder_path (str): root local path where project folder will be created

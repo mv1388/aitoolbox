@@ -40,7 +40,9 @@ setup(
         'nltk',
         'allennlp==0.9',
         'pyrouge',
-        'rouge'
+        'rouge',
+
+        'tensorboard'
     ],
 
     test_suite='tests',
