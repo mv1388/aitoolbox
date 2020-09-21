@@ -3,7 +3,30 @@ from torch.optim.lr_scheduler import ReduceLROnPlateau, LambdaLR, StepLR, MultiS
 from aitoolbox.torchtrain.callbacks.abstract import AbstractCallback
 
 
-class GeneralLRScheduler(AbstractCallback):
+class AbstractScheduler:
+    def __init__(self):
+        """Scheduler (callback) base class
+
+        All the scheduler callbacks should in addition to ``AbstractCallback`` also inherit from this base class.
+        This class serves to indicate to torchtrain components which used callbacks are schedulers and which are just
+        normal callbacks which have nothing to do with learning rate scheduling.
+
+        In addition to the above, this scheduler base class also implements the interface methods needed for saving
+        and loading the scheduler state_dict's when checkpointing and reloading the scheduler.
+
+        When implementing the actual scheduler callback make sure to assign the created learning rate scheduler
+        to the ``self.scheduler`` class member.
+        """
+        self.scheduler = None
+
+    def state_dict(self):
+        return self.scheduler.state_dict()
+
+    def load_state_dict(self, state_dict):
+        self.scheduler.load_state_dict(state_dict)
+
+
+class GeneralLRSchedulerCallback(AbstractScheduler, AbstractCallback):
     def __init__(self, scheduler_class, optimizer_idx=None, **kwargs):
         """Learning rate scheduler base class
 
@@ -13,10 +36,10 @@ class GeneralLRScheduler(AbstractCallback):
                 of the paired optimizer when using multiple optimizers
             **kwargs: learning rate scheduler additional parameters
         """
+        AbstractScheduler.__init__(self)
         AbstractCallback.__init__(self, 'General learn rate scheduler')
         self.scheduler_args = kwargs
         self.scheduler_class = scheduler_class
-        self.scheduler = None
         self.optimizer_idx = optimizer_idx
 
     def register_train_loop_object(self, train_loop_obj):
@@ -46,14 +69,14 @@ class GeneralLRScheduler(AbstractCallback):
         self.scheduler.step()
 
 
-class ReduceLROnPlateauScheduler(GeneralLRScheduler):
+class ReduceLROnPlateauScheduler(GeneralLRSchedulerCallback):
     def __init__(self, **kwargs):
         """Learning rate scheduler which reduces the rate if the loss performance stops improving
 
         Args:
             **kwargs: learning rate scheduler additional parameters
         """
-        GeneralLRScheduler.__init__(self, ReduceLROnPlateau, **kwargs)
+        GeneralLRSchedulerCallback.__init__(self, ReduceLROnPlateau, **kwargs)
         self.callback_name = 'Reduce learn rate if the model hits the plateau'
 
     def on_epoch_end(self):
@@ -61,7 +84,7 @@ class ReduceLROnPlateauScheduler(GeneralLRScheduler):
         self.scheduler.step(val_loss_avg)
 
 
-class ReduceLROnPlateauMetricScheduler(GeneralLRScheduler):
+class ReduceLROnPlateauMetricScheduler(GeneralLRSchedulerCallback):
     def __init__(self, metric_name, **kwargs):
         """Learning rate scheduler which reduces the rate if the performance of the selected metric stops improving
 
@@ -72,7 +95,7 @@ class ReduceLROnPlateauMetricScheduler(GeneralLRScheduler):
             metric_name (str): monitored metric based on which the learning rate scheduler modifies the learning rate
             **kwargs: learning rate scheduler additional parameters
         """
-        GeneralLRScheduler.__init__(self, ReduceLROnPlateau, **kwargs)
+        GeneralLRSchedulerCallback.__init__(self, ReduceLROnPlateau, **kwargs)
         self.metric_name = metric_name
         self.callback_name = 'Reduce learn rate if the model hits the plateau based on metric in TrainLoop history'
 
@@ -86,7 +109,7 @@ class ReduceLROnPlateauMetricScheduler(GeneralLRScheduler):
         self.scheduler.step(val_metric_result)
 
 
-class LambdaLRScheduler(GeneralLRScheduler):
+class LambdaLRScheduler(GeneralLRSchedulerCallback):
     def __init__(self, lr_lambda, execute_epoch_end=True, execute_batch_end=False, **kwargs):
         """Sets the learning rate of each parameter group to the initial lr times a given function
 
@@ -99,7 +122,7 @@ class LambdaLRScheduler(GeneralLRScheduler):
             execute_batch_end (bool): should scheduler step be executed at the end of each batch
             **kwargs: learning rate scheduler additional parameters
         """
-        GeneralLRScheduler.__init__(self, LambdaLR, **dict(kwargs, lr_lambda=lr_lambda))
+        GeneralLRSchedulerCallback.__init__(self, LambdaLR, **dict(kwargs, lr_lambda=lr_lambda))
         self.callback_name = ''
         self.execute_epoch_end = execute_epoch_end
         self.execute_batch_end = execute_batch_end
@@ -113,7 +136,7 @@ class LambdaLRScheduler(GeneralLRScheduler):
             self.scheduler.step()
 
 
-class StepLRScheduler(GeneralLRScheduler):
+class StepLRScheduler(GeneralLRSchedulerCallback):
     def __init__(self, step_size, **kwargs):
         """Sets the learning rate of each parameter group to the initial lr decayed by gamma every step_size epochs
 
@@ -123,11 +146,11 @@ class StepLRScheduler(GeneralLRScheduler):
             step_size (int): period of learning rate decay
             **kwargs: learning rate scheduler additional parameters
         """
-        GeneralLRScheduler.__init__(self, StepLR, **dict(kwargs, step_size=step_size))
+        GeneralLRSchedulerCallback.__init__(self, StepLR, **dict(kwargs, step_size=step_size))
         self.callback_name = ''
 
 
-class MultiStepLRScheduler(GeneralLRScheduler):
+class MultiStepLRScheduler(GeneralLRSchedulerCallback):
     def __init__(self, milestones_list, **kwargs):
         """Set the learning rate of each parameter group to the initial lr decayed by gamma once the number of epoch
             reaches one of the milestones.
@@ -138,5 +161,5 @@ class MultiStepLRScheduler(GeneralLRScheduler):
             milestones_list (list): list of epoch indices. Must be increasing
             **kwargs: learning rate scheduler additional parameters
         """
-        GeneralLRScheduler.__init__(self, MultiStepLR, **dict(kwargs, milestones=milestones_list))
+        GeneralLRSchedulerCallback.__init__(self, MultiStepLR, **dict(kwargs, milestones=milestones_list))
         self.callback_name = ''
