@@ -44,7 +44,9 @@ class ModelCheckpoint(AbstractCallback):
             num_best_checkpoints_kept (int): number of best performing models which are kept when removing suboptimal
                 model checkpoints
         """
-        AbstractCallback.__init__(self, 'Model checkpoint at end of epoch', device_idx_execution=0)
+        # execution_order=100 to make sure that this callback is the very last one to be executed when all the
+        # evaluations are already stored in the train_history and especially also when schedulers have the updated state
+        AbstractCallback.__init__(self, 'Model checkpoint at end of epoch', execution_order=100, device_idx_execution=0)
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
@@ -163,9 +165,9 @@ class ModelTrainEndSave(AbstractCallback):
             bucket_name (str): name of the bucket in the cloud storage
             cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
         """
-        # execution_order=100 to make sure that this callback is the very last one to be executed when all the
+        # execution_order=101 to make sure that this callback is the very last one to be executed when all the
         # evaluations are already stored in the train_history
-        AbstractCallback.__init__(self, 'Model save at the end of training', execution_order=100)
+        AbstractCallback.__init__(self, 'Model save at the end of training', execution_order=101)
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
