@@ -198,14 +198,15 @@ class TestTrainLoopCheckpointEndSave(unittest.TestCase):
         train_loop.callbacks_handler.register_callbacks([AbstractCallback('callback_test2')])
         self.assertEqual(len(train_loop.callbacks), 3)
         # After callbacks are released from cache they also get sorted by priority
-        for reg_cb, true_cb in zip(train_loop.callbacks, [ModelCheckpoint, AbstractCallback, ModelTrainEndSave]):
+        for reg_cb, true_cb in zip(train_loop.callbacks, [AbstractCallback, ModelCheckpoint, ModelTrainEndSave]):
             self.assertEqual(type(reg_cb), true_cb)
 
         for reg_cb in train_loop.callbacks:
             self.assertEqual(reg_cb.train_loop_obj, train_loop)
 
         for reg_cb, cb_name in zip(train_loop.callbacks,
-                                   ['Model checkpoint at end of epoch', 'callback_test2', 'Model save at the end of training']):
+                                   ['callback_test2',
+                                    'Model checkpoint at end of epoch', 'Model save at the end of training',]):
             self.assertEqual(reg_cb.callback_name, cb_name)
 
     def test_optimizer_missing_state_dict_exception(self):
