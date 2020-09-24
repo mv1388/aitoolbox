@@ -281,7 +281,7 @@ class ModelTrainEndSave(AbstractCallback):
                                                              file_name=os.path.basename(local_experiment_python_file_path))
                     if local_source_code_zip_path is not None:
                         param_reporter.copy_to_cloud_storage(local_source_code_zip_path,
-                                                             self.model_checkpointer,
+                                                             self.results_saver.model_saver,
                                                              file_name=os.path.basename(local_source_code_zip_path))
 
                 self._hyperparams_already_saved = True
