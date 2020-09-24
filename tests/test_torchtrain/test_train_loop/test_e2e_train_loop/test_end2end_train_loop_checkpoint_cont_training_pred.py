@@ -963,7 +963,8 @@ class TestEnd2EndTrainLoopModelOptimizerSaveReloadContinueTraining(unittest.Test
 
     def test_e2e_ff_net_scheduler_callback_continue_train_train_5_epoch_compare(self):
         self.set_seeds()
-        batch_size = 50
+        batch_size = 100
+        num_epochs = 10
 
         train_dataset = TensorDataset(torch.randn(1000, 50), torch.randint(low=0, high=10, size=(1000,)))
         val_dataset = TensorDataset(torch.randn(300, 50), torch.randint(low=0, high=10, size=(300,)))
@@ -974,8 +975,7 @@ class TestEnd2EndTrainLoopModelOptimizerSaveReloadContinueTraining(unittest.Test
         test_dataloader = DataLoader(test_dataset, batch_size=batch_size)
 
         scheduler_cb = [
-            StepLRScheduler(step_size=2),
-            LinearWithWarmupScheduler(num_warmup_steps=1, num_training_steps=len(train_dataloader))
+            LinearWithWarmupScheduler(num_warmup_steps=1, num_training_steps=len(train_dataloader) * num_epochs)
         ]
 
         model = FFNet()
@@ -992,15 +992,15 @@ class TestEnd2EndTrainLoopModelOptimizerSaveReloadContinueTraining(unittest.Test
             val_result_package=ClassificationResultPackage(), test_result_package=ClassificationResultPackage(),
             cloud_save_mode=None
         )
-        train_loop.fit(num_epochs=10, callbacks=scheduler_cb)
+        train_loop.fit(num_epochs=num_epochs, callbacks=scheduler_cb)
 
         model_reload_ep4 = FFNet()
         optimizer_reload_ep4 = optim.Adam(model_reload_ep4.parameters(), lr=0.001, betas=(0.9, 0.999))
         criterion_reload_ep4 = nn.NLLLoss()
 
         scheduler_cb_reloaded = [
-            StepLRScheduler(step_size=2),
-            LinearWithWarmupScheduler(num_warmup_steps=1, num_training_steps=len(train_dataloader))
+            LinearWithWarmupScheduler(num_warmup_steps=1, num_training_steps=len(train_dataloader) * num_epochs,
+                                      last_epoch=(len(train_dataloader) * 4) - 1)
         ]
 
         train_loop_reload_ep4 = TrainLoop(
@@ -1009,7 +1009,7 @@ class TestEnd2EndTrainLoopModelOptimizerSaveReloadContinueTraining(unittest.Test
             optimizer_reload_ep4, criterion_reload_ep4
         )
         train_loop_reload_ep4.epoch = 4
-        train_loop_reload_ep4.fit(num_epochs=10, callbacks=[
+        train_loop_reload_ep4.fit(num_epochs=num_epochs, callbacks=[
             ModelLoadContinueTraining(train_loop.experiment_timestamp, saved_model_dir='checkpoint_model', epoch_num=3,
                                       project_name=train_loop.project_name, experiment_name=train_loop.experiment_name,
                                       local_model_result_folder_path=THIS_DIR, cloud_save_mode='local')
@@ -1021,17 +1021,6 @@ class TestEnd2EndTrainLoopModelOptimizerSaveReloadContinueTraining(unittest.Test
             self.assertEqual(orig_state.tolist(), reload_state.tolist())
 
         self.check_loaded_representation(optimizer_reload_ep4, scheduler_cb_reloaded, optimizer, scheduler_cb)
-
-        for orig_state, reload_state in zip(optimizer.state_dict()['state'].values(),
-                                            optimizer_reload_ep4.state_dict()['state'].values()):
-            self.assertEqual(orig_state['step'], reload_state['step'])
-            self.assertEqual(orig_state['exp_avg'].tolist(), reload_state['exp_avg'].tolist())
-            self.assertEqual(orig_state['exp_avg_sq'].tolist(), reload_state['exp_avg_sq'].tolist())
-
-        for (orig_k, orig_state), (reload_k, reload_state) in zip(model.state_dict().items(),
-                                                                  model_reload_ep4.state_dict().items()):
-            self.assertEqual(orig_k, reload_k)
-            self.assertEqual(orig_state.tolist(), reload_state.tolist())
 
         train_pred, _, _ = train_loop.predict_on_train_set()
         val_pred, _, _ = train_loop.predict_on_validation_set()
