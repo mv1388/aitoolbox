@@ -254,7 +254,7 @@ class TestTrainLoopVSCorePyTorch(unittest.TestCase):
         test_dataloader = DataLoader(test_dataset, batch_size=batch_size)
 
         num_warmup_steps = 5
-        num_training_steps = len(train_dataloader)
+        num_training_steps = len(train_dataloader) * num_epochs
 
         scheduler_aitb = LinearWithWarmupScheduler(num_warmup_steps=num_warmup_steps,
                                                    num_training_steps=num_training_steps)

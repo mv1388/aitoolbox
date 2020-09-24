@@ -327,7 +327,7 @@ class TestEnd2EndTrainLoopCheckpointEndSave(unittest.TestCase):
 
         scheduler_cb = [
             StepLRScheduler(step_size=2),
-            LinearWithWarmupScheduler(num_warmup_steps=1, num_training_steps=len(train_dataloader))
+            LinearWithWarmupScheduler(num_warmup_steps=1, num_training_steps=len(train_dataloader) * 5)
         ]
 
         model = FFNet()
