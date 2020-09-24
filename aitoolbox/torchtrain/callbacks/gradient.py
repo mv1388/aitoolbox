@@ -77,8 +77,8 @@ class GradientStatsPrint(AbstractCallback):
         if self.on_every_grad_update:
             self.train_loop_obj.grad_cb_used = True
 
-    def on_after_gradient_update(self):
-        if self.on_every_grad_update:
+    def on_after_gradient_update(self, optimizer_idx):
+        if self.on_every_grad_update and optimizer_idx == 0:
             self.gradients_report()
 
     def on_epoch_end(self):
