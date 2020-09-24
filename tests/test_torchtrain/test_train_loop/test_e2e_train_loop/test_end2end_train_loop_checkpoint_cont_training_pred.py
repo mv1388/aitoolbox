@@ -961,7 +961,7 @@ class TestEnd2EndTrainLoopModelOptimizerSaveReloadContinueTraining(unittest.Test
         if os.path.exists(project_path):
             shutil.rmtree(project_path)
 
-    def test_e2e_ff_net_scheduler_callback_continue_train_train_5_epoch_compare(self):
+    def test_e2e_ff_net_scheduler_callback_continue_training_5_epoch_compare(self):
         self.set_seeds()
         batch_size = 100
         num_epochs = 10
