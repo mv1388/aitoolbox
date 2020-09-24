@@ -5,11 +5,15 @@ from tests.utils import *
 
 from torch.utils.data.dataset import TensorDataset
 from torch.utils.data.dataloader import DataLoader
+from torch.optim.adam import Adam
 
 from aitoolbox.torchtrain.train_loop import TrainLoop
 from aitoolbox.torchtrain.model import ModelWrap
 from aitoolbox.torchtrain.tl_components.callback_handler import CallbacksHandler
 from aitoolbox.torchtrain.multi_loss_optim import MultiOptimizer
+from aitoolbox.torchtrain.schedulers.basic import ReduceLROnPlateauScheduler, StepLRScheduler
+from aitoolbox.torchtrain.schedulers.warmup import LinearWithWarmupScheduler
+from aitoolbox.torchtrain.callbacks.basic import EarlyStopping, ListRegisteredCallbacks
 
 
 class TestTrainLoop(unittest.TestCase):
@@ -457,6 +461,21 @@ class TestTrainLoop(unittest.TestCase):
         self.assertEqual(os.environ['MASTER_ADDR'], 'localhost')
         self.assertEqual(os.environ['MASTER_PORT'], '8888')
         self.assertEqual(os.environ['MKL_THREADING_LAYER'], 'GNU')
+
+    def test_get_schedulers(self):
+        schedulers_list = [
+            ReduceLROnPlateauScheduler(), StepLRScheduler(step_size=5), LinearWithWarmupScheduler(5, 100)
+        ]
+        callbacks_list = [
+            EarlyStopping(), ListRegisteredCallbacks()
+        ]
+
+        model = NetUnifiedBatchFeed()
+        train_loop = TrainLoop(model, None, None, None, Adam(model.parameters()), None)
+        train_loop.callbacks_handler.register_callbacks(schedulers_list + callbacks_list)
+
+        tl_filtered_schedulers = train_loop.get_schedulers()
+        self.assertEqual(tl_filtered_schedulers, schedulers_list)
 
 
 class TestMultiLossOptiTrainLoop(unittest.TestCase):
