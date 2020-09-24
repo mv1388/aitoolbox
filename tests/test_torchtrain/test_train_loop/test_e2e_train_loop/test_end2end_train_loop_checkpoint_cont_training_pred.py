@@ -963,11 +963,11 @@ class TestEnd2EndTrainLoopModelOptimizerSaveReloadContinueTraining(unittest.Test
 
     def test_e2e_ff_net_scheduler_callback_continue_train_train_5_epoch_compare(self):
         self.set_seeds()
-        batch_size = 10
+        batch_size = 50
 
-        train_dataset = TensorDataset(torch.randn(100, 50), torch.randint(low=0, high=10, size=(100,)))
-        val_dataset = TensorDataset(torch.randn(30, 50), torch.randint(low=0, high=10, size=(30,)))
-        test_dataset = TensorDataset(torch.randn(30, 50), torch.randint(low=0, high=10, size=(30,)))
+        train_dataset = TensorDataset(torch.randn(1000, 50), torch.randint(low=0, high=10, size=(1000,)))
+        val_dataset = TensorDataset(torch.randn(300, 50), torch.randint(low=0, high=10, size=(300,)))
+        test_dataset = TensorDataset(torch.randn(300, 50), torch.randint(low=0, high=10, size=(300,)))
 
         train_dataloader = DataLoader(train_dataset, batch_size=batch_size)
         val_dataloader = DataLoader(val_dataset, batch_size=batch_size)
