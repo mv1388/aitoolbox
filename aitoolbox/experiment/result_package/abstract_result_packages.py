@@ -213,9 +213,9 @@ class AbstractResultPackage(ABC):
                                                 'with argparser.')
 
         # Check if hyperparameters dict had python experiment script element and is not None
-        if 'python_experiment_file_path' not in self.hyperparameters or \
-                self.hyperparameters['python_experiment_file_path'] is None:
-            self.warn_about_result_data_problem('python_experiment_file_path missing from hyperparameters dict. '
+        if 'experiment_file_path' not in self.hyperparameters or \
+                self.hyperparameters['experiment_file_path'] is None:
+            self.warn_about_result_data_problem('experiment_file_path missing from hyperparameters dict. '
                                                 'Potential solution: add it to the model config file and parse '
                                                 'with argparser.')
 
