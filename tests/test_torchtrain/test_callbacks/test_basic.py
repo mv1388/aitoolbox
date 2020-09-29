@@ -5,7 +5,7 @@ from torch.utils.data.dataloader import DataLoader
 
 from tests.utils import *
 
-from aitoolbox.torchtrain.callbacks.basic import EarlyStopping, DataSubsetTestRun, FunctionOnTrainLoop
+from aitoolbox.torchtrain.callbacks.basic import EarlyStopping, ThresholdEarlyStopping, DataSubsetTestRun, FunctionOnTrainLoop
 from aitoolbox.torchtrain.train_loop import TrainLoop
 
 
@@ -140,6 +140,71 @@ class TestEarlyStoppingCallback(unittest.TestCase):
             result.append(train_loop.early_stop)
 
         self.assertEqual(result, expected_result)
+
+
+class TestThresholdEarlyStoppingCallback(unittest.TestCase):
+    def test_basic_loss_above_thresh(self):
+        self.threshold_early_stop_change_check(val_list=[0.8], threshold=0.7, expected_result=[True])
+        self.threshold_early_stop_change_check(val_list=[0.71], threshold=0.7, expected_result=[True])
+
+    def test_basic_loss_below_thresh(self):
+        self.threshold_early_stop_change_check(val_list=[0.7], threshold=0.7, expected_result=[False])
+        self.threshold_early_stop_change_check(val_list=[0.6], threshold=0.7, expected_result=[False])
+
+    def test_growing_loss(self):
+        self.threshold_early_stop_change_check(val_list=[0.6, 0.65, 0.7, 0.71, 0.8], threshold=0.7,
+                                               expected_result=[False, False, False, True, True])
+
+    def test_basic_acc_below_thresh(self):
+        self.threshold_early_stop_change_check(val_list=[0.6], threshold=0.7, expected_result=[True], monitor='dummy_acc')
+        self.threshold_early_stop_change_check(val_list=[0.69], threshold=0.7, expected_result=[True], monitor='dummy_acc')
+
+    def test_basic_acc_above_thresh(self):
+        self.threshold_early_stop_change_check(val_list=[0.7], threshold=0.7, expected_result=[False], monitor='dummy_acc')
+        self.threshold_early_stop_change_check(val_list=[0.8], threshold=0.7, expected_result=[False], monitor='dummy_acc')
+
+    def test_falling_acc(self):
+        self.threshold_early_stop_change_check(val_list=[0.8, 0.71, 0.7, 0.65, 0.6], threshold=0.7,
+                                               expected_result=[False, False, False, True, True], monitor='dummy_acc')
+
+    def test_loss_falling_patience(self):
+        self.threshold_early_stop_change_check(val_list=[0.8, 0.71, 0.7, 0.65, 0.6], threshold=0.65,
+                                               expected_result=[False, False, True, True, True],
+                                               patience=2)
+        self.threshold_early_stop_change_check(val_list=[0.8, 0.8, 0.71, 0.7, 0.65, 0.6], threshold=0.65,
+                                               expected_result=[False, False, False, True, True, True],
+                                               expected_patience_counts=[2, 1, 0, -1, 3, 3],
+                                               patience=3)
+
+    def test_acc_growing_patience(self):
+        self.threshold_early_stop_change_check(val_list=[0.6, 0.65, 0.7, 0.71, 0.8], threshold=0.71,
+                                               expected_result=[False, False, True, True, True],
+                                               monitor='dummy_acc', patience=2)
+        self.threshold_early_stop_change_check(val_list=[0.6, 0.65, 0.7, 0.71, 0.8, 0.8], threshold=0.8,
+                                               expected_result=[False, False, False, True, True, True],
+                                               expected_patience_counts=[2, 1, 0, -1, 3, 3],
+                                               monitor='dummy_acc', patience=3)
+
+    def threshold_early_stop_change_check(self, val_list, threshold,
+                                          expected_result, expected_patience_counts=None,
+                                          monitor='dummy_loss', patience=0):
+        callback = ThresholdEarlyStopping(monitor=monitor, threshold=threshold, patience=patience)
+        train_loop = TrainLoop(NetUnifiedBatchFeed(), None, None, None, None, None)
+        train_loop.callbacks_handler.register_callbacks([callback])
+        self.assertFalse(train_loop.early_stop)
+
+        result = []
+        patience_counts = []
+
+        for val in val_list:
+            train_loop.insert_metric_result_into_history(monitor, val)
+            callback.on_epoch_end()
+            result.append(train_loop.early_stop)
+            patience_counts.append(callback.patience_count)
+
+        self.assertEqual(result, expected_result)
+        if expected_patience_counts is not None:
+            self.assertEqual(patience_counts, expected_patience_counts)
 
 
 class TestDataSubsetTestRun(unittest.TestCase):
