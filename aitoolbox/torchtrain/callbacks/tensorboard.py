@@ -38,7 +38,7 @@ class TensorboardReporterBaseCB(AbstractExperimentCallback):
         AbstractExperimentCallback.__init__(self, callback_name,
                                             project_name, experiment_name, local_model_result_folder_path,
                                             cloud_save_mode, bucket_name, cloud_dir_prefix,
-                                            device_idx_execution=0)
+                                            execution_order=97, device_idx_execution=0)
         # Default log_dir
         self.log_dir = 'tensorboard'
         if log_dir is not None:
