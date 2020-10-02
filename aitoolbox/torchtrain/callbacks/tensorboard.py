@@ -104,7 +104,8 @@ class TensorboardReporterBaseCB(AbstractExperimentCallback):
         if self.is_project:
             self.try_infer_experiment_details(infer_cloud_details=True)
             self.prepare_results_saver()
-            self.log_dir = self.create_log_dir()
+
+        self.log_dir = self.create_log_dir()
 
         if 'filename_suffix' not in self.tb_writer_kwargs and not self.is_project:
             self.tb_writer_kwargs['filename_suffix'] = f'_{self.train_loop_obj.experiment_timestamp}'
@@ -112,12 +113,20 @@ class TensorboardReporterBaseCB(AbstractExperimentCallback):
         self.tb_writer = SummaryWriter(log_dir=self.log_dir, **self.tb_writer_kwargs)
 
     def create_log_dir(self):
-        experiment_path = FolderCreator.create_base_folder(self.project_name, self.experiment_name,
-                                                           self.train_loop_obj.experiment_timestamp,
-                                                           self.local_model_result_folder_path)
-        full_log_dir = os.path.join(experiment_path, self.log_dir)
-        if not os.path.exists(full_log_dir):
-            os.mkdir(full_log_dir)
+        full_log_dir = self.log_dir
+
+        if self.is_project:
+            experiment_path = FolderCreator.create_base_folder(self.project_name, self.experiment_name,
+                                                               self.train_loop_obj.experiment_timestamp,
+                                                               self.local_model_result_folder_path)
+            full_log_dir = os.path.join(experiment_path, self.log_dir)
+            if not os.path.exists(full_log_dir):
+                os.mkdir(full_log_dir)
+
+        if self.project_name is not None and self.experiment_name is not None:
+            full_log_dir = os.path.join(full_log_dir, f'{self.project_name}_{self.experiment_name}')
+            if not os.path.exists(full_log_dir):
+                os.mkdir(full_log_dir)
 
         return full_log_dir
 
