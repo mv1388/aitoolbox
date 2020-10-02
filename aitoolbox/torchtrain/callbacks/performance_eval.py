@@ -151,7 +151,8 @@ class ModelPerformancePrintReport(AbstractCallback):
                 case of missing metric throw and exception and thus interrupt the training loop
             list_tracked_metrics (bool): should all tracked metrics names be listed
         """
-        AbstractCallback.__init__(self, 'Model performance print reporter', device_idx_execution=0)
+        AbstractCallback.__init__(self, 'Model performance print reporter',
+                                  execution_order=97, device_idx_execution=0)
         self.metrics = metrics
         self.on_each_epoch = on_each_epoch
         self.report_frequency = report_frequency
