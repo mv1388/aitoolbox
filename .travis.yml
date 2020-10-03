@@ -39,7 +39,7 @@ matrix:
 
 # command to install dependencies
 install:
-  - pip install tensorflow keras moto[all] pytest six>=1.13.0
+  - pip install six>=1.13.0 tensorflow keras moto[all] pytest
   - pip install -r requirements.txt
 
 script:
