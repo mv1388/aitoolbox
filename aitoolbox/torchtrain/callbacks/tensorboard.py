@@ -155,7 +155,7 @@ class TensorboardReporterBaseCB(AbstractExperimentCallback):
                     self.project_name, self.experiment_name, self.train_loop_obj.experiment_timestamp
                 )
             if self.project_name is not None and self.experiment_name is not None:
-                tb_dir_sub_path = self.log_dir.split('/')[-2:]
+                tb_dir_sub_path = '/'.join(self.log_dir.split('/')[-2:])
             else:
                 tb_dir_sub_path = os.path.basename(self.log_dir)
 
