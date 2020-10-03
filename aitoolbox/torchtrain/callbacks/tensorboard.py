@@ -113,22 +113,22 @@ class TensorboardReporterBaseCB(AbstractExperimentCallback):
         self.tb_writer = SummaryWriter(log_dir=self.log_dir, **self.tb_writer_kwargs)
 
     def create_log_dir(self):
-        full_log_dir = self.log_dir
+        full_log_dir_path = self.log_dir
 
         if self.is_project:
             experiment_path = FolderCreator.create_base_folder(self.project_name, self.experiment_name,
                                                                self.train_loop_obj.experiment_timestamp,
                                                                self.local_model_result_folder_path)
-            full_log_dir = os.path.join(experiment_path, self.log_dir)
-            if not os.path.exists(full_log_dir):
-                os.mkdir(full_log_dir)
+            full_log_dir_path = os.path.join(experiment_path, self.log_dir)
+            if not os.path.exists(full_log_dir_path):
+                os.mkdir(full_log_dir_path)
 
         if self.project_name is not None and self.experiment_name is not None:
-            full_log_dir = os.path.join(full_log_dir, f'{self.project_name}_{self.experiment_name}')
-            if not os.path.exists(full_log_dir):
-                os.mkdir(full_log_dir)
+            full_log_dir_path = os.path.join(full_log_dir_path, f'{self.project_name}_{self.experiment_name}')
+            if not os.path.exists(full_log_dir_path):
+                os.mkdir(full_log_dir_path)
 
-        return full_log_dir
+        return full_log_dir_path
 
     def prepare_results_saver(self):
         if self.cloud_save_mode in s3_available_options:
