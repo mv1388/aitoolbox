@@ -46,7 +46,7 @@ class TrainLoop:
                  train_loader, validation_loader, test_loader,
                  optimizer, criterion,
                  collate_batch_pred_fn=append_predictions, pred_transform_fn=torch_cat_transf,
-                 end_auto_eval=True,
+                 end_auto_eval=True, lazy_experiment_save=True,
                  gpu_mode='single', cuda_device_idx=None, use_amp=False):
         """Core PyTorch TrainLoop supporting the model training and target prediction
 
@@ -69,6 +69,9 @@ class TrainLoop:
                 loss calculations. This is useful when conducting very costly experiments to save on compute time.
                 Specify either True/False boolean to always run or never run after each epoch or specify an int to
                 execute only every specified number of epochs.
+            lazy_experiment_save (bool): when in lazy mode experiment tracking components will create the experiment
+                folder only after some training results are available (possibly at the end of the first epoch) instead
+                of at the beginning of training.
             gpu_mode (str): GPU training mode selection. TrainLoop supports different GPU training modes by
                 specifying one of the following:
 
@@ -105,6 +108,7 @@ class TrainLoop:
         self.collate_batch_pred_fn = collate_batch_pred_fn
         self.pred_transform_fn = pred_transform_fn
         self.end_auto_eval = end_auto_eval
+        self.lazy_experiment_save = lazy_experiment_save
 
         self.num_optimizers = 1 if not isinstance(self.optimizer, MultiOptimizer) else len(self.optimizer)
 
@@ -857,7 +861,7 @@ class TrainLoopCheckpoint(TrainLoop):
                  cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix='', source_dirs=(),
                  rm_subopt_local_models=False, num_best_checkpoints_kept=2,
                  collate_batch_pred_fn=append_predictions, pred_transform_fn=torch_cat_transf,
-                 end_auto_eval=True,
+                 end_auto_eval=True, lazy_experiment_save=True,
                  gpu_mode='single', cuda_device_idx=None, use_amp=False):
         """TrainLoop with the automatic model check-pointing at the end of each epoch
 
@@ -895,6 +899,9 @@ class TrainLoopCheckpoint(TrainLoop):
                 loss calculations. This is useful when conducting very costly experiments to save on compute time.
                 Specify either True/False boolean to always run or never run after each epoch or specify an int to
                 execute only every specified number of epochs.
+            lazy_experiment_save (bool): when in lazy mode experiment tracking components will create the experiment
+                folder only after some training results are available (possibly at the end of the first epoch) instead
+                of at the beginning of training.
             gpu_mode (str): GPU training mode selection. TrainLoop supports different GPU training modes by
                 specifying one of the following:
 
@@ -915,7 +922,8 @@ class TrainLoopCheckpoint(TrainLoop):
         """
         TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion,
                            collate_batch_pred_fn, pred_transform_fn,
-                           end_auto_eval, gpu_mode, cuda_device_idx, use_amp)
+                           end_auto_eval, lazy_experiment_save,
+                           gpu_mode, cuda_device_idx, use_amp)
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
@@ -948,7 +956,7 @@ class TrainLoopEndSave(TrainLoop):
                  hyperparams, val_result_package=None, test_result_package=None,
                  cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix='', source_dirs=(),
                  collate_batch_pred_fn=append_predictions, pred_transform_fn=torch_cat_transf,
-                 end_auto_eval=True,
+                 end_auto_eval=True, lazy_experiment_save=True,
                  gpu_mode='single', cuda_device_idx=None, use_amp=False):
         """TrainLoop with the model performance evaluation and final model saving at the end of the training process
 
@@ -985,6 +993,9 @@ class TrainLoopEndSave(TrainLoop):
                 loss calculations. This is useful when conducting very costly experiments to save on compute time.
                 Specify either True/False boolean to always run or never run after each epoch or specify an int to
                 execute only every specified number of epochs.
+            lazy_experiment_save (bool): when in lazy mode experiment tracking components will create the experiment
+                folder only after some training results are available (possibly at the end of the first epoch) instead
+                of at the beginning of training.
             gpu_mode (str): GPU training mode selection. TrainLoop supports different GPU training modes by
                 specifying one of the following:
 
@@ -1005,7 +1016,8 @@ class TrainLoopEndSave(TrainLoop):
         """
         TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion,
                            collate_batch_pred_fn, pred_transform_fn,
-                           end_auto_eval, gpu_mode, cuda_device_idx, use_amp)
+                           end_auto_eval, lazy_experiment_save,
+                           gpu_mode, cuda_device_idx, use_amp)
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
@@ -1058,7 +1070,7 @@ class TrainLoopCheckpointEndSave(TrainLoopEndSave):
                  cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix='', source_dirs=(),
                  rm_subopt_local_models=False, num_best_checkpoints_kept=2,
                  collate_batch_pred_fn=append_predictions, pred_transform_fn=torch_cat_transf,
-                 end_auto_eval=True,
+                 end_auto_eval=True, lazy_experiment_save=True,
                  gpu_mode='single', cuda_device_idx=None, use_amp=False):
         """TrainLoop both saving model check-pointing at the end of each epoch and model performance reporting
             and model saving at the end of the training process
@@ -1101,6 +1113,9 @@ class TrainLoopCheckpointEndSave(TrainLoopEndSave):
                 loss calculations. This is useful when conducting very costly experiments to save on compute time.
                 Specify either True/False boolean to always run or never run after each epoch or specify an int to
                 execute only every specified number of epochs.
+            lazy_experiment_save (bool): when in lazy mode experiment tracking components will create the experiment
+                folder only after some training results are available (possibly at the end of the first epoch) instead
+                of at the beginning of training.
             gpu_mode (str): GPU training mode selection. TrainLoop supports different GPU training modes by
                 specifying one of the following:
 
@@ -1130,7 +1145,8 @@ class TrainLoopCheckpointEndSave(TrainLoopEndSave):
                                   hyperparams, val_result_package, test_result_package,
                                   cloud_save_mode, bucket_name, cloud_dir_prefix, source_dirs,
                                   collate_batch_pred_fn, pred_transform_fn,
-                                  end_auto_eval, gpu_mode, cuda_device_idx, use_amp)
+                                  end_auto_eval, lazy_experiment_save,
+                                  gpu_mode, cuda_device_idx, use_amp)
         self.rm_subopt_local_models = rm_subopt_local_models
 
         self.callbacks_handler.register_callbacks([

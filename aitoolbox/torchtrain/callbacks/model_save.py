@@ -114,6 +114,9 @@ class ModelCheckpoint(AbstractCallback):
                 local_model_result_folder_path=self.local_model_result_folder_path, checkpoint_model=True
             )
 
+        if not self.train_loop_obj.lazy_experiment_save:
+            self.save_hyperparams()
+
     def save_hyperparams(self):
         if not self._hyperparams_already_saved:
             param_reporter = HyperParamSourceReporter(self.project_name, self.experiment_name,
@@ -259,6 +262,10 @@ class ModelTrainEndSave(AbstractCallback):
                 self.project_name, self.experiment_name,
                 local_model_result_folder_path=self.local_model_result_folder_path
             )
+
+        if not self.train_loop_obj.lazy_experiment_save and \
+                (not self.train_loop_obj.ddp_training_mode or self.train_loop_obj.device.index == 0):
+            self.save_hyperparams()
 
     def save_hyperparams(self):
         if not self._hyperparams_already_saved:
