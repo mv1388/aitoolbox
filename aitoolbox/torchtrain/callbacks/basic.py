@@ -68,6 +68,44 @@ class EarlyStopping(AbstractCallback):
                 print(f'Early stopping at epoch: {self.train_loop_obj.epoch}. Best recorded epoch: {self.best_epoch}.')
 
 
+class ThresholdEarlyStopping(AbstractCallback):
+    def __init__(self, monitor, threshold, patience=0):
+        """Early stopping of the training if the performance doesn't reach the specified threshold
+
+        Args:
+            monitor (str): performance measure that is tracked to decide if performance reached the desired threshold
+            threshold (float): performance threshold that needs to be exceeded in order to continue training
+            patience (int): how many epochs the early stopper waits for the tracked performance to reach the desired
+                threshold
+        """
+        AbstractCallback.__init__(self, 'Threshold early stopping', execution_order=99)
+        self.monitor = monitor
+        self.threshold = threshold
+
+        self.patience = patience
+        self.patience_count = self.patience
+
+    def on_epoch_end(self):
+        history_data = self.train_loop_obj.train_history[self.monitor]
+        current_performance = history_data[-1]
+
+        if 'loss' in self.monitor.lower() or 'error' in self.monitor.lower():
+            if current_performance > self.threshold:
+                self.patience_count -= 1
+            else:
+                self.patience_count = self.patience
+        else:
+            if current_performance < self.threshold:
+                self.patience_count -= 1
+            else:
+                self.patience_count = self.patience
+
+        if self.patience_count < 0:
+            self.train_loop_obj.early_stop = True
+            print('Threshold performance not reached. '
+                  f'Early stopping at epoch: {self.train_loop_obj.epoch}.')
+
+
 class TerminateOnNaN(AbstractCallback):
     def __init__(self, monitor='loss'):
         """Terminate training if NaNs are predicted, thus metrics are NaN

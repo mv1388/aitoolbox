@@ -27,6 +27,7 @@ from aitoolbox.torchtrain.data.batch_model_feed_defs import AbstractModelFeedDef
 from aitoolbox.torchtrain.tl_components.callback_handler import CallbacksHandler
 from aitoolbox.torchtrain.tl_components.ddp_handler import DDPHandler
 from aitoolbox.torchtrain.callbacks.model_save import ModelCheckpoint, ModelTrainEndSave
+from aitoolbox.torchtrain.schedulers.basic import AbstractScheduler
 from aitoolbox.experiment.training_history import TrainingHistory
 from aitoolbox.torchtrain.tl_components.model_prediction_store import ModelPredictionStore
 from aitoolbox.torchtrain.tl_components.message_passing import MessageService
@@ -634,6 +635,16 @@ class TrainLoop:
             metric_result (float or dict): new result for the corresponding metric
         """
         self.train_history.insert_single_result_into_history(metric_name, metric_result)
+
+    def get_schedulers(self):
+        """Get the registered schedulers
+
+        Schedulers in TrainLoop training are implemented as callbacks under the hood.
+
+        Returns:
+            list: list of scheduler (callbacks)
+        """
+        return [cb for cb in self.callbacks if isinstance(cb, AbstractScheduler)]
 
     def _train_dp(self, num_epochs, callbacks=None, grad_accumulation=1, dp_model_args=None):
         """Train the model on multi-GPU with DataParallel auto wrapping

@@ -44,7 +44,9 @@ class ModelCheckpoint(AbstractCallback):
             num_best_checkpoints_kept (int): number of best performing models which are kept when removing suboptimal
                 model checkpoints
         """
-        AbstractCallback.__init__(self, 'Model checkpoint at end of epoch', device_idx_execution=0)
+        # execution_order=100 to make sure that this callback is the very last one to be executed when all the
+        # evaluations are already stored in the train_history and especially also when schedulers have the updated state
+        AbstractCallback.__init__(self, 'Model checkpoint at end of epoch', execution_order=100, device_idx_execution=0)
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
@@ -65,10 +67,13 @@ class ModelCheckpoint(AbstractCallback):
     def on_epoch_end(self):
         self.save_hyperparams()
         if not self.train_loop_obj.use_deepspeed:
-            model_checkpoint = {'model_state_dict': self.train_loop_obj.model.state_dict(),
-                                'optimizer_state_dict': self.train_loop_obj.optimizer.state_dict(),
-                                'epoch': self.train_loop_obj.epoch,
-                                'hyperparams': self.hyperparams}
+            model_checkpoint = {
+                'model_state_dict': self.train_loop_obj.model.state_dict(),
+                'optimizer_state_dict': self.train_loop_obj.optimizer.state_dict(),
+                'schedulers_state_dict': [scheduler.state_dict() for scheduler in self.train_loop_obj.get_schedulers()],
+                'epoch': self.train_loop_obj.epoch,
+                'hyperparams': self.hyperparams
+            }
             # If Nvidia apex amp is used
             if self.train_loop_obj.use_amp:
                 model_checkpoint['amp'] = amp.state_dict()
@@ -160,9 +165,9 @@ class ModelTrainEndSave(AbstractCallback):
             bucket_name (str): name of the bucket in the cloud storage
             cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
         """
-        # execution_order=100 to make sure that this callback is the very last one to be executed when all the
+        # execution_order=101 to make sure that this callback is the very last one to be executed when all the
         # evaluations are already stored in the train_history
-        AbstractCallback.__init__(self, 'Model save at the end of training', execution_order=100)
+        AbstractCallback.__init__(self, 'Model save at the end of training', execution_order=101)
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
@@ -183,10 +188,13 @@ class ModelTrainEndSave(AbstractCallback):
         if not self.train_loop_obj.ddp_training_mode or self.train_loop_obj.device.index == 0:
             self.save_hyperparams()
         if not self.train_loop_obj.use_deepspeed:
-            model_final_state = {'model_state_dict': self.train_loop_obj.model.state_dict(),
-                                 'optimizer_state_dict': self.train_loop_obj.optimizer.state_dict(),
-                                 'epoch': self.train_loop_obj.epoch,
-                                 'hyperparams': self.hyperparams}
+            model_final_state = {
+                'model_state_dict': self.train_loop_obj.model.state_dict(),
+                'optimizer_state_dict': self.train_loop_obj.optimizer.state_dict(),
+                'schedulers_state_dict': [scheduler.state_dict() for scheduler in self.train_loop_obj.get_schedulers()],
+                'epoch': self.train_loop_obj.epoch,
+                'hyperparams': self.hyperparams
+            }
             # If Nvidia apex amp is used
             if self.train_loop_obj.use_amp:
                 model_final_state['amp'] = amp.state_dict()
@@ -273,7 +281,7 @@ class ModelTrainEndSave(AbstractCallback):
                                                              file_name=os.path.basename(local_experiment_python_file_path))
                     if local_source_code_zip_path is not None:
                         param_reporter.copy_to_cloud_storage(local_source_code_zip_path,
-                                                             self.model_checkpointer,
+                                                             self.results_saver.model_saver,
                                                              file_name=os.path.basename(local_source_code_zip_path))
 
                 self._hyperparams_already_saved = True
