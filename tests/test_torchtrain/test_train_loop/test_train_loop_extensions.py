@@ -1,10 +1,14 @@
 import unittest
+import os
+import shutil
 
 from aitoolbox.torchtrain import TrainLoopCheckpoint, TrainLoopEndSave, TrainLoopCheckpointEndSave
 from aitoolbox.torchtrain.callbacks.abstract import AbstractCallback
 from aitoolbox.torchtrain.callbacks.model_save import ModelCheckpoint, ModelTrainEndSave
 from aitoolbox.torchtrain.tl_components.callback_handler import CallbacksHandler
 from tests.utils import NetUnifiedBatchFeed, DummyOptimizer, MiniDummyOptimizer, DummyResultPackage
+
+THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 class TestTrainLoopCheckpoint(unittest.TestCase):
@@ -46,6 +50,52 @@ class TestTrainLoopCheckpoint(unittest.TestCase):
                 "local_model_result_folder_path", {}
             ).callbacks_handler.register_callbacks(None)
 
+    def test_lazy_code_save(self):
+        train_loop_lazy_save = TrainLoopCheckpoint(
+            NetUnifiedBatchFeed(), None, None, None, DummyOptimizer(), None,
+            "project_name", "experiment_name", THIS_DIR,
+            {},
+            cloud_save_mode=None,
+            source_dirs=[os.path.join(THIS_DIR, 'test_e2e_train_loop'),
+                         os.path.join(THIS_DIR, 'test_train_loop_pytorch_compare')],
+            lazy_experiment_save=True
+        )
+        train_loop_lazy_save.callbacks_handler.register_callbacks([])
+        self.assertFalse(os.path.exists(os.path.join(THIS_DIR, 'project_name')))
+        self.assertFalse(os.path.exists(
+            os.path.join(THIS_DIR, 'project_name', f'experiment_name_{train_loop_lazy_save.experiment_timestamp}'))
+        )
+
+        train_loop_lazy_save.callbacks_handler.execute_epoch_end()
+        self.assertTrue(os.path.exists(os.path.join(THIS_DIR, 'project_name')))
+        self.assertTrue(os.path.exists(
+            os.path.join(THIS_DIR, 'project_name', f'experiment_name_{train_loop_lazy_save.experiment_timestamp}'))
+        )
+
+        project_path = os.path.join(THIS_DIR, 'project_name')
+        if os.path.exists(project_path):
+            shutil.rmtree(project_path)
+
+    def test_non_lazy_code_save(self):
+        train_loop_non_lazy_save = TrainLoopCheckpoint(
+            NetUnifiedBatchFeed(), None, None, None, DummyOptimizer(), None,
+            "project_name", "experiment_name", THIS_DIR,
+            {},
+            cloud_save_mode=None,
+            source_dirs=[os.path.join(THIS_DIR, 'test_e2e_train_loop'),
+                         os.path.join(THIS_DIR, 'test_train_loop_pytorch_compare')],
+            lazy_experiment_save=False
+        )
+        train_loop_non_lazy_save.callbacks_handler.register_callbacks([])
+        self.assertTrue(os.path.exists(os.path.join(THIS_DIR, 'project_name')))
+        self.assertTrue(os.path.exists(
+            os.path.join(THIS_DIR, 'project_name', f'experiment_name_{train_loop_non_lazy_save.experiment_timestamp}'))
+        )
+
+        project_path = os.path.join(THIS_DIR, 'project_name')
+        if os.path.exists(project_path):
+            shutil.rmtree(project_path)
+
 
 class TestTrainLoopEndSave(unittest.TestCase):
     def test_init_values(self):
@@ -75,6 +125,54 @@ class TestTrainLoopEndSave(unittest.TestCase):
         self.assertIsInstance(train_loop.callbacks_handler, CallbacksHandler)
         self.assertEqual(train_loop.callbacks_handler.train_loop_obj, train_loop)
         self.assertFalse(train_loop.early_stop)
+
+    def test_lazy_code_save(self):
+        train_loop_lazy_save = TrainLoopEndSave(
+            NetUnifiedBatchFeed(), None, [100] * 100, [100] * 100, DummyOptimizer(), None,
+            "project_name", "experiment_name", THIS_DIR,
+            {},
+            cloud_save_mode=None,
+            val_result_package=DummyResultPackage(), test_result_package=DummyResultPackage(),
+            source_dirs=[os.path.join(THIS_DIR, 'test_e2e_train_loop'),
+                         os.path.join(THIS_DIR, 'test_train_loop_pytorch_compare')],
+            lazy_experiment_save=True
+        )
+        train_loop_lazy_save.callbacks_handler.register_callbacks([])
+        self.assertFalse(os.path.exists(os.path.join(THIS_DIR, 'project_name')))
+        self.assertFalse(os.path.exists(
+            os.path.join(THIS_DIR, 'project_name', f'experiment_name_{train_loop_lazy_save.experiment_timestamp}'))
+        )
+
+        train_loop_lazy_save.callbacks_handler.execute_train_end()
+        self.assertTrue(os.path.exists(os.path.join(THIS_DIR, 'project_name')))
+        self.assertTrue(os.path.exists(
+            os.path.join(THIS_DIR, 'project_name', f'experiment_name_{train_loop_lazy_save.experiment_timestamp}'))
+        )
+
+        project_path = os.path.join(THIS_DIR, 'project_name')
+        if os.path.exists(project_path):
+            shutil.rmtree(project_path)
+
+    def test_non_lazy_code_save(self):
+        train_loop_non_lazy_save = TrainLoopEndSave(
+            NetUnifiedBatchFeed(), None, [100] * 100, [100] * 100, DummyOptimizer(), None,
+            "project_name", "experiment_name", THIS_DIR,
+            {},
+            cloud_save_mode=None,
+            val_result_package=DummyResultPackage(), test_result_package=DummyResultPackage(),
+            source_dirs=[os.path.join(THIS_DIR, 'test_e2e_train_loop'),
+                         os.path.join(THIS_DIR, 'test_train_loop_pytorch_compare')],
+            lazy_experiment_save=False
+        )
+        train_loop_non_lazy_save.callbacks_handler.register_callbacks([])
+        self.assertTrue(os.path.exists(os.path.join(THIS_DIR, 'project_name')))
+        self.assertTrue(os.path.exists(
+            os.path.join(THIS_DIR, 'project_name', f'experiment_name_{train_loop_non_lazy_save.experiment_timestamp}'))
+        )
+
+        project_path = os.path.join(THIS_DIR, 'project_name')
+        if os.path.exists(project_path):
+            shutil.rmtree(project_path)
 
     def test_loader_package_exceptions(self):
         with self.assertRaises(ValueError):
@@ -208,6 +306,54 @@ class TestTrainLoopCheckpointEndSave(unittest.TestCase):
                                    ['callback_test2',
                                     'Model checkpoint at end of epoch', 'Model save at the end of training',]):
             self.assertEqual(reg_cb.callback_name, cb_name)
+
+    def test_lazy_code_save(self):
+        train_loop_lazy_save = TrainLoopCheckpointEndSave(
+            NetUnifiedBatchFeed(), None, [100] * 100, [100] * 100, DummyOptimizer(), None,
+            "project_name", "experiment_name", THIS_DIR,
+            {},
+            cloud_save_mode=None,
+            val_result_package=DummyResultPackage(), test_result_package=DummyResultPackage(),
+            source_dirs=[os.path.join(THIS_DIR, 'test_e2e_train_loop'),
+                         os.path.join(THIS_DIR, 'test_train_loop_pytorch_compare')],
+            lazy_experiment_save=True
+        )
+        train_loop_lazy_save.callbacks_handler.register_callbacks([])
+        self.assertFalse(os.path.exists(os.path.join(THIS_DIR, 'project_name')))
+        self.assertFalse(os.path.exists(
+            os.path.join(THIS_DIR, 'project_name', f'experiment_name_{train_loop_lazy_save.experiment_timestamp}'))
+        )
+
+        train_loop_lazy_save.callbacks_handler.execute_train_end()
+        self.assertTrue(os.path.exists(os.path.join(THIS_DIR, 'project_name')))
+        self.assertTrue(os.path.exists(
+            os.path.join(THIS_DIR, 'project_name', f'experiment_name_{train_loop_lazy_save.experiment_timestamp}'))
+        )
+
+        project_path = os.path.join(THIS_DIR, 'project_name')
+        if os.path.exists(project_path):
+            shutil.rmtree(project_path)
+
+    def test_non_lazy_code_save(self):
+        train_loop_non_lazy_save = TrainLoopCheckpointEndSave(
+            NetUnifiedBatchFeed(), None, [100] * 100, [100] * 100, DummyOptimizer(), None,
+            "project_name", "experiment_name", THIS_DIR,
+            {},
+            cloud_save_mode=None,
+            val_result_package=DummyResultPackage(), test_result_package=DummyResultPackage(),
+            source_dirs=[os.path.join(THIS_DIR, 'test_e2e_train_loop'),
+                         os.path.join(THIS_DIR, 'test_train_loop_pytorch_compare')],
+            lazy_experiment_save=False
+        )
+        train_loop_non_lazy_save.callbacks_handler.register_callbacks([])
+        self.assertTrue(os.path.exists(os.path.join(THIS_DIR, 'project_name')))
+        self.assertTrue(os.path.exists(
+            os.path.join(THIS_DIR, 'project_name', f'experiment_name_{train_loop_non_lazy_save.experiment_timestamp}'))
+        )
+
+        project_path = os.path.join(THIS_DIR, 'project_name')
+        if os.path.exists(project_path):
+            shutil.rmtree(project_path)
 
     def test_optimizer_missing_state_dict_exception(self):
         dummy_result_package = DummyResultPackage()
