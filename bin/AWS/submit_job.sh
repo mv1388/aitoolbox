@@ -215,7 +215,9 @@ ssh -i $key_path $username@$ec2_instance_address \
 
 echo "Instance IP: $ec2_instance_address"
 echo "To easily ssh connect into the running job session execute:"
+echo
 echo "    ./ssh_to_instance.sh $ec2_instance_address -s"
+echo
 
 if [ $ssh_at_start == true ]; then
     ./ssh_to_instance.sh $ec2_instance_address --os-name $username --ssh-tmux
