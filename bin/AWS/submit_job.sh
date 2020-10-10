@@ -214,6 +214,8 @@ ssh -i $key_path $username@$ec2_instance_address \
     "source activate $py_env ; tmux new-session -d -s 'training' './finish_prepare_instance.sh ; cd project ; ./run_experiment.sh $terminate_setting --experiment-script $experiment_script_file $log_upload_setting --cleanup-script' \; pipe-pane 'cat > $logging_path'"
 
 echo "Instance IP: $ec2_instance_address"
+echo "To easily ssh connect into the running job session execute:"
+echo "    ./ssh_to_instance.sh $ec2_instance_address -s"
 
 if [ $ssh_at_start == true ]; then
     ./ssh_to_instance.sh $ec2_instance_address --os-name $username --ssh-tmux
