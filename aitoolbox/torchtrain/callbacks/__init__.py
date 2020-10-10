@@ -1,6 +1,6 @@
 from aitoolbox.torchtrain.callbacks.abstract import AbstractCallback, AbstractExperimentCallback
 from aitoolbox.torchtrain.callbacks.basic import (
-    EarlyStopping, EmailNotification, TerminateOnNaN, AllPredictionsSame, LogUpload
+    EarlyStopping, ThresholdEarlyStopping, EmailNotification, TerminateOnNaN, AllPredictionsSame, LogUpload
 )
 from aitoolbox.torchtrain.callbacks.performance_eval import (
     ModelPerformanceEvaluation, ModelPerformancePrintReport, ModelTrainHistoryFileWriter, ModelTrainHistoryPlot

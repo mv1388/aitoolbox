@@ -283,6 +283,7 @@ class GLUEResultPackage(AbstractResultPackage):
 
     def prepare_results_dict(self):
         glue_result = GLUEMetric(self.y_true, self.y_predicted, self.task_name).get_metric_dict()
+        glue_result = dict_util.flatten_dict(glue_result)
         return glue_result
 
 
@@ -296,4 +297,5 @@ class XNLIResultPackage(AbstractResultPackage):
 
     def prepare_results_dict(self):
         xnli_result = XNLIMetric(self.y_true, self.y_predicted).get_metric_dict()
+        xnli_result = dict_util.flatten_dict(xnli_result)
         return xnli_result

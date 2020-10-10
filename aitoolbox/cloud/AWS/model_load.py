@@ -109,6 +109,21 @@ class PyTorchS3ModelLoader(BaseModelLoader):
         """
         return self.local_model_loader.init_optimizer(optimizer, device)
 
+    def init_scheduler(self, scheduler_callbacks_list, ignore_saved=False, ignore_missing_saved=False):
+        """Initialize the list of schedulers based on saved model/optimizer/scheduler checkpoint
+
+        Args:
+            scheduler_callbacks_list (list): list of scheduler (callbacks)
+            ignore_saved (bool): if exception should be raised in the case there are found scheduler snapshots
+                in the checkpoint, but not schedulers are provided to this method
+            ignore_missing_saved (bool): if exception should be raised in the case schedulers are provided to
+                this method but no saved scheduler snapshots can be found in the checkpoint
+
+        Returns:
+            list: list of initialized scheduler (callbacks)
+        """
+        return self.local_model_loader.init_scheduler(scheduler_callbacks_list, ignore_saved, ignore_missing_saved)
+
     def init_amp(self):
         """Initialize Nvidia Apex 16 AMP
 

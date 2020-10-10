@@ -205,7 +205,7 @@ class AbstractExperimentCallback(AbstractCallback):
                 self.local_model_result_folder_path = self.train_loop_obj.local_model_result_folder_path
         except AttributeError:
             raise AttributeError('Currently used TrainLoop does not support automatic project folder structure '
-                                 'creation. Project name, etc. thus can not be automatically deduced. Please provide'
+                                 'creation. Project name, etc. thus can not be automatically deduced. Please provide '
                                  'them in the callback parameters instead of currently used None values.')
 
         try:
