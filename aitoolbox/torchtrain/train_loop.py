@@ -40,7 +40,7 @@ class TrainLoop:
                  train_loader, validation_loader, test_loader,
                  optimizer, criterion,
                  collate_batch_pred_fn=append_predictions, pred_transform_fn=torch_cat_transf,
-                 end_auto_eval=True,
+                 end_auto_eval=True, lazy_experiment_save=True,
                  gpu_mode='single', cuda_device_idx=None, use_amp=False):
         """Core PyTorch TrainLoop supporting the model training and target prediction
 
@@ -63,6 +63,9 @@ class TrainLoop:
                 loss calculations. This is useful when conducting very costly experiments to save on compute time.
                 Specify either True/False boolean to always run or never run after each epoch or specify an int to
                 execute only every specified number of epochs.
+            lazy_experiment_save (bool): when in lazy mode experiment tracking components will create the experiment
+                folder only after some training results are available (possibly at the end of the first epoch) instead
+                of at the beginning of training.
             gpu_mode (str): GPU training mode selection. TrainLoop supports different GPU training modes by
                 specifying one of the following:
 
@@ -97,6 +100,7 @@ class TrainLoop:
         self.collate_batch_pred_fn = collate_batch_pred_fn
         self.pred_transform_fn = pred_transform_fn
         self.end_auto_eval = end_auto_eval
+        self.lazy_experiment_save = lazy_experiment_save
 
         self.num_optimizers = 1 if not isinstance(self.optimizer, MultiOptimizer) else len(self.optimizer)
 
@@ -655,9 +659,6 @@ class TrainLoop:
             grad_accumulation (int): number of batches the gradients are accumulated before updating weights
             dp_model_args (dict or None): parameters for :class:`aitoolbox.torchtrain.parallel.TTDataParallel` /
                 ``nn.DataParallel`` DP model wrap.
-                Probably the most common optional parameter to set is ``TTDataParallel``'s ``add_model_attributes``
-                list. In this list the user can list any additional TTModel attributes which need to be transferred to
-                the TTDataParallel level to enable their use in the transferred/exposed class methods.
 
         Returns:
             TTDataParallel or nn.DataParallel: trained model
@@ -765,7 +766,7 @@ class TrainLoop:
         self._train(num_epochs, callbacks, grad_accumulation)
 
     def _train_deepspeed(self, deepspeed_args, num_epochs, callbacks=None,
-                         add_model_attributes=None, **ds_model_args):
+                         **ds_model_args):
         """Train the model using Microsoft DeepSpeed package
 
         Before starting the training the DeepSpeed library needs to be installed on the machine. Find the installation
@@ -779,8 +780,6 @@ class TrainLoop:
                 A dictionary containing local_rank and deepspeed_config file location.
             num_epochs (int): how many epochs the network will be trained
             callbacks (list): callbacks that are executed during the training run
-            add_model_attributes (list or tuple or None): additional TTModel attributes which need to be transferred to
-                the TTDataParallel level to enable their use in the transferred/exposed class methods
             **ds_model_args: additional parameters for the underlying ``deepspeed.DeepSpeedLight`` class
 
                 Possible arguments: https://deepspeed.readthedocs.io/en/latest/initialize.html
@@ -798,7 +797,7 @@ class TrainLoop:
 
         self.model = TTDeepSpeedLight(
             args=deepspeed_args,
-            model=self.model, model_parameters=self.model.parameters(), add_model_attributes=add_model_attributes,
+            model=self.model, model_parameters=self.model.parameters(),
             training_data=self.train_loader.dataset,
             **ds_model_args
         )
@@ -833,7 +832,7 @@ class TrainLoopCheckpoint(TrainLoop):
                  cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix='', source_dirs=(),
                  rm_subopt_local_models=False, num_best_checkpoints_kept=2,
                  collate_batch_pred_fn=append_predictions, pred_transform_fn=torch_cat_transf,
-                 end_auto_eval=True,
+                 end_auto_eval=True, lazy_experiment_save=True,
                  gpu_mode='single', cuda_device_idx=None, use_amp=False):
         """TrainLoop with the automatic model check-pointing at the end of each epoch
 
@@ -871,6 +870,9 @@ class TrainLoopCheckpoint(TrainLoop):
                 loss calculations. This is useful when conducting very costly experiments to save on compute time.
                 Specify either True/False boolean to always run or never run after each epoch or specify an int to
                 execute only every specified number of epochs.
+            lazy_experiment_save (bool): when in lazy mode experiment tracking components will create the experiment
+                folder only after some training results are available (possibly at the end of the first epoch) instead
+                of at the beginning of training.
             gpu_mode (str): GPU training mode selection. TrainLoop supports different GPU training modes by
                 specifying one of the following:
 
@@ -889,7 +891,8 @@ class TrainLoopCheckpoint(TrainLoop):
         """
         TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion,
                            collate_batch_pred_fn, pred_transform_fn,
-                           end_auto_eval, gpu_mode, cuda_device_idx, use_amp)
+                           end_auto_eval, lazy_experiment_save,
+                           gpu_mode, cuda_device_idx, use_amp)
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
@@ -922,7 +925,7 @@ class TrainLoopEndSave(TrainLoop):
                  hyperparams, val_result_package=None, test_result_package=None,
                  cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix='', source_dirs=(),
                  collate_batch_pred_fn=append_predictions, pred_transform_fn=torch_cat_transf,
-                 end_auto_eval=True,
+                 end_auto_eval=True, lazy_experiment_save=True,
                  gpu_mode='single', cuda_device_idx=None, use_amp=False):
         """TrainLoop with the model performance evaluation and final model saving at the end of the training process
 
@@ -959,6 +962,9 @@ class TrainLoopEndSave(TrainLoop):
                 loss calculations. This is useful when conducting very costly experiments to save on compute time.
                 Specify either True/False boolean to always run or never run after each epoch or specify an int to
                 execute only every specified number of epochs.
+            lazy_experiment_save (bool): when in lazy mode experiment tracking components will create the experiment
+                folder only after some training results are available (possibly at the end of the first epoch) instead
+                of at the beginning of training.
             gpu_mode (str): GPU training mode selection. TrainLoop supports different GPU training modes by
                 specifying one of the following:
 
@@ -977,7 +983,8 @@ class TrainLoopEndSave(TrainLoop):
         """
         TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion,
                            collate_batch_pred_fn, pred_transform_fn,
-                           end_auto_eval, gpu_mode, cuda_device_idx, use_amp)
+                           end_auto_eval, lazy_experiment_save,
+                           gpu_mode, cuda_device_idx, use_amp)
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
@@ -1030,7 +1037,7 @@ class TrainLoopCheckpointEndSave(TrainLoopEndSave):
                  cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix='', source_dirs=(),
                  rm_subopt_local_models=False, num_best_checkpoints_kept=2,
                  collate_batch_pred_fn=append_predictions, pred_transform_fn=torch_cat_transf,
-                 end_auto_eval=True,
+                 end_auto_eval=True, lazy_experiment_save=True,
                  gpu_mode='single', cuda_device_idx=None, use_amp=False):
         """TrainLoop both saving model check-pointing at the end of each epoch and model performance reporting
             and model saving at the end of the training process
@@ -1073,6 +1080,9 @@ class TrainLoopCheckpointEndSave(TrainLoopEndSave):
                 loss calculations. This is useful when conducting very costly experiments to save on compute time.
                 Specify either True/False boolean to always run or never run after each epoch or specify an int to
                 execute only every specified number of epochs.
+            lazy_experiment_save (bool): when in lazy mode experiment tracking components will create the experiment
+                folder only after some training results are available (possibly at the end of the first epoch) instead
+                of at the beginning of training.
             gpu_mode (str): GPU training mode selection. TrainLoop supports different GPU training modes by
                 specifying one of the following:
 
@@ -1100,7 +1110,8 @@ class TrainLoopCheckpointEndSave(TrainLoopEndSave):
                                   hyperparams, val_result_package, test_result_package,
                                   cloud_save_mode, bucket_name, cloud_dir_prefix, source_dirs,
                                   collate_batch_pred_fn, pred_transform_fn,
-                                  end_auto_eval, gpu_mode, cuda_device_idx, use_amp)
+                                  end_auto_eval, lazy_experiment_save,
+                                  gpu_mode, cuda_device_idx, use_amp)
         self.rm_subopt_local_models = rm_subopt_local_models
 
         self.callbacks_handler.register_callbacks([

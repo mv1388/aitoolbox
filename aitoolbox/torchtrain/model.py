@@ -12,7 +12,16 @@ class TTModel(nn.Module, ABC):
 
     In addition to the common ``forward()`` method required by the base nn.Module, the user also needs to implement
     the additional AIToolbox specific ``get_loss()`` and ``get_predictions()`` methods.
+
+    ``transfer_model_attributes`` (list or tuple): additional TTModel attributes which need to be transferred to
+    the TTDataParallel level to enable their use in the transferred/exposed class methods. When coding
+    the model's __init__() method user should also fill in the string names of attributes that should be
+    transferred in case the model is wrapped for DP/DDP.
     """
+    def __init__(self):
+        super().__init__()
+        self.transfer_model_attributes = []
+
     @abstractmethod
     def get_loss(self, batch_data, criterion, device):
         """Get loss during training stage
