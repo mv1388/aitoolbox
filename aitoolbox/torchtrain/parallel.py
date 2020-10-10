@@ -18,14 +18,12 @@ from aitoolbox.utils.util import copy_function
 
 
 class TTParallelBase:
-    def __init__(self, module, add_model_attributes=None,
+    def __init__(self, module,
                  default_model_methods=('get_loss', 'get_loss_eval', 'get_predictions')):
         """torchtrain parallel base class used for transferring TTModel functions to the PyTorch Parallel wrappers level
 
         Args:
             module (aitoolbox.torchtrain.model.TTModel): neural network model
-            add_model_attributes (list or tuple or None): additional TTModel attributes which need to be transferred to
-                the TTDataParallel level to enable their use in the transferred/exposed class methods
             default_model_methods (list or tuple): list of core methods which are present also in TTModel abstract class
         """
         # Core TTModel methods which every model has
@@ -43,8 +41,8 @@ class TTParallelBase:
                     functools.partial(copy_function(getattr(module, method_name)), self))
 
         # Optionally transfer additional TTModel attributes to the TTDataParallel level
-        if add_model_attributes is not None and isinstance(add_model_attributes, (list, tuple)):
-            for attr_name in add_model_attributes:
+        if module.transfer_model_attributes is not None and isinstance(module.transfer_model_attributes, (list, tuple)):
+            for attr_name in module.transfer_model_attributes:
                 setattr(self, attr_name, getattr(module, attr_name))
 
     def get_loss(self, batch_data, criterion, device):
@@ -58,7 +56,7 @@ class TTParallelBase:
 
 
 class TTDataParallel(nn.DataParallel, TTParallelBase):
-    def __init__(self, module, add_model_attributes=None,
+    def __init__(self, module,
                  default_model_methods=('get_loss', 'get_loss_eval', 'get_predictions'), **kwargs):
         """torchtrain enabled DataParallel
 
@@ -68,53 +66,47 @@ class TTDataParallel(nn.DataParallel, TTParallelBase):
 
         Args:
             module (aitoolbox.torchtrain.model.TTModel): neural network model
-            add_model_attributes (list or tuple or None): additional TTModel attributes which need to be transferred to
-                the TTDataParallel level to enable their use in the transferred/exposed class methods
             default_model_methods (list or tuple): list of core methods which are present also in TTModel abstract class
             **kwargs: additional parameters for underlying nn.DataParallel
         """
         nn.DataParallel.__init__(self, module, **kwargs)
-        TTParallelBase.__init__(self, module, add_model_attributes, default_model_methods)
+        TTParallelBase.__init__(self, module, default_model_methods)
 
 
 class TTDistributedDataParallel(DistributedDataParallel, TTParallelBase):
-    def __init__(self, module, add_model_attributes=None,
+    def __init__(self, module,
                  default_model_methods=('get_loss', 'get_loss_eval', 'get_predictions'), **kwargs):
         """torchtrain enabled DistributedDataParallel
 
         Args:
             module (aitoolbox.torchtrain.model.TTModel): neural network model
-            add_model_attributes (list or tuple or None): additional TTModel attributes which need to be transferred to
-                the TTDistributedDataParallel level to enable their use in the transferred/exposed class methods
             default_model_methods (list or tuple): list of core methods which are present also in TTModel abstract class
             **kwargs: additional parameters for underlying nn.parallel.DistributedDataParallel
         """
         DistributedDataParallel.__init__(self, module, **kwargs)
-        TTParallelBase.__init__(self, module, add_model_attributes, default_model_methods)
+        TTParallelBase.__init__(self, module, default_model_methods)
 
 
 if APEX_AVAILABLE:
     class TTApexDistributedDataParallel(ApexDistributedDataParallel, TTParallelBase):
-        def __init__(self, module, add_model_attributes=None,
+        def __init__(self, module,
                      default_model_methods=('get_loss', 'get_loss_eval', 'get_predictions'), **kwargs):
             """torchtrain enabled Nvidia Apex DistributedDataParallel
 
             Args:
                 module (aitoolbox.torchtrain.model.TTModel): neural network model
-                add_model_attributes (list or tuple or None): additional TTModel attributes which need to be
-                transferred to the TTDataParallel level to enable their use in the transferred/exposed class methods
                 default_model_methods (list or tuple): list of core methods which are present also in TTModel
                     abstract class
                 **kwargs: additional parameters for underlying apex.parallel.DistributedDataParallel
             """
             ApexDistributedDataParallel.__init__(self, module, **kwargs)
-            TTParallelBase.__init__(self, module, add_model_attributes, default_model_methods)
+            TTParallelBase.__init__(self, module, default_model_methods)
 
 
 if DEEPSPEED_AVAILABLE:
     class TTDeepSpeedLight(DeepSpeedLight, TTParallelBase):
         def __init__(self, args, model,
-                     add_model_attributes=None, default_model_methods=('get_loss', 'get_loss_eval', 'get_predictions'),
+                     default_model_methods=('get_loss', 'get_loss_eval', 'get_predictions'),
                      **kwargs):
             """torchtrain enabled Microsoft DeepSpeed's DeepSpeedLight engine
 
@@ -122,8 +114,6 @@ if DEEPSPEED_AVAILABLE:
                 args (argparse.Namespace): argparser results structured as per DeepSpeed requirements. A dictionary
                     containing local_rank and deepspeed_config file location.
                 model (aitoolbox.torchtrain.model.TTModel): neural network model
-                add_model_attributes (list or tuple or None): additional TTModel attributes which need to be transferred
-                    to the TTDeepSpeedLight level to enable their use in the transferred/exposed class methods
                 default_model_methods (list or tuple): list of core methods which are present also in TTModel
                     abstract class
                 **kwargs: additional parameters for the underlying ``deepspeed.DeepSpeedLight`` class
@@ -131,4 +121,4 @@ if DEEPSPEED_AVAILABLE:
                     Possible arguments: https://deepspeed.readthedocs.io/en/latest/initialize.html
             """
             DeepSpeedLight.__init__(self, args, model, **kwargs)
-            TTParallelBase.__init__(self, model, add_model_attributes, default_model_methods)
+            TTParallelBase.__init__(self, model, default_model_methods)

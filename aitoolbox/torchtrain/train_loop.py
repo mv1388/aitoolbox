@@ -673,9 +673,6 @@ class TrainLoop:
             grad_accumulation (int): number of batches the gradients are accumulated before updating weights
             dp_model_args (dict or None): parameters for :class:`aitoolbox.torchtrain.parallel.TTDataParallel` /
                 ``nn.DataParallel`` DP model wrap.
-                Probably the most common optional parameter to set is ``TTDataParallel``'s ``add_model_attributes``
-                list. In this list the user can list any additional TTModel attributes which need to be transferred to
-                the TTDataParallel level to enable their use in the transferred/exposed class methods.
 
         Returns:
             TTDataParallel or nn.DataParallel: trained model
@@ -793,7 +790,7 @@ class TrainLoop:
         self._train(num_epochs, callbacks, grad_accumulation)
 
     def _train_deepspeed(self, deepspeed_args, num_epochs, callbacks=None,
-                         add_model_attributes=None, **ds_model_args):
+                         **ds_model_args):
         """Train the model using Microsoft DeepSpeed package
 
         Before starting the training the DeepSpeed library needs to be installed on the machine. Find the installation
@@ -807,8 +804,6 @@ class TrainLoop:
                 A dictionary containing local_rank and deepspeed_config file location.
             num_epochs (int): how many epochs the network will be trained
             callbacks (list): callbacks that are executed during the training run
-            add_model_attributes (list or tuple or None): additional TTModel attributes which need to be transferred to
-                the TTDataParallel level to enable their use in the transferred/exposed class methods
             **ds_model_args: additional parameters for the underlying ``deepspeed.DeepSpeedLight`` class
 
                 Possible arguments: https://deepspeed.readthedocs.io/en/latest/initialize.html
@@ -826,7 +821,7 @@ class TrainLoop:
 
         self.model = TTDeepSpeedLight(
             args=deepspeed_args,
-            model=self.model, model_parameters=self.model.parameters(), add_model_attributes=add_model_attributes,
+            model=self.model, model_parameters=self.model.parameters(),
             training_data=self.train_loader.dataset,
             **ds_model_args
         )
