@@ -85,7 +85,7 @@ class SmallFFNet(TTModel):
     def get_loss(self, batch_data, criterion, device):
         x, y = batch_data
         pred_y = self(x)
-        loss = criterion(pred_y, y)
+        loss = criterion(pred_y.squeeze(), y)
         return loss
 
     def get_predictions(self, batch_data, device):
