@@ -142,7 +142,7 @@ local_model_result_folder_path = '~/PycharmProjects/MemoryNet/model_results'
 # local_model_result_folder_path = '/home/ec2-user/project/model_results'
 
 m_saver = KerasS3ModelSaver(local_model_result_folder_path=local_model_result_folder_path)
-s3_model_path, experiment_timestamp, _ = m_saver.save_model(model=model, 
+s3_model_path, experiment_timestamp, _ = m_saver.save_model(model=model,
                                                             project_name='QA_QAngaroo', experiment_name='separate_files2',
                                                             protect_existing_folder=True)
 print(s3_model_path)
