@@ -9,7 +9,7 @@ class TrainingHistory:
         In many ways the object can be used with the same API as a normal python dict. However, for the need of
         tracking performance in the TrainLoop TrainingHistory offers additional functions handling the input, output
         and quality assurance of the stored results.
-        
+
         Args:
             has_validation: if train history should by default include 'val_loss'. This is needed when train loops
                 by default evaluate loss on validation set when such a set is available.

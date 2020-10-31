@@ -124,7 +124,7 @@ class MultiLossModel(TTModel):
         x, y = batch_data
         pred_y, _ = self(x)
         return pred_y, y, {}
-    
+
     
 def keras_dummy_model():
     from keras.models import Sequential
@@ -237,7 +237,7 @@ class DeactivateModelFeedDefinition(AbstractModelFeedDefinition):
 
         Returns:
             PyTorch loss
-        """    
+        """
         return self.dummy_batch
 
     def get_loss_eval(self, model, batch_data, criterion, device):

@@ -77,7 +77,7 @@ class TestModelPerformanceEvaluationCallback(unittest.TestCase):
         y_test = result_pkg.y_true
         y_pred = result_pkg.y_predicted
         metadata = result_pkg.additional_results['additional_results']
-        
+
         r = []
         for i in range(1, len(dummy_val_loader) + 1):
             r += [i] * 64
