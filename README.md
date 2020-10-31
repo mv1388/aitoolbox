@@ -163,7 +163,7 @@ custom AMP `GradScaler` initialization parameters, these should be provided as a
 `use_amp={'init_scale': 2.**16, 'growth_factor': 2.0, ...}` to the TrainLoop. 
 All AMP initializations and training related steps are then handled automatically by the TrainLoop. 
 
-You can read more about different details in the 
+You can read more about different AMP details in the 
 [PyTorch AMP documentation](https://pytorch.org/docs/stable/notes/amp_examples.html).
 
 ### Single-GPU mixed precision training
@@ -188,6 +188,8 @@ All the user has to do is set accordingly the `use_amp` parameter of the TrainLo
 parameter to `'ddp'`. 
 Under the hood, TrainLoop will initialize the model and the optimizer for AMP and start training using 
 DistributedDataParallel approach.
+
+Example of multi-GPU AMP setup:
 ```python
 from aitoolbox.torchtrain.train_loop import *
 

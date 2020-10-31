@@ -16,5 +16,5 @@ results are either stored only locally or if desired also automatically synced t
    torchtrain/schedulers
    torchtrain/multi_loss_opti
    torchtrain/parallel
-   torchtrain/apex_training
+   torchtrain/amp_training
    torchtrain/advanced
