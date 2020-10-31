@@ -180,7 +180,7 @@ TrainLoop(
 ).fit(num_epochs=10)
 ``` 
 
-Check out a full [Apex AMP training example](https://github.com/mv1388/aitoolbox/blob/master/examples/amp_training/single_GPU_training.py).
+Check out a full [AMP single-GPU training example](https://github.com/mv1388/aitoolbox/blob/master/examples/amp_training/single_GPU_training.py).
 
 ### Multi-GPU DDP mixed precision training
 When training in the multi-GPU setting, the setup is mostly the same as in the single-GPU. 
@@ -201,7 +201,7 @@ TrainLoop(
 ).fit(num_epochs=10)
 ``` 
 
-Check out a full [Apex AMP DistributedDataParallel training example](https://github.com/mv1388/aitoolbox/blob/master/examples/amp_training/mutli_GPU_training.py).
+Check out a full [AMP multi-GPU DistributedDataParallel training example](https://github.com/mv1388/aitoolbox/blob/master/examples/amp_training/mutli_GPU_training.py).
 
 
 ## Model
