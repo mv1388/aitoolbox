@@ -2,7 +2,7 @@ Automatic Mixed Precision Training
 ==================================
 
 All the TrainLoop versions also support training with Automatic Mixed Precision (*AMP*). In the past this required
-using the `Nvidia apex <https://github.com/NVIDIA/apex>`_ extension but from _PyTorch 1.6_ onwards AMP functionality
+using the `Nvidia apex <https://github.com/NVIDIA/apex>`_ extension but from *PyTorch 1.6* onwards AMP functionality
 is built into core PyTorch and no separate instalation is needed.
 Current version of AIToolbox already supports the use of built-in PyTorch AMP.
 
