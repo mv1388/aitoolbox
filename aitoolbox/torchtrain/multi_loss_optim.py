@@ -105,7 +105,7 @@ class MultiOptimizer:
         return [optimizer.state_dict() for optimizer in self.optimizer_list]
 
     def load_state_dict(self, state_dict_list):
-        if type(state_dict_list) != list:
+        if not isinstance(state_dict_list, list):
             raise TypeError("state_dict_list is expected to be a list type.")
         if len(state_dict_list) != len(self.optimizer_list):
             raise ValueError("Provided len(state_dict_list) != len(self.optimizer_list).")
