@@ -105,9 +105,11 @@ class TrainLoop:
         self.num_optimizers = 1 if not isinstance(self.optimizer, MultiOptimizer) else len(self.optimizer)
 
         self.gpu_mode = gpu_mode
+
         self.use_amp = use_amp is True or type(use_amp) == dict
-        self.amp_scaler_init = {} if use_amp is True else use_amp
-        self.amp_scaler = amp.GradScaler(**self.amp_scaler_init) if self.use_amp and self.gpu_mode != 'ddp' else None
+        self.amp_scaler_init = use_amp if type(use_amp) == dict else {}
+        self.amp_scaler = amp.GradScaler(**self.amp_scaler_init, enabled=self.use_amp)
+
         self.use_deepspeed = False
 
         USE_CUDA = torch.cuda.is_available()
@@ -304,10 +306,10 @@ class TrainLoop:
                 #     self.amp_scaler.scale(loss_batch).backward()
 
                 # TODO: Make sure this is equivalent to the commented out code block above
-                if self.use_amp and self.amp_scaler is not None:
-                    loss_batch = self.amp_scaler.scale(loss_batch)
-
-                loss_batch.backward()
+                # Always pass the loss through the scaler to keep the code simpler
+                # Depending on the `enabled` parameter of the scaler
+                # the loss gets scaled or just returned unchanged
+                self.amp_scaler.scale(loss_batch).backward()
             else:
                 # Non-AMP or AMP backward are done under the hood in the MultiLoss wrap
                 loss_batch.backward(optimizer_idx, iteration, self.amp_scaler)
@@ -330,10 +332,10 @@ class TrainLoop:
                 self.model.step()
             else:
                 if not isinstance(self.optimizer, MultiOptimizer):
-                    if not self.use_amp:
-                        self.optimizer.step()
-                    else:
-                        self.amp_scaler.step(self.optimizer)
+                    # To step the optimizer always give it to the AMP scaler to keep the code simpler
+                    # If scaler is disabled it will just call normal ``step()`` method
+                    # of the provided optimizer without any scaling unscaling done prior to it
+                    self.amp_scaler.step(self.optimizer)
                 else:
                     # Non-AMP or AMP optimizer step are done under the hood in the MultiOptimizer wrap
                     self.optimizer.step(optimizer_idx, iteration, self.amp_scaler)
@@ -768,9 +770,8 @@ class TrainLoop:
         if self.criterion is not None:
             self.criterion = self.criterion.to(self.device)
 
-        # Optionally initialize AMP scaler inside each of the processes
-        if self.use_amp:
-            self.amp_scaler = amp.GradScaler(**self.amp_scaler_init)
+        # Initialize AMP scaler inside each of the processes
+        self.amp_scaler = amp.GradScaler(**self.amp_scaler_init, enabled=self.use_amp)
 
         # Wrap models into DDP module
         if isinstance(self.model, TTModel):
