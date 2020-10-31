@@ -233,6 +233,9 @@ class TrainLoop:
                     # Optimizer zero grad
                     self._optimizer_zero_grad(iteration, grad_accumulation, optimizer_idx)
 
+                if self.use_amp:
+                    self.amp_scaler.update()
+
                 self.callbacks_handler.execute_batch_end()
 
             # Automatic end of epoch code - reports the train and if available validation loss and executes callbacks
@@ -270,10 +273,12 @@ class TrainLoop:
             else:
                 loss_batch = self.batch_model_feed_def.get_loss(self.model, batch_data,
                                                                 self.criterion, self.device)
-        self.loss_batch_accum.append(loss_batch.item())
+            loss_batch_log = loss_batch
 
-        # Need to divide by the number of accumulation steps if our loss is averaged over the training samples
-        loss_batch = loss_batch / grad_accumulation
+            # Need to divide by the number of accumulation steps if our loss is averaged over the training samples
+            loss_batch = loss_batch / grad_accumulation
+
+        self.loss_batch_accum.append(loss_batch_log.item())
 
         return loss_batch
 
@@ -317,7 +322,13 @@ class TrainLoop:
         """
         # if (iteration + 1) % grad_accumulation == 0 or iteration == len(self.train_loader) - 1:
         if (iteration + 1) % grad_accumulation == 0:
-            if self.use_deepspeed:
+            if self.use_amp:
+                if not isinstance(self.optimizer, MultiOptimizer):
+                    self.amp_scaler.step(self.optimizer)
+                else:
+                    raise ValueError
+
+            elif self.use_deepspeed:
                 self.model.step()
             else:
                 if not isinstance(self.optimizer, MultiOptimizer):
@@ -518,11 +529,12 @@ class TrainLoop:
 
         with torch.no_grad():
             for batch_data in tqdm(data_loader):
-                if self.batch_model_feed_def is None:
-                    loss_batch = self.model.get_loss_eval(batch_data, self.criterion, self.device)
-                else:
-                    loss_batch = self.batch_model_feed_def.get_loss_eval(self.model, batch_data, self.criterion,
-                                                                         self.device)
+                with autocast(enabled=self.use_amp):
+                    if self.batch_model_feed_def is None:
+                        loss_batch = self.model.get_loss_eval(batch_data, self.criterion, self.device)
+                    else:
+                        loss_batch = self.batch_model_feed_def.get_loss_eval(self.model, batch_data, self.criterion,
+                                                                             self.device)
 
                 loss_avg.append(loss_batch.item())
 
@@ -603,11 +615,12 @@ class TrainLoop:
 
         with torch.no_grad():
             for batch_data in tqdm(data_loader):
-                if self.batch_model_feed_def is None:
-                    y_pred_batch, y_test_batch, metadata_batch = self.model.get_predictions(batch_data, self.device)
-                else:
-                    y_pred_batch, y_test_batch, metadata_batch = \
-                        self.batch_model_feed_def.get_predictions(self.model, batch_data, self.device)
+                with autocast(enabled=self.use_amp):
+                    if self.batch_model_feed_def is None:
+                        y_pred_batch, y_test_batch, metadata_batch = self.model.get_predictions(batch_data, self.device)
+                    else:
+                        y_pred_batch, y_test_batch, metadata_batch = \
+                            self.batch_model_feed_def.get_predictions(self.model, batch_data, self.device)
 
                 y_pred = self.collate_batch_pred_fn(y_pred_batch, y_pred)
                 y_test = self.collate_batch_pred_fn(y_test_batch, y_test)
