@@ -65,7 +65,7 @@ class ModelLoadContinueTraining(AbstractExperimentCallback):
                                                                  self.used_data_parallel)
         self.train_loop_obj.optimizer = self.model_loader.init_optimizer(self.train_loop_obj.optimizer)
         if self.train_loop_obj.use_amp:
-            self.model_loader.init_amp()
+            self.train_loop_obj.amp_scaler = self.model_loader.init_amp(self.train_loop_obj.amp_scaler)
 
         self.train_loop_obj.epoch = model_representation['epoch'] + 1
 

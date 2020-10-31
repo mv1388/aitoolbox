@@ -2,11 +2,6 @@ from abc import ABC, abstractmethod
 import os
 from collections import OrderedDict
 import torch
-try:
-    from apex import amp
-    APEX_AVAILABLE = True
-except ImportError:
-    APEX_AVAILABLE = False
 
 from aitoolbox.experiment.local_save.folder_create import ExperimentFolder
 from aitoolbox.torchtrain.schedulers.basic import AbstractScheduler
@@ -158,15 +153,13 @@ class PyTorchLocalModelLoader(AbstractLocalModelLoader):
             if not ignore_missing_saved:
                 raise KeyError('Schedulers_state_dict not found in the loaded model representation but you provided '
                                'schedulers to TrainLoop.')
-            else:
-                return scheduler_callbacks_list
+            return scheduler_callbacks_list
 
         if len(loaded_schedulers) > 0 and len(scheduler_callbacks_list) == 0:
             if not ignore_saved:
                 raise ValueError('No schedulers were provided to the TrainLoop, however scheduler state_dicts were'
                                  'found saved in the loaded model representation.')
-            else:
-                return scheduler_callbacks_list
+            return scheduler_callbacks_list
 
         if len(scheduler_callbacks_list) != len(loaded_schedulers):
             raise ValueError('Number of provided schedulers does not match the number of loaded scheduler state_dicts. '
@@ -182,13 +175,14 @@ class PyTorchLocalModelLoader(AbstractLocalModelLoader):
 
         return scheduler_callbacks_list
 
-    def init_amp(self):
-        """Initialize Nvidia Apex 16 AMP
+    def init_amp(self, amp_scaler):
+        """Initialize AMP GradScaler
+
+        Args:
+            amp_scaler (torch.cuda.amp.GradScaler): AMP GradScaler
 
         Returns:
-            None
+            torch.cuda.amp.GradScaler: initialized AMP GradScaler
         """
-        if APEX_AVAILABLE:
-            amp.load_state_dict(self.model_representation['amp'])
-        else:
-            print('Trying to use Nvidia Apex AMP for 16-bit mixed precision. However, Nvidia Apex is not installed.')
+        amp_scaler.load_state_dict(self.model_representation['amp'])
+        return amp_scaler

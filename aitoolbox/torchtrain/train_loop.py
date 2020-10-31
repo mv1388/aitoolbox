@@ -11,13 +11,7 @@ from torch.nn.modules import Module
 import torch.multiprocessing as mp
 import torch.distributed as dist
 from torch.nn.parallel import DistributedDataParallel
-try:
-    from apex import amp
-    from apex.parallel import DistributedDataParallel as ApexDistributedDataParallel
-    from aitoolbox.torchtrain.parallel import TTApexDistributedDataParallel
-    APEX_AVAILABLE = True
-except ImportError:
-    APEX_AVAILABLE = False
+import torch.cuda.amp as amp
 try:
     import deepspeed
     from aitoolbox.torchtrain.parallel import TTDeepSpeedLight
@@ -81,14 +75,12 @@ class TrainLoop:
                 * ``'deepspeed'``: training via the Microsoft DeepSpeed
 
             cuda_device_idx (int or None): CUDA device index used when training on multiple GPUs
-            use_amp (bool or dict): use Nvidia Apex 16-bit Automatic Mixed Precision (AMP)
+            use_amp (bool or dict): use 16-bit Automatic Mixed Precision (AMP)
 
                 To switch to AMP mode either:
 
-                * set this parameter to ``True`` to use default AMP initialization parameters
-                * provide custom Apex AMP initialization parameters as a dict as this parameter
-
-                Available AMP initialization parameters: https://nvidia.github.io/apex/amp.html#apex.amp.initialize
+                * set this parameter to ``True`` to use default AMP ``torch.cuda.amp.GradScaler`` initialization params
+                * provide custom AMP ``torch.cuda.amp.GradScaler`` initialization parameters as a dict as this parameter
         """
         if isinstance(model, TTModel) or isinstance(model, TTDataParallel):
             self.model = model
@@ -114,7 +106,8 @@ class TrainLoop:
 
         self.gpu_mode = gpu_mode
         self.use_amp = use_amp is True or type(use_amp) == dict
-        self.amp_params = {} if use_amp is True else use_amp
+        self.amp_scaler_init = {} if use_amp is True else use_amp
+        self.amp_scaler = amp.GradScaler(**self.amp_scaler_init) if self.use_amp and self.gpu_mode != 'ddp' else None
         self.use_deepspeed = False
 
         USE_CUDA = torch.cuda.is_available()
@@ -153,9 +146,6 @@ class TrainLoop:
         if self.gpu_mode not in ['single', 'dp', 'ddp', 'deepspeed']:
             raise ValueError("gpu_mode parameter set to the non-supported value. Can use only the following values: "
                              "'single', 'dp', 'ddp' and 'deepspeed'")
-        if self.use_amp and not APEX_AVAILABLE:
-            raise ValueError('Trying to use Nvidia Apex AMP for 16-bit mixed precision. However, Nvidia Apex is not'
-                             'installed.')
 
     def fit(self, num_epochs, callbacks=None, grad_accumulation=1, **kwargs):
         """Train the model using the train loop
@@ -213,9 +203,6 @@ class TrainLoop:
         self.model = self.model.to(self.device)
         if self.criterion is not None:
             self.criterion = self.criterion.to(self.device)
-        # Initialize AMP when training with Nvidia APEX mixed precision
-        if self.use_amp and not self.ddp_training_mode:
-            self.model, self.optimizer = amp.initialize(self.model, self.optimizer, **self.amp_params)
 
         self.model.train()
 
@@ -245,6 +232,9 @@ class TrainLoop:
                     self._optimizer_step(iteration, grad_accumulation, optimizer_idx)
                     # Optimizer zero grad
                     self._optimizer_zero_grad(iteration, grad_accumulation, optimizer_idx)
+
+                if self.use_amp:
+                    self.amp_scaler.update()
 
                 self.callbacks_handler.execute_batch_end()
 
@@ -277,15 +267,18 @@ class TrainLoop:
         Returns:
             loss: loss calculated on current batch
         """
-        if self.batch_model_feed_def is None:
-            loss_batch = self.model.get_loss(batch_data, self.criterion, self.device)
-        else:
-            loss_batch = self.batch_model_feed_def.get_loss(self.model, batch_data, self.criterion, self.device)
+        with amp.autocast(enabled=self.use_amp):
+            if self.batch_model_feed_def is None:
+                loss_batch = self.model.get_loss(batch_data, self.criterion, self.device)
+            else:
+                loss_batch = self.batch_model_feed_def.get_loss(self.model, batch_data,
+                                                                self.criterion, self.device)
+            loss_batch_log = loss_batch
 
-        self.loss_batch_accum.append(loss_batch.item())
+            # Need to divide by the number of accumulation steps if our loss is averaged over the training samples
+            loss_batch = loss_batch / grad_accumulation
 
-        # Need to divide by the number of accumulation steps if our loss is averaged over the training samples
-        loss_batch = loss_batch / grad_accumulation
+        self.loss_batch_accum.append(loss_batch_log.item())
 
         return loss_batch
 
@@ -301,21 +294,23 @@ class TrainLoop:
         Returns:
             None
         """
-        if self.use_amp:
-            if not isinstance(loss_batch, MultiLoss):
-                # Single loss Apex AMP calculation
-                with amp.scale_loss(loss_batch, self.optimizer) as scaled_loss:
-                    scaled_loss.backward()
-            else:
-                # Multi-loss Apex AMP calculation
-                loss_batch.backward_amp(self.optimizer, optimizer_idx, iteration)
-        elif self.use_deepspeed:
+        if self.use_deepspeed:
             self.model.backward(loss_batch)
         else:
             if not isinstance(loss_batch, MultiLoss):
+                # if not self.use_amp:
+                #     loss_batch.backward()
+                # else:
+                #     self.amp_scaler.scale(loss_batch).backward()
+
+                # TODO: Make sure this is equivalent to the commented out code block above
+                if self.use_amp and self.amp_scaler is not None:
+                    loss_batch = self.amp_scaler.scale(loss_batch)
+
                 loss_batch.backward()
             else:
-                loss_batch.backward(optimizer_idx, iteration)
+                # Non-AMP or AMP backward are done under the hood in the MultiLoss wrap
+                loss_batch.backward(optimizer_idx, iteration, self.amp_scaler)
 
     def _optimizer_step(self, iteration, grad_accumulation, optimizer_idx):
         """Execute the optimizer step
@@ -335,9 +330,13 @@ class TrainLoop:
                 self.model.step()
             else:
                 if not isinstance(self.optimizer, MultiOptimizer):
-                    self.optimizer.step()
+                    if not self.use_amp:
+                        self.optimizer.step()
+                    else:
+                        self.amp_scaler.step(self.optimizer)
                 else:
-                    self.optimizer.step(optimizer_idx, iteration)
+                    # Non-AMP or AMP optimizer step are done under the hood in the MultiOptimizer wrap
+                    self.optimizer.step(optimizer_idx, iteration, self.amp_scaler)
 
             if self.grad_cb_used:
                 self.callbacks_handler.execute_optimizer_step()
@@ -532,11 +531,12 @@ class TrainLoop:
 
         with torch.no_grad():
             for batch_data in tqdm(data_loader):
-                if self.batch_model_feed_def is None:
-                    loss_batch = self.model.get_loss_eval(batch_data, self.criterion, self.device)
-                else:
-                    loss_batch = self.batch_model_feed_def.get_loss_eval(self.model, batch_data, self.criterion,
-                                                                         self.device)
+                with amp.autocast(enabled=self.use_amp):
+                    if self.batch_model_feed_def is None:
+                        loss_batch = self.model.get_loss_eval(batch_data, self.criterion, self.device)
+                    else:
+                        loss_batch = self.batch_model_feed_def.get_loss_eval(self.model, batch_data, self.criterion,
+                                                                             self.device)
 
                 loss_avg.append(loss_batch.item())
 
@@ -617,11 +617,12 @@ class TrainLoop:
 
         with torch.no_grad():
             for batch_data in tqdm(data_loader):
-                if self.batch_model_feed_def is None:
-                    y_pred_batch, y_test_batch, metadata_batch = self.model.get_predictions(batch_data, self.device)
-                else:
-                    y_pred_batch, y_test_batch, metadata_batch = \
-                        self.batch_model_feed_def.get_predictions(self.model, batch_data, self.device)
+                with amp.autocast(enabled=self.use_amp):
+                    if self.batch_model_feed_def is None:
+                        y_pred_batch, y_test_batch, metadata_batch = self.model.get_predictions(batch_data, self.device)
+                    else:
+                        y_pred_batch, y_test_batch, metadata_batch = \
+                            self.batch_model_feed_def.get_predictions(self.model, batch_data, self.device)
 
                 y_pred = self.collate_batch_pred_fn(y_pred_batch, y_pred)
                 y_test = self.collate_batch_pred_fn(y_test_batch, y_test)
@@ -698,11 +699,9 @@ class TrainLoop:
             num_epochs (int): how many epochs the network will be trained
             callbacks (list or None): callbacks that are executed during the training run
             grad_accumulation (int): number of batches the gradients are accumulated before updating weights
-            ddp_model_args (dict or None): parameters for DistributedDataParallel / APEX DistributedDataParallel model
+            ddp_model_args (dict or None): parameters for DistributedDataParallel model
                 Available parameters for DistributedDataParallel:
                     https://pytorch.org/docs/master/nn.html#torch.nn.parallel.DistributedDataParallel
-                Available parameters for APEX DistributedDataParallel:
-                    https://nvidia.github.io/apex/parallel.html#apex.parallel.DistributedDataParallel
             in_process_data_load (AbstractCallback or list or None):
                 in-process data loading logic implemented as a torchtrain callback. The logic should be placed inside
                 the on_multiprocess_start() callback function.
@@ -769,23 +768,15 @@ class TrainLoop:
         if self.criterion is not None:
             self.criterion = self.criterion.to(self.device)
 
-        # Optionally initialize APEX
-        # Not using AMP initialization at the start of the fit() fn because in the multi-GPU setting the model has to
-        # be first AMP-initialized before it's wrapped into (APEX) DistributedDataParallel.
+        # Optionally initialize AMP scaler inside each of the processes
         if self.use_amp:
-            self.model, self.optimizer = amp.initialize(self.model, self.optimizer, **self.amp_params)
+            self.amp_scaler = amp.GradScaler(**self.amp_scaler_init)
 
         # Wrap models into DDP module
         if isinstance(self.model, TTModel):
-            if not self.use_amp:
-                self.model = TTDistributedDataParallel(self.model, device_ids=[gpu], **ddp_args['ddp_model_args'])
-            else:
-                self.model = TTApexDistributedDataParallel(self.model, **ddp_args['ddp_model_args'])
+            self.model = TTDistributedDataParallel(self.model, device_ids=[gpu], **ddp_args['ddp_model_args'])
         else:
-            if not self.use_amp:
-                self.model = DistributedDataParallel(self.model, device_ids=[gpu], **ddp_args['ddp_model_args'])
-            else:
-                self.model = ApexDistributedDataParallel(self.model, **ddp_args['ddp_model_args'])
+            self.model = DistributedDataParallel(self.model, device_ids=[gpu], **ddp_args['ddp_model_args'])
 
         self._train(num_epochs, callbacks, grad_accumulation)
 
@@ -906,14 +897,12 @@ class TrainLoopCheckpoint(TrainLoop):
                 * ``'deepspeed'``: training via the Microsoft DeepSpeed
 
             cuda_device_idx (int or None): CUDA device index used when training on multiple GPUs
-            use_amp (bool or dict): use Nvidia Apex 16-bit Automatic Mixed Precision (AMP)
+            use_amp (bool or dict): use 16-bit Automatic Mixed Precision (AMP)
 
                 To switch to AMP mode either:
 
-                * set this parameter to ``True`` to use default AMP initialization parameters
-                * provide custom Apex AMP initialization parameters as a dict as this parameter
-
-                Available AMP initialization parameters: https://nvidia.github.io/apex/amp.html#apex.amp.initialize
+                * set this parameter to ``True`` to use default AMP ``torch.cuda.amp.GradScaler`` initialization params
+                * provide custom AMP ``torch.cuda.amp.GradScaler`` initialization parameters as a dict as this parameter
         """
         TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion,
                            collate_batch_pred_fn, pred_transform_fn,
@@ -1000,14 +989,12 @@ class TrainLoopEndSave(TrainLoop):
                 * ``'deepspeed'``: training via the Microsoft DeepSpeed
 
             cuda_device_idx (int or None): CUDA device index used when training on multiple GPUs
-            use_amp (bool or dict): use Nvidia Apex 16-bit Automatic Mixed Precision (AMP)
+            use_amp (bool or dict): use 16-bit Automatic Mixed Precision (AMP)
 
                 To switch to AMP mode either:
 
-                * set this parameter to ``True`` to use default AMP initialization parameters
-                * provide custom Apex AMP initialization parameters as a dict as this parameter
-
-                Available AMP initialization parameters: https://nvidia.github.io/apex/amp.html#apex.amp.initialize
+                * set this parameter to ``True`` to use default AMP ``torch.cuda.amp.GradScaler`` initialization params
+                * provide custom AMP ``torch.cuda.amp.GradScaler`` initialization parameters as a dict as this parameter
         """
         TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion,
                            collate_batch_pred_fn, pred_transform_fn,
@@ -1120,14 +1107,12 @@ class TrainLoopCheckpointEndSave(TrainLoopEndSave):
                 * ``'deepspeed'``: training via the Microsoft DeepSpeed
 
             cuda_device_idx (int or None): CUDA device index used when training on multiple GPUs
-            use_amp (bool or dict): use Nvidia Apex 16-bit Automatic Mixed Precision (AMP)
+            use_amp (bool or dict): use 16-bit Automatic Mixed Precision (AMP)
 
                 To switch to AMP mode either:
 
-                * set this parameter to ``True`` to use default AMP initialization parameters
-                * provide custom Apex AMP initialization parameters as a dict as this parameter
-
-                Available AMP initialization parameters: https://nvidia.github.io/apex/amp.html#apex.amp.initialize
+                * set this parameter to ``True`` to use default AMP ``torch.cuda.amp.GradScaler`` initialization params
+                * provide custom AMP ``torch.cuda.amp.GradScaler`` initialization parameters as a dict as this parameter
         """
         if 'experiment_file_path' not in hyperparams:
             hyperparams['experiment_file_path'] = inspect.getframeinfo(inspect.currentframe().f_back).filename

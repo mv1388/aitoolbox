@@ -1,9 +1,4 @@
 import os
-try:
-    from apex import amp
-    APEX_AVAILABLE = True
-except ImportError:
-    APEX_AVAILABLE = False
 
 from aitoolbox.cloud.AWS.model_save import PyTorchS3ModelSaver
 from aitoolbox.cloud.GoogleCloud.model_save import PyTorchGoogleStorageModelSaver
@@ -76,7 +71,7 @@ class ModelCheckpoint(AbstractCallback):
             }
             # If Nvidia apex amp is used
             if self.train_loop_obj.use_amp:
-                model_checkpoint['amp'] = amp.state_dict()
+                model_checkpoint['amp'] = self.train_loop_obj.amp_scaler.state_dict()
         else:
             model_checkpoint = self.train_loop_obj.model
 
@@ -200,7 +195,7 @@ class ModelTrainEndSave(AbstractCallback):
             }
             # If Nvidia apex amp is used
             if self.train_loop_obj.use_amp:
-                model_final_state['amp'] = amp.state_dict()
+                model_final_state['amp'] = self.train_loop_obj.amp_scaler.state_dict()
         else:
             model_final_state = self.train_loop_obj.model
 
