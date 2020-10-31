@@ -124,10 +124,13 @@ class PyTorchS3ModelLoader(BaseModelLoader):
         """
         return self.local_model_loader.init_scheduler(scheduler_callbacks_list, ignore_saved, ignore_missing_saved)
 
-    def init_amp(self):
-        """Initialize Nvidia Apex 16 AMP
+    def init_amp(self, amp_scaler):
+        """Initialize AMP GradScaler
+
+        Args:
+            amp_scaler (torch.cuda.amp.GradScaler): AMP GradScaler
 
         Returns:
-            None
+            torch.cuda.amp.GradScaler: initialized AMP GradScaler
         """
-        self.local_model_loader.init_amp()
+        return self.local_model_loader.init_amp(amp_scaler)

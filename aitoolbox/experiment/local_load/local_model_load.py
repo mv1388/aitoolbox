@@ -2,11 +2,6 @@ from abc import ABC, abstractmethod
 import os
 from collections import OrderedDict
 import torch
-try:
-    from apex import amp
-    APEX_AVAILABLE = True
-except ImportError:
-    APEX_AVAILABLE = False
 
 from aitoolbox.experiment.local_save.folder_create import ExperimentFolder
 from aitoolbox.torchtrain.schedulers.basic import AbstractScheduler
@@ -182,13 +177,14 @@ class PyTorchLocalModelLoader(AbstractLocalModelLoader):
 
         return scheduler_callbacks_list
 
-    def init_amp(self):
-        """Initialize Nvidia Apex 16 AMP
+    def init_amp(self, amp_scaler):
+        """Initialize AMP GradScaler
+
+        Args:
+            amp_scaler (torch.cuda.amp.GradScaler): AMP GradScaler
 
         Returns:
-            None
+            torch.cuda.amp.GradScaler: initialized AMP GradScaler
         """
-        if APEX_AVAILABLE:
-            amp.load_state_dict(self.model_representation['amp'])
-        else:
-            print('Trying to use Nvidia Apex AMP for 16-bit mixed precision. However, Nvidia Apex is not installed.')
+        amp_scaler.load_state_dict(self.model_representation['amp'])
+        return amp_scaler
