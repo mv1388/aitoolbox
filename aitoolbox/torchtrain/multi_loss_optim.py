@@ -85,7 +85,7 @@ class MultiOptimizer:
         if amp_grad_scaler is None:
             self.optimizer_list[optimizer_idx].step()
         else:
-            amp_grad_scaler.scale(self.optimizer_list[optimizer_idx])
+            amp_grad_scaler.step(self.optimizer_list[optimizer_idx])
 
     def zero_grad(self, optimizer_idx, iteration):
         """Execute zero_grad for optimizer at the specified index
