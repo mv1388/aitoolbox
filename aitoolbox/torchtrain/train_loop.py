@@ -294,19 +294,23 @@ class TrainLoop:
         Returns:
             None
         """
-        if self.use_amp:
-            if not isinstance(loss_batch, MultiLoss):
-                self.amp_scaler.scale(loss_batch).backward()
-            else:
-                # Multi-loss Apex AMP calculation
-                loss_batch.backward_amp(self.optimizer, optimizer_idx, iteration)
-        elif self.use_deepspeed:
+        if self.use_deepspeed:
             self.model.backward(loss_batch)
         else:
             if not isinstance(loss_batch, MultiLoss):
+                # if not self.use_amp:
+                #     loss_batch.backward()
+                # else:
+                #     self.amp_scaler.scale(loss_batch).backward()
+
+                # TODO: Make sure this is equivalent to the commented out code block above
+                if self.use_amp and self.amp_scaler is not None:
+                    loss_batch = self.amp_scaler.scale(loss_batch)
+
                 loss_batch.backward()
             else:
-                loss_batch.backward(optimizer_idx, iteration)
+                # Non-AMP or AMP backward are done under the hood in the MultiLoss wrap
+                loss_batch.backward(optimizer_idx, iteration, self.amp_scaler)
 
     def _optimizer_step(self, iteration, grad_accumulation, optimizer_idx):
         """Execute the optimizer step
@@ -322,19 +326,17 @@ class TrainLoop:
         """
         # if (iteration + 1) % grad_accumulation == 0 or iteration == len(self.train_loader) - 1:
         if (iteration + 1) % grad_accumulation == 0:
-            if self.use_amp:
-                if not isinstance(self.optimizer, MultiOptimizer):
-                    self.amp_scaler.step(self.optimizer)
-                else:
-                    raise ValueError
-
-            elif self.use_deepspeed:
+            if self.use_deepspeed:
                 self.model.step()
             else:
                 if not isinstance(self.optimizer, MultiOptimizer):
-                    self.optimizer.step()
+                    if not self.use_amp:
+                        self.optimizer.step()
+                    else:
+                        self.amp_scaler.step(self.optimizer)
                 else:
-                    self.optimizer.step(optimizer_idx, iteration)
+                    # Non-AMP or AMP optimizer step are done under the hood in the MultiOptimizer wrap
+                    self.optimizer.step(optimizer_idx, iteration, self.amp_scaler)
 
             if self.grad_cb_used:
                 self.callbacks_handler.execute_optimizer_step()

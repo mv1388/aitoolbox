@@ -1,9 +1,3 @@
-try:
-    from apex import amp
-    APEX_AVAILABLE = True
-except ImportError:
-    APEX_AVAILABLE = False
-
 
 class MultiLoss:
     def __init__(self, loss_dict, loss_optimizer_map=None, retain_graph_until_last=True):
@@ -30,7 +24,7 @@ class MultiLoss:
 
             self.optimizer_loss_map = {int(v): str(k) for k, v in loss_optimizer_map.items()}
 
-    def backward(self, optimizer_idx, iteration):
+    def backward(self, optimizer_idx, iteration, amp_grad_scaler=None):
         """Executes backward() for the specific loss based on provided optimizer_idx
 
         Args:
@@ -38,35 +32,22 @@ class MultiLoss:
                 only a single optimizer is used this parameter can be ignored.
             iteration (int): Current iteration index. Not used in the most simple setup but provided in case of more
                 elaborate loss backward logic is devised.
-
-        Returns:
-            None
-        """
-        if self.retain_graph_until_last and self.loss_backward_remaining > 1:
-            self.loss_dict[self.optimizer_loss_map[optimizer_idx]].backward(retain_graph=True)
-        else:
-            self.loss_dict[self.optimizer_loss_map[optimizer_idx]].backward()
-
-        self.loss_backward_remaining -= 1
-
-    def backward_amp(self, optimizers, optimizer_idx, iteration):
-        """When training with AMP executes backward() for the specific loss based on provided optimizer_idx
-
-        Args:
-            optimizers (MultiOptimizer): list of optimizers all used optimizers
-            optimizer_idx (int): index of the current optimizer. Mostly useful when using multiple optimizers. When
-                only a single optimizer is used this parameter can be ignored.
-            iteration (int): Current iteration index. Not used in the most simple setup but provided in case of more
-                elaborate loss backward logic is devised.
+            amp_grad_scaler (torch.cuda.amp.GradScaler or None): AMP GradScaler. If scaler is not provided then no grad
+                scaling is done and this method behaves as normal non-AMP ``backward()``.
 
         Returns:
             None
         """
         loss = self.loss_dict[self.optimizer_loss_map[optimizer_idx]]
-        optimizer = optimizers[optimizer_idx]
 
-        with amp.scale_loss(loss, optimizer, loss_id=self.loss_backward_remaining) as scaled_loss:
-            scaled_loss.backward()
+        # If AMP is used we scale the loss with the GradScaler
+        if amp_grad_scaler is not None:
+            loss = amp_grad_scaler.scale(loss)
+
+        if self.retain_graph_until_last and self.loss_backward_remaining > 1:
+            loss.backward(retain_graph=True)
+        else:
+            loss.backward()
 
         self.loss_backward_remaining -= 1
 
@@ -87,7 +68,7 @@ class MultiOptimizer:
         """
         self.optimizer_list = optimizer_list
 
-    def step(self, optimizer_idx, iteration):
+    def step(self, optimizer_idx, iteration, amp_grad_scaler=None):
         """Execute step for optimizer at the specified index
 
         Args:
@@ -95,11 +76,16 @@ class MultiOptimizer:
                 only a single optimizer is used this parameter can be ignored.
             iteration (int): Current iteration index. Not used in the most simple setup but provided in case of more
                 elaborate loss backward logic is devised.
+            amp_grad_scaler (torch.cuda.amp.GradScaler or None): AMP GradScaler. If scaler is not provided then no
+                scaler-based optimizer step is done and this method behaves as normal non-AMP optimizer ``step()``.
 
         Returns:
             None
         """
-        self.optimizer_list[optimizer_idx].step()
+        if amp_grad_scaler is None:
+            self.optimizer_list[optimizer_idx].step()
+        else:
+            amp_grad_scaler.scale(self.optimizer_list[optimizer_idx])
 
     def zero_grad(self, optimizer_idx, iteration):
         """Execute zero_grad for optimizer at the specified index
