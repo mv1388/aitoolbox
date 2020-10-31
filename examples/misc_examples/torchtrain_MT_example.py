@@ -18,10 +18,8 @@ from aitoolbox.nlp.core.vocabulary import Vocabulary
 
 
 """
-        
 Based on:
     https://github.com/bentrevett/pytorch-seq2seq/blob/master/4%20-%20Packed%20Padded%20Sequences%2C%20Masking%20and%20Inference.ipynb
-
 """
 
 

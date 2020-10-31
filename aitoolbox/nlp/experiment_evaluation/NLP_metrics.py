@@ -501,8 +501,10 @@ class BLEUScoreStrTorchNLPMetric(AbstractBaseMetric):
     def calculate_metric(self):
         BLEUSentenceScoreMetric.check_transl_sent_num_match([self.y_true, self.y_predicted])
 
-        sentence_bleu_results = [bleu.get_moses_multi_bleu([' '.join(true_t)], [' '.join(pred_t)], lowercase=self.lowercase) 
-                                 for true_t, pred_t in zip(self.y_true, self.y_predicted)]
+        sentence_bleu_results = [
+            bleu.get_moses_multi_bleu([' '.join(true_t)], [' '.join(pred_t)], lowercase=self.lowercase)
+            for true_t, pred_t in zip(self.y_true, self.y_predicted)
+        ]
         
         if self.output_text_dir is not None:
             BLEUSentenceScoreMetric.dump_translation_text_to_disk(self.source_sents,
