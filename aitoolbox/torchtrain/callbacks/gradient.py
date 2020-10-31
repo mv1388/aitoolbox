@@ -46,6 +46,7 @@ class GradValueClip(GradientCallbackBase):
             optimizer = optimizer[optimizer_idx]
 
         # Unscales the gradients of optimizer's assigned params in-place
+        # Following: https://pytorch.org/docs/stable/notes/amp_examples.html#gradient-clipping
         self.train_loop_obj.amp_scaler.unscale_(optimizer)
 
         torch.nn.utils.clip_grad_value_(self.train_loop_obj.model.parameters(), self.max_grad_value)
@@ -69,6 +70,7 @@ class GradNormClip(GradientCallbackBase):
             optimizer = optimizer[optimizer_idx]
 
         # Unscales the gradients of optimizer's assigned params in-place
+        # Following: https://pytorch.org/docs/stable/notes/amp_examples.html#gradient-clipping
         self.train_loop_obj.amp_scaler.unscale_(optimizer)
 
         torch.nn.utils.clip_grad_norm_(self.train_loop_obj.model.parameters(), self.max_grad_norm, **self.kwargs)
