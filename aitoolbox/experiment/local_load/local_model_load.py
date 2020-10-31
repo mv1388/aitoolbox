@@ -153,15 +153,13 @@ class PyTorchLocalModelLoader(AbstractLocalModelLoader):
             if not ignore_missing_saved:
                 raise KeyError('Schedulers_state_dict not found in the loaded model representation but you provided '
                                'schedulers to TrainLoop.')
-            else:
-                return scheduler_callbacks_list
+            return scheduler_callbacks_list
 
         if len(loaded_schedulers) > 0 and len(scheduler_callbacks_list) == 0:
             if not ignore_saved:
                 raise ValueError('No schedulers were provided to the TrainLoop, however scheduler state_dicts were'
                                  'found saved in the loaded model representation.')
-            else:
-                return scheduler_callbacks_list
+            return scheduler_callbacks_list
 
         if len(scheduler_callbacks_list) != len(loaded_schedulers):
             raise ValueError('Number of provided schedulers does not match the number of loaded scheduler state_dicts. '
