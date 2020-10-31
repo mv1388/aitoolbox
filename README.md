@@ -150,7 +150,7 @@ TrainLoop(
 
 Check out a full [DistributedDataParallel training example](https://github.com/mv1388/aitoolbox/blob/master/examples/dp_ddp_training/ddp_training.py).
 
-## Automatic Mixed Precision training
+## Automatic Mixed Precision training (AMP)
 
 All the TrainLoop versions also support training with Automatic Mixed Precision (*AMP*). In the past this required
 using the [Nvidia apex](https://github.com/NVIDIA/apex) extension but from _PyTorch 1.6_ onwards AMP functionality 
