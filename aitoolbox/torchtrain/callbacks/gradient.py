@@ -3,6 +3,7 @@ import numpy as np
 import torch
 
 from aitoolbox.torchtrain.callbacks.abstract import AbstractCallback, AbstractExperimentCallback
+from aitoolbox.torchtrain.multi_loss_optim import MultiOptimizer
 from aitoolbox.experiment.local_save.local_results_save import BaseLocalResultsSaver
 from aitoolbox.experiment.result_reporting.report_generator import GradientPlotter
 from aitoolbox.cloud.AWS.results_save import BaseResultsSaver as BaseResultsS3Saver
@@ -41,7 +42,11 @@ class GradValueClip(GradientCallbackBase):
 
     def on_after_gradient_update(self, optimizer_idx):
         if self.train_loop_obj.use_amp:
-            self.train_loop_obj.amp_scaler.unscale_(self.train_loop_obj.optimizer)
+            optimizer = self.train_loop_obj.optimizer
+            if isinstance(optimizer, MultiOptimizer):
+                optimizer = optimizer[optimizer_idx]
+
+            self.train_loop_obj.amp_scaler.unscale_(optimizer)
 
         torch.nn.utils.clip_grad_value_(self.train_loop_obj.model.parameters(), self.max_grad_value)
 
@@ -60,7 +65,11 @@ class GradNormClip(GradientCallbackBase):
 
     def on_after_gradient_update(self, optimizer_idx):
         if self.train_loop_obj.use_amp:
-            self.train_loop_obj.amp_scaler.unscale_(self.train_loop_obj.optimizer)
+            optimizer = self.train_loop_obj.optimizer
+            if isinstance(optimizer, MultiOptimizer):
+                optimizer = optimizer[optimizer_idx]
+
+            self.train_loop_obj.amp_scaler.unscale_(optimizer)
 
         torch.nn.utils.clip_grad_norm_(self.train_loop_obj.model.parameters(), self.max_grad_norm, **self.kwargs)
 
