@@ -235,8 +235,7 @@ class TrainLoop:
                     # Optimizer zero grad
                     self._optimizer_zero_grad(iteration, grad_accumulation, optimizer_idx)
 
-                if self.use_amp:
-                    self.amp_scaler.update()
+                self.amp_scaler.update()
 
                 self.callbacks_handler.execute_batch_end()
 
