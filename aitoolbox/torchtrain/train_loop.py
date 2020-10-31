@@ -11,7 +11,7 @@ from torch.nn.modules import Module
 import torch.multiprocessing as mp
 import torch.distributed as dist
 from torch.nn.parallel import DistributedDataParallel
-from torch.cuda.amp import autocast, GradScaler
+import torch.cuda.amp as amp
 try:
     import deepspeed
     from aitoolbox.torchtrain.parallel import TTDeepSpeedLight
@@ -107,7 +107,7 @@ class TrainLoop:
         self.gpu_mode = gpu_mode
         self.use_amp = use_amp is True or type(use_amp) == dict
         self.amp_scaler_init = {} if use_amp is True else use_amp
-        self.amp_scaler = GradScaler(**self.amp_scaler_init) if self.use_amp and self.gpu_mode != 'ddp' else None
+        self.amp_scaler = amp.GradScaler(**self.amp_scaler_init) if self.use_amp and self.gpu_mode != 'ddp' else None
         self.use_deepspeed = False
 
         USE_CUDA = torch.cuda.is_available()
@@ -267,7 +267,7 @@ class TrainLoop:
         Returns:
             loss: loss calculated on current batch
         """
-        with autocast(enabled=self.use_amp):
+        with amp.autocast(enabled=self.use_amp):
             if self.batch_model_feed_def is None:
                 loss_batch = self.model.get_loss(batch_data, self.criterion, self.device)
             else:
@@ -529,7 +529,7 @@ class TrainLoop:
 
         with torch.no_grad():
             for batch_data in tqdm(data_loader):
-                with autocast(enabled=self.use_amp):
+                with amp.autocast(enabled=self.use_amp):
                     if self.batch_model_feed_def is None:
                         loss_batch = self.model.get_loss_eval(batch_data, self.criterion, self.device)
                     else:
@@ -615,7 +615,7 @@ class TrainLoop:
 
         with torch.no_grad():
             for batch_data in tqdm(data_loader):
-                with autocast(enabled=self.use_amp):
+                with amp.autocast(enabled=self.use_amp):
                     if self.batch_model_feed_def is None:
                         y_pred_batch, y_test_batch, metadata_batch = self.model.get_predictions(batch_data, self.device)
                     else:
@@ -768,7 +768,7 @@ class TrainLoop:
 
         # Optionally initialize AMP scaler inside each of the processes
         if self.use_amp:
-            self.amp_scaler = GradScaler(**self.amp_scaler_init)
+            self.amp_scaler = amp.GradScaler(**self.amp_scaler_init)
 
         # Wrap models into DDP module
         if isinstance(self.model, TTModel):
