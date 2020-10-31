@@ -28,6 +28,7 @@ class TestTrainLoop(unittest.TestCase):
         self.assertIsInstance(train_loop.callbacks_handler, CallbacksHandler)
         self.assertEqual(train_loop.callbacks_handler.train_loop_obj, train_loop)
         self.assertFalse(train_loop.early_stop)
+        self.assertIsNone(train_loop.amp_scaler)
 
     def test_fit_mode_selection_single_gpu(self):
         gpu_mode, num_epochs, callbacks, grad_accumulation = self.execute_train_loop_fit_in_mode('single')
