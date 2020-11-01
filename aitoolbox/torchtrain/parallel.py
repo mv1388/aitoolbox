@@ -2,11 +2,6 @@ import functools
 import torch.nn as nn
 from torch.nn.parallel import DistributedDataParallel
 try:
-    from apex.parallel import DistributedDataParallel as ApexDistributedDataParallel
-    APEX_AVAILABLE = True
-except ImportError:
-    APEX_AVAILABLE = False
-try:
     from deepspeed import DeepSpeedLight
     DEEPSPEED_AVAILABLE = True
 except ImportError:
@@ -85,22 +80,6 @@ class TTDistributedDataParallel(DistributedDataParallel, TTParallelBase):
         """
         DistributedDataParallel.__init__(self, module, **kwargs)
         TTParallelBase.__init__(self, module, default_model_methods)
-
-
-if APEX_AVAILABLE:
-    class TTApexDistributedDataParallel(ApexDistributedDataParallel, TTParallelBase):
-        def __init__(self, module,
-                     default_model_methods=('get_loss', 'get_loss_eval', 'get_predictions'), **kwargs):
-            """torchtrain enabled Nvidia Apex DistributedDataParallel
-
-            Args:
-                module (aitoolbox.torchtrain.model.TTModel): neural network model
-                default_model_methods (list or tuple): list of core methods which are present also in TTModel
-                    abstract class
-                **kwargs: additional parameters for underlying apex.parallel.DistributedDataParallel
-            """
-            ApexDistributedDataParallel.__init__(self, module, **kwargs)
-            TTParallelBase.__init__(self, module, default_model_methods)
 
 
 if DEEPSPEED_AVAILABLE:
