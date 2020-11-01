@@ -24,7 +24,7 @@ setup(
         'matplotlib',
         'seaborn',
 
-        'torch',
+        'torch>=1.6.0',
         'torchvision',
         'torchtext',
         'pytorch-nlp',
