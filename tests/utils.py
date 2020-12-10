@@ -392,13 +392,14 @@ class TrainLoopFitMethodTracking(TrainLoop):
     def __init__(self, *args, gpu_mode):
         super().__init__(*args, gpu_mode=gpu_mode)
 
-    def _train(self, num_epochs, callbacks=None, grad_accumulation=1):
-        return 'train_single', num_epochs, callbacks, grad_accumulation
+    def _train(self, num_epochs, num_iterations, callbacks=None, grad_accumulation=1):
+        return 'train_single', num_epochs, num_iterations, callbacks, grad_accumulation
 
-    def _train_dp(self, num_epochs, callbacks=None, grad_accumulation=1, dp_model_args=None):
-        return 'train_dp', num_epochs, callbacks, grad_accumulation, dp_model_args
+    def _train_dp(self, num_epochs, num_iterations, callbacks=None, grad_accumulation=1, dp_model_args=None):
+        return 'train_dp', num_epochs, num_iterations, callbacks, grad_accumulation, dp_model_args
 
-    def _train_ddp(self, num_epochs, callbacks=None, grad_accumulation=1,
+    def _train_ddp(self, num_epochs, num_iterations, callbacks=None, grad_accumulation=1,
                    ddp_model_args=None, in_process_data_load=None,
                    num_nodes=1, node_rank=0, num_gpus=torch.cuda.device_count()):
-        return 'train_ddp', num_epochs, callbacks, grad_accumulation, ddp_model_args, in_process_data_load, num_nodes
+        return 'train_ddp', num_epochs, num_iterations, callbacks, grad_accumulation, ddp_model_args, \
+               in_process_data_load, num_nodes

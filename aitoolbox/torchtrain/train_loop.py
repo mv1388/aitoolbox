@@ -1,6 +1,7 @@
 from tqdm import tqdm
 import os
 import time
+import math
 import datetime
 import inspect
 from typing import Optional
@@ -123,6 +124,7 @@ class TrainLoop:
         self.experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
         self.loss_batch_accum = []
         self.epoch = 0
+        self.total_iterations = 0
 
         self.train_history = TrainingHistory(has_validation=self.validation_loader is not None)
         self.prediction_store = ModelPredictionStore(auto_purge=True)
@@ -147,7 +149,7 @@ class TrainLoop:
             raise ValueError("gpu_mode parameter set to the non-supported value. Can use only the following values: "
                              "'single', 'dp', 'ddp' and 'deepspeed'")
 
-    def fit(self, num_epochs, callbacks=None, grad_accumulation=1, **kwargs):
+    def fit(self, num_epochs=0, num_iterations=0, callbacks=None, grad_accumulation=1, **kwargs):
         """Train the model using the train loop
 
         This is the general API method which starts the model training. By calling this method and depending on
@@ -161,6 +163,8 @@ class TrainLoop:
 
         Args:
             num_epochs (int): how many epochs the network will be trained
+            num_iterations (int): how many iterations (batches) the network will be trained. This enables more granular
+                specification of the training length than the ``num_epochs`` parameter.
             callbacks (list or None): callbacks that are executed during the training run
             grad_accumulation (int): number of batches the gradients are accumulated before updating weights
             **kwargs: additional parameters for training methods:
@@ -175,29 +179,43 @@ class TrainLoop:
         Returns:
             TTModel or torch.nn.modules.Module or TTDataParallel or deepspeed.DeepSpeedLight: trained model
         """
+        if num_epochs > 0 and num_iterations > 0:
+            raise ValueError('Both num_epochs and num_iterations are set. '
+                             'They are mutually exclusive, so set only one of them.')
+        if num_epochs == 0 and num_iterations == 0:
+            raise ValueError('Both num_epochs and num_iterations are set to 0. No training would be done.')
+
         if self.gpu_mode == 'single':
-            return self._train(num_epochs, callbacks=callbacks, grad_accumulation=grad_accumulation)
+            return self._train(num_epochs, num_iterations, callbacks=callbacks, grad_accumulation=grad_accumulation)
         elif self.gpu_mode == 'dp':
-            return self._train_dp(num_epochs, callbacks=callbacks, grad_accumulation=grad_accumulation, **kwargs)
+            return self._train_dp(num_epochs, num_iterations, callbacks=callbacks, grad_accumulation=grad_accumulation,
+                                  **kwargs)
         elif self.gpu_mode == 'ddp':
-            return self._train_ddp(num_epochs, callbacks=callbacks, grad_accumulation=grad_accumulation, **kwargs)
+            return self._train_ddp(num_epochs, num_iterations, callbacks=callbacks, grad_accumulation=grad_accumulation,
+                                   **kwargs)
         elif self.gpu_mode == 'deepspeed':
-            return self._train_deepspeed(num_epochs=num_epochs, callbacks=callbacks, **kwargs)
+            return self._train_deepspeed(num_epochs=num_epochs, num_iterations=num_iterations, callbacks=callbacks,
+                                         **kwargs)
         else:
             raise ValueError("gpu_mode parameter set to the non-supported value. Can use only the following values: "
                              "'single', 'dp', 'ddp' and 'deepspeed'")
 
-    def _train(self, num_epochs, callbacks=None, grad_accumulation=1):
+    def _train(self, num_epochs, num_iterations, callbacks=None, grad_accumulation=1):
         """Train the model using the train loop
 
         Args:
             num_epochs (int): how many epochs the network will be trained
+            num_iterations (int): how many iterations (batches) the network will be trained. This enables more granular
+                specification of the training length than the ``num_epochs`` parameter.
             callbacks (list or None): callbacks that are executed during the training run
             grad_accumulation (int): number of batches the gradients are accumulated before updating weights
 
         Returns:
             TTModel or torch.nn.modules.Module or TTDataParallel or deepspeed.DeepSpeedLight: trained model
         """
+        if num_iterations > 0:
+            num_epochs = int(math.ceil(float(num_iterations) / len(self.train_loader)))
+
         self.callbacks_handler.register_callbacks(callbacks)
 
         self.model = self.model.to(self.device)
@@ -238,6 +256,10 @@ class TrainLoop:
 
                 self.callbacks_handler.execute_batch_end()
 
+                self.total_iterations += 1
+                if self.total_iterations == num_iterations:
+                    break
+
             # Automatic end of epoch code - reports the train and if available validation loss and executes callbacks
             self.auto_execute_end_of_epoch()
             self.callbacks_handler.execute_epoch_end()
@@ -250,6 +272,9 @@ class TrainLoop:
                 self.early_stop = sum(self.ddp_handler.mp_sync(self.early_stop).numpy()) > 0
             # self.early_stop is changed from the early stopper callback
             if self.early_stop:
+                break
+
+            if self.total_iterations == num_iterations:
                 break
 
         self.auto_execute_end_of_training()
@@ -665,11 +690,13 @@ class TrainLoop:
         """
         return [cb for cb in self.callbacks if isinstance(cb, AbstractScheduler)]
 
-    def _train_dp(self, num_epochs, callbacks=None, grad_accumulation=1, dp_model_args=None):
+    def _train_dp(self, num_epochs, num_iterations, callbacks=None, grad_accumulation=1, dp_model_args=None):
         """Train the model on multi-GPU with DataParallel auto wrapping
 
         Args:
             num_epochs (int): how many epochs the network will be trained
+            num_iterations (int): how many iterations (batches) the network will be trained. This enables more granular
+                specification of the training length than the ``num_epochs`` parameter.
             callbacks (list or None): callbacks that are executed during the training run
             grad_accumulation (int): number of batches the gradients are accumulated before updating weights
             dp_model_args (dict or None): parameters for :class:`aitoolbox.torchtrain.parallel.TTDataParallel` /
@@ -686,9 +713,9 @@ class TrainLoop:
             else:
                 self.model = nn.DataParallel(self.model, **dp_model_args)
 
-        return self._train(num_epochs, callbacks, grad_accumulation)
+        return self._train(num_epochs, num_iterations, callbacks, grad_accumulation)
 
-    def _train_ddp(self, num_epochs, callbacks=None, grad_accumulation=1,
+    def _train_ddp(self, num_epochs, num_iterations, callbacks=None, grad_accumulation=1,
                    ddp_model_args=None, in_process_data_load=None,
                    num_nodes=1, node_rank=0, num_gpus=torch.cuda.device_count()):
         """Train the model using the train loop in the Distributed Data Parallel setting
@@ -697,6 +724,8 @@ class TrainLoop:
 
         Args:
             num_epochs (int): how many epochs the network will be trained
+            num_iterations (int): how many iterations (batches) the network will be trained. This enables more granular
+                specification of the training length than the ``num_epochs`` parameter.
             callbacks (list or None): callbacks that are executed during the training run
             grad_accumulation (int): number of batches the gradients are accumulated before updating weights
             ddp_model_args (dict or None): parameters for DistributedDataParallel model
@@ -731,17 +760,19 @@ class TrainLoop:
 
         mp.spawn(self._spawn_fit,
                  args=(
-                     ddp_args, num_epochs, callbacks, grad_accumulation, in_process_data_load
+                     ddp_args, num_epochs, num_iterations, callbacks, grad_accumulation, in_process_data_load
                  ),
                  nprocs=ddp_args['world_size'])
 
-    def _spawn_fit(self, gpu, ddp_args, num_epochs, callbacks, grad_accumulation, in_process_data_load):
+    def _spawn_fit(self, gpu, ddp_args, num_epochs, num_iterations, callbacks, grad_accumulation, in_process_data_load):
         """Helper function that prepares the TrainLoop state inside each of the spawned processes and initiates training
 
         Args:
             gpu (int): provided by the mp.spawn(); index of the GPU allocated to the current process
             ddp_args (dict): parameters dict needed for the distributed training setup
             num_epochs (int): how many epochs the network will be trained
+            num_iterations (int): how many iterations (batches) the network will be trained. This enables more granular
+                specification of the training length than the ``num_epochs`` parameter.
             callbacks (list or None): callbacks that are executed during the training run
             grad_accumulation (int): number of batches the gradients are accumulated before updating weights
             in_process_data_load (list or None): in-process data loading logic implemented as a torchtrain callback.
@@ -778,9 +809,9 @@ class TrainLoop:
         else:
             self.model = DistributedDataParallel(self.model, device_ids=[gpu], **ddp_args['ddp_model_args'])
 
-        self._train(num_epochs, callbacks, grad_accumulation)
+        self._train(num_epochs, num_iterations, callbacks, grad_accumulation)
 
-    def _train_deepspeed(self, deepspeed_args, num_epochs, callbacks=None,
+    def _train_deepspeed(self, deepspeed_args, num_epochs, num_iterations, callbacks=None,
                          **ds_model_args):
         """Train the model using Microsoft DeepSpeed package
 
@@ -794,6 +825,8 @@ class TrainLoop:
             deepspeed_args (argparse.Namespace): argparser results structured as per DeepSpeed requirements.
                 A dictionary containing local_rank and deepspeed_config file location.
             num_epochs (int): how many epochs the network will be trained
+            num_iterations (int): how many iterations (batches) the network will be trained. This enables more granular
+                specification of the training length than the ``num_epochs`` parameter.
             callbacks (list): callbacks that are executed during the training run
             **ds_model_args: additional parameters for the underlying ``deepspeed.DeepSpeedLight`` class
 
@@ -819,15 +852,17 @@ class TrainLoop:
         self.optimizer = self.model.optimizer
         self.train_loader = self.model.training_dataloader
 
-        return self._train(num_epochs, callbacks)
+        return self._train(num_epochs, num_iterations, callbacks)
 
-    def __call__(self, num_epochs, callbacks=None, grad_accumulation=1, **kwargs):
+    def __call__(self, num_epochs=0, num_iterations=0, callbacks=None, grad_accumulation=1, **kwargs):
         """Train the model using the train loop
 
         This is a convenience function which calls the main TrainLoop model training method fit().
 
         Args:
             num_epochs (int): how many epochs the network will be trained
+            num_iterations (int): how many iterations (batches) the network will be trained. This enables more granular
+                specification of the training length than the ``num_epochs`` parameter.
             callbacks (list): callbacks that are executed during the training run
             grad_accumulation (int): number of batches the gradients are accumulated before updating weights
             **kwargs: additional parameters for ``_train_dp()``, ``_train_ddp()`` and ``_train_deepspeed()`` methods.
@@ -835,7 +870,7 @@ class TrainLoop:
         Returns:
             TTModel or torch.nn.modules.Module or TTDataParallel: trained model
         """
-        return self.fit(num_epochs, callbacks, grad_accumulation, **kwargs)
+        return self.fit(num_epochs, num_iterations, callbacks, grad_accumulation, **kwargs)
 
 
 class TrainLoopCheckpoint(TrainLoop):

@@ -31,25 +31,29 @@ class TestTrainLoop(unittest.TestCase):
         self.assertIsNone(train_loop.amp_scaler)
 
     def test_fit_mode_selection_single_gpu(self):
-        gpu_mode, num_epochs, callbacks, grad_accumulation = self.execute_train_loop_fit_in_mode('single')
+        gpu_mode, num_epochs, num_iterations, callbacks, grad_accumulation = \
+            self.execute_train_loop_fit_in_mode('single')
 
         self.assertEqual(gpu_mode, 'train_single')
         self.assertEqual(num_epochs, 5)
+        self.assertEqual(num_iterations, 0)
         self.assertEqual(callbacks, [10])
         self.assertEqual(grad_accumulation, 1)
 
     def test_fit_mode_selection_dp(self):
-        gpu_mode, num_epochs, callbacks, grad_accumulation, dp_model_args = \
+        gpu_mode, num_epochs, num_iterations, callbacks, grad_accumulation, dp_model_args = \
             self.execute_train_loop_fit_in_mode('dp', dp_model_args={'aaa': 1})
 
         self.assertEqual(gpu_mode, 'train_dp')
         self.assertEqual(num_epochs, 5)
+        self.assertEqual(num_iterations, 0)
         self.assertEqual(callbacks, [10])
         self.assertEqual(grad_accumulation, 1)
         self.assertEqual(dp_model_args, {'aaa': 1})
 
     def test_fit_mode_selection_ddp(self):
-        gpu_mode, num_epochs, callbacks, grad_accumulation, ddp_model_args, in_process_data_load, num_nodes = \
+        gpu_mode, num_epochs, num_iterations, callbacks, \
+            grad_accumulation, ddp_model_args, in_process_data_load, num_nodes = \
             self.execute_train_loop_fit_in_mode(
                 'ddp',
                 ddp_model_args={'aaa': 1}, in_process_data_load='bla', num_nodes=5
@@ -57,6 +61,7 @@ class TestTrainLoop(unittest.TestCase):
 
         self.assertEqual(gpu_mode, 'train_ddp')
         self.assertEqual(num_epochs, 5)
+        self.assertEqual(num_iterations, 0)
         self.assertEqual(callbacks, [10])
         self.assertEqual(grad_accumulation, 1)
         self.assertEqual(ddp_model_args, {'aaa': 1})
