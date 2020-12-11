@@ -67,6 +67,7 @@ class ModelCheckpoint(AbstractCallback):
                 'optimizer_state_dict': self.train_loop_obj.optimizer.state_dict(),
                 'schedulers_state_dict': [scheduler.state_dict() for scheduler in self.train_loop_obj.get_schedulers()],
                 'epoch': self.train_loop_obj.epoch,
+                'iteration_idx': self.train_loop_obj.iteration_idx,
                 'hyperparams': self.hyperparams
             }
             # If Nvidia apex amp is used
@@ -191,6 +192,7 @@ class ModelTrainEndSave(AbstractCallback):
                 'optimizer_state_dict': self.train_loop_obj.optimizer.state_dict(),
                 'schedulers_state_dict': [scheduler.state_dict() for scheduler in self.train_loop_obj.get_schedulers()],
                 'epoch': self.train_loop_obj.epoch,
+                'iteration_idx': self.train_loop_obj.iteration_idx,
                 'hyperparams': self.hyperparams
             }
             # If Nvidia apex amp is used
