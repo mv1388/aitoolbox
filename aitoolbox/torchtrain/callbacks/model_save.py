@@ -140,6 +140,78 @@ class ModelCheckpoint(AbstractCallback):
                 self._hyperparams_already_saved = True
 
 
+class ModelIterationCheckpoint(ModelCheckpoint):
+    def __init__(self, save_frequency,
+                 project_name, experiment_name, local_model_result_folder_path,
+                 hyperparams,
+                 cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix='',
+                 rm_subopt_local_models=False, num_best_checkpoints_kept=2):
+        """Check-point save the model during training to disk or also to S3 / GCS cloud storage
+
+        Args:
+            save_frequency (int): frequency of saving the model checkpoint every specified number of training iterations
+            project_name (str): root name of the project
+            experiment_name (str): name of the particular experiment
+            local_model_result_folder_path (str): root local path where project folder will be created
+            hyperparams (dict): used hyper-parameters. When running the TrainLoop from jupyter notebook in order to
+                ensure the python experiment file copying to the experiment folder, the user needs to manually
+                specify the python file path as the value for the `experiment_file_path` key. If running the training
+                directly from the terminal the path deduction is done automatically.
+            cloud_save_mode (str or None): Storage destination selector.
+                For AWS S3: 's3' / 'aws_s3' / 'aws'
+                For Google Cloud Storage: 'gcs' / 'google_storage' / 'google storage'
+                Everything else results just in local storage to disk
+            bucket_name (str): name of the bucket in the cloud storage
+            cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
+            rm_subopt_local_models (bool or str): if True, the deciding metric is set to 'loss'. Give string metric name
+                to set it as a deciding metric for suboptimal model removal. If metric name consists of substring 'loss'
+                the metric minimization is done otherwise metric maximization is done
+            num_best_checkpoints_kept (int): number of best performing models which are kept when removing suboptimal
+                model checkpoints
+        """
+        super().__init__(
+            project_name, experiment_name, local_model_result_folder_path,
+            hyperparams,
+            cloud_save_mode, bucket_name, cloud_dir_prefix,
+            rm_subopt_local_models, num_best_checkpoints_kept
+        )
+        self.save_frequency = save_frequency
+
+        if save_frequency < 0:
+            raise ValueError(f'save_frequency can have values only >= 0. But received value {save_frequency}.')
+
+    def on_batch_end(self):
+        if self.train_loop_obj.iteration_idx % self.save_frequency == 0 and self.train_loop_obj.iteration_idx > 0:
+            print(f'--> Saving model checkpoint at the training iteration: {self.train_loop_obj.iteration_idx}')
+            self.save_hyperparams()
+
+            if not self.train_loop_obj.use_deepspeed:
+                model_checkpoint = {
+                    'model_state_dict': self.train_loop_obj.model.state_dict(),
+                    'optimizer_state_dict': self.train_loop_obj.optimizer.state_dict(),
+                    'schedulers_state_dict': [scheduler.state_dict() for scheduler in
+                                              self.train_loop_obj.get_schedulers()],
+                    'epoch': self.train_loop_obj.epoch,
+                    'iteration_idx': self.train_loop_obj.iteration_idx,
+                    'hyperparams': self.hyperparams
+                }
+                # If Nvidia apex amp is used
+                if self.train_loop_obj.use_amp:
+                    model_checkpoint['amp'] = self.train_loop_obj.amp_scaler.state_dict()
+            else:
+                model_checkpoint = self.train_loop_obj.model
+
+            model_paths = self.model_checkpointer.save_model(
+                model=model_checkpoint,
+                project_name=self.project_name,
+                experiment_name=self.experiment_name,
+                experiment_timestamp=self.train_loop_obj.experiment_timestamp,
+                epoch=self.train_loop_obj.epoch,
+                iteration_idx=self.train_loop_obj.iteration_idx,
+                protect_existing_folder=True
+            )
+
+
 class ModelTrainEndSave(AbstractCallback):
     def __init__(self, project_name, experiment_name, local_model_result_folder_path,
                  hyperparams, val_result_package=None, test_result_package=None,
