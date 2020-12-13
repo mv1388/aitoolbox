@@ -25,7 +25,7 @@ class TestTrainLoop(unittest.TestCase):
         self.assertEqual(train_loop.train_history.train_history, {'loss': [], 'accumulated_loss': [], 'val_loss': []})
 
         self.assertEqual(train_loop.epoch, 0)
-        self.assertEqual(train_loop.iteration_idx, -1)
+        self.assertEqual(train_loop.total_iteration_idx, -1)
         self.assertEqual(train_loop.callbacks, [])
         self.assertIsInstance(train_loop.callbacks_handler, CallbacksHandler)
         self.assertEqual(train_loop.callbacks_handler.train_loop_obj, train_loop)
@@ -286,7 +286,7 @@ class TestTrainLoop(unittest.TestCase):
         )
         train_loop.fit(num_epochs=10)
 
-        self.assertEqual(train_loop.iteration_idx, (4 * 10) - 1)
+        self.assertEqual(train_loop.total_iteration_idx, (4 * 10) - 1)
         self.assertEqual(train_loop.epoch, 9)
         self.assertFalse(train_loop.early_stop)
 
@@ -304,7 +304,7 @@ class TestTrainLoop(unittest.TestCase):
         )
         train_loop.fit(num_iterations=10)
 
-        self.assertEqual(train_loop.iteration_idx, 9)
+        self.assertEqual(train_loop.total_iteration_idx, 9)
         self.assertEqual(train_loop.epoch, 2)
         self.assertFalse(train_loop.early_stop)
 
@@ -322,7 +322,7 @@ class TestTrainLoop(unittest.TestCase):
         )
         train_loop.fit(num_iterations=10)
 
-        self.assertEqual(train_loop.iteration_idx, 9)
+        self.assertEqual(train_loop.total_iteration_idx, 9)
         self.assertEqual(train_loop.epoch, 3)
         self.assertFalse(train_loop.early_stop)
 
@@ -340,7 +340,7 @@ class TestTrainLoop(unittest.TestCase):
         )
         train_loop.fit(num_iterations=150)
 
-        self.assertEqual(train_loop.iteration_idx, 149)
+        self.assertEqual(train_loop.total_iteration_idx, 149)
         self.assertEqual(train_loop.epoch, 4)
         self.assertFalse(train_loop.early_stop)
 

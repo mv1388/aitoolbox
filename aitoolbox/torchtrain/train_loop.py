@@ -125,7 +125,7 @@ class TrainLoop:
         self.loss_batch_accum = []
         self.epoch = 0
         # Intentionally set to -1 because we do += 1 at the start of every iteration
-        self.iteration_idx = -1
+        self.total_iteration_idx = -1
 
         self.train_history = TrainingHistory(has_validation=self.validation_loader is not None)
         self.prediction_store = ModelPredictionStore(auto_purge=True)
@@ -235,7 +235,7 @@ class TrainLoop:
             self.callbacks_handler.execute_epoch_begin()
 
             for iteration, batch_data in enumerate(tqdm(self.train_loader)):
-                self.iteration_idx += 1
+                self.total_iteration_idx += 1
                 self.callbacks_handler.execute_batch_begin()
 
                 # Feed batch into the model
@@ -258,7 +258,7 @@ class TrainLoop:
 
                 self.callbacks_handler.execute_batch_end()
 
-                if self.iteration_idx + 1 == num_iterations:
+                if self.total_iteration_idx + 1 == num_iterations:
                     break
 
             # Automatic end of epoch code - reports the train and if available validation loss and executes callbacks
@@ -275,9 +275,9 @@ class TrainLoop:
             if self.early_stop:
                 break
 
-            if self.iteration_idx + 1 == num_iterations:
+            if self.total_iteration_idx + 1 == num_iterations:
                 print(f'Stopping training after {num_iterations} training iterations. '
-                      f'Current iteration index: {self.iteration_idx}')
+                      f'Current iteration index: {self.total_iteration_idx}')
                 break
 
         self.auto_execute_end_of_training()
