@@ -147,9 +147,7 @@ class TestTrainLoopVSCorePyTorch(unittest.TestCase):
 
     def test_training_iteration_trainloop_core_pytorch_prediction_loss_compare(self):
         num_epochs = 10
-
         batch_size = 10
-        grad_accumulation = 5
 
         self.set_seeds()
         model_aitb = FFNetAIToolbox()
@@ -175,7 +173,7 @@ class TestTrainLoopVSCorePyTorch(unittest.TestCase):
         )
         train_loop.fit(num_iterations=num_epochs * len(train_dataloader))
 
-        self.assertEqual(train_loop.iteration_idx, (num_epochs * len(train_dataloader)) - 1)
+        self.assertEqual(train_loop.total_iteration_idx, (num_epochs * len(train_dataloader)) - 1)
 
         train_pred_aitb, _, _ = train_loop.predict_on_train_set()
         val_pred_aitb, _, _ = train_loop.predict_on_validation_set()
@@ -200,7 +198,7 @@ class TestTrainLoopVSCorePyTorch(unittest.TestCase):
         self.assertEqual(iteration_ctr, 1000)
         self.assertEqual(iteration_ctr, num_epochs * len(train_dataloader))
 
-        self.assertEqual(train_loop.iteration_idx, iteration_ctr - 1)
+        self.assertEqual(train_loop.total_iteration_idx, iteration_ctr - 1)
 
         train_pred_pt, train_loss_pt = [], []
         model_pt.eval()
