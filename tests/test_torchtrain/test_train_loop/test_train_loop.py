@@ -24,6 +24,8 @@ class TestTrainLoop(unittest.TestCase):
         train_loop = TrainLoop(NetUnifiedBatchFeed(), None, 100, None, None, None)
         self.assertEqual(train_loop.train_history.train_history, {'loss': [], 'accumulated_loss': [], 'val_loss': []})
 
+        self.assertEqual(train_loop.epoch, 0)
+        self.assertEqual(train_loop.total_iteration_idx, -1)
         self.assertEqual(train_loop.callbacks, [])
         self.assertIsInstance(train_loop.callbacks_handler, CallbacksHandler)
         self.assertEqual(train_loop.callbacks_handler.train_loop_obj, train_loop)
@@ -31,25 +33,29 @@ class TestTrainLoop(unittest.TestCase):
         self.assertIsNone(train_loop.amp_scaler)
 
     def test_fit_mode_selection_single_gpu(self):
-        gpu_mode, num_epochs, callbacks, grad_accumulation = self.execute_train_loop_fit_in_mode('single')
+        gpu_mode, num_epochs, num_iterations, callbacks, grad_accumulation = \
+            self.execute_train_loop_fit_in_mode('single')
 
         self.assertEqual(gpu_mode, 'train_single')
         self.assertEqual(num_epochs, 5)
+        self.assertEqual(num_iterations, 0)
         self.assertEqual(callbacks, [10])
         self.assertEqual(grad_accumulation, 1)
 
     def test_fit_mode_selection_dp(self):
-        gpu_mode, num_epochs, callbacks, grad_accumulation, dp_model_args = \
+        gpu_mode, num_epochs, num_iterations, callbacks, grad_accumulation, dp_model_args = \
             self.execute_train_loop_fit_in_mode('dp', dp_model_args={'aaa': 1})
 
         self.assertEqual(gpu_mode, 'train_dp')
         self.assertEqual(num_epochs, 5)
+        self.assertEqual(num_iterations, 0)
         self.assertEqual(callbacks, [10])
         self.assertEqual(grad_accumulation, 1)
         self.assertEqual(dp_model_args, {'aaa': 1})
 
     def test_fit_mode_selection_ddp(self):
-        gpu_mode, num_epochs, callbacks, grad_accumulation, ddp_model_args, in_process_data_load, num_nodes = \
+        gpu_mode, num_epochs, num_iterations, callbacks, \
+            grad_accumulation, ddp_model_args, in_process_data_load, num_nodes = \
             self.execute_train_loop_fit_in_mode(
                 'ddp',
                 ddp_model_args={'aaa': 1}, in_process_data_load='bla', num_nodes=5
@@ -57,6 +63,7 @@ class TestTrainLoop(unittest.TestCase):
 
         self.assertEqual(gpu_mode, 'train_ddp')
         self.assertEqual(num_epochs, 5)
+        self.assertEqual(num_iterations, 0)
         self.assertEqual(callbacks, [10])
         self.assertEqual(grad_accumulation, 1)
         self.assertEqual(ddp_model_args, {'aaa': 1})
@@ -264,6 +271,103 @@ class TestTrainLoop(unittest.TestCase):
                          {'on_train_loop_registration': 0, 'on_epoch_begin': 2, 'on_epoch_end': 2, 'on_train_begin': 0,
                           'on_train_end': 1, 'on_batch_begin': 8, 'on_batch_end': 0,
                           'on_after_gradient_update': 8, 'on_after_optimizer_step': 8})
+
+    def test_fit_epoch_num(self):
+        dummy_optimizer = DummyOptimizer()
+        dummy_loss = DummyLoss()
+        dummy_train_loader = list(range(4))
+        dummy_val_loader = list(range(3))
+        dummy_test_loader = list(range(2))
+
+        model = NetUnifiedBatchFeed()
+        train_loop = TrainLoop(
+            model, dummy_train_loader, dummy_val_loader, dummy_test_loader,
+            dummy_optimizer, dummy_loss
+        )
+        train_loop.fit(num_epochs=10)
+
+        self.assertEqual(train_loop.total_iteration_idx, (4 * 10) - 1)
+        self.assertEqual(train_loop.epoch, 9)
+        self.assertFalse(train_loop.early_stop)
+
+    def test_fit_iteration_number_simple(self):
+        dummy_optimizer = DummyOptimizer()
+        dummy_loss = DummyLoss()
+        dummy_train_loader = list(range(4))
+        dummy_val_loader = list(range(3))
+        dummy_test_loader = list(range(2))
+
+        model = NetUnifiedBatchFeed()
+        train_loop = TrainLoop(
+            model, dummy_train_loader, dummy_val_loader, dummy_test_loader,
+            dummy_optimizer, dummy_loss
+        )
+        train_loop.fit(num_iterations=10)
+
+        self.assertEqual(train_loop.total_iteration_idx, 9)
+        self.assertEqual(train_loop.epoch, 2)
+        self.assertFalse(train_loop.early_stop)
+
+    def test_fit_iteration_number_round_up(self):
+        dummy_optimizer = DummyOptimizer()
+        dummy_loss = DummyLoss()
+        dummy_train_loader = list(range(3))
+        dummy_val_loader = list(range(3))
+        dummy_test_loader = list(range(2))
+
+        model = NetUnifiedBatchFeed()
+        train_loop = TrainLoop(
+            model, dummy_train_loader, dummy_val_loader, dummy_test_loader,
+            dummy_optimizer, dummy_loss
+        )
+        train_loop.fit(num_iterations=10)
+
+        self.assertEqual(train_loop.total_iteration_idx, 9)
+        self.assertEqual(train_loop.epoch, 3)
+        self.assertFalse(train_loop.early_stop)
+
+    def test_fit_iteration_number_long_train(self):
+        dummy_optimizer = DummyOptimizer()
+        dummy_loss = DummyLoss()
+        dummy_train_loader = list(range(32))
+        dummy_val_loader = list(range(3))
+        dummy_test_loader = list(range(2))
+
+        model = NetUnifiedBatchFeed()
+        train_loop = TrainLoop(
+            model, dummy_train_loader, dummy_val_loader, dummy_test_loader,
+            dummy_optimizer, dummy_loss
+        )
+        train_loop.fit(num_iterations=150)
+
+        self.assertEqual(train_loop.total_iteration_idx, 149)
+        self.assertEqual(train_loop.epoch, 4)
+        self.assertFalse(train_loop.early_stop)
+
+    def test_fit_epoch_num_iteration_num_error(self):
+        dummy_optimizer = DummyOptimizer()
+        dummy_loss = DummyLoss()
+        dummy_train_loader = list(range(4))
+        dummy_val_loader = list(range(3))
+        dummy_test_loader = list(range(2))
+
+        model = NetUnifiedBatchFeed()
+        train_loop = TrainLoop(
+            model, dummy_train_loader, dummy_val_loader, dummy_test_loader,
+            dummy_optimizer, dummy_loss
+        )
+
+        with self.assertRaises(ValueError):
+            train_loop.fit(num_epochs=10, num_iterations=123)
+
+        with self.assertRaises(ValueError):
+            train_loop.fit()
+
+        with self.assertRaises(ValueError):
+            train_loop.fit(0, 0)
+
+        with self.assertRaises(ValueError):
+            train_loop.fit(num_epochs=0, num_iterations=0)
 
     def test_predict_train_data(self):
         self.eval_prediction('train')
