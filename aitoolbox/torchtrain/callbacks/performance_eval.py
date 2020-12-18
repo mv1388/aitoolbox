@@ -12,7 +12,8 @@ from aitoolbox.experiment.result_reporting.report_generator import TrainingHisto
 
 class ModelPerformanceEvaluation(AbstractCallback):
     def __init__(self, result_package, args,
-                 on_each_epoch=True, on_train_data=False, on_val_data=True, eval_frequency=None,
+                 on_each_epoch=True, on_train_data=False, on_val_data=True,
+                 eval_frequency=None, on_iteration_frequency=0,
                  if_available_output_to_project_dir=True):
         """Track performance metrics from result_package and store them into TrainLoop's history
 
@@ -26,10 +27,13 @@ class ModelPerformanceEvaluation(AbstractCallback):
             result_package (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
             args (dict):
             on_each_epoch (bool): calculate performance results just at the end of training or at the end of each epoch
-            on_train_data (bool):
-            on_val_data (bool):
+            on_train_data (bool): evaluate on training data
+            on_val_data (bool): evaluate on validation data
             eval_frequency (int or None): evaluation is done every specified number of epochs. Useful when predictions
                 are quite expensive and are slowing down the overall training
+            on_iteration_frequency (int): evaluation frequency in terms of training iterations used for more
+                fine-grained sub-epoch performance evaluation specification. If set to 0 no inter epoch execution is
+                performed.
             if_available_output_to_project_dir (bool): if using train loop version which builds project local folder
                 structure for saving checkpoints or creation of end of training reports, by setting
                 if_available_output_to_project_dir to True the potential additional metadata result outputs from the
@@ -47,6 +51,7 @@ class ModelPerformanceEvaluation(AbstractCallback):
         self.on_train_data = on_train_data
         self.on_val_data = on_val_data
         self.eval_frequency = eval_frequency
+        self.on_iteration_frequency = on_iteration_frequency
         self.if_available_output_to_project_dir = if_available_output_to_project_dir
 
         if not on_train_data and not on_val_data:
@@ -66,6 +71,12 @@ class ModelPerformanceEvaluation(AbstractCallback):
             else:
                 print(f'Skipping performance evaluation on this epoch ({self.train_loop_obj.epoch}). '
                       f'Evaluating every {self.eval_frequency} epochs.')
+
+    def on_batch_end(self):
+        if self.on_iteration_frequency > 0:
+            if self.train_loop_obj.total_iteration_idx % self.on_iteration_frequency == 0 and \
+                    self.train_loop_obj.total_iteration_idx > 0:
+                self.evaluate_model_performance(prefix=f'iterfreq{self.on_iteration_frequency}_')
 
     def evaluate_model_performance(self, prefix=''):
         """Calculate performance based on the provided result packages
@@ -131,7 +142,7 @@ class ModelPerformanceEvaluation(AbstractCallback):
 
 
 class ModelPerformancePrintReport(AbstractCallback):
-    def __init__(self, metrics, on_each_epoch=True, report_frequency=None,
+    def __init__(self, metrics, on_each_epoch=True, report_frequency=None, report_iteration_frequency=0,
                  strict_metric_reporting=True, list_tracked_metrics=False):
         """Print the model performance to the console
 
@@ -147,6 +158,9 @@ class ModelPerformancePrintReport(AbstractCallback):
             on_each_epoch (bool): present results just at the end of training or at the end of each epoch
             report_frequency (int or None): evaluation is done every specified number of epochs. Useful when predictions
                 are quite expensive and are slowing down the overall training
+            report_iteration_frequency (int): report frequency in terms of training iterations used for more
+                fine-grained sub-epoch performance evaluation specification. If set to 0 no inter epoch execution is
+                performed.
             strict_metric_reporting (bool): if False ignore missing metric in the TrainLoop.train_history, if True, in
                 case of missing metric throw and exception and thus interrupt the training loop
             list_tracked_metrics (bool): should all tracked metrics names be listed
@@ -156,6 +170,7 @@ class ModelPerformancePrintReport(AbstractCallback):
         self.metrics = metrics
         self.on_each_epoch = on_each_epoch
         self.report_frequency = report_frequency
+        self.report_iteration_frequency = report_iteration_frequency
         self.strict_metric_reporting = strict_metric_reporting
         self.list_tracked_metrics = list_tracked_metrics
 
@@ -172,6 +187,14 @@ class ModelPerformancePrintReport(AbstractCallback):
                     (self.report_frequency is not None and self.train_loop_obj.epoch % self.report_frequency == 0):
                 print('------------------  End of epoch performance report  -------------------')
                 self.print_performance_report()
+
+    def on_batch_end(self):
+        if self.report_iteration_frequency > 0:
+            if self.train_loop_obj.total_iteration_idx % self.report_iteration_frequency == 0 and \
+                    self.train_loop_obj.total_iteration_idx > 0:
+                print(f'------------------  Iteration #{self.train_loop_obj.total_iteration_idx} performance report  '
+                      '-------------------')
+                self.print_performance_report(prefix=f'iterfreq{self.report_iteration_frequency}_')
 
     def print_performance_report(self, prefix=''):
         """Print the model performance
@@ -301,10 +324,11 @@ class MetricHistoryRename(TrainHistoryFormatter):
 
 class ModelTrainHistoryBaseCB(AbstractExperimentCallback):
     def __init__(self, callback_name, execution_order=0,
-                 epoch_end=True, train_end=False, file_format='',
+                 epoch_end=True, train_end=False, report_iteration_frequency=0, file_format='',
                  project_name=None, experiment_name=None, local_model_result_folder_path=None,
                  cloud_save_mode=None, bucket_name=None, cloud_dir_prefix=None):
-        """Base callback class to be inherited from when reporting train performance history
+        """Base callback class to be inherited from when reporting train performance history in a saved
+            file-based format
 
         Args:
             callback_name (str): name of the callback
@@ -312,6 +336,9 @@ class ModelTrainHistoryBaseCB(AbstractExperimentCallback):
                 than the callbacks are executed in the order they were registered.
             epoch_end (bool): should plot after every epoch
             train_end (bool): should plot at the end of the training
+            report_iteration_frequency (int): report frequency in terms of training iterations used for more
+                fine-grained sub-epoch performance evaluation specification. If set to 0 no inter epoch execution is
+                performed.
             file_format (str): output file format
             project_name (str or None): root name of the project
             experiment_name (str or None): name of the particular experiment
@@ -331,6 +358,7 @@ class ModelTrainHistoryBaseCB(AbstractExperimentCallback):
             raise ValueError('Both epoch_end and train_end are set to False. At least one of these should be True.')
         self.epoch_end = epoch_end
         self.train_end = train_end
+        self.report_iteration_frequency = report_iteration_frequency
         self.file_format = file_format
 
         self.cloud_results_saver = None
@@ -353,7 +381,7 @@ class ModelTrainHistoryBaseCB(AbstractExperimentCallback):
 
 
 class ModelTrainHistoryPlot(ModelTrainHistoryBaseCB):
-    def __init__(self, epoch_end=True, train_end=False, file_format='png',
+    def __init__(self, epoch_end=True, train_end=False, report_iteration_frequency=0, file_format='png',
                  project_name=None, experiment_name=None, local_model_result_folder_path=None,
                  cloud_save_mode=None, bucket_name=None, cloud_dir_prefix=None):
         """Plot the evaluated performance metric history
@@ -361,6 +389,9 @@ class ModelTrainHistoryPlot(ModelTrainHistoryBaseCB):
         Args:
             epoch_end (bool): should plot after every epoch
             train_end (bool): should plot at the end of the training
+            report_iteration_frequency (int): report frequency in terms of training iterations used for more
+                fine-grained sub-epoch performance evaluation specification. If set to 0 no inter epoch execution is
+                performed.
             file_format (str): output file format. Can be either 'png' for saving separate images or 'pdf' for combining
                 all the plots into a single pdf file.
             project_name (str or None): root name of the project
@@ -376,7 +407,8 @@ class ModelTrainHistoryPlot(ModelTrainHistoryBaseCB):
         # execution_order=97 makes sure that any performance calculation callbacks are executed before and the most
         # recent results can already be found in the train_history
         ModelTrainHistoryBaseCB.__init__(self, 'Model Train history Plot report', execution_order=97,
-                                         epoch_end=epoch_end, train_end=train_end, file_format=file_format,
+                                         epoch_end=epoch_end, train_end=train_end,
+                                         report_iteration_frequency=report_iteration_frequency, file_format=file_format,
                                          project_name=project_name, experiment_name=experiment_name,
                                          local_model_result_folder_path=local_model_result_folder_path,
                                          cloud_save_mode=cloud_save_mode, bucket_name=bucket_name,
@@ -389,6 +421,16 @@ class ModelTrainHistoryPlot(ModelTrainHistoryBaseCB):
         self.try_infer_experiment_details(infer_cloud_details=True)
         self.prepare_results_saver()
 
+    def on_batch_end(self):
+        if self.report_iteration_frequency > 0:
+            if self.train_loop_obj.total_iteration_idx % self.report_iteration_frequency == 0 and \
+                    self.train_loop_obj.total_iteration_idx > 0:
+                # TODO: Decide if the prefix should be removed here so that we just mix iteration and epoch results
+                self.plot_current_train_history(
+                    prefix=f'iterfreq{self.report_iteration_frequency}_',
+                    iteration_level=True
+                )
+
     def on_epoch_end(self):
         if self.epoch_end:
             self.plot_current_train_history()
@@ -397,15 +439,22 @@ class ModelTrainHistoryPlot(ModelTrainHistoryBaseCB):
         if self.train_end:
             self.plot_current_train_history(prefix='train_end_')
 
-    def plot_current_train_history(self, prefix=''):
+    def plot_current_train_history(self, prefix='', iteration_level=False):
         """Plot current training history snapshot in the encapsulating TrainLoop
 
         Args:
             prefix (str): plots folder name prefix
+            iteration_level (bool): set to True if reporting is done at the iteration level instead of epoch level
 
         Returns:
             None
         """
+        iteration_suffix = ''
+        iteration_frequency = None
+        if iteration_level:
+            iteration_suffix = f'_iter_{self.train_loop_obj.total_iteration_idx}'
+            iteration_frequency = self.report_iteration_frequency
+
         experiment_results_local_path = \
             BaseLocalResultsSaver.create_experiment_local_results_folder(self.project_name, self.experiment_name,
                                                                          self.train_loop_obj.experiment_timestamp,
@@ -413,9 +462,12 @@ class ModelTrainHistoryPlot(ModelTrainHistoryBaseCB):
 
         plotter = TrainingHistoryPlotter(experiment_results_local_path=experiment_results_local_path)
         saved_local_results_details = \
-            plotter.generate_report(training_history=self.train_loop_obj.train_history,
-                                    plots_folder_name=f'{prefix}plots_epoch_{self.train_loop_obj.epoch}',
-                                    file_format=self.file_format)
+            plotter.generate_report(
+                training_history=self.train_loop_obj.train_history,
+                plots_folder_name=f'{prefix}plots_epoch_{self.train_loop_obj.epoch}{iteration_suffix}',
+                file_format=self.file_format,
+                iteration_frequency=iteration_frequency
+            )
 
         results_file_local_paths = [result_local_path for _, result_local_path in saved_local_results_details]
         self.message_service.write_message('ModelTrainHistoryPlot_results_file_local_paths',
@@ -435,7 +487,7 @@ class ModelTrainHistoryPlot(ModelTrainHistoryBaseCB):
 
 
 class ModelTrainHistoryFileWriter(ModelTrainHistoryBaseCB):
-    def __init__(self, epoch_end=True, train_end=False, file_format='txt',
+    def __init__(self, epoch_end=True, train_end=False, report_iteration_frequency=0, file_format='txt',
                  project_name=None, experiment_name=None, local_model_result_folder_path=None,
                  cloud_save_mode=None, bucket_name=None, cloud_dir_prefix=None):
         """Write evaluated performance metric history to the text file
@@ -443,6 +495,9 @@ class ModelTrainHistoryFileWriter(ModelTrainHistoryBaseCB):
         Args:
             epoch_end (bool): should plot after every epoch
             train_end (bool): should plot at the end of the training
+            report_iteration_frequency (int): report frequency in terms of training iterations used for more
+                fine-grained sub-epoch performance evaluation specification. If set to 0 no inter epoch execution is
+                performed.
             file_format (str): output file format. Can be either 'txt' human readable output or
                 'tsv' for a tabular format or 'csv' for comma separated format.
             project_name (str or None): root name of the project
@@ -458,7 +513,8 @@ class ModelTrainHistoryFileWriter(ModelTrainHistoryBaseCB):
         # execution_order=97 makes sure that any performance calculation callbacks are executed before and the most
         # recent results can already be found in the train_history
         ModelTrainHistoryBaseCB.__init__(self, 'Model Train performance history file writer', execution_order=97,
-                                         epoch_end=epoch_end, train_end=train_end, file_format=file_format,
+                                         epoch_end=epoch_end, train_end=train_end,
+                                         report_iteration_frequency=report_iteration_frequency, file_format=file_format,
                                          project_name=project_name, experiment_name=experiment_name,
                                          local_model_result_folder_path=local_model_result_folder_path,
                                          cloud_save_mode=cloud_save_mode, bucket_name=bucket_name,
@@ -473,6 +529,16 @@ class ModelTrainHistoryFileWriter(ModelTrainHistoryBaseCB):
         self.try_infer_experiment_details(infer_cloud_details=True)
         self.prepare_results_saver()
 
+    def on_batch_end(self):
+        if self.report_iteration_frequency > 0:
+            if self.train_loop_obj.total_iteration_idx % self.report_iteration_frequency == 0 and \
+                    self.train_loop_obj.total_iteration_idx > 0:
+                # TODO: Decide if the prefix should be removed here so that we just mix iteration and epoch results
+                self.write_current_train_history(
+                    prefix=f'iterfreq{self.report_iteration_frequency}_',
+                    iteration_level=True
+                )
+
     def on_epoch_end(self):
         if self.epoch_end:
             self.write_current_train_history()
@@ -481,11 +547,12 @@ class ModelTrainHistoryFileWriter(ModelTrainHistoryBaseCB):
         if self.train_end:
             self.write_current_train_history(prefix='train_end_')
 
-    def write_current_train_history(self, prefix=''):
+    def write_current_train_history(self, prefix='', iteration_level=False):
         """Write to text file the current training history snapshot in the encapsulating TrainLoop
 
         Args:
             prefix (str): history text file name prefix
+            iteration_level (bool): set to True if reporting is done at the iteration level instead of epoch level
 
         Returns:
             None
@@ -497,10 +564,13 @@ class ModelTrainHistoryFileWriter(ModelTrainHistoryBaseCB):
         self.result_writer.experiment_results_local_path = experiment_results_local_path
 
         results_file_path_in_cloud_results_dir, results_file_local_path = \
-            self.result_writer.generate_report(training_history=self.train_loop_obj.train_history,
-                                               epoch=self.train_loop_obj.epoch,
-                                               file_name=f'{prefix}results.{self.file_format}',
-                                               file_format=self.file_format)
+            self.result_writer.generate_report(
+                training_history=self.train_loop_obj.train_history,
+                epoch=self.train_loop_obj.epoch,
+                iteration_idx=self.train_loop_obj.total_iteration_idx if iteration_level else None,
+                file_name=f'{prefix}results.{self.file_format}',
+                file_format=self.file_format
+            )
 
         self.message_service.write_message('ModelTrainHistoryFileWriter_results_file_local_paths',
                                            [results_file_local_path],

@@ -17,7 +17,7 @@ class TrainingHistoryPlotter:
         """
         self.experiment_results_local_path = experiment_results_local_path
 
-    def generate_report(self, training_history, plots_folder_name='plots', file_format='png'):
+    def generate_report(self, training_history, plots_folder_name='plots', file_format='png', iteration_frequency=None):
         """Plot all the currently present performance result in the training history
 
         Every plot shows the progression of a single performance metric over the epochs.
@@ -27,6 +27,9 @@ class TrainingHistoryPlotter:
             plots_folder_name (str): local dir name where the plots should be saved
             file_format (str): output file format. Can be either 'png' for saving separate images or 'pdf' for combining
                 all the plots into a single pdf file.
+            iteration_frequency (int or None): report frequency in terms of training iterations used for more
+                fine-grained sub-epoch performance evaluation specification. If set to None no inter epoch execution is
+                performed.
 
         Returns:
             list: list of saved plot paths
@@ -36,20 +39,22 @@ class TrainingHistoryPlotter:
             if not os.path.exists(plots_local_folder_path):
                 os.mkdir(plots_local_folder_path)
 
-            plots_paths = self.plot_png(training_history, plots_local_folder_path, plots_folder_name)
+            plots_paths = self.plot_png(training_history,
+                                        plots_local_folder_path, plots_folder_name, iteration_frequency)
 
         elif file_format == 'pdf':
-            plots_paths = self.plot_pdf(training_history, self.experiment_results_local_path, plots_folder_name)
+            plots_paths = self.plot_pdf(training_history,
+                                        self.experiment_results_local_path, plots_folder_name, iteration_frequency)
         else:
             raise ValueError(f"Not supported file_format: {file_format}. "
                              "Select one of the following: 'png' or 'pdf'.")
 
         return plots_paths
 
-    def plot_png(self, training_history, plots_local_folder_path, plots_folder_name):
+    def plot_png(self, training_history, plots_local_folder_path, plots_folder_name, iteration_frequency):
         plots_paths = []
 
-        for metric_name, fig in self.generate_plots(training_history):
+        for metric_name, fig in self.generate_plots(training_history, iteration_frequency):
             file_name = f'{metric_name}.png'
             file_path = os.path.join(plots_local_folder_path, file_name)
 
@@ -60,41 +65,55 @@ class TrainingHistoryPlotter:
 
         return plots_paths
 
-    def plot_pdf(self, training_history, plots_local_folder_path, plots_file_name):
+    def plot_pdf(self, training_history, plots_local_folder_path, plots_file_name, iteration_frequency):
         file_name = f'{plots_file_name}.pdf'
         file_path = os.path.join(plots_local_folder_path, file_name)
 
         with PdfPages(file_path) as pdf_pages:
-            for _, fig in self.generate_plots(training_history):
+            for _, fig in self.generate_plots(training_history, iteration_frequency):
                 pdf_pages.savefig(fig)
 
         return [[file_name, file_path]]
 
     @staticmethod
-    def generate_plots(training_history):
+    def generate_plots(training_history, iteration_frequency):
         for metric_name, result_history in training_history.get_train_history_dict(flatten_dict=True).items():
             if len(result_history) > 1:
-                fig = TrainingHistoryPlotter.plot_performance_curve(metric_name, result_history)
+                fig = TrainingHistoryPlotter.plot_performance_curve(metric_name, result_history, iteration_frequency)
                 yield metric_name, fig
 
     @staticmethod
-    def plot_performance_curve(metric_name, result_history):
+    def plot_performance_curve(metric_name, result_history, iteration_frequency):
         """Plot the performance of a selected calculated metric over the epochs
 
         Args:
             metric_name (str or int): name of plotted metric
             result_history (list or np.array): results history for the selected metric
+            iteration_frequency (int or None): report frequency in terms of training iterations used for more
+                fine-grained sub-epoch performance evaluation specification. If set to None no inter epoch execution is
+                performed and the plotting is treated as end of epoch plotting.
 
         Returns:
             plt.figure: plot figure
         """
         fig = plt.figure()
         fig.set_size_inches(10, 8)
-        
-        ax = sns.lineplot(x=list(range(len(result_history))), y=result_history,
-                          markers='o')
 
-        ax.set_xlabel("Epoch", size=10)
+        if iteration_frequency is None:
+            ax = sns.lineplot(
+                x=list(range(len(result_history))),
+                y=result_history,
+                markers='o'
+            )
+            ax.set_xlabel("Epoch", size=10)
+        else:
+            ax = sns.lineplot(
+                x=[i * iteration_frequency for i in range(len(result_history) + 1)],
+                y=[0.] + list(result_history),
+                markers='o'
+            )
+            ax.set_xlabel("Iteration", size=10)
+
         ax.set_ylabel(metric_name, size=10)
 
         # Adding plot title and subtitles
@@ -120,12 +139,15 @@ class TrainingHistoryWriter:
         self.experiment_results_local_path = experiment_results_local_path
         self.metric_name_cols = None
 
-    def generate_report(self, training_history, epoch, file_name, results_folder_name='', file_format='txt'):
+    def generate_report(self, training_history, epoch, iteration_idx,
+                        file_name, results_folder_name='', file_format='txt'):
         """Write all the currently present performance result in the training history into the text file
 
         Args:
             training_history (aitoolbox.experiment.training_history.TrainingHistory):
             epoch (int): current epoch
+            iteration_idx (int or None): index of the current training iteration. If set to None the record is treated
+                as the end of epoch record.
             file_name (str): output text file name
             results_folder_name (str): results folder path where the report file will be located
             file_format (str): output file format. Can be either 'txt' human readable output or
@@ -141,11 +163,11 @@ class TrainingHistoryWriter:
         file_path = os.path.join(results_write_local_folder_path, file_name)
 
         if file_format == 'txt':
-            self.write_txt(training_history, epoch, file_path)
+            self.write_txt(training_history, epoch, iteration_idx, file_path)
         elif file_format == 'tsv':
-            self.write_csv_tsv(training_history, epoch, file_path, delimiter='\t')
+            self.write_csv_tsv(training_history, epoch, iteration_idx, file_path, delimiter='\t')
         elif file_format == 'csv':
-            self.write_csv_tsv(training_history, epoch, file_path, delimiter=',')
+            self.write_csv_tsv(training_history, epoch, iteration_idx, file_path, delimiter=',')
         else:
             raise ValueError(f"Output format '{file_format}' is not supported. "
                              "Select one of the following: 'txt', 'tsv', 'csv'.")
@@ -154,31 +176,39 @@ class TrainingHistoryWriter:
                             file_name), file_path
 
     @staticmethod
-    def write_txt(training_history, epoch, file_path):
+    def write_txt(training_history, epoch, iteration_idx, file_path):
         with open(file_path, 'a') as f:
             f.write('============================\n')
-            f.write(f'Epoch: {epoch}\n')
+            if iteration_idx is None:
+                f.write(f'Epoch: {epoch}\n')
+            else:
+                f.write(f'Iteration: {iteration_idx}\t\t(Epoch: {epoch})\n')
             f.write('============================\n')
             for metric_name, result_history in training_history.get_train_history_dict(flatten_dict=True).items():
                 f.write(f'{metric_name}:\t{result_history[-1]}\n')
             f.write('\n\n')
 
-    def write_csv_tsv(self, training_history, epoch, file_path, delimiter):
+    def write_csv_tsv(self, training_history, epoch, iteration_idx, file_path, delimiter):
         with open(file_path, 'a') as f:
             tsv_writer = csv.writer(f, delimiter=delimiter)
             current_metric_names = list(training_history.get_train_history_dict(flatten_dict=True).keys())
 
+            report_freq_title = 'Epoch' if iteration_idx is None else 'Iteration'
+
             if self.metric_name_cols is None:
                 self.metric_name_cols = current_metric_names
-                tsv_writer.writerow(['Epoch'] + self.metric_name_cols)
+                tsv_writer.writerow([report_freq_title] + self.metric_name_cols)
 
             if sorted(current_metric_names) != sorted(self.metric_name_cols):
                 self.metric_name_cols = current_metric_names
                 tsv_writer.writerow(['NEW_METRICS_DETECTED'])
-                tsv_writer.writerow(['Epoch'] + self.metric_name_cols)
+                tsv_writer.writerow([report_freq_title] + self.metric_name_cols)
 
+            report_idx = epoch if iteration_idx is None else iteration_idx
             training_history_dict = training_history.get_train_history_dict(flatten_dict=True)
-            tsv_writer.writerow([epoch] + [training_history_dict[metric_name][-1] for metric_name in self.metric_name_cols])
+            tsv_writer.writerow(
+                [report_idx] + [training_history_dict[metric_name][-1] for metric_name in self.metric_name_cols]
+            )
 
 
 class GradientPlotter:
