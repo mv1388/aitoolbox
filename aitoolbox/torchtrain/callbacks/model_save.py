@@ -67,7 +67,7 @@ class ModelCheckpoint(AbstractCallback):
                 'optimizer_state_dict': self.train_loop_obj.optimizer.state_dict(),
                 'schedulers_state_dict': [scheduler.state_dict() for scheduler in self.train_loop_obj.get_schedulers()],
                 'epoch': self.train_loop_obj.epoch,
-                'total_iteration_idx': self.train_loop_obj.total_iteration_idx,
+                'iteration_idx': self.train_loop_obj.total_iteration_idx,
                 'hyperparams': self.hyperparams
             }
             # If Nvidia apex amp is used
@@ -181,8 +181,9 @@ class ModelIterationCheckpoint(ModelCheckpoint):
             raise ValueError(f'save_frequency can have values only >= 0. But received value {save_frequency}.')
 
     def on_batch_end(self):
-        if self.train_loop_obj.iteration_idx % self.save_frequency == 0 and self.train_loop_obj.iteration_idx > 0:
-            print(f'--> Saving model checkpoint at the training iteration: {self.train_loop_obj.iteration_idx}')
+        if self.train_loop_obj.total_iteration_idx % self.save_frequency == 0 and \
+                self.train_loop_obj.total_iteration_idx > 0:
+            print(f'--> Saving model checkpoint at the training iteration: {self.train_loop_obj.total_iteration_idx}')
             self.save_hyperparams()
 
             if not self.train_loop_obj.use_deepspeed:
@@ -192,7 +193,7 @@ class ModelIterationCheckpoint(ModelCheckpoint):
                     'schedulers_state_dict': [scheduler.state_dict() for scheduler in
                                               self.train_loop_obj.get_schedulers()],
                     'epoch': self.train_loop_obj.epoch,
-                    'iteration_idx': self.train_loop_obj.iteration_idx,
+                    'iteration_idx': self.train_loop_obj.total_iteration_idx,
                     'hyperparams': self.hyperparams
                 }
                 # If Nvidia apex amp is used
@@ -207,7 +208,7 @@ class ModelIterationCheckpoint(ModelCheckpoint):
                 experiment_name=self.experiment_name,
                 experiment_timestamp=self.train_loop_obj.experiment_timestamp,
                 epoch=self.train_loop_obj.epoch,
-                iteration_idx=self.train_loop_obj.iteration_idx,
+                iteration_idx=self.train_loop_obj.total_iteration_idx,
                 protect_existing_folder=True
             )
 
@@ -264,7 +265,7 @@ class ModelTrainEndSave(AbstractCallback):
                 'optimizer_state_dict': self.train_loop_obj.optimizer.state_dict(),
                 'schedulers_state_dict': [scheduler.state_dict() for scheduler in self.train_loop_obj.get_schedulers()],
                 'epoch': self.train_loop_obj.epoch,
-                'total_iteration_idx': self.train_loop_obj.total_iteration_idx,
+                'iteration_idx': self.train_loop_obj.total_iteration_idx,
                 'hyperparams': self.hyperparams
             }
             # If Nvidia apex amp is used
