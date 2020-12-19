@@ -25,7 +25,8 @@ class TestTrainingHistoryPlotter(unittest.TestCase):
 
                 result_writer.generate_report(train_history, iteration_frequency=report_freq)
 
-        self.assertEqual(os.listdir(os.path.join(THIS_DIR, 'plots')), ['my_metric_1.png', 'my_metric_3.png', 'my_metric_2.png'])
+        self.assertEqual(os.listdir(os.path.join(THIS_DIR, 'plots')),
+                         ['my_metric_1.png', 'my_metric_3.png', 'my_metric_2.png'])
 
         project_path = os.path.join(THIS_DIR, 'plots')
         if os.path.exists(project_path):
