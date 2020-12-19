@@ -116,13 +116,22 @@ class TrainingHistoryPlotter:
 
         ax.set_ylabel(metric_name, size=10)
 
+        if iteration_frequency is None:
+            report_freq_title = 'epoch'
+            max_position = np.argmax(result_history)
+            min_position = np.argmin(result_history)
+        else:
+            report_freq_title = 'iteration'
+            max_position = iteration_frequency * int(np.argmax([0.] + list(result_history)))
+            min_position = iteration_frequency * int(np.argmin([0.] + list(result_history)))
+
         # Adding plot title and subtitles
         ax.text(s=metric_name, x=0.5, y=1.07, fontsize=16, weight='bold', ha='center', va='bottom',
                 transform=ax.transAxes)
-        ax.text(s=f'Max result: {max(result_history)} {metric_name} (at epoch {np.argmax(result_history)})',
+        ax.text(s=f'Max result: {max(result_history)} {metric_name} (at {report_freq_title} {max_position})',
                 x=0.5, y=1.035, fontsize=8, alpha=0.75,
                 ha='center', va='bottom', transform=ax.transAxes)
-        ax.text(s=f'Min result: {min(result_history)} {metric_name} (at epoch {np.argmin(result_history)})',
+        ax.text(s=f'Min result: {min(result_history)} {metric_name} (at {report_freq_title} {min_position})',
                 x=0.5, y=1.01, fontsize=8, alpha=0.75,
                 ha='center', va='bottom', transform=ax.transAxes)
 

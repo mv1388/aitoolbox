@@ -3,10 +3,33 @@ import os
 import csv
 import shutil
 
-from aitoolbox.experiment.result_reporting.report_generator import TrainingHistoryWriter
+from aitoolbox.experiment.result_reporting.report_generator import TrainingHistoryPlotter, TrainingHistoryWriter
 from aitoolbox.experiment.training_history import TrainingHistory
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
+
+
+class TestTrainingHistoryPlotter(unittest.TestCase):
+    def test_iteration_level_recording(self):
+        result_writer = TrainingHistoryPlotter(experiment_results_local_path=THIS_DIR)
+        train_history = TrainingHistory(has_validation=False)
+
+        num_iterations = 100
+        report_freq = 10
+
+        for i in range(num_iterations):
+            if i % report_freq == 0 and i > 0:
+                train_history.insert_single_result_into_history('my_metric_1', i)
+                train_history.insert_single_result_into_history('my_metric_2', i ** 2)
+                train_history.insert_single_result_into_history('my_metric_3', i ** .5)
+
+                result_writer.generate_report(train_history, iteration_frequency=report_freq)
+
+        self.assertEqual(os.listdir(os.path.join(THIS_DIR, 'plots')), ['my_metric_1.png', 'my_metric_3.png', 'my_metric_2.png'])
+
+        project_path = os.path.join(THIS_DIR, 'plots')
+        if os.path.exists(project_path):
+            shutil.rmtree(project_path)
 
 
 class TestTrainingHistoryWriter(unittest.TestCase):
@@ -181,14 +204,13 @@ class TestTrainingHistoryWriter(unittest.TestCase):
         report_freq = 1000
 
         for i in range(num_iterations):
-            train_history.insert_single_result_into_history('my_metric_1', i)
-            train_history.insert_single_result_into_history('my_metric_2', i * 2)
-            train_history.insert_single_result_into_history('my_metric_3', i * 5)
-
             if i % report_freq == 0 and i > 0:
-                results_file_path_in_cloud_results_dir, results_file_local_path = \
-                    result_writer.generate_report(train_history, epoch=0, iteration_idx=i,
-                                                  file_name='results.txt', results_folder_name='results_txt')
+                train_history.insert_single_result_into_history('my_metric_1', i)
+                train_history.insert_single_result_into_history('my_metric_2', i * 2)
+                train_history.insert_single_result_into_history('my_metric_3', i * 5)
+
+                result_writer.generate_report(train_history, epoch=0, iteration_idx=i,
+                                              file_name='results.txt', results_folder_name='results_txt')
 
         with open(os.path.join(THIS_DIR, 'results_txt', 'results.txt'), 'r') as f:
             f_content = [l.strip() for l in f.readlines() if l.startswith('Iteration')]
