@@ -497,11 +497,11 @@ class TrainLoop:
         Returns:
             float or dict: loss, in the case of multi loss, the dict gets returned
         """
-        if not self.prediction_store.has_train_loss(self.epoch) or force_prediction:
+        if not self.prediction_store.has_train_loss(self.total_iteration_idx) or force_prediction:
             loss = self.evaluate_model_loss(self.train_loader)
-            self.prediction_store.insert_train_loss(loss, self.epoch, force_prediction)
+            self.prediction_store.insert_train_loss(loss, self.total_iteration_idx, force_prediction)
         else:
-            loss = self.prediction_store.get_train_loss(self.epoch)
+            loss = self.prediction_store.get_train_loss(self.total_iteration_idx)
 
         return loss
 
@@ -515,11 +515,11 @@ class TrainLoop:
         Returns:
             float or dict: loss, in the case of multi loss, the dict gets returned
         """
-        if not self.prediction_store.has_val_loss(self.epoch) or force_prediction:
+        if not self.prediction_store.has_val_loss(self.total_iteration_idx) or force_prediction:
             loss = self.evaluate_model_loss(self.validation_loader)
-            self.prediction_store.insert_val_loss(loss, self.epoch, force_prediction)
+            self.prediction_store.insert_val_loss(loss, self.total_iteration_idx, force_prediction)
         else:
-            loss = self.prediction_store.get_val_loss(self.epoch)
+            loss = self.prediction_store.get_val_loss(self.total_iteration_idx)
 
         return loss
 
@@ -533,11 +533,11 @@ class TrainLoop:
         Returns:
             float or dict: loss, in the case of multi loss, the dict gets returned
         """
-        if not self.prediction_store.has_test_loss(self.epoch) or force_prediction:
+        if not self.prediction_store.has_test_loss(self.total_iteration_idx) or force_prediction:
             loss = self.evaluate_model_loss(self.test_loader)
-            self.prediction_store.insert_test_loss(loss, self.epoch, force_prediction)
+            self.prediction_store.insert_test_loss(loss, self.total_iteration_idx, force_prediction)
         else:
-            loss = self.prediction_store.get_test_loss(self.epoch)
+            loss = self.prediction_store.get_test_loss(self.total_iteration_idx)
 
         return loss
 
@@ -584,11 +584,11 @@ class TrainLoop:
         Returns:
             (torch.Tensor, torch.Tensor, dict): y_pred, y_true, metadata
         """
-        if not self.prediction_store.has_train_predictions(self.epoch) or force_prediction:
+        if not self.prediction_store.has_train_predictions(self.total_iteration_idx) or force_prediction:
             predictions = self.predict_with_model(self.train_loader)
-            self.prediction_store.insert_train_predictions(predictions, self.epoch, force_prediction)
+            self.prediction_store.insert_train_predictions(predictions, self.total_iteration_idx, force_prediction)
         else:
-            predictions = self.prediction_store.get_train_predictions(self.epoch)
+            predictions = self.prediction_store.get_train_predictions(self.total_iteration_idx)
 
         return predictions
 
@@ -602,11 +602,11 @@ class TrainLoop:
         Returns:
             (torch.Tensor, torch.Tensor, dict): y_pred, y_true, metadata
         """
-        if not self.prediction_store.has_val_predictions(self.epoch) or force_prediction:
+        if not self.prediction_store.has_val_predictions(self.total_iteration_idx) or force_prediction:
             predictions = self.predict_with_model(self.validation_loader)
-            self.prediction_store.insert_val_predictions(predictions, self.epoch, force_prediction)
+            self.prediction_store.insert_val_predictions(predictions, self.total_iteration_idx, force_prediction)
         else:
-            predictions = self.prediction_store.get_val_predictions(self.epoch)
+            predictions = self.prediction_store.get_val_predictions(self.total_iteration_idx)
 
         return predictions
 
@@ -620,11 +620,11 @@ class TrainLoop:
         Returns:
             (torch.Tensor, torch.Tensor, dict): y_pred, y_true, metadata
         """
-        if not self.prediction_store.has_test_predictions(self.epoch) or force_prediction:
+        if not self.prediction_store.has_test_predictions(self.total_iteration_idx) or force_prediction:
             predictions = self.predict_with_model(self.test_loader)
-            self.prediction_store.insert_test_predictions(predictions, self.epoch, force_prediction)
+            self.prediction_store.insert_test_predictions(predictions, self.total_iteration_idx, force_prediction)
         else:
-            predictions = self.prediction_store.get_test_predictions(self.epoch)
+            predictions = self.prediction_store.get_test_predictions(self.total_iteration_idx)
 
         return predictions
 
