@@ -252,7 +252,10 @@ class GradientPlotter:
             plots_paths = self.plot_png(model_layer_gradients, grad_plots_local_folder_path, grad_plots_folder_name)
 
         elif file_format == 'pdf':
-            plots_paths = self.plot_pdf(model_layer_gradients, self.experiment_grad_results_local_path, grad_plots_folder_name)
+            plots_paths = self.plot_pdf(
+                model_layer_gradients,
+                self.experiment_grad_results_local_path, grad_plots_folder_name
+            )
         else:
             raise ValueError(f"Not supported file_format: {file_format}. "
                              "Select one of the following: 'png' or 'pdf'.")
