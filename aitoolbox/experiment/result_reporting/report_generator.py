@@ -187,12 +187,15 @@ class TrainingHistoryWriter:
     @staticmethod
     def write_txt(training_history, epoch, iteration_idx, file_path):
         with open(file_path, 'a') as f:
-            f.write('============================\n')
             if iteration_idx is None:
+                f.write('============================\n')
                 f.write(f'Epoch: {epoch}\n')
+                f.write('============================\n')
             else:
+                f.write('====================================================\n')
                 f.write(f'Iteration: {iteration_idx + 1}\t\t(Epoch: {epoch}; Iteration idx: {iteration_idx})\n')
-            f.write('============================\n')
+                f.write('====================================================\n')
+
             for metric_name, result_history in training_history.get_train_history_dict(flatten_dict=True).items():
                 f.write(f'{metric_name}:\t{result_history[-1]}\n')
             f.write('\n\n')
