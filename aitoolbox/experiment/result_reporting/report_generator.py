@@ -191,7 +191,7 @@ class TrainingHistoryWriter:
             if iteration_idx is None:
                 f.write(f'Epoch: {epoch}\n')
             else:
-                f.write(f'Iteration: {iteration_idx}\t\t(Epoch: {epoch})\n')
+                f.write(f'Iteration: {iteration_idx + 1}\t\t(Epoch: {epoch}; Iteration idx: {iteration_idx})\n')
             f.write('============================\n')
             for metric_name, result_history in training_history.get_train_history_dict(flatten_dict=True).items():
                 f.write(f'{metric_name}:\t{result_history[-1]}\n')
@@ -213,7 +213,7 @@ class TrainingHistoryWriter:
                 tsv_writer.writerow(['NEW_METRICS_DETECTED'])
                 tsv_writer.writerow([report_freq_title] + self.metric_name_cols)
 
-            report_idx = epoch if iteration_idx is None else iteration_idx
+            report_idx = epoch if iteration_idx is None else iteration_idx + 1
             training_history_dict = training_history.get_train_history_dict(flatten_dict=True)
             tsv_writer.writerow(
                 [report_idx] + [training_history_dict[metric_name][-1] for metric_name in self.metric_name_cols]

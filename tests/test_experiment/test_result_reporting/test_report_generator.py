@@ -18,7 +18,7 @@ class TestTrainingHistoryPlotter(unittest.TestCase):
         report_freq = 10
 
         for i in range(num_iterations):
-            if i % report_freq == 0 and i > 0:
+            if (i + 1) % report_freq == 0:
                 train_history.insert_single_result_into_history('my_metric_1', i)
                 train_history.insert_single_result_into_history('my_metric_2', i ** 2)
                 train_history.insert_single_result_into_history('my_metric_3', i ** .5)
@@ -205,7 +205,7 @@ class TestTrainingHistoryWriter(unittest.TestCase):
         report_freq = 1000
 
         for i in range(num_iterations):
-            if i % report_freq == 0 and i > 0:
+            if (i + 1) % report_freq == 0:
                 train_history.insert_single_result_into_history('my_metric_1', i)
                 train_history.insert_single_result_into_history('my_metric_2', i * 2)
                 train_history.insert_single_result_into_history('my_metric_3', i * 5)
@@ -217,7 +217,7 @@ class TestTrainingHistoryWriter(unittest.TestCase):
             f_content = [l.strip() for l in f.readlines() if l.startswith('Iteration')]
 
         f_content_parse = [int(el.split('\t\t')[0].split(': ')[1]) for el in f_content]
-        self.assertEqual(list(range(1000, 100000, 1000)), f_content_parse)
+        self.assertEqual(list(range(1000, 100001, 1000)), f_content_parse)
 
         project_path = os.path.join(THIS_DIR, 'results_txt')
         if os.path.exists(project_path):

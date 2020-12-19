@@ -74,7 +74,7 @@ class ModelPerformanceEvaluation(AbstractCallback):
 
     def on_batch_end(self):
         if self.on_iteration_frequency > 0:
-            if self.train_loop_obj.total_iteration_idx % self.on_iteration_frequency == 0 and \
+            if (self.train_loop_obj.total_iteration_idx + 1) % self.on_iteration_frequency == 0 and \
                     self.train_loop_obj.total_iteration_idx > 0:
                 self.evaluate_model_performance(prefix=f'iterfreq{self.on_iteration_frequency}_')
 
@@ -190,7 +190,7 @@ class ModelPerformancePrintReport(AbstractCallback):
 
     def on_batch_end(self):
         if self.report_iteration_frequency > 0:
-            if self.train_loop_obj.total_iteration_idx % self.report_iteration_frequency == 0 and \
+            if (self.train_loop_obj.total_iteration_idx + 1) % self.report_iteration_frequency == 0 and \
                     self.train_loop_obj.total_iteration_idx > 0:
                 print(f'------------------  Iteration #{self.train_loop_obj.total_iteration_idx} performance report  '
                       '-------------------')
@@ -423,7 +423,7 @@ class ModelTrainHistoryPlot(ModelTrainHistoryBaseCB):
 
     def on_batch_end(self):
         if self.report_iteration_frequency > 0:
-            if self.train_loop_obj.total_iteration_idx % self.report_iteration_frequency == 0 and \
+            if (self.train_loop_obj.total_iteration_idx + 1) % self.report_iteration_frequency == 0 and \
                     self.train_loop_obj.total_iteration_idx > 0:
                 # TODO: Decide if the prefix should be removed here so that we just mix iteration and epoch results
                 self.plot_current_train_history(
@@ -531,7 +531,7 @@ class ModelTrainHistoryFileWriter(ModelTrainHistoryBaseCB):
 
     def on_batch_end(self):
         if self.report_iteration_frequency > 0:
-            if self.train_loop_obj.total_iteration_idx % self.report_iteration_frequency == 0 and \
+            if (self.train_loop_obj.total_iteration_idx + 1) % self.report_iteration_frequency == 0 and \
                     self.train_loop_obj.total_iteration_idx > 0:
                 # TODO: Decide if the prefix should be removed here so that we just mix iteration and epoch results
                 self.write_current_train_history(
