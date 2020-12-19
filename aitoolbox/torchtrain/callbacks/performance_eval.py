@@ -190,7 +190,8 @@ class ModelPerformancePrintReport(AbstractCallback):
     def on_batch_end(self):
         if self.report_iteration_frequency > 0:
             if (self.train_loop_obj.total_iteration_idx + 1) % self.report_iteration_frequency == 0:
-                print(f'------------------  Iteration #{self.train_loop_obj.total_iteration_idx} performance report  '
+                print('------------------  '
+                      f'Iteration #{self.train_loop_obj.total_iteration_idx + 1} performance report  '
                       '-------------------')
                 self.print_performance_report(prefix=f'iterfreq{self.report_iteration_frequency}_')
 
