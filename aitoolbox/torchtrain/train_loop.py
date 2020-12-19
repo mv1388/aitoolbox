@@ -27,7 +27,7 @@ from aitoolbox.torchtrain.multi_loss_optim import MultiLoss, MultiOptimizer
 from aitoolbox.torchtrain.data.batch_model_feed_defs import AbstractModelFeedDefinition
 from aitoolbox.torchtrain.tl_components.callback_handler import CallbacksHandler
 from aitoolbox.torchtrain.tl_components.ddp_handler import DDPHandler
-from aitoolbox.torchtrain.callbacks.model_save import ModelCheckpoint, ModelTrainEndSave
+from aitoolbox.torchtrain.callbacks.model_save import ModelCheckpoint, ModelIterationCheckpoint, ModelTrainEndSave
 from aitoolbox.torchtrain.schedulers.basic import AbstractScheduler
 from aitoolbox.experiment.training_history import TrainingHistory
 from aitoolbox.torchtrain.tl_components.model_prediction_store import ModelPredictionStore
@@ -884,6 +884,7 @@ class TrainLoopCheckpoint(TrainLoop):
                  hyperparams,
                  cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix='', source_dirs=(),
                  rm_subopt_local_models=False, num_best_checkpoints_kept=2,
+                 iteration_save_freq=0,
                  collate_batch_pred_fn=append_predictions, pred_transform_fn=torch_cat_transf,
                  end_auto_eval=True, lazy_experiment_save=True,
                  gpu_mode='single', cuda_device_idx=None, use_amp=False):
@@ -915,6 +916,8 @@ class TrainLoopCheckpoint(TrainLoop):
                 the metric minimization is done otherwise metric maximization is done
             num_best_checkpoints_kept (int): number of best performing models which are kept when removing suboptimal
                 model checkpoints
+            iteration_save_freq (int): frequency of saving the model checkpoint every specified number of
+                training iterations
             collate_batch_pred_fn (callable): collate function transforming batch predictions as they come out from the
                 model
             pred_transform_fn (callable): function transforming all the produced predictions after all the batches have
@@ -954,20 +957,37 @@ class TrainLoopCheckpoint(TrainLoop):
         self.bucket_name = bucket_name
         self.cloud_dir_prefix = cloud_dir_prefix
         self.rm_subopt_local_models = rm_subopt_local_models
+        self.iteration_save_freq = iteration_save_freq
 
         if 'experiment_file_path' not in self.hyperparams:
             self.hyperparams['experiment_file_path'] = inspect.getframeinfo(inspect.currentframe().f_back).filename
         if 'source_dirs_paths' not in self.hyperparams:
             self.hyperparams['source_dirs_paths'] = source_dirs
 
-        self.callbacks_handler.register_callbacks([
-            ModelCheckpoint(self.project_name, self.experiment_name, self.local_model_result_folder_path,
-                            self.hyperparams,
-                            cloud_save_mode=self.cloud_save_mode,
-                            bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
-                            rm_subopt_local_models=self.rm_subopt_local_models,
-                            num_best_checkpoints_kept=num_best_checkpoints_kept)
-        ], cache_callbacks=True)
+        if iteration_save_freq == 0:
+            model_checkpoint_cb = ModelCheckpoint(
+                self.project_name, self.experiment_name, self.local_model_result_folder_path,
+                self.hyperparams,
+                cloud_save_mode=self.cloud_save_mode,
+                bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
+                rm_subopt_local_models=self.rm_subopt_local_models,
+                num_best_checkpoints_kept=num_best_checkpoints_kept
+            )
+        elif iteration_save_freq > 0:
+            model_checkpoint_cb = ModelIterationCheckpoint(
+                iteration_save_freq,
+                self.project_name, self.experiment_name, self.local_model_result_folder_path,
+                self.hyperparams,
+                cloud_save_mode=self.cloud_save_mode,
+                bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
+                rm_subopt_local_models=self.rm_subopt_local_models,
+                num_best_checkpoints_kept=num_best_checkpoints_kept
+            )
+        else:
+            raise ValueError('iteration_save_freq can have values only >= 0. '
+                             f'But received value {iteration_save_freq}.')
+
+        self.callbacks_handler.register_callbacks([model_checkpoint_cb], cache_callbacks=True)
 
 
 class TrainLoopEndSave(TrainLoop):
@@ -1089,6 +1109,7 @@ class TrainLoopCheckpointEndSave(TrainLoopEndSave):
                  hyperparams, val_result_package=None, test_result_package=None,
                  cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix='', source_dirs=(),
                  rm_subopt_local_models=False, num_best_checkpoints_kept=2,
+                 iteration_save_freq=0,
                  collate_batch_pred_fn=append_predictions, pred_transform_fn=torch_cat_transf,
                  end_auto_eval=True, lazy_experiment_save=True,
                  gpu_mode='single', cuda_device_idx=None, use_amp=False):
@@ -1125,6 +1146,8 @@ class TrainLoopCheckpointEndSave(TrainLoopEndSave):
                 the metric minimization is done otherwise metric maximization is done
             num_best_checkpoints_kept (int): number of best performing models which are kept when removing suboptimal
                 model checkpoints
+            iteration_save_freq (int): frequency of saving the model checkpoint every specified number of
+                training iterations
             collate_batch_pred_fn (callable): collate function transforming batch predictions as they come out from the
                 model
             pred_transform_fn (callable): function transforming all the produced predictions after all the batches have
@@ -1166,12 +1189,29 @@ class TrainLoopCheckpointEndSave(TrainLoopEndSave):
                                   end_auto_eval, lazy_experiment_save,
                                   gpu_mode, cuda_device_idx, use_amp)
         self.rm_subopt_local_models = rm_subopt_local_models
+        self.iteration_save_freq = iteration_save_freq
 
-        self.callbacks_handler.register_callbacks([
-            ModelCheckpoint(self.project_name, self.experiment_name, self.local_model_result_folder_path,
-                            self.hyperparams,
-                            cloud_save_mode=self.cloud_save_mode,
-                            bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
-                            rm_subopt_local_models=self.rm_subopt_local_models,
-                            num_best_checkpoints_kept=num_best_checkpoints_kept)
-        ], cache_callbacks=True)
+        if iteration_save_freq == 0:
+            model_checkpoint_cb = ModelCheckpoint(
+                self.project_name, self.experiment_name, self.local_model_result_folder_path,
+                self.hyperparams,
+                cloud_save_mode=self.cloud_save_mode,
+                bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
+                rm_subopt_local_models=self.rm_subopt_local_models,
+                num_best_checkpoints_kept=num_best_checkpoints_kept
+            )
+        elif iteration_save_freq > 0:
+            model_checkpoint_cb = ModelIterationCheckpoint(
+                iteration_save_freq,
+                self.project_name, self.experiment_name, self.local_model_result_folder_path,
+                self.hyperparams,
+                cloud_save_mode=self.cloud_save_mode,
+                bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
+                rm_subopt_local_models=self.rm_subopt_local_models,
+                num_best_checkpoints_kept=num_best_checkpoints_kept
+            )
+        else:
+            raise ValueError('iteration_save_freq can have values only >= 0. '
+                             f'But received value {iteration_save_freq}.')
+
+        self.callbacks_handler.register_callbacks([model_checkpoint_cb], cache_callbacks=True)

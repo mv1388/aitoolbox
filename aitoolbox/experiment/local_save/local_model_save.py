@@ -14,7 +14,9 @@ from aitoolbox.utils.file_system import zip_folder
 
 class AbstractLocalModelSaver(ABC):
     @abstractmethod
-    def save_model(self, model, project_name, experiment_name, experiment_timestamp=None, epoch=None, protect_existing_folder=True):
+    def save_model(self, model, project_name, experiment_name, experiment_timestamp=None,
+                   epoch=None, iteration_idx=None,
+                   protect_existing_folder=True):
         """Model saving method which all the model savers have to implement to give an expected API to other components
         
         Args:
@@ -24,6 +26,7 @@ class AbstractLocalModelSaver(ABC):
             experiment_name (str): name of the particular experiment
             experiment_timestamp (str or None): time stamp at the start of training
             epoch (int or None): in which epoch the model is being saved
+            iteration_idx (int or None): at which training iteration the model is being saved
             protect_existing_folder (bool): can override potentially already existing folder or not
 
         Returns:
@@ -77,7 +80,9 @@ class PyTorchLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
         """
         BaseLocalModelSaver.__init__(self, local_model_result_folder_path, checkpoint_model)
 
-    def save_model(self, model, project_name, experiment_name, experiment_timestamp=None, epoch=None, protect_existing_folder=True):
+    def save_model(self, model, project_name, experiment_name, experiment_timestamp=None,
+                   epoch=None, iteration_idx=None,
+                   protect_existing_folder=True):
         """Save the PyTorch model representation dict to the local drive
 
         Args:
@@ -87,6 +92,7 @@ class PyTorchLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
             experiment_name (str): name of the particular experiment
             experiment_timestamp (str or None): time stamp at the start of training
             epoch (int or None): in which epoch the model is being saved
+            iteration_idx (int or None): at which training iteration the model is being saved
             protect_existing_folder (bool): can override potentially already existing folder or not
 
         Returns:
@@ -99,6 +105,7 @@ class PyTorchLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
 
         experiment_model_local_path = self.create_experiment_local_models_folder(project_name, experiment_name,
                                                                                  experiment_timestamp)
+        iteration_suffix = f'_ITER{iteration_idx}' if iteration_idx is not None else ''
 
         if DEEPSPEED_AVAILABLE and isinstance(model, deepspeed.DeepSpeedLight):
             tag = f'epoch_{epoch}' if self.checkpoint_model else 'final'
@@ -112,7 +119,7 @@ class PyTorchLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
             if epoch is None:
                 model_name = f'model_{experiment_name}_{experiment_timestamp}.pth'
             else:
-                model_name = f'model_{experiment_name}_{experiment_timestamp}_E{epoch}.pth'
+                model_name = f'model_{experiment_name}_{experiment_timestamp}_E{epoch}{iteration_suffix}.pth'
 
             model_local_path = os.path.join(experiment_model_local_path, model_name)
 
@@ -155,7 +162,9 @@ class KerasLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
         """
         BaseLocalModelSaver.__init__(self, local_model_result_folder_path, checkpoint_model)
 
-    def save_model(self, model, project_name, experiment_name, experiment_timestamp=None, epoch=None, protect_existing_folder=True):
+    def save_model(self, model, project_name, experiment_name, experiment_timestamp=None,
+                   epoch=None, iteration_idx=None,
+                   protect_existing_folder=True):
         """Save the Keras model to the local drive
 
         Args:
@@ -164,6 +173,7 @@ class KerasLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
             experiment_name (str): name of the particular experiment
             experiment_timestamp (str or None): time stamp at the start of training
             epoch (int or None): in which epoch the model is being saved
+            iteration_idx (int or None): at which training iteration the model is being saved
             protect_existing_folder (bool): can override potentially already existing folder or not
 
         Returns:
@@ -174,11 +184,12 @@ class KerasLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
 
         experiment_model_local_path = self.create_experiment_local_models_folder(project_name, experiment_name,
                                                                                  experiment_timestamp)
+        iteration_suffix = f'_ITER{iteration_idx}' if iteration_idx is not None else ''
 
         if epoch is None:
             model_name = f'model_{experiment_name}_{experiment_timestamp}.h5'
         else:
-            model_name = f'model_{experiment_name}_{experiment_timestamp}_E{epoch}.h5'
+            model_name = f'model_{experiment_name}_{experiment_timestamp}_E{epoch}{iteration_suffix}.h5'
 
         model_local_path = os.path.join(experiment_model_local_path, model_name)
 
