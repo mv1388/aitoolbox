@@ -537,14 +537,14 @@ class TestTrainLoop(unittest.TestCase):
         eval_predictions(dummy_test_loader, y_test_test, y_pred_test, metadata, offset=4+2)
 
         self.assertEqual(list(train_loop.prediction_store.prediction_store.keys()),
-                         ['epoch', 'train_pred', 'test_pred'])
-        self.assertEqual(train_loop.prediction_store.prediction_store['epoch'], 0)
+                         ['iteration_idx', 'train_pred', 'test_pred'])
+        self.assertEqual(train_loop.prediction_store.prediction_store['iteration_idx'], -1)
 
         # Test store purge
-        train_loop.epoch += 1
+        train_loop.total_iteration_idx += 1
         y_pred, y_test, metadata = train_loop.predict_on_validation_set()
-        self.assertEqual(train_loop.prediction_store.prediction_store['epoch'], 1)
-        self.assertEqual(list(train_loop.prediction_store.prediction_store.keys()), ['epoch', 'val_pred'])
+        self.assertEqual(train_loop.prediction_store.prediction_store['iteration_idx'], 0)
+        self.assertEqual(list(train_loop.prediction_store.prediction_store.keys()), ['iteration_idx', 'val_pred'])
 
     def test_ddp_env_settings(self):
         dummy_optimizer = DummyOptimizer()
