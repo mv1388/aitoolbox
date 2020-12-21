@@ -23,7 +23,8 @@ class TestTrainingHistoryPlotter(unittest.TestCase):
                 train_history.insert_single_result_into_history('my_metric_2', i ** 2)
                 train_history.insert_single_result_into_history('my_metric_3', i ** .5)
 
-                result_writer.generate_report(train_history, iteration_frequency=report_freq)
+                result_writer.generate_report(train_history, iteration_frequency=report_freq,
+                                              iteration_level_metric_names=['my_metric_1', 'my_metric_2', 'my_metric_3'])
 
         self.assertEqual(sorted(os.listdir(os.path.join(THIS_DIR, 'plots'))),
                          sorted(['my_metric_1.png', 'my_metric_2.png', 'my_metric_3.png']))
@@ -42,7 +43,7 @@ class TestTrainingHistoryWriter(unittest.TestCase):
         result_writer = TrainingHistoryWriter(experiment_results_local_path=THIS_DIR)
 
         results_file_path_in_cloud_results_dir, results_file_local_path = \
-            result_writer.generate_report(train_history, epoch=0, iteration_idx=None,
+            result_writer.generate_report(train_history, epoch=0, iteration_idx=None, iteration_level_metric_names=[],
                                           file_name=f'results.txt', results_folder_name='results_txt')
 
         self.assertEqual(results_file_path_in_cloud_results_dir, 'results_txt/results.txt')
@@ -59,7 +60,7 @@ class TestTrainingHistoryWriter(unittest.TestCase):
         train_history.insert_single_result_into_history('Completely_new_metric', 442.3)
 
         results_file_path_in_cloud_results_dir, results_file_local_path = \
-            result_writer.generate_report(train_history, epoch=1, iteration_idx=None,
+            result_writer.generate_report(train_history, epoch=1, iteration_idx=None, iteration_level_metric_names=[],
                                           file_name=f'results.txt', results_folder_name='results_txt')
 
         with open(os.path.join(THIS_DIR, 'results_txt/results.txt'), 'r') as f:
@@ -83,14 +84,14 @@ class TestTrainingHistoryWriter(unittest.TestCase):
         result_writer = TrainingHistoryWriter(experiment_results_local_path=THIS_DIR)
 
         results_file_path_in_cloud_results_dir, results_file_local_path = \
-            result_writer.generate_report(train_history, epoch=0, iteration_idx=None,
+            result_writer.generate_report(train_history, epoch=0, iteration_idx=None, iteration_level_metric_names=[],
                                           file_name=f'results.txt', results_folder_name='results')
 
         self.assertEqual(results_file_path_in_cloud_results_dir, 'results/results.txt')
         self.assertEqual(results_file_local_path, os.path.join(THIS_DIR, 'results/results.txt'))
 
         results_file_path_in_cloud_results_dir_2, results_file_local_path_2 = \
-            result_writer.generate_report(train_history, epoch=0, iteration_idx=None,
+            result_writer.generate_report(train_history, epoch=0, iteration_idx=None, iteration_level_metric_names=[],
                                           file_name=f'results.txt', results_folder_name='results_NEW')
 
         self.assertEqual(results_file_path_in_cloud_results_dir_2, 'results_NEW/results.txt')
@@ -126,7 +127,8 @@ class TestTrainingHistoryWriter(unittest.TestCase):
                                                                      'NEW_METRIC': [13323.4, 133323.4]})
 
         results_file_path_in_cloud_results_dir, results_file_local_path = \
-            result_writer.generate_report(train_history, epoch=0, iteration_idx=None, file_name=f'results.txt')
+            result_writer.generate_report(train_history, epoch=0, iteration_idx=None, iteration_level_metric_names=[],
+                                          file_name=f'results.txt')
 
         self.assertEqual(results_file_path_in_cloud_results_dir, 'results.txt')
         self.assertEqual(results_file_local_path, os.path.join(THIS_DIR, 'results.txt'))
@@ -184,7 +186,8 @@ class TestTrainingHistoryWriter(unittest.TestCase):
     def execute_single_write(self, result_writer, train_history, expected_results, epoch,
                              file_name, results_folder_name):
         results_file_path_in_cloud_results_dir, results_file_local_path = \
-            result_writer.generate_report(train_history, epoch=epoch, iteration_idx=None,
+            result_writer.generate_report(train_history,
+                                          epoch=epoch, iteration_idx=None, iteration_level_metric_names=[],
                                           file_name=file_name, results_folder_name=results_folder_name,
                                           file_format='tsv')
 
@@ -210,7 +213,7 @@ class TestTrainingHistoryWriter(unittest.TestCase):
                 train_history.insert_single_result_into_history('my_metric_2', i * 2)
                 train_history.insert_single_result_into_history('my_metric_3', i * 5)
 
-                result_writer.generate_report(train_history, epoch=0, iteration_idx=i,
+                result_writer.generate_report(train_history, epoch=0, iteration_idx=i, iteration_level_metric_names=[],
                                               file_name='results.txt', results_folder_name='results_txt')
 
         with open(os.path.join(THIS_DIR, 'results_txt', 'results.txt'), 'r') as f:

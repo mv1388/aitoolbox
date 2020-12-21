@@ -79,27 +79,15 @@ if __name__ == '__main__':
     criterion = nn.NLLLoss()
 
     callbacks = [ModelPerformanceEvaluation(ClassificationResultPackage(), {},
-                                            on_train_data=True, on_val_data=True),
-                 ModelPerformancePrintReport(['train_Accuracy', 'val_Accuracy']),
-                 ModelTrainHistoryPlot(),
-                 ModelTrainHistoryFileWriter(),
-                 EarlyStopping(patience=5)]
+                                            on_train_data=False, on_val_data=True,
+                                            on_iteration_frequency=100),
+                 ModelPerformancePrintReport(['val_Accuracy'],
+                                             report_iteration_frequency=100),
+                 ModelTrainHistoryPlot(report_iteration_frequency=100),
+                 ModelTrainHistoryFileWriter(report_iteration_frequency=100)]
 
     print('Starting train loop')
     # With AWS S3 cloud results saving
-    TrainLoopCheckpointEndSave(
-        model,
-        train_loader, val_loader, test_loader,
-        optimizer, criterion,
-        project_name='tl_full_experiment_tracking', experiment_name='tutorial_example',
-        local_model_result_folder_path=THIS_DIR,
-        hyperparams={},
-        val_result_package=ClassificationResultPackage(), test_result_package=ClassificationResultPackage(),
-        cloud_save_mode='s3', bucket_name='results',  # bucket_name should be set to the bucket on your S3
-        rm_subopt_local_models=True, num_best_checkpoints_kept=3
-    ).fit(num_epochs=10, callbacks=callbacks)
-
-    # With only local results saving - no saving to cloud
     # TrainLoopCheckpointEndSave(
     #     model,
     #     train_loader, val_loader, test_loader,
@@ -108,6 +96,19 @@ if __name__ == '__main__':
     #     local_model_result_folder_path=THIS_DIR,
     #     hyperparams={},
     #     val_result_package=ClassificationResultPackage(), test_result_package=ClassificationResultPackage(),
-    #     cloud_save_mode=None,
+    #     cloud_save_mode='s3', bucket_name='results',  # bucket_name should be set to the bucket on your S3
     #     rm_subopt_local_models=True, num_best_checkpoints_kept=3
     # ).fit(num_epochs=10, callbacks=callbacks)
+
+    # With only local results saving - no saving to cloud
+    TrainLoopCheckpointEndSave(
+        model,
+        train_loader, val_loader, test_loader,
+        optimizer, criterion,
+        project_name='tl_full_experiment_tracking', experiment_name='tutorial_example',
+        local_model_result_folder_path=THIS_DIR,
+        hyperparams={},
+        val_result_package=ClassificationResultPackage(), test_result_package=ClassificationResultPackage(),
+        cloud_save_mode=None,
+        iteration_save_freq=100
+    ).fit(num_iterations=3000, callbacks=callbacks)
