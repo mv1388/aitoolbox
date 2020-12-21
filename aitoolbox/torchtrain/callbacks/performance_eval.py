@@ -440,7 +440,7 @@ class ModelTrainHistoryPlot(ModelTrainHistoryBaseCB):
     def on_batch_end(self):
         if self.report_iteration_frequency > 0:
             if (self.train_loop_obj.total_iteration_idx + 1) % self.report_iteration_frequency == 0:
-                # TODO: Decide if the prefix should be removed here so that we just mix iteration and epoch results
+                # Decide if the prefix should be removed here so that we just mix iteration and epoch results
                 self.plot_current_train_history(
                     prefix=f'iterfreq{self.report_iteration_frequency}_',
                     iteration_suffix=f'_iter_{self.train_loop_obj.total_iteration_idx}',
@@ -548,7 +548,7 @@ class ModelTrainHistoryFileWriter(ModelTrainHistoryBaseCB):
     def on_batch_end(self):
         if self.report_iteration_frequency > 0:
             if (self.train_loop_obj.total_iteration_idx + 1) % self.report_iteration_frequency == 0:
-                # TODO: Decide if the prefix should be removed here so that we just mix iteration and epoch results
+                # Decide if the prefix should be removed here so that we just mix iteration and epoch results
                 self.write_current_train_history(
                     prefix=f'iterfreq{self.report_iteration_frequency}_',
                     iteration_idx=self.train_loop_obj.total_iteration_idx
