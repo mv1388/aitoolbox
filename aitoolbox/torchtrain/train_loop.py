@@ -124,8 +124,13 @@ class TrainLoop:
         self.experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
         self.loss_batch_accum = []
         self.epoch = 0
+        self.iteration = 0
         # Intentionally set to -1 because we do += 1 at the start of every iteration
         self.total_iteration_idx = -1
+
+        # Store settings provided in fit()
+        self.num_epochs, self.num_iterations = None, None
+        self.grad_accumulation = 1
 
         self.train_history = TrainingHistory(has_validation=self.validation_loader is not None)
         self.prediction_store = ModelPredictionStore(auto_purge=True)
@@ -216,6 +221,9 @@ class TrainLoop:
         """
         if num_iterations > 0:
             num_epochs = int(math.ceil(float(num_iterations) / len(self.train_loader)))
+        self.num_epochs = num_epochs
+        self.num_iterations = num_iterations
+        self.grad_accumulation = grad_accumulation
 
         self.callbacks_handler.register_callbacks(callbacks)
 
@@ -234,24 +242,24 @@ class TrainLoop:
                 print(f'Epoch: {self.epoch}')
             self.callbacks_handler.execute_epoch_begin()
 
-            for iteration, batch_data in enumerate(tqdm(self.train_loader)):
+            for self.iteration, batch_data in enumerate(tqdm(self.train_loader)):
                 self.total_iteration_idx += 1
                 self.callbacks_handler.execute_batch_begin()
 
                 # Feed batch into the model
-                loss_batch = self._calculate_batch_loss(batch_data, grad_accumulation)
+                loss_batch = self._calculate_batch_loss(batch_data)
 
                 # Iterate over potentially multiple optimizers
                 for optimizer_idx in range(self.num_optimizers):
                     # Backward pass through the model
-                    self._backward_pass(loss_batch, iteration, optimizer_idx)
+                    self._backward_pass(loss_batch, optimizer_idx)
                     if self.grad_cb_used:
                         self.callbacks_handler.execute_gradient_update(optimizer_idx)
 
                     # Optimizer step
-                    self._optimizer_step(iteration, grad_accumulation, optimizer_idx)
+                    self._optimizer_step(optimizer_idx)
                     # Optimizer zero grad
-                    self._optimizer_zero_grad(iteration, grad_accumulation, optimizer_idx)
+                    self._optimizer_zero_grad(optimizer_idx)
 
                 if self.use_amp:
                     self.amp_scaler.update()
@@ -285,12 +293,11 @@ class TrainLoop:
 
         return self.model
 
-    def _calculate_batch_loss(self, batch_data, grad_accumulation):
+    def _calculate_batch_loss(self, batch_data):
         """Push batch data through the model and calculate the batch loss
 
         Args:
             batch_data: input data batch
-            grad_accumulation (int): number of batches the gradients are accumulated before updating weights
 
         Returns:
             loss: loss calculated on current batch
@@ -304,18 +311,17 @@ class TrainLoop:
             loss_batch_log = loss_batch
 
             # Need to divide by the number of accumulation steps if our loss is averaged over the training samples
-            loss_batch = loss_batch / grad_accumulation
+            loss_batch = loss_batch / self.grad_accumulation
 
         self.loss_batch_accum.append(loss_batch_log.item())
 
         return loss_batch
 
-    def _backward_pass(self, loss_batch, iteration, optimizer_idx):
+    def _backward_pass(self, loss_batch, optimizer_idx):
         """Execute backward pass from the current batch loss
 
         Args:
             loss_batch: loss calculated on current batch
-            iteration (int): current iteration index
             optimizer_idx (int): index of the current optimizer. Mostly useful when using multiple optimizers. When
                 only a single optimizer is used this parameter can be ignored.
 
@@ -338,14 +344,12 @@ class TrainLoop:
                 loss_batch.backward()
             else:
                 # Non-AMP or AMP backward are done under the hood in the MultiLoss wrap
-                loss_batch.backward(optimizer_idx, iteration, self.amp_scaler)
+                loss_batch.backward(optimizer_idx, self.iteration, self.amp_scaler)
 
-    def _optimizer_step(self, iteration, grad_accumulation, optimizer_idx):
+    def _optimizer_step(self, optimizer_idx):
         """Execute the optimizer step
 
         Args:
-            iteration (int): current iteration index
-            grad_accumulation (int): number of batches the gradients are accumulated before updating weights
             optimizer_idx (int): index of the current optimizer. Mostly useful when using multiple optimizers. When
                 only a single optimizer is used this parameter can be ignored.
 
@@ -353,7 +357,7 @@ class TrainLoop:
             None
         """
         # if (iteration + 1) % grad_accumulation == 0 or iteration == len(self.train_loader) - 1:
-        if (iteration + 1) % grad_accumulation == 0:
+        if (self.iteration + 1) % self.grad_accumulation == 0:
             if self.use_deepspeed:
                 self.model.step()
             else:
@@ -364,17 +368,15 @@ class TrainLoop:
                         self.amp_scaler.step(self.optimizer)
                 else:
                     # Non-AMP or AMP optimizer step are done under the hood in the MultiOptimizer wrap
-                    self.optimizer.step(optimizer_idx, iteration, self.amp_scaler)
+                    self.optimizer.step(optimizer_idx, self.iteration, self.amp_scaler)
 
             if self.grad_cb_used:
                 self.callbacks_handler.execute_optimizer_step()
 
-    def _optimizer_zero_grad(self, iteration, grad_accumulation, optimizer_idx):
+    def _optimizer_zero_grad(self, optimizer_idx):
         """Execute optimizer zero grad
 
         Args:
-            iteration (int): current iteration index
-            grad_accumulation (int): number of batches the gradients are accumulated before updating weights
             optimizer_idx (int): index of the current optimizer. Mostly useful when using multiple optimizers. When
                 only a single optimizer is used this parameter can be ignored.
 
@@ -382,12 +384,12 @@ class TrainLoop:
             None
         """
         # if (iteration + 1) % grad_accumulation == 0 or iteration == len(self.train_loader) - 1:
-        if (iteration + 1) % grad_accumulation == 0:
+        if (self.iteration + 1) % self.grad_accumulation == 0:
             if not self.use_deepspeed:
                 if not isinstance(self.optimizer, MultiOptimizer):
                     self.optimizer.zero_grad()
                 else:
-                    self.optimizer.zero_grad(optimizer_idx, iteration)
+                    self.optimizer.zero_grad(optimizer_idx, self.iteration)
 
     def auto_execute_end_of_epoch(self):
         """Basic performance evaluation executed by default at the end of each epoch
@@ -692,6 +694,20 @@ class TrainLoop:
             list: list of scheduler (callbacks)
         """
         return [cb for cb in self.callbacks if isinstance(cb, AbstractScheduler)]
+
+    def get_num_training_steps(self):
+        """Get the number of actual training steps
+
+        Useful in case of gradient accumulation to learn the number of steps where the gradient is actually updated
+        in between the accumulation steps.
+
+        Returns:
+            int: number of training steps / iterations
+        """
+        if self.num_iterations > 0:
+            return self.num_iterations // self.grad_accumulation
+        else:
+            return int(len(self.train_loader) // self.grad_accumulation * self.num_epochs)
 
     def _train_dp(self, num_epochs, num_iterations, callbacks=None, grad_accumulation=1, dp_model_args=None):
         """Train the model on multi-GPU with DataParallel auto wrapping
