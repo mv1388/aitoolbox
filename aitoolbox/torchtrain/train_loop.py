@@ -1,6 +1,7 @@
 from tqdm import tqdm
 import os
 import time
+import math
 import datetime
 import inspect
 from typing import Optional
@@ -26,7 +27,7 @@ from aitoolbox.torchtrain.multi_loss_optim import MultiLoss, MultiOptimizer
 from aitoolbox.torchtrain.data.batch_model_feed_defs import AbstractModelFeedDefinition
 from aitoolbox.torchtrain.tl_components.callback_handler import CallbacksHandler
 from aitoolbox.torchtrain.tl_components.ddp_handler import DDPHandler
-from aitoolbox.torchtrain.callbacks.model_save import ModelCheckpoint, ModelTrainEndSave
+from aitoolbox.torchtrain.callbacks.model_save import ModelCheckpoint, ModelIterationCheckpoint, ModelTrainEndSave
 from aitoolbox.torchtrain.schedulers.basic import AbstractScheduler
 from aitoolbox.experiment.training_history import TrainingHistory
 from aitoolbox.torchtrain.tl_components.model_prediction_store import ModelPredictionStore
@@ -125,6 +126,13 @@ class TrainLoop:
         self.experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
         self.loss_batch_accum = []
         self.epoch = 0
+        self.iteration = 0
+        # Intentionally set to -1 because we do += 1 at the start of every iteration
+        self.total_iteration_idx = -1
+
+        # Store settings provided in fit()
+        self.num_epochs, self.num_iterations = None, None
+        self.grad_accumulation = 1
 
         self.train_history = TrainingHistory(has_validation=self.validation_loader is not None)
         self.prediction_store = ModelPredictionStore(auto_purge=True)
@@ -149,7 +157,7 @@ class TrainLoop:
             raise ValueError("gpu_mode parameter set to the non-supported value. Can use only the following values: "
                              "'single', 'dp', 'ddp' and 'deepspeed'")
 
-    def fit(self, num_epochs, callbacks=None, grad_accumulation=1, **kwargs):
+    def fit(self, num_epochs=0, num_iterations=0, callbacks=None, grad_accumulation=1, **kwargs):
         """Train the model using the train loop
 
         This is the general API method which starts the model training. By calling this method and depending on
@@ -163,6 +171,8 @@ class TrainLoop:
 
         Args:
             num_epochs (int): how many epochs the network will be trained
+            num_iterations (int): how many iterations (batches) the network will be trained. This enables more granular
+                specification of the training length than the ``num_epochs`` parameter.
             callbacks (list or None): callbacks that are executed during the training run
             grad_accumulation (int): number of batches the gradients are accumulated before updating weights
             **kwargs: additional parameters for training methods:
@@ -177,29 +187,46 @@ class TrainLoop:
         Returns:
             TTModel or torch.nn.modules.Module or TTDataParallel or deepspeed.DeepSpeedLight: trained model
         """
+        if num_epochs > 0 and num_iterations > 0:
+            raise ValueError('Both num_epochs and num_iterations are set. '
+                             'They are mutually exclusive, so set only one of them.')
+        if num_epochs == 0 and num_iterations == 0:
+            raise ValueError('Both num_epochs and num_iterations are set to 0. No training would be done.')
+
         if self.gpu_mode == 'single':
-            return self._train(num_epochs, callbacks=callbacks, grad_accumulation=grad_accumulation)
+            return self._train(num_epochs, num_iterations, callbacks=callbacks, grad_accumulation=grad_accumulation)
         elif self.gpu_mode == 'dp':
-            return self._train_dp(num_epochs, callbacks=callbacks, grad_accumulation=grad_accumulation, **kwargs)
+            return self._train_dp(num_epochs, num_iterations, callbacks=callbacks, grad_accumulation=grad_accumulation,
+                                  **kwargs)
         elif self.gpu_mode == 'ddp':
-            return self._train_ddp(num_epochs, callbacks=callbacks, grad_accumulation=grad_accumulation, **kwargs)
+            return self._train_ddp(num_epochs, num_iterations, callbacks=callbacks, grad_accumulation=grad_accumulation,
+                                   **kwargs)
         elif self.gpu_mode == 'deepspeed':
-            return self._train_deepspeed(num_epochs=num_epochs, callbacks=callbacks, **kwargs)
+            return self._train_deepspeed(num_epochs=num_epochs, num_iterations=num_iterations, callbacks=callbacks,
+                                         **kwargs)
         else:
             raise ValueError("gpu_mode parameter set to the non-supported value. Can use only the following values: "
                              "'single', 'dp', 'ddp' and 'deepspeed'")
 
-    def _train(self, num_epochs, callbacks=None, grad_accumulation=1):
+    def _train(self, num_epochs, num_iterations, callbacks=None, grad_accumulation=1):
         """Train the model using the train loop
 
         Args:
             num_epochs (int): how many epochs the network will be trained
+            num_iterations (int): how many iterations (batches) the network will be trained. This enables more granular
+                specification of the training length than the ``num_epochs`` parameter.
             callbacks (list or None): callbacks that are executed during the training run
             grad_accumulation (int): number of batches the gradients are accumulated before updating weights
 
         Returns:
             TTModel or torch.nn.modules.Module or TTDataParallel or deepspeed.DeepSpeedLight: trained model
         """
+        if num_iterations > 0:
+            num_epochs = int(math.ceil(float(num_iterations) / len(self.train_loader)))
+        self.num_epochs = num_epochs
+        self.num_iterations = num_iterations
+        self.grad_accumulation = grad_accumulation
+
         self.callbacks_handler.register_callbacks(callbacks)
 
         self.model = self.model.to(self.device)
@@ -217,27 +244,31 @@ class TrainLoop:
                 print(f'Epoch: {self.epoch}')
             self.callbacks_handler.execute_epoch_begin()
 
-            for iteration, batch_data in enumerate(tqdm(self.train_loader)):
+            for self.iteration, batch_data in enumerate(tqdm(self.train_loader)):
+                self.total_iteration_idx += 1
                 self.callbacks_handler.execute_batch_begin()
 
                 # Feed batch into the model
-                loss_batch = self._calculate_batch_loss(batch_data, grad_accumulation)
+                loss_batch = self._calculate_batch_loss(batch_data)
 
                 # Iterate over potentially multiple optimizers
                 for optimizer_idx in range(self.num_optimizers):
                     # Backward pass through the model
-                    self._backward_pass(loss_batch, iteration, optimizer_idx)
+                    self._backward_pass(loss_batch, optimizer_idx)
                     if self.grad_cb_used:
                         self.callbacks_handler.execute_gradient_update(optimizer_idx)
 
                     # Optimizer step
-                    self._optimizer_step(iteration, grad_accumulation, optimizer_idx)
+                    self._optimizer_step(optimizer_idx)
                     # Optimizer zero grad
-                    self._optimizer_zero_grad(iteration, grad_accumulation, optimizer_idx)
+                    self._optimizer_zero_grad(optimizer_idx)
 
                 self.amp_scaler.update()
 
                 self.callbacks_handler.execute_batch_end()
+
+                if self.total_iteration_idx + 1 == num_iterations:
+                    break
 
             # Automatic end of epoch code - reports the train and if available validation loss and executes callbacks
             self.auto_execute_end_of_epoch()
@@ -253,17 +284,21 @@ class TrainLoop:
             if self.early_stop:
                 break
 
+            if self.total_iteration_idx + 1 == num_iterations:
+                print(f'Stopping training after {num_iterations} training iterations. '
+                      f'Current iteration index: {self.total_iteration_idx}')
+                break
+
         self.auto_execute_end_of_training()
         self.callbacks_handler.execute_train_end()
 
         return self.model
 
-    def _calculate_batch_loss(self, batch_data, grad_accumulation):
+    def _calculate_batch_loss(self, batch_data):
         """Push batch data through the model and calculate the batch loss
 
         Args:
             batch_data: input data batch
-            grad_accumulation (int): number of batches the gradients are accumulated before updating weights
 
         Returns:
             loss: loss calculated on current batch
@@ -277,18 +312,17 @@ class TrainLoop:
             loss_batch_log = loss_batch
 
             # Need to divide by the number of accumulation steps if our loss is averaged over the training samples
-            loss_batch = loss_batch / grad_accumulation
+            loss_batch = loss_batch / self.grad_accumulation
 
         self.loss_batch_accum.append(loss_batch_log.item())
 
         return loss_batch
 
-    def _backward_pass(self, loss_batch, iteration, optimizer_idx):
+    def _backward_pass(self, loss_batch, optimizer_idx):
         """Execute backward pass from the current batch loss
 
         Args:
             loss_batch: loss calculated on current batch
-            iteration (int): current iteration index
             optimizer_idx (int): index of the current optimizer. Mostly useful when using multiple optimizers. When
                 only a single optimizer is used this parameter can be ignored.
 
@@ -311,14 +345,12 @@ class TrainLoop:
                 self.amp_scaler.scale(loss_batch).backward()
             else:
                 # Non-AMP or AMP backward are done under the hood in the MultiLoss wrap
-                loss_batch.backward(optimizer_idx, iteration, self.amp_scaler)
+                loss_batch.backward(optimizer_idx, self.iteration, self.amp_scaler)
 
-    def _optimizer_step(self, iteration, grad_accumulation, optimizer_idx):
+    def _optimizer_step(self, optimizer_idx):
         """Execute the optimizer step
 
         Args:
-            iteration (int): current iteration index
-            grad_accumulation (int): number of batches the gradients are accumulated before updating weights
             optimizer_idx (int): index of the current optimizer. Mostly useful when using multiple optimizers. When
                 only a single optimizer is used this parameter can be ignored.
 
@@ -326,7 +358,7 @@ class TrainLoop:
             None
         """
         # if (iteration + 1) % grad_accumulation == 0 or iteration == len(self.train_loader) - 1:
-        if (iteration + 1) % grad_accumulation == 0:
+        if (self.iteration + 1) % self.grad_accumulation == 0:
             if self.use_deepspeed:
                 self.model.step()
             else:
@@ -337,17 +369,15 @@ class TrainLoop:
                     self.amp_scaler.step(self.optimizer)
                 else:
                     # Non-AMP or AMP optimizer step are done under the hood in the MultiOptimizer wrap
-                    self.optimizer.step(optimizer_idx, iteration, self.amp_scaler)
+                    self.optimizer.step(optimizer_idx, self.iteration, self.amp_scaler)
 
             if self.grad_cb_used:
                 self.callbacks_handler.execute_optimizer_step()
 
-    def _optimizer_zero_grad(self, iteration, grad_accumulation, optimizer_idx):
+    def _optimizer_zero_grad(self, optimizer_idx):
         """Execute optimizer zero grad
 
         Args:
-            iteration (int): current iteration index
-            grad_accumulation (int): number of batches the gradients are accumulated before updating weights
             optimizer_idx (int): index of the current optimizer. Mostly useful when using multiple optimizers. When
                 only a single optimizer is used this parameter can be ignored.
 
@@ -355,12 +385,12 @@ class TrainLoop:
             None
         """
         # if (iteration + 1) % grad_accumulation == 0 or iteration == len(self.train_loader) - 1:
-        if (iteration + 1) % grad_accumulation == 0:
+        if (self.iteration + 1) % self.grad_accumulation == 0:
             if not self.use_deepspeed:
                 if not isinstance(self.optimizer, MultiOptimizer):
                     self.optimizer.zero_grad()
                 else:
-                    self.optimizer.zero_grad(optimizer_idx, iteration)
+                    self.optimizer.zero_grad(optimizer_idx, self.iteration)
 
     def auto_execute_end_of_epoch(self):
         """Basic performance evaluation executed by default at the end of each epoch
@@ -470,11 +500,11 @@ class TrainLoop:
         Returns:
             float or dict: loss, in the case of multi loss, the dict gets returned
         """
-        if not self.prediction_store.has_train_loss(self.epoch) or force_prediction:
+        if not self.prediction_store.has_train_loss(self.total_iteration_idx) or force_prediction:
             loss = self.evaluate_model_loss(self.train_loader)
-            self.prediction_store.insert_train_loss(loss, self.epoch, force_prediction)
+            self.prediction_store.insert_train_loss(loss, self.total_iteration_idx, force_prediction)
         else:
-            loss = self.prediction_store.get_train_loss(self.epoch)
+            loss = self.prediction_store.get_train_loss(self.total_iteration_idx)
 
         return loss
 
@@ -488,11 +518,11 @@ class TrainLoop:
         Returns:
             float or dict: loss, in the case of multi loss, the dict gets returned
         """
-        if not self.prediction_store.has_val_loss(self.epoch) or force_prediction:
+        if not self.prediction_store.has_val_loss(self.total_iteration_idx) or force_prediction:
             loss = self.evaluate_model_loss(self.validation_loader)
-            self.prediction_store.insert_val_loss(loss, self.epoch, force_prediction)
+            self.prediction_store.insert_val_loss(loss, self.total_iteration_idx, force_prediction)
         else:
-            loss = self.prediction_store.get_val_loss(self.epoch)
+            loss = self.prediction_store.get_val_loss(self.total_iteration_idx)
 
         return loss
 
@@ -506,11 +536,11 @@ class TrainLoop:
         Returns:
             float or dict: loss, in the case of multi loss, the dict gets returned
         """
-        if not self.prediction_store.has_test_loss(self.epoch) or force_prediction:
+        if not self.prediction_store.has_test_loss(self.total_iteration_idx) or force_prediction:
             loss = self.evaluate_model_loss(self.test_loader)
-            self.prediction_store.insert_test_loss(loss, self.epoch, force_prediction)
+            self.prediction_store.insert_test_loss(loss, self.total_iteration_idx, force_prediction)
         else:
-            loss = self.prediction_store.get_test_loss(self.epoch)
+            loss = self.prediction_store.get_test_loss(self.total_iteration_idx)
 
         return loss
 
@@ -557,11 +587,11 @@ class TrainLoop:
         Returns:
             (torch.Tensor, torch.Tensor, dict): y_pred, y_true, metadata
         """
-        if not self.prediction_store.has_train_predictions(self.epoch) or force_prediction:
+        if not self.prediction_store.has_train_predictions(self.total_iteration_idx) or force_prediction:
             predictions = self.predict_with_model(self.train_loader)
-            self.prediction_store.insert_train_predictions(predictions, self.epoch, force_prediction)
+            self.prediction_store.insert_train_predictions(predictions, self.total_iteration_idx, force_prediction)
         else:
-            predictions = self.prediction_store.get_train_predictions(self.epoch)
+            predictions = self.prediction_store.get_train_predictions(self.total_iteration_idx)
 
         return predictions
 
@@ -575,11 +605,11 @@ class TrainLoop:
         Returns:
             (torch.Tensor, torch.Tensor, dict): y_pred, y_true, metadata
         """
-        if not self.prediction_store.has_val_predictions(self.epoch) or force_prediction:
+        if not self.prediction_store.has_val_predictions(self.total_iteration_idx) or force_prediction:
             predictions = self.predict_with_model(self.validation_loader)
-            self.prediction_store.insert_val_predictions(predictions, self.epoch, force_prediction)
+            self.prediction_store.insert_val_predictions(predictions, self.total_iteration_idx, force_prediction)
         else:
-            predictions = self.prediction_store.get_val_predictions(self.epoch)
+            predictions = self.prediction_store.get_val_predictions(self.total_iteration_idx)
 
         return predictions
 
@@ -593,11 +623,11 @@ class TrainLoop:
         Returns:
             (torch.Tensor, torch.Tensor, dict): y_pred, y_true, metadata
         """
-        if not self.prediction_store.has_test_predictions(self.epoch) or force_prediction:
+        if not self.prediction_store.has_test_predictions(self.total_iteration_idx) or force_prediction:
             predictions = self.predict_with_model(self.test_loader)
-            self.prediction_store.insert_test_predictions(predictions, self.epoch, force_prediction)
+            self.prediction_store.insert_test_predictions(predictions, self.total_iteration_idx, force_prediction)
         else:
-            predictions = self.prediction_store.get_test_predictions(self.epoch)
+            predictions = self.prediction_store.get_test_predictions(self.total_iteration_idx)
 
         return predictions
 
@@ -666,11 +696,27 @@ class TrainLoop:
         """
         return [cb for cb in self.callbacks if isinstance(cb, AbstractScheduler)]
 
-    def _train_dp(self, num_epochs, callbacks=None, grad_accumulation=1, dp_model_args=None):
+    def get_num_training_steps(self):
+        """Get the number of actual training steps
+
+        Useful in case of gradient accumulation to learn the number of steps where the gradient is actually updated
+        in between the accumulation steps.
+
+        Returns:
+            int: number of training steps / iterations
+        """
+        if self.num_iterations > 0:
+            return self.num_iterations // self.grad_accumulation
+        else:
+            return int(len(self.train_loader) // self.grad_accumulation * self.num_epochs)
+
+    def _train_dp(self, num_epochs, num_iterations, callbacks=None, grad_accumulation=1, dp_model_args=None):
         """Train the model on multi-GPU with DataParallel auto wrapping
 
         Args:
             num_epochs (int): how many epochs the network will be trained
+            num_iterations (int): how many iterations (batches) the network will be trained. This enables more granular
+                specification of the training length than the ``num_epochs`` parameter.
             callbacks (list or None): callbacks that are executed during the training run
             grad_accumulation (int): number of batches the gradients are accumulated before updating weights
             dp_model_args (dict or None): parameters for :class:`aitoolbox.torchtrain.parallel.TTDataParallel` /
@@ -687,9 +733,9 @@ class TrainLoop:
             else:
                 self.model = nn.DataParallel(self.model, **dp_model_args)
 
-        return self._train(num_epochs, callbacks, grad_accumulation)
+        return self._train(num_epochs, num_iterations, callbacks, grad_accumulation)
 
-    def _train_ddp(self, num_epochs, callbacks=None, grad_accumulation=1,
+    def _train_ddp(self, num_epochs, num_iterations, callbacks=None, grad_accumulation=1,
                    ddp_model_args=None, in_process_data_load=None,
                    num_nodes=1, node_rank=0, num_gpus=torch.cuda.device_count()):
         """Train the model using the train loop in the Distributed Data Parallel setting
@@ -698,6 +744,8 @@ class TrainLoop:
 
         Args:
             num_epochs (int): how many epochs the network will be trained
+            num_iterations (int): how many iterations (batches) the network will be trained. This enables more granular
+                specification of the training length than the ``num_epochs`` parameter.
             callbacks (list or None): callbacks that are executed during the training run
             grad_accumulation (int): number of batches the gradients are accumulated before updating weights
             ddp_model_args (dict or None): parameters for DistributedDataParallel model
@@ -732,17 +780,19 @@ class TrainLoop:
 
         mp.spawn(self._spawn_fit,
                  args=(
-                     ddp_args, num_epochs, callbacks, grad_accumulation, in_process_data_load
+                     ddp_args, num_epochs, num_iterations, callbacks, grad_accumulation, in_process_data_load
                  ),
                  nprocs=ddp_args['world_size'])
 
-    def _spawn_fit(self, gpu, ddp_args, num_epochs, callbacks, grad_accumulation, in_process_data_load):
+    def _spawn_fit(self, gpu, ddp_args, num_epochs, num_iterations, callbacks, grad_accumulation, in_process_data_load):
         """Helper function that prepares the TrainLoop state inside each of the spawned processes and initiates training
 
         Args:
             gpu (int): provided by the mp.spawn(); index of the GPU allocated to the current process
             ddp_args (dict): parameters dict needed for the distributed training setup
             num_epochs (int): how many epochs the network will be trained
+            num_iterations (int): how many iterations (batches) the network will be trained. This enables more granular
+                specification of the training length than the ``num_epochs`` parameter.
             callbacks (list or None): callbacks that are executed during the training run
             grad_accumulation (int): number of batches the gradients are accumulated before updating weights
             in_process_data_load (list or None): in-process data loading logic implemented as a torchtrain callback.
@@ -778,9 +828,9 @@ class TrainLoop:
         else:
             self.model = DistributedDataParallel(self.model, device_ids=[gpu], **ddp_args['ddp_model_args'])
 
-        self._train(num_epochs, callbacks, grad_accumulation)
+        self._train(num_epochs, num_iterations, callbacks, grad_accumulation)
 
-    def _train_deepspeed(self, deepspeed_args, num_epochs, callbacks=None,
+    def _train_deepspeed(self, deepspeed_args, num_epochs, num_iterations, callbacks=None,
                          **ds_model_args):
         """Train the model using Microsoft DeepSpeed package
 
@@ -794,6 +844,8 @@ class TrainLoop:
             deepspeed_args (argparse.Namespace): argparser results structured as per DeepSpeed requirements.
                 A dictionary containing local_rank and deepspeed_config file location.
             num_epochs (int): how many epochs the network will be trained
+            num_iterations (int): how many iterations (batches) the network will be trained. This enables more granular
+                specification of the training length than the ``num_epochs`` parameter.
             callbacks (list): callbacks that are executed during the training run
             **ds_model_args: additional parameters for the underlying ``deepspeed.DeepSpeedLight`` class
 
@@ -819,15 +871,17 @@ class TrainLoop:
         self.optimizer = self.model.optimizer
         self.train_loader = self.model.training_dataloader
 
-        return self._train(num_epochs, callbacks)
+        return self._train(num_epochs, num_iterations, callbacks)
 
-    def __call__(self, num_epochs, callbacks=None, grad_accumulation=1, **kwargs):
+    def __call__(self, num_epochs=0, num_iterations=0, callbacks=None, grad_accumulation=1, **kwargs):
         """Train the model using the train loop
 
         This is a convenience function which calls the main TrainLoop model training method fit().
 
         Args:
             num_epochs (int): how many epochs the network will be trained
+            num_iterations (int): how many iterations (batches) the network will be trained. This enables more granular
+                specification of the training length than the ``num_epochs`` parameter.
             callbacks (list): callbacks that are executed during the training run
             grad_accumulation (int): number of batches the gradients are accumulated before updating weights
             **kwargs: additional parameters for ``_train_dp()``, ``_train_ddp()`` and ``_train_deepspeed()`` methods.
@@ -835,7 +889,7 @@ class TrainLoop:
         Returns:
             TTModel or torch.nn.modules.Module or TTDataParallel: trained model
         """
-        return self.fit(num_epochs, callbacks, grad_accumulation, **kwargs)
+        return self.fit(num_epochs, num_iterations, callbacks, grad_accumulation, **kwargs)
 
 
 class TrainLoopCheckpoint(TrainLoop):
@@ -846,6 +900,7 @@ class TrainLoopCheckpoint(TrainLoop):
                  hyperparams,
                  cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix='', source_dirs=(),
                  rm_subopt_local_models=False, num_best_checkpoints_kept=2,
+                 iteration_save_freq=0,
                  collate_batch_pred_fn=append_predictions, pred_transform_fn=torch_cat_transf,
                  end_auto_eval=True, lazy_experiment_save=True,
                  gpu_mode='single', cuda_device_idx=None, use_amp=False):
@@ -877,6 +932,8 @@ class TrainLoopCheckpoint(TrainLoop):
                 the metric minimization is done otherwise metric maximization is done
             num_best_checkpoints_kept (int): number of best performing models which are kept when removing suboptimal
                 model checkpoints
+            iteration_save_freq (int): frequency of saving the model checkpoint every specified number of
+                training iterations
             collate_batch_pred_fn (callable): collate function transforming batch predictions as they come out from the
                 model
             pred_transform_fn (callable): function transforming all the produced predictions after all the batches have
@@ -916,20 +973,37 @@ class TrainLoopCheckpoint(TrainLoop):
         self.bucket_name = bucket_name
         self.cloud_dir_prefix = cloud_dir_prefix
         self.rm_subopt_local_models = rm_subopt_local_models
+        self.iteration_save_freq = iteration_save_freq
 
         if 'experiment_file_path' not in self.hyperparams:
             self.hyperparams['experiment_file_path'] = inspect.getframeinfo(inspect.currentframe().f_back).filename
         if 'source_dirs_paths' not in self.hyperparams:
             self.hyperparams['source_dirs_paths'] = source_dirs
 
-        self.callbacks_handler.register_callbacks([
-            ModelCheckpoint(self.project_name, self.experiment_name, self.local_model_result_folder_path,
-                            self.hyperparams,
-                            cloud_save_mode=self.cloud_save_mode,
-                            bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
-                            rm_subopt_local_models=self.rm_subopt_local_models,
-                            num_best_checkpoints_kept=num_best_checkpoints_kept)
-        ], cache_callbacks=True)
+        if iteration_save_freq == 0:
+            model_checkpoint_cb = ModelCheckpoint(
+                self.project_name, self.experiment_name, self.local_model_result_folder_path,
+                self.hyperparams,
+                cloud_save_mode=self.cloud_save_mode,
+                bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
+                rm_subopt_local_models=self.rm_subopt_local_models,
+                num_best_checkpoints_kept=num_best_checkpoints_kept
+            )
+        elif iteration_save_freq > 0:
+            model_checkpoint_cb = ModelIterationCheckpoint(
+                iteration_save_freq,
+                self.project_name, self.experiment_name, self.local_model_result_folder_path,
+                self.hyperparams,
+                cloud_save_mode=self.cloud_save_mode,
+                bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
+                rm_subopt_local_models=self.rm_subopt_local_models,
+                num_best_checkpoints_kept=num_best_checkpoints_kept
+            )
+        else:
+            raise ValueError('iteration_save_freq can have values only >= 0. '
+                             f'But received value {iteration_save_freq}.')
+
+        self.callbacks_handler.register_callbacks([model_checkpoint_cb], cache_callbacks=True)
 
 
 class TrainLoopEndSave(TrainLoop):
@@ -1051,6 +1125,7 @@ class TrainLoopCheckpointEndSave(TrainLoopEndSave):
                  hyperparams, val_result_package=None, test_result_package=None,
                  cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix='', source_dirs=(),
                  rm_subopt_local_models=False, num_best_checkpoints_kept=2,
+                 iteration_save_freq=0,
                  collate_batch_pred_fn=append_predictions, pred_transform_fn=torch_cat_transf,
                  end_auto_eval=True, lazy_experiment_save=True,
                  gpu_mode='single', cuda_device_idx=None, use_amp=False):
@@ -1087,6 +1162,8 @@ class TrainLoopCheckpointEndSave(TrainLoopEndSave):
                 the metric minimization is done otherwise metric maximization is done
             num_best_checkpoints_kept (int): number of best performing models which are kept when removing suboptimal
                 model checkpoints
+            iteration_save_freq (int): frequency of saving the model checkpoint every specified number of
+                training iterations
             collate_batch_pred_fn (callable): collate function transforming batch predictions as they come out from the
                 model
             pred_transform_fn (callable): function transforming all the produced predictions after all the batches have
@@ -1128,12 +1205,29 @@ class TrainLoopCheckpointEndSave(TrainLoopEndSave):
                                   end_auto_eval, lazy_experiment_save,
                                   gpu_mode, cuda_device_idx, use_amp)
         self.rm_subopt_local_models = rm_subopt_local_models
+        self.iteration_save_freq = iteration_save_freq
 
-        self.callbacks_handler.register_callbacks([
-            ModelCheckpoint(self.project_name, self.experiment_name, self.local_model_result_folder_path,
-                            self.hyperparams,
-                            cloud_save_mode=self.cloud_save_mode,
-                            bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
-                            rm_subopt_local_models=self.rm_subopt_local_models,
-                            num_best_checkpoints_kept=num_best_checkpoints_kept)
-        ], cache_callbacks=True)
+        if iteration_save_freq == 0:
+            model_checkpoint_cb = ModelCheckpoint(
+                self.project_name, self.experiment_name, self.local_model_result_folder_path,
+                self.hyperparams,
+                cloud_save_mode=self.cloud_save_mode,
+                bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
+                rm_subopt_local_models=self.rm_subopt_local_models,
+                num_best_checkpoints_kept=num_best_checkpoints_kept
+            )
+        elif iteration_save_freq > 0:
+            model_checkpoint_cb = ModelIterationCheckpoint(
+                iteration_save_freq,
+                self.project_name, self.experiment_name, self.local_model_result_folder_path,
+                self.hyperparams,
+                cloud_save_mode=self.cloud_save_mode,
+                bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
+                rm_subopt_local_models=self.rm_subopt_local_models,
+                num_best_checkpoints_kept=num_best_checkpoints_kept
+            )
+        else:
+            raise ValueError('iteration_save_freq can have values only >= 0. '
+                             f'But received value {iteration_save_freq}.')
+
+        self.callbacks_handler.register_callbacks([model_checkpoint_cb], cache_callbacks=True)

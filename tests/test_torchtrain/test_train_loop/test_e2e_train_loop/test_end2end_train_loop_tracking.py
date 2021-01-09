@@ -738,6 +738,109 @@ class TestEnd2EndTrainLoopCheckpoint(unittest.TestCase):
         if os.path.exists(project_path):
             shutil.rmtree(project_path)
 
+    def test_e2e_ff_net_train_loop_iteration_model_checkpointing(self):
+        self.set_seeds()
+        batch_size = 10
+
+        train_dataset = TensorDataset(torch.randn(100, 50), torch.randint(low=0, high=10, size=(100,)))
+        val_dataset = TensorDataset(torch.randn(30, 50), torch.randint(low=0, high=10, size=(30,)))
+        test_dataset = TensorDataset(torch.randn(30, 50), torch.randint(low=0, high=10, size=(30,)))
+
+        train_dataloader = DataLoader(train_dataset, batch_size=batch_size)
+        val_dataloader = DataLoader(val_dataset, batch_size=batch_size)
+        test_dataloader = DataLoader(test_dataset, batch_size=batch_size)
+
+        model = FFNet()
+        optimizer = optim.Adam(model.parameters(), lr=0.001, betas=(0.9, 0.999))
+        criterion = nn.NLLLoss()
+
+        train_loop = TrainLoopCheckpoint(
+            model,
+            train_dataloader, val_dataloader, test_dataloader,
+            optimizer, criterion,
+            project_name='e2e_train_loop_example', experiment_name='TrainLoopCheckpoint_example',
+            local_model_result_folder_path=THIS_DIR,
+            hyperparams={'batch_size': batch_size},
+            cloud_save_mode=None,
+            iteration_save_freq=5
+        )
+        train_loop.fit(num_iterations=100)
+
+        experiment_dir_path = os.path.join(THIS_DIR, train_loop.project_name,
+                                           f'{train_loop.experiment_name}_{train_loop.experiment_timestamp}')
+
+        self.assertEqual(
+            sorted(os.listdir(os.path.join(experiment_dir_path, 'checkpoint_model'))),
+            sorted(
+                [f'model_{train_loop.experiment_name}_{train_loop.experiment_timestamp}_E{ep}.pth'
+                 for ep in range(10)] +
+                [f'model_{train_loop.experiment_name}_{train_loop.experiment_timestamp}_E{int(iteration / 10)}_ITER{iteration}.pth'
+                 for iteration in range(5, 100, 5)]
+            )
+        )
+
+        project_path = os.path.join(THIS_DIR, 'e2e_train_loop_example')
+        if os.path.exists(project_path):
+            shutil.rmtree(project_path)
+
+    @mock_s3
+    def test_e2e_ff_net_train_loop_iteration_model_checkpointing_cloud_save(self):
+        s3 = boto3.resource('s3')
+        s3.create_bucket(Bucket=BUCKET_NAME)
+        s3_client = boto3.client('s3')
+
+        self.set_seeds()
+        batch_size = 10
+
+        train_dataset = TensorDataset(torch.randn(100, 50), torch.randint(low=0, high=10, size=(100,)))
+        val_dataset = TensorDataset(torch.randn(30, 50), torch.randint(low=0, high=10, size=(30,)))
+        test_dataset = TensorDataset(torch.randn(30, 50), torch.randint(low=0, high=10, size=(30,)))
+
+        train_dataloader = DataLoader(train_dataset, batch_size=batch_size)
+        val_dataloader = DataLoader(val_dataset, batch_size=batch_size)
+        test_dataloader = DataLoader(test_dataset, batch_size=batch_size)
+
+        model = FFNet()
+        optimizer = optim.Adam(model.parameters(), lr=0.001, betas=(0.9, 0.999))
+        criterion = nn.NLLLoss()
+
+        train_loop = TrainLoopCheckpoint(
+            model,
+            train_dataloader, val_dataloader, test_dataloader,
+            optimizer, criterion,
+            project_name='e2e_train_loop_example', experiment_name='TrainLoopCheckpoint_example',
+            local_model_result_folder_path=THIS_DIR,
+            hyperparams={'batch_size': batch_size},
+            cloud_save_mode='s3', bucket_name=BUCKET_NAME, cloud_dir_prefix='experiment_results',
+            iteration_save_freq=5
+        )
+        train_loop.fit(num_iterations=100)
+
+        bucket_content = [el['Key'] for el in s3_client.list_objects(Bucket=BUCKET_NAME)['Contents']]
+
+        cloud_experiment_folder = f'{train_loop.cloud_dir_prefix}/{train_loop.project_name}/' \
+                                  f'{train_loop.experiment_name}_{train_loop.experiment_timestamp}'
+
+        model_checkpoint_files = \
+            [f'model_{train_loop.experiment_name}_{train_loop.experiment_timestamp}_E{ep}.pth'
+             for ep in range(10)] + \
+            [f'model_{train_loop.experiment_name}_{train_loop.experiment_timestamp}_E{int(iteration / 10)}_ITER{iteration}.pth'
+             for iteration in range(5, 100, 5)]
+        model_checkpoints = [
+            f'{cloud_experiment_folder}/checkpoint_model/{model_fn}' for model_fn in model_checkpoint_files
+        ]
+        additional_files = [
+            f'{cloud_experiment_folder}/hyperparams_list.txt',
+            f'{cloud_experiment_folder}/{THIS_FILE}'
+        ]
+        expected_files = model_checkpoints + additional_files
+
+        self.assertEqual(sorted(bucket_content), sorted(expected_files))
+
+        project_path = os.path.join(THIS_DIR, 'e2e_train_loop_example')
+        if os.path.exists(project_path):
+            shutil.rmtree(project_path)
+
     @staticmethod
     def set_seeds():
         manual_seed = 0

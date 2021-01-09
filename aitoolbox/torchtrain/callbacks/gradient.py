@@ -41,15 +41,16 @@ class GradValueClip(GradientCallbackBase):
         self.max_grad_value = max_grad_value
 
     def on_after_gradient_update(self, optimizer_idx):
-        optimizer = self.train_loop_obj.optimizer
-        if isinstance(optimizer, MultiOptimizer):
-            optimizer = optimizer[optimizer_idx]
+        if (self.train_loop_obj.iteration + 1) % self.train_loop_obj.grad_accumulation == 0:
+            optimizer = self.train_loop_obj.optimizer
+            if isinstance(optimizer, MultiOptimizer):
+                optimizer = optimizer[optimizer_idx]
 
-        # Unscales the gradients of optimizer's assigned params in-place
-        # Following: https://pytorch.org/docs/stable/notes/amp_examples.html#gradient-clipping
-        self.train_loop_obj.amp_scaler.unscale_(optimizer)
+            # Unscales the gradients of optimizer's assigned params in-place
+            # Following: https://pytorch.org/docs/stable/notes/amp_examples.html#gradient-clipping
+            self.train_loop_obj.amp_scaler.unscale_(optimizer)
 
-        torch.nn.utils.clip_grad_value_(self.train_loop_obj.model.parameters(), self.max_grad_value)
+            torch.nn.utils.clip_grad_value_(self.train_loop_obj.model.parameters(), self.max_grad_value)
 
 
 class GradNormClip(GradientCallbackBase):
@@ -65,15 +66,16 @@ class GradNormClip(GradientCallbackBase):
         self.kwargs = kwargs
 
     def on_after_gradient_update(self, optimizer_idx):
-        optimizer = self.train_loop_obj.optimizer
-        if isinstance(optimizer, MultiOptimizer):
-            optimizer = optimizer[optimizer_idx]
+        if (self.train_loop_obj.iteration + 1) % self.train_loop_obj.grad_accumulation == 0:
+            optimizer = self.train_loop_obj.optimizer
+            if isinstance(optimizer, MultiOptimizer):
+                optimizer = optimizer[optimizer_idx]
 
-        # Unscales the gradients of optimizer's assigned params in-place
-        # Following: https://pytorch.org/docs/stable/notes/amp_examples.html#gradient-clipping
-        self.train_loop_obj.amp_scaler.unscale_(optimizer)
+            # Unscales the gradients of optimizer's assigned params in-place
+            # Following: https://pytorch.org/docs/stable/notes/amp_examples.html#gradient-clipping
+            self.train_loop_obj.amp_scaler.unscale_(optimizer)
 
-        torch.nn.utils.clip_grad_norm_(self.train_loop_obj.model.parameters(), self.max_grad_norm, **self.kwargs)
+            torch.nn.utils.clip_grad_norm_(self.train_loop_obj.model.parameters(), self.max_grad_norm, **self.kwargs)
 
 
 class GradientStatsPrint(AbstractCallback):

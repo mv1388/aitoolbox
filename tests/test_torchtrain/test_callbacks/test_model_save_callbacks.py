@@ -1,12 +1,13 @@
 import unittest
 import os
 import shutil
+import torch
 
 from aitoolbox.cloud.AWS.model_save import PyTorchS3ModelSaver
 from aitoolbox.experiment.experiment_saver import FullPyTorchExperimentS3Saver
 from aitoolbox.experiment.local_experiment_saver import FullPyTorchExperimentLocalSaver
 from aitoolbox.experiment.local_save.local_model_save import PyTorchLocalModelSaver
-from aitoolbox.torchtrain.callbacks.model_save import ModelCheckpoint, ModelTrainEndSave
+from aitoolbox.torchtrain.callbacks.model_save import ModelCheckpoint, ModelIterationCheckpoint, ModelTrainEndSave
 from aitoolbox.torchtrain.train_loop import TrainLoop
 from tests.utils import NetUnifiedBatchFeed, MiniDummyOptimizer, DummyResultPackage, DummyOptimizer
 
@@ -83,6 +84,61 @@ class TestModelCheckpointCallback(unittest.TestCase):
         for line in f_lines:
             k, v = line.strip().split(':\t')
             self.assertEqual(str(hyperparams[k]), v)
+
+        project_path = os.path.join(THIS_DIR, 'project_name')
+        if os.path.exists(project_path):
+            shutil.rmtree(project_path)
+
+
+class TestModelIterationCheckpoint(unittest.TestCase):
+    def test_end_of_batch_model_saving_with_iteration_info(self):
+        hyperparams = {'param_1': 100, 'param_A': 234, 'LR': 0.001, 'path': 'bla/bladddd'}
+
+        callback = ModelIterationCheckpoint(
+            2, 'project_name', 'experiment_name', THIS_DIR,
+            hyperparams=hyperparams,
+            cloud_save_mode=None)
+        train_loop = TrainLoop(NetUnifiedBatchFeed(), None, None, None, DummyOptimizer(), None)
+        train_loop.callbacks_handler.register_callbacks([callback])
+        train_loop.callbacks_handler.execute_train_begin()
+
+        for iteration in range(10):
+            train_loop.total_iteration_idx = iteration
+            train_loop.callbacks_handler.execute_batch_end()
+
+            if iteration % 5 == 0:
+                train_loop.callbacks_handler.execute_epoch_end()
+                train_loop.epoch += 1
+
+        experiment_dir_path = os.path.join(THIS_DIR, 'project_name',
+                                           f'experiment_name_{train_loop.experiment_timestamp}')
+
+        model_file_names = \
+            [
+                f'model_experiment_name_{train_loop.experiment_timestamp}_E{ep}.pth'
+                for ep in range(2)
+            ] + \
+            [
+                f'model_experiment_name_{train_loop.experiment_timestamp}_E1_ITER2.pth',
+                f'model_experiment_name_{train_loop.experiment_timestamp}_E1_ITER4.pth',
+                f'model_experiment_name_{train_loop.experiment_timestamp}_E2_ITER6.pth',
+                f'model_experiment_name_{train_loop.experiment_timestamp}_E2_ITER8.pth',
+            ]
+
+        self.assertEqual(
+            sorted(os.listdir(os.path.join(experiment_dir_path, 'checkpoint_model'))),
+            sorted(model_file_names)
+        )
+
+        expected_ctrs = [(0, 0), (1, 5), (1, 2), (1, 4), (2, 6), (2, 8)]
+        self.assertEqual(len(model_file_names), len(expected_ctrs))
+
+        for file_name, (exp_epoch, exp_iter) in zip(sorted(model_file_names), expected_ctrs):
+            file_path = os.path.join(experiment_dir_path, 'checkpoint_model', file_name)
+            model_dict = torch.load(file_path)
+
+            self.assertEqual(model_dict['epoch'], exp_epoch)
+            self.assertEqual(model_dict['iteration_idx'], exp_iter)
 
         project_path = os.path.join(THIS_DIR, 'project_name')
         if os.path.exists(project_path):

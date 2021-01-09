@@ -61,7 +61,7 @@ class TestGradientStatsPrintCallback(unittest.TestCase):
 
         TrainLoop(model, train_loader, None, None, optimizer, criterion).fit(num_epochs=1, callbacks=[callback])
         sys.stdout = sys.__stdout__
-        expected_print = '\n'.join(captured_output.getvalue().split('\n')[7:]).strip()
+        expected_print = '\n'.join(captured_output.getvalue().split('\n')[8:]).strip()
 
         gradients_l1 = model.l1.weight.grad.cpu().numpy()
         gradients_l2 = model.l2.weight.grad.cpu().numpy()
