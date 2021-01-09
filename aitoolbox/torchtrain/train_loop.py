@@ -107,8 +107,8 @@ class TrainLoop:
 
         self.gpu_mode = gpu_mode
 
-        self.use_amp = use_amp is True or type(use_amp) == dict
-        self.amp_scaler_init = use_amp if type(use_amp) == dict else {}
+        self.use_amp = use_amp is True or isinstance(use_amp, dict)
+        self.amp_scaler_init = use_amp if isinstance(use_amp, dict) else {}
         self.amp_scaler = amp.GradScaler(**self.amp_scaler_init, enabled=self.use_amp)
 
         self.use_deepspeed = False
