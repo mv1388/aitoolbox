@@ -810,7 +810,7 @@ class TrainLoop:
 
         self._train(num_epochs, num_iterations, callbacks, grad_accumulation)
 
-    def __call__(self, num_epochs, callbacks=None, grad_accumulation=1, **kwargs):
+    def __call__(self, num_epochs=0, num_iterations=0, callbacks=None, grad_accumulation=1, **kwargs):
         """Train the model using the train loop
 
         This is a convenience function which calls the main TrainLoop model training method fit().
@@ -822,7 +822,6 @@ class TrainLoop:
             callbacks (list): callbacks that are executed during the training run
             grad_accumulation (int): number of batches the gradients are accumulated before updating weights
             **kwargs: additional parameters for ``_train_dp()`` and ``_train_ddp()`` methods.
-
         Returns:
             TTModel or torch.nn.modules.Module or TTDataParallel: trained model
         """
