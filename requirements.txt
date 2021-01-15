@@ -3,7 +3,7 @@ pandas
 scikit-learn
 matplotlib
 seaborn
-torch
+torch>=1.6.0
 torchvision
 torchtext
 pytorch-nlp
@@ -18,3 +18,4 @@ nltk
 allennlp==0.9
 pyrouge
 rouge
+tensorboard

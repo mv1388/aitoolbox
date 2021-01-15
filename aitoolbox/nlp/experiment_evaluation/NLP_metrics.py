@@ -8,7 +8,7 @@ from pyrouge import Rouge155
 from rouge import Rouge
 from nltk.translate.bleu_score import sentence_bleu, corpus_bleu
 from torchnlp.metrics import bleu
-from transformers import glue_compute_metrics
+from transformers import glue_compute_metrics, xnli_compute_metrics
 
 from aitoolbox.experiment.core_metrics.abstract_metric import AbstractBaseMetric
 
@@ -501,8 +501,10 @@ class BLEUScoreStrTorchNLPMetric(AbstractBaseMetric):
     def calculate_metric(self):
         BLEUSentenceScoreMetric.check_transl_sent_num_match([self.y_true, self.y_predicted])
 
-        sentence_bleu_results = [bleu.get_moses_multi_bleu([' '.join(true_t)], [' '.join(pred_t)], lowercase=self.lowercase) 
-                                 for true_t, pred_t in zip(self.y_true, self.y_predicted)]
+        sentence_bleu_results = [
+            bleu.get_moses_multi_bleu([' '.join(true_t)], [' '.join(pred_t)], lowercase=self.lowercase)
+            for true_t, pred_t in zip(self.y_true, self.y_predicted)
+        ]
         
         if self.output_text_dir is not None:
             BLEUSentenceScoreMetric.dump_translation_text_to_disk(self.source_sents,
@@ -541,4 +543,24 @@ class GLUEMetric(AbstractBaseMetric):
         super().__init__(y_true, y_predicted, metric_name=f'GLUE_{task_name}')
 
     def calculate_metric(self):
-        return glue_compute_metrics(task_name=self.task_name, preds=self.y_predicted, labels=self.y_true)
+        metric_dict = glue_compute_metrics(task_name=self.task_name, preds=self.y_predicted, labels=self.y_true)
+        metric_dict = {k.replace('/', '_'): v for k, v in metric_dict.items()}
+        return metric_dict
+
+
+class XNLIMetric(AbstractBaseMetric):
+    def __init__(self, y_true, y_predicted):
+        """XNLI evaluation metrics
+
+        Wrapper around HF Transformers ``xnli_compute_metrics()``
+
+        Args:
+            y_true:
+            y_predicted:
+        """
+        super().__init__(y_true, y_predicted, metric_name='xnli_accuracy')
+
+    def calculate_metric(self):
+        metric_dict = xnli_compute_metrics(task_name='xnli', preds=self.y_predicted, labels=self.y_true)
+        metric_dict = {k.replace('/', '_'): v for k, v in metric_dict.items()}
+        return metric_dict

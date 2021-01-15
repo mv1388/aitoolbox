@@ -9,7 +9,9 @@ from aitoolbox.experiment.local_save.local_model_save import PyTorchLocalModelSa
 
 class AbstractModelSaver(ABC):
     @abstractmethod
-    def save_model(self, model, project_name, experiment_name, experiment_timestamp=None, epoch=None, protect_existing_folder=True):
+    def save_model(self, model, project_name, experiment_name, experiment_timestamp=None,
+                   epoch=None, iteration_idx=None,
+                   protect_existing_folder=True):
         """
 
         Args:
@@ -18,6 +20,7 @@ class AbstractModelSaver(ABC):
             experiment_name (str):
             experiment_timestamp (str or None):
             epoch (int or None):
+            iteration_idx (int or None):
             protect_existing_folder (bool):
 
         Returns:
@@ -71,7 +74,8 @@ class PyTorchS3ModelSaver(AbstractModelSaver, BaseModelSaver):
         BaseModelSaver.__init__(self, bucket_name, cloud_dir_prefix, checkpoint_model)
         self.pytorch_local_saver = PyTorchLocalModelSaver(local_model_result_folder_path, checkpoint_model)
 
-    def save_model(self, model, project_name, experiment_name, experiment_timestamp=None, epoch=None,
+    def save_model(self, model, project_name, experiment_name, experiment_timestamp=None,
+                   epoch=None, iteration_idx=None,
                    protect_existing_folder=True):
         """Save PyTorch model representation to AWS S3
 
@@ -81,6 +85,7 @@ class PyTorchS3ModelSaver(AbstractModelSaver, BaseModelSaver):
             experiment_name (str): name of the particular experiment
             experiment_timestamp (str or None): time stamp at the start of training
             epoch (int or None): epoch number
+            iteration_idx (int or None): at which training iteration the model is being saved
             protect_existing_folder (bool): can override potentially already existing folder or not
 
         Returns:
@@ -102,7 +107,7 @@ class PyTorchS3ModelSaver(AbstractModelSaver, BaseModelSaver):
             experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
 
         model_name, model_local_path = self.pytorch_local_saver.save_model(model, project_name, experiment_name,
-                                                                           experiment_timestamp, epoch,
+                                                                           experiment_timestamp, epoch, iteration_idx,
                                                                            protect_existing_folder)
 
         experiment_s3_path = self.create_experiment_cloud_storage_folder_structure(project_name, experiment_name,
@@ -130,7 +135,8 @@ class KerasS3ModelSaver(AbstractModelSaver, BaseModelSaver):
         BaseModelSaver.__init__(self, bucket_name, cloud_dir_prefix, checkpoint_model)
         self.keras_local_saver = KerasLocalModelSaver(local_model_result_folder_path, checkpoint_model)
 
-    def save_model(self, model, project_name, experiment_name, experiment_timestamp=None, epoch=None,
+    def save_model(self, model, project_name, experiment_name, experiment_timestamp=None,
+                   epoch=None, iteration_idx=None,
                    protect_existing_folder=True):
         """Save Keras model to AWS S3
 
@@ -140,6 +146,7 @@ class KerasS3ModelSaver(AbstractModelSaver, BaseModelSaver):
             experiment_name (str): name of the particular experiment
             experiment_timestamp (str or None): time stamp at the start of training
             epoch (int or None): epoch number
+            iteration_idx (int or None): at which training iteration the model is being saved
             protect_existing_folder (bool): can override potentially already existing folder or not
 
         Returns:
@@ -159,7 +166,7 @@ class KerasS3ModelSaver(AbstractModelSaver, BaseModelSaver):
             experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
 
         model_name, model_local_path = self.keras_local_saver.save_model(model, project_name, experiment_name,
-                                                                         experiment_timestamp, epoch,
+                                                                         experiment_timestamp, epoch, iteration_idx,
                                                                          protect_existing_folder)
 
         experiment_s3_path = self.create_experiment_cloud_storage_folder_structure(project_name, experiment_name,

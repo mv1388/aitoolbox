@@ -82,5 +82,5 @@ if __name__ == '__main__':
               train_loader, val_loader, test_loader,
               optimizer, criterion,
               gpu_mode='ddp',
-              use_amp={'opt_level': 'O1'}) \
+              use_amp=True) \
         .fit(num_epochs=10, callbacks=callbacks)

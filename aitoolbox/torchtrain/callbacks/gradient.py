@@ -3,6 +3,7 @@ import numpy as np
 import torch
 
 from aitoolbox.torchtrain.callbacks.abstract import AbstractCallback, AbstractExperimentCallback
+from aitoolbox.torchtrain.multi_loss_optim import MultiOptimizer
 from aitoolbox.experiment.local_save.local_results_save import BaseLocalResultsSaver
 from aitoolbox.experiment.result_reporting.report_generator import GradientPlotter
 from aitoolbox.cloud.AWS.results_save import BaseResultsSaver as BaseResultsS3Saver
@@ -40,7 +41,15 @@ class GradValueClip(GradientCallbackBase):
         self.max_grad_value = max_grad_value
 
     def on_after_gradient_update(self, optimizer_idx):
-        torch.nn.utils.clip_grad_value_(self.train_loop_obj.model.parameters(), self.max_grad_value)
+        if (self.train_loop_obj.iteration + 1) % self.train_loop_obj.grad_accumulation == 0:
+            if self.train_loop_obj.use_amp:
+                optimizer = self.train_loop_obj.optimizer
+                if isinstance(optimizer, MultiOptimizer):
+                    optimizer = optimizer[optimizer_idx]
+
+                self.train_loop_obj.amp_scaler.unscale_(optimizer)
+
+            torch.nn.utils.clip_grad_value_(self.train_loop_obj.model.parameters(), self.max_grad_value)
 
 
 class GradNormClip(GradientCallbackBase):
@@ -56,7 +65,15 @@ class GradNormClip(GradientCallbackBase):
         self.kwargs = kwargs
 
     def on_after_gradient_update(self, optimizer_idx):
-        torch.nn.utils.clip_grad_norm_(self.train_loop_obj.model.parameters(), self.max_grad_norm, **self.kwargs)
+        if (self.train_loop_obj.iteration + 1) % self.train_loop_obj.grad_accumulation == 0:
+            if self.train_loop_obj.use_amp:
+                optimizer = self.train_loop_obj.optimizer
+                if isinstance(optimizer, MultiOptimizer):
+                    optimizer = optimizer[optimizer_idx]
+
+                self.train_loop_obj.amp_scaler.unscale_(optimizer)
+
+            torch.nn.utils.clip_grad_norm_(self.train_loop_obj.model.parameters(), self.max_grad_norm, **self.kwargs)
 
 
 class GradientStatsPrint(AbstractCallback):
@@ -77,8 +94,8 @@ class GradientStatsPrint(AbstractCallback):
         if self.on_every_grad_update:
             self.train_loop_obj.grad_cb_used = True
 
-    def on_after_gradient_update(self):
-        if self.on_every_grad_update:
+    def on_after_gradient_update(self, optimizer_idx):
+        if self.on_every_grad_update and optimizer_idx == 0:
             self.gradients_report()
 
     def on_epoch_end(self):

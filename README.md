@@ -150,22 +150,24 @@ TrainLoop(
 
 Check out a full [DistributedDataParallel training example](https://github.com/mv1388/aitoolbox/blob/master/examples/dp_ddp_training/ddp_training.py).
 
-## Automatic Mixed Precision training via Nvidia Apex
+## Automatic Mixed Precision training (AMP)
 
-All the TrainLoop versions also support training with Automatic Mixed Precision (*AMP*)
-using the [Nvidia apex](https://github.com/NVIDIA/apex) extension. To use this feature the user first
-has to install the Nvidia apex library ([installation instructions](https://github.com/NVIDIA/apex#linux)).
+All the TrainLoop versions also support training with Automatic Mixed Precision (*AMP*). In the past this required
+using the [Nvidia apex](https://github.com/NVIDIA/apex) extension but from _PyTorch 1.6_ onwards AMP functionality 
+is built into core PyTorch and no separate instalation is needed. 
+Current version of AIToolbox already supports the use of built-in PyTorch AMP. 
 
 The user only has to set the TrainLoop parameter `use_amp` to `use_amp=True` in order to use the default 
-AMP initialization and start training the model in the mixed precision mode. If the user wants to specify custom 
-AMP initialization parameters, these should be provided as a dict parameter `use_amp={'opt_level': 'O1'}` to 
-the TrainLoop. All AMP initializations and training related steps are then handled automatically by the TrainLoop. 
+AMP initialization and start training the model in the mixed precision mode. If the user wants to specify 
+custom AMP `GradScaler` initialization parameters, these should be provided as a dict parameter 
+`use_amp={'init_scale': 2.**16, 'growth_factor': 2.0, ...}` to the TrainLoop. 
+All AMP initializations and training related steps are then handled automatically by the TrainLoop. 
 
-You can read more about different AMP optimization levels in the
-[Nvidia apex documentation](https://nvidia.github.io/apex/amp.html#opt-levels-and-properties).
+You can read more about different AMP details in the 
+[PyTorch AMP documentation](https://pytorch.org/docs/stable/notes/amp_examples.html).
 
 ### Single-GPU mixed precision training
-Example of single-GPU APEX setup:
+Example of single-GPU AMP setup:
 ```python
 from aitoolbox.torchtrain.train_loop import *
 
@@ -174,18 +176,20 @@ model = ... # TTModel
 TrainLoop(
     model, ...,
     optimizer, criterion, 
-    use_amp={'opt_level': 'O1'}
+    use_amp=True
 ).fit(num_epochs=10)
 ``` 
 
-Check out a full [Apex AMP training example](https://github.com/mv1388/aitoolbox/blob/master/examples/apex_amp_training/apex_single_GPU_training.py).
+Check out a full [AMP single-GPU training example](https://github.com/mv1388/aitoolbox/blob/master/examples/amp_training/single_GPU_training.py).
 
 ### Multi-GPU DDP mixed precision training
 When training in the multi-GPU setting, the setup is mostly the same as in the single-GPU. 
 All the user has to do is set accordingly the `use_amp` parameter of the TrainLoop and to switch its `gpu_mode`
 parameter to `'ddp'`. 
 Under the hood, TrainLoop will initialize the model and the optimizer for AMP and start training using 
-DistributedDataParallel approach (DDP is currently only multi-GPU training setup supported by Apex AMP).
+DistributedDataParallel approach.
+
+Example of multi-GPU AMP setup:
 ```python
 from aitoolbox.torchtrain.train_loop import *
 
@@ -195,11 +199,11 @@ TrainLoop(
     model, ...,
     optimizer, criterion,
     gpu_mode='ddp',
-    use_amp={'opt_level': 'O1'}
+    use_amp=True
 ).fit(num_epochs=10)
 ``` 
 
-Check out a full [Apex AMP DistributedDataParallel training example](https://github.com/mv1388/aitoolbox/blob/master/examples/apex_amp_training/apex_mutli_GPU_training.py).
+Check out a full [AMP multi-GPU DistributedDataParallel training example](https://github.com/mv1388/aitoolbox/blob/master/examples/amp_training/mutli_GPU_training.py).
 
 
 ## Model

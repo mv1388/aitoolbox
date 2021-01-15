@@ -2,13 +2,9 @@ from abc import ABC, abstractmethod
 import os
 from collections import OrderedDict
 import torch
-try:
-    from apex import amp
-    APEX_AVAILABLE = True
-except ImportError:
-    APEX_AVAILABLE = False
 
 from aitoolbox.experiment.local_save.folder_create import ExperimentFolder
+from aitoolbox.torchtrain.schedulers.basic import AbstractScheduler
 
 
 class AbstractLocalModelLoader(ABC):
@@ -66,6 +62,11 @@ class PyTorchLocalModelLoader(AbstractLocalModelLoader):
         model_path = os.path.join(experiment_dir_path, model_save_dir, model_name)
 
         self.model_representation = torch.load(model_path, map_location=map_location)
+
+        # Fix for back-compatibility
+        if 'schedulers_state_dict' not in self.model_representation:
+            self.model_representation['schedulers_state_dict'] = []
+
         return self.model_representation
 
     def load_model_from_path(self, model_path, map_location=None):
@@ -132,13 +133,56 @@ class PyTorchLocalModelLoader(AbstractLocalModelLoader):
 
         return optimizer
 
-    def init_amp(self):
-        """Initialize Nvidia Apex 16 AMP
+    def init_scheduler(self, scheduler_callbacks_list, ignore_saved=False, ignore_missing_saved=False):
+        """Initialize the list of schedulers based on saved model/optimizer/scheduler checkpoint
+
+        Args:
+            scheduler_callbacks_list (list): list of scheduler (callbacks)
+            ignore_saved (bool): if exception should be raised in the case there are found scheduler snapshots
+                in the checkpoint, but not schedulers are provided to this method
+            ignore_missing_saved (bool): if exception should be raised in the case schedulers are provided to
+                this method but no saved scheduler snapshots can be found in the checkpoint
 
         Returns:
-            None
+            list: list of initialized scheduler (callbacks)
         """
-        if APEX_AVAILABLE:
-            amp.load_state_dict(self.model_representation['amp'])
-        else:
-            print('Trying to use Nvidia Apex AMP for 16-bit mixed precision. However, Nvidia Apex is not installed.')
+        self.check_if_model_loaded()
+        loaded_schedulers = self.model_representation['schedulers_state_dict']
+
+        if len(loaded_schedulers) == 0 and len(scheduler_callbacks_list) > 0:
+            if not ignore_missing_saved:
+                raise KeyError('Schedulers_state_dict not found in the loaded model representation but you provided '
+                               'schedulers to TrainLoop.')
+            return scheduler_callbacks_list
+
+        if len(loaded_schedulers) > 0 and len(scheduler_callbacks_list) == 0:
+            if not ignore_saved:
+                raise ValueError('No schedulers were provided to the TrainLoop, however scheduler state_dicts were'
+                                 'found saved in the loaded model representation.')
+            return scheduler_callbacks_list
+
+        if len(scheduler_callbacks_list) != len(loaded_schedulers):
+            raise ValueError('Number of provided schedulers does not match the number of loaded scheduler state_dicts. '
+                             f'Number of given schedulers: {len(scheduler_callbacks_list)} and number of loaded'
+                             f"scheduler state_dicts: {len(loaded_schedulers)}")
+
+        # Initialize the scheduler callbacks with the saved scheduler states
+        for sch_cb, sch_state_dict in zip(scheduler_callbacks_list, loaded_schedulers):
+            if not isinstance(sch_cb, AbstractScheduler):
+                raise TypeError('Provided scheduler is not inherited from AbstractScheduler')
+
+            sch_cb.load_state_dict(sch_state_dict)
+
+        return scheduler_callbacks_list
+
+    def init_amp(self, amp_scaler):
+        """Initialize AMP GradScaler
+
+        Args:
+            amp_scaler (torch.cuda.amp.GradScaler): AMP GradScaler
+
+        Returns:
+            torch.cuda.amp.GradScaler: initialized AMP GradScaler
+        """
+        amp_scaler.load_state_dict(self.model_representation['amp'])
+        return amp_scaler

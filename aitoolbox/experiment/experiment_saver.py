@@ -150,7 +150,7 @@ class FullKerasExperimentS3Saver(BaseFullExperimentS3Saver):
         BaseFullExperimentS3Saver.__init__(self, keras_model_saver, project_name, experiment_name,
                                            bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix,
                                            local_model_result_folder_path=local_model_result_folder_path)
-        
+
         
 # class FullTensorFlowExperimentS3Saver(BaseFullExperimentS3Saver):
 #     def __init__(self, project_name, experiment_name,

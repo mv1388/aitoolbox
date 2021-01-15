@@ -49,6 +49,37 @@ class FFNet(TTModel):
         return predicted.cpu(), target, {'example_feat_sum': input_data.sum(dim=1).tolist()}
 
 
+class FFNetModelBasedCriterion(FFNet):
+    def __init__(self):
+        super().__init__()
+        self.criterion_in_model = nn.NLLLoss()
+
+    def get_loss(self, batch_data, criterion, device):
+        input_data, target = batch_data
+        input_data = input_data.to(device)
+        target = target.to(device)
+
+        predicted = self(input_data)
+        loss = self.criterion_in_model(predicted, target)
+
+        return loss
+
+
+class FFNetFunctionalBasedCriterion(FFNet):
+    def __init__(self):
+        super().__init__()
+
+    def get_loss(self, batch_data, criterion, device):
+        input_data, target = batch_data
+        input_data = input_data.to(device)
+        target = target.to(device)
+
+        predicted = self(input_data)
+        loss = F.nll_loss(predicted, target)
+
+        return loss
+
+
 class TestEnd2EndTrainLoop(unittest.TestCase):
     def test_e2e_ff_net_train_loop(self):
         self.set_seeds()
@@ -225,6 +256,69 @@ class TestEnd2EndTrainLoop(unittest.TestCase):
                     for el_model, el_expected in zip(row_model.tolist(), row_expected.tolist()):
                         self.assertAlmostEqual(el_model, el_expected, places=6)
 
+    def test_e2e_ff_net_train_loop_epoch_iteration(self):
+        num_epochs = 10
+
+        self.set_seeds()
+        model = FFNet()
+        optimizer = optim.Adam(model.parameters(), lr=0.001, betas=(0.9, 0.999))
+        criterion = nn.NLLLoss()
+
+        self.set_seeds()
+        model_iteration = FFNet()
+        optimizer_iteration = optim.Adam(model_iteration.parameters(), lr=0.001, betas=(0.9, 0.999))
+        criterion_iteration = nn.NLLLoss()
+
+        train_dataset = TensorDataset(torch.randn(1000, 50), torch.randint(low=0, high=10, size=(1000,)))
+        val_dataset = TensorDataset(torch.randn(300, 50), torch.randint(low=0, high=10, size=(300,)))
+        test_dataset = TensorDataset(torch.randn(300, 50), torch.randint(low=0, high=10, size=(300,)))
+
+        train_dataloader = DataLoader(train_dataset, batch_size=100)
+        val_dataloader = DataLoader(val_dataset, batch_size=100)
+        test_dataloader = DataLoader(test_dataset, batch_size=100)
+
+        train_dataloader_iteration = DataLoader(train_dataset, batch_size=100)
+        val_dataloader_iteration = DataLoader(val_dataset, batch_size=100)
+        test_dataloader_iteration = DataLoader(test_dataset, batch_size=100)
+
+        train_loop = TrainLoop(
+            model,
+            train_dataloader, val_dataloader, test_dataloader,
+            optimizer, criterion
+        )
+        train_loop.fit(num_epochs=num_epochs)
+
+        train_loop_iteration = TrainLoop(
+            model_iteration,
+            train_dataloader_iteration, val_dataloader_iteration, test_dataloader_iteration,
+            optimizer_iteration, criterion_iteration
+        )
+        train_loop_iteration.fit(num_iterations=num_epochs * len(train_dataloader_iteration))
+
+        train_pred, _, _ = train_loop.predict_on_train_set()
+        val_pred, _, _ = train_loop.predict_on_validation_set()
+        test_pred, _, _ = train_loop.predict_on_test_set()
+
+        train_pred_iteration, _, _ = train_loop_iteration.predict_on_train_set()
+        val_pred_iteration, _, _ = train_loop_iteration.predict_on_validation_set()
+        test_pred_iteration, _, _ = train_loop_iteration.predict_on_test_set()
+
+        self.assertEqual(train_pred.argmax(dim=1).tolist(), train_pred_iteration.argmax(dim=1).tolist())
+        self.assertEqual(val_pred.argmax(dim=1).tolist(), val_pred_iteration.argmax(dim=1).tolist())
+        self.assertEqual(test_pred.argmax(dim=1).tolist(), test_pred_iteration.argmax(dim=1).tolist())
+
+        train_loss = train_loop.evaluate_loss_on_train_set()
+        val_loss = train_loop.evaluate_loss_on_validation_set()
+        test_loss = train_loop.evaluate_loss_on_test_set()
+
+        train_loss_iteration = train_loop_iteration.evaluate_loss_on_train_set()
+        val_loss_iteration = train_loop_iteration.evaluate_loss_on_validation_set()
+        test_loss_iteration = train_loop_iteration.evaluate_loss_on_test_set()
+
+        self.assertAlmostEqual(train_loss, train_loss_iteration, places=6)
+        self.assertAlmostEqual(val_loss, val_loss_iteration, places=6)
+        self.assertAlmostEqual(test_loss, test_loss_iteration, places=6)
+
     def test_e2e_ff_net_train_loop_grad_accumulation(self):
         num_epochs = 10
 
@@ -287,6 +381,53 @@ class TestEnd2EndTrainLoop(unittest.TestCase):
         self.assertAlmostEqual(train_loss, train_loss_grad_acc, places=6)
         self.assertAlmostEqual(val_loss, val_loss_grad_acc, places=6)
         self.assertAlmostEqual(test_loss, test_loss_grad_acc, places=6)
+
+    def test_e2e_ff_net_train_loop_no_criterion_provided(self):
+        self.execute_training_no_criterion_provided(single_loss_inst=True)
+        self.execute_training_no_criterion_provided(single_loss_inst=False)
+
+    def execute_training_no_criterion_provided(self, single_loss_inst=True):
+        self.set_seeds()
+        batch_size = 10
+
+        train_dataset = TensorDataset(torch.randn(100, 50), torch.randint(low=0, high=10, size=(100,)))
+        val_dataset = TensorDataset(torch.randn(30, 50), torch.randint(low=0, high=10, size=(30,)))
+        test_dataset = TensorDataset(torch.randn(30, 50), torch.randint(low=0, high=10, size=(30,)))
+
+        train_dataloader = DataLoader(train_dataset, batch_size=batch_size)
+        val_dataloader = DataLoader(val_dataset, batch_size=batch_size)
+        test_dataloader = DataLoader(test_dataset, batch_size=batch_size)
+
+        if single_loss_inst:
+            model = FFNetModelBasedCriterion()
+        else:
+            model = FFNetFunctionalBasedCriterion()
+        optimizer = optim.Adam(model.parameters(), lr=0.001, betas=(0.9, 0.999))
+
+        train_loop = TrainLoop(
+            model,
+            train_dataloader, val_dataloader, test_dataloader,
+            optimizer, None
+        )
+
+        train_loop.fit(num_epochs=5)
+        tl_history = train_loop.train_history.train_history
+
+        self.assertEqual(train_loop.epoch, 4)
+
+        result_approx = {
+            'loss': [2.224587655067444, 2.1440203189849854, 2.0584306001663206, 1.962017869949341, 1.8507084131240845],
+            'accumulated_loss': [2.3059947967529295, 2.1976317405700683, 2.114974856376648, 2.0259472250938417, 1.9252637863159179],
+            'val_loss': [2.330514828364054, 2.345397472381592, 2.363233725229899, 2.3853348096211753, 2.4111196994781494],
+            'train_end_test_loss': [2.31626296043396]
+        }
+        self.assertEqual(sorted(tl_history.keys()), sorted(result_approx.keys()))
+
+        for metric, results_list in result_approx.items():
+            self.assertEqual(len(results_list), len(tl_history[metric]))
+
+            for correct_result, tl_result in zip(results_list, tl_history[metric]):
+                self.assertAlmostEqual(correct_result, tl_result, places=6)
 
     @staticmethod
     def set_seeds():

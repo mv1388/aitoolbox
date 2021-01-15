@@ -5,11 +5,15 @@ from tests.utils import *
 
 from torch.utils.data.dataset import TensorDataset
 from torch.utils.data.dataloader import DataLoader
+from torch.optim.adam import Adam
 
 from aitoolbox.torchtrain.train_loop import TrainLoop
 from aitoolbox.torchtrain.model import ModelWrap
 from aitoolbox.torchtrain.tl_components.callback_handler import CallbacksHandler
 from aitoolbox.torchtrain.multi_loss_optim import MultiOptimizer
+from aitoolbox.torchtrain.schedulers.basic import ReduceLROnPlateauScheduler, StepLRScheduler
+from aitoolbox.torchtrain.schedulers.warmup import LinearWithWarmupScheduler
+from aitoolbox.torchtrain.callbacks.basic import EarlyStopping, ListRegisteredCallbacks
 
 
 class TestTrainLoop(unittest.TestCase):
@@ -20,31 +24,38 @@ class TestTrainLoop(unittest.TestCase):
         train_loop = TrainLoop(NetUnifiedBatchFeed(), None, 100, None, None, None)
         self.assertEqual(train_loop.train_history.train_history, {'loss': [], 'accumulated_loss': [], 'val_loss': []})
 
+        self.assertEqual(train_loop.epoch, 0)
+        self.assertEqual(train_loop.total_iteration_idx, -1)
         self.assertEqual(train_loop.callbacks, [])
         self.assertIsInstance(train_loop.callbacks_handler, CallbacksHandler)
         self.assertEqual(train_loop.callbacks_handler.train_loop_obj, train_loop)
         self.assertFalse(train_loop.early_stop)
+        self.assertIsNone(train_loop.amp_scaler)
 
     def test_fit_mode_selection_single_gpu(self):
-        gpu_mode, num_epochs, callbacks, grad_accumulation = self.execute_train_loop_fit_in_mode('single')
+        gpu_mode, num_epochs, num_iterations, callbacks, grad_accumulation = \
+            self.execute_train_loop_fit_in_mode('single')
 
         self.assertEqual(gpu_mode, 'train_single')
         self.assertEqual(num_epochs, 5)
+        self.assertEqual(num_iterations, 0)
         self.assertEqual(callbacks, [10])
         self.assertEqual(grad_accumulation, 1)
 
     def test_fit_mode_selection_dp(self):
-        gpu_mode, num_epochs, callbacks, grad_accumulation, dp_model_args = \
+        gpu_mode, num_epochs, num_iterations, callbacks, grad_accumulation, dp_model_args = \
             self.execute_train_loop_fit_in_mode('dp', dp_model_args={'aaa': 1})
 
         self.assertEqual(gpu_mode, 'train_dp')
         self.assertEqual(num_epochs, 5)
+        self.assertEqual(num_iterations, 0)
         self.assertEqual(callbacks, [10])
         self.assertEqual(grad_accumulation, 1)
         self.assertEqual(dp_model_args, {'aaa': 1})
 
     def test_fit_mode_selection_ddp(self):
-        gpu_mode, num_epochs, callbacks, grad_accumulation, ddp_model_args, in_process_data_load, num_nodes = \
+        gpu_mode, num_epochs, num_iterations, callbacks, \
+            grad_accumulation, ddp_model_args, in_process_data_load, num_nodes = \
             self.execute_train_loop_fit_in_mode(
                 'ddp',
                 ddp_model_args={'aaa': 1}, in_process_data_load='bla', num_nodes=5
@@ -52,6 +63,7 @@ class TestTrainLoop(unittest.TestCase):
 
         self.assertEqual(gpu_mode, 'train_ddp')
         self.assertEqual(num_epochs, 5)
+        self.assertEqual(num_iterations, 0)
         self.assertEqual(callbacks, [10])
         self.assertEqual(grad_accumulation, 1)
         self.assertEqual(ddp_model_args, {'aaa': 1})
@@ -260,6 +272,103 @@ class TestTrainLoop(unittest.TestCase):
                           'on_train_end': 1, 'on_batch_begin': 8, 'on_batch_end': 0,
                           'on_after_gradient_update': 8, 'on_after_optimizer_step': 8})
 
+    def test_fit_epoch_num(self):
+        dummy_optimizer = DummyOptimizer()
+        dummy_loss = DummyLoss()
+        dummy_train_loader = list(range(4))
+        dummy_val_loader = list(range(3))
+        dummy_test_loader = list(range(2))
+
+        model = NetUnifiedBatchFeed()
+        train_loop = TrainLoop(
+            model, dummy_train_loader, dummy_val_loader, dummy_test_loader,
+            dummy_optimizer, dummy_loss
+        )
+        train_loop.fit(num_epochs=10)
+
+        self.assertEqual(train_loop.total_iteration_idx, (4 * 10) - 1)
+        self.assertEqual(train_loop.epoch, 9)
+        self.assertFalse(train_loop.early_stop)
+
+    def test_fit_iteration_number_simple(self):
+        dummy_optimizer = DummyOptimizer()
+        dummy_loss = DummyLoss()
+        dummy_train_loader = list(range(4))
+        dummy_val_loader = list(range(3))
+        dummy_test_loader = list(range(2))
+
+        model = NetUnifiedBatchFeed()
+        train_loop = TrainLoop(
+            model, dummy_train_loader, dummy_val_loader, dummy_test_loader,
+            dummy_optimizer, dummy_loss
+        )
+        train_loop.fit(num_iterations=10)
+
+        self.assertEqual(train_loop.total_iteration_idx, 9)
+        self.assertEqual(train_loop.epoch, 2)
+        self.assertFalse(train_loop.early_stop)
+
+    def test_fit_iteration_number_round_up(self):
+        dummy_optimizer = DummyOptimizer()
+        dummy_loss = DummyLoss()
+        dummy_train_loader = list(range(3))
+        dummy_val_loader = list(range(3))
+        dummy_test_loader = list(range(2))
+
+        model = NetUnifiedBatchFeed()
+        train_loop = TrainLoop(
+            model, dummy_train_loader, dummy_val_loader, dummy_test_loader,
+            dummy_optimizer, dummy_loss
+        )
+        train_loop.fit(num_iterations=10)
+
+        self.assertEqual(train_loop.total_iteration_idx, 9)
+        self.assertEqual(train_loop.epoch, 3)
+        self.assertFalse(train_loop.early_stop)
+
+    def test_fit_iteration_number_long_train(self):
+        dummy_optimizer = DummyOptimizer()
+        dummy_loss = DummyLoss()
+        dummy_train_loader = list(range(32))
+        dummy_val_loader = list(range(3))
+        dummy_test_loader = list(range(2))
+
+        model = NetUnifiedBatchFeed()
+        train_loop = TrainLoop(
+            model, dummy_train_loader, dummy_val_loader, dummy_test_loader,
+            dummy_optimizer, dummy_loss
+        )
+        train_loop.fit(num_iterations=150)
+
+        self.assertEqual(train_loop.total_iteration_idx, 149)
+        self.assertEqual(train_loop.epoch, 4)
+        self.assertFalse(train_loop.early_stop)
+
+    def test_fit_epoch_num_iteration_num_error(self):
+        dummy_optimizer = DummyOptimizer()
+        dummy_loss = DummyLoss()
+        dummy_train_loader = list(range(4))
+        dummy_val_loader = list(range(3))
+        dummy_test_loader = list(range(2))
+
+        model = NetUnifiedBatchFeed()
+        train_loop = TrainLoop(
+            model, dummy_train_loader, dummy_val_loader, dummy_test_loader,
+            dummy_optimizer, dummy_loss
+        )
+
+        with self.assertRaises(ValueError):
+            train_loop.fit(num_epochs=10, num_iterations=123)
+
+        with self.assertRaises(ValueError):
+            train_loop.fit()
+
+        with self.assertRaises(ValueError):
+            train_loop.fit(0, 0)
+
+        with self.assertRaises(ValueError):
+            train_loop.fit(num_epochs=0, num_iterations=0)
+
     def test_predict_train_data(self):
         self.eval_prediction('train')
         self.eval_prediction_separate_batch_feed('train')
@@ -428,14 +537,14 @@ class TestTrainLoop(unittest.TestCase):
         eval_predictions(dummy_test_loader, y_test_test, y_pred_test, metadata, offset=4+2)
 
         self.assertEqual(list(train_loop.prediction_store.prediction_store.keys()),
-                         ['epoch', 'train_pred', 'test_pred'])
-        self.assertEqual(train_loop.prediction_store.prediction_store['epoch'], 0)
+                         ['iteration_idx', 'train_pred', 'test_pred'])
+        self.assertEqual(train_loop.prediction_store.prediction_store['iteration_idx'], -1)
 
         # Test store purge
-        train_loop.epoch += 1
+        train_loop.total_iteration_idx += 1
         y_pred, y_test, metadata = train_loop.predict_on_validation_set()
-        self.assertEqual(train_loop.prediction_store.prediction_store['epoch'], 1)
-        self.assertEqual(list(train_loop.prediction_store.prediction_store.keys()), ['epoch', 'val_pred'])
+        self.assertEqual(train_loop.prediction_store.prediction_store['iteration_idx'], 0)
+        self.assertEqual(list(train_loop.prediction_store.prediction_store.keys()), ['iteration_idx', 'val_pred'])
 
     def test_ddp_env_settings(self):
         dummy_optimizer = DummyOptimizer()
@@ -457,6 +566,21 @@ class TestTrainLoop(unittest.TestCase):
         self.assertEqual(os.environ['MASTER_ADDR'], 'localhost')
         self.assertEqual(os.environ['MASTER_PORT'], '8888')
         self.assertEqual(os.environ['MKL_THREADING_LAYER'], 'GNU')
+
+    def test_get_schedulers(self):
+        schedulers_list = [
+            ReduceLROnPlateauScheduler(), StepLRScheduler(step_size=5), LinearWithWarmupScheduler(5, 100)
+        ]
+        callbacks_list = [
+            EarlyStopping(), ListRegisteredCallbacks()
+        ]
+
+        model = NetUnifiedBatchFeed()
+        train_loop = TrainLoop(model, None, None, None, Adam(model.parameters()), None)
+        train_loop.callbacks_handler.register_callbacks(schedulers_list + callbacks_list)
+
+        tl_filtered_schedulers = train_loop.get_schedulers()
+        self.assertEqual(tl_filtered_schedulers, schedulers_list)
 
 
 class TestMultiLossOptiTrainLoop(unittest.TestCase):

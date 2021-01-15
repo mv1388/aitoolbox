@@ -22,7 +22,6 @@ def get_dataset_local_copy(local_dataset_folder_path, protect_local_folder=True)
 
     Returns:
         None
-
     """
     dataset_fetcher = HotpotQADatasetFetcher(bucket_name='dataset-store', local_dataset_folder_path=local_dataset_folder_path)
     dataset_fetcher.fetch_dataset(protect_local_folder=protect_local_folder)

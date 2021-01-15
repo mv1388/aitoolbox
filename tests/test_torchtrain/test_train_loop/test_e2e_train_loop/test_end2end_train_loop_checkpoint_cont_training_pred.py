@@ -15,6 +15,8 @@ from aitoolbox import TrainLoopCheckpointEndSave, ClassificationResultPackage, T
 from aitoolbox.torchtrain.model import TTModel
 from aitoolbox.experiment.local_load.local_model_load import PyTorchLocalModelLoader
 from aitoolbox.torchtrain.callbacks.model_load import ModelLoadContinueTraining
+from aitoolbox.torchtrain.schedulers.basic import StepLRScheduler
+from aitoolbox.torchtrain.schedulers.warmup import LinearWithWarmupScheduler
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -958,6 +960,119 @@ class TestEnd2EndTrainLoopModelOptimizerSaveReloadContinueTraining(unittest.Test
         project_path = os.path.join(THIS_DIR, 'e2e_train_loop_example')
         if os.path.exists(project_path):
             shutil.rmtree(project_path)
+
+    def test_e2e_ff_net_scheduler_callback_continue_training_5_epoch_compare(self):
+        self.set_seeds()
+        batch_size = 100
+        num_epochs = 10
+
+        train_dataset = TensorDataset(torch.randn(1000, 50), torch.randint(low=0, high=10, size=(1000,)))
+        val_dataset = TensorDataset(torch.randn(300, 50), torch.randint(low=0, high=10, size=(300,)))
+        test_dataset = TensorDataset(torch.randn(300, 50), torch.randint(low=0, high=10, size=(300,)))
+
+        train_dataloader = DataLoader(train_dataset, batch_size=batch_size)
+        val_dataloader = DataLoader(val_dataset, batch_size=batch_size)
+        test_dataloader = DataLoader(test_dataset, batch_size=batch_size)
+
+        scheduler_cb = [
+            LinearWithWarmupScheduler(num_warmup_steps=1, num_training_steps=len(train_dataloader) * num_epochs)
+        ]
+
+        model = FFNet()
+        optimizer = optim.Adam(model.parameters(), lr=0.001, betas=(0.9, 0.999))
+        criterion = nn.NLLLoss()
+
+        train_loop = TrainLoopCheckpointEndSave(
+            model,
+            train_dataloader, val_dataloader, test_dataloader,
+            optimizer, criterion,
+            project_name='e2e_train_loop_example', experiment_name='TrainLoopCheckpointEndSave_example',
+            local_model_result_folder_path=THIS_DIR,
+            hyperparams={'batch_size': batch_size},
+            val_result_package=ClassificationResultPackage(), test_result_package=ClassificationResultPackage(),
+            cloud_save_mode=None
+        )
+        train_loop.fit(num_epochs=num_epochs, callbacks=scheduler_cb)
+
+        model_reload_ep4 = FFNet()
+        optimizer_reload_ep4 = optim.Adam(model_reload_ep4.parameters(), lr=0.001, betas=(0.9, 0.999))
+        criterion_reload_ep4 = nn.NLLLoss()
+
+        scheduler_cb_reloaded = [
+            LinearWithWarmupScheduler(num_warmup_steps=1, num_training_steps=len(train_dataloader) * num_epochs,
+                                      last_epoch=(len(train_dataloader) * 4) - 1)
+        ]
+
+        train_loop_reload_ep4 = TrainLoop(
+            model_reload_ep4,
+            train_dataloader, val_dataloader, test_dataloader,
+            optimizer_reload_ep4, criterion_reload_ep4
+        )
+        train_loop_reload_ep4.epoch = 4
+        train_loop_reload_ep4.fit(num_epochs=num_epochs, callbacks=[
+            ModelLoadContinueTraining(train_loop.experiment_timestamp, saved_model_dir='checkpoint_model', epoch_num=3,
+                                      project_name=train_loop.project_name, experiment_name=train_loop.experiment_name,
+                                      local_model_result_folder_path=THIS_DIR, cloud_save_mode='local')
+        ] + scheduler_cb_reloaded)
+
+        for (orig_k, orig_state), (reload_k, reload_state) in zip(model.state_dict().items(),
+                                                                  model_reload_ep4.state_dict().items()):
+            self.assertEqual(orig_k, reload_k)
+            self.assertEqual(orig_state.tolist(), reload_state.tolist())
+
+        self.check_loaded_representation(optimizer_reload_ep4, scheduler_cb_reloaded, optimizer, scheduler_cb)
+
+        train_pred, _, _ = train_loop.predict_on_train_set()
+        val_pred, _, _ = train_loop.predict_on_validation_set()
+        test_pred, _, _ = train_loop.predict_on_test_set()
+
+        train_pred_reload_ep4, _, _ = train_loop_reload_ep4.predict_on_train_set()
+        val_pred_reload_ep4, _, _ = train_loop_reload_ep4.predict_on_validation_set()
+        test_pred_reload_ep4, _, _ = train_loop_reload_ep4.predict_on_test_set()
+
+        self.assertEqual(train_pred.tolist(), train_pred_reload_ep4.tolist())
+        self.assertEqual(val_pred.tolist(), val_pred_reload_ep4.tolist())
+        self.assertEqual(test_pred.tolist(), test_pred_reload_ep4.tolist())
+
+        train_loss = train_loop.evaluate_loss_on_train_set()
+        val_loss = train_loop.evaluate_loss_on_validation_set()
+        test_loss = train_loop.evaluate_loss_on_test_set()
+
+        train_loss_reload_ep4 = train_loop_reload_ep4.evaluate_loss_on_train_set()
+        val_loss_reload_ep4 = train_loop_reload_ep4.evaluate_loss_on_validation_set()
+        test_loss_reload_ep4 = train_loop_reload_ep4.evaluate_loss_on_test_set()
+
+        self.assertEqual(train_loss, train_loss_reload_ep4)
+        self.assertEqual(val_loss, val_loss_reload_ep4)
+        self.assertEqual(test_loss, test_loss_reload_ep4)
+
+        project_path = os.path.join(THIS_DIR, 'e2e_train_loop_example')
+        if os.path.exists(project_path):
+            shutil.rmtree(project_path)
+
+    def check_loaded_representation(self, optimizer_reload, scheduler_reload_cb, optimizer, scheduler_cb):
+        self.assertEqual(optimizer_reload.state_dict().keys(), optimizer.state_dict().keys())
+
+        loaded_optimizer_state = optimizer_reload.state_dict()['state']
+        for state_idx in range(len(loaded_optimizer_state)):
+            opti_state = optimizer.state_dict()['state'][state_idx]
+            loaded_state = loaded_optimizer_state[state_idx]
+
+            self.assertEqual(opti_state.keys(), loaded_state.keys())
+            self.assertEqual(opti_state['step'], loaded_state['step'])
+            self.assertEqual(opti_state['exp_avg'].tolist(), loaded_state['exp_avg'].tolist())
+            self.assertEqual(opti_state['exp_avg_sq'].tolist(), loaded_state['exp_avg_sq'].tolist())
+
+        self.assertEqual(
+            optimizer_reload.state_dict()['param_groups'],
+            optimizer.state_dict()['param_groups']
+        )
+
+        for scheduler_idx in range(len(scheduler_cb)):
+            self.assertEqual(
+                scheduler_reload_cb[scheduler_idx].state_dict(),
+                scheduler_cb[scheduler_idx].state_dict()
+            )
 
     @staticmethod
     def set_seeds():

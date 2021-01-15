@@ -8,6 +8,7 @@ from aitoolbox.cloud import s3_available_options, gcs_available_options
 class ModelLoadContinueTraining(AbstractExperimentCallback):
     def __init__(self,
                  saved_experiment_timestamp, saved_model_dir='checkpoint_model', epoch_num=None,
+                 ignore_saved_schedulers=False, ignore_missing_saved_schedulers=False,
                  used_data_parallel=False, custom_local_loader_class=None,
                  project_name=None, experiment_name=None, local_model_result_folder_path=None,
                  cloud_save_mode=None, bucket_name=None, cloud_dir_prefix=None, **kwargs):
@@ -18,6 +19,10 @@ class ModelLoadContinueTraining(AbstractExperimentCallback):
             saved_model_dir (str): folder where saved model file is inside main experiment folder
             epoch_num (int or None): if loading checkpoint model instead of final model this parameter indicates
                 from which epoch of training the model will be loaded
+            ignore_saved_schedulers (bool): if exception should be raised in the case there are found scheduler
+                snapshots in the checkpoint, but not schedulers are provided to this method
+            ignore_missing_saved_schedulers (bool): if exception should be raised in the case schedulers are provided
+                to this method but no saved scheduler snapshots can be found in the checkpoint
             used_data_parallel (bool): if the saved model was nn.DataParallel or normal model
             custom_local_loader_class (AbstractLocalModelLoader class or None): provide a custom local PyTorch model
                 loader definition in case the default one is not suitable for particular use case. For example,
@@ -40,6 +45,8 @@ class ModelLoadContinueTraining(AbstractExperimentCallback):
         self.saved_experiment_timestamp = saved_experiment_timestamp
         self.saved_model_dir = saved_model_dir
         self.epoch_num = epoch_num
+        self.ignore_saved_schedulers = ignore_saved_schedulers
+        self.ignore_missing_saved_schedulers = ignore_missing_saved_schedulers
         self.used_data_parallel = used_data_parallel
         self.custom_local_loader_class = custom_local_loader_class
         self.local_loader_kwargs = kwargs
@@ -58,9 +65,19 @@ class ModelLoadContinueTraining(AbstractExperimentCallback):
                                                                  self.used_data_parallel)
         self.train_loop_obj.optimizer = self.model_loader.init_optimizer(self.train_loop_obj.optimizer)
         if self.train_loop_obj.use_amp:
-            self.model_loader.init_amp()
+            self.train_loop_obj.amp_scaler = self.model_loader.init_amp(self.train_loop_obj.amp_scaler)
 
         self.train_loop_obj.epoch = model_representation['epoch'] + 1
+
+    def on_train_begin(self):
+        # Not doing in on_train_loop_registration() in order to ensure
+        # schedulers are initialised inside the scheduler callbacks
+        schedulers = self.train_loop_obj.get_schedulers()
+        self.model_loader.init_scheduler(
+            schedulers,
+            ignore_saved=self.ignore_saved_schedulers,
+            ignore_missing_saved=self.ignore_missing_saved_schedulers
+        )
 
     def init_model_loader(self):
         """Initialize model loader object based on provided arguments to the callback object

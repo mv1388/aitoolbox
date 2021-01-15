@@ -206,6 +206,8 @@ class MyModel(NetUnifiedBatchFeed):
         super().__init__()
         self.model_level_str = 'test string'
 
+        self.transfer_model_attributes = ['model_level_str']
+
     def get_loss(self, batch_data, criterion, device):
         return 'loss_return'
 

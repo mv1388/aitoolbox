@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='aitoolbox',
-    version='1.2.0',
+    version='1.3.0',
     author='Marko Vidoni',
     author_email='',
     url='https://github.com/mv1388/AIToolbox',
@@ -24,7 +24,7 @@ setup(
         'matplotlib',
         'seaborn',
 
-        'torch',
+        'torch>=1.6.0',
         'torchvision',
         'torchtext',
         'pytorch-nlp',
@@ -40,7 +40,9 @@ setup(
         'nltk',
         'allennlp==0.9',
         'pyrouge',
-        'rouge'
+        'rouge',
+
+        'tensorboard'
     ],
 
     test_suite='tests',

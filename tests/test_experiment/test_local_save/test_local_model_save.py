@@ -214,7 +214,7 @@ class TestPyTorchLocalModelSaver(unittest.TestCase):
         exp_dir_name = 'experimentSubDirPT'
         current_time = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
         model_name_true = f'model_{exp_dir_name}_{current_time}_E{epoch}.pth'
-        
+
         project_path = os.path.join(THIS_DIR, project_dir_name)
         exp_path = os.path.join(project_path, f'{exp_dir_name}_{current_time}')
         model_path = os.path.join(exp_path, 'checkpoint_model' if checkpoint_model else 'model')
