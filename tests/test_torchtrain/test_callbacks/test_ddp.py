@@ -5,7 +5,7 @@ from tests.utils import SmallFFNet
 
 from aitoolbox import TrainLoop, BasicDataset
 from aitoolbox.torchtrain.callbacks.ddp import DistributedSamplerSetEpoch
-from aitoolbox.torchtrain.tl_components.ddp_handler import DDPHandler
+from aitoolbox.torchtrain.train_loop.components.ddp_handler import DDPHandler
 
 
 class TestDistributedSamplerSetEpoch(unittest.TestCase):

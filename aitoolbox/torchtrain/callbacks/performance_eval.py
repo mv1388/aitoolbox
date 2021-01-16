@@ -2,7 +2,7 @@ import copy
 import os
 
 from aitoolbox.torchtrain.callbacks.abstract import AbstractCallback, AbstractExperimentCallback
-from aitoolbox.torchtrain.tl_components import message_passing as msg_passing_settings
+from aitoolbox.torchtrain.train_loop.components import message_passing as msg_passing_settings
 from aitoolbox.cloud.AWS.results_save import BaseResultsSaver as BaseResultsS3Saver
 from aitoolbox.cloud.GoogleCloud.results_save import BaseResultsGoogleStorageSaver
 from aitoolbox.cloud import s3_available_options, gcs_available_options
