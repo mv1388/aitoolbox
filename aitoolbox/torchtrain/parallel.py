@@ -1,11 +1,6 @@
 import functools
 import torch.nn as nn
 from torch.nn.parallel import DistributedDataParallel
-try:
-    from apex.parallel import DistributedDataParallel as ApexDistributedDataParallel
-    APEX_AVAILABLE = True
-except ImportError:
-    APEX_AVAILABLE = False
 
 from aitoolbox.utils.util import copy_function
 

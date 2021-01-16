@@ -69,7 +69,7 @@ class ModelCheckpoint(AbstractCallback):
             'iteration_idx': self.train_loop_obj.total_iteration_idx,
             'hyperparams': self.hyperparams
         }
-        # If Nvidia apex amp is used
+        # If AMP is used
         if self.train_loop_obj.use_amp:
             model_checkpoint['amp'] = self.train_loop_obj.amp_scaler.state_dict()
 
@@ -192,7 +192,7 @@ class ModelIterationCheckpoint(ModelCheckpoint):
                 'iteration_idx': self.train_loop_obj.total_iteration_idx,
                 'hyperparams': self.hyperparams
             }
-            # If Nvidia apex amp is used
+            # If AMP is used
             if self.train_loop_obj.use_amp:
                 model_checkpoint['amp'] = self.train_loop_obj.amp_scaler.state_dict()
 
@@ -261,7 +261,7 @@ class ModelTrainEndSave(AbstractCallback):
             'iteration_idx': self.train_loop_obj.total_iteration_idx,
             'hyperparams': self.hyperparams
         }
-        # If Nvidia apex amp is used
+        # If AMP is used
         if self.train_loop_obj.use_amp:
             model_final_state['amp'] = self.train_loop_obj.amp_scaler.state_dict()
 
