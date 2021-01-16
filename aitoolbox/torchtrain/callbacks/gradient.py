@@ -42,12 +42,13 @@ class GradValueClip(GradientCallbackBase):
 
     def on_after_gradient_update(self, optimizer_idx):
         if (self.train_loop_obj.iteration + 1) % self.train_loop_obj.grad_accumulation == 0:
-            if self.train_loop_obj.use_amp:
-                optimizer = self.train_loop_obj.optimizer
-                if isinstance(optimizer, MultiOptimizer):
-                    optimizer = optimizer[optimizer_idx]
+            optimizer = self.train_loop_obj.optimizer
+            if isinstance(optimizer, MultiOptimizer):
+                optimizer = optimizer[optimizer_idx]
 
-                self.train_loop_obj.amp_scaler.unscale_(optimizer)
+            # Unscales the gradients of optimizer's assigned params in-place
+            # Following: https://pytorch.org/docs/stable/notes/amp_examples.html#gradient-clipping
+            self.train_loop_obj.amp_scaler.unscale_(optimizer)
 
             torch.nn.utils.clip_grad_value_(self.train_loop_obj.model.parameters(), self.max_grad_value)
 
@@ -66,12 +67,13 @@ class GradNormClip(GradientCallbackBase):
 
     def on_after_gradient_update(self, optimizer_idx):
         if (self.train_loop_obj.iteration + 1) % self.train_loop_obj.grad_accumulation == 0:
-            if self.train_loop_obj.use_amp:
-                optimizer = self.train_loop_obj.optimizer
-                if isinstance(optimizer, MultiOptimizer):
-                    optimizer = optimizer[optimizer_idx]
+            optimizer = self.train_loop_obj.optimizer
+            if isinstance(optimizer, MultiOptimizer):
+                optimizer = optimizer[optimizer_idx]
 
-                self.train_loop_obj.amp_scaler.unscale_(optimizer)
+            # Unscales the gradients of optimizer's assigned params in-place
+            # Following: https://pytorch.org/docs/stable/notes/amp_examples.html#gradient-clipping
+            self.train_loop_obj.amp_scaler.unscale_(optimizer)
 
             torch.nn.utils.clip_grad_norm_(self.train_loop_obj.model.parameters(), self.max_grad_norm, **self.kwargs)
 
