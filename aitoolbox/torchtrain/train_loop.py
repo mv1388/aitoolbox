@@ -13,12 +13,6 @@ import torch.multiprocessing as mp
 import torch.distributed as dist
 from torch.nn.parallel import DistributedDataParallel
 import torch.cuda.amp as amp
-try:
-    import deepspeed
-    from aitoolbox.torchtrain.parallel import TTDeepSpeedLight
-    DEEPSPEED_AVAILABLE = True
-except ImportError:
-    DEEPSPEED_AVAILABLE = False
 
 from aitoolbox.utils import dict_util
 from aitoolbox.torchtrain.model import TTModel, ModelWrap
@@ -73,7 +67,6 @@ class TrainLoop:
                 * ``'single'``: single GPU training
                 * ``'dp'``: multi-GPU training via DataParallel
                 * ``'ddp'``: multi-GPU training via DistributedDataParallel
-                * ``'deepspeed'``: training via the Microsoft DeepSpeed
 
             cuda_device_idx (int or None): CUDA device index used when training on multiple GPUs
             use_amp (bool or dict): use 16-bit Automatic Mixed Precision (AMP)
@@ -110,8 +103,6 @@ class TrainLoop:
         self.use_amp = use_amp is True or isinstance(use_amp, dict)
         self.amp_scaler_init = use_amp if isinstance(use_amp, dict) else {}
         self.amp_scaler = amp.GradScaler(**self.amp_scaler_init, enabled=self.use_amp)
-
-        self.use_deepspeed = False
 
         USE_CUDA = torch.cuda.is_available()
         cuda_suffix = ''
@@ -153,9 +144,9 @@ class TrainLoop:
         if not isinstance(self.model, TTModel) and not isinstance(self.model, TTDataParallel) and \
                 isinstance(self.model, Module) and not isinstance(self.batch_model_feed_def, AbstractModelFeedDefinition):
             raise TypeError('Provided the base PyTorch model but did not give the batch_model_feed_def')
-        if self.gpu_mode not in ['single', 'dp', 'ddp', 'deepspeed']:
+        if self.gpu_mode not in ['single', 'dp', 'ddp']:
             raise ValueError("gpu_mode parameter set to the non-supported value. Can use only the following values: "
-                             "'single', 'dp', 'ddp' and 'deepspeed'")
+                             "'single', 'dp' and 'ddp'")
 
     def fit(self, num_epochs=0, num_iterations=0, callbacks=None, grad_accumulation=1, **kwargs):
         """Train the model using the train loop
@@ -167,7 +158,6 @@ class TrainLoop:
         * Basic (CPU or single GPU) mode
         * DataParallel mode
         * DistributedDataParallel mode
-        * Microsoft DeepSpeed mode
 
         Args:
             num_epochs (int): how many epochs the network will be trained
@@ -179,13 +169,12 @@ class TrainLoop:
 
                 * :meth:`aitoolbox.torchtrain.train_loop.TrainLoop._train_dp`
                 * :meth:`aitoolbox.torchtrain.train_loop.TrainLoop._train_ddp`
-                * :meth:`aitoolbox.torchtrain.train_loop.TrainLoop._train_deepspeed`
 
                 These training methods are called by the TrainLoop depending on the specified setting of the TrainLoop's
                 ``gpu_mode`` parameter.
 
         Returns:
-            TTModel or torch.nn.modules.Module or TTDataParallel or deepspeed.DeepSpeedLight: trained model
+            TTModel or torch.nn.modules.Module or TTDataParallel: trained model
         """
         if num_epochs > 0 and num_iterations > 0:
             raise ValueError('Both num_epochs and num_iterations are set. '
@@ -201,12 +190,9 @@ class TrainLoop:
         elif self.gpu_mode == 'ddp':
             return self._train_ddp(num_epochs, num_iterations, callbacks=callbacks, grad_accumulation=grad_accumulation,
                                    **kwargs)
-        elif self.gpu_mode == 'deepspeed':
-            return self._train_deepspeed(num_epochs=num_epochs, num_iterations=num_iterations, callbacks=callbacks,
-                                         **kwargs)
         else:
             raise ValueError("gpu_mode parameter set to the non-supported value. Can use only the following values: "
-                             "'single', 'dp', 'ddp' and 'deepspeed'")
+                             "'single', 'dp' and 'ddp'")
 
     def _train(self, num_epochs, num_iterations, callbacks=None, grad_accumulation=1):
         """Train the model using the train loop
@@ -219,7 +205,7 @@ class TrainLoop:
             grad_accumulation (int): number of batches the gradients are accumulated before updating weights
 
         Returns:
-            TTModel or torch.nn.modules.Module or TTDataParallel or deepspeed.DeepSpeedLight: trained model
+            TTModel or torch.nn.modules.Module or TTDataParallel: trained model
         """
         if num_iterations > 0:
             num_epochs = int(math.ceil(float(num_iterations) / len(self.train_loader)))
@@ -329,23 +315,20 @@ class TrainLoop:
         Returns:
             None
         """
-        if self.use_deepspeed:
-            self.model.backward(loss_batch)
-        else:
-            if not isinstance(loss_batch, MultiLoss):
-                # if not self.use_amp:
-                #     loss_batch.backward()
-                # else:
-                #     self.amp_scaler.scale(loss_batch).backward()
+        if not isinstance(loss_batch, MultiLoss):
+            # if not self.use_amp:
+            #     loss_batch.backward()
+            # else:
+            #     self.amp_scaler.scale(loss_batch).backward()
 
-                # TODO: Make sure this is equivalent to the commented out code block above
-                # Always pass the loss through the scaler to keep the code simpler
-                # Depending on the `enabled` parameter of the scaler
-                # the loss gets scaled or just returned unchanged
-                self.amp_scaler.scale(loss_batch).backward()
-            else:
-                # Non-AMP or AMP backward are done under the hood in the MultiLoss wrap
-                loss_batch.backward(optimizer_idx, self.iteration, self.amp_scaler)
+            # TODO: Make sure this is equivalent to the commented out code block above
+            # Always pass the loss through the scaler to keep the code simpler
+            # Depending on the `enabled` parameter of the scaler
+            # the loss gets scaled or just returned unchanged
+            self.amp_scaler.scale(loss_batch).backward()
+        else:
+            # Non-AMP or AMP backward are done under the hood in the MultiLoss wrap
+            loss_batch.backward(optimizer_idx, self.iteration, self.amp_scaler)
 
     def _optimizer_step(self, optimizer_idx):
         """Execute the optimizer step
@@ -359,17 +342,14 @@ class TrainLoop:
         """
         # if (iteration + 1) % grad_accumulation == 0 or iteration == len(self.train_loader) - 1:
         if (self.iteration + 1) % self.grad_accumulation == 0:
-            if self.use_deepspeed:
-                self.model.step()
+            if not isinstance(self.optimizer, MultiOptimizer):
+                # To step the optimizer always give it to the AMP scaler to keep the code simpler
+                # If scaler is disabled it will just call normal ``step()`` method
+                # of the provided optimizer without any scaling unscaling done prior to it
+                self.amp_scaler.step(self.optimizer)
             else:
-                if not isinstance(self.optimizer, MultiOptimizer):
-                    # To step the optimizer always give it to the AMP scaler to keep the code simpler
-                    # If scaler is disabled it will just call normal ``step()`` method
-                    # of the provided optimizer without any scaling unscaling done prior to it
-                    self.amp_scaler.step(self.optimizer)
-                else:
-                    # Non-AMP or AMP optimizer step are done under the hood in the MultiOptimizer wrap
-                    self.optimizer.step(optimizer_idx, self.iteration, self.amp_scaler)
+                # Non-AMP or AMP optimizer step are done under the hood in the MultiOptimizer wrap
+                self.optimizer.step(optimizer_idx, self.iteration, self.amp_scaler)
 
             if self.grad_cb_used:
                 self.callbacks_handler.execute_optimizer_step()
@@ -386,11 +366,10 @@ class TrainLoop:
         """
         # if (iteration + 1) % grad_accumulation == 0 or iteration == len(self.train_loader) - 1:
         if (self.iteration + 1) % self.grad_accumulation == 0:
-            if not self.use_deepspeed:
-                if not isinstance(self.optimizer, MultiOptimizer):
-                    self.optimizer.zero_grad()
-                else:
-                    self.optimizer.zero_grad(optimizer_idx, self.iteration)
+            if not isinstance(self.optimizer, MultiOptimizer):
+                self.optimizer.zero_grad()
+            else:
+                self.optimizer.zero_grad(optimizer_idx, self.iteration)
 
     def auto_execute_end_of_epoch(self):
         """Basic performance evaluation executed by default at the end of each epoch
@@ -830,49 +809,6 @@ class TrainLoop:
 
         self._train(num_epochs, num_iterations, callbacks, grad_accumulation)
 
-    def _train_deepspeed(self, deepspeed_args, num_epochs, num_iterations, callbacks=None,
-                         **ds_model_args):
-        """Train the model using Microsoft DeepSpeed package
-
-        Before starting the training the DeepSpeed library needs to be installed on the machine. Find the installation
-        instructions on this page: https://www.deepspeed.ai/getting-started/#installation.
-
-        If you want to manually install the DeepSpeed package execute the ``install.sh`` script:
-        https://github.com/microsoft/DeepSpeed/blob/master/install.sh
-
-        Args:
-            deepspeed_args (argparse.Namespace): argparser results structured as per DeepSpeed requirements.
-                A dictionary containing local_rank and deepspeed_config file location.
-            num_epochs (int): how many epochs the network will be trained
-            num_iterations (int): how many iterations (batches) the network will be trained. This enables more granular
-                specification of the training length than the ``num_epochs`` parameter.
-            callbacks (list): callbacks that are executed during the training run
-            **ds_model_args: additional parameters for the underlying ``deepspeed.DeepSpeedLight`` class
-
-                Possible arguments: https://deepspeed.readthedocs.io/en/latest/initialize.html
-
-        Returns:
-            deepspeed.DeepSpeedLight: DeepSpeed model engine
-        """
-        if not DEEPSPEED_AVAILABLE:
-            raise ValueError('Trying to use Microsoft DeepSpeed. However, DeepSpeed is not installed.')
-        if self.use_amp:
-            raise ValueError('Base Nvidia APEX AMP enabled. To use DeepSpeed first disable base AMP and specify '
-                             'the AMP as part of DeepSpeed config.')
-
-        self.use_deepspeed = True
-
-        self.model = TTDeepSpeedLight(
-            args=deepspeed_args,
-            model=self.model, model_parameters=self.model.parameters(),
-            training_data=self.train_loader.dataset,
-            **ds_model_args
-        )
-        self.optimizer = self.model.optimizer
-        self.train_loader = self.model.training_dataloader
-
-        return self._train(num_epochs, num_iterations, callbacks)
-
     def __call__(self, num_epochs=0, num_iterations=0, callbacks=None, grad_accumulation=1, **kwargs):
         """Train the model using the train loop
 
@@ -884,8 +820,7 @@ class TrainLoop:
                 specification of the training length than the ``num_epochs`` parameter.
             callbacks (list): callbacks that are executed during the training run
             grad_accumulation (int): number of batches the gradients are accumulated before updating weights
-            **kwargs: additional parameters for ``_train_dp()``, ``_train_ddp()`` and ``_train_deepspeed()`` methods.
-
+            **kwargs: additional parameters for ``_train_dp()`` and ``_train_ddp()`` methods.
         Returns:
             TTModel or torch.nn.modules.Module or TTDataParallel: trained model
         """
@@ -951,7 +886,6 @@ class TrainLoopCheckpoint(TrainLoop):
                 * ``'single'``: single GPU training
                 * ``'dp'``: multi-GPU training via DataParallel
                 * ``'ddp'``: multi-GPU training via DistributedDataParallel
-                * ``'deepspeed'``: training via the Microsoft DeepSpeed
 
             cuda_device_idx (int or None): CUDA device index used when training on multiple GPUs
             use_amp (bool or dict): use 16-bit Automatic Mixed Precision (AMP)
@@ -1060,7 +994,6 @@ class TrainLoopEndSave(TrainLoop):
                 * ``'single'``: single GPU training
                 * ``'dp'``: multi-GPU training via DataParallel
                 * ``'ddp'``: multi-GPU training via DistributedDataParallel
-                * ``'deepspeed'``: training via the Microsoft DeepSpeed
 
             cuda_device_idx (int or None): CUDA device index used when training on multiple GPUs
             use_amp (bool or dict): use 16-bit Automatic Mixed Precision (AMP)
@@ -1181,7 +1114,6 @@ class TrainLoopCheckpointEndSave(TrainLoopEndSave):
                 * ``'single'``: single GPU training
                 * ``'dp'``: multi-GPU training via DataParallel
                 * ``'ddp'``: multi-GPU training via DistributedDataParallel
-                * ``'deepspeed'``: training via the Microsoft DeepSpeed
 
             cuda_device_idx (int or None): CUDA device index used when training on multiple GPUs
             use_amp (bool or dict): use 16-bit Automatic Mixed Precision (AMP)
