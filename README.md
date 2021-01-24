@@ -50,7 +50,7 @@ git+https://github.com/mv1388/aitoolbox#egg=aitoolbox
 
 ## TrainLoop
 
-[`TrainLoop`](https://aitoolbox.readthedocs.io/en/latest/api/aitoolbox.torchtrain.train_loop.html#aitoolbox.torchtrain.train_loop.TrainLoop)
+[`TrainLoop`](https://aitoolbox.readthedocs.io/en/latest/api/aitoolbox.torchtrain.train_loop.train_loop.html#aitoolbox.torchtrain.train_loop.train_loop.TrainLoop)
 is the main abstraction for PyTorch neural net training. At its core
 it handles the batch feeding of data into the model, calculating loss and updating parameters for a specified number of epochs.
 To learn how to define the TrainLoop supported PyTorch model please look at the [Model](#model) section bellow.
@@ -70,15 +70,15 @@ AIToolbox includes a few more advanced derivations of the basic TrainLoop
 which automatically handle the experiment tracking by creating model
 checkpoints, performance reports, example predictions, etc. All of this can be saved just on the local drive
 or can also be automatically stored on AWS S3. Currently implemented advanced 
-[`TrainLoops`](https://aitoolbox.readthedocs.io/en/latest/api/aitoolbox.torchtrain.train_loop.html#module-aitoolbox.torchtrain.train_loop) 
+[`TrainLoops`](https://aitoolbox.readthedocs.io/en/latest/api/aitoolbox.torchtrain.train_loop.train_loop_tracking.html) 
 are 
-[`TrainLoopCheckpoint`](https://aitoolbox.readthedocs.io/en/latest/api/aitoolbox.torchtrain.train_loop.html#aitoolbox.torchtrain.train_loop.TrainLoopCheckpoint), 
-[`TrainLoopEndSave`](https://aitoolbox.readthedocs.io/en/latest/api/aitoolbox.torchtrain.train_loop.html#aitoolbox.torchtrain.train_loop.TrainLoopEndSave) and 
-[`TrainLoopCheckpointEndSave`](https://aitoolbox.readthedocs.io/en/latest/api/aitoolbox.torchtrain.train_loop.html#aitoolbox.torchtrain.train_loop.TrainLoopCheckpointEndSave).
+[`TrainLoopCheckpoint`](https://aitoolbox.readthedocs.io/en/latest/api/aitoolbox.torchtrain.train_loop.train_loop_tracking.html#aitoolbox.torchtrain.train_loop.train_loop_tracking.TrainLoopCheckpoint), 
+[`TrainLoopEndSave`](https://aitoolbox.readthedocs.io/en/latest/api/aitoolbox.torchtrain.train_loop.train_loop_tracking.html#aitoolbox.torchtrain.train_loop.train_loop_tracking.TrainLoopEndSave) and 
+[`TrainLoopCheckpointEndSave`](https://aitoolbox.readthedocs.io/en/latest/api/aitoolbox.torchtrain.train_loop.train_loop_tracking.html#aitoolbox.torchtrain.train_loop.train_loop_tracking.TrainLoopCheckpointEndSave).
 Here, 'Checkpoint' stands for checkpointing after each epoch, while 'EndSave' will only persist and evaluate at the very end of the training. 
 
 For the most complete experiment tracking it is recommended to use the 
-[`TrainLoopCheckpointEndSave`](https://aitoolbox.readthedocs.io/en/latest/api/aitoolbox.torchtrain.train_loop.html#aitoolbox.torchtrain.train_loop.TrainLoopCheckpointEndSave) 
+[`TrainLoopCheckpointEndSave`](https://aitoolbox.readthedocs.io/en/latest/api/aitoolbox.torchtrain.train_loop.train_loop_tracking.html#aitoolbox.torchtrain.train_loop.train_loop_tracking.TrainLoopCheckpointEndSave) 
 option. 
 The optional use of the *result packages* needed for the neural net performance evaluation is explained in 
 the [experiment section](#experiment) bellow.

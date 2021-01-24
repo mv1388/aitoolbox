@@ -1,7 +1,7 @@
 Train Loop
 ==========
 
-``TrainLoop`` and it's module :mod:`aitoolbox.torchtrain.train_loop` is at the core of and probably most important
+``TrainLoop`` and it's module :mod:`aitoolbox.torchtrain.train_loop.train_loop` is at the core of and probably most important
 component of the entire *AIToolbox* package.
 
 Common to all available TrainLoops is the *PyTorch* model training loop engine which automatically handles the
@@ -20,7 +20,7 @@ To train the model, all the user has to do is provide the TrainLoop with the mod
 loss function and the optimizer. That's it.
 
 Once the TrainLoop with all the necessary components has been created all that's left is to start training the model.
-Common to all the available TrainLoops is the :meth:`aitoolbox.torchtrain.train_loop.TrainLoop.fit` method which
+Common to all the available TrainLoops is the :meth:`aitoolbox.torchtrain.train_loop.train_loop.TrainLoop.fit` method which
 initiates the training process. The ``.fit()`` method will train the provided model on the given training dataset in
 the training dataloader for the specified number of epochs.
 
@@ -34,12 +34,14 @@ the training dataloader for the specified number of epochs.
 TrainLoop Variations
 --------------------
 
-:mod:`aitoolbox.torchtrain.train_loop` module consists of four different ``TrainLoop`` variations:
+:mod:`aitoolbox.torchtrain.train_loop` module consists of submodules
+:mod:`aitoolbox.torchtrain.train_loop.train_loop` and :mod:`aitoolbox.torchtrain.train_loop.train_loop_tracking`
+which implement four different ``TrainLoop`` variations:
 
-* :class:`aitoolbox.torchtrain.train_loop.TrainLoop`
-* :class:`aitoolbox.torchtrain.train_loop.TrainLoopCheckpoint`
-* :class:`aitoolbox.torchtrain.train_loop.TrainLoopEndSave`
-* :class:`aitoolbox.torchtrain.train_loop.TrainLoopCheckpointEndSave`
+* :class:`aitoolbox.torchtrain.train_loop.train_loop.TrainLoop`
+* :class:`aitoolbox.torchtrain.train_loop.train_loop_tracking.TrainLoopCheckpoint`
+* :class:`aitoolbox.torchtrain.train_loop.train_loop_tracking.TrainLoopEndSave`
+* :class:`aitoolbox.torchtrain.train_loop.train_loop_tracking.TrainLoopCheckpointEndSave`
 
 The above listed TrainLoop options can be distinguished based on the varying extent of the automatic experiment tracking
 they do on top of the core training loop functionality. The available TrainLoops follow this naming convention:
@@ -54,7 +56,7 @@ TrainLoop
 The simplest TrainLoop version which only performs the model training and does no experiment tracking and
 performance evaluation.
 
-The API can be found in: :class:`aitoolbox.torchtrain.train_loop.TrainLoop`.
+The API can be found in: :class:`aitoolbox.torchtrain.train_loop.train_loop.TrainLoop`.
 
 Example of the ``TrainLoop`` used to train the model:
 
@@ -83,7 +85,7 @@ TrainLoopCheckpoint
 Same training process as in TrainLoop with additional automatic model checkpointing (saving) after every epoch. Model
 saving can be done only to the local disk or also to the cloud storage such as AWS S3.
 
-The API can be found in: :class:`aitoolbox.torchtrain.train_loop.TrainLoopCheckpoint`.
+The API can be found in: :class:`aitoolbox.torchtrain.train_loop.train_loop_tracking.TrainLoopCheckpoint`.
 
 .. code-block:: python
 
@@ -125,7 +127,7 @@ evaluation at the end of the training process. This way the TrainLoop ensures ex
 the training. Model and experiment results saving can be done only to the local disk or also to the cloud storage
 such as AWS S3.
 
-The API can be found in: :class:`aitoolbox.torchtrain.train_loop.TrainLoopEndSave`.
+The API can be found in: :class:`aitoolbox.torchtrain.train_loop.train_loop_tracking.TrainLoopEndSave`.
 
 For information about the ``ResultPackage`` used in this example, have a look at the :doc:`../experiment/result_package`
 section.
@@ -172,7 +174,7 @@ each epoch as well as automatic model checkpointing and model performance evalua
 This way the TrainLoop ensures full experiment tracking with the maximum extent. Model and experiment results saving
 can be done only to the local disk or also to the cloud storage such as AWS S3.
 
-The API can be found in: :class:`aitoolbox.torchtrain.train_loop.TrainLoopCheckpointEndSave`.
+The API can be found in: :class:`aitoolbox.torchtrain.train_loop.train_loop_tracking.TrainLoopCheckpointEndSave`.
 
 For information about the ``ResultPackage`` used in this example, have a look at the :doc:`../experiment/result_package`
 section.

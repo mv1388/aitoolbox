@@ -3,13 +3,14 @@ import os
 
 from tests.utils import *
 
+import torch
 from torch.utils.data.dataset import TensorDataset
 from torch.utils.data.dataloader import DataLoader
 from torch.optim.adam import Adam
 
 from aitoolbox.torchtrain.train_loop import TrainLoop
 from aitoolbox.torchtrain.model import ModelWrap
-from aitoolbox.torchtrain.tl_components.callback_handler import CallbacksHandler
+from aitoolbox.torchtrain.train_loop.components.callback_handler import CallbacksHandler
 from aitoolbox.torchtrain.multi_loss_optim import MultiOptimizer
 from aitoolbox.torchtrain.schedulers.basic import ReduceLROnPlateauScheduler, StepLRScheduler
 from aitoolbox.torchtrain.schedulers.warmup import LinearWithWarmupScheduler
@@ -30,7 +31,16 @@ class TestTrainLoop(unittest.TestCase):
         self.assertIsInstance(train_loop.callbacks_handler, CallbacksHandler)
         self.assertEqual(train_loop.callbacks_handler.train_loop_obj, train_loop)
         self.assertFalse(train_loop.early_stop)
-        self.assertIsNone(train_loop.amp_scaler)
+        self.assertIsInstance(train_loop.amp_scaler, torch.cuda.amp.GradScaler)
+
+    def test_amp_grad_scaler_enabled(self):
+        train_loop = TrainLoop(NetUnifiedBatchFeed(), None, 100, None, None, None, use_amp=False)
+        self.assertIsInstance(train_loop.amp_scaler, torch.cuda.amp.GradScaler)
+        self.assertFalse(train_loop.amp_scaler.is_enabled())
+
+        train_loop_try_enable = TrainLoop(NetUnifiedBatchFeed(), None, 100, None, None, None, use_amp=True)
+        self.assertIsInstance(train_loop_try_enable.amp_scaler, torch.cuda.amp.GradScaler)
+        self.assertFalse(train_loop_try_enable.amp_scaler.is_enabled())
 
     def test_fit_mode_selection_single_gpu(self):
         gpu_mode, num_epochs, num_iterations, callbacks, grad_accumulation = \
