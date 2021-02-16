@@ -17,7 +17,7 @@ class TrainLoopCheckpoint(TrainLoop):
                  rm_subopt_local_models=False, num_best_checkpoints_kept=2,
                  iteration_save_freq=0,
                  collate_batch_pred_fn=append_predictions, pred_transform_fn=torch_cat_transf,
-                 end_auto_eval=True, lazy_experiment_save=True,
+                 end_auto_eval=True, lazy_experiment_save=False,
                  gpu_mode='single', cuda_device_idx=None, use_amp=False):
         """TrainLoop with the automatic model check-pointing at the end of each epoch
 
@@ -128,7 +128,7 @@ class TrainLoopEndSave(TrainLoop):
                  hyperparams, val_result_package=None, test_result_package=None,
                  cloud_save_mode='s3', bucket_name='model-result', cloud_dir_prefix='', source_dirs=(),
                  collate_batch_pred_fn=append_predictions, pred_transform_fn=torch_cat_transf,
-                 end_auto_eval=True, lazy_experiment_save=True,
+                 end_auto_eval=True, lazy_experiment_save=False,
                  gpu_mode='single', cuda_device_idx=None, use_amp=False):
         """TrainLoop with the model performance evaluation and final model saving at the end of the training process
 
@@ -240,7 +240,7 @@ class TrainLoopCheckpointEndSave(TrainLoopEndSave):
                  rm_subopt_local_models=False, num_best_checkpoints_kept=2,
                  iteration_save_freq=0,
                  collate_batch_pred_fn=append_predictions, pred_transform_fn=torch_cat_transf,
-                 end_auto_eval=True, lazy_experiment_save=True,
+                 end_auto_eval=True, lazy_experiment_save=False,
                  gpu_mode='single', cuda_device_idx=None, use_amp=False):
         """TrainLoop both saving model check-pointing at the end of each epoch and model performance reporting
             and model saving at the end of the training process

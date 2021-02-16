@@ -32,7 +32,7 @@ class TrainLoop:
                  train_loader, validation_loader, test_loader,
                  optimizer, criterion,
                  collate_batch_pred_fn=append_predictions, pred_transform_fn=torch_cat_transf,
-                 end_auto_eval=True, lazy_experiment_save=True,
+                 end_auto_eval=True, lazy_experiment_save=False,
                  gpu_mode='single', cuda_device_idx=None, use_amp=False):
         """Core PyTorch TrainLoop supporting the model training and target prediction
 
