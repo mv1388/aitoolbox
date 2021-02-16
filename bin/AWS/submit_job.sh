@@ -17,6 +17,7 @@ function usage()
 
    optional arguments:
      -k, --key STR                  path to ssh key
+     -n, --name STR                 name for the created instance
      -d, --dataset STR              dataset to be optionally downloaded from the S3 storage directly to ec2 instance
      -r, --preproc STR              the preprocessed version of the main dataset
      -f, --framework STR            desired deep learning framework
@@ -54,6 +55,7 @@ username="ubuntu"
 terminate_cmd=false
 ssh_at_start=false
 spot_instance=true
+instance_name=
 
 default_logging_filename="training.log"
 
@@ -68,6 +70,10 @@ key="$1"
 case $key in
     -k|--key)
     key_path="$2"
+    shift 2 # past argument value
+    ;;
+    -n|--instance_name)
+    instance_name="$2"
     shift 2 # past argument value
     ;;
     -p|--project)
@@ -201,6 +207,10 @@ if [ "$spot_instance" == true ]; then
 else
     echo "Creating on-demand instance"
     instance_id=$(aws ec2 run-instances --cli-input-json file://configs/$instance_config --query 'Instances[0].InstanceId' --output text)
+fi
+
+if [[ "$instance_name" != "" ]]; then
+    aws ec2 create-tags --resources $instance_id --tags Key=Name,Value=$instance_name
 fi
 
 echo "Waiting for instance create"
