@@ -63,7 +63,8 @@ class TestAbstractExperimentCallback(unittest.TestCase):
                                                 project_name=project_name, experiment_name=experiment_name,
                                                 local_model_result_folder_path=local_path,
                                                 hyperparams={}, val_result_package=DummyResultPackageExtend(),
-                                                cloud_save_mode=None)
+                                                cloud_save_mode=None,
+                                                lazy_experiment_save=True)
         train_loop.callbacks_handler.register_callbacks([callback])
         callback.try_infer_experiment_details(infer_cloud_details=False)
 
@@ -82,7 +83,8 @@ class TestAbstractExperimentCallback(unittest.TestCase):
         train_loop = TrainLoopCheckpointEndSave(model, None, [], None, DummyOptimizer(), None,
                                                 project_name=project_name, experiment_name=experiment_name,
                                                 local_model_result_folder_path=local_path,
-                                                hyperparams={}, val_result_package=DummyResultPackageExtend())
+                                                hyperparams={}, val_result_package=DummyResultPackageExtend(),
+                                                lazy_experiment_save=True)
         train_loop.callbacks_handler.register_callbacks([callback])
         callback.try_infer_experiment_details(infer_cloud_details=True)
 
@@ -111,7 +113,8 @@ class TestAbstractExperimentCallback(unittest.TestCase):
                                                 local_model_result_folder_path=local_path,
                                                 hyperparams={}, val_result_package=DummyResultPackageExtend(),
                                                 cloud_save_mode=cloud_save_mode, bucket_name=bucket_name,
-                                                cloud_dir_prefix=cloud_dir_prefix)
+                                                cloud_dir_prefix=cloud_dir_prefix,
+                                                lazy_experiment_save=True)
         train_loop.callbacks_handler.register_callbacks([callback])
         callback.try_infer_experiment_details(infer_cloud_details=True)
 
@@ -145,7 +148,8 @@ class TestAbstractExperimentCallback(unittest.TestCase):
                                                 local_model_result_folder_path=f'TL_{local_path}',
                                                 hyperparams={}, val_result_package=DummyResultPackageExtend(),
                                                 cloud_save_mode='s3', bucket_name=f'TL_{bucket_name}',
-                                                cloud_dir_prefix=f'TL_{cloud_dir_prefix}')
+                                                cloud_dir_prefix=f'TL_{cloud_dir_prefix}',
+                                                lazy_experiment_save=True)
         train_loop.callbacks_handler.register_callbacks([callback])
         callback.try_infer_experiment_details(infer_cloud_details=True)
 

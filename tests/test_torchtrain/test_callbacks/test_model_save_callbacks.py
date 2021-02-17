@@ -34,7 +34,8 @@ class TestModelCheckpointCallback(unittest.TestCase):
     def test_checkpointer_type_on_train_start(self):
         callback = ModelCheckpoint('project_name', 'experiment_name', 'local_model_result_folder_path', hyperparams={},
                                    cloud_save_mode='s3')
-        train_loop = TrainLoop(NetUnifiedBatchFeed(), None, None, None, DummyOptimizer(), None)
+        train_loop = TrainLoop(NetUnifiedBatchFeed(), None, None, None, DummyOptimizer(), None,
+                               lazy_experiment_save=True)
         train_loop.callbacks_handler.register_callbacks([callback], cache_callbacks=True)
         self.assertIsNone(callback.model_checkpointer)
         train_loop.callbacks_handler.register_callbacks(None, cache_callbacks=False)
@@ -42,7 +43,8 @@ class TestModelCheckpointCallback(unittest.TestCase):
 
         callback_2 = ModelCheckpoint('project_name', 'experiment_name', 'local_model_result_folder_path', hyperparams={},
                                      cloud_save_mode=None)
-        train_loop = TrainLoop(NetUnifiedBatchFeed(), None, None, None, DummyOptimizer(), None)
+        train_loop = TrainLoop(NetUnifiedBatchFeed(), None, None, None, DummyOptimizer(), None,
+                               lazy_experiment_save=True)
         train_loop.callbacks_handler.register_callbacks([callback_2], cache_callbacks=True)
         self.assertIsNone(callback_2.model_checkpointer)
         train_loop.callbacks_handler.register_callbacks(None, cache_callbacks=False)
@@ -66,7 +68,7 @@ class TestModelCheckpointCallback(unittest.TestCase):
         train_loop.callbacks_handler.register_callbacks([callback])
         train_loop.callbacks_handler.execute_train_begin()
 
-        self.assertFalse(callback._hyperparams_already_saved)
+        self.assertTrue(callback._hyperparams_already_saved)
 
         callback.save_hyperparams()
         self.assertTrue(callback._hyperparams_already_saved)
@@ -88,6 +90,19 @@ class TestModelCheckpointCallback(unittest.TestCase):
         project_path = os.path.join(THIS_DIR, 'project_name')
         if os.path.exists(project_path):
             shutil.rmtree(project_path)
+
+    def test_save_args_false(self):
+        hyperparams = {'param_1': 100, 'param_A': 234, 'LR': 0.001, 'path': 'bla/bladddd'}
+
+        callback = ModelCheckpoint('project_name', 'experiment_name', THIS_DIR,
+                                   hyperparams=hyperparams,
+                                   cloud_save_mode=None)
+        train_loop = TrainLoop(NetUnifiedBatchFeed(), None, None, None, DummyOptimizer(), None,
+                               lazy_experiment_save=True)
+        train_loop.callbacks_handler.register_callbacks([callback])
+        train_loop.callbacks_handler.execute_train_begin()
+
+        self.assertFalse(callback._hyperparams_already_saved)
 
 
 class TestModelIterationCheckpoint(unittest.TestCase):
@@ -162,7 +177,8 @@ class TestModelTrainEndSaveCallback(unittest.TestCase):
     def test_end_saver_type_on_train_start(self):
         callback = ModelTrainEndSave('project_name', 'experiment_name', 'local_model_result_folder_path',
                                      {}, DummyResultPackage(), cloud_save_mode='s3')
-        train_loop = TrainLoop(NetUnifiedBatchFeed(), None, None, None, DummyOptimizer(), None)
+        train_loop = TrainLoop(NetUnifiedBatchFeed(), None, None, None, DummyOptimizer(), None,
+                               lazy_experiment_save=True)
         train_loop.callbacks_handler.register_callbacks([callback], cache_callbacks=True)
         self.assertIsNone(callback.results_saver)
         train_loop.callbacks_handler.register_callbacks(None, cache_callbacks=False)
@@ -170,7 +186,8 @@ class TestModelTrainEndSaveCallback(unittest.TestCase):
 
         callback_2 = ModelTrainEndSave('project_name', 'experiment_name', 'local_model_result_folder_path',
                                        {}, DummyResultPackage(), cloud_save_mode=None)
-        train_loop = TrainLoop(NetUnifiedBatchFeed(), None, None, None, DummyOptimizer(), None)
+        train_loop = TrainLoop(NetUnifiedBatchFeed(), None, None, None, DummyOptimizer(), None,
+                               lazy_experiment_save=True)
         train_loop.callbacks_handler.register_callbacks([callback_2], cache_callbacks=True)
         self.assertIsNone(callback_2.results_saver)
         train_loop.callbacks_handler.register_callbacks(None, cache_callbacks=False)
@@ -182,7 +199,8 @@ class TestModelTrainEndSaveCallback(unittest.TestCase):
 
         callback = ModelTrainEndSave('project_name', 'experiment_name', 'local_model_result_folder_path',
                                      {}, result_pkg)
-        train_loop = TrainLoop(NetUnifiedBatchFeed(), None, None, None, DummyOptimizer(), None)
+        train_loop = TrainLoop(NetUnifiedBatchFeed(), None, None, None, DummyOptimizer(), None,
+                               lazy_experiment_save=True)
         train_loop.callbacks_handler.register_callbacks([callback])
 
         self.assertEqual(result_pkg.experiment_path,
@@ -199,7 +217,7 @@ class TestModelTrainEndSaveCallback(unittest.TestCase):
         train_loop.callbacks_handler.register_callbacks([callback])
         train_loop.callbacks_handler.execute_train_begin()
 
-        self.assertFalse(callback._hyperparams_already_saved)
+        self.assertTrue(callback._hyperparams_already_saved)
 
         callback.save_hyperparams()
         self.assertTrue(callback._hyperparams_already_saved)
