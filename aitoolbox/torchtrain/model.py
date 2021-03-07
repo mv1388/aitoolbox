@@ -69,7 +69,8 @@ class TTModel(nn.Module, ABC):
             device: device on which the model is making the prediction
 
         Returns:
-            np.array, np.array, dict: y_pred.cpu(), y_test.cpu(), metadata
+            torch.Tensor, torch.Tensor, dict: y_pred.cpu(), y_test.cpu(), metadata
+                in the form of dict of lists/torch.Tensors/np.arrays
         """
         pass
 
