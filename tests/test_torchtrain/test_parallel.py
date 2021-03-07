@@ -113,9 +113,6 @@ class TestTTDataParallel(unittest.TestCase):
 
         self.assertEqual(dp_model.get_loss(100, None, None), (1, 1, 'my_new_fn return value', 'test string'))
 
-        with self.assertRaises(nn.modules.module.ModuleAttributeError):
-            dp_model.get_loss(100, None, 'unreachable')
-
         with self.assertRaises(AttributeError):
             dp_model.get_loss(100, None, 'unreachable')
 
