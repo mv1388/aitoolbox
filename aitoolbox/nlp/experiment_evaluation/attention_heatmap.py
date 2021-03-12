@@ -30,12 +30,6 @@ class AttentionHeatMap(AbstractBaseMetric):
         AbstractBaseMetric.__init__(self, None, None, metric_name='Attention_HeatMap', np_array=False)
 
     def calculate_metric(self):
-        """
-
-        Returns:
-            None
-
-        """
         dir_path = self.prepare_folder_for_saving(self.plot_save_dir)
         output_plot_paths = []
 

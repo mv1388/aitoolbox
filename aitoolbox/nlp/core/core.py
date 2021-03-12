@@ -72,21 +72,3 @@ def find_sub_list(sub_list, main_list):
     for ind in (i for i, e in enumerate(main_list) if e == sub_list[0]):
         if main_list[ind:ind+sll] == sub_list:
             return ind, ind+sll-1
-
-
-class NLPDatasetPrepareResult:
-    def __init__(self, dataset_name, dataset_type='train', vocab_memory_safeguard=True):
-        self.dataset_name = dataset_name
-        self.dataset_type = dataset_type
-
-        self.vocab_memory_safeguard = vocab_memory_safeguard
-
-        self.core_data = None
-        self.vocab = None
-        self.max_text_sequence_lens = None
-
-    def store_data(self, core_data, vocab, max_text_sequence_lens):
-        self.core_data = core_data
-        if not self.vocab_memory_safeguard:
-            self.vocab = vocab
-        self.max_text_sequence_lens = max_text_sequence_lens
