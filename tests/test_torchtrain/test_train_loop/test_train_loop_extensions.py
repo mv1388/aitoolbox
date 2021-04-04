@@ -14,11 +14,13 @@ THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 class TestTrainLoopCheckpoint(unittest.TestCase):
     def test_init_values(self):
         train_loop_non_val = TrainLoopCheckpoint(NetUnifiedBatchFeed(), None, None, None, DummyOptimizer(), None,
-                                                 "project_name", "experiment_name", "local_model_result_folder_path", {})
+                                                 "project_name", "experiment_name", "local_model_result_folder_path", {},
+                                                 lazy_experiment_save=True)
         self.assertEqual(train_loop_non_val.train_history.train_history, {'loss': [], 'accumulated_loss': []})
 
         train_loop = TrainLoopCheckpoint(NetUnifiedBatchFeed(), None, 100, None, DummyOptimizer(), None,
-                                         "project_name", "experiment_name", "local_model_result_folder_path", {})
+                                         "project_name", "experiment_name", "local_model_result_folder_path", {},
+                                         lazy_experiment_save=True)
         self.assertEqual(train_loop.train_history.train_history, {'loss': [], 'accumulated_loss': [], 'val_loss': []})
 
         self.assertEqual(len(train_loop.callbacks), 0)
@@ -102,13 +104,15 @@ class TestTrainLoopEndSave(unittest.TestCase):
         train_loop_non_val = TrainLoopEndSave(NetUnifiedBatchFeed(), None, 100, 100, DummyOptimizer(), None,
                                               "project_name", "experiment_name", "local_model_result_folder_path",
                                               hyperparams={}, val_result_package=DummyResultPackage(),
-                                              test_result_package=DummyResultPackage(), cloud_save_mode='s3')
+                                              test_result_package=DummyResultPackage(), cloud_save_mode='s3',
+                                              lazy_experiment_save=True)
         self.assertEqual(train_loop_non_val.train_history.train_history, {'loss': [], 'accumulated_loss': [], 'val_loss': []})
 
         dummy_result_package = DummyResultPackage()
         train_loop = TrainLoopEndSave(NetUnifiedBatchFeed(), None, 100, None, DummyOptimizer(), None,
                                       "project_name", "experiment_name", "local_model_result_folder_path",
-                                      hyperparams={}, val_result_package=dummy_result_package, cloud_save_mode='s3')
+                                      hyperparams={}, val_result_package=dummy_result_package, cloud_save_mode='s3',
+                                      lazy_experiment_save=True)
         self.assertEqual(train_loop.train_history.train_history, {'loss': [], 'accumulated_loss': [], 'val_loss': []})
 
         self.assertEqual(len(train_loop.callbacks), 0)
@@ -225,13 +229,15 @@ class TestTrainLoopCheckpointEndSave(unittest.TestCase):
     def test_init_values(self):
         train_loop_non_val = TrainLoopCheckpointEndSave(NetUnifiedBatchFeed(), None, 100, None, DummyOptimizer(), None,
                                                         "project_name", "experiment_name", "local_model_result_folder_path",
-                                                        hyperparams={}, val_result_package=DummyResultPackage(), cloud_save_mode='s3')
+                                                        hyperparams={}, val_result_package=DummyResultPackage(), cloud_save_mode='s3',
+                                                        lazy_experiment_save=True)
         self.assertEqual(train_loop_non_val.train_history.train_history, {'loss': [], 'accumulated_loss': [], 'val_loss': []})
 
         dummy_result_package = DummyResultPackage()
         train_loop = TrainLoopCheckpointEndSave(NetUnifiedBatchFeed(), None, 100, None, DummyOptimizer(), None,
                                                 "project_name", "experiment_name", "local_model_result_folder_path",
-                                                hyperparams={}, val_result_package=dummy_result_package, cloud_save_mode='s3')
+                                                hyperparams={}, val_result_package=dummy_result_package, cloud_save_mode='s3',
+                                                lazy_experiment_save=True)
         self.assertEqual(train_loop.train_history.train_history, {'loss': [], 'accumulated_loss': [], 'val_loss': []})
 
         self.assertEqual(len(train_loop.callbacks), 0)
@@ -266,7 +272,8 @@ class TestTrainLoopCheckpointEndSave(unittest.TestCase):
                                                 hyperparams={},
                                                 val_result_package=dummy_result_package_val,
                                                 test_result_package=dummy_result_package_test,
-                                                cloud_save_mode='s3')
+                                                cloud_save_mode='s3',
+                                                lazy_experiment_save=True)
         self.assertEqual(train_loop.callbacks_handler.callbacks_cache[0].val_result_package, dummy_result_package_val)
         self.assertEqual(train_loop.callbacks_handler.callbacks_cache[0].test_result_package, dummy_result_package_test)
 
@@ -281,7 +288,8 @@ class TestTrainLoopCheckpointEndSave(unittest.TestCase):
                                                 "project_name", "experiment_name",
                                                 "local_model_result_folder_path",
                                                 hyperparams={}, val_result_package=dummy_result_package,
-                                                cloud_save_mode='s3')
+                                                cloud_save_mode='s3',
+                                                lazy_experiment_save=True)
 
         self.assertEqual(len(train_loop.callbacks), 0)
         self.assertEqual(len(train_loop.callbacks_handler.callbacks_cache), 2)

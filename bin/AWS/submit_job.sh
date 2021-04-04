@@ -17,6 +17,7 @@ function usage()
 
    optional arguments:
      -k, --key STR                  path to ssh key
+     -n, --name STR                 name for the created instance
      -d, --dataset STR              dataset to be optionally downloaded from the S3 storage directly to ec2 instance
      -r, --preproc STR              the preprocessed version of the main dataset
      -f, --framework STR            desired deep learning framework
@@ -31,6 +32,7 @@ function usage()
      -o, --os-name STR              username depending on the OS chosen. Default is ubuntu
      -t, --terminate                the instance will be terminated when training is done
      -s, --ssh-start                automatically ssh into the instance when the training starts
+     --on-demand                    create on-demand instance instead of spot instance
      -h, --help                     show this help message and exit
 
 HEREDOC
@@ -52,6 +54,8 @@ use_deepspeed=false
 username="ubuntu"
 terminate_cmd=false
 ssh_at_start=false
+spot_instance=true
+instance_name=
 
 default_logging_filename="training.log"
 
@@ -66,6 +70,10 @@ key="$1"
 case $key in
     -k|--key)
     key_path="$2"
+    shift 2 # past argument value
+    ;;
+    -n|--instance_name)
+    instance_name="$2"
     shift 2 # past argument value
     ;;
     -p|--project)
@@ -128,6 +136,10 @@ case $key in
     ssh_at_start=true
     shift 1 # past argument value
     ;;
+    --on-demand)
+    spot_instance=false
+    shift 1 # past argument value
+    ;;
     -h|--help )
     usage;
     exit;
@@ -186,12 +198,22 @@ fi
 #############################
 # Instance creation
 #############################
-echo "Creating spot request"
-request_id=$(aws ec2 request-spot-instances --launch-specification file://configs/$instance_config --query 'SpotInstanceRequests[0].SpotInstanceRequestId' --output text)
-aws ec2 wait spot-instance-request-fulfilled --spot-instance-request-ids $request_id
+if [ "$spot_instance" == true ]; then
+    echo "Creating spot request"
+    request_id=$(aws ec2 request-spot-instances --launch-specification file://configs/$instance_config --query 'SpotInstanceRequests[0].SpotInstanceRequestId' --output text)
+    aws ec2 wait spot-instance-request-fulfilled --spot-instance-request-ids $request_id
+
+    instance_id=$(aws ec2 describe-spot-instance-requests --spot-instance-request-ids $request_id --query 'SpotInstanceRequests[0].InstanceId' --output text)
+else
+    echo "Creating on-demand instance"
+    instance_id=$(aws ec2 run-instances --cli-input-json file://configs/$instance_config --query 'Instances[0].InstanceId' --output text)
+fi
+
+if [[ "$instance_name" != "" ]]; then
+    aws ec2 create-tags --resources $instance_id --tags Key=Name,Value=$instance_name
+fi
 
 echo "Waiting for instance create"
-instance_id=$(aws ec2 describe-spot-instance-requests --spot-instance-request-ids $request_id --query 'SpotInstanceRequests[0].InstanceId' --output text)
 aws ec2 wait instance-status-ok --instance-ids $instance_id
 
 ec2_instance_address=$(aws ec2 describe-instances --instance-ids $instance_id --query 'Reservations[*].Instances[*].PublicDnsName' --output text)
