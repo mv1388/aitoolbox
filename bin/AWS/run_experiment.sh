@@ -82,7 +82,7 @@ source $project_root_path/AWS_run_scripts/AWS_core_scripts/$experiment_script_fi
 
 if [[ $log_file_path != "" && -f $log_file_path ]]; then
     filtered_log_file_path="$(dirname $log_file_path)/filtered_$(basename $log_file_path)"
-    grep -v '^\r\n*' $log_file_path > $filtered_log_file_path
+    sed -n -e '/              STARTING THE TRAINING JOB               /, $p' $log_file_path | grep -v '%|.*|' > $filtered_log_file_path
 
     s3_log_path="$log_s3_dir_path/$(basename $log_file_path)"
     aws s3 cp $log_file_path $s3_log_path
