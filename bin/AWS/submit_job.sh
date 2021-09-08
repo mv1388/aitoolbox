@@ -33,6 +33,7 @@ function usage()
      -t, --terminate                the instance will be terminated when training is done
      -s, --ssh-start                automatically ssh into the instance when the training starts
      --on-demand                    create on-demand instance instead of spot instance
+     --central-region               create the instance in the central region (Frankfurt)
      -h, --help                     show this help message and exit
 
 HEREDOC
@@ -55,6 +56,7 @@ username="ubuntu"
 terminate_cmd=false
 ssh_at_start=false
 spot_instance=true
+central_region=false
 instance_name=
 
 default_logging_filename="training.log"
@@ -140,6 +142,10 @@ case $key in
     spot_instance=false
     shift 1 # past argument value
     ;;
+    --central-region)
+    central_region=true
+    shift 1 # past argument value
+    ;;
     -h|--help )
     usage;
     exit;
@@ -182,6 +188,10 @@ fi
 
 if [[ "$instance_type" != "" ]]; then
     instance_config=config_$(tr . _ <<< $instance_type).json
+fi
+
+if [ "$central_region" == true ]; then
+    instance_config=${instance_config%.*}_central.json
 fi
 
 if [ "$default_log" == true ]; then

@@ -37,6 +37,7 @@ function usage()
      --no-ssh                       after test job is submitted don't automatically ssh into the running instance
      -k, --key STR                  path to ssh key
      -o, --os-name STR              username depending on the OS chosen. Default is ubuntu
+     --central-region               create the instance in the central region (Frankfurt)
      -h, --help                     show this help message and exit
 
 HEREDOC
@@ -48,6 +49,7 @@ instance_type=
 username="ubuntu"
 py_env="pytorch_latest_p36"
 ssh_at_start=true
+central_region=false
 
 gpu_mode="single"
 
@@ -84,6 +86,10 @@ case $key in
     username="$2"
     shift 2 # past argument value
     ;;
+    --central-region)
+    central_region=true
+    shift 1 # past argument value
+    ;;
     -h|--help )
     usage;
     exit;
@@ -98,6 +104,10 @@ done
 
 if [[ "$instance_type" != "" ]]; then
     instance_config=config_$(tr . _ <<< $instance_type).json
+fi
+
+if [ "$central_region" == true ]; then
+    instance_config=${instance_config%.*}_central.json
 fi
 
 pytest_dir="tests_gpu/test_single_gpu"
