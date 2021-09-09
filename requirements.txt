@@ -16,6 +16,7 @@ botocore
 google-cloud-storage
 nltk
 allennlp==0.9
+overrides == 3.1.0
 pyrouge
 rouge
 tensorboard
