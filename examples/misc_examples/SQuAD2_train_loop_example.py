@@ -5,9 +5,9 @@ import torch.nn as nn
 
 from aitoolbox.nlp.dataset.SQuAD2.SQuAD2DataReader import SQuAD2ConcatContextDatasetReader
 from aitoolbox.torchtrain.data.dataset import BasicDataset as SQuAD2Dataset
-from aitoolbox.nlp.dataset.torch_collate_fns import qa_concat_ctx_span_collate_fn
+from aitoolbox.nlp.torch_collate_fns import qa_concat_ctx_span_collate_fn
 
-from aitoolbox.torchtrain.train_loop import TrainLoop, TrainLoopCheckpointEndSave
+from aitoolbox.torchtrain.train_loop import TrainLoopCheckpointEndSave
 from aitoolbox.torchtrain.callbacks.performance_eval import ModelPerformanceEvaluation, \
     ModelPerformancePrintReport, ModelTrainHistoryPlot
 from aitoolbox.torchtrain.schedulers.basic import ReduceLROnPlateauScheduler
