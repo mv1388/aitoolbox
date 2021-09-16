@@ -23,6 +23,7 @@ function usage()
      -o, --os-name STR              username depending on the OS chosen. Default is ubuntu
      -t, --terminate                the instance will be terminated when training is done
      -s, --ssh-start                automatically ssh into the instance when the training starts
+     --central-region               create the instance in the central region (Frankfurt)
      -h, --help                     show this help message and exit
 
 HEREDOC
@@ -41,6 +42,7 @@ use_apex=false
 username="ubuntu"
 terminate_cmd=false
 ssh_at_start=false
+aws_region="eu-west-1"
 
 
 while [[ $# -gt 0 ]]; do
@@ -99,6 +101,10 @@ case $key in
     ssh_at_start=true
     shift 1 # past argument value
     ;;
+    --central-region)
+    aws_region="eu-central-1"
+    shift 1 # past argument value
+    ;;
     -h|--help )
     usage;
     exit;
@@ -139,6 +145,10 @@ if [[ "$instance_type" != "" ]]; then
     instance_config=config_$(tr . _ <<< $instance_type).json
 fi
 
+if [ "$aws_region" == "eu-central-1" ]; then
+    instance_config=${instance_config%.*}_central.json
+fi
+
 
 #############################
 # Instance creation
@@ -159,7 +169,7 @@ ec2_instance_address=$(aws ec2 describe-instances --instance-ids $instance_id --
 ##############################
 echo "Preparing instance"
 ./prepare_instance.sh -k $key_path -a $ec2_instance_address \
-    -f $DL_framework -v $AIToolbox_version -p $local_project_path -d $dataset_name -r $preproc_dataset $apex_setting -o $username --no-ssh
+    -f $DL_framework -v $AIToolbox_version -p $local_project_path -d $dataset_name -r $preproc_dataset $apex_setting -o $username --aws-region $aws_region --no-ssh
 
 
 #########################################################

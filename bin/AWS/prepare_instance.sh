@@ -38,6 +38,7 @@ function usage()
      -x, --apex             switch on to install Nvidia Apex library for mixed precision training
      --deepspeed            install Microsoft DeepSpeed library
      -o, --os-name STR      username depending on the OS chosen. Default is ubuntu
+     --aws-region STR       create the instance in the specified region. Default is Ireland (eu-west-1)
      --no-ssh               disable auto ssh-ing to the instance
      -h, --help             show this help message and exit
 
@@ -54,6 +55,7 @@ preproc_dataset="None"
 use_apex=false
 use_deepspeed=false
 username="ubuntu"
+aws_region="eu-west-1"
 auto_ssh_to_instance=true
 
 while [[ $# -gt 0 ]]; do
@@ -100,6 +102,10 @@ case $key in
     username="$2"
     shift 2 # past argument value
     ;;
+    --aws-region)
+    aws_region="$2"
+    shift 2 # past argument value
+    ;;
     --no-ssh)
     auto_ssh_to_instance=false
     shift 1 # past argument value
@@ -131,6 +137,13 @@ else
     py_env="pytorch_latest_p36"
 fi
 
+if [ "$aws_region" == "eu-central-1" ]; then
+    instance_config=${instance_config%.*}_central.json
+fi
+
+# Set the region either to Ireland or Frankfurt
+export AWS_DEFAULT_REGION=$aws_region
+
 
 ssh -i $key_path -o "StrictHostKeyChecking no" $username@$ec2_instance_address 'mkdir ~/project ; mkdir ~/project/data ; mkdir ~/project/model_results'
 
@@ -147,9 +160,7 @@ echo "#!/usr/bin/env bash
 export LANGUAGE=en_US.UTF-8
 export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
-export AWS_DEFAULT_REGION=eu-west-1
-
-#echo Ireland AWS zone: eu-west-1
+export AWS_DEFAULT_REGION=$aws_region
 
 #aws configure
 cd project
