@@ -19,7 +19,6 @@ function usage()
      -i, --instance-config STR      instance configuration json filename
      --instance-type STR            instance type label; if this is provided the value from --instance-config is ignored
      -n, --no-bootstrap             keep the newly created instance and don't run the bootstrapping
-     -x, --apex                     switch on to install Nvidia Apex library for mixed precision training
      -o, --os-name STR              username depending on the OS chosen. Default is ubuntu
      -t, --terminate                the instance will be terminated when training is done
      -s, --ssh-start                automatically ssh into the instance when the training starts
@@ -37,7 +36,6 @@ AIToolbox_version="1.4.0"
 instance_config="config_p2_xlarge.json"
 instance_type=
 run_bootstrap=true
-use_apex=false
 username="ubuntu"
 terminate_cmd=false
 ssh_at_start=false
@@ -83,10 +81,6 @@ case $key in
     run_bootstrap=false
     shift 1 # past argument value
     ;;
-    -x|--apex)
-    use_apex=true
-    shift 1 # past argument value
-    ;;
     -o|--os-name)
     username="$2"
     shift 2 # past argument value
@@ -125,11 +119,6 @@ else
     py_env="pytorch_latest_p36"
 fi
 
-apex_setting=""
-if [ "$use_apex" == true ]; then
-    apex_setting="--apex"
-fi
-
 terminate_setting=""
 if [ "$terminate_cmd" == true ]; then
     terminate_setting="--terminate"
@@ -159,7 +148,7 @@ ec2_instance_address=$(aws ec2 describe-instances --instance-ids $instance_id --
 ##############################
 echo "Preparing instance"
 ./prepare_instance.sh -k $key_path -a $ec2_instance_address \
-    -f $DL_framework -v $AIToolbox_version -p $local_project_path -d $dataset_name -r $preproc_dataset $apex_setting -o $username --no-ssh
+    -f $DL_framework -v $AIToolbox_version -p $local_project_path -d $dataset_name -r $preproc_dataset -o $username --no-ssh
 
 
 #########################################################
