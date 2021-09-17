@@ -180,7 +180,7 @@ class TrainLoop:
             raise ValueError('Both num_epochs and num_iterations are set to 0. No training would be done.')
 
         if self.gpu_mode == 'single':
-            return self._train(num_epochs, num_iterations, callbacks=callbacks, grad_accumulation=grad_accumulation)
+            return self.train_loop(num_epochs, num_iterations, callbacks=callbacks, grad_accumulation=grad_accumulation)
         elif self.gpu_mode == 'dp':
             return self._train_dp(num_epochs, num_iterations, callbacks=callbacks, grad_accumulation=grad_accumulation,
                                   **kwargs)
@@ -191,7 +191,7 @@ class TrainLoop:
             raise ValueError("gpu_mode parameter set to the non-supported value. Can use only the following values: "
                              "'single', 'dp' and 'ddp'")
 
-    def _train(self, num_epochs, num_iterations, callbacks=None, grad_accumulation=1):
+    def train_loop(self, num_epochs, num_iterations, callbacks=None, grad_accumulation=1):
         """Train the model using the train loop
 
         Args:
@@ -232,19 +232,19 @@ class TrainLoop:
                 self.callbacks_handler.execute_batch_begin()
 
                 # Feed batch into the model
-                loss_batch = self._calculate_batch_loss(batch_data)
+                loss_batch = self.calculate_batch_loss(batch_data)
 
                 # Iterate over potentially multiple optimizers
                 for optimizer_idx in range(self.num_optimizers):
                     # Backward pass through the model
-                    self._backward_pass(loss_batch, optimizer_idx)
+                    self.backward_pass(loss_batch, optimizer_idx)
                     if self.grad_cb_used:
                         self.callbacks_handler.execute_gradient_update(optimizer_idx)
 
                     # Optimizer step
-                    self._optimizer_step(optimizer_idx)
+                    self.optimizer_step(optimizer_idx)
                     # Optimizer zero grad
-                    self._optimizer_zero_grad(optimizer_idx)
+                    self.optimizer_zero_grad(optimizer_idx)
 
                 self.amp_scaler.update()
 
@@ -277,7 +277,7 @@ class TrainLoop:
 
         return self.model
 
-    def _calculate_batch_loss(self, batch_data):
+    def calculate_batch_loss(self, batch_data):
         """Push batch data through the model and calculate the batch loss
 
         Args:
@@ -301,7 +301,7 @@ class TrainLoop:
 
         return loss_batch
 
-    def _backward_pass(self, loss_batch, optimizer_idx):
+    def backward_pass(self, loss_batch, optimizer_idx):
         """Execute backward pass from the current batch loss
 
         Args:
@@ -327,7 +327,7 @@ class TrainLoop:
             # Non-AMP or AMP backward are done under the hood in the MultiLoss wrap
             loss_batch.backward(optimizer_idx, self.iteration, self.amp_scaler)
 
-    def _optimizer_step(self, optimizer_idx):
+    def optimizer_step(self, optimizer_idx):
         """Execute the optimizer step
 
         Args:
@@ -351,7 +351,7 @@ class TrainLoop:
             if self.grad_cb_used:
                 self.callbacks_handler.execute_optimizer_step()
 
-    def _optimizer_zero_grad(self, optimizer_idx):
+    def optimizer_zero_grad(self, optimizer_idx):
         """Execute optimizer zero grad
 
         Args:
@@ -709,7 +709,7 @@ class TrainLoop:
             else:
                 self.model = nn.DataParallel(self.model, **dp_model_args)
 
-        return self._train(num_epochs, num_iterations, callbacks, grad_accumulation)
+        return self.train_loop(num_epochs, num_iterations, callbacks, grad_accumulation)
 
     def _train_ddp(self, num_epochs, num_iterations, callbacks=None, grad_accumulation=1,
                    ddp_model_args=None, in_process_data_load=None,
@@ -804,7 +804,7 @@ class TrainLoop:
         else:
             self.model = DistributedDataParallel(self.model, device_ids=[gpu], **ddp_args['ddp_model_args'])
 
-        self._train(num_epochs, num_iterations, callbacks, grad_accumulation)
+        self.train_loop(num_epochs, num_iterations, callbacks, grad_accumulation)
 
     def __call__(self, num_epochs=0, num_iterations=0, callbacks=None, grad_accumulation=1, **kwargs):
         """Train the model using the train loop

@@ -392,7 +392,7 @@ class TrainLoopFitMethodTracking(TrainLoop):
     def __init__(self, *args, gpu_mode):
         super().__init__(*args, gpu_mode=gpu_mode)
 
-    def _train(self, num_epochs, num_iterations, callbacks=None, grad_accumulation=1):
+    def train_loop(self, num_epochs, num_iterations, callbacks=None, grad_accumulation=1):
         return 'train_single', num_epochs, num_iterations, callbacks, grad_accumulation
 
     def _train_dp(self, num_epochs, num_iterations, callbacks=None, grad_accumulation=1, dp_model_args=None):
