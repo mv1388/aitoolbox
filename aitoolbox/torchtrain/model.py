@@ -189,7 +189,3 @@ class ModelWrap:
 
         self.model = model
         self.batch_model_feed_def = batch_model_feed_def
-
-
-# For backward compatibility:
-from aitoolbox.torchtrain.parallel import TTDataParallel
