@@ -49,7 +49,7 @@ instance_type=
 username="ubuntu"
 py_env="pytorch_latest_p36"
 ssh_at_start=true
-central_region=false
+aws_region="eu-west-1"
 
 gpu_mode="single"
 
@@ -87,7 +87,7 @@ case $key in
     shift 2 # past argument value
     ;;
     --central-region)
-    central_region=true
+    aws_region="eu-central-1"
     shift 1 # past argument value
     ;;
     -h|--help )
@@ -106,7 +106,7 @@ if [[ "$instance_type" != "" ]]; then
     instance_config=config_$(tr . _ <<< $instance_type).json
 fi
 
-if [ "$central_region" == true ]; then
+if [ "$aws_region" == "eu-central-1" ]; then
     instance_config=${instance_config%.*}_central.json
 fi
 
@@ -115,6 +115,9 @@ if [[ "$gpu_mode" == "multi" ]]; then
     pytest_dir="tests_gpu/test_multi_gpu"
 fi
 
+
+# Set the region either to Ireland or Frankfurt
+export AWS_DEFAULT_REGION=$aws_region
 
 #############################
 # Instance creation
@@ -146,7 +149,7 @@ scp -i $key_path ../../requirements.txt $username@$ec2_instance_address:~/packag
 #########################################################
 echo "Running the comparison tests"
 ssh -i $key_path $username@$ec2_instance_address \
-    "source activate $py_env ; tmux new-session -d -s 'training' 'export AWS_DEFAULT_REGION=eu-west-1 ; cd package_test ; pip install pytest seaborn==0.9.0 ; pip install -r requirements.txt ; pip install torchtext==0.7 torchvision>=0.9.1 ; pytest $pytest_dir -s ; aws s3 cp $logging_path s3://aitoolbox-testing/core_pytorch_comparisson_testing/$logging_filename ; aws ec2 terminate-instances --instance-ids $instance_id' \; pipe-pane 'cat > $logging_path'"
+    "source activate $py_env ; tmux new-session -d -s 'training' 'export AWS_DEFAULT_REGION=$aws_region ; cd package_test ; pip install pytest seaborn==0.9.0 ; pip install -r requirements.txt ; pip install torchtext==0.7 torchvision>=0.9.1 ; pytest $pytest_dir -s ; aws s3 cp $logging_path s3://aitoolbox-testing/core_pytorch_comparisson_testing/$logging_filename ; aws ec2 terminate-instances --instance-ids $instance_id' \; pipe-pane 'cat > $logging_path'"
 
 echo "Instance IP: $ec2_instance_address"
 

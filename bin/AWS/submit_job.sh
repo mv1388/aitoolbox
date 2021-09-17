@@ -52,7 +52,7 @@ username="ubuntu"
 terminate_cmd=false
 ssh_at_start=false
 spot_instance=true
-central_region=false
+aws_region="eu-west-1"
 instance_name=
 
 default_logging_filename="training.log"
@@ -131,7 +131,7 @@ case $key in
     shift 1 # past argument value
     ;;
     --central-region)
-    central_region=true
+    aws_region="eu-central-1"
     shift 1 # past argument value
     ;;
     -h|--help )
@@ -169,7 +169,7 @@ if [[ "$instance_type" != "" ]]; then
     instance_config=config_$(tr . _ <<< $instance_type).json
 fi
 
-if [ "$central_region" == true ]; then
+if [ "$aws_region" == "eu-central-1" ]; then
     instance_config=${instance_config%.*}_central.json
 fi
 
@@ -183,6 +183,9 @@ if [ "$log_s3_dir_path" != "None" ] && [ "$log_s3_dir_path" != "False" ]; then
     log_upload_setting="--log-path $logging_path --log-s3-upload-dir $log_s3_dir_path"
 fi
 
+
+# Set the region either to Ireland or Frankfurt
+export AWS_DEFAULT_REGION=$aws_region
 
 #############################
 # Instance creation
@@ -213,7 +216,7 @@ ec2_instance_address=$(aws ec2 describe-instances --instance-ids $instance_id --
 ##############################
 echo "Preparing instance"
 ./prepare_instance.sh -k $key_path -a $ec2_instance_address \
-    -f $DL_framework -v $AIToolbox_version -p $local_project_path -d $dataset_name -r $preproc_dataset -o $username --no-ssh
+    -f $DL_framework -v $AIToolbox_version -p $local_project_path -d $dataset_name -r $preproc_dataset -o $username --aws-region $aws_region --no-ssh
 
 
 #########################################################
@@ -222,7 +225,7 @@ echo "Preparing instance"
 printf "\n========================================================\n"
 echo "Running the job"
 ssh -i $key_path $username@$ec2_instance_address \
-    "source activate $py_env ; tmux new-session -d -s 'training' './finish_prepare_instance.sh ; cd project ; ./run_experiment.sh $terminate_setting --experiment-script $experiment_script_file $log_upload_setting --cleanup-script' \; pipe-pane 'cat > $logging_path'"
+    "source activate $py_env ; tmux new-session -d -s 'training' './finish_prepare_instance.sh ; cd project ; ./run_experiment.sh $terminate_setting --experiment-script $experiment_script_file $log_upload_setting --cleanup-script --aws-region $aws_region' \; pipe-pane 'cat > $logging_path'"
 
 echo "Instance IP: $ec2_instance_address"
 echo "To easily ssh connect into the running job session execute:"
