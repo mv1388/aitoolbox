@@ -35,8 +35,6 @@ function usage()
      -p, --project STR      path to the project to be optionally uploaded to the running ec2 instance
      -d, --dataset STR      dataset to be optionally downloaded from the S3 storage directly to ec2 instance
      -r, --preproc STR      the preprocessed version of the main dataset
-     -x, --apex             switch on to install Nvidia Apex library for mixed precision training
-     --deepspeed            install Microsoft DeepSpeed library
      -o, --os-name STR      username depending on the OS chosen. Default is ubuntu
      --no-ssh               disable auto ssh-ing to the instance
      -h, --help             show this help message and exit
@@ -51,8 +49,6 @@ AIToolbox_version="1.4.0"
 local_project_path="None"
 dataset_name="None"
 preproc_dataset="None"
-use_apex=false
-use_deepspeed=false
 username="ubuntu"
 auto_ssh_to_instance=true
 
@@ -87,14 +83,6 @@ case $key in
     -r|--preproc)
     preproc_dataset="$2"
     shift 2 # past argument value
-    ;;
-    -x|--apex)
-    use_apex=true
-    shift 1 # past argument value
-    ;;
-    --deepspeed)
-    use_deepspeed=true
-    shift 1 # past argument value
     ;;
     -o|--os-name)
     username="$2"
@@ -164,20 +152,6 @@ pip install jsonnet seaborn==0.9.0
 
 #conda install -y -c conda-forge jsonnet
 #conda install -y -c anaconda seaborn=0.9.0
-
-if [ $use_apex == true ]; then
-    git clone https://github.com/NVIDIA/apex
-    cd apex
-    pip install -v --no-cache-dir --global-option=\"--cpp_ext\" --global-option=\"--cuda_ext\" ./
-    cd ..
-fi
-
-if [ $use_deepspeed == true ]; then
-    git clone https://github.com/microsoft/DeepSpeed
-    cd DeepSpeed
-    ./install.sh --local_only --skip_requirements
-    cd ..
-fi
 
 pip install aitoolbox-$AIToolbox_version.tar.gz
 
