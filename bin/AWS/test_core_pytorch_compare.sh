@@ -47,7 +47,7 @@ key_path=$(jq -r '.key_path' configs/my_config.json)
 instance_config="config_p2_xlarge.json"
 instance_type=
 username="ubuntu"
-py_env="pytorch_latest_p36"
+py_env="pytorch_p38"
 ssh_at_start=true
 aws_region="eu-west-1"
 
