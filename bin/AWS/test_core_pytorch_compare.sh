@@ -45,7 +45,7 @@ HEREDOC
 }
 
 key_path=$(jq -r '.key_path' configs/my_config.json)
-instance_config="config_p2_xlarge.json"
+instance_config="default_config.json"
 instance_type=
 username="ubuntu"
 py_env="pytorch_p38"
@@ -109,7 +109,7 @@ esac
 done
 
 if [[ "$instance_type" != "" ]]; then
-    instance_config=config_$(tr . _ <<< $instance_type).json
+    instance_type="--instance-type $instance_type"
 fi
 
 if [ "$aws_region" == "eu-central-1" ]; then
@@ -121,6 +121,14 @@ if [[ "$gpu_mode" == "multi" ]]; then
     pytest_dir="tests_gpu/test_multi_gpu"
 fi
 
+spot_instance_option=""
+if [ "$spot_instance" == true ]; then
+    echo "Creating spot instance"
+    spot_instance_option=(--instance-market-options '{ "MarketType": "spot" }')
+else
+    echo "Creating on-demand instance"
+fi
+
 
 # Set the region either to Ireland or Frankfurt
 export AWS_DEFAULT_REGION=$aws_region
@@ -128,16 +136,8 @@ export AWS_DEFAULT_REGION=$aws_region
 #############################
 # Instance creation
 #############################
-if [ "$spot_instance" == true ]; then
-    echo "Creating spot request"
-    request_id=$(aws ec2 request-spot-instances --launch-specification file://configs/$instance_config --query 'SpotInstanceRequests[0].SpotInstanceRequestId' --output text)
-    aws ec2 wait spot-instance-request-fulfilled --spot-instance-request-ids $request_id
 
-    instance_id=$(aws ec2 describe-spot-instance-requests --spot-instance-request-ids $request_id --query 'SpotInstanceRequests[0].InstanceId' --output text)
-else
-    echo "Creating on-demand instance"
-    instance_id=$(aws ec2 run-instances --cli-input-json file://configs/$instance_config --query 'Instances[0].InstanceId' --output text)
-fi
+instance_id=$(aws ec2 run-instances $instance_type "${spot_instance_option[@]}" --cli-input-json file://configs/$instance_config --query 'Instances[0].InstanceId' --output text)
 
 echo "Waiting for instance create"
 aws ec2 wait instance-status-ok --instance-ids $instance_id
