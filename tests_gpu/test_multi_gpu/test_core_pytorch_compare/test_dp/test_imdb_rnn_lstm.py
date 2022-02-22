@@ -8,7 +8,8 @@ import torch
 import torch.nn as nn
 
 import torchtext
-import torchtext.data
+from torchtext.legacy.data import BucketIterator, Field, LabelField
+from torchtext.legacy.datasets import IMDB
 
 from aitoolbox import TrainLoop, TTModel, TTDataParallel
 
@@ -35,7 +36,7 @@ class RNNClassifier(TTModel):
         # [sentence len, batch size] => [sentence len, batch size, embedding size]
         embedded = self.embedding(text)
 
-        packed = torch.nn.utils.rnn.pack_padded_sequence(embedded, text_length)
+        packed = torch.nn.utils.rnn.pack_padded_sequence(embedded, text_length.cpu())
 
         # [sentence len, batch size, embedding size] =>
         #  output: [sentence len, batch size, hidden size]
@@ -87,7 +88,7 @@ class LSTMClassifier(TTModel):
         # [sentence len, batch size] => [sentence len, batch size, embedding size]
         embedded = self.embedding(text)
 
-        packed = torch.nn.utils.rnn.pack_padded_sequence(embedded, text_length)
+        packed = torch.nn.utils.rnn.pack_padded_sequence(embedded, text_length.cpu())
 
         # [sentence len, batch size, embedding size] =>
         #  output: [sentence len, batch size, hidden size]
@@ -148,7 +149,7 @@ class TestIMDBRNN(unittest.TestCase):
         HIDDEN_DIM = 100
         OUTPUT_DIM = 1
 
-        train_loader, val_loader = torchtext.data.BucketIterator.splits(
+        train_loader, val_loader = BucketIterator.splits(
             (train_data, test_data),
             batch_size=BATCH_SIZE, sort_within_batch=True
         )
@@ -182,7 +183,7 @@ class TestIMDBRNN(unittest.TestCase):
         HIDDEN_DIM = 100
         OUTPUT_DIM = 1
 
-        train_loader, val_loader = torchtext.data.BucketIterator.splits(
+        train_loader, val_loader = BucketIterator.splits(
             (train_data, test_data),
             batch_size=BATCH_SIZE, sort_within_batch=True
         )
@@ -249,10 +250,10 @@ class TestIMDBRNN(unittest.TestCase):
         self.set_seeds()
         VOCABULARY_SIZE = 20000
 
-        TEXT = torchtext.data.Field(lower=True, include_lengths=True)  # necessary for packed_padded_sequence
-        LABEL = torchtext.data.LabelField(dtype=torch.float)
+        TEXT = Field(lower=True, include_lengths=True)  # necessary for packed_padded_sequence
+        LABEL = LabelField(dtype=torch.float)
 
-        train_data, test_data = torchtext.datasets.IMDB.splits(
+        train_data, test_data = IMDB.splits(
             text_field=TEXT, label_field=LABEL,
             root=os.path.join(THIS_DIR, 'data'),
             train='train', test='test'
@@ -308,7 +309,7 @@ class TestIMDBLSTM(unittest.TestCase):
         HIDDEN_DIM = 100
         OUTPUT_DIM = 1
 
-        train_loader, val_loader = torchtext.data.BucketIterator.splits(
+        train_loader, val_loader = BucketIterator.splits(
             (train_data, test_data),
             batch_size=BATCH_SIZE, sort_within_batch=True
         )
@@ -342,7 +343,7 @@ class TestIMDBLSTM(unittest.TestCase):
         HIDDEN_DIM = 100
         OUTPUT_DIM = 1
 
-        train_loader, val_loader = torchtext.data.BucketIterator.splits(
+        train_loader, val_loader = BucketIterator.splits(
             (train_data, test_data),
             batch_size=BATCH_SIZE, sort_within_batch=True
         )
@@ -409,10 +410,10 @@ class TestIMDBLSTM(unittest.TestCase):
         self.set_seeds()
         VOCABULARY_SIZE = 20000
 
-        TEXT = torchtext.data.Field(lower=True, include_lengths=True)  # necessary for packed_padded_sequence
-        LABEL = torchtext.data.LabelField(dtype=torch.float)
+        TEXT = Field(lower=True, include_lengths=True)  # necessary for packed_padded_sequence
+        LABEL = LabelField(dtype=torch.float)
 
-        train_data, test_data = torchtext.datasets.IMDB.splits(
+        train_data, test_data = IMDB.splits(
             text_field=TEXT, label_field=LABEL,
             root=os.path.join(THIS_DIR, 'data'),
             train='train', test='test'
