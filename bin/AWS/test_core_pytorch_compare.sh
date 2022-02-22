@@ -121,14 +121,6 @@ if [[ "$gpu_mode" == "multi" ]]; then
     pytest_dir="tests_gpu/test_multi_gpu"
 fi
 
-spot_instance_option=""
-if [ "$spot_instance" == true ]; then
-    echo "Creating spot instance"
-    spot_instance_option=(--instance-market-options '{ "MarketType": "spot" }')
-else
-    echo "Creating on-demand instance"
-fi
-
 
 # Set the region either to Ireland or Frankfurt
 export AWS_DEFAULT_REGION=$aws_region
@@ -136,6 +128,13 @@ export AWS_DEFAULT_REGION=$aws_region
 #############################
 # Instance creation
 #############################
+spot_instance_option=""
+if [ "$spot_instance" == true ]; then
+    echo "Creating spot instance"
+    spot_instance_option=(--instance-market-options '{ "MarketType": "spot" }')
+else
+    echo "Creating on-demand instance"
+fi
 
 instance_id=$(aws ec2 run-instances $instance_type "${spot_instance_option[@]}" --cli-input-json file://configs/$instance_config --query 'Instances[0].InstanceId' --output text)
 
