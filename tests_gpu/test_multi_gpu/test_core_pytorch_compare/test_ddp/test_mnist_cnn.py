@@ -17,7 +17,7 @@ import torch.distributed as dist
 from torch.nn.parallel import DistributedDataParallel
 from torch.utils.data.distributed import DistributedSampler
 
-from aitoolbox import TrainLoop, TTModel
+from aitoolbox import TTModel
 from tests_gpu.test_multi_gpu.ddp_prediction_saver import DDPPredictionSave
 from tests_gpu.test_multi_gpu.deterministic_train_loop import DeterministicTrainLoop
 
