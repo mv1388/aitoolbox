@@ -19,6 +19,7 @@ from torch.utils.data.distributed import DistributedSampler
 
 from aitoolbox import TrainLoop, TTModel
 from tests_gpu.test_multi_gpu.ddp_prediction_saver import DDPPredictionSave
+from tests_gpu.test_multi_gpu.deterministic_train_loop import DeterministicTrainLoop
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -106,7 +107,7 @@ class TestMNISTCNN(unittest.TestCase):
         criterion = nn.NLLLoss()
 
         print('Starting train loop')
-        tl = TrainLoop(
+        tl = DeterministicTrainLoop(
             model,
             train_loader, val_loader, None,
             optimizer, criterion,
@@ -167,6 +168,18 @@ class TestMNISTCNN(unittest.TestCase):
 
     @staticmethod
     def manual_ddp_training(gpu, num_epochs, model_pt, optimizer_pt, criterion_pt, train_loader, val_loader):
+        manual_seed = 0
+        torch.backends.cudnn.enabled = False
+        torch.backends.cudnn.benchmark = False
+        torch.backends.cudnn.deterministic = True
+
+        np.random.seed(manual_seed)
+        random.seed(manual_seed)
+        torch.manual_seed(manual_seed)
+        # if you are suing GPU
+        torch.cuda.manual_seed(manual_seed)
+        torch.cuda.manual_seed_all(manual_seed)
+
         rank = gpu
         dist.init_process_group(backend='nccl', init_method='env://', world_size=torch.cuda.device_count(), rank=rank)
         torch.manual_seed(0)
