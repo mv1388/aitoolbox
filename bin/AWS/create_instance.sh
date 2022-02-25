@@ -21,7 +21,6 @@ function usage()
      -n, --name STR                 name for the created instance
      --no-bootstrap                 keep the newly created instance and don't run the bootstrapping
      -o, --os-name STR              username depending on the OS chosen. Default is ubuntu
-     -t, --terminate                the instance will be terminated when training is done
      -s, --ssh-start                automatically ssh into the instance when the training starts
      --on-demand                    create on-demand instance instead of spot instance
      --central-region               create the instance in the central region (Frankfurt)
@@ -41,7 +40,6 @@ instance_config="default_config.json"
 instance_type=
 run_bootstrap=true
 username="ubuntu"
-terminate_cmd=false
 ssh_at_start=false
 spot_instance=true
 aws_region="eu-west-1"
@@ -97,10 +95,6 @@ case $key in
     username="$2"
     shift 2 # past argument value
     ;;
-    -t|--terminate)
-    terminate_cmd=true
-    shift 1 # past argument value
-    ;;
     -s|--ssh-start)
     ssh_at_start=true
     shift 1 # past argument value
@@ -141,11 +135,6 @@ elif [ "$DL_framework" == "pytorch" ]; then
     py_env="pytorch_latest_p36"
 else
     py_env="pytorch_latest_p36"
-fi
-
-terminate_setting=""
-if [ "$terminate_cmd" == true ]; then
-    terminate_setting="--terminate"
 fi
 
 if [[ "$instance_type" != "" ]]; then
