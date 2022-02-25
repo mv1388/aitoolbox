@@ -26,7 +26,7 @@ setup(
 
         'torch>=1.6.0',
         'torchvision',
-        'torchtext',
+        'torchtext==0.7',
         'pytorch-nlp',
         'transformers',
 
