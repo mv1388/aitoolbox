@@ -138,7 +138,7 @@ else
 fi
 
 if [[ "$instance_type" != "" ]]; then
-    instance_config=config_$(tr . _ <<< $instance_type).json
+    instance_type="--instance-type $instance_type"
 fi
 
 if [ "$aws_region" == "eu-central-1" ]; then
