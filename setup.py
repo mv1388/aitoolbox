@@ -36,6 +36,7 @@ setup(
         'boto3',
         'botocore',
         'google-cloud-storage',
+        'protobuf==3.19.4',
 
         'nltk',
         'pyrouge',
