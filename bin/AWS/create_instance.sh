@@ -23,6 +23,7 @@ function usage()
      -t, --terminate                the instance will be terminated when training is done
      -s, --ssh-start                automatically ssh into the instance when the training starts
      --central-region               create the instance in the central region (Frankfurt)
+     --pypi                         install package from PyPI instead of the local package version
      -h, --help                     show this help message and exit
 
 HEREDOC
@@ -41,6 +42,7 @@ username="ubuntu"
 terminate_cmd=false
 ssh_at_start=false
 aws_region="eu-west-1"
+local_pypi_install=""
 
 
 while [[ $# -gt 0 ]]; do
@@ -97,6 +99,10 @@ case $key in
     ;;
     --central-region)
     aws_region="eu-central-1"
+    shift 1 # past argument value
+    ;;
+    --pypi)
+    local_pypi_install="--pypi"
     shift 1 # past argument value
     ;;
     -h|--help )
@@ -158,7 +164,7 @@ ec2_instance_address=$(aws ec2 describe-instances --instance-ids $instance_id --
 ##############################
 echo "Preparing instance"
 ./prepare_instance.sh -k $key_path -a $ec2_instance_address \
-    -f $DL_framework -v $AIToolbox_version -p $local_project_path -d $dataset_name -r $preproc_dataset -o $username --aws-region $aws_region --no-ssh
+    -f $DL_framework -v $AIToolbox_version -p $local_project_path -d $dataset_name -r $preproc_dataset -o $username --aws-region $aws_region $local_pypi_install --no-ssh
 
 
 #########################################################
