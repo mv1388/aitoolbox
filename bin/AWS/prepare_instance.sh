@@ -167,7 +167,7 @@ pip install -U boto3
 pip install awscli
 pip install -U numpy
 pip install --ignore-installed greenlet
-pip install jsonnet seaborn==0.9.0
+pip install seaborn==0.9.0
 
 #conda install -y -c conda-forge jsonnet
 #conda install -y -c anaconda seaborn=0.9.0

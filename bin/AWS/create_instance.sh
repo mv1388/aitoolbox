@@ -18,10 +18,12 @@ function usage()
      -v, --version FLOAT            AIToolbox version to be installed on ec2
      -i, --instance-config STR      instance configuration json filename
      --instance-type STR            instance type label; if this is provided the value from --instance-config is ignored
-     -n, --no-bootstrap             keep the newly created instance and don't run the bootstrapping
+     -n, --name STR                 name for the created instance
+     --no-bootstrap                 keep the newly created instance and don't run the bootstrapping
      -o, --os-name STR              username depending on the OS chosen. Default is ubuntu
      -t, --terminate                the instance will be terminated when training is done
      -s, --ssh-start                automatically ssh into the instance when the training starts
+     --on-demand                    create on-demand instance instead of spot instance
      --central-region               create the instance in the central region (Frankfurt)
      --pypi                         install package from PyPI instead of the local package version
      -h, --help                     show this help message and exit
@@ -35,13 +37,15 @@ dataset_name="None"
 preproc_dataset="None"
 DL_framework="pytorch"
 AIToolbox_version="1.4.0"
-instance_config="config_p2_xlarge.json"
+instance_config="default_config.json"
 instance_type=
 run_bootstrap=true
 username="ubuntu"
 terminate_cmd=false
 ssh_at_start=false
+spot_instance=true
 aws_region="eu-west-1"
+instance_name=
 local_pypi_install=""
 
 
@@ -81,7 +85,11 @@ case $key in
     instance_type="$2"
     shift 2 # past argument value
     ;;
-    -n|--no-bootstrap)
+    -n|--instance_name)
+    instance_name="$2"
+    shift 2 # past argument value
+    ;;
+    --no-bootstrap)
     run_bootstrap=false
     shift 1 # past argument value
     ;;
@@ -95,6 +103,10 @@ case $key in
     ;;
     -s|--ssh-start)
     ssh_at_start=true
+    shift 1 # past argument value
+    ;;
+    --on-demand)
+    spot_instance=false
     shift 1 # past argument value
     ;;
     --central-region)
@@ -148,12 +160,21 @@ fi
 #############################
 # Instance creation
 #############################
-echo "Creating spot request"
-request_id=$(aws ec2 request-spot-instances --launch-specification file://configs/$instance_config --query 'SpotInstanceRequests[0].SpotInstanceRequestId' --output text)
-aws ec2 wait spot-instance-request-fulfilled --spot-instance-request-ids $request_id
+spot_instance_option=""
+if [ "$spot_instance" == true ]; then
+    echo "Creating spot instance"
+    spot_instance_option=(--instance-market-options '{ "MarketType": "spot" }')
+else
+    echo "Creating on-demand instance"
+fi
+
+instance_id=$(aws ec2 run-instances $instance_type "${spot_instance_option[@]}" --cli-input-json file://configs/$instance_config --query 'Instances[0].InstanceId' --output text)
+
+if [[ "$instance_name" != "" ]]; then
+    aws ec2 create-tags --resources $instance_id --tags Key=Name,Value=$instance_name
+fi
 
 echo "Waiting for instance create"
-instance_id=$(aws ec2 describe-spot-instance-requests --spot-instance-request-ids $request_id --query 'SpotInstanceRequests[0].InstanceId' --output text)
 aws ec2 wait instance-status-ok --instance-ids $instance_id
 
 ec2_instance_address=$(aws ec2 describe-instances --instance-ids $instance_id --query 'Reservations[*].Instances[*].PublicDnsName' --output text)

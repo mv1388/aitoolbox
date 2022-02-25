@@ -37,6 +37,7 @@ function usage()
      --no-ssh                       after test job is submitted don't automatically ssh into the running instance
      -k, --key STR                  path to ssh key
      -o, --os-name STR              username depending on the OS chosen. Default is ubuntu
+     --on-demand                    create on-demand instance instead of spot instance
      --central-region               create the instance in the central region (Frankfurt)
      -h, --help                     show this help message and exit
 
@@ -44,11 +45,12 @@ HEREDOC
 }
 
 key_path=$(jq -r '.key_path' configs/my_config.json)
-instance_config="config_p2_xlarge.json"
+instance_config="default_config.json"
 instance_type=
 username="ubuntu"
 py_env="pytorch_latest_p36"
 ssh_at_start=true
+spot_instance=true
 aws_region="eu-west-1"
 
 gpu_mode="single"
@@ -86,6 +88,10 @@ case $key in
     username="$2"
     shift 2 # past argument value
     ;;
+    --on-demand)
+    spot_instance=false
+    shift 1 # past argument value
+    ;;
     --central-region)
     aws_region="eu-central-1"
     shift 1 # past argument value
@@ -103,7 +109,7 @@ esac
 done
 
 if [[ "$instance_type" != "" ]]; then
-    instance_config=config_$(tr . _ <<< $instance_type).json
+    instance_type="--instance-type $instance_type"
 fi
 
 if [ "$aws_region" == "eu-central-1" ]; then
@@ -122,12 +128,17 @@ export AWS_DEFAULT_REGION=$aws_region
 #############################
 # Instance creation
 #############################
-echo "Creating spot request"
-request_id=$(aws ec2 request-spot-instances --launch-specification file://configs/$instance_config --query 'SpotInstanceRequests[0].SpotInstanceRequestId' --output text)
-aws ec2 wait spot-instance-request-fulfilled --spot-instance-request-ids $request_id
+spot_instance_option=""
+if [ "$spot_instance" == true ]; then
+    echo "Creating spot instance"
+    spot_instance_option=(--instance-market-options '{ "MarketType": "spot" }')
+else
+    echo "Creating on-demand instance"
+fi
+
+instance_id=$(aws ec2 run-instances $instance_type "${spot_instance_option[@]}" --cli-input-json file://configs/$instance_config --query 'Instances[0].InstanceId' --output text)
 
 echo "Waiting for instance create"
-instance_id=$(aws ec2 describe-spot-instance-requests --spot-instance-request-ids $request_id --query 'SpotInstanceRequests[0].InstanceId' --output text)
 aws ec2 wait instance-status-ok --instance-ids $instance_id
 
 ec2_instance_address=$(aws ec2 describe-instances --instance-ids $instance_id --query 'Reservations[*].Instances[*].PublicDnsName' --output text)

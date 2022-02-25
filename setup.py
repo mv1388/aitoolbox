@@ -38,7 +38,6 @@ setup(
         'google-cloud-storage',
 
         'nltk',
-        'allennlp==0.9',
         'pyrouge',
         'rouge',
 

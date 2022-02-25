@@ -44,7 +44,7 @@ dataset_name="None"
 preproc_dataset="None"
 DL_framework="pytorch"
 AIToolbox_version="1.4.0"
-instance_config="config_p2_xlarge.json"
+instance_config="default_config.json"
 instance_type=
 experiment_script_file="aws_run_experiments_project.sh"
 log_s3_dir_path="s3://model-result/training_logs"
@@ -172,7 +172,7 @@ if [ "$terminate_cmd" == true ]; then
 fi
 
 if [[ "$instance_type" != "" ]]; then
-    instance_config=config_$(tr . _ <<< $instance_type).json
+    instance_type="--instance-type $instance_type"
 fi
 
 if [ "$aws_region" == "eu-central-1" ]; then
@@ -196,16 +196,15 @@ export AWS_DEFAULT_REGION=$aws_region
 #############################
 # Instance creation
 #############################
+spot_instance_option=""
 if [ "$spot_instance" == true ]; then
-    echo "Creating spot request"
-    request_id=$(aws ec2 request-spot-instances --launch-specification file://configs/$instance_config --query 'SpotInstanceRequests[0].SpotInstanceRequestId' --output text)
-    aws ec2 wait spot-instance-request-fulfilled --spot-instance-request-ids $request_id
-
-    instance_id=$(aws ec2 describe-spot-instance-requests --spot-instance-request-ids $request_id --query 'SpotInstanceRequests[0].InstanceId' --output text)
+    echo "Creating spot instance"
+    spot_instance_option=(--instance-market-options '{ "MarketType": "spot" }')
 else
     echo "Creating on-demand instance"
-    instance_id=$(aws ec2 run-instances --cli-input-json file://configs/$instance_config --query 'Instances[0].InstanceId' --output text)
 fi
+
+instance_id=$(aws ec2 run-instances $instance_type "${spot_instance_option[@]}" --cli-input-json file://configs/$instance_config --query 'Instances[0].InstanceId' --output text)
 
 if [[ "$instance_name" != "" ]]; then
     aws ec2 create-tags --resources $instance_id --tags Key=Name,Value=$instance_name
