@@ -63,7 +63,7 @@ class TTDataParallel(nn.DataParallel, TTParallelBase):
         TTParallelBase.__init__(self, module, default_model_methods)
 
 
-class TTDistributedDataParallel(TTParallelBase, DistributedDataParallel):
+class TTDistributedDataParallel(DistributedDataParallel, TTParallelBase):
     def __init__(self, module,
                  default_model_methods=('get_loss', 'get_loss_eval', 'get_predictions'), **kwargs):
         """torchtrain enabled DistributedDataParallel
