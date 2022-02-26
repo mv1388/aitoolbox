@@ -37,6 +37,7 @@ function usage()
      -r, --preproc STR      the preprocessed version of the main dataset
      -o, --os-name STR      username depending on the OS chosen. Default is ubuntu
      --aws-region STR       create the instance in the specified region. Default is Ireland (eu-west-1)
+     --pypi                 install package from PyPI instead of the local package version
      --no-ssh               disable auto ssh-ing to the instance
      -h, --help             show this help message and exit
 
@@ -52,6 +53,7 @@ dataset_name="None"
 preproc_dataset="None"
 username="ubuntu"
 aws_region="eu-west-1"
+pypi_install=false
 auto_ssh_to_instance=true
 
 while [[ $# -gt 0 ]]; do
@@ -94,6 +96,10 @@ case $key in
     aws_region="$2"
     shift 2 # past argument value
     ;;
+    --pypi)
+    pypi_install=true
+    shift 1 # past argument value
+    ;;
     --no-ssh)
     auto_ssh_to_instance=false
     shift 1 # past argument value
@@ -135,7 +141,9 @@ export AWS_DEFAULT_REGION=$aws_region
 
 ssh -i $key_path -o "StrictHostKeyChecking no" $username@$ec2_instance_address 'mkdir ~/project ; mkdir ~/project/data ; mkdir ~/project/model_results'
 
-scp -i $key_path ../../dist/aitoolbox-$AIToolbox_version.tar.gz  $username@$ec2_instance_address:~/project
+if [ $pypi_install == false ]; then
+    scp -i $key_path ../../dist/aitoolbox-$AIToolbox_version.tar.gz  $username@$ec2_instance_address:~/project
+fi
 scp -i $key_path download_data.sh  $username@$ec2_instance_address:~/project
 scp -i $key_path run_experiment.sh  $username@$ec2_instance_address:~/project
 
@@ -164,7 +172,11 @@ pip install seaborn==0.9.0
 #conda install -y -c conda-forge jsonnet
 #conda install -y -c anaconda seaborn=0.9.0
 
-pip install aitoolbox-$AIToolbox_version.tar.gz
+if [ $pypi_install == false ]; then
+  pip install aitoolbox-$AIToolbox_version.tar.gz
+else
+  pip install aitoolbox==$AIToolbox_version
+fi
 
 if [ $local_project_path != 'None' ]; then
     pip install -r ~/project/AWS_run_scripts/AWS_bootstrap/requirements.txt

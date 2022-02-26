@@ -21,10 +21,10 @@ function usage()
      -n, --name STR                 name for the created instance
      --no-bootstrap                 keep the newly created instance and don't run the bootstrapping
      -o, --os-name STR              username depending on the OS chosen. Default is ubuntu
-     -t, --terminate                the instance will be terminated when training is done
      -s, --ssh-start                automatically ssh into the instance when the training starts
      --on-demand                    create on-demand instance instead of spot instance
      --central-region               create the instance in the central region (Frankfurt)
+     --pypi                         install package from PyPI instead of the local package version
      -h, --help                     show this help message and exit
 
 HEREDOC
@@ -40,11 +40,11 @@ instance_config="default_config.json"
 instance_type=
 run_bootstrap=true
 username="ubuntu"
-terminate_cmd=false
 ssh_at_start=false
 spot_instance=true
 aws_region="eu-west-1"
 instance_name=
+local_pypi_install=""
 
 
 while [[ $# -gt 0 ]]; do
@@ -95,10 +95,6 @@ case $key in
     username="$2"
     shift 2 # past argument value
     ;;
-    -t|--terminate)
-    terminate_cmd=true
-    shift 1 # past argument value
-    ;;
     -s|--ssh-start)
     ssh_at_start=true
     shift 1 # past argument value
@@ -109,6 +105,10 @@ case $key in
     ;;
     --central-region)
     aws_region="eu-central-1"
+    shift 1 # past argument value
+    ;;
+    --pypi)
+    local_pypi_install="--pypi"
     shift 1 # past argument value
     ;;
     -h|--help )
@@ -137,13 +137,8 @@ else
     py_env="pytorch_latest_p36"
 fi
 
-terminate_setting=""
-if [ "$terminate_cmd" == true ]; then
-    terminate_setting="--terminate"
-fi
-
 if [[ "$instance_type" != "" ]]; then
-    instance_config=config_$(tr . _ <<< $instance_type).json
+    instance_type="--instance-type $instance_type"
 fi
 
 if [ "$aws_region" == "eu-central-1" ]; then
@@ -179,7 +174,7 @@ ec2_instance_address=$(aws ec2 describe-instances --instance-ids $instance_id --
 ##############################
 echo "Preparing instance"
 ./prepare_instance.sh -k $key_path -a $ec2_instance_address \
-    -f $DL_framework -v $AIToolbox_version -p $local_project_path -d $dataset_name -r $preproc_dataset -o $username --aws-region $aws_region --no-ssh
+    -f $DL_framework -v $AIToolbox_version -p $local_project_path -d $dataset_name -r $preproc_dataset -o $username --aws-region $aws_region $local_pypi_install --no-ssh
 
 
 #########################################################
