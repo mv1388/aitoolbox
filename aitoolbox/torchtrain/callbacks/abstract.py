@@ -12,7 +12,7 @@ class AbstractCallback:
         Args:
             callback_name (str): name of the callback
             execution_order (int): order of the callback execution. If all the used callbacks have the orders set to 0,
-                than the callbacks are executed in the order they were registered.
+                then the callbacks are executed in the order they were registered.
             device_idx_execution (int or None): index of the (CUDA GPU) device DDP process inside which the callback
                 should be executed
         """
