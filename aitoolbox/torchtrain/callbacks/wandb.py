@@ -145,9 +145,9 @@ class WandBTracking(AbstractExperimentCallback):
 
         Args:
             alerts (list[AlertConfig]): list of alerts where each alert configuration is specified as
-                an AlertConfig dataclass. User should provide the ``metric_name`` based on which the alert should be
-                triggered. The last calculated value of the metric is then compared with the provided
-                ``threshold_value``. The ``objective`` can be either "maximize" or "minimize".
+                an AlertConfig dataclass. User should provide the ``metric_name`` based on which the alert
+                should be triggered. The last calculated value of the metric is then compared with
+                the provided ``threshold_value``. The ``objective`` can be either "maximize" or "minimize".
             metrics_log (dict): dict of metrics names and their corresponding current values.
 
         Returns:
