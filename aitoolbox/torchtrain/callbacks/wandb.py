@@ -1,12 +1,22 @@
 import os
+from dataclasses import dataclass
+
 import wandb
 
 from aitoolbox.torchtrain.callbacks.abstract import AbstractExperimentCallback
 from aitoolbox.experiment.local_save.folder_create import ExperimentFolder as FolderCreator
 
 
+@dataclass
+class AlertConfig:
+    metric_name: str
+    threshold_value: float
+    objective: str = "maximize"
+    wandb_alert_level: wandb.AlertLevel = None
+
+
 class WandBTracking(AbstractExperimentCallback):
-    def __init__(self, metric_names=None, batch_log_frequency=None, hyperparams=None, tags=None,
+    def __init__(self, metric_names=None, batch_log_frequency=None, hyperparams=None, tags=None, alerts=None,
                  wandb_pre_initialized=False, source_dirs=(), log_dir=None, is_project=True,
                  project_name=None, experiment_name=None, local_model_result_folder_path=None,
                  **kwargs):
@@ -28,6 +38,10 @@ class WandBTracking(AbstractExperimentCallback):
                 the list of tags on this run in the UI. Tags are useful for organizing runs together, or applying
                 temporary labels like "baseline" or "production". It's easy to add and remove tags in the UI, or filter
                 down to just runs with a specific tag.
+            alerts (list[AlertConfig] or None): list of alerts where each alert configuration is specified as
+                an AlertConfig dataclass. User should provide the ``metric_name`` based on which the alert should be
+                triggered. The last calculated value of the metric is then compared with the provided
+                ``threshold_value``. The ``objective`` can be either "maximize" or "minimize".
             wandb_pre_initialized (bool): if wandb has been initialized already outside the callback
                 (e.g. at the start of the experiment script). If not, the callback initializes the wandb process.
             source_dirs (tuple or list): list of source code directories which will be stored by wandb. If empty list
@@ -51,6 +65,9 @@ class WandBTracking(AbstractExperimentCallback):
         self.hyperparams = hyperparams
         self.tags = tags
 
+        self.alerts = alerts
+        self.check_alerts()
+
         self.wandb_pre_initialized = wandb_pre_initialized
         self.source_dirs = source_dirs
         self.wandb_params_kwargs = kwargs
@@ -60,7 +77,10 @@ class WandBTracking(AbstractExperimentCallback):
 
     def on_epoch_end(self):
         metric_names = self.metric_names if self.metric_names is not None else self.train_loop_obj.train_history.keys()
-        self.log_train_history_metrics(metric_names)
+        metrics_log = self.log_train_history_metrics(metric_names)
+
+        if self.alerts is not None:
+            self.send_configured_alerts(self.alerts, metrics_log)
 
     def on_batch_end(self):
         if self.batch_log_frequency is not None and \
@@ -114,6 +134,44 @@ class WandBTracking(AbstractExperimentCallback):
 
         wandb.run.log(metrics_log, step=self.train_loop_obj.total_iteration_idx, commit=True)
 
+        return metrics_log
+
+    @staticmethod
+    def send_configured_alerts(alerts, metrics_log):
+        """Send wandb alerts
+
+        Sending of alerts depends on current metric values in the ``metrics_log``
+        satisfying the conditions specified in the alert configuration.
+
+        Args:
+            alerts (list[AlertConfig]): list of alerts where each alert configuration is specified as
+                an AlertConfig dataclass. User should provide the ``metric_name`` based on which the alert should be
+                triggered. The last calculated value of the metric is then compared with the provided
+                ``threshold_value``. The ``objective`` can be either "maximize" or "minimize".
+            metrics_log (dict): dict of metrics names and their corresponding current values.
+
+        Returns:
+            None
+        """
+        for alert_config in alerts:
+            metric_result = metrics_log[alert_config.metric_name]
+
+            if alert_config.objective == 'maximize' and metric_result < alert_config.threshold_value:
+                wandb.alert(
+                    title=f"{alert_config.metric_name} is too low",
+                    text=f"Metric {alert_config.metric_name} is currently at {metric_result} "
+                         f"which is below the specified threshold of {alert_config.threshold_value}.",
+                    level=alert_config.wandb_alert_level
+                )
+
+            elif alert_config.objective == 'minimize' and metric_result > alert_config.threshold_value:
+                wandb.alert(
+                    title=f"{alert_config.metric_name} is too high",
+                    text=f"Metric {alert_config.metric_name} is currently at {metric_result} "
+                         f"which is above the specified threshold of {alert_config.threshold_value}.",
+                    level=alert_config.wandb_alert_level
+                )
+
     def on_train_loop_registration(self):
         self.try_infer_experiment_details(infer_cloud_details=False)
         self.try_infer_additional_logging_details()
@@ -154,3 +212,13 @@ class WandBTracking(AbstractExperimentCallback):
             raise KeyError("'experiment_file_path' not in the TrainingLoop hyperparams dict. If you want to log only "
                            "the single execution python file and don't want to specify it manually consider switching "
                            "'is_project' parameter to False.")
+
+    def check_alerts(self):
+        if self.alerts is not None:
+            for alert in self.alerts:
+                if not isinstance(alert, AlertConfig):
+                    raise TypeError("Alerts should be instances of AlertConfig dataclass.")
+
+                if alert.objective not in ['maximize', 'minimize']:
+                    raise ValueError("Alert objective can only be 'maximize' or 'minimize'. "
+                                     f"Alert {alert} has objective set to: {alert.objective}.")
