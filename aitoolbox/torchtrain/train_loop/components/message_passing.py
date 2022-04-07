@@ -1,7 +1,7 @@
-import enum
+from enum import Enum
 
 
-class MessageHandling(enum.Enum):
+class MessageHandling(Enum):
     KEEP_FOREVER = 'keep_forever'
     UNTIL_END_OF_EPOCH = 'until_end_of_epoch'
     UNTIL_READ = 'until_read'
