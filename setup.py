@@ -42,7 +42,8 @@ setup(
         'pyrouge',
         'rouge',
 
-        'tensorboard'
+        'tensorboard',
+        'wandb'
     ],
 
     test_suite='tests',

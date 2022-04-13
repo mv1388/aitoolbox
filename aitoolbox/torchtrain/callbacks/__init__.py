@@ -7,6 +7,7 @@ from aitoolbox.torchtrain.callbacks.performance_eval import (
 )
 from aitoolbox.torchtrain.callbacks.gradient import GradNormClip, GradValueClip
 from aitoolbox.torchtrain.callbacks.tensorboard import TensorboardFullTracking, TensorboardTrainHistoryMetric
+from aitoolbox.torchtrain.callbacks.wandb import WandBTracking
 
 # For back-compatibility
 from aitoolbox.torchtrain.schedulers.warmup import LinearWithWarmupScheduler

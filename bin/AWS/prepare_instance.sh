@@ -55,6 +55,7 @@ username="ubuntu"
 aws_region="eu-west-1"
 pypi_install=false
 auto_ssh_to_instance=true
+wandb_name=$(jq -r '.wandb' configs/my_config.json)
 
 while [[ $# -gt 0 ]]; do
 key="$1"
@@ -177,6 +178,8 @@ if [ $pypi_install == false ]; then
 else
   pip install aitoolbox==$AIToolbox_version
 fi
+
+export WANDB_API_KEY=\$(aws ssm get-parameter --name $wandb_name --with-decryption --output text --query Parameter.Value)
 
 if [ $local_project_path != 'None' ]; then
     pip install -r ~/project/AWS_run_scripts/AWS_bootstrap/requirements.txt
