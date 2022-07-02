@@ -137,6 +137,13 @@ class ModelPerformanceEvaluation(AbstractCallback):
                                                                                self.train_loop_obj.experiment_timestamp,
                                                                                self.train_loop_obj.local_model_result_folder_path)
 
+        if isinstance(self.result_package, TorchMetricsPackage):
+            if self.on_train_data:
+                self.train_result_package.metric.to(self.train_loop_obj.device)
+
+            if self.on_val_data:
+                self.result_package.metric.to(self.train_loop_obj.device)
+
 
 class ModelPerformancePrintReport(AbstractCallback):
     def __init__(self, metrics, on_each_epoch=True, report_frequency=None,
