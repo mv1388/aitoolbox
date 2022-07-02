@@ -100,7 +100,7 @@ test_loader = torch.utils.data.DataLoader(
 
 model = Net()
 optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
-criterion = F.nll_loss
+criterion = nn.NLLLoss()
 
 callbacks = [ModelPerformanceEvaluation(ClassificationResultPackage(), args.__dict__,
                                         on_train_data=True, on_val_data=True),

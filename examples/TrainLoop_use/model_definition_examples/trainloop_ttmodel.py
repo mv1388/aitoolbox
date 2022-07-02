@@ -12,6 +12,9 @@ from aitoolbox.torchtrain.model import TTModel
 from aitoolbox.torchtrain.callbacks.performance_eval import ModelPerformanceEvaluation, ModelPerformancePrintReport
 from aitoolbox.experiment.result_package.basic_packages import ClassificationResultPackage
 
+from aitoolbox.experiment.result_package.torch_metrics_packages import TorchMetricsPackage
+from torchmetrics import Accuracy
+
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
@@ -97,7 +100,7 @@ test_loader = torch.utils.data.DataLoader(
 
 model = Net()
 optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
-criterion = F.nll_loss
+criterion = nn.NLLLoss()
 
 callbacks = [ModelPerformanceEvaluation(ClassificationResultPackage(), args.__dict__,
                                         on_train_data=True, on_val_data=True),
