@@ -53,7 +53,7 @@ class TestCallbacksHandler(unittest.TestCase):
                 [], [],
                 [batch_begin_train_begin_after_opti_cb, batch_begin_train_begin_cb], [],
                 [batch_begin_train_begin_after_opti_cb, batch_begin_train_begin_cb, batch_begin_cb], [],
-                [], [batch_begin_train_begin_after_opti_cb], []
+                [], [batch_begin_train_begin_after_opti_cb], [], []
             ]
         )
 
@@ -104,7 +104,7 @@ class TestCallbacksHandler(unittest.TestCase):
                 [], [],
                 [batch_begin_train_begin_cb, batch_begin_train_begin_after_opti_cb], [],
                 [batch_begin_cb, batch_begin_train_begin_cb, batch_begin_train_begin_after_opti_cb], [],
-                [], [batch_begin_train_begin_after_opti_cb], []
+                [], [batch_begin_train_begin_after_opti_cb], [], []
             ]
         )
 
@@ -137,7 +137,7 @@ class TestCallbacksHandler(unittest.TestCase):
                 [], [],
                 [batch_begin_train_begin_after_opti_cb, batch_begin_train_begin_cb], [],
                 [batch_begin_train_begin_after_opti_cb, batch_begin_train_begin_cb, batch_begin_cb], [],
-                [], [batch_begin_train_begin_after_opti_cb], []
+                [], [batch_begin_train_begin_after_opti_cb], [], []
             ]
         )
 
@@ -316,7 +316,7 @@ class TestCallbacksHandler(unittest.TestCase):
 
         cb_handler.register_callbacks(callbacks, cache_callbacks=True)
         self.assertEqual(train_loop.callbacks, [])
-        self.assertEqual(cb_handler.registered_cbs, [[], [], [], [], [], [], [], [], []])
+        self.assertEqual(cb_handler.registered_cbs, [[], [], [], [], [], [], [], [], [], []])
         self.assertEqual(cb_handler.callbacks_cache, callbacks)
         for cb in callbacks:
             self.assertIsNone(cb.train_loop_obj)
@@ -330,7 +330,7 @@ class TestCallbacksHandler(unittest.TestCase):
             cb_handler.registered_cbs,
             [[], [], [batch_begin_train_begin_after_opti_cb, batch_begin_train_begin_cb], [],
              [batch_begin_train_begin_after_opti_cb, batch_begin_train_begin_cb, batch_begin_cb], [], [],
-             [batch_begin_train_begin_after_opti_cb], []]
+             [batch_begin_train_begin_after_opti_cb], [], []]
         )
         self.assertEqual(cb_handler.callbacks_cache, [])
 
@@ -346,7 +346,7 @@ class TestCallbacksHandler(unittest.TestCase):
 
         cb_handler.register_callbacks(callbacks, cache_callbacks=True)
         self.assertEqual(train_loop.callbacks, [])
-        self.assertEqual(cb_handler.registered_cbs, [[], [], [], [], [], [], [], [], []])
+        self.assertEqual(cb_handler.registered_cbs, [[], [], [], [], [], [], [], [], [], []])
         self.assertEqual(cb_handler.callbacks_cache, callbacks)
         for cb in callbacks:
             self.assertIsNone(cb.train_loop_obj)
@@ -363,7 +363,7 @@ class TestCallbacksHandler(unittest.TestCase):
             [[], [], [batch_begin_train_begin_after_opti_cb, batch_begin_train_begin_cb], [],
              [batch_begin_train_begin_after_opti_cb, batch_begin_train_begin_cb, batch_begin_cb_add, batch_begin_cb],
              [], [],
-             [batch_begin_train_begin_after_opti_cb], []]
+             [batch_begin_train_begin_after_opti_cb], [], []]
         )
         self.assertEqual(cb_handler.callbacks_cache, [])
 
@@ -378,7 +378,7 @@ class TestCallbacksHandler(unittest.TestCase):
              [batch_begin_train_begin_after_opti_cb, batch_begin_train_begin_cb, batch_begin_train_begin_cb_add], [],
              [batch_begin_train_begin_after_opti_cb, batch_begin_train_begin_cb, batch_begin_cb_add, batch_begin_cb,
               batch_begin_train_begin_cb_add], [], [],
-             [batch_begin_train_begin_after_opti_cb], []]
+             [batch_begin_train_begin_after_opti_cb], [], []]
         )
         self.assertEqual(cb_handler.callbacks_cache, [])
 
