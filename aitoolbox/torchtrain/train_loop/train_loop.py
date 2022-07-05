@@ -631,6 +631,10 @@ class TrainLoop:
                         y_pred_batch, y_test_batch, metadata_batch = \
                             self.batch_model_feed_def.get_predictions(self.model, batch_data, self.device)
 
+                # Take care to not unintentionally modify the data when it's passed inside the callbacks
+                # executed at this point (passing the reference).
+                self.callbacks_handler.execute_after_batch_prediction(y_pred_batch, y_test_batch, metadata_batch)
+
                 y_pred = self.collate_batch_pred_fn(y_pred_batch, y_pred)
                 y_test = self.collate_batch_pred_fn(y_test_batch, y_test)
 

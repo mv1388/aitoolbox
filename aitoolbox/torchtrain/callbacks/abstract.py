@@ -133,6 +133,26 @@ class AbstractCallback:
         """
         pass
 
+    def on_after_batch_prediction(self, y_pred_batch, y_test_batch, metadata_batch):
+        """Logic executed in the prediction loop after the predictions for the single batch are made
+
+        IMPORTANT: Take care to not unintentionally modify the (predicted) input data when it's passed inside
+                   this function of a callback (you have a reference to the original).
+                   If the data is modified the subsequent steps or evaluations that are executed by the TrainLoop
+                   might get broken or corrupted. With more access/power there needs to be more care!
+
+        All the inputs into this function are the outputs from the model's ``get_predictions()`` method.
+
+        Args:
+            y_pred_batch: model's predictions for the current batch
+            y_test_batch: reference ground truth targets for the current batch
+            metadata_batch: additional results/metadata returned by the model for the current batch
+
+        Returns:
+            None
+        """
+        pass
+
 
 class AbstractExperimentCallback(AbstractCallback):
     def __init__(self, callback_name,

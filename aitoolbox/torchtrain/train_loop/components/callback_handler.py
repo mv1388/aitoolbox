@@ -87,6 +87,10 @@ class BasicCallbacksHandler:
         for callback in self.train_loop_obj.callbacks:
             callback.on_multiprocess_start()
 
+    def execute_after_batch_prediction(self, y_pred_batch, y_test_batch, metadata_batch):
+        for callback in self.train_loop_obj.callbacks:
+            callback.on_after_batch_prediction(y_pred_batch, y_test_batch, metadata_batch)
+
     def mp_filter_callbacks(self):
         self.train_loop_obj.callbacks = self._mp_filter_cb_list(self.train_loop_obj.callbacks)
 
@@ -189,13 +193,15 @@ class CallbacksHandler(BasicCallbacksHandler):
         self.cbs_on_after_gradient_update = []
         self.cbs_on_after_optimizer_step = []
         self.cbs_on_multiprocess_start = []
+        self.cbs_on_after_batch_prediction = []
         
         self.registered_cbs = [
             self.cbs_on_epoch_begin, self.cbs_on_epoch_end,
             self.cbs_on_train_begin, self.cbs_on_train_end,
             self.cbs_on_batch_begin,  self.cbs_on_batch_end,
             self.cbs_on_after_gradient_update, self.cbs_on_after_optimizer_step,
-            self.cbs_on_multiprocess_start
+            self.cbs_on_multiprocess_start,
+            self.cbs_on_after_batch_prediction
         ]
 
     def register_callbacks(self, callbacks, cache_callbacks=False):
@@ -261,6 +267,10 @@ class CallbacksHandler(BasicCallbacksHandler):
         for callback in self.cbs_on_multiprocess_start:
             callback.on_multiprocess_start()
 
+    def execute_after_batch_prediction(self, y_pred_batch, y_test_batch, metadata_batch):
+        for callback in self.cbs_on_after_batch_prediction:
+            callback.on_after_batch_prediction(y_pred_batch, y_test_batch, metadata_batch)
+
     def split_on_execution_position(self, callbacks, register_train_loop=False):
         if callbacks is not None and len(callbacks) > 0:
             for callback in callbacks:
@@ -299,6 +309,9 @@ class CallbacksHandler(BasicCallbacksHandler):
                     if not is_empty_function(callback.on_multiprocess_start):
                         self.cbs_on_multiprocess_start.append(callback)
 
+                    if not is_empty_function(callback.on_after_batch_prediction):
+                        self.cbs_on_after_batch_prediction.append(callback)
+
         for cbs_at_position in self.registered_cbs:
             if not all(0 == cb.execution_order for cb in cbs_at_position):
                 cbs_at_position.sort(key=lambda cb: cb.execution_order)
@@ -314,13 +327,15 @@ class CallbacksHandler(BasicCallbacksHandler):
         self.cbs_on_after_gradient_update = self._mp_filter_cb_list(self.cbs_on_after_gradient_update)
         self.cbs_on_after_optimizer_step = self._mp_filter_cb_list(self.cbs_on_after_optimizer_step)
         self.cbs_on_multiprocess_start = self._mp_filter_cb_list(self.cbs_on_multiprocess_start)
+        self.cbs_on_after_batch_prediction = self._mp_filter_cb_list(self.cbs_on_after_batch_prediction)
 
         self.registered_cbs = [
             self.cbs_on_epoch_begin, self.cbs_on_epoch_end,
             self.cbs_on_train_begin, self.cbs_on_train_end,
             self.cbs_on_batch_begin, self.cbs_on_batch_end,
             self.cbs_on_after_gradient_update, self.cbs_on_after_optimizer_step,
-            self.cbs_on_multiprocess_start
+            self.cbs_on_multiprocess_start,
+            self.cbs_on_after_batch_prediction
         ]
 
     def __str__(self):
@@ -333,4 +348,5 @@ class CallbacksHandler(BasicCallbacksHandler):
                f'At on_batch_end:\n{self.print_callback_info(self.cbs_on_batch_end)}\n' \
                f'At on_after_gradient_update:\n{self.print_callback_info(self.cbs_on_after_gradient_update)}\n' \
                f'At on_after_optimizer_step:\n{self.print_callback_info(self.cbs_on_after_optimizer_step)}\n' \
-               f'At on_multiprocess_start:\n{self.print_callback_info(self.cbs_on_multiprocess_start)}'
+               f'At on_multiprocess_start:\n{self.print_callback_info(self.cbs_on_multiprocess_start)}\n' \
+               f'At cbs_on_after_batch_prediction:\n{self.print_callback_info(self.cbs_on_after_batch_prediction)}\n'
