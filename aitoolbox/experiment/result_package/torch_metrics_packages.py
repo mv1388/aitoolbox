@@ -21,8 +21,8 @@ class TorchMetricsPackage(AbstractResultPackage):
         if not isinstance(metric_result, dict):
             metric_result = {self.metric.__class__.__name__: metric_result}
 
-        # Add suffix PTL to indicate that we are using PyTorch Lightning metrics instead of normal aitoolbox metric
-        metric_result = {f'{k}_PTL': v for k, v in metric_result.items()}
+        # Add suffix PTLMetrics to indicate that we are using PyTorch Lightning metrics instead of aitoolbox metric
+        metric_result = {f'{k}_PTLMetrics': v for k, v in metric_result.items()}
 
         return metric_result
 

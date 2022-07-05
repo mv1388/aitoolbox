@@ -29,7 +29,6 @@ setup(
         'torchtext==0.7',
         'pytorch-nlp',
         'transformers',
-        'torchmetrics',
 
         'joblib',
         'tqdm',
