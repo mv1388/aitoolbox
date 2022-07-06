@@ -32,6 +32,9 @@ class TestCallbacksHandler(unittest.TestCase):
         self.assertTrue(function_exists(callback_handler, 'execute_batch_begin'))
         self.assertTrue(function_exists(callback_handler, 'execute_batch_end'))
         self.assertTrue(function_exists(callback_handler, 'execute_gradient_update'))
+        self.assertTrue(function_exists(callback_handler, 'execute_optimizer_step'))
+        self.assertTrue(function_exists(callback_handler, 'execute_multiprocess_start'))
+        self.assertTrue(function_exists(callback_handler, 'execute_after_batch_prediction'))
 
     def test_register_callbacks(self):
         train_loop = TrainLoop(NetUnifiedBatchFeed(), None, 100, None, None, None)
@@ -382,6 +385,62 @@ class TestCallbacksHandler(unittest.TestCase):
         )
         self.assertEqual(cb_handler.callbacks_cache, [])
 
+    def test_handler_execution_after_batch_prediction(self):
+        self.execute_training_with_on_batch_prediction_cb(
+            num_epochs=5, train_loader=list(range(4)), val_loader=list(range(3)), test_loader=None
+        )
+        self.execute_training_with_on_batch_prediction_cb(
+            num_epochs=30, train_loader=list(range(4)), val_loader=list(range(3)), test_loader=None
+        )
+        self.execute_training_with_on_batch_prediction_cb(
+            num_epochs=10, train_loader=list(range(4)), val_loader=list(range(3)), test_loader=list(range(2))
+        )
+        self.execute_training_with_on_batch_prediction_cb(
+            num_epochs=30, train_loader=list(range(20)), val_loader=list(range(8)), test_loader=list(range(5))
+        )
+
+    def execute_training_with_on_batch_prediction_cb(self, num_epochs, train_loader, val_loader, test_loader):
+        train_loader_size = len(train_loader) if train_loader is not None else 0
+        val_loader_size = len(val_loader) if val_loader is not None else 0
+        test_loader_size = len(test_loader) if test_loader is not None else 0
+
+        dummy_optimizer = DummyOptimizer()
+        dummy_loss = DummyLoss()
+        train_loop = TrainLoop(
+            NetUnifiedBatchFeed(),
+            train_loader, val_loader, test_loader,
+            dummy_optimizer, dummy_loss
+        )
+
+        callback = AfterBatchPredictionCB(execute_callbacks=True)
+        train_loop.fit(num_epochs=num_epochs, callbacks=[callback])
+
+        self.assertEqual(callback.cb_execution_ctr,
+                         num_epochs * (train_loader_size + val_loader_size + test_loader_size))
+        self.assertEqual(
+            callback.cb_execution_ctr_dict,
+            {'train': num_epochs * train_loader_size,
+             'validation': num_epochs * val_loader_size,
+             'test': num_epochs * test_loader_size}
+        )
+
+    def test_handler_disable_execution_after_batch_prediction(self):
+        dummy_optimizer = DummyOptimizer()
+        dummy_loss = DummyLoss()
+        dummy_train_loader = list(range(4))
+        dummy_val_loader = list(range(3))
+        train_loop = TrainLoop(
+            NetUnifiedBatchFeed(),
+            dummy_train_loader, dummy_val_loader, None,
+            dummy_optimizer, dummy_loss
+        )
+
+        callback = AfterBatchPredictionCB(execute_callbacks=False)
+        train_loop.fit(num_epochs=5, callbacks=[callback])
+
+        self.assertEqual(callback.cb_execution_ctr, 0)
+        self.assertEqual(callback.cb_execution_ctr_dict, {'train': 0, 'validation': 0, 'test': 0})
+
 
 class BatchBeginCB(AbstractCallback):
     def __init__(self, execution_order=0):
@@ -421,3 +480,24 @@ class BatchBeginTrainBeginAfterOptiCB(AbstractCallback):
 
     def on_after_optimizer_step(self):
         self.exe_on_after_optimizer_step = True
+
+
+class AfterBatchPredictionCB(AbstractCallback):
+    def __init__(self, execute_callbacks, execution_order=0):
+        super().__init__('', execution_order)
+        self.execute_callbacks = execute_callbacks
+        self.cb_execution_ctr = 0
+        self.cb_execution_ctr_dict = {'train': 0, 'validation': 0, 'test': 0}
+
+    def on_epoch_end(self):
+        self.train_loop_obj.predict_on_train_set(execute_callbacks=self.execute_callbacks)
+        self.train_loop_obj.predict_on_validation_set(execute_callbacks=self.execute_callbacks)
+
+        if self.train_loop_obj.test_loader is not None:
+            self.train_loop_obj.predict_on_test_set(execute_callbacks=self.execute_callbacks)
+
+    def on_after_batch_prediction(self, y_pred_batch, y_test_batch, metadata_batch, dataset_info):
+        self.cb_execution_ctr += 1
+
+        dataset_type = dataset_info['type']
+        self.cb_execution_ctr_dict[dataset_type] += 1
