@@ -87,7 +87,7 @@ class BasicCallbacksHandler:
         for callback in self.train_loop_obj.callbacks:
             callback.on_multiprocess_start()
 
-    def execute_after_batch_prediction(self, y_pred_batch, y_test_batch, metadata_batch):
+    def execute_after_batch_prediction(self, y_pred_batch, y_test_batch, metadata_batch, dataset_info):
         for callback in self.train_loop_obj.callbacks:
             callback.on_after_batch_prediction(y_pred_batch, y_test_batch, metadata_batch)
 
@@ -267,9 +267,9 @@ class CallbacksHandler(BasicCallbacksHandler):
         for callback in self.cbs_on_multiprocess_start:
             callback.on_multiprocess_start()
 
-    def execute_after_batch_prediction(self, y_pred_batch, y_test_batch, metadata_batch):
+    def execute_after_batch_prediction(self, y_pred_batch, y_test_batch, metadata_batch, dataset_info):
         for callback in self.cbs_on_after_batch_prediction:
-            callback.on_after_batch_prediction(y_pred_batch, y_test_batch, metadata_batch)
+            callback.on_after_batch_prediction(y_pred_batch, y_test_batch, metadata_batch, dataset_info)
 
     def split_on_execution_position(self, callbacks, register_train_loop=False):
         if callbacks is not None and len(callbacks) > 0:

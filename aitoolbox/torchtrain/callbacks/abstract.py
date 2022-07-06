@@ -133,7 +133,7 @@ class AbstractCallback:
         """
         pass
 
-    def on_after_batch_prediction(self, y_pred_batch, y_test_batch, metadata_batch):
+    def on_after_batch_prediction(self, y_pred_batch, y_test_batch, metadata_batch, dataset_info):
         """Logic executed in the prediction loop after the predictions for the single batch are made
 
         IMPORTANT: Take care to not unintentionally modify the (predicted) input data when it's passed inside
@@ -147,6 +147,9 @@ class AbstractCallback:
             y_pred_batch: model's predictions for the current batch
             y_test_batch: reference ground truth targets for the current batch
             metadata_batch: additional results/metadata returned by the model for the current batch
+            dataset_info (dict or None): additional information describing the dataset inside the provided dataloader.
+                One such dataset info is the dataset ``type`` (train, validation, or test) set by TrainLoop's
+                predict_on_train_set(), predict_on_validation_set() and predict_on_test_set() methods.
 
         Returns:
             None

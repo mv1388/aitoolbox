@@ -553,66 +553,80 @@ class TrainLoop:
 
         return loss_avg
 
-    def predict_on_train_set(self, force_prediction=False):
+    def predict_on_train_set(self, force_prediction=False, execute_callbacks=False):
         """Run train dataset through the network and return true target values, target predictions and metadata
 
         Args:
             force_prediction (bool): recompute the output prediction even if it is available in the prediction cache.
                 This causes the old cached predictions to be overwritten.
+            execute_callbacks (bool): If true, prediction loop will execute provided callbacks after prediction for
+                each batch has been made. Otherwise, callbacks at this position are ignored.
 
         Returns:
             (torch.Tensor, torch.Tensor, dict): y_pred, y_true, metadata
         """
         if not self.prediction_store.has_train_predictions(self.total_iteration_idx) or force_prediction:
-            predictions = self.predict_with_model(self.train_loader)
+            predictions = self.predict_with_model(self.train_loader, execute_callbacks,
+                                                  dataset_info={'type': 'train'})
             self.prediction_store.insert_train_predictions(predictions, self.total_iteration_idx, force_prediction)
         else:
             predictions = self.prediction_store.get_train_predictions(self.total_iteration_idx)
 
         return predictions
 
-    def predict_on_validation_set(self, force_prediction=False):
+    def predict_on_validation_set(self, force_prediction=False, execute_callbacks=False):
         """Run validation dataset through the network and return true target values, target predictions and metadata
 
         Args:
             force_prediction (bool): recompute the output prediction even if it is available in the prediction cache.
                 This causes the old cached predictions to be overwritten.
+            execute_callbacks (bool): If true, prediction loop will execute provided callbacks after prediction for
+                each batch has been made. Otherwise, callbacks at this position are ignored.
 
         Returns:
             (torch.Tensor, torch.Tensor, dict): y_pred, y_true, metadata
         """
         if not self.prediction_store.has_val_predictions(self.total_iteration_idx) or force_prediction:
-            predictions = self.predict_with_model(self.validation_loader)
+            predictions = self.predict_with_model(self.validation_loader, execute_callbacks,
+                                                  dataset_info={'type': 'validation'})
             self.prediction_store.insert_val_predictions(predictions, self.total_iteration_idx, force_prediction)
         else:
             predictions = self.prediction_store.get_val_predictions(self.total_iteration_idx)
 
         return predictions
 
-    def predict_on_test_set(self, force_prediction=False):
+    def predict_on_test_set(self, force_prediction=False, execute_callbacks=False):
         """Run test dataset through the network and return true target values, target predictions and metadata
 
         Args:
             force_prediction (bool): recompute the output prediction even if it is available in the prediction cache.
                 This causes the old cached predictions to be overwritten.
+            execute_callbacks (bool): If true, prediction loop will execute provided callbacks after prediction for
+                each batch has been made. Otherwise, callbacks at this position are ignored.
 
         Returns:
             (torch.Tensor, torch.Tensor, dict): y_pred, y_true, metadata
         """
         if not self.prediction_store.has_test_predictions(self.total_iteration_idx) or force_prediction:
-            predictions = self.predict_with_model(self.test_loader)
+            predictions = self.predict_with_model(self.test_loader, execute_callbacks,
+                                                  dataset_info={'type': 'test'})
             self.prediction_store.insert_test_predictions(predictions, self.total_iteration_idx, force_prediction)
         else:
             predictions = self.prediction_store.get_test_predictions(self.total_iteration_idx)
 
         return predictions
 
-    def predict_with_model(self, data_loader):
+    def predict_with_model(self, data_loader, execute_callbacks=False, dataset_info=None):
         """Run given dataset through the network and return true target values, target predictions and metadata
 
         Args:
             data_loader (torch.utils.data.DataLoader): dataloader containing the data on which the output predictions
                 are calculated
+            execute_callbacks (bool): If true, prediction loop will execute provided callbacks after prediction for
+                each batch has been made. Otherwise, callbacks at this position are ignored.
+            dataset_info (dict or None): additional information describing the dataset inside the provided dataloader.
+                One such dataset info is the dataset ``type`` (train, validation, or test) set by
+                predict_on_train_set(), predict_on_validation_set() and predict_on_test_set() methods.
 
         Returns:
             (torch.Tensor, torch.Tensor, dict): y_pred, y_true, metadata
@@ -631,9 +645,13 @@ class TrainLoop:
                         y_pred_batch, y_test_batch, metadata_batch = \
                             self.batch_model_feed_def.get_predictions(self.model, batch_data, self.device)
 
-                # Take care to not unintentionally modify the data when it's passed inside the callbacks
-                # executed at this point (passing the reference).
-                self.callbacks_handler.execute_after_batch_prediction(y_pred_batch, y_test_batch, metadata_batch)
+                if execute_callbacks:
+                    # Take care to not unintentionally modify the data when it's passed inside the callbacks
+                    # executed at this point (passing the reference).
+                    self.callbacks_handler.execute_after_batch_prediction(
+                        y_pred_batch, y_test_batch, metadata_batch,
+                        dataset_info
+                    )
 
                 y_pred = self.collate_batch_pred_fn(y_pred_batch, y_pred)
                 y_test = self.collate_batch_pred_fn(y_test_batch, y_test)
