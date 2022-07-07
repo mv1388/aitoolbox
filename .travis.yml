@@ -2,10 +2,10 @@ language: python
 
 matrix:
   include:
-    - name: "Ubuntu 18.04 - Python 3.8"
+    - name: "Ubuntu 18.04 - Python 3.9"
       os: linux
       dist: bionic  # Ubuntu 18.04
-      python: 3.8
+      python: 3.9
 #    - name: "Ubuntu 18.04 - Python 3.7"
 #      os: linux
 #      dist: bionic  # Ubuntu 18.04
@@ -28,7 +28,7 @@ matrix:
 # command to install dependencies
 install:
   - pip install 'six>=1.13.0'
-  - pip install moto[all] pytest
+  - pip install 'moto[all]==1.3.14' pytest
   - pip install tensorflow keras
   - pip install -r requirements.txt
 
