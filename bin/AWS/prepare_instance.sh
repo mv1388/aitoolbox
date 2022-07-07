@@ -186,23 +186,6 @@ if [ $local_project_path != 'None' ]; then
     ~/project/AWS_run_scripts/AWS_bootstrap/bootstrap.sh
 fi
 
-#./pyrouge_set_rouge_path ~/project/ROUGE-1.5.5
-#
-#sudo yum -y install perl-CPAN
-##sudo perl -MCPAN -e 'install LWP::UserAgent::Cached'
-##sudo perl -MCPAN -e 'install Bundle::LWP'
-#sudo yum install -y perl-libwww-perl
-#sudo perl -MCPAN -e 'install DB_File'
-#
-#cd ROUGE-1.5.5/data
-#rm WordNet-2.0.exc.db
-#cd WordNet-2.0-Exceptions
-#./buildExeptionDB.pl . exc WordNet-2.0.exc.db
-#cd ../
-#ln -s WordNet-2.0-Exceptions/WordNet-2.0.exc.db WordNet-2.0.exc.db
-#cd ../..
-
-
 if [ $dataset_name != 'None' ]; then
     ./download_data.sh -p ~/project/data -d $dataset_name -r $preproc_dataset
 fi
