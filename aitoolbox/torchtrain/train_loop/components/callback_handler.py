@@ -20,7 +20,7 @@ class BasicCallbacksHandler:
     def register_callbacks(self, callbacks, cache_callbacks=False):
         """Register TrainLoop object reference inside the listed callbacks when the TrainLoop is created
 
-        Normally, this is called from inside of the train loop by the TrainLoop itself. Basically train loop "registers"
+        Normally, this is called from inside the train loop by the TrainLoop itself. Basically train loop "registers"
         itself.
 
         Args:
