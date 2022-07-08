@@ -21,14 +21,13 @@ class HFEvaluateResultPackage(AbstractResultPackage):
                 inputs available already at the start before making model predictions and thus don't need to be gathered
                 from the train/prediction loop.
         """
-        AbstractResultPackage.__init__(self, pkg_name='HuggingFace Evaluate metrics')
+        AbstractResultPackage.__init__(self, pkg_name='HuggingFace Evaluate metrics', **kwargs)
 
         self.metric = hf_evaluate_metric
         self.use_models_additional_results = use_models_additional_results
-        self.additional_metric_parameters = kwargs
 
     def prepare_results_dict(self):
-        additional_metric_inputs = self.additional_metric_parameters
+        additional_metric_inputs = self.package_metadata
 
         if self.use_models_additional_results:
             model_additional_results = self.additional_results['additional_results']
