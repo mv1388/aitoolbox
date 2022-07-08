@@ -21,7 +21,7 @@ class AbstractExperimentSaver(ABC):
             training_history (aitoolbox.experiment.training_history.TrainingHistory):
             experiment_timestamp (str): time stamp of the training start
             save_true_pred_labels (bool): should ground truth labels also be saved
-            separate_files (bool): should the results be saved in separate pickle files or should all of the results
+            separate_files (bool): should the results be saved in separate pickle files or should all the results
                 be batched together in a single results file
             protect_existing_folder (bool): can override potentially already existing folder or not
 
@@ -60,7 +60,7 @@ class BaseFullExperimentSaver(AbstractExperimentSaver):
             training_history (aitoolbox.experiment.training_history.TrainingHistory):
             experiment_timestamp (str): time stamp at the start of training
             save_true_pred_labels (bool): should ground truth labels also be saved
-            separate_files (bool): should the results be saved in separate pickle files or should all of the results
+            separate_files (bool): should the results be saved in separate pickle files or should all the results
                 be batched together in a single results file
             protect_existing_folder (bool): can override potentially already existing folder or not
 

@@ -33,7 +33,7 @@ class MultiLoss:
             iteration (int): Current iteration index. Not used in the most simple setup but provided in case of more
                 elaborate loss backward logic is devised.
             amp_grad_scaler (torch.cuda.amp.GradScaler): AMP GradScaler. If scaler ``enabled`` parameter is set to False
-                the loss is still passed to it but it gets returned unscaled so the behaviour is as it is in the case
+                the loss is still passed to it, but it gets returned unscaled so the behaviour is as it is in the case
                 of non-AMP training.
 
         Returns:
@@ -79,7 +79,7 @@ class MultiOptimizer:
             iteration (int): Current iteration index. Not used in the most simple setup but provided in case of more
                 elaborate loss backward logic is devised.
             amp_grad_scaler (torch.cuda.amp.GradScaler): AMP GradScaler. If scaler ``enabled`` parameter is set to False
-                the optimizer have it's normal step() method called withoud applying the AMP mandated unscaling
+                the optimizer have it's normal step() method called without applying the AMP mandated unscaling
                 beforehand. In this respect the behaviour will be the same as in the non-AMP training.
 
         Returns:
