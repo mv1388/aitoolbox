@@ -379,7 +379,7 @@ class DummyResultPackageExtendV2(DummyResultPackageExtend):
 
     def list_additional_results_dump_paths(self):
         return self.additional_results
-    
+
 
 class DummyResultPackageExtendVariable(DummyResultPackageExtend):
     def __init__(self, result_d):
@@ -388,7 +388,31 @@ class DummyResultPackageExtendVariable(DummyResultPackageExtend):
         
     def prepare_results_dict(self):
         return self.result_d
-        
+
+
+class DummyTorchMetrics:
+    def __init__(self, return_float=True):
+        self.return_float = return_float
+
+        self.compute_ctr = 0
+        self.reset_ctr = 0
+        self.to_result = None
+
+    def compute(self):
+        self.compute_ctr += 1
+
+    def reset(self):
+        self.reset_ctr += 1
+
+    def to(self, device):
+        self.to_result = f'{device}_1'
+
+    def __call__(self, *args, **kwargs):
+        if self.return_float:
+            return 123.4
+        else:
+            return {'metric_1': 12.34, 'metric_2': 56.78}
+
 
 class DummyAbstractBaseMetric(AbstractBaseMetric):
     def __init__(self, val):
