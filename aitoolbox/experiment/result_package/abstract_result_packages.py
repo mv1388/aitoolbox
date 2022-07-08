@@ -21,7 +21,9 @@ class AbstractResultPackage(ABC):
             np_array (bool or str): how the inputs should be handled. Should the package try to automatically guess, or
                 you want to manually decide whether to leave the inputs as they are or convert them to np.array.
                 Possible options: True, False, 'auto'
-                Be slightly careful with 'auto' as it sometimes doesn't work so it is preferable to explicitly use True/False
+
+                Be slightly careful with 'auto' as it sometimes doesn't work,
+                so it is preferable to explicitly use True/False
             **kwargs (dict): additional package_metadata for the result package
         """
         self.pkg_name = pkg_name
