@@ -151,7 +151,7 @@ class ModelPerformancePrintReport(AbstractCallback):
         """Print the model performance to the console
 
         Best used in combination with the callback which actually calculates some performance evaluation metrics, such
-        as ModelPerformanceEvaluation. Otherwise we are limited only to automatic loss calculation reporting.
+        as ModelPerformanceEvaluation. Otherwise, we are limited only to automatic loss calculation reporting.
 
         When listing callbacks for the TrainLoop it is important to list the ModelPerformanceEvaluation before
         this ModelPerformancePrintReport. This ensures that the calculated results are present in the
@@ -324,7 +324,7 @@ class ModelTrainHistoryBaseCB(AbstractExperimentCallback):
         Args:
             callback_name (str): name of the callback
             execution_order (int): order of the callback execution. If all the used callbacks have the orders set to 0,
-                than the callbacks are executed in the order they were registered.
+                then the callbacks are executed in the order they were registered.
             epoch_end (bool): should plot after every epoch
             train_end (bool): should plot at the end of the training
             file_format (str): output file format
@@ -458,7 +458,7 @@ class ModelTrainHistoryFileWriter(ModelTrainHistoryBaseCB):
         Args:
             epoch_end (bool): should plot after every epoch
             train_end (bool): should plot at the end of the training
-            file_format (str): output file format. Can be either 'txt' human readable output or
+            file_format (str): output file format. Can be either 'txt' human-readable output or
                 'tsv' for a tabular format or 'csv' for comma separated format.
             project_name (str or None): root name of the project
             experiment_name (str or None): name of the particular experiment

@@ -52,8 +52,10 @@ class HyperParamSourceReporter:
         """Copy saved text local file into cloud storage
 
         Args:
-            local_hyperparams_file_path (str): path to hyperparams file stored on local disk. File to be uploaded to cloud
+            local_hyperparams_file_path (str): path to hyperparams file stored on local disk.
+                File to be uploaded to cloud
             cloud_saver (BaseModelSaver or BaseResultsSaver or BaseModelGoogleStorageSaver or BaseResultsGoogleStorageSaver):
+                cloud saver object
             file_name (str or None): manually specify the file name to be saved to the cloud instead of taking
                 the default from self.file_name
 

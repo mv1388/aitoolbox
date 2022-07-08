@@ -50,7 +50,7 @@ class TTDataParallel(nn.DataParallel, TTParallelBase):
                  default_model_methods=('get_loss', 'get_loss_eval', 'get_predictions'), **kwargs):
         """torchtrain enabled DataParallel
 
-        This DataParallel wrapper works in the same way as the original PyTorch nn.DataParallel. Furthermore it exposes
+        This DataParallel wrapper works in the same way as the original PyTorch nn.DataParallel. Furthermore, it exposes
         TTModel batch data feeding definitions (additional abstract methods) to the TrainLoop while still enabling
         multi GPU training.
 
