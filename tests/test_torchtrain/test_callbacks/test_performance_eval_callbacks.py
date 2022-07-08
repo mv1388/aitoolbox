@@ -8,6 +8,7 @@ from aitoolbox.torchtrain.callbacks.performance_eval import ModelPerformanceEval
     ModelTrainHistoryFileWriter, MetricHistoryRename
 from aitoolbox.torchtrain.train_loop import TrainLoop, TrainLoopCheckpoint
 from aitoolbox.experiment.training_history import TrainingHistory
+from aitoolbox.experiment.result_package.torch_metrics_packages import TorchMetricsPackage
 
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -183,6 +184,68 @@ class TestModelPerformanceEvaluationCallback(unittest.TestCase):
         self.assertEqual(train_loop.train_history.train_history,
                          {'loss': [], 'accumulated_loss': [], 'val_loss': [], 'val_dummy': [111.0, 123.0, 135.0],
                           'val_extended_dummy': [1323123.44, 1323135.44, 1323147.44]})
+
+    def test_torch_metrics_result_package_performance_eval_epoch_end_reset_val_data(self):
+        metric = DummyTorchMetrics(return_float=True)
+        result_package = TorchMetricsPackage(metric)
+
+        callback = ModelPerformanceEvaluation(
+            result_package, {},
+            on_each_epoch=False, on_train_data=False, on_val_data=True
+        )
+
+        for i in range(100):
+            callback.on_epoch_end()
+            self.assertEqual(metric.reset_ctr, i + 1)
+            self.assertEqual(callback.result_package.metric.reset_ctr, i + 1)
+
+    def test_torch_metrics_result_package_performance_eval_epoch_end_reset_train_val_data(self):
+        metric = DummyTorchMetrics(return_float=True)
+        result_package = TorchMetricsPackage(metric)
+
+        callback = ModelPerformanceEvaluation(
+            result_package, {},
+            on_each_epoch=False, on_train_data=True, on_val_data=True
+        )
+        self.assertEqual(callback.result_package, result_package)
+        self.assertNotEqual(result_package, callback.train_result_package)
+
+        for i in range(100):
+            callback.on_epoch_end()
+            self.assertEqual(metric.reset_ctr, i + 1)
+            self.assertEqual(callback.result_package.metric.reset_ctr, i + 1)
+            self.assertEqual(callback.train_result_package.metric.reset_ctr, i + 1)
+
+    def test_torch_metrics_result_package_performance_eval_tl_registration_move_to_device_val_data(self):
+        metric = DummyTorchMetrics(return_float=True)
+        result_package = TorchMetricsPackage(metric)
+
+        callback = ModelPerformanceEvaluation(
+            result_package, {},
+            on_each_epoch=False, on_train_data=False, on_val_data=True,
+            if_available_output_to_project_dir=False
+        )
+        callback.train_loop_obj = TrainLoop(NetUnifiedBatchFeed(), None, None, None, None, None)
+
+        callback.on_train_loop_registration()
+        self.assertEqual(metric.to_result, 'cpu_1')
+        self.assertEqual(callback.result_package.metric.to_result, 'cpu_1')
+
+    def test_torch_metrics_result_package_performance_eval_tl_registration_move_to_device_train_val_data(self):
+        metric = DummyTorchMetrics(return_float=True)
+        result_package = TorchMetricsPackage(metric)
+
+        callback = ModelPerformanceEvaluation(
+            result_package, {},
+            on_each_epoch=False, on_train_data=True, on_val_data=True,
+            if_available_output_to_project_dir=False
+        )
+        callback.train_loop_obj = TrainLoop(NetUnifiedBatchFeed(), None, None, None, None, None)
+
+        callback.on_train_loop_registration()
+        self.assertEqual(metric.to_result, 'cpu_1')
+        self.assertEqual(callback.result_package.metric.to_result, 'cpu_1')
+        self.assertEqual(callback.train_result_package.metric.to_result, 'cpu_1')
 
 
 class TestModelTrainHistoryFileWriter(unittest.TestCase):

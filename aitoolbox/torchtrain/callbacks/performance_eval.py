@@ -8,6 +8,7 @@ from aitoolbox.cloud.GoogleCloud.results_save import BaseResultsGoogleStorageSav
 from aitoolbox.cloud import s3_available_options, gcs_available_options
 from aitoolbox.experiment.local_save.local_results_save import BaseLocalResultsSaver
 from aitoolbox.experiment.result_reporting.report_generator import TrainingHistoryPlotter, TrainingHistoryWriter
+from aitoolbox.experiment.result_package.torch_metrics_packages import TorchMetricsPackage
 
 
 class ModelPerformanceEvaluation(AbstractCallback):
@@ -66,6 +67,13 @@ class ModelPerformanceEvaluation(AbstractCallback):
             else:
                 print(f'Skipping performance evaluation on this epoch ({self.train_loop_obj.epoch}). '
                       f'Evaluating every {self.eval_frequency} epochs.')
+
+        if isinstance(self.result_package, TorchMetricsPackage):
+            if self.on_train_data:
+                self.train_result_package.metric_reset()
+
+            if self.on_val_data:
+                self.result_package.metric_reset()
 
     def evaluate_model_performance(self, prefix=''):
         """Calculate performance based on the provided result packages
@@ -128,6 +136,13 @@ class ModelPerformanceEvaluation(AbstractCallback):
                                                                                self.train_loop_obj.experiment_name,
                                                                                self.train_loop_obj.experiment_timestamp,
                                                                                self.train_loop_obj.local_model_result_folder_path)
+
+        if isinstance(self.result_package, TorchMetricsPackage):
+            if self.on_train_data:
+                self.train_result_package.metric.to(self.train_loop_obj.device)
+
+            if self.on_val_data:
+                self.result_package.metric.to(self.train_loop_obj.device)
 
 
 class ModelPerformancePrintReport(AbstractCallback):
