@@ -24,10 +24,10 @@ class ModelPerformanceEvaluation(AbstractCallback):
 
         Args:
             result_package (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
-            args (dict):
+            args (dict): used hyper-parameters
             on_each_epoch (bool): calculate performance results just at the end of training or at the end of each epoch
-            on_train_data (bool):
-            on_val_data (bool):
+            on_train_data (bool): should the evaluation be done on the training dataset
+            on_val_data (bool): should the evaluation be done on the validation dataset
             eval_frequency (int or None): evaluation is done every specified number of epochs. Useful when predictions
                 are quite expensive and are slowing down the overall training
             if_available_output_to_project_dir (bool): if using train loop version which builds project local folder
@@ -37,7 +37,7 @@ class ModelPerformanceEvaluation(AbstractCallback):
                 the result_package's output folder shouldn't be full path but just the folder name and the full folder
                 path pointing inside the corresponding project folder will be automatically created.
                 If such a functionality should to be prevented and manual full additional metadata results dump folder
-                is needed potentially outside the project folder, than set this argument to False and
+                is needed potentially outside the project folder, then set this argument to False and
                 specify a full folder path.
         """
         AbstractCallback.__init__(self, 'Model performance calculator - evaluator')
