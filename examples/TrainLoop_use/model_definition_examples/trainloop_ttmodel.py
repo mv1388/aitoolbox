@@ -12,9 +12,6 @@ from aitoolbox.torchtrain.model import TTModel
 from aitoolbox.torchtrain.callbacks.performance_eval import ModelPerformanceEvaluation, ModelPerformancePrintReport
 from aitoolbox.experiment.result_package.basic_packages import ClassificationResultPackage
 
-from aitoolbox.experiment.result_package.torch_metrics_packages import TorchMetricsPackage
-from torchmetrics import Accuracy
-
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
