@@ -103,7 +103,7 @@ class AbstractCallback:
         """Logic executed after the model gradients are updated
 
         To ensure the execution of this callback enable the `self.train_loop_obj.grad_cb_used = True` option in the
-        on_train_loop_registration(). Otherwise logic implemented here will not be executed by the TrainLoop.
+        on_train_loop_registration(). Otherwise, logic implemented here will not be executed by the TrainLoop.
 
         Args:
             optimizer_idx (int): index of the current optimizer. Mostly useful when using multiple optimizers.
@@ -118,7 +118,7 @@ class AbstractCallback:
         """Logic executed after the optimizer does a new step and updates the model weights
 
         To ensure the execution of this callback enable the `self.train_loop_obj.grad_cb_used = True` option in the
-        on_train_loop_registration(). Otherwise logic implemented here will not be executed by the TrainLoop.
+        on_train_loop_registration(). Otherwise, logic implemented here will not be executed by the TrainLoop.
 
         Returns:
             None

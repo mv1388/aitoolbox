@@ -4,7 +4,6 @@ import time
 import datetime
 
 from aitoolbox.experiment.local_save.folder_create import ExperimentFolder
-from aitoolbox.utils.file_system import zip_folder
 
 
 class AbstractLocalModelSaver(ABC):
@@ -178,24 +177,6 @@ class KerasLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
         model.save(model_local_path)
 
         return model_name, model_local_path
-
-
-# class TensorFlowLocalModelSaver(AbstractLocalModelSaver, BaseLocalModelSaver):
-#     def __init__(self, local_model_result_folder_path='~/project/model_result',
-#                  checkpoint_model=False):
-#         """TensorFlow experiment local model saver
-#
-#         Args:
-#             local_model_result_folder_path (str): root local path where project folder will be created
-#             checkpoint_model (bool): if the model is coming from the mid-training checkpoint
-#         """
-#         BaseLocalModelSaver.__init__(self, local_model_result_folder_path, checkpoint_model)
-#
-#         raise NotImplementedError
-#
-#     def save_model(self, model, project_name, experiment_name, experiment_timestamp=None, epoch=None,
-#                    protect_existing_folder=True):
-#         raise NotImplementedError
 
 
 class LocalSubOptimalModelRemover:

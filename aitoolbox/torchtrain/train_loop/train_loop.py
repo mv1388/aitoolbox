@@ -795,7 +795,7 @@ class TrainLoop:
             grad_accumulation (int): number of batches the gradients are accumulated before updating weights
             in_process_data_load (list or None): in-process data loading logic implemented as a torchtrain callback.
                 The logic should be placed inside the on_multiprocess_start() callback function.
-                When using this data loading option bare in mind that loaded dataset will be replicated in memory for
+                When using this data loading option bear in mind that loaded dataset will be replicated in memory for
                 every spawned training process. This can in turn in cause extensive overall memory consumption.
         """
         rank = ddp_args['node_rank'] * ddp_args['num_gpus'] + gpu

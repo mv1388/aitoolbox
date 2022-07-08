@@ -45,20 +45,3 @@ class KerasGoogleStorageModelSaver(BaseModelGoogleStorageSaver, KerasS3ModelSave
         """
         BaseModelGoogleStorageSaver.__init__(self, bucket_name, cloud_dir_prefix, checkpoint_model)
         self.keras_local_saver = KerasLocalModelSaver(local_model_result_folder_path, checkpoint_model)
-        
-
-# class TensorFlowGoogleStorageModelSaver(BaseModelGoogleStorageSaver, TensorFlowS3ModelSaver):
-#     def __init__(self, bucket_name='model-result', cloud_dir_prefix='',
-#                  local_model_result_folder_path='~/project/model_result', checkpoint_model=False):
-#         """TensorFlow Google Cloud Storage model saving
-#
-#         Args:
-#             bucket_name (str): name of the bucket in the Google Cloud Storage to which the models will be saved
-#             cloud_dir_prefix (str): destination folder path inside selected bucket
-#             local_model_result_folder_path (str): root local path where project folder will be created
-#             checkpoint_model (bool): if the model being saved is checkpoint model or final end of training model
-#         """
-#         BaseModelGoogleStorageSaver.__init__(self, bucket_name, cloud_dir_prefix, checkpoint_model)
-#         self.tf_local_saver = TensorFlowLocalModelSaver(local_model_result_folder_path, checkpoint_model)
-#
-#         raise NotImplementedError
