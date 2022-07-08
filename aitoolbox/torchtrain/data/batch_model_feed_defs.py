@@ -13,7 +13,7 @@ class AbstractModelFeedDefinition(ABC):
     The primary way of defining the model for TrainLoop training is to utilize:
         aitoolbox.torchtrain.model.TTModel
 
-    Use of the ModelFeedDefinition is the legacy way of defining the model. However in certain scenarios where the
+    Use of the ModelFeedDefinition is the legacy way of defining the model. However, in certain scenarios where the
     TTModel might prove to increase complexity, ModelFeedDefinition still is useful for augmenting the nn.Module with
     the logic to calculate loss and predictions.
     """
