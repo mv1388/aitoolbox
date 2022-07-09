@@ -1,9 +1,11 @@
-KEEP_FOREVER = 'keep_forever'
-UNTIL_END_OF_EPOCH = 'until_end_of_epoch'
-UNTIL_READ = 'until_read'
-OVERWRITE = 'overwrite'
+from enum import Enum
 
-ACCEPTED_SETTINGS = (KEEP_FOREVER, UNTIL_END_OF_EPOCH, UNTIL_READ, OVERWRITE)
+
+class MessageHandling(Enum):
+    KEEP_FOREVER = 'keep_forever'
+    UNTIL_END_OF_EPOCH = 'until_end_of_epoch'
+    UNTIL_READ = 'until_read'
+    OVERWRITE = 'overwrite'
 
 
 class Message:
@@ -13,7 +15,8 @@ class Message:
         Args:
             key (str): message key
             value: message value
-            msg_handling_settings (str or list): selected message handling settings for this particular message
+            msg_handling_settings (MessageHandling or list[MessageHandling]): selected message handling settings
+                for this particular message
         """
         self.key = key
         self.value = value
@@ -41,20 +44,23 @@ class MessageService:
         """
         if key in self.message_store:
             messages = [msg.value for msg in self.message_store[key]]
-            self.message_store[key] = [msg for msg in self.message_store[key] if UNTIL_READ not in msg.msg_handling_settings]
+            self.message_store[key] = [
+                msg for msg in self.message_store[key]
+                if MessageHandling.UNTIL_READ not in msg.msg_handling_settings
+            ]
             return messages
         else:
             return None
 
-    def write_message(self, key, value, msg_handling_settings=UNTIL_END_OF_EPOCH):
+    def write_message(self, key, value, msg_handling_settings=MessageHandling.UNTIL_END_OF_EPOCH):
         """Write a new message to the message service
 
         Args:
             key (str): message key
             value: message content
-            msg_handling_settings (str or list): setting how to handle the lifespan of the message.
-                Can use one of the following message lifecycle handling settings which are variables imported from this
-                script file and can be found defined at the beginning of the script:
+            msg_handling_settings (MessageHandling or list[MessageHandling]): setting how to handle the lifespan of
+                the message. Can use one of the following message lifecycle handling settings which are variables
+                imported from this script file and can be found defined at the beginning of the script:
 
                 * ``KEEP_FOREVER``
                 * ``UNTIL_END_OF_EPOCH``
@@ -64,14 +70,14 @@ class MessageService:
         Returns:
             None
         """
-        self.validate_msg_handling_settings(msg_handling_settings)
+        msg_handling_settings = self.validate_msg_handling_settings(msg_handling_settings)
 
         if key not in self.message_store:
             self.message_store[key] = []
 
         message = Message(key, value, msg_handling_settings)
 
-        if OVERWRITE in msg_handling_settings:
+        if MessageHandling.OVERWRITE in msg_handling_settings:
             self.message_store[key] = [message]
         else:
             self.message_store[key].append(message)
@@ -86,25 +92,24 @@ class MessageService:
         """
         for key, msgs_list in list(self.message_store.items()):
             self.message_store[key] = [msg for msg in self.message_store[key]
-                                       if UNTIL_END_OF_EPOCH not in msg.msg_handling_settings]
+                                       if MessageHandling.UNTIL_END_OF_EPOCH not in msg.msg_handling_settings]
 
             if len(self.message_store[key]) == 0:
                 del self.message_store[key]
 
     @staticmethod
     def validate_msg_handling_settings(msg_handling_settings):
-        if type(msg_handling_settings) == str:
-            if msg_handling_settings not in ACCEPTED_SETTINGS:
-                raise ValueError(f'Provided msg_handling_settings {msg_handling_settings} is not supported. '
-                                 f'Currently supported settings are: {ACCEPTED_SETTINGS}.')
-        elif type(msg_handling_settings) == list:
+        if type(msg_handling_settings) == list:
             for msg_setting in msg_handling_settings:
-                if msg_setting not in ACCEPTED_SETTINGS:
-                    raise ValueError(f'Provided msg_handling_settings {msg_setting} is not supported. '
-                                     f'Currently supported settings are: {ACCEPTED_SETTINGS}.')
+                if type(msg_setting) != MessageHandling:
+                    raise TypeError('msg_setting is not of the correct MessageHandling type. '
+                                    f'It is {type(msg_setting)}.')
 
-            if len(msg_handling_settings) > 1 and OVERWRITE not in msg_handling_settings:
+            if len(msg_handling_settings) > 1 and MessageHandling.OVERWRITE not in msg_handling_settings:
                 raise ValueError(f'Provided two incompatible msg_handling_settings {msg_handling_settings}. '
-                                 f'Only OVERRIDE setting can currently be combined with another available setting')
-        else:
-            raise ValueError(f'Provided msg_handling_settings {msg_handling_settings} type not supported str or list')
+                                 'Only OVERRIDE setting can currently be combined with another available setting.')
+        elif type(msg_handling_settings) != MessageHandling:
+            raise ValueError(f'Provided msg_handling_settings {msg_handling_settings} type not of the supported '
+                             'MessageHandling or list of MessageHandling.')
+
+        return msg_handling_settings if type(msg_handling_settings) is list else [msg_handling_settings]
