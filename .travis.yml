@@ -1,27 +1,15 @@
 language: python
 
-#python:
-# - "3.6"
-# - "3.7"
-
 matrix:
   include:
-    - name: "Ubuntu 16.04 - Python 3.6"
-      os: linux
-      dist: xenial  # Ubuntu 16.04
-      python: 3.6
-    - name: "Ubuntu 16.04 - Python 3.7"
-      os: linux
-      dist: xenial  # Ubuntu 16.04
-      python: 3.7
-    - name: "Ubuntu 18.04 - Python 3.6"
+    - name: "Ubuntu 18.04 - Python 3.8"
       os: linux
       dist: bionic  # Ubuntu 18.04
-      python: 3.6
-    - name: "Ubuntu 18.04 - Python 3.7"
-      os: linux
-      dist: bionic  # Ubuntu 18.04
-      python: 3.7
+      python: 3.8
+#    - name: "Ubuntu 18.04 - Python 3.7"
+#      os: linux
+#      dist: bionic  # Ubuntu 18.04
+#      python: 3.8
 #    - name: "OSX xcode10.2 - Python 3"
 #      os: osx
 #      osx_image: xcode10.2
@@ -39,6 +27,7 @@ matrix:
 
 # command to install dependencies
 install:
+  - pip install setuptools==41.0.0
   - pip install 'six>=1.13.0'
   - pip install 'moto[all]==1.3.14' pytest
   - pip install tensorflow keras

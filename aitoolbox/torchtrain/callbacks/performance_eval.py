@@ -2,12 +2,13 @@ import copy
 import os
 
 from aitoolbox.torchtrain.callbacks.abstract import AbstractCallback, AbstractExperimentCallback
-from aitoolbox.torchtrain.train_loop.components import message_passing as msg_passing_settings
+from aitoolbox.torchtrain.train_loop.components.message_passing import MessageHandling
 from aitoolbox.cloud.AWS.results_save import BaseResultsSaver as BaseResultsS3Saver
 from aitoolbox.cloud.GoogleCloud.results_save import BaseResultsGoogleStorageSaver
 from aitoolbox.cloud import s3_available_options, gcs_available_options
 from aitoolbox.experiment.local_save.local_results_save import BaseLocalResultsSaver
 from aitoolbox.experiment.result_reporting.report_generator import TrainingHistoryPlotter, TrainingHistoryWriter
+from aitoolbox.experiment.result_package.torch_metrics_packages import TorchMetricsPackage
 
 
 class ModelPerformanceEvaluation(AbstractCallback):
@@ -25,10 +26,10 @@ class ModelPerformanceEvaluation(AbstractCallback):
 
         Args:
             result_package (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
-            args (dict):
+            args (dict): used hyper-parameters
             on_each_epoch (bool): calculate performance results just at the end of training or at the end of each epoch
-            on_train_data (bool): evaluate on training data
-            on_val_data (bool): evaluate on validation data
+            on_train_data (bool): should the evaluation be done on the training dataset
+            on_val_data (bool): should the evaluation be done on the validation dataset
             eval_frequency (int or None): evaluation is done every specified number of epochs. Useful when predictions
                 are quite expensive and are slowing down the overall training
             on_iteration_frequency (int): evaluation frequency in terms of training iterations used for more
@@ -41,7 +42,7 @@ class ModelPerformanceEvaluation(AbstractCallback):
                 the result_package's output folder shouldn't be full path but just the folder name and the full folder
                 path pointing inside the corresponding project folder will be automatically created.
                 If such a functionality should to be prevented and manual full additional metadata results dump folder
-                is needed potentially outside the project folder, than set this argument to False and
+                is needed potentially outside the project folder, then set this argument to False and
                 specify a full folder path.
         """
         AbstractCallback.__init__(self, 'Model performance calculator - evaluator')
@@ -71,6 +72,13 @@ class ModelPerformanceEvaluation(AbstractCallback):
             else:
                 print(f'Skipping performance evaluation on this epoch ({self.train_loop_obj.epoch}). '
                       f'Evaluating every {self.eval_frequency} epochs.')
+
+        if isinstance(self.result_package, TorchMetricsPackage):
+            if self.on_train_data:
+                self.train_result_package.metric_reset()
+
+            if self.on_val_data:
+                self.result_package.metric_reset()
 
     def on_batch_end(self):
         if self.on_iteration_frequency > 0:
@@ -156,6 +164,13 @@ class ModelPerformanceEvaluation(AbstractCallback):
                                                                                self.train_loop_obj.experiment_timestamp,
                                                                                self.train_loop_obj.local_model_result_folder_path)
 
+        if isinstance(self.result_package, TorchMetricsPackage):
+            if self.on_train_data:
+                self.train_result_package.metric.to(self.train_loop_obj.device)
+
+            if self.on_val_data:
+                self.result_package.metric.to(self.train_loop_obj.device)
+
 
 class ModelPerformancePrintReport(AbstractCallback):
     def __init__(self, metrics, on_each_epoch=True, report_frequency=None, report_iteration_frequency=0,
@@ -163,7 +178,7 @@ class ModelPerformancePrintReport(AbstractCallback):
         """Print the model performance to the console
 
         Best used in combination with the callback which actually calculates some performance evaluation metrics, such
-        as ModelPerformanceEvaluation. Otherwise we are limited only to automatic loss calculation reporting.
+        as ModelPerformanceEvaluation. Otherwise, we are limited only to automatic loss calculation reporting.
 
         When listing callbacks for the TrainLoop it is important to list the ModelPerformanceEvaluation before
         this ModelPerformancePrintReport. This ensures that the calculated results are present in the
@@ -349,7 +364,7 @@ class ModelTrainHistoryBaseCB(AbstractExperimentCallback):
         Args:
             callback_name (str): name of the callback
             execution_order (int): order of the callback execution. If all the used callbacks have the orders set to 0,
-                than the callbacks are executed in the order they were registered.
+                then the callbacks are executed in the order they were registered.
             epoch_end (bool): should plot after every epoch
             train_end (bool): should plot at the end of the training
             report_iteration_frequency (int): report frequency in terms of training iterations used for more
@@ -488,7 +503,7 @@ class ModelTrainHistoryPlot(ModelTrainHistoryBaseCB):
         results_file_local_paths = [result_local_path for _, result_local_path in saved_local_results_details]
         self.message_service.write_message('ModelTrainHistoryPlot_results_file_local_paths',
                                            results_file_local_paths,
-                                           msg_handling_settings=msg_passing_settings.UNTIL_END_OF_EPOCH)
+                                           msg_handling_settings=MessageHandling.UNTIL_END_OF_EPOCH)
 
         if self.cloud_results_saver is not None:
             experiment_cloud_path = \
@@ -514,7 +529,7 @@ class ModelTrainHistoryFileWriter(ModelTrainHistoryBaseCB):
             report_iteration_frequency (int): report frequency in terms of training iterations used for more
                 fine-grained sub-epoch performance evaluation specification. If set to 0 no inter epoch execution is
                 performed.
-            file_format (str): output file format. Can be either 'txt' human readable output or
+            file_format (str): output file format. Can be either 'txt' human-readable output or
                 'tsv' for a tabular format or 'csv' for comma separated format.
             project_name (str or None): root name of the project
             experiment_name (str or None): name of the particular experiment
@@ -594,7 +609,7 @@ class ModelTrainHistoryFileWriter(ModelTrainHistoryBaseCB):
 
         self.message_service.write_message('ModelTrainHistoryFileWriter_results_file_local_paths',
                                            [results_file_local_path],
-                                           msg_handling_settings=msg_passing_settings.UNTIL_END_OF_EPOCH)
+                                           msg_handling_settings=MessageHandling.UNTIL_END_OF_EPOCH)
 
         if self.cloud_results_saver is not None:
             experiment_cloud_path = \

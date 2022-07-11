@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Example how to run:
-# ./prepare_instance.sh -k <SSH_KEY_LOCATION> -a <INSTANCE_IP_ADDRESS> -f pytorch -v 1.3.0 -p ~/PycharmProjects/Transformer -d SQuAD2 -r orig
+# ./prepare_instance.sh -k <SSH_KEY_LOCATION> -a <INSTANCE_IP_ADDRESS> -f pytorch -v 1.5.0 -p ~/PycharmProjects/Transformer -d SQuAD2 -r orig
 
 # When you get ssh-ed to the instance finish the instance prep process by running:
 # ./finish_prepare_instance.sh
@@ -35,9 +35,9 @@ function usage()
      -p, --project STR      path to the project to be optionally uploaded to the running ec2 instance
      -d, --dataset STR      dataset to be optionally downloaded from the S3 storage directly to ec2 instance
      -r, --preproc STR      the preprocessed version of the main dataset
-     -x, --apex             switch on to install Nvidia Apex library for mixed precision training
-     --deepspeed            install Microsoft DeepSpeed library
      -o, --os-name STR      username depending on the OS chosen. Default is ubuntu
+     --aws-region STR       create the instance in the specified region. Default is Ireland (eu-west-1)
+     --pypi                 install package from PyPI instead of the local package version
      --no-ssh               disable auto ssh-ing to the instance
      -h, --help             show this help message and exit
 
@@ -47,14 +47,15 @@ HEREDOC
 key_path=$(jq -r '.key_path' configs/my_config.json)
 ec2_instance_address=
 DL_framework="pytorch"
-AIToolbox_version="1.3.0"
+AIToolbox_version="1.5.0"
 local_project_path="None"
 dataset_name="None"
 preproc_dataset="None"
-use_apex=false
-use_deepspeed=false
 username="ubuntu"
+aws_region="eu-west-1"
+pypi_install=false
 auto_ssh_to_instance=true
+wandb_name=$(jq -r '.wandb' configs/my_config.json)
 
 while [[ $# -gt 0 ]]; do
 key="$1"
@@ -88,17 +89,17 @@ case $key in
     preproc_dataset="$2"
     shift 2 # past argument value
     ;;
-    -x|--apex)
-    use_apex=true
-    shift 1 # past argument value
-    ;;
-    --deepspeed)
-    use_deepspeed=true
-    shift 1 # past argument value
-    ;;
     -o|--os-name)
     username="$2"
     shift 2 # past argument value
+    ;;
+    --aws-region)
+    aws_region="$2"
+    shift 2 # past argument value
+    ;;
+    --pypi)
+    pypi_install=true
+    shift 1 # past argument value
     ;;
     --no-ssh)
     auto_ssh_to_instance=false
@@ -131,10 +132,19 @@ else
     py_env="pytorch_latest_p36"
 fi
 
+if [ "$aws_region" == "eu-central-1" ]; then
+    instance_config=${instance_config%.*}_central.json
+fi
+
+# Set the region either to Ireland or Frankfurt
+export AWS_DEFAULT_REGION=$aws_region
+
 
 ssh -i $key_path -o "StrictHostKeyChecking no" $username@$ec2_instance_address 'mkdir ~/project ; mkdir ~/project/data ; mkdir ~/project/model_results'
 
-scp -i $key_path ../../dist/aitoolbox-$AIToolbox_version.tar.gz  $username@$ec2_instance_address:~/project
+if [ $pypi_install == false ]; then
+    scp -i $key_path ../../dist/aitoolbox-$AIToolbox_version.tar.gz  $username@$ec2_instance_address:~/project
+fi
 scp -i $key_path download_data.sh  $username@$ec2_instance_address:~/project
 scp -i $key_path run_experiment.sh  $username@$ec2_instance_address:~/project
 
@@ -147,9 +157,7 @@ echo "#!/usr/bin/env bash
 export LANGUAGE=en_US.UTF-8
 export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
-export AWS_DEFAULT_REGION=eu-west-1
-
-#echo Ireland AWS zone: eu-west-1
+export AWS_DEFAULT_REGION=$aws_region
 
 #aws configure
 cd project
@@ -160,48 +168,23 @@ pip install -U boto3
 pip install awscli
 pip install -U numpy
 pip install --ignore-installed greenlet
-pip install jsonnet seaborn==0.9.0
+pip install seaborn==0.9.0
 
 #conda install -y -c conda-forge jsonnet
 #conda install -y -c anaconda seaborn=0.9.0
 
-if [ $use_apex == true ]; then
-    git clone https://github.com/NVIDIA/apex
-    cd apex
-    pip install -v --no-cache-dir --global-option=\"--cpp_ext\" --global-option=\"--cuda_ext\" ./
-    cd ..
+if [ $pypi_install == false ]; then
+  pip install aitoolbox-$AIToolbox_version.tar.gz
+else
+  pip install aitoolbox==$AIToolbox_version
 fi
 
-if [ $use_deepspeed == true ]; then
-    git clone https://github.com/microsoft/DeepSpeed
-    cd DeepSpeed
-    ./install.sh --local_only --skip_requirements
-    cd ..
-fi
-
-pip install aitoolbox-$AIToolbox_version.tar.gz
+export WANDB_API_KEY=\$(aws ssm get-parameter --name $wandb_name --with-decryption --output text --query Parameter.Value)
 
 if [ $local_project_path != 'None' ]; then
     pip install -r ~/project/AWS_run_scripts/AWS_bootstrap/requirements.txt
     ~/project/AWS_run_scripts/AWS_bootstrap/bootstrap.sh
 fi
-
-#./pyrouge_set_rouge_path ~/project/ROUGE-1.5.5
-#
-#sudo yum -y install perl-CPAN
-##sudo perl -MCPAN -e 'install LWP::UserAgent::Cached'
-##sudo perl -MCPAN -e 'install Bundle::LWP'
-#sudo yum install -y perl-libwww-perl
-#sudo perl -MCPAN -e 'install DB_File'
-#
-#cd ROUGE-1.5.5/data
-#rm WordNet-2.0.exc.db
-#cd WordNet-2.0-Exceptions
-#./buildExeptionDB.pl . exc WordNet-2.0.exc.db
-#cd ../
-#ln -s WordNet-2.0-Exceptions/WordNet-2.0.exc.db WordNet-2.0.exc.db
-#cd ../..
-
 
 if [ $dataset_name != 'None' ]; then
     ./download_data.sh -p ~/project/data -d $dataset_name -r $preproc_dataset

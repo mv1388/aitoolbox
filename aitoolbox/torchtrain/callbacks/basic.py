@@ -389,7 +389,7 @@ class FunctionOnTrainLoop(AbstractCallback):
             after_gradient_update (bool): should execute after the gradient update
             after_optimizer_step (bool): should execute after the optimizer step
             execution_order (int): order of the callback execution. If all the used callbacks have the orders set to 0,
-                than the callbacks are executed in the order they were registered.
+                then the callbacks are executed in the order they were registered.
         """
         AbstractCallback.__init__(self, 'Execute given function as a callback', execution_order, device_idx_execution)
         self.fn_to_execute = fn_to_execute

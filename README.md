@@ -1,11 +1,10 @@
 # AI Toolbox
 
 [![PyPI version](https://badge.fury.io/py/aitoolbox.svg)](https://badge.fury.io/py/aitoolbox)
-[![Build Status](https://travis-ci.org/mv1388/AIToolbox.svg?branch=master)](https://travis-ci.org/mv1388/AIToolbox)
+[![Build Status](https://app.travis-ci.com/mv1388/aitoolbox.svg?branch=master)](https://app.travis-ci.com/mv1388/aitoolbox)
 [![Documentation Status](https://readthedocs.org/projects/aitoolbox/badge/?version=latest)](https://aitoolbox.readthedocs.io/en/latest/?badge=latest)
 &nbsp; &nbsp;
 [![codebeat badge](https://codebeat.co/badges/04217a3f-a838-418f-8f14-66cf6ae1b03d)](https://codebeat.co/projects/github-com-mv1388-aitoolbox-master)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/8349596c31a948d8916814a2037ffdf3)](https://www.codacy.com/manual/mv1388/AIToolbox?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=mv1388/AIToolbox&amp;utm_campaign=Badge_Grade)
 [![CodeFactor](https://www.codefactor.io/repository/github/mv1388/aitoolbox/badge)](https://www.codefactor.io/repository/github/mv1388/aitoolbox)
 
 [**Documentation**](https://aitoolbox.readthedocs.io/en/latest/)
