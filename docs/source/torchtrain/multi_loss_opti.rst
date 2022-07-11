@@ -35,8 +35,18 @@ optimizers each with access to different parameters of the model. These separate
 in a list to the :class:`aitoolbox.torchtrain.multi_loss_optim.MultiOptimizer` wrapper.
 The ``MultiOptimizer`` can subsequently be given to the TrainLoop the same way as the normal single optimizer.
 
-MultiOptimizer definition example:
+``MultiOptimizer`` definition example:
 
 .. code-block:: python
 
     MultiOptimizer([optimizer_1, optimizer_2])
+
+
+When more advanced multi-optimizer training logic is required the user can override the
+:meth:`aitoolbox.torchtrain.multi_loss_optim.MultiOptimizer.step` and/or the
+:meth:`aitoolbox.torchtrain.multi_loss_optim.MultiOptimizer.zero_grad` methods as needed.
+
+Lastly, when using the ``MultiOptimizer`` the training state checkpoint saving is also automatically
+handled by the train loop. As part of this the train loop automatically stores the state of
+each of the optimizers wrapped inside of the ``MultiOptimizer``. The same functionality is provided
+when loading the saved model.
