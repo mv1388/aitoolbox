@@ -152,7 +152,7 @@ class ModelPerformanceEvaluation(AbstractCallback):
             self.message_service.write_message(
                 'ITERATION_LEVEL_METRICS',
                 list(set(metric_names_list + iteration_level_metric_names)),
-                msg_handling_settings=[msg_passing_settings.OVERWRITE, msg_passing_settings.KEEP_FOREVER]
+                msg_handling_settings=[MessageHandling.OVERWRITE, MessageHandling.KEEP_FOREVER]
             )
 
     def on_train_loop_registration(self):
