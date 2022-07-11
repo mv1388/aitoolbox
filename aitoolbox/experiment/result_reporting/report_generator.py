@@ -128,7 +128,7 @@ class TrainingHistoryWriter:
             epoch (int): current epoch
             file_name (str): output text file name
             results_folder_name (str): results folder path where the report file will be located
-            file_format (str): output file format. Can be either 'txt' human readable output or
+            file_format (str): output file format. Can be either 'txt' human-readable output or
                 'tsv' for a tabular format or 'csv' for comma separated format.
 
         Returns:

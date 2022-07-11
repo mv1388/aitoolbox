@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Example how to run:
-# ./prepare_instance.sh -k <SSH_KEY_LOCATION> -a <INSTANCE_IP_ADDRESS> -f pytorch -v 1.4.0 -p ~/PycharmProjects/Transformer -d SQuAD2 -r orig
+# ./prepare_instance.sh -k <SSH_KEY_LOCATION> -a <INSTANCE_IP_ADDRESS> -f pytorch -v 1.5.0 -p ~/PycharmProjects/Transformer -d SQuAD2 -r orig
 
 # When you get ssh-ed to the instance finish the instance prep process by running:
 # ./finish_prepare_instance.sh
@@ -37,6 +37,7 @@ function usage()
      -r, --preproc STR      the preprocessed version of the main dataset
      -o, --os-name STR      username depending on the OS chosen. Default is ubuntu
      --aws-region STR       create the instance in the specified region. Default is Ireland (eu-west-1)
+     --pypi                 install package from PyPI instead of the local package version
      --no-ssh               disable auto ssh-ing to the instance
      -h, --help             show this help message and exit
 
@@ -46,13 +47,15 @@ HEREDOC
 key_path=$(jq -r '.key_path' configs/my_config.json)
 ec2_instance_address=
 DL_framework="pytorch"
-AIToolbox_version="1.4.0"
+AIToolbox_version="1.5.0"
 local_project_path="None"
 dataset_name="None"
 preproc_dataset="None"
 username="ubuntu"
 aws_region="eu-west-1"
+pypi_install=false
 auto_ssh_to_instance=true
+wandb_name=$(jq -r '.wandb' configs/my_config.json)
 
 while [[ $# -gt 0 ]]; do
 key="$1"
@@ -93,6 +96,10 @@ case $key in
     --aws-region)
     aws_region="$2"
     shift 2 # past argument value
+    ;;
+    --pypi)
+    pypi_install=true
+    shift 1 # past argument value
     ;;
     --no-ssh)
     auto_ssh_to_instance=false
@@ -135,7 +142,9 @@ export AWS_DEFAULT_REGION=$aws_region
 
 ssh -i $key_path -o "StrictHostKeyChecking no" $username@$ec2_instance_address 'mkdir ~/project ; mkdir ~/project/data ; mkdir ~/project/model_results'
 
-scp -i $key_path ../../dist/aitoolbox-$AIToolbox_version.tar.gz  $username@$ec2_instance_address:~/project
+if [ $pypi_install == false ]; then
+    scp -i $key_path ../../dist/aitoolbox-$AIToolbox_version.tar.gz  $username@$ec2_instance_address:~/project
+fi
 scp -i $key_path download_data.sh  $username@$ec2_instance_address:~/project
 scp -i $key_path run_experiment.sh  $username@$ec2_instance_address:~/project
 
@@ -159,34 +168,23 @@ pip install -U boto3
 pip install awscli
 pip install -U numpy
 pip install --ignore-installed greenlet
-pip install jsonnet seaborn==0.9.0
+pip install seaborn==0.9.0
 
 #conda install -y -c conda-forge jsonnet
 #conda install -y -c anaconda seaborn=0.9.0
 
-pip install aitoolbox-$AIToolbox_version.tar.gz
+if [ $pypi_install == false ]; then
+  pip install aitoolbox-$AIToolbox_version.tar.gz
+else
+  pip install aitoolbox==$AIToolbox_version
+fi
+
+export WANDB_API_KEY=\$(aws ssm get-parameter --name $wandb_name --with-decryption --output text --query Parameter.Value)
 
 if [ $local_project_path != 'None' ]; then
     pip install -r ~/project/AWS_run_scripts/AWS_bootstrap/requirements.txt
     ~/project/AWS_run_scripts/AWS_bootstrap/bootstrap.sh
 fi
-
-#./pyrouge_set_rouge_path ~/project/ROUGE-1.5.5
-#
-#sudo yum -y install perl-CPAN
-##sudo perl -MCPAN -e 'install LWP::UserAgent::Cached'
-##sudo perl -MCPAN -e 'install Bundle::LWP'
-#sudo yum install -y perl-libwww-perl
-#sudo perl -MCPAN -e 'install DB_File'
-#
-#cd ROUGE-1.5.5/data
-#rm WordNet-2.0.exc.db
-#cd WordNet-2.0-Exceptions
-#./buildExeptionDB.pl . exc WordNet-2.0.exc.db
-#cd ../
-#ln -s WordNet-2.0-Exceptions/WordNet-2.0.exc.db WordNet-2.0.exc.db
-#cd ../..
-
 
 if [ $dataset_name != 'None' ]; then
     ./download_data.sh -p ~/project/data -d $dataset_name -r $preproc_dataset

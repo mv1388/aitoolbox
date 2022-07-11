@@ -18,10 +18,12 @@ class AbstractResultPackage(ABC):
         Args:
             pkg_name (str or None): result package name used just for clarity
             strict_content_check (bool): should just print warning or raise the error and crash
-            np_array (bool or str): how the inputs should be handled. Should the package try to automatically guess or
+            np_array (bool or str): how the inputs should be handled. Should the package try to automatically guess, or
                 you want to manually decide whether to leave the inputs as they are or convert them to np.array.
                 Possible options: True, False, 'auto'
-                Be slightly careful with 'auto' as it sometimes doesn't work so it is preferable to explicitly use True/False
+
+                Be slightly careful with 'auto' as it sometimes doesn't work,
+                so it is preferable to explicitly use True/False
             **kwargs (dict): additional package_metadata for the result package
         """
         self.pkg_name = pkg_name
@@ -151,9 +153,9 @@ class AbstractResultPackage(ABC):
         return self.additional_results_dump_paths
 
     def list_additional_results_dump_paths(self):
-        """Specify the list of meta data files you also want to save & upload to s3 during the experiment saving procedure
+        """Specify the list of metadata files you also want to save & upload to s3 during the experiment saving procedure
 
-        By default there are no additional files that are saved as the return is None. If you want to save your
+        By default, there are no additional files that are saved as the return is None. If you want to save your
         specific additional files produced during the training procedure, then override this method specifying
         the file paths.
 

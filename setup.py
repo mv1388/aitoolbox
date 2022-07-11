@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='aitoolbox',
-    version='1.4.0',
+    version='1.5.0',
     author='Marko Vidoni',
     author_email='',
     url='https://github.com/mv1388/AIToolbox',
@@ -26,7 +26,7 @@ setup(
 
         'torch>=1.6.0',
         'torchvision',
-        'torchtext',
+        'torchtext==0.7',
         'pytorch-nlp',
         'transformers',
 
@@ -36,13 +36,14 @@ setup(
         'boto3',
         'botocore',
         'google-cloud-storage',
+        'protobuf==3.19.4',
 
         'nltk',
-        'allennlp==0.9',
         'pyrouge',
         'rouge',
 
-        'tensorboard'
+        'tensorboard',
+        'wandb'
     ],
 
     test_suite='tests',

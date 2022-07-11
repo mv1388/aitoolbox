@@ -12,7 +12,7 @@ class AbstractCallback:
         Args:
             callback_name (str): name of the callback
             execution_order (int): order of the callback execution. If all the used callbacks have the orders set to 0,
-                than the callbacks are executed in the order they were registered.
+                then the callbacks are executed in the order they were registered.
             device_idx_execution (int or None): index of the (CUDA GPU) device DDP process inside which the callback
                 should be executed
         """
@@ -103,7 +103,7 @@ class AbstractCallback:
         """Logic executed after the model gradients are updated
 
         To ensure the execution of this callback enable the `self.train_loop_obj.grad_cb_used = True` option in the
-        on_train_loop_registration(). Otherwise logic implemented here will not be executed by the TrainLoop.
+        on_train_loop_registration(). Otherwise, logic implemented here will not be executed by the TrainLoop.
 
         Args:
             optimizer_idx (int): index of the current optimizer. Mostly useful when using multiple optimizers.
@@ -118,7 +118,7 @@ class AbstractCallback:
         """Logic executed after the optimizer does a new step and updates the model weights
 
         To ensure the execution of this callback enable the `self.train_loop_obj.grad_cb_used = True` option in the
-        on_train_loop_registration(). Otherwise logic implemented here will not be executed by the TrainLoop.
+        on_train_loop_registration(). Otherwise, logic implemented here will not be executed by the TrainLoop.
 
         Returns:
             None
@@ -156,7 +156,7 @@ class AbstractExperimentCallback(AbstractCallback):
             bucket_name (str): name of the bucket in the cloud storage
             cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
             execution_order (int): order of the callback execution. If all the used callbacks have the orders set to 0,
-                than the callbacks are executed in the order they were registered.
+                then the callbacks are executed in the order they were registered.
             device_idx_execution (int or None): index of the (CUDA GPU) device DDP process inside which the callback
                 should be executed
         """
