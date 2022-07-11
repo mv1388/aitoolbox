@@ -86,6 +86,7 @@ class TrainLoopCheckpoint(TrainLoop):
         self.cloud_save_mode = cloud_save_mode
         self.bucket_name = bucket_name
         self.cloud_dir_prefix = cloud_dir_prefix
+        self.source_dirs = source_dirs
         self.rm_subopt_local_models = rm_subopt_local_models
         self.iteration_save_freq = iteration_save_freq
 
@@ -196,6 +197,7 @@ class TrainLoopEndSave(TrainLoop):
         self.cloud_save_mode = cloud_save_mode
         self.bucket_name = bucket_name
         self.cloud_dir_prefix = cloud_dir_prefix
+        self.source_dirs = source_dirs
 
         if 'experiment_file_path' not in self.hyperparams:
             self.hyperparams['experiment_file_path'] = inspect.getframeinfo(inspect.currentframe().f_back).filename

@@ -6,7 +6,6 @@
 
 project_root_path=~/project
 export PYTHONPATH=${PYTHONPATH}:$project_root_path
-export AWS_DEFAULT_REGION=eu-west-1
 
 # usage function
 function usage()
@@ -21,6 +20,7 @@ function usage()
      -l, --log-path STR             path to the local log file which will be uploaded to s3
      --log-s3-upload-dir STR        path to the logs folder on S3 to which the training log should be uploaded
      -c, --cleanup-script STR       post execution cleanup script
+     --aws-region STR               create the instance in the specified region. Default is Ireland (eu-west-1)
      -h, --help                     show this help message and exit
 
 HEREDOC
@@ -31,6 +31,7 @@ experiment_script_file="aws_run_experiments_project.sh"
 log_file_path=
 log_s3_dir_path="s3://model-result/training_logs"
 post_experiment_run_cleanup=false
+aws_region="eu-west-1"
 
 while [[ $# -gt 0 ]]; do
 key="$1"
@@ -56,6 +57,10 @@ case $key in
     post_experiment_run_cleanup=true
     shift 1 # past argument value
     ;;
+    --aws-region)
+    aws_region="$2"
+    shift 2 # past argument value
+    ;;
     -h|--help )
     usage;
     exit;
@@ -67,6 +72,10 @@ case $key in
     ;;
 esac
 done
+
+# Set the region either to Ireland or Frankfurt
+export AWS_DEFAULT_REGION=$aws_region
+
 
 echo "
 ************************************************************

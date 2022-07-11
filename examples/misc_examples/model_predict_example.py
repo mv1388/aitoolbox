@@ -5,7 +5,7 @@ import torch.nn as nn
 
 from aitoolbox.nlp.dataset.SQuAD2.SQuAD2DataReader import SQuAD2ConcatContextDatasetReader
 from aitoolbox.torchtrain.data.dataset import BasicDataset as SQuAD2Dataset
-from aitoolbox.nlp.dataset.torch_collate_fns import qa_concat_ctx_span_collate_fn
+from aitoolbox.nlp.torch_collate_fns import qa_concat_ctx_span_collate_fn
 
 from aitoolbox.torchtrain.model_predict import PyTorchModelPredictor
 from aitoolbox.nlp.experiment_evaluation.NLP_result_package import QuestionAnswerResultPackage
