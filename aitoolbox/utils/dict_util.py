@@ -1,13 +1,17 @@
 import collections
 import copy
+import numpy as np
+import torch
+
+from aitoolbox.utils.util import flatten_list_of_lists
 
 
 def combine_prediction_metadata_batches(metadata_list):
-    """Combines a list of dicts with the same keys and lists as values into a single dict with concatenated lists
-        for each corresponding key
+    """Combines a list of dicts with the same keys and [lists or torch.Tensors or np.arrays] as values into
+        a single dict with concatenated [lists or torch.Tensors or np.arrays] for each corresponding key
 
     Args:
-        metadata_list (list): list of dicts with matching keys and lists for values
+        metadata_list (list): list of dicts with matching keys and [lists or torch.Tensors or np.arrays] for values
 
     Returns:
         dict: combined single dict
@@ -18,7 +22,22 @@ def combine_prediction_metadata_batches(metadata_list):
         for meta_el in metadata_batch:
             if meta_el not in combined_metadata:
                 combined_metadata[meta_el] = []
-            combined_metadata[meta_el] += metadata_batch[meta_el]
+
+            combined_metadata[meta_el].append(metadata_batch[meta_el])
+
+    for meta_el in combined_metadata:
+        metadata_elements_list = combined_metadata[meta_el]
+
+        if isinstance(metadata_elements_list[0], list):
+            combined_metadata[meta_el] = flatten_list_of_lists(metadata_elements_list)
+        elif isinstance(metadata_elements_list[0], torch.Tensor):
+            combined_metadata[meta_el] = torch.cat(metadata_elements_list, dim=0)
+        elif isinstance(metadata_elements_list[0], np.ndarray):
+            combined_metadata[meta_el] = np.concatenate(metadata_elements_list, axis=0)
+        else:
+            raise TypeError(f'Provided metadata element data type which is not supported '
+                            f'by the function (type: {type(metadata_elements_list[0])}). '
+                            f'Function supports the following data types: list, torch.Tensor and np.array')
 
     return combined_metadata
 
