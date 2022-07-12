@@ -224,7 +224,7 @@ class CallbacksHandler:
             other (list): callbacks list
 
         Returns:
-            BasicCallbacksHandler:
+            CallbacksHandler:
         """
         self.register_callbacks(other)
         return self
@@ -236,7 +236,7 @@ class CallbacksHandler:
             other (list): callbacks list
 
         Returns:
-            BasicCallbacksHandler:
+            CallbacksHandler:
         """
         self.register_callbacks(other)
         return self
