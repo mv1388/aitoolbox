@@ -159,7 +159,8 @@ class CallbacksHandler:
                 cbs_at_position.sort(key=lambda cb: cb.execution_order)
                 
     def mp_filter_callbacks(self):
-        self.mp_filter_callbacks()
+        self.train_loop_obj.callbacks = self._mp_filter_cb_list(self.train_loop_obj.callbacks)
+
         self.cbs_on_epoch_begin = self._mp_filter_cb_list(self.cbs_on_epoch_begin)
         self.cbs_on_epoch_end = self._mp_filter_cb_list(self.cbs_on_epoch_end)
         self.cbs_on_train_begin = self._mp_filter_cb_list(self.cbs_on_train_begin)
