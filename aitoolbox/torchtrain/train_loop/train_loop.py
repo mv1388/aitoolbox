@@ -564,6 +564,7 @@ class TrainLoop:
 
         Returns:
             (torch.Tensor, torch.Tensor, dict): y_pred, y_true, metadata
+                in the form of dict of lists/torch.Tensors/np.arrays
         """
         if not self.prediction_store.has_train_predictions(self.total_iteration_idx) or force_prediction:
             predictions = self.predict_with_model(self.train_loader, execute_callbacks,
@@ -585,6 +586,7 @@ class TrainLoop:
 
         Returns:
             (torch.Tensor, torch.Tensor, dict): y_pred, y_true, metadata
+                in the form of dict of lists/torch.Tensors/np.arrays
         """
         if not self.prediction_store.has_val_predictions(self.total_iteration_idx) or force_prediction:
             predictions = self.predict_with_model(self.validation_loader, execute_callbacks,
@@ -606,6 +608,7 @@ class TrainLoop:
 
         Returns:
             (torch.Tensor, torch.Tensor, dict): y_pred, y_true, metadata
+                in the form of dict of lists/torch.Tensors/np.arrays
         """
         if not self.prediction_store.has_test_predictions(self.total_iteration_idx) or force_prediction:
             predictions = self.predict_with_model(self.test_loader, execute_callbacks,
@@ -630,6 +633,7 @@ class TrainLoop:
 
         Returns:
             (torch.Tensor, torch.Tensor, dict): y_pred, y_true, metadata
+                in the form of dict of lists/torch.Tensors/np.arrays
         """
         self.model = self.model.to(self.device)
 

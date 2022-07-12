@@ -1,4 +1,6 @@
 import unittest
+import numpy as np
+import torch
 
 from aitoolbox.utils import dict_util
 
@@ -32,7 +34,7 @@ class TestCombinePredictionMetadataBatches(unittest.TestCase):
              'meta_2_special': list(range(4)) * 2}
         )
 
-    def test_combine_metadata_dicts_with_varying_elements(self):
+    def test_combine_metadata_dicts_with_varying_list_elements(self):
         metadata_batches = [
             {'meta_1': [1, 100, 1000, 10000], 'meta_2': list(range(4)), 'meta_2_special': list(range(2))},
             {'meta_1': [1, 100, 1000, 10000], 'meta_2': list(range(4))},
@@ -47,6 +49,121 @@ class TestCombinePredictionMetadataBatches(unittest.TestCase):
              'meta_2': list(range(4)) * 4,
              'meta_2_special': list(range(2)),
              'completely_new_meta': ['334', '1000', 'bla']}
+        )
+
+    def test_combine_metadata_dicts_with_torch_tensors(self):
+        meta_1 = torch.rand(20, 50)
+        meta_2 = torch.randint(0, 100, (20, 12))
+
+        metadata_batches = [
+            {'meta_1': meta_1, 'meta_2': meta_2},
+            {'meta_1': meta_1, 'meta_2': meta_2},
+            {'meta_1': meta_1, 'meta_2': meta_2},
+            {'meta_1': meta_1, 'meta_2': meta_2}
+        ]
+
+        combined_metadata = dict_util.combine_prediction_metadata_batches(metadata_batches)
+        self.assertEqual(sorted(combined_metadata.keys()), ['meta_1', 'meta_2'])
+        self.assertEqual(combined_metadata['meta_1'].shape, (meta_1.shape[0] * 4, meta_1.shape[1]))
+        self.assertEqual(combined_metadata['meta_2'].shape, (meta_2.shape[0] * 4, meta_2.shape[1]))
+        for vals in combined_metadata.values():
+            self.assertIsInstance(vals, torch.Tensor)
+
+        self.assertEqual(
+            {k: v.tolist() for k, v in combined_metadata.items()},
+            {
+                'meta_1': torch.cat([meta_1, meta_1, meta_1, meta_1]).tolist(),
+                'meta_2': torch.cat([meta_2, meta_2, meta_2, meta_2]).tolist()
+            }
+        )
+
+    def test_combine_metadata_dicts_with_nunmpy_arrays(self):
+        meta_1 = np.random.rand(20, 50)
+        meta_2 = np.random.randint(0, 100, (20, 12))
+
+        metadata_batches = [
+            {'meta_1': meta_1, 'meta_2': meta_2},
+            {'meta_1': meta_1, 'meta_2': meta_2},
+            {'meta_1': meta_1, 'meta_2': meta_2},
+            {'meta_1': meta_1, 'meta_2': meta_2}
+        ]
+
+        combined_metadata = dict_util.combine_prediction_metadata_batches(metadata_batches)
+        self.assertEqual(sorted(combined_metadata.keys()), ['meta_1', 'meta_2'])
+        self.assertEqual(combined_metadata['meta_1'].shape, (meta_1.shape[0] * 4, meta_1.shape[1]))
+        self.assertEqual(combined_metadata['meta_2'].shape, (meta_2.shape[0] * 4, meta_2.shape[1]))
+        for vals in combined_metadata.values():
+            self.assertIsInstance(vals, np.ndarray)
+
+        self.assertEqual(
+            {k: v.tolist() for k, v in combined_metadata.items()},
+            {
+                'meta_1': np.concatenate([meta_1, meta_1, meta_1, meta_1]).tolist(),
+                'meta_2': np.concatenate([meta_2, meta_2, meta_2, meta_2]).tolist()
+            }
+        )
+
+    def test_combine_metadata_dicts_with_mixed_lists_torch_tensors_np_arrays(self):
+        meta_torch_1 = torch.rand(20, 50)
+        meta_torch_2 = torch.randint(0, 100, (20, 12))
+        meta_np_1 = np.random.rand(20, 25)
+        meta_np_2 = np.random.randint(0, 200, (20, 34))
+        meta_list_1 = list(range(20))
+        meta_list_2 = list(range(19, -1, -1))
+        meta_list_3 = [
+            [1, 2, 3],
+            [4, 5, 3],
+            [3, 3, 3]
+        ]
+
+        metadata_batches = [
+            {'meta_torch_1': meta_torch_1, 'meta_torch_2': meta_torch_2,
+             'meta_np_1': meta_np_1, 'meta_np_2': meta_np_2,
+             'meta_list_1': meta_list_1, 'meta_list_2': meta_list_2, 'meta_list_3': meta_list_3},
+            {'meta_torch_1': meta_torch_1, 'meta_torch_2': meta_torch_2,
+             'meta_np_1': meta_np_1, 'meta_np_2': meta_np_2,
+             'meta_list_1': meta_list_1, 'meta_list_2': meta_list_2, 'meta_list_3': meta_list_3},
+            {'meta_torch_1': meta_torch_1, 'meta_torch_2': meta_torch_2,
+             'meta_np_1': meta_np_1, 'meta_np_2': meta_np_2,
+             'meta_list_1': meta_list_1, 'meta_list_2': meta_list_2, 'meta_list_3': meta_list_3},
+            {'meta_torch_1': meta_torch_1, 'meta_torch_2': meta_torch_2,
+             'meta_np_1': meta_np_1, 'meta_np_2': meta_np_2,
+             'meta_list_1': meta_list_1, 'meta_list_2': meta_list_2, 'meta_list_3': meta_list_3}
+        ]
+
+        combined_metadata = dict_util.combine_prediction_metadata_batches(metadata_batches)
+        self.assertEqual(
+            sorted(combined_metadata.keys()),
+            sorted(['meta_torch_1', 'meta_torch_2', 'meta_np_1', 'meta_np_2',
+                    'meta_list_1', 'meta_list_2', 'meta_list_3'])
+        )
+        self.assertEqual(combined_metadata['meta_torch_1'].shape, (meta_torch_1.shape[0] * 4, meta_torch_1.shape[1]))
+        self.assertEqual(combined_metadata['meta_torch_2'].shape, (meta_torch_2.shape[0] * 4, meta_torch_2.shape[1]))
+        self.assertEqual(combined_metadata['meta_np_1'].shape, (meta_np_1.shape[0] * 4, meta_np_1.shape[1]))
+        self.assertEqual(combined_metadata['meta_np_2'].shape, (meta_np_2.shape[0] * 4, meta_np_2.shape[1]))
+        self.assertEqual(len(combined_metadata['meta_list_1']), len(meta_list_1) * 4)
+        self.assertEqual(len(combined_metadata['meta_list_2']), len(meta_list_2) * 4)
+        self.assertEqual(len(combined_metadata['meta_list_3']), len(meta_list_3) * 4)
+
+        self.assertIsInstance(combined_metadata['meta_torch_1'], torch.Tensor)
+        self.assertIsInstance(combined_metadata['meta_torch_2'], torch.Tensor)
+        self.assertIsInstance(combined_metadata['meta_np_1'], np.ndarray)
+        self.assertIsInstance(combined_metadata['meta_np_2'], np.ndarray)
+        self.assertIsInstance(combined_metadata['meta_list_1'], list)
+        self.assertIsInstance(combined_metadata['meta_list_2'], list)
+        self.assertIsInstance(combined_metadata['meta_list_3'], list)
+
+        self.assertEqual(
+            {k: v.tolist() if not isinstance(v, list) else v for k, v in combined_metadata.items()},
+            {
+                'meta_torch_1': torch.cat([meta_torch_1, meta_torch_1, meta_torch_1, meta_torch_1]).tolist(),
+                'meta_torch_2': torch.cat([meta_torch_2, meta_torch_2, meta_torch_2, meta_torch_2]).tolist(),
+                'meta_np_1': np.concatenate([meta_np_1, meta_np_1, meta_np_1, meta_np_1]).tolist(),
+                'meta_np_2': np.concatenate([meta_np_2, meta_np_2, meta_np_2, meta_np_2]).tolist(),
+                'meta_list_1': meta_list_1 + meta_list_1 + meta_list_1 + meta_list_1,
+                'meta_list_2': meta_list_2 + meta_list_2 + meta_list_2 + meta_list_2,
+                'meta_list_3': meta_list_3 + meta_list_3 + meta_list_3 + meta_list_3
+            }
         )
 
 
