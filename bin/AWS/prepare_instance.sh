@@ -148,10 +148,6 @@ fi
 scp -i $key_path download_data.sh  $username@$ec2_instance_address:~/project
 scp -i $key_path run_experiment.sh  $username@$ec2_instance_address:~/project
 
-# Stuff for pyrouge package
-scp -i $key_path ../pyrouge_set_rouge_path $username@$ec2_instance_address:~/project
-scp -i $key_path -r ../ROUGE-1.5.5 $username@$ec2_instance_address:~/project
-
 echo "#!/usr/bin/env bash
 
 export LANGUAGE=en_US.UTF-8
