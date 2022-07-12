@@ -3,6 +3,8 @@ import os
 
 from tests.utils import *
 
+import numpy as np
+
 import torch
 from torch.utils.data.dataset import TensorDataset
 from torch.utils.data.dataloader import DataLoader
@@ -11,6 +13,7 @@ from torch.optim.adam import Adam
 from aitoolbox.torchtrain.train_loop import TrainLoop
 from aitoolbox.torchtrain.model import ModelWrap
 from aitoolbox.torchtrain.train_loop.components.callback_handler import CallbacksHandler
+from aitoolbox.torchtrain.callbacks.abstract import AbstractCallback
 from aitoolbox.torchtrain.multi_loss_optim import MultiOptimizer
 from aitoolbox.torchtrain.schedulers.basic import ReduceLROnPlateauScheduler, StepLRScheduler
 from aitoolbox.torchtrain.schedulers.warmup import LinearWithWarmupScheduler
@@ -474,6 +477,56 @@ class TestTrainLoop(unittest.TestCase):
             d['bla'] += [i + 200] * 64
         self.assertEqual(metadata, d)
 
+    def test_prediction_batched_average_via_batch_prediction_callback(self):
+        self.execute_training_with_on_batch_prediction_cb(
+            num_epochs=5, train_loader=list(range(4)), val_loader=list(range(3)), test_loader=None
+        )
+        self.execute_training_with_on_batch_prediction_cb(
+            num_epochs=30, train_loader=list(range(4)), val_loader=list(range(3)), test_loader=None
+        )
+        self.execute_training_with_on_batch_prediction_cb(
+            num_epochs=10, train_loader=list(range(4)), val_loader=list(range(3)), test_loader=list(range(2))
+        )
+        self.execute_training_with_on_batch_prediction_cb(
+            num_epochs=30, train_loader=list(range(20)), val_loader=list(range(8)), test_loader=list(range(5))
+        )
+
+    def execute_training_with_on_batch_prediction_cb(self, num_epochs, train_loader, val_loader, test_loader):
+        loaders = {'train': train_loader, 'validation': val_loader, 'test': test_loader}
+
+        train_loader_size = len(train_loader) if train_loader is not None else 0
+        val_loader_size = len(val_loader) if val_loader is not None else 0
+        test_loader_size = len(test_loader) if test_loader is not None else 0
+        loader_sizes = {'train': train_loader_size, 'validation': val_loader_size, 'test': test_loader_size}
+
+        dummy_optimizer = DummyOptimizer()
+        dummy_loss = DummyLoss()
+        train_loop = TrainLoop(
+            NetUnifiedBatchFeedSimplified(),
+            train_loader, val_loader, test_loader,
+            dummy_optimizer, dummy_loss
+        )
+
+        callback = BatchedAverageAfterBatchPredictionCB()
+        train_loop.fit(num_epochs=num_epochs, callbacks=[callback])
+
+        calculated_sums = callback.dataset_type_sum_dict_history[0]
+        for hist_el in callback.dataset_type_sum_dict_history:
+            self.assertEqual(hist_el, calculated_sums)
+
+        for dataset_type in loader_sizes.keys():
+            if loader_sizes[dataset_type] == 0:
+                self.assertEqual(calculated_sums[dataset_type], 0)
+            else:
+                self.assertEqual(
+                    calculated_sums[dataset_type] / loader_sizes[dataset_type],
+                    sum(loaders[dataset_type]) / loader_sizes[dataset_type]
+                )
+                self.assertEqual(
+                    calculated_sums[dataset_type] / loader_sizes[dataset_type],
+                    np.mean(loaders[dataset_type])
+                )
+
     def test_basic_history_tracking(self):
         num_epochs = 2
         dummy_optimizer = DummyOptimizer()
@@ -665,3 +718,26 @@ class TestMultiLossOptiTrainLoop(unittest.TestCase):
         loss_result = train_loop.evaluate_loss_on_train_set(force_prediction=True)
 
         self.assertEqual(loss_result, {'loss_1': 32.0, 'loss_2': 32.0})
+
+
+class BatchedAverageAfterBatchPredictionCB(AbstractCallback):
+    def __init__(self):
+        super().__init__('')
+        self.dataset_type_sum_dict = {'train': 0, 'validation': 0, 'test': 0}
+        self.dataset_type_sum_dict_history = []
+
+    def on_epoch_end(self):
+        self.train_loop_obj.predict_on_train_set(execute_callbacks=True)
+        self.train_loop_obj.predict_on_validation_set(execute_callbacks=True)
+
+        if self.train_loop_obj.test_loader is not None:
+            self.train_loop_obj.predict_on_test_set(execute_callbacks=True)
+
+        self.dataset_type_sum_dict_history.append(self.dataset_type_sum_dict)
+        self.dataset_type_sum_dict = {'train': 0, 'validation': 0, 'test': 0}
+
+    def on_after_batch_prediction(self, y_pred_batch, y_test_batch, metadata_batch, dataset_info):
+        dataset_type = dataset_info['type']
+        current_value = metadata_batch['batch_data']
+
+        self.dataset_type_sum_dict[dataset_type] += current_value[0]

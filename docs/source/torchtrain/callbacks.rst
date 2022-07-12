@@ -19,6 +19,8 @@ module. There are several general categories of available callbacks:
 * :mod:`aitoolbox.torchtrain.callbacks.gradient` - model gradient reporting
 * :mod:`aitoolbox.torchtrain.callbacks.model_load` - existing model loading at train start
 * :mod:`aitoolbox.torchtrain.callbacks.tensorboard` - tensorboard training tracking
+* :mod:`aitoolbox.torchtrain.callbacks.wandb` - Weights & Biases training tracking
+
 
 Example of the several basic callbacks used to infuse additional logic into the model training process:
 
@@ -83,6 +85,7 @@ Callback execution is currently supported at the following positions in the Trai
 * :meth:`aitoolbox.torchtrain.callbacks.abstract.AbstractCallback.on_train_end`
 * :meth:`aitoolbox.torchtrain.callbacks.abstract.AbstractCallback.on_train_loop_registration`
 * :meth:`aitoolbox.torchtrain.callbacks.abstract.AbstractCallback.on_multiprocess_start`
+* :meth:`aitoolbox.torchtrain.callbacks.abstract.AbstractCallback.on_after_batch_prediction`
 
 train_loop_obj
 ^^^^^^^^^^^^^^
