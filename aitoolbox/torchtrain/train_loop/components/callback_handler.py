@@ -8,12 +8,14 @@ class CallbacksHandler:
     def __init__(self, train_loop_obj):
         """Callback handler used for the callback orchestration inside the TrainLoop
 
-        Compared to `BasicCallbacksHandler`, this handler will at certain TrainLoop stage only execute those
-        callbacks which have implemented the functionality intended to be executed at this particular stage.
-        Thus, `CallbacksHandler` doesn't unnecessarily execute callbacks at stages they are not implemented at.
+        The use of this handler is to call specified callback methods inside the TrainLoop at different stages of
+        the training process. This executes desired callbacks' functionality at the desired point of the training
+        process.
 
-        Common use of this handler is to call different methods inside the TrainLoop at different stages of the training
-        process. Thus execute desired callbacks' functionality at the desired point of the training process.
+        The ``CallbacksHandler`` handler will at certain TrainLoop stage only execute those
+        callback methods which have implemented the functionality intended to be executed at this particular stage.
+        Thus, `CallbacksHandler` doesn't unnecessarily execute callbacks at stages they are not implemented at -
+        their respective callback methods are left as ``pass`` and aren't overridden with some desired code logic.
 
         Args:
             train_loop_obj (aitoolbox.torchtrain.train_loop.TrainLoop): reference to the encapsulating TrainLoop
