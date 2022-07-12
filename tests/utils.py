@@ -70,6 +70,16 @@ class NetUnifiedBatchFeed(TTModel):
                torch.FloatTensor([self.prediction_count] * 64).cpu(), {'bla': [self.prediction_count + 200] * 64}
 
 
+class NetUnifiedBatchFeedSimplified(NetUnifiedBatchFeed):
+    def __init__(self):
+        NetUnifiedBatchFeed.__init__(self)
+
+    def get_predictions(self, batch_data, device):
+        return torch.FloatTensor([self.prediction_count + 100] * 64).cpu(), \
+               torch.FloatTensor([self.prediction_count] * 64).cpu(), \
+               {'batch_data': [batch_data]}
+
+
 class SmallFFNet(TTModel):
     def __init__(self):
         super().__init__()
