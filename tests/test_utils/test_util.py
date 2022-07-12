@@ -98,6 +98,16 @@ class TestUtil(unittest.TestCase):
         self.assertEqual(util.flatten_list_of_lists([[1, 2, 3], [4, 5], [3, 3, 3, 3]]),
                          [1, 2, 3, 4, 5, 3, 3, 3, 3])
 
+        self.assertEqual(
+            util.flatten_list_of_lists(
+                [
+                    [[1, 2, 3], [4, 5, 3], [3, 3, 3]],
+                    [[10, 2, 3], [40, 5, 3], [30, 3, 3]],
+                    [[100, 2, 3], [400, 5, 3], [300, 3, 3]]
+                ]),
+            [[1, 2, 3], [4, 5, 3], [3, 3, 3], [10, 2, 3], [40, 5, 3], [30, 3, 3], [100, 2, 3], [400, 5, 3], [300, 3, 3]]
+        )
+
 
 class EmptyFunctions:
     def __init__(self):
