@@ -15,7 +15,7 @@ function usage()
    optional arguments:
      -t, --terminate                the instance will be terminated when training is done
      -e, --experiment-script STR    name of the experiment bash script to be executed in order to start the training
-     -p, --project-root STR         path to the project root
+     -p, --project-root STR         path to the project root on the execution server/AWS
      -l, --log-path STR             path to the local log file which will be uploaded to s3
      --log-s3-upload-dir STR        path to the logs folder on S3 to which the training log should be uploaded
      -c, --cleanup-script           post execution cleanup script

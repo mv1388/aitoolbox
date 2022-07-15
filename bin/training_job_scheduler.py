@@ -83,18 +83,31 @@ class TrainingJobScheduler:
         return str(pd.read_csv(self.job_queue_file_path))
 
 
-app = typer.Typer()
+app = typer.Typer(help='Training Job Scheduler CLI')
 
 
-@app.command()
+@app.command(help='Run training jobs execution loop which goes runs through provided jobs in the queue')
 def run(
-        log_path: str = os.path.expanduser(
-            f"~/project/training_{datetime.datetime.fromtimestamp(time.time()).strftime('%Y%m%d_%H_%M_%S')}.log"
+        log_path: str = typer.Option(
+            os.path.expanduser(f"~/project/training_{datetime.datetime.fromtimestamp(time.time()).strftime('%Y%m%d_%H_%M_%S')}.log"),
+            help='Logging file path on the execution server'
         ),
-        log_s3_upload_dir: str = 's3://model-result/training_logs',
-        aws_region: str = 'eu-west-1',
-        terminate: bool = False,
-        job_queue_file_path: str = '~/training_job_queue.csv'
+        log_s3_upload_dir: str = typer.Option(
+            's3://model-result/training_logs',
+            help='Path to the logs folder on S3 to which the training log should be uploaded'
+        ),
+        aws_region: str = typer.Option(
+            'eu-west-1',
+            help='AWS region code'
+        ),
+        terminate: bool = typer.Option(
+            False,
+            help='The instance will be terminated when all the training is done'
+        ),
+        job_queue_file_path: str = typer.Option(
+            '~/training_job_queue.csv',
+            help='File path of the job queue on the execution server/AWS'
+        )
 ):
     job_scheduler = TrainingJobScheduler(job_queue_file_path)
     print('Jobs currently in the queue:')
@@ -107,9 +120,21 @@ def run(
         subprocess.run('aws ec2 terminate-instances --instance-ids $(ec2metadata --instance-id | cut -d " " -f 2)')
 
 
-@app.command()
-def add_job(experiment_script: str = 'aws_run_experiments_project.sh', project_root: str = '~/project',
-            job_queue_file_path: str = '~/training_job_queue.csv'):
+@app.command(help='Add a new training job to the job queue')
+def add_job(
+        experiment_script: str = typer.Option(
+            'aws_run_experiments_project.sh',
+            help='Name of the experiment bash script to be executed in order to start the training'
+        ),
+        project_root: str = typer.Option(
+            '~/project',
+            help='Path to the project root on the execution server/AWS'
+        ),
+        job_queue_file_path: str = typer.Option(
+            '~/training_job_queue.csv',
+            help='File path of the job queue on the execution server/AWS'
+        )
+):
     job_scheduler = TrainingJobScheduler(job_queue_file_path)
     job_scheduler.add_job(experiment_script, project_root)
 
@@ -117,8 +142,13 @@ def add_job(experiment_script: str = 'aws_run_experiments_project.sh', project_r
     print(job_scheduler)
 
 
-@app.command()
-def list_queue(job_queue_file_path: str = '~/training_job_queue.csv'):
+@app.command(help='List the job queue contents')
+def list_queue(
+        job_queue_file_path: str = typer.Option(
+            '~/training_job_queue.csv',
+            help='File path of the job queue on the execution server/AWS'
+        )
+):
     print(TrainingJobScheduler(job_queue_file_path))
 
 
