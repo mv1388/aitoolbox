@@ -9,6 +9,11 @@ import typer
 
 class TrainingJobScheduler:
     def __init__(self, job_queue_file_path):
+        """Model training job queue scheduler
+
+        Args:
+            job_queue_file_path (str): File path of the job queue on the execution server/AWS
+        """
         self.job_queue_file_path = os.path.expanduser(job_queue_file_path)
         self.job_queue = None
 
