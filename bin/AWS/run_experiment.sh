@@ -4,8 +4,6 @@
 # ./finish_prepare_instance.sh
 # ./run_experiment.sh (optional: -t / --terminate)
 
-project_root_path=~/project
-export PYTHONPATH=${PYTHONPATH}:$project_root_path
 
 # usage function
 function usage()
@@ -17,6 +15,7 @@ function usage()
    optional arguments:
      -t, --terminate                the instance will be terminated when training is done
      -e, --experiment-script STR    name of the experiment bash script to be executed in order to start the training
+     -p, --project-root STR         path to the project root
      -l, --log-path STR             path to the local log file which will be uploaded to s3
      --log-s3-upload-dir STR        path to the logs folder on S3 to which the training log should be uploaded
      -c, --cleanup-script STR       post execution cleanup script
@@ -28,6 +27,7 @@ HEREDOC
 
 terminate_cmd=false
 experiment_script_file="aws_run_experiments_project.sh"
+project_root_path=~/project
 log_file_path=
 log_s3_dir_path="s3://model-result/training_logs"
 post_experiment_run_cleanup=false
@@ -43,6 +43,10 @@ case $key in
     ;;
     -e|--experiment-script)
     experiment_script_file="$2"
+    shift 2 # past argument value
+    ;;
+    -p|--project-root)
+    project_root_path="$2"
     shift 2 # past argument value
     ;;
     -l|--log-path)
@@ -72,6 +76,9 @@ case $key in
     ;;
 esac
 done
+
+
+export PYTHONPATH=${PYTHONPATH}:$project_root_path
 
 # Set the region either to Ireland or Frankfurt
 export AWS_DEFAULT_REGION=$aws_region
