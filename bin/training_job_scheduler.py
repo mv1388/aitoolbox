@@ -117,7 +117,10 @@ def run(
 
     if terminate:
         print('Terminating the instance')
-        subprocess.run('aws ec2 terminate-instances --instance-ids $(ec2metadata --instance-id | cut -d " " -f 2)')
+        subprocess.run(
+            'aws ec2 terminate-instances --instance-ids $(ec2metadata --instance-id | cut -d " " -f 2)',
+            shell=True
+        )
 
 
 @app.command(help='Add a new training job to the job queue')
