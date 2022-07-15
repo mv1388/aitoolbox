@@ -18,7 +18,7 @@ function usage()
      -p, --project-root STR         path to the project root
      -l, --log-path STR             path to the local log file which will be uploaded to s3
      --log-s3-upload-dir STR        path to the logs folder on S3 to which the training log should be uploaded
-     -c, --cleanup-script STR       post execution cleanup script
+     -c, --cleanup-script           post execution cleanup script
      --aws-region STR               create the instance in the specified region. Default is Ireland (eu-west-1)
      -h, --help                     show this help message and exit
 

@@ -30,18 +30,22 @@ class TrainingJobScheduler:
             logging_path = self.get_job_logging_path(logging_path)
             log_upload_setting = f"--log-path {logging_path} --log-s3-upload-dir {log_s3_dir_path}"
 
-            subprocess.run(
+            process_return = subprocess.run(
                 [
                     os.path.expanduser('~/project/run_experiment.sh'),
-                    '--experiment-script', job_todo['experiment_script_file'],
-                    '--project-root', job_todo['project_root_path'],
+                    '--experiment-script', job_todo.iloc[0]['experiment_script_file'],
+                    '--project-root', job_todo.iloc[0]['project_root_path'],
                     log_upload_setting,
                     '--cleanup-script',
                     '--aws-region', aws_region
-                ]
+                ],
+                shell=True
             )
 
+            # re-read the queue file to get in any additions to the queue during the model training run
+            self.job_queue = pd.read_csv(self.job_queue_file_path)
             self.job_queue.loc[job_todo.index, 'job_status'] = 'done'
+            self.job_queue.loc[job_todo.index, 'job_return_code'] = process_return.returncode
             self.job_queue.to_csv(self.job_queue_file_path, index=False)
 
             self.job_counter += 1
@@ -64,7 +68,7 @@ class TrainingJobScheduler:
             self.job_queue = pd.read_csv(self.job_queue_file_path)
         else:
             self.job_queue = pd.DataFrame(columns=['job_status', 'experiment_script_file',
-                                                   'project_root_path', 'timestamp'])
+                                                   'project_root_path', 'job_return_code', 'timestamp'])
 
         self.job_queue = self.job_queue.append({
             'job_status': 'waiting',
@@ -84,7 +88,11 @@ app = typer.Typer()
 
 @app.command()
 def run(
-        log_path: str, log_s3_upload_dir: str, aws_region: str,
+        log_path: str = os.path.expanduser(
+            f"~/project/training_{datetime.datetime.fromtimestamp(time.time()).strftime('%Y%m%d_%H_%M_%S')}.log"
+        ),
+        log_s3_upload_dir: str = 's3://model-result/training_logs',
+        aws_region: str = 'eu-west-1',
         terminate: bool = False,
         job_queue_file_path: str = '~/training_job_queue.csv'
 ):
