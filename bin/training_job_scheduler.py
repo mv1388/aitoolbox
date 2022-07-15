@@ -31,14 +31,12 @@ class TrainingJobScheduler:
             log_upload_setting = f"--log-path {logging_path} --log-s3-upload-dir {log_s3_dir_path}"
 
             process_return = subprocess.run(
-                [
-                    os.path.expanduser('~/project/run_experiment.sh'),
-                    '--experiment-script', job_todo.iloc[0]['experiment_script_file'],
-                    '--project-root', job_todo.iloc[0]['project_root_path'],
-                    log_upload_setting,
-                    '--cleanup-script',
-                    '--aws-region', aws_region
-                ],
+                f"{os.path.expanduser('~/project/run_experiment.sh')} "
+                f"--experiment-script {job_todo.iloc[0]['experiment_script_file']} "
+                f"--project-root {job_todo.iloc[0]['project_root_path']} "
+                f"{log_upload_setting} "
+                f"--cleanup-script "
+                f"--aws-region {aws_region}",
                 shell=True
             )
 
