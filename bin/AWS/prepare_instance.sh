@@ -147,7 +147,7 @@ if [ $pypi_install == false ]; then
 fi
 scp -i $key_path download_data.sh  $username@$ec2_instance_address:~/project
 scp -i $key_path run_experiment.sh  $username@$ec2_instance_address:~/project
-scp -i $key_path training_job_scheduler.py  $username@$ec2_instance_address:~
+scp -i $key_path ../training_job_scheduler.py  $username@$ec2_instance_address:~
 
 echo "#!/usr/bin/env bash
 
