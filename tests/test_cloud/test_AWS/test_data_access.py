@@ -15,7 +15,7 @@ THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 class TestBaseDataSaver(unittest.TestCase):
     @mock_s3
     def test_data_upload(self):
-        s3 = boto3.resource('s3')
+        s3 = boto3.resource('s3', region_name='us-east-1')
         s3.create_bucket(Bucket=BUCKET_NAME)
         s3_client = boto3.client('s3')
 
@@ -31,7 +31,7 @@ class TestBaseDataSaver(unittest.TestCase):
 
     @mock_s3
     def test_data_upload_content(self):
-        s3 = boto3.resource('s3')
+        s3 = boto3.resource('s3', region_name='us-east-1')
         s3.create_bucket(Bucket=BUCKET_NAME)
 
         data_saver = BaseDataSaver(bucket_name=BUCKET_NAME)
@@ -53,7 +53,7 @@ class TestBaseDataSaver(unittest.TestCase):
 
     @mock_s3
     def test_folder_upload(self):
-        s3 = boto3.resource('s3')
+        s3 = boto3.resource('s3', region_name='us-east-1')
         s3.create_bucket(Bucket=BUCKET_NAME)
         s3_client = boto3.client('s3')
 
@@ -78,7 +78,7 @@ class TestBaseDataSaver(unittest.TestCase):
 class TestBaseDataLoader(unittest.TestCase):
     @mock_s3
     def test_data_download(self):
-        s3 = boto3.resource('s3')
+        s3 = boto3.resource('s3', region_name='us-east-1')
         s3.create_bucket(Bucket=BUCKET_NAME)
         s3_client = boto3.client('s3')
         s3_client.upload_file(os.path.join(THIS_DIR, 'resources/file.txt'), BUCKET_NAME, 'file.txt')
