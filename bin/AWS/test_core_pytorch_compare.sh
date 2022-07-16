@@ -48,7 +48,7 @@ key_path=$(jq -r '.key_path' configs/my_config.json)
 instance_config="default_config.json"
 instance_type=
 username="ubuntu"
-py_env="pytorch_latest_p36"
+py_env="pytorch"
 ssh_at_start=true
 spot_instance=true
 aws_region="eu-west-1"
@@ -160,7 +160,7 @@ scp -i $key_path ../../requirements.txt $username@$ec2_instance_address:~/packag
 #########################################################
 echo "Running the comparison tests"
 ssh -i $key_path $username@$ec2_instance_address \
-    "source activate $py_env ; tmux new-session -d -s 'training' 'export AWS_DEFAULT_REGION=$aws_region ; cd package_test ; pip install pytest seaborn==0.9.0 ; pip install -r requirements.txt ; pip install torchtext==0.7 torchvision>=0.9.1 ; pytest $pytest_dir -s ; aws s3 cp $logging_path s3://aitoolbox-testing/core_pytorch_comparisson_testing/$logging_filename ; aws ec2 terminate-instances --instance-ids $instance_id' \; pipe-pane 'cat > $logging_path'"
+    "source activate $py_env ; tmux new-session -d -s 'training' 'export AWS_DEFAULT_REGION=$aws_region ; cd package_test ; pip install pytest seaborn==0.9.0 ; pip install -r requirements.txt ; pytest $pytest_dir -s ; aws s3 cp $logging_path s3://aitoolbox-testing/core_pytorch_comparisson_testing/$logging_filename ; aws ec2 terminate-instances --instance-ids $instance_id' \; pipe-pane 'cat > $logging_path'"
 
 echo "Instance IP: $ec2_instance_address"
 

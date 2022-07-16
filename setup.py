@@ -18,7 +18,7 @@ setup(
     packages=find_packages(exclude=['tests', 'tests_gpu', 'examples', 'deprecated']),
 
     install_requires=[
-        'torch',
+        'torch>=1.12.0',
         'torchvision',
         'torchtext',
         'pytorch-nlp',
