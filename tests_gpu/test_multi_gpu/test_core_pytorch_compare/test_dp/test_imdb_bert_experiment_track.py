@@ -5,6 +5,7 @@ import shutil
 import random
 import numpy as np
 import torch
+import torch.nn as nn
 from torch.utils.data import DataLoader
 from torch.optim import AdamW
 
@@ -12,7 +13,8 @@ from transformers import AutoModelForSequenceClassification
 from transformers import AutoTokenizer
 from datasets import load_dataset
 
-from aitoolbox import TrainLoopCheckpointEndSave, TTModel, ModelPerformanceEvaluation, ModelPerformancePrintReport, \
+from aitoolbox import TrainLoopCheckpointEndSave, TTModel, \
+    ModelPerformanceEvaluation, ModelPerformancePrintReport, \
     ModelTrainHistoryPlot, ModelTrainHistoryFileWriter, BinaryClassificationResultPackage
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -88,7 +90,8 @@ class TestIMDBBERTExperimentTrack(unittest.TestCase):
             local_model_result_folder_path=THIS_DIR,
             hyperparams={},
             val_result_package=BinaryClassificationResultPackage(),
-            cloud_save_mode=None
+            cloud_save_mode=None,
+            gpu_mode='dp'
         )
         self.assertEqual(train_loop.device.type, "cuda")
 
@@ -110,7 +113,7 @@ class TestIMDBBERTExperimentTrack(unittest.TestCase):
         self.assertEqual(device.type, "cuda")
 
         model = AutoModelForSequenceClassification.from_pretrained("bert-base-cased", num_labels=2)
-        model = model.to(device)
+        model = nn.DataParallel(model).to(device)
         optimizer = AdamW(model.parameters(), lr=5e-5)
 
         print('Starting manual PyTorch training')
