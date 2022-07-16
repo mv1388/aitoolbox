@@ -411,7 +411,7 @@ class TestEnd2EndTrainLoopCheckpointEndSave(unittest.TestCase):
 
     @mock_s3
     def test_e2e_ff_net_train_loop_cloud_save(self):
-        s3 = boto3.resource('s3', region_name='us-east-1')
+        s3 = boto3.resource('s3')
         s3.create_bucket(Bucket=BUCKET_NAME)
         s3_client = boto3.client('s3')
 
@@ -686,7 +686,7 @@ class TestEnd2EndTrainLoopCheckpoint(unittest.TestCase):
 
     @mock_s3
     def test_e2e_ff_net_train_loop_cloud_save(self):
-        s3 = boto3.resource('s3', region_name='us-east-1')
+        s3 = boto3.resource('s3')
         s3.create_bucket(Bucket=BUCKET_NAME)
         s3_client = boto3.client('s3')
 
@@ -785,7 +785,7 @@ class TestEnd2EndTrainLoopCheckpoint(unittest.TestCase):
 
     @mock_s3
     def test_e2e_ff_net_train_loop_iteration_model_checkpointing_cloud_save(self):
-        s3 = boto3.resource('s3', region_name='us-east-1')
+        s3 = boto3.resource('s3')
         s3.create_bucket(Bucket=BUCKET_NAME)
         s3_client = boto3.client('s3')
 
@@ -1102,7 +1102,7 @@ class TestEnd2EndTrainLoopEndSave(unittest.TestCase):
 
     @mock_s3
     def test_e2e_ff_net_train_loop_cloud_save(self):
-        s3 = boto3.resource('s3', region_name='us-east-1')
+        s3 = boto3.resource('s3')
         s3.create_bucket(Bucket=BUCKET_NAME)
         s3_client = boto3.client('s3')
 
