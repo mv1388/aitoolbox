@@ -391,7 +391,7 @@ class TestMNISTCNNAttributeTransfer(unittest.TestCase):
 
 
 """
-    Bit of a waste of time and not that important to check this use-case
+    Waste of time a bit - not that important to check this use-case
     
     Left here for archival/documentation purposes
 """
