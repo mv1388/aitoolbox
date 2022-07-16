@@ -130,11 +130,11 @@ if [ "$key_path" == "" ] ; then
 fi
 
 if [ "$DL_framework" == "TF" ]; then
-    py_env="tensorflow_p36"
+    py_env="tensorflow"
 elif [ "$DL_framework" == "pytorch" ]; then
-    py_env="pytorch_latest_p36"
+    py_env="pytorch"
 else
-    py_env="pytorch_latest_p36"
+    py_env="pytorch"
 fi
 
 if [[ "$instance_type" != "" ]]; then
