@@ -756,7 +756,7 @@ class TrainLoop:
             in_process_data_load (AbstractCallback or list or None):
                 in-process data loading logic implemented as a torchtrain callback. The logic should be placed inside
                 the on_multiprocess_start() callback function.
-                When using this data loading option bare in mind that loaded dataset will be replicated in memory for
+                When using this data loading option bear in mind that loaded dataset will be replicated in memory for
                 every spawned training process. This can in turn in cause extensive overall memory consumption.
             num_nodes (int): number of nodes in the cluster
             node_rank (int): rank of the current node
