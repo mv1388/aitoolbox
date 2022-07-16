@@ -13,22 +13,22 @@ setup(
     license='MIT',
     keywords=['PyTorch', 'deep learning', 'research', 'train loop'],
 
-    python_requires='>=3.6.0',
+    python_requires='>=3.9.0',
 
     packages=find_packages(exclude=['tests', 'tests_gpu', 'examples', 'deprecated']),
 
     install_requires=[
+        'torch',
+        'torchvision',
+        'torchtext',
+        'pytorch-nlp',
+        'transformers',
+
         'numpy',
         'pandas',
         'scikit-learn',
         'matplotlib',
         'seaborn',
-
-        'torch>=1.6.0',
-        'torchvision',
-        'torchtext==0.7',
-        'pytorch-nlp',
-        'transformers',
 
         'joblib',
         'tqdm',
@@ -57,7 +57,6 @@ setup(
         'Topic :: Scientific/Engineering :: Artificial Intelligence',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7'
+        'Programming Language :: Python :: 3.9'
     ]
 )
