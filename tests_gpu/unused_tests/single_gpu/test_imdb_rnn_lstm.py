@@ -15,7 +15,7 @@ from aitoolbox import TrainLoop, TTModel
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
 """
-Training taken from: 
+Training taken from:
     https://github.com/rasbt/deeplearning-models/blob/master/pytorch_ipynb/rnn/rnn_simple_packed_imdb.ipynb
 """
 
