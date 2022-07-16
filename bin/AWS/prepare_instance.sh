@@ -156,21 +156,11 @@ export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
 export AWS_DEFAULT_REGION=$aws_region
 
-#aws configure
 cd project
 
 source activate $py_env
 
-pip install -U boto3
-pip install awscli
-pip install -U numpy
-pip install --ignore-installed greenlet
-pip install seaborn==0.9.0
-
 pip install 'typer[all]'
-
-#conda install -y -c conda-forge jsonnet
-#conda install -y -c anaconda seaborn=0.9.0
 
 if [ $pypi_install == false ]; then
   pip install aitoolbox-$AIToolbox_version.tar.gz
