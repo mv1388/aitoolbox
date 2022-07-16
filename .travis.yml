@@ -27,8 +27,6 @@ matrix:
 
 # command to install dependencies
 install:
-  - pip install setuptools
-  - pip install 'six'
   - pip install 'moto[all]' pytest
   - pip install tensorflow keras
   - pip install -r requirements.txt
