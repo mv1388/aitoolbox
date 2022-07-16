@@ -1,6 +1,7 @@
 import unittest
 
 import os
+import shutil
 import random
 import numpy as np
 import torch
@@ -55,6 +56,10 @@ class TestIMDBBERT(unittest.TestCase):
         self.assertEqual(val_loss_tl, val_loss_pt)
         self.assertEqual(y_pred_tl, y_pred_pt)
         self.assertEqual(y_true_tl, y_true_pt)
+
+        project_path = os.path.join(THIS_DIR, 'tl_full_experiment_tracking')
+        if os.path.exists(project_path):
+            shutil.rmtree(project_path)
 
     def train_eval_trainloop(self, train_data, test_data, num_epochs):
         self.set_seeds()
