@@ -38,7 +38,8 @@ class BERTModel(TTModel):
         batch = {k: v.to(device) for k, v in batch_data.items()}
         outputs = self(**batch)
         loss = outputs.loss
-        return loss
+        # loss.mean() because DP returns the tensor with the shape of number of used GPUs instead of a scalar
+        return loss.mean()
 
     def get_predictions(self, batch_data, device):
         batch = {k: v.to(device) for k, v in batch_data.items()}
@@ -123,7 +124,7 @@ class TestIMDBBERTExperimentTrack(unittest.TestCase):
             for i, batch_data in enumerate(train_loader):
                 batch = {k: v.to(device) for k, v in batch_data.items()}
                 outputs = model(**batch)
-                loss = outputs.loss
+                loss = outputs.loss.mean()
                 loss.backward()
                 optimizer.step()
                 optimizer.zero_grad()
@@ -152,7 +153,8 @@ class TestIMDBBERTExperimentTrack(unittest.TestCase):
                 logits = outputs.logits
                 predictions = torch.argmax(logits, dim=-1)
 
-                loss_batch = outputs.loss.cpu().item()
+                # loss.mean() because DP returns the tensor with the shape of number of used GPUs instead of a scalar
+                loss_batch = outputs.loss.mean().cpu().item()
                 val_pred += predictions.cpu().tolist()
                 val_true += batch["labels"].cpu().tolist()
                 val_loss.append(loss_batch)
