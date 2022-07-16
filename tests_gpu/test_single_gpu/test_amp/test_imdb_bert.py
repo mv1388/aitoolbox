@@ -109,6 +109,8 @@ class TestIMDBBERT(unittest.TestCase):
                 scaler.step(optimizer)
                 scaler.update()
 
+                optimizer.zero_grad()
+
             # Imitate what happens in auto_execute_end_of_epoch() in TrainLoop
             for _ in train_loader:
                 pass
