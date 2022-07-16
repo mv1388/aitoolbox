@@ -147,6 +147,7 @@ if [ $pypi_install == false ]; then
 fi
 scp -i $key_path download_data.sh  $username@$ec2_instance_address:~/project
 scp -i $key_path run_experiment.sh  $username@$ec2_instance_address:~/project
+scp -i $key_path ../training_job_scheduler.py  $username@$ec2_instance_address:~
 
 echo "#!/usr/bin/env bash
 
@@ -165,6 +166,8 @@ pip install awscli
 pip install -U numpy
 pip install --ignore-installed greenlet
 pip install seaborn==0.9.0
+
+pip install 'typer[all]'
 
 #conda install -y -c conda-forge jsonnet
 #conda install -y -c anaconda seaborn=0.9.0
