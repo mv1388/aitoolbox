@@ -30,7 +30,7 @@ experiment_script_file="aws_run_experiments_project.sh"
 aws_project_root_path=~/project
 
 username="ubuntu"
-py_env="pytorch"
+py_env="pytorch_latest_p36"
 
 
 while [[ $# -gt 0 ]]; do

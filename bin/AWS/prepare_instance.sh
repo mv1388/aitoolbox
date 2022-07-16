@@ -125,11 +125,11 @@ fi
 
 
 if [ "$DL_framework" == "TF" ]; then
-    py_env="tensorflow"
+    py_env="tensorflow_p36"
 elif [ "$DL_framework" == "pytorch" ]; then
-    py_env="pytorch"
+    py_env="pytorch_latest_p36"
 else
-    py_env="pytorch"
+    py_env="pytorch_latest_p36"
 fi
 
 if [ "$aws_region" == "eu-central-1" ]; then
