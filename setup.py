@@ -18,17 +18,17 @@ setup(
     packages=find_packages(exclude=['tests', 'tests_gpu', 'examples', 'deprecated']),
 
     install_requires=[
-        'numpy',
-        'pandas',
-        'scikit-learn',
-        'matplotlib',
-        'seaborn',
-
         'torch>=1.12.0',
         'torchvision',
         'torchtext',
         'pytorch-nlp',
         'transformers',
+
+        'numpy',
+        'pandas',
+        'scikit-learn',
+        'matplotlib',
+        'seaborn',
 
         'joblib',
         'tqdm',
