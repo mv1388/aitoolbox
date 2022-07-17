@@ -35,6 +35,7 @@ function usage()
      --instance-type STR            instance type label; if this is provided the value from --instance-config is ignored
      -i, --instance-config STR      instance configuration json filename
      --no-ssh                       after test job is submitted don't automatically ssh into the running instance
+     -d, --debug                    run in debug mode: run the tests, but don't terminate the instance at the end
      -k, --key STR                  path to ssh key
      -o, --os-name STR              username depending on the OS chosen. Default is ubuntu
      --on-demand                    create on-demand instance instead of spot instance
@@ -50,6 +51,7 @@ instance_type=
 username="ubuntu"
 py_env="pytorch"
 ssh_at_start=true
+debug_mode=false
 spot_instance=true
 aws_region="eu-west-1"
 
@@ -82,6 +84,10 @@ case $key in
     ;;
     --no-ssh)
     ssh_at_start=false
+    shift 1 # past argument value
+    ;;
+    -d|--debug)
+    debug_mode=true
     shift 1 # past argument value
     ;;
     -o|--os-name)
@@ -154,13 +160,17 @@ scp -i $key_path -r ../../aitoolbox $username@$ec2_instance_address:~/package_te
 scp -i $key_path -r ../../tests_gpu $username@$ec2_instance_address:~/package_test
 scp -i $key_path ../../requirements.txt $username@$ec2_instance_address:~/package_test
 
+terminate_setting=""
+if [ "$debug_mode" == true ]; then
+  terminate_setting="aws ec2 terminate-instances --instance-ids $instance_id"
+fi
 
 #########################################################
 # Bootstrapping the instance and execute the testing
 #########################################################
 echo "Running the comparison tests"
 ssh -i $key_path $username@$ec2_instance_address \
-    "source activate $py_env ; tmux new-session -d -s 'training' 'export AWS_DEFAULT_REGION=$aws_region ; cd package_test ; pip install pytest datasets ; pip install -r requirements.txt ; python -m pytest $pytest_dir -s ; aws s3 cp $logging_path s3://aitoolbox-testing/core_pytorch_comparisson_testing/$logging_filename ; aws ec2 terminate-instances --instance-ids $instance_id' \; pipe-pane 'cat > $logging_path'"
+    "source activate $py_env ; tmux new-session -d -s 'training' 'export AWS_DEFAULT_REGION=$aws_region ; cd package_test ; pip install pytest datasets ; pip install -r requirements.txt ; python -m pytest $pytest_dir -s ; aws s3 cp $logging_path s3://aitoolbox-testing/core_pytorch_comparisson_testing/$logging_filename ; $terminate_setting' \; pipe-pane 'cat > $logging_path'"
 
 echo "Instance IP: $ec2_instance_address"
 
