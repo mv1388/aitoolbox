@@ -410,7 +410,11 @@ class TrainLoop:
         Primarily useful for parsing between single loss representation and the multi-loss representation.
 
         Args:
-            loss_record (list): list losses from each processed batch
+            loss_record (list): list of losses from each processed batch. If we used multiple losses wrapped inside
+                MultiLoss() then the _train() function called its item() method which converted multi-loss
+                representation into the list of dicts, where each dict represents a loss for a single batch:
+
+                ``[{'loss_1': 1., 'loss_2': 33.}, { ... }]``
 
         Returns:
             np.array or dict: in the case of single loss numpy array is returned, otherwise the dict of multiple losses
