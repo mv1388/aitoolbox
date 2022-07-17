@@ -96,7 +96,7 @@ class DDPHandler:
         data_loader_sampler = DataLoader(**data_loader_args)
         return data_loader_sampler, ddp_sampler
 
-    def mp_sync(self, data, concat_mp_data=True):
+    def mp_sync(self, data, concat_mp_data=True, double_precision=False):
         """Multiprocess data sync
 
         Share input data between all the active processes so that every process has all the values from
@@ -107,6 +107,11 @@ class DDPHandler:
                 In case this is torch.Tensor, resulting output the device location will be preserved.
             concat_mp_data (bool): should the returned list of collected tensors be concatenated into a single list
                 of values
+            double_precision (bool): in case the ``data`` parameter is not already a Tensor, the function wraps given
+                data into a Tensor. By default, it uses PyTorch default 32 bit precision float tensor. If this parameter
+                is set to ``True`` however, the double precision 64 bit tensor will be created. This is useful
+                for example if input data is in 64 bit, and we want to prevent precision reduction when syncing the data
+                across the workers.
 
         Returns:
             torch.Tensor: list of `data` variable values synced across all the active processes
@@ -118,7 +123,7 @@ class DDPHandler:
         if isinstance(data, torch.Tensor):
             input_data_device = data.device.type
         else:
-            data = torch.Tensor(data)
+            data = torch.tensor(data, dtype=torch.float32 if not double_precision else torch.float64)
 
         data_tensor_wrap = data.to(self.train_loop_obj.device)
         mp_data = [torch.zeros_like(data_tensor_wrap) for _ in range(dist.get_world_size())]
