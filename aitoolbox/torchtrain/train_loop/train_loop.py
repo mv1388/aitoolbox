@@ -297,7 +297,7 @@ class TrainLoop:
             # Need to divide by the number of accumulation steps if our loss is averaged over the training samples
             loss_batch = loss_batch / self.grad_accumulation
 
-        self.loss_batch_accum.append(loss_batch_log.item())
+        self.loss_batch_accum.append(loss_batch_log.detach())
 
         return loss_batch
 
@@ -376,7 +376,7 @@ class TrainLoop:
         Returns:
             None
         """
-        loss_parsed = self.parse_loss(self.loss_batch_accum)
+        loss_parsed = self.parse_loss(self.loss_batch_accum).cpu().numpy()
         self._print_save_loss(loss_parsed,
                               loss_type_name='accumulated_loss',
                               loss_print_description='AVG BATCH ACCUMULATED TRAIN LOSS')
@@ -410,44 +410,48 @@ class TrainLoop:
         Primarily useful for parsing between single loss representation and the multi-loss representation.
 
         Args:
-            loss_record (list): list of losses from each processed batch.
+            loss_record (list): list of Tensor losses from each processed batch.
 
-                If we used single loss than the ``loss_record`` is a list of floats where each element float is
-                loss for a single batch which has been transformed from torch Tensor into the float via .item()
+                If we used single loss than the ``loss_record`` is a list of Tensors where each element Tensor is
+                loss for a single batch.
 
                 If we used multiple losses wrapped inside MultiLoss() then the _train() function called its
-                item() method which converted multi-loss representation into the list of dicts, where each dict
+                detach() method which converted multi-loss representation into the list of dicts, where each dict
                 represents a loss for a single batch:
 
-                ``[{'loss_1': 1., 'loss_2': 33.}, { ... }]``
+                ``[{'loss_1': Tensor(1.), 'loss_2': Tensor(33.)}, { ... }]``
 
         Returns:
-            np.array or dict: in the case of single loss numpy array is returned, otherwise the dict of multiple losses
-                is returned
+            torch.Tensor or MultiLoss: in the case of single loss torch Tensor is returned, otherwise the dict of
+                multiple losses is returned where each value is again a torch Tensor
+
+                Important to note: all the returned loss Tensors are left on the original device (e.g. a GPU).
         """
         loss_names = None
 
-        if isinstance(self.optimizer, MultiOptimizer):
+        if isinstance(loss_record[0], MultiLoss):
             loss_names = sorted(loss_record[0].keys())
             # loss_record is a list of lists with dimensions: [num_batches, num_losses]
-            loss_record = [[loss_dict[k] for k in loss_names] for loss_dict in loss_record]
+            loss_record = [list(multi_loss.values()) for multi_loss in loss_record]
+
+        loss_record = torch.Tensor(loss_record)
 
         if self.ddp_training_mode:
-            loss_record = self.ddp_handler.mp_sync(loss_record, double_precision=True)
-            loss_record = loss_record.numpy()
+            loss_record = self.ddp_handler.mp_sync(loss_record)
 
-        loss_avg = np.mean(loss_record, axis=0)
+        loss_avg = torch.mean(loss_record, dim=0)
 
         if loss_names is None:
             return loss_avg
         else:
-            return dict(zip(loss_names, loss_avg))
+            return MultiLoss(dict(zip(loss_names, loss_avg)))
 
     def _print_save_loss(self, loss_parsed, loss_type_name, loss_print_description):
         """Helper function which prints information about parsed loss and saves the loss results into the history
 
         Args:
-            loss_parsed (np.array or dict): parsed loss result either as a single value or as a dict of multiple losses
+            loss_parsed (np.array or MultiLoss): parsed loss result either as a single value or as MultiLoss
+                in case of multiple losses
             loss_type_name (str): type of the provided loss result
             loss_print_description (str): presentation description text of the provided loss result
 
@@ -456,16 +460,16 @@ class TrainLoop:
         """
         # Results reporting to terminal
         if not self.ddp_training_mode or self.device.index == 0:
-            loss_avg = np.mean(list(loss_parsed.values())) if isinstance(loss_parsed, dict) else loss_parsed
+            loss_avg = np.mean(list(loss_parsed.values())) if isinstance(loss_parsed, MultiLoss) else loss_parsed
             print(f'{loss_print_description}: {loss_avg}')
 
-            if isinstance(self.optimizer, MultiOptimizer) and isinstance(loss_parsed, dict):
+            if isinstance(self.optimizer, MultiOptimizer) and isinstance(loss_parsed, MultiLoss):
                 print(f'MULTI-LOSS {loss_print_description}:')
                 for loss_name, loss_val in loss_parsed.items():
                     print(f'\t{loss_name}: {loss_val}')
 
         # Insert results into history
-        if isinstance(self.optimizer, MultiOptimizer) and isinstance(loss_parsed, dict):
+        if isinstance(loss_parsed, MultiLoss):
             for loss_name, loss_val in loss_parsed.items():
                 self.insert_metric_result_into_history(f'{loss_type_name}_{loss_name}', loss_val)
         else:
@@ -550,7 +554,7 @@ class TrainLoop:
                         loss_batch = self.batch_model_feed_def.get_loss_eval(self.model, batch_data, self.criterion,
                                                                              self.device)
 
-                loss_avg.append(loss_batch.item())
+                loss_avg.append(loss_batch.detach())
 
             loss_avg = self.parse_loss(loss_avg)
 
