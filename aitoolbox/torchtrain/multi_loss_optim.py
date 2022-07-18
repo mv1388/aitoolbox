@@ -73,14 +73,20 @@ class MultiLoss(MutableMapping):
             {k: loss / grad_accumulation for k, loss in self.loss_dict.items()}
         )
 
-    def cpu(self, **kwargs):
-        return self._new_multi_loss_object_from_self({k: loss.cpu(**kwargs) for k, loss in self.loss_dict.items()})
+    def cpu(self, *args, **kwargs):
+        return self._new_multi_loss_object_from_self(
+            {k: loss.cpu(*args, **kwargs) for k, loss in self.loss_dict.items()}
+        )
 
-    def cuda(self, **kwargs):
-        return self._new_multi_loss_object_from_self({k: loss.cuda(**kwargs) for k, loss in self.loss_dict.items()})
+    def cuda(self, *args, **kwargs):
+        return self._new_multi_loss_object_from_self(
+            {k: loss.cuda(*args, **kwargs) for k, loss in self.loss_dict.items()}
+        )
 
-    def to(self, **kwargs):
-        return self._new_multi_loss_object_from_self({k: loss.to(**kwargs) for k, loss in self.loss_dict.items()})
+    def to(self, *args, **kwargs):
+        return self._new_multi_loss_object_from_self(
+            {k: loss.to(*args, **kwargs) for k, loss in self.loss_dict.items()}
+        )
 
     def _new_multi_loss_object_from_self(self, loss_dict):
         multi_loss_self_copy = MultiLoss(
