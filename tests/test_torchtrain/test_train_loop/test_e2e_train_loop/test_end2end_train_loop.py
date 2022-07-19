@@ -372,11 +372,11 @@ class TestEnd2EndTrainLoop(unittest.TestCase):
 
         train_loss = train_loop.evaluate_loss_on_train_set()
         val_loss = train_loop.evaluate_loss_on_validation_set()
-        test_loss = train_loop.evaluate_loss_on_test_set()
+        test_loss = train_loop.evaluate_loss_on_test_set(float_dict_format=True)
 
         train_loss_grad_acc = train_loop_grad_acc.evaluate_loss_on_train_set()
         val_loss_grad_acc = train_loop_grad_acc.evaluate_loss_on_validation_set()
-        test_loss_grad_acc = train_loop_grad_acc.evaluate_loss_on_test_set()
+        test_loss_grad_acc = train_loop_grad_acc.evaluate_loss_on_test_set(float_dict_format=True)
 
         self.assertAlmostEqual(train_loss, train_loss_grad_acc, places=6)
         self.assertAlmostEqual(val_loss, val_loss_grad_acc, places=6)
