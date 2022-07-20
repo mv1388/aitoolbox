@@ -410,7 +410,16 @@ class TrainLoop:
         Primarily useful for parsing between single loss representation and the multi-loss representation.
 
         Args:
-            loss_record (list): list losses from each processed batch
+            loss_record (list): list of losses from each processed batch.
+
+                If we used single loss than the ``loss_record`` is a list of floats where each element float is
+                loss for a single batch which has been transformed from torch Tensor into the float via .item()
+
+                If we used multiple losses wrapped inside MultiLoss() then the _train() function called its
+                item() method which converted multi-loss representation into the list of dicts, where each dict
+                represents a loss for a single batch:
+
+                ``[{'loss_1': 1., 'loss_2': 33.}, { ... }]``
 
         Returns:
             np.array or dict: in the case of single loss numpy array is returned, otherwise the dict of multiple losses
@@ -420,23 +429,19 @@ class TrainLoop:
 
         if isinstance(self.optimizer, MultiOptimizer):
             loss_names = sorted(loss_record[0].keys())
+            # loss_record is a list of lists with dimensions: [num_batches, num_losses]
             loss_record = [[loss_dict[k] for k in loss_names] for loss_dict in loss_record]
 
-            loss_batch_accum_avg = np.mean(loss_record, axis=0)
-        else:
-            loss_batch_accum_avg = np.mean(loss_record)
-
         if self.ddp_training_mode:
-            loss_ddp_synced = self.ddp_handler.mp_sync(loss_batch_accum_avg).numpy()
-            if isinstance(self.optimizer, MultiOptimizer):
-                loss_batch_accum_avg = np.mean(loss_ddp_synced, axis=0)
-            else:
-                loss_batch_accum_avg = np.mean(loss_ddp_synced)
+            loss_record = self.ddp_handler.mp_sync(loss_record, double_precision=True)
+            loss_record = loss_record.numpy()
+
+        loss_avg = np.mean(loss_record, axis=0)
 
         if loss_names is None:
-            return loss_batch_accum_avg
+            return loss_avg
         else:
-            return dict(zip(loss_names, loss_batch_accum_avg))
+            return dict(zip(loss_names, loss_avg))
 
     def _print_save_loss(self, loss_parsed, loss_type_name, loss_print_description):
         """Helper function which prints information about parsed loss and saves the loss results into the history
