@@ -154,11 +154,11 @@ class TestIMDBBERTExperimentTrack(unittest.TestCase):
                 predictions = torch.argmax(logits, dim=-1)
 
                 # loss.mean() because DP returns the tensor with the shape of number of used GPUs instead of a scalar
-                loss_batch = outputs.loss.mean().cpu().item()
+                loss_batch = outputs.loss.mean().cpu()
                 val_pred += predictions.cpu().tolist()
                 val_true += batch["labels"].cpu().tolist()
                 val_loss.append(loss_batch)
-            val_loss = np.mean(val_loss)
+            val_loss = torch.mean(torch.Tensor(val_loss))
 
         return val_loss, val_pred, val_true
 
