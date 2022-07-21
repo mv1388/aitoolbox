@@ -156,14 +156,12 @@ export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
 export AWS_DEFAULT_REGION=$aws_region
 
-cd project
-
 source activate $py_env
 
 pip install 'typer[all]'
 
 if [ $pypi_install == false ]; then
-  pip install aitoolbox-$AIToolbox_version.tar.gz
+  pip install ~/project/aitoolbox-$AIToolbox_version.tar.gz
 else
   pip install aitoolbox==$AIToolbox_version
 fi
