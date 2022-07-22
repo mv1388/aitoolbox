@@ -32,8 +32,8 @@ class TrainingJobScheduler:
             self.job_queue.loc[job_todo.index, 'job_status'] = 'running'
             self.job_queue.to_csv(self.job_queue_file_path, index=False)
 
-            logging_path_iteration = self.get_job_logging_path(logging_path)
-            log_upload_setting = f"--log-path {logging_path_iteration} --log-s3-upload-dir {log_s3_dir_path}"
+            log_upload_setting = \
+                f"--log-path {logging_path} --log-s3-upload-dir {log_s3_dir_path} --log-iteration {self.job_counter}"
 
             process_return = subprocess.run(
                 f"{os.path.expanduser('~/project/run_experiment.sh')} "
@@ -56,15 +56,6 @@ class TrainingJobScheduler:
     def is_job_available(self):
         self.job_queue = pd.read_csv(self.job_queue_file_path)
         return not all(el == 'done' for el in self.job_queue['job_status'])
-
-    def get_job_logging_path(self, logging_path):
-        path_extension = os.path.expanduser(logging_path).split('.')
-        if len(path_extension) != 2:
-            raise ValueError
-
-        logging_path, extension = path_extension
-
-        return f'{logging_path}_train_job_{self.job_counter}.{extension}'
 
     def add_job(self, experiment_script_file, project_root_path):
         if os.path.exists(self.job_queue_file_path):

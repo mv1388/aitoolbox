@@ -18,6 +18,7 @@ function usage()
      -p, --project-root STR         path to the project root on the execution server/AWS
      -l, --log-path STR             path to the local log file which will be uploaded to s3
      --log-s3-upload-dir STR        path to the logs folder on S3 to which the training log should be uploaded
+     -i, --log-iteration INT        index of an executed job via the scheduler
      -c, --cleanup-script           post execution cleanup script
      --aws-region STR               create the instance in the specified region. Default is Ireland (eu-west-1)
      -h, --help                     show this help message and exit
@@ -30,6 +31,7 @@ experiment_script_file="aws_run_experiments_project.sh"
 project_root_path=~/project
 log_file_path=
 log_s3_dir_path="s3://model-result/training_logs"
+log_iteration=-1
 post_experiment_run_cleanup=false
 aws_region="eu-west-1"
 
@@ -55,6 +57,10 @@ case $key in
     ;;
     --log-s3-upload-dir)
     log_s3_dir_path="$2"
+    shift 2 # past argument value
+    ;;
+    -i|--log-iteration)
+    log_iteration="$2"
     shift 2 # past argument value
     ;;
     -c|--cleanup-script)
@@ -98,6 +104,19 @@ source $project_root_path/AWS_run_scripts/AWS_core_scripts/$experiment_script_fi
 
 if [[ $log_file_path != "" && -f $log_file_path ]]; then
     filtered_log_file_path="$(dirname $log_file_path)/filtered_$(basename $log_file_path)"
+
+    if [ "$log_iteration" -ge 0 ]; then
+        log_file_path_without_ext="${log_file_path%.*}"
+        extension="${log_file_path##*.}"
+        log_file_path_iteration="${log_file_path_without_ext}_train_job_${log_iteration}.${extension}"
+
+        cp $log_file_path $log_file_path_iteration
+        log_file_path=$log_file_path_iteration
+
+        filtered_log_file_path_without_ext="${filtered_log_file_path%.*}"
+        filtered_log_file_path="${filtered_log_file_path_without_ext}_train_job_${log_iteration}.${extension}"
+    fi
+
     sed -n -e '/              STARTING THE TRAINING JOB               /, $p' $log_file_path | grep -v '%|.*|' > $filtered_log_file_path
 
     s3_log_path="$log_s3_dir_path/$(basename $log_file_path)"
