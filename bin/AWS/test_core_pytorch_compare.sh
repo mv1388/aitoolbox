@@ -161,7 +161,7 @@ scp -i $key_path -r ../../tests_gpu $username@$ec2_instance_address:~/package_te
 scp -i $key_path ../../requirements.txt $username@$ec2_instance_address:~/package_test
 
 terminate_setting=""
-if [ "$debug_mode" == true ]; then
+if [ "$debug_mode" == false ]; then
   terminate_setting="aws ec2 terminate-instances --instance-ids $instance_id"
 fi
 
