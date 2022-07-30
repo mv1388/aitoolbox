@@ -434,7 +434,7 @@ class TrainLoop:
             # loss_record is a list of lists with dimensions: [num_batches, num_losses]
             loss_record = [list(multi_loss.values()) for multi_loss in loss_record]
 
-        loss_record = torch.Tensor(loss_record)
+        loss_record = torch.DoubleTensor(loss_record)
 
         if self.ddp_training_mode:
             loss_record = self.ddp_handler.mp_sync(loss_record)
