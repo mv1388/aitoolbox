@@ -207,8 +207,8 @@ class TestMultiLossOptimizerMNISTCNN(unittest.TestCase):
                 val_true += target.cpu().tolist()
                 val_loss_1.append(loss_batch_1)
                 val_loss_2.append(loss_batch_2)
-            val_loss_1 = torch.mean(torch.Tensor(val_loss_1))
-            val_loss_2 = torch.mean(torch.Tensor(val_loss_2))
+            val_loss_1 = torch.mean(torch.DoubleTensor(val_loss_1))
+            val_loss_2 = torch.mean(torch.DoubleTensor(val_loss_2))
 
         return {'loss_1': val_loss_1, 'loss_2': val_loss_2}, val_pred, val_true
 

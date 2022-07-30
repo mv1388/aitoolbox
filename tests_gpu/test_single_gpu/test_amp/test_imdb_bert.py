@@ -133,7 +133,7 @@ class TestIMDBBERT(unittest.TestCase):
                 val_pred += predictions.cpu().tolist()
                 val_true += batch["labels"].cpu().tolist()
                 val_loss.append(loss_batch)
-            val_loss = torch.mean(torch.Tensor(val_loss))
+            val_loss = torch.mean(torch.DoubleTensor(val_loss))
 
         return val_loss, val_pred, val_true
 
