@@ -46,6 +46,7 @@ HEREDOC
 }
 
 key_path=$(jq -r '.key_path' configs/my_config.json)
+email_address=$(jq -r '.email' configs/my_config.json)
 instance_config="default_config.json"
 instance_type=
 username="ubuntu"
@@ -159,6 +160,7 @@ ssh -i $key_path -o "StrictHostKeyChecking no" $username@$ec2_instance_address '
 scp -i $key_path -r ../../aitoolbox $username@$ec2_instance_address:~/package_test
 scp -i $key_path -r ../../tests_gpu $username@$ec2_instance_address:~/package_test
 scp -i $key_path ../../requirements.txt $username@$ec2_instance_address:~/package_test
+scp -i $key_path send_log_email.sh $username@$ec2_instance_address:~
 
 terminate_setting=""
 if [ "$debug_mode" == false ]; then
@@ -170,7 +172,7 @@ fi
 #########################################################
 echo "Running the comparison tests"
 ssh -i $key_path $username@$ec2_instance_address \
-    "source activate $py_env ; tmux new-session -d -s 'training' 'export AWS_DEFAULT_REGION=$aws_region ; cd package_test ; pip install pytest datasets ; pip install -r requirements.txt ; python -m pytest $pytest_dir -s ; aws s3 cp $logging_path s3://aitoolbox-testing/core_pytorch_comparisson_testing/$logging_filename ; $terminate_setting' \; pipe-pane 'cat > $logging_path'"
+    "source activate $py_env ; tmux new-session -d -s 'training' 'export AWS_DEFAULT_REGION=$aws_region ; cd package_test ; pip install pytest datasets ; pip install -r requirements.txt ; python -m pytest $pytest_dir -s ; aws s3 cp $logging_path s3://aitoolbox-testing/core_pytorch_comparisson_testing/$logging_filename ; ~/send_log_email.sh -f $email_address -t $email_address -s GPU testing results for: $pytest_dir --attachment-path $logging_path ; $terminate_setting' \; pipe-pane 'cat > $logging_path'"
 
 echo "Instance IP: $ec2_instance_address"
 
