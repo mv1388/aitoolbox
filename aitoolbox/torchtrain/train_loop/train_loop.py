@@ -246,7 +246,10 @@ class TrainLoop:
                     # Optimizer zero grad
                     self._optimizer_zero_grad(optimizer_idx)
 
-                self.amp_scaler.update()
+                # Execute AMP scaler update only when optimizer is stepped and grads are zeroed out
+                # https://pytorch.org/docs/stable/notes/amp_examples.html#gradient-accumulation
+                if (self.iteration + 1) % self.grad_accumulation == 0:
+                    self.amp_scaler.update()
 
                 self.callbacks_handler.execute_batch_end()
 
