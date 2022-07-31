@@ -3,7 +3,7 @@ name: Example workflow for Codecov
 on: [push, pull_request]
 
 jobs:
-  run:
+  codecov:
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -22,7 +22,7 @@ jobs:
       run: |
         pip install pytest
         pip install pytest-cov
-        pytest --cov=./ --cov-report=xml
+        pytest --cov=./ --cov-report=xml tests/
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
