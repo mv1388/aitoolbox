@@ -1,6 +1,6 @@
 name: Example workflow for Codecov
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   run:
