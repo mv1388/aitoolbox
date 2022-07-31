@@ -337,8 +337,8 @@ class TrainLoop:
         Returns:
             None
         """
-        # if (iteration + 1) % grad_accumulation == 0 or iteration == len(self.train_loader) - 1:
-        if (self.iteration + 1) % self.grad_accumulation == 0:
+        # if (self.iteration + 1) % self.grad_accumulation == 0:
+        if (self.iteration + 1) % self.grad_accumulation == 0 or self.iteration == len(self.train_loader) - 1:
             if not isinstance(self.optimizer, MultiOptimizer):
                 # To step the optimizer always give it to the AMP scaler to keep the code simpler
                 # If scaler is disabled it will just call normal ``step()`` method
@@ -361,8 +361,8 @@ class TrainLoop:
         Returns:
             None
         """
-        # if (iteration + 1) % grad_accumulation == 0 or iteration == len(self.train_loader) - 1:
-        if (self.iteration + 1) % self.grad_accumulation == 0:
+        # if (self.iteration + 1) % self.grad_accumulation == 0:
+        if (self.iteration + 1) % self.grad_accumulation == 0 or self.iteration == len(self.train_loader) - 1:
             if not isinstance(self.optimizer, MultiOptimizer):
                 self.optimizer.zero_grad()
             else:
