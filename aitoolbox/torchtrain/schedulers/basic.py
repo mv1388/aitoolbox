@@ -133,7 +133,9 @@ class LambdaLRScheduler(GeneralLRSchedulerCallback):
 
     def on_batch_end(self):
         if self.execute_batch_end:
-            if (self.train_loop_obj.iteration + 1) % self.train_loop_obj.grad_accumulation == 0:
+            # if (self.train_loop_obj.iteration + 1) % self.train_loop_obj.grad_accumulation == 0:
+            if (self.train_loop_obj.iteration + 1) % self.train_loop_obj.grad_accumulation == 0 or \
+                    self.train_loop_obj.iteration == len(self.train_loop_obj.train_loader) - 1:
                 self.scheduler.step()
 
 

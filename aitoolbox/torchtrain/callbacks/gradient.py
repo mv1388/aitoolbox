@@ -41,7 +41,9 @@ class GradValueClip(GradientCallbackBase):
         self.max_grad_value = max_grad_value
 
     def on_after_gradient_update(self, optimizer_idx):
-        if (self.train_loop_obj.iteration + 1) % self.train_loop_obj.grad_accumulation == 0:
+        # if (self.train_loop_obj.iteration + 1) % self.train_loop_obj.grad_accumulation == 0:
+        if (self.train_loop_obj.iteration + 1) % self.train_loop_obj.grad_accumulation == 0 or \
+                self.train_loop_obj.iteration == len(self.train_loop_obj.train_loader) - 1:
             optimizer = self.train_loop_obj.optimizer
             if isinstance(optimizer, MultiOptimizer):
                 optimizer = optimizer[optimizer_idx]
