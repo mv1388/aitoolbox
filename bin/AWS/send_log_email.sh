@@ -93,7 +93,7 @@ else
 
     attachment_filesize=$(ls -l ~/log_email_message.json | awk '{print  $5}')
 
-    # If filesize is above 10MB (10000000) limit from aws ses
+    # If file size is above 10MB (10000000) limit from aws ses
     if [ "$attachment_filesize" -gt 10000000 ]; then
         echo "Full attachments too large. Switching to tail filtered attachment only"
         body_text="${body_text}\nFull attachments too large. Switched to tail filtered attachment only!"
