@@ -2,7 +2,7 @@
 
 # Example call:
 
-# ./install_package.sh 1.6.0 --uninstall
+# ./install_package.sh 1.6.1 --uninstall
 
 
 pkgversion=$1
