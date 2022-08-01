@@ -26,8 +26,8 @@ copyright = f'{datetime.datetime.now().year}, Marko Vidoni'
 author = 'Marko Vidoni'
 
 # The full version, including alpha/beta/rc tags
-version = '1.6.0'
-release = '1.6.0'
+version = '1.6.1'
+release = '1.6.1'
 
 
 # -- General configuration ---------------------------------------------------
