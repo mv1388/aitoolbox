@@ -8,7 +8,7 @@
 pkgversion=$1
 uninstallPrevious=$2
 
-source activate py36
+source activate py39
 
 if [ $uninstallPrevious == "--uninstall" ]; then
     sudo pip uninstall aitoolbox

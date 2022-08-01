@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source activate py36
+source activate py39
 
 clean_build=false
 
