@@ -2,13 +2,13 @@
 
 # Example call:
 
-# ./install_package.sh 1.6.0 --uninstall
+# ./install_package.sh 1.6.1 --uninstall
 
 
 pkgversion=$1
 uninstallPrevious=$2
 
-source activate py36
+source activate py39
 
 if [ $uninstallPrevious == "--uninstall" ]; then
     sudo pip uninstall aitoolbox
