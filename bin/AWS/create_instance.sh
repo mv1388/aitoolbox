@@ -123,12 +123,6 @@ case $key in
 esac
 done
 
-if [ "$key_path" == "" ] ; then
-    echo "Not provided required parameters"
-    usage
-    exit
-fi
-
 if [ "$DL_framework" == "TF" ]; then
     py_env="tensorflow"
 elif [ "$DL_framework" == "pytorch" ]; then
