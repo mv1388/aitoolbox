@@ -73,7 +73,7 @@ case $key in
 esac
 done
 
-if [ "$key_path" == "" ] || [ "$ec2_instance_address" == "" ] || [ "$local_project_path" == "" ]; then
+if [ "$ec2_instance_address" == "" ] || [ "$local_project_path" == "" ]; then
     echo "Not provided required parameters"
     usage
     exit

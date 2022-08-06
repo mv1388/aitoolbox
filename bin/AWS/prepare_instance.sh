@@ -117,7 +117,7 @@ case $key in
 esac
 done
 
-if [ "$key_path" == "" ] || [ "$ec2_instance_address" == "" ] || [ "$DL_framework" == "" ] || [ "$AIToolbox_version" == "" ]; then
+if [ "$ec2_instance_address" == "" ] || [ "$DL_framework" == "" ] || [ "$AIToolbox_version" == "" ]; then
     echo "Not provided required parameters"
     usage
     exit

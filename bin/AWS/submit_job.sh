@@ -158,7 +158,7 @@ case $key in
 esac
 done
 
-if [ "$key_path" == "" ] || [ "$local_project_path" == "" ]; then
+if [ "$local_project_path" == "" ]; then
     echo "Not provided required parameters"
     usage
     exit
