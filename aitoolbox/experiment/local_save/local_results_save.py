@@ -249,6 +249,9 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
                 
                 The first file path should be pointing to the main experiment results file.
         """
+        if experiment_timestamp is None:
+            experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
+
         experiment_results_local_path = self.create_experiment_local_folder_structure(project_name, experiment_name,
                                                                                       experiment_timestamp)
 
