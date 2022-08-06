@@ -237,11 +237,24 @@ printf "\n========================================================\n"
 echo "Running the job"
 if [ "$run_with_scheduler" == true ]; then
   ssh -i $key_path $username@$ec2_instance_address \
-      "source activate $py_env ; tmux new-session -d -s 'training' 'source finish_prepare_instance.sh ; cd project ; python ~/training_job_scheduler.py add-job --experiment-script $experiment_script_file ; python ~/training_job_scheduler.py run $terminate_setting $log_upload_setting --aws-region $aws_region' \; pipe-pane 'cat > $logging_path'"
+      "source activate $py_env ;\
+      tmux new-session -d -s 'training' \
+      'source finish_prepare_instance.sh ;\
+        cd project ;\
+        python ~/training_job_scheduler.py add-job --experiment-script $experiment_script_file ;\
+        python ~/training_job_scheduler.py run $terminate_setting $log_upload_setting --aws-region $aws_region' \
+      \; \
+      pipe-pane 'cat > $logging_path'"
 
 else
   ssh -i $key_path $username@$ec2_instance_address \
-      "source activate $py_env ; tmux new-session -d -s 'training' 'source finish_prepare_instance.sh ; cd project ; ./run_experiment.sh $terminate_setting --experiment-script $experiment_script_file $log_upload_setting --cleanup-script --aws-region $aws_region' \; pipe-pane 'cat > $logging_path'"
+      "source activate $py_env ;\
+      tmux new-session -d -s 'training' \
+      'source finish_prepare_instance.sh ;\
+        cd project ;\
+        ./run_experiment.sh $terminate_setting --experiment-script $experiment_script_file $log_upload_setting --cleanup-script --aws-region $aws_region' \
+      \; \
+      pipe-pane 'cat > $logging_path'"
 fi
 
 echo "Instance IP: $ec2_instance_address"
