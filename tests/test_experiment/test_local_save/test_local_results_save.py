@@ -155,6 +155,33 @@ class TestBaseLocalResultsSaver(unittest.TestCase):
         if os.path.exists(project_dir_path_true):
             shutil.rmtree(project_dir_path_true)
 
+    def test_forced_unsupported_file_format_error(self):
+        project_dir_name = 'projectDir'
+        exp_dir_name = 'experimentSubDir'
+        current_time = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
+        file_name = 'test_dump'
+
+        project_dir_path_true = os.path.join(THIS_DIR, project_dir_name)
+        experiment_dir_path_true = os.path.join(project_dir_path_true, f'{exp_dir_name}_{current_time}')
+        experiment_results_dir_path_true = os.path.join(experiment_dir_path_true, 'results')
+
+        result_dict = {'acc': 10, 'loss': 101010.2, 'rogue': 4445.5}
+
+        saver = BaseLocalResultsSaver(local_model_result_folder_path=THIS_DIR, file_format='my_fancy_format')
+
+        self.assertEqual(saver.file_format, 'pickle')
+
+        saver.create_experiment_local_folder_structure(project_dir_name, exp_dir_name, current_time)
+
+        # Force format re-set to unsupported my_fancy_format
+        saver.file_format = 'my_fancy_format'
+
+        with self.assertRaises(ValueError):
+            saver.save_file(result_dict, file_name, f'{experiment_results_dir_path_true}/{file_name}')
+
+        if os.path.exists(project_dir_path_true):
+            shutil.rmtree(project_dir_path_true)
+
 
 class TestLocalResultsSaverSingleFile(unittest.TestCase):
     def test_save_experiment_results_pickle(self):
