@@ -172,7 +172,18 @@ fi
 #########################################################
 echo "Running the comparison tests"
 ssh -i $key_path $username@$ec2_instance_address \
-    "source activate $py_env ; tmux new-session -d -s 'training' 'export AWS_DEFAULT_REGION=$aws_region ; cd package_test ; pip install pytest datasets ; pip install -r requirements.txt ; python -m pytest $pytest_dir -s ; aws s3 cp $logging_path s3://aitoolbox-testing/core_pytorch_comparisson_testing/$logging_filename ; ~/send_log_email.sh -f $email_address -t $email_address -s \"GPU testing results for: $pytest_dir\" --attachment-path $logging_path ; $terminate_setting' \; pipe-pane 'cat > $logging_path'"
+    "source activate $py_env ;\
+    tmux new-session -d -s 'training' \
+    'export AWS_DEFAULT_REGION=$aws_region ;\
+      cd package_test ;\
+      pip install pytest datasets ;\
+      pip install -r requirements.txt ;\
+      python -m pytest $pytest_dir -s ;\
+      aws s3 cp $logging_path s3://aitoolbox-testing/core_pytorch_comparison_testing/$logging_filename ;\
+      ~/send_log_email.sh -f $email_address -t $email_address -s \"GPU testing results for: $pytest_dir\" --attachment-path $logging_path ;\
+      $terminate_setting' \
+    \; \
+    pipe-pane 'cat > $logging_path'"
 
 echo "Instance IP: $ec2_instance_address"
 

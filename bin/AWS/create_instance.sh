@@ -35,7 +35,7 @@ local_project_path="None"
 dataset_name="None"
 preproc_dataset="None"
 DL_framework="pytorch"
-AIToolbox_version="1.6.0"
+AIToolbox_version="1.6.1"
 instance_config="default_config.json"
 instance_type=
 run_bootstrap=true
@@ -122,12 +122,6 @@ case $key in
     ;;
 esac
 done
-
-if [ "$key_path" == "" ] ; then
-    echo "Not provided required parameters"
-    usage
-    exit
-fi
 
 if [ "$DL_framework" == "TF" ]; then
     py_env="tensorflow"

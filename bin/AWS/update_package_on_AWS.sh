@@ -9,13 +9,13 @@ function usage()
 
    arguments:
      -a, --address STR      ec2 instance Public DNS address
-     -f, --framework STR    desired deep learning framework
-     -v, --version FLOAT    AIToolbox version to be installed on ec2
-     -h, --help             show this help message and exit
 
    optional arguments:
+     -f, --framework STR    desired deep learning framework
+     -v, --version FLOAT    AIToolbox version to be installed on ec2
      -k, --key STR          path to ssh key
      -o, --os-name STR      username depending on the OS chosen. Default is ubuntu
+     -h, --help             show this help message and exit
 
 HEREDOC
 }
@@ -23,7 +23,7 @@ HEREDOC
 key_path=$(jq -r '.key_path' configs/my_config.json)
 ec2_instance_address=
 DL_framework="pytorch"
-AIToolbox_version="1.6.0"
+AIToolbox_version="1.6.1"
 username="ubuntu"
 
 while [[ $# -gt 0 ]]; do
@@ -62,7 +62,7 @@ case $key in
 esac
 done
 
-if [ "$key_path" == "" ] || [ "$ec2_instance_address" == "" ] || [ "$DL_framework" == "" ] || [ "$AIToolbox_version" == "" ]; then
+if [ "$ec2_instance_address" == "" ] || [ "$DL_framework" == "" ] || [ "$AIToolbox_version" == "" ]; then
     echo "Not provided required parameters"
     usage
     exit
@@ -80,4 +80,7 @@ fi
 
 scp -i $key_path ../../dist/aitoolbox-$AIToolbox_version.tar.gz  $username@$ec2_instance_address:~/project
 
-ssh -i $key_path $username@$ec2_instance_address "source activate $py_env ; pip uninstall aitoolbox ; pip install ~/project/aitoolbox-$AIToolbox_version.tar.gz"
+ssh -i $key_path $username@$ec2_instance_address \
+    "source activate $py_env ;\
+      pip uninstall aitoolbox ;\
+      pip install ~/project/aitoolbox-$AIToolbox_version.tar.gz"

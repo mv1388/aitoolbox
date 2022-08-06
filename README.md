@@ -1,7 +1,7 @@
 # AI Toolbox
 
 [![PyPI version](https://badge.fury.io/py/aitoolbox.svg)](https://badge.fury.io/py/aitoolbox)
-[![Build Status](https://app.travis-ci.com/mv1388/aitoolbox.svg?branch=master)](https://app.travis-ci.com/mv1388/aitoolbox)
+[![Package testing](https://github.com/mv1388/aitoolbox/actions/workflows/package_testing.yml/badge.svg)](https://github.com/mv1388/aitoolbox/actions/workflows/package_testing.yml)
 [![Documentation Status](https://readthedocs.org/projects/aitoolbox/badge/?version=latest)](https://aitoolbox.readthedocs.io/en/latest/?badge=latest)
 &nbsp; &nbsp;
 [![codebeat badge](https://codebeat.co/badges/04217a3f-a838-418f-8f14-66cf6ae1b03d)](https://codebeat.co/projects/github-com-mv1388-aitoolbox-master)

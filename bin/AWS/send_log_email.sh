@@ -77,7 +77,6 @@ case $key in
 esac
 done
 
-
 if [ "$sender_email" == "" ] || [ "$recipient_email" == "" ] || [ "$subject_text" == "" ] || [ "$attachment_path" == "" ]; then
     echo "Not provided required parameters"
     usage
@@ -91,6 +90,15 @@ if [ "$send_only_tail_filtered_log" == true ]; then
     echo '{"Data": "From: '${sender_email}'\nTo: '${recipient_email}'\nSubject: '${subject_text}'\nMIME-Version: 1.0\nContent-type: Multipart/Mixed; boundary=\"NextPart\"\n\n--NextPart\nContent-Type: text/plain\n\n'${body_text}'\n\n--NextPart\nContent-Type: text/plain;\nContent-Transfer-Encoding: base64;\nContent-Disposition: attachment; filename=\"tail_'${attachment_filename}'\"\n\n'$(tail -n $filter_last_lines $attachment_path | base64)'\n\n--NextPart--"}' > ~/log_email_message.json
 else
     echo '{"Data": "From: '${sender_email}'\nTo: '${recipient_email}'\nSubject: '${subject_text}'\nMIME-Version: 1.0\nContent-type: Multipart/Mixed; boundary=\"NextPart\"\n\n--NextPart\nContent-Type: text/plain\n\n'${body_text}'\n\n--NextPart\nContent-Type: text/plain;\nContent-Transfer-Encoding: base64;\nContent-Disposition: attachment; filename=\"'${attachment_filename}'\"\n\n'$(base64 $attachment_path)'\n\n--NextPart\nContent-Type: text/plain;\nContent-Transfer-Encoding: base64;\nContent-Disposition: attachment; filename=\"tail_'${attachment_filename}'\"\n\n'$(tail -n $filter_last_lines $attachment_path | base64)'\n\n--NextPart--"}' > ~/log_email_message.json
+
+    attachment_filesize=$(ls -l ~/log_email_message.json | awk '{print  $5}')
+
+    # If file size is above 10MB (10000000) limit from aws ses
+    if [ "$attachment_filesize" -gt 10000000 ]; then
+        echo "Full attachments too large. Switching to tail filtered attachment only"
+        body_text="${body_text}\nFull attachments too large. Switched to tail filtered attachment only! Showing last $filter_last_lines lines from the original log file."
+        echo '{"Data": "From: '${sender_email}'\nTo: '${recipient_email}'\nSubject: '${subject_text}'\nMIME-Version: 1.0\nContent-type: Multipart/Mixed; boundary=\"NextPart\"\n\n--NextPart\nContent-Type: text/plain\n\n'${body_text}'\n\n--NextPart\nContent-Type: text/plain;\nContent-Transfer-Encoding: base64;\nContent-Disposition: attachment; filename=\"tail_'${attachment_filename}'\"\n\n'$(tail -n $filter_last_lines $attachment_path | base64)'\n\n--NextPart--"}' > ~/log_email_message.json
+    fi
 fi
 
 aws ses send-raw-email --region eu-west-1 --raw-message file://~/log_email_message.json
