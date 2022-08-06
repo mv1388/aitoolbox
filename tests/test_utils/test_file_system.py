@@ -9,6 +9,53 @@ THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 class TestFileSystem(unittest.TestCase):
+    def test_create_folder_hierarchy(self):
+        folder_hierarchy = ['folder_1', 'folder_2', 'folder_3']
+        folder_path, all_created_folder_paths = file_system.create_folder_hierarchy(THIS_DIR, folder_hierarchy)
+
+        self.assertTrue(os.path.exists(os.path.join(THIS_DIR, *folder_hierarchy)))
+        self.assertEqual(folder_path, os.path.join(THIS_DIR, *folder_hierarchy))
+        self.assertEqual(
+            all_created_folder_paths,
+            [os.path.join(THIS_DIR, *folder_hierarchy[:i]) for i in range(len(folder_hierarchy) + 1)]
+        )
+
+        with self.assertRaises(ValueError):
+            file_system.create_folder_hierarchy('missing_path', ['folder_1', 'folder_2'])
+
+        if os.path.exists(os.path.join(THIS_DIR, 'folder_1')):
+            shutil.rmtree(os.path.join(THIS_DIR, 'folder_1'))
+
+    def test_create_folder_hierarchy_two_prong(self):
+        folder_hierarchy_1 = ['folder_1', 'folder_2', 'folder_3']
+        folder_path_1, all_created_folder_paths_1 = file_system.create_folder_hierarchy(THIS_DIR, folder_hierarchy_1)
+
+        self.assertTrue(os.path.exists(os.path.join(THIS_DIR, *folder_hierarchy_1)))
+        self.assertEqual(folder_path_1, os.path.join(THIS_DIR, *folder_hierarchy_1))
+        self.assertEqual(
+            all_created_folder_paths_1,
+            [os.path.join(THIS_DIR, *folder_hierarchy_1[:i]) for i in range(len(folder_hierarchy_1) + 1)]
+        )
+
+        folder_hierarchy = ['folder_1', 'folder_4', 'folder_1']
+        folder_path, all_created_folder_paths = file_system.create_folder_hierarchy(THIS_DIR, folder_hierarchy)
+
+        # Check if previously created hierarchy still exists
+        self.assertTrue(os.path.exists(os.path.join(THIS_DIR, *folder_hierarchy_1)))
+
+        self.assertTrue(os.path.exists(os.path.join(THIS_DIR, *folder_hierarchy)))
+        self.assertEqual(folder_path, os.path.join(THIS_DIR, *folder_hierarchy))
+        self.assertEqual(
+            all_created_folder_paths,
+            [os.path.join(THIS_DIR, *folder_hierarchy[:i]) for i in range(len(folder_hierarchy) + 1)]
+        )
+
+        with self.assertRaises(ValueError):
+            file_system.create_folder_hierarchy('missing_path', ['folder_1', 'folder_2'])
+
+        if os.path.exists(os.path.join(THIS_DIR, 'folder_1')):
+            shutil.rmtree(os.path.join(THIS_DIR, 'folder_1'))
+
     def test_zip_folder(self):
         dummy_dir_path, dummy_files_content = self.prepare_dummy_folder()
 
