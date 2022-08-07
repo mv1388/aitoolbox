@@ -199,13 +199,13 @@ class TestTTDistributedDataParallel(unittest.TestCase):
         for i in range(1, 101):
             assert ddp_model(100) == i
 
-    def test_dp_model_wrap_get_loss_attribute_access(self):
+    def test_ddp_model_wrap_get_loss_attribute_access(self):
         os.environ['MASTER_ADDR'] = 'localhost'
         os.environ['MASTER_PORT'] = '8888'
-        mp.spawn(self._dp_model_wrap_get_loss_attribute_access, nprocs=2)
+        mp.spawn(self._ddp_model_wrap_get_loss_attribute_access, nprocs=2)
 
     @staticmethod
-    def _dp_model_wrap_get_loss_attribute_access(gpu):
+    def _ddp_model_wrap_get_loss_attribute_access(gpu):
         dist.init_process_group(backend='gloo', init_method='env://', world_size=2, rank=gpu)
         model = DPModel()
         ddp_model = TTDistributedDataParallel(model)
@@ -213,13 +213,13 @@ class TestTTDistributedDataParallel(unittest.TestCase):
         for i in range(1, 101):
             assert ddp_model.get_loss(100, None, None) == (i, i, 'my_new_fn return value', 'test string')
 
-    def test_dp_model_wrap_get_predictions_attribute_access(self):
+    def test_ddp_model_wrap_get_predictions_attribute_access(self):
         os.environ['MASTER_ADDR'] = 'localhost'
         os.environ['MASTER_PORT'] = '8888'
-        mp.spawn(self._dp_model_wrap_get_predictions_attribute_access, nprocs=2)
+        mp.spawn(self._ddp_model_wrap_get_predictions_attribute_access, nprocs=2)
 
     @staticmethod
-    def _dp_model_wrap_get_predictions_attribute_access(gpu):
+    def _ddp_model_wrap_get_predictions_attribute_access(gpu):
         dist.init_process_group(backend='gloo', init_method='env://', world_size=2, rank=gpu)
         model = DPModel()
         ddp_model = TTDistributedDataParallel(model)
@@ -227,13 +227,13 @@ class TestTTDistributedDataParallel(unittest.TestCase):
         for i in range(1, 101):
             assert ddp_model.get_predictions(100, None) == (i, i, 'my_new_fn return value', 'test string')
 
-    def test_dp_model_wrap_all_methods_mix_attribute_access(self):
+    def test_ddp_model_wrap_all_methods_mix_attribute_access(self):
         os.environ['MASTER_ADDR'] = 'localhost'
         os.environ['MASTER_PORT'] = '8888'
-        mp.spawn(self._dp_model_wrap_all_methods_mix_attribute_access, nprocs=2)
+        mp.spawn(self._ddp_model_wrap_all_methods_mix_attribute_access, nprocs=2)
 
     @staticmethod
-    def _dp_model_wrap_all_methods_mix_attribute_access(gpu):
+    def _ddp_model_wrap_all_methods_mix_attribute_access(gpu):
         dist.init_process_group(backend='gloo', init_method='env://', world_size=2, rank=gpu)
         model = DPModel()
         ddp_model = TTDistributedDataParallel(model)
@@ -244,13 +244,13 @@ class TestTTDistributedDataParallel(unittest.TestCase):
         for i in range(1, 101):
             assert ddp_model.get_loss(100, None, None) == (i + 100, i, 'my_new_fn return value', 'test string')
 
-    def test_dp_model_wrap_unreachable_attribute_access(self):
+    def test_ddp_model_wrap_unreachable_attribute_access(self):
         os.environ['MASTER_ADDR'] = 'localhost'
         os.environ['MASTER_PORT'] = '8888'
-        mp.spawn(self._dp_model_wrap_unreachable_attribute_access, nprocs=2)
+        mp.spawn(self._ddp_model_wrap_unreachable_attribute_access, nprocs=2)
 
     @staticmethod
-    def _dp_model_wrap_unreachable_attribute_access(gpu):
+    def _ddp_model_wrap_unreachable_attribute_access(gpu):
         dist.init_process_group(backend='gloo', init_method='env://', world_size=2, rank=gpu)
         model = DPModel()
         ddp_model = TTDistributedDataParallel(model)
