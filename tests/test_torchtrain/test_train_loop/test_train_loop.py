@@ -701,6 +701,18 @@ class TestTrainLoop(unittest.TestCase):
         train_loop.fit(num_iterations=100, grad_accumulation=21)
         self.assertEqual(train_loop.get_num_training_steps(), 100 // 21)
 
+    def test_call(self):
+        model = NetUnifiedBatchFeed()
+        dummy_optimizer = DummyOptimizer()
+        dummy_loss = DummyLoss()
+        dummy_train_loader = list(range(100))
+
+        train_loop = TrainLoop(model, dummy_train_loader, None, None, dummy_optimizer, dummy_loss)
+        self.assertEqual(train_loop.epoch, 0)
+        train_loop(num_epochs=3)
+        self.assertEqual(train_loop.epoch, 2)
+        self.assertEqual(train_loop.total_iteration_idx, 100 * 3 - 1)
+
 
 class TestMultiLossOptiTrainLoop(unittest.TestCase):
     def test_multi_loss_in_train_loop(self):
