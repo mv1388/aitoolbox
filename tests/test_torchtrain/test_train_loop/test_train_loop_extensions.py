@@ -4,7 +4,7 @@ import shutil
 
 from aitoolbox.torchtrain import TrainLoopCheckpoint, TrainLoopEndSave, TrainLoopCheckpointEndSave
 from aitoolbox.torchtrain.callbacks.abstract import AbstractCallback
-from aitoolbox.torchtrain.callbacks.model_save import ModelCheckpoint, ModelTrainEndSave
+from aitoolbox.torchtrain.callbacks.model_save import ModelCheckpoint, ModelIterationCheckpoint, ModelTrainEndSave
 from aitoolbox.torchtrain.train_loop.components.callback_handler import CallbacksHandler
 from tests.utils import NetUnifiedBatchFeed, DummyOptimizer, MiniDummyOptimizer, DummyResultPackage
 
@@ -277,6 +277,26 @@ class TestTrainLoopCheckpointEndSave(unittest.TestCase):
                 {},
                 iteration_save_freq=-10
             )
+
+        train_loop_non_iter = TrainLoopCheckpointEndSave(
+            NetUnifiedBatchFeed(), None, 100, None, DummyOptimizer(), None,
+            "project_name", "experiment_name", "local_model_result_folder_path",
+            {},
+            val_result_package=DummyResultPackage(),
+            iteration_save_freq=0
+        )
+
+        self.assertIsInstance(train_loop_non_iter.callbacks_handler.callbacks_cache[1], ModelCheckpoint)
+
+        train_loop_iter = TrainLoopCheckpointEndSave(
+            NetUnifiedBatchFeed(), None, 100, None, DummyOptimizer(), None,
+            "project_name", "experiment_name", "local_model_result_folder_path",
+            {},
+            val_result_package=DummyResultPackage(),
+            iteration_save_freq=10
+        )
+
+        self.assertIsInstance(train_loop_iter.callbacks_handler.callbacks_cache[1], ModelIterationCheckpoint)
 
     def test_init_val_test_loader_values(self):
         dummy_result_package_val = DummyResultPackage()
