@@ -35,6 +35,14 @@ class TestTrainLoopCheckpoint(unittest.TestCase):
         self.assertEqual(train_loop.callbacks_handler.train_loop_obj, train_loop)
         self.assertFalse(train_loop.early_stop)
 
+        with self.assertRaises(ValueError):
+            TrainLoopCheckpoint(
+                NetUnifiedBatchFeed(), None, None, None, DummyOptimizer(), None,
+                "project_name", "experiment_name", "local_model_result_folder_path",
+                {},
+                iteration_save_freq=-10
+            )
+
     def test_optimizer_missing_state_dict_exception(self):
         raised = False
         try:
@@ -261,6 +269,14 @@ class TestTrainLoopCheckpointEndSave(unittest.TestCase):
         self.assertIsInstance(train_loop.callbacks_handler, CallbacksHandler)
         self.assertEqual(train_loop.callbacks_handler.train_loop_obj, train_loop)
         self.assertFalse(train_loop.early_stop)
+
+        with self.assertRaises(ValueError):
+            TrainLoopCheckpointEndSave(
+                NetUnifiedBatchFeed(), None, None, None, DummyOptimizer(), None,
+                "project_name", "experiment_name", "local_model_result_folder_path",
+                {},
+                iteration_save_freq=-10
+            )
 
     def test_init_val_test_loader_values(self):
         dummy_result_package_val = DummyResultPackage()
