@@ -83,3 +83,7 @@ class TestAllPredTransformFns(unittest.TestCase):
                               torch.Tensor([5, 6, 7]), torch.Tensor([100, 200])]).numpy().tolist(),
             np.array([1., 2., 3., 4., 5., 6., 7., 100., 200.]).tolist()
         )
+
+    def test_keep_list_transf(self):
+        data = list(range(100))
+        self.assertEqual(keep_list_transf(data), data)
