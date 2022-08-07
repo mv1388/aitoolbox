@@ -272,9 +272,10 @@ class TestTrainLoopCheckpointEndSave(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             TrainLoopCheckpointEndSave(
-                NetUnifiedBatchFeed(), None, None, None, DummyOptimizer(), None,
+                NetUnifiedBatchFeed(), None, 100, None, DummyOptimizer(), None,
                 "project_name", "experiment_name", "local_model_result_folder_path",
                 {},
+                val_result_package=DummyResultPackage(),
                 iteration_save_freq=-10
             )
 
