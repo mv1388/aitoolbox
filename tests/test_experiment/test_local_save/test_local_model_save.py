@@ -239,6 +239,43 @@ class TestPyTorchLocalModelSaver(unittest.TestCase):
         if os.path.exists(project_path):
             shutil.rmtree(project_path)
 
+    def test_fail_check_model_dict_contents(self):
+        project_dir_name = 'projectPyTorchLocalModelSaver'
+        exp_dir_name = 'experimentSubDirPT'
+        current_time = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
+
+        model = Net()
+        saver = PyTorchLocalModelSaver(local_model_result_folder_path=THIS_DIR)
+
+        model_checkpoint = {'model_state_dict': model.state_dict(), 'optimizer_state_dict': None,
+                            'epoch': 10, 'hyperparams': {}}
+
+        for key_excluded in model_checkpoint.keys():
+            model_check = {k: v for k, v in model_checkpoint.items() if k != key_excluded}
+
+            with self.assertRaises(ValueError):
+                saver.check_model_dict_contents(model_check)
+
+        for key_excluded in model_checkpoint.keys():
+            model_check = {k: v for k, v in model_checkpoint.items() if k != key_excluded}
+            model_check['additional'] = 'aaaa'
+
+            with self.assertRaises(ValueError):
+                saver.check_model_dict_contents(model_check)
+
+        for key_excluded in model_checkpoint.keys():
+            model_check = {k: v for k, v in model_checkpoint.items() if k != key_excluded}
+
+            with self.assertRaises(ValueError):
+                saver.save_model(model_check, project_dir_name, exp_dir_name, current_time, 1)
+
+        for key_excluded in model_checkpoint.keys():
+            model_check = {k: v for k, v in model_checkpoint.items() if k != key_excluded}
+            model_check['additional'] = 'aaaa'
+
+            with self.assertRaises(ValueError):
+                saver.save_model(model_check, project_dir_name, exp_dir_name, current_time, 1)
+
 
 class TestKerasLocalModelSaver(unittest.TestCase):
     def test_init(self):
