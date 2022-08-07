@@ -233,6 +233,24 @@ class TestTrainingHistory(unittest.TestCase):
              'NEW_METRIC': [13323.4, 133323.4], 'ADDITIONAL_metric': [122.3], 'addi': [344]}
         )
 
+        with self.assertRaises(TypeError):
+            th + [123.4, 1223.4, 13323.4, 13323.4]
+
+        with self.assertRaises(TypeError):
+            th + 123.4
+
+        with self.assertRaises(TypeError):
+            [123.4, 1223.4, 13323.4, 13323.4] + th
+
+        with self.assertRaises(TypeError):
+            123.4 + th
+
+        with self.assertRaises(TypeError):
+            th += [123.4, 1223.4, 13323.4, 13323.4]
+
+        with self.assertRaises(TypeError):
+            th += 123.4
+
     @staticmethod
     def _build_dummy_history():
         th = TrainingHistory()

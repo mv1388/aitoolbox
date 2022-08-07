@@ -11,9 +11,10 @@ class AbstractResultPackage(ABC):
         """Base Result package used to derive specific result packages from
 
         Functions which the user should potentially override in a specific result package:
-            - prepare_results_dict()
-            - list_additional_results_dump_paths()
-            - set_experiment_dir_path_for_additional_results()
+
+            * :meth:`aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.prepare_results_dict`
+            * :meth:`aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.list_additional_results_dump_paths`
+            * :meth:`aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.set_experiment_dir_path_for_additional_results`
 
         Args:
             pkg_name (str or None): result package name used just for clarity
@@ -141,7 +142,7 @@ class AbstractResultPackage(ABC):
         """Return paths to the additional results which are stored to local drive when the package is evaluated
 
         For example if package plots attention heatmaps and saves pictures to disk, this function will return
-        paths to these picture files. This is achieved via the call to the use implemented function
+        paths to these picture files. This is achieved via the call to the user-implemented function
         list_additional_results_dump_paths().
 
         Returns:

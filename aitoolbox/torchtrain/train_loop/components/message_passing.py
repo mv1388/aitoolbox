@@ -109,7 +109,7 @@ class MessageService:
                 raise ValueError(f'Provided two incompatible msg_handling_settings {msg_handling_settings}. '
                                  'Only OVERRIDE setting can currently be combined with another available setting.')
         elif type(msg_handling_settings) != MessageHandling:
-            raise ValueError(f'Provided msg_handling_settings {msg_handling_settings} type not of the supported '
-                             'MessageHandling or list of MessageHandling.')
+            raise TypeError(f'Provided msg_handling_settings {msg_handling_settings} type not of the supported '
+                            'MessageHandling or list of MessageHandling.')
 
         return msg_handling_settings if type(msg_handling_settings) is list else [msg_handling_settings]
