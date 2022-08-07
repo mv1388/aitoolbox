@@ -33,6 +33,23 @@ class DummyFullResultPackage(AbstractResultPackage):
         return self.hyper_params
 
 
+class DummyNonAbstractLocalModelSaver:
+    pass
+
+
+class TestBaseFullExperimentLocalSaver(unittest.TestCase):
+    def test_init(self):
+        project_dir_name = 'projectPyTorchLocalModelSaver'
+        exp_dir_name = 'experimentSubDirPT'
+
+        with self.assertRaises(TypeError):
+            BaseFullExperimentLocalSaver(
+                DummyNonAbstractLocalModelSaver(),
+                project_name=project_dir_name, experiment_name=exp_dir_name,
+                local_model_result_folder_path=THIS_DIR
+            )
+
+
 class TestFullPyTorchExperimentLocalSaver(unittest.TestCase):
     def test_init(self):
         project_dir_name = 'projectPyTorchLocalModelSaver'
