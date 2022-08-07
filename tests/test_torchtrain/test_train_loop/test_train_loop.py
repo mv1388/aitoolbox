@@ -36,6 +36,62 @@ class TestTrainLoop(unittest.TestCase):
         self.assertFalse(train_loop.early_stop)
         self.assertIsInstance(train_loop.amp_scaler, torch.cuda.amp.GradScaler)
 
+    def test_get_num_training_steps(self):
+        model = NetUnifiedBatchFeed()
+        dummy_optimizer = DummyOptimizer()
+        dummy_loss = DummyLoss()
+        dummy_train_loader = list(range(100))
+
+        train_loop = TrainLoop(model, dummy_train_loader, None, None, dummy_optimizer, dummy_loss)
+        train_loop.fit(num_epochs=3)
+        self.assertEqual(train_loop.get_num_training_steps(), 300)
+
+        train_loop = TrainLoop(model, dummy_train_loader, None, None, dummy_optimizer, dummy_loss)
+        train_loop.fit(num_epochs=10)
+        self.assertEqual(train_loop.get_num_training_steps(), 1000)
+
+        train_loop = TrainLoop(model, dummy_train_loader, None, None, dummy_optimizer, dummy_loss)
+        train_loop.fit(num_epochs=3, grad_accumulation=5)
+        self.assertEqual(train_loop.get_num_training_steps(), 60)
+
+        train_loop = TrainLoop(model, dummy_train_loader, None, None, dummy_optimizer, dummy_loss)
+        train_loop.fit(num_epochs=3, grad_accumulation=10)
+        self.assertEqual(train_loop.get_num_training_steps(), 30)
+
+        train_loop = TrainLoop(model, dummy_train_loader, None, None, dummy_optimizer, dummy_loss)
+        train_loop.fit(num_epochs=3, grad_accumulation=20)
+        self.assertEqual(train_loop.get_num_training_steps(), 15)
+
+        train_loop = TrainLoop(model, dummy_train_loader, None, None, dummy_optimizer, dummy_loss)
+        train_loop.fit(num_epochs=10, grad_accumulation=5)
+        self.assertEqual(train_loop.get_num_training_steps(), 200)
+
+    def test_get_num_training_steps_num_iterations(self):
+        model = NetUnifiedBatchFeed()
+        dummy_optimizer = DummyOptimizer()
+        dummy_loss = DummyLoss()
+        dummy_train_loader = list(range(4))
+
+        train_loop = TrainLoop(model, dummy_train_loader, None, None, dummy_optimizer, dummy_loss)
+        train_loop.fit(num_iterations=120)
+        self.assertEqual(train_loop.get_num_training_steps(), 120)
+
+        train_loop = TrainLoop(model, dummy_train_loader, None, None, dummy_optimizer, dummy_loss)
+        train_loop.fit(num_iterations=100)
+        self.assertEqual(train_loop.get_num_training_steps(), 100)
+
+        train_loop = TrainLoop(model, dummy_train_loader, None, None, dummy_optimizer, dummy_loss)
+        train_loop.fit(num_iterations=100, grad_accumulation=5)
+        self.assertEqual(train_loop.get_num_training_steps(), 100 / 5)
+
+        train_loop = TrainLoop(model, dummy_train_loader, None, None, dummy_optimizer, dummy_loss)
+        train_loop.fit(num_iterations=100, grad_accumulation=20)
+        self.assertEqual(train_loop.get_num_training_steps(), 100 / 20)
+
+        train_loop = TrainLoop(model, dummy_train_loader, None, None, dummy_optimizer, dummy_loss)
+        train_loop.fit(num_iterations=100, grad_accumulation=21)
+        self.assertEqual(train_loop.get_num_training_steps(), 100 // 21)
+
     def test_amp_grad_scaler_enabled(self):
         train_loop = TrainLoop(NetUnifiedBatchFeed(), None, 100, None, None, None, use_amp=False)
         self.assertIsInstance(train_loop.amp_scaler, torch.cuda.amp.GradScaler)
