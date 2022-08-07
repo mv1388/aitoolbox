@@ -348,6 +348,10 @@ class MultiLossDummy(DummyLoss):
         return self
 
 
+class DummyNonAbstractResultPackage:
+    pass
+
+
 class DummyResultPackage(AbstractResultPackage):
     def __init__(self):
         AbstractResultPackage.__init__(self, 'DummyPackage', False)

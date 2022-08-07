@@ -6,7 +6,8 @@ from aitoolbox.torchtrain import TrainLoopCheckpoint, TrainLoopEndSave, TrainLoo
 from aitoolbox.torchtrain.callbacks.abstract import AbstractCallback
 from aitoolbox.torchtrain.callbacks.model_save import ModelCheckpoint, ModelIterationCheckpoint, ModelTrainEndSave
 from aitoolbox.torchtrain.train_loop.components.callback_handler import CallbacksHandler
-from tests.utils import NetUnifiedBatchFeed, DummyOptimizer, MiniDummyOptimizer, DummyResultPackage
+from tests.utils import NetUnifiedBatchFeed, DummyOptimizer, MiniDummyOptimizer, \
+    DummyResultPackage, DummyNonAbstractResultPackage
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -231,6 +232,26 @@ class TestTrainLoopEndSave(unittest.TestCase):
                              val_result_package=None,
                              test_result_package=None,
                              cloud_save_mode='s3')
+
+    def test_loader_package_type_exceptions(self):
+        self.create_loader_package_type_exceptions(DummyNonAbstractResultPackage(), None)
+        self.create_loader_package_type_exceptions(DummyNonAbstractResultPackage(), DummyNonAbstractResultPackage())
+        self.create_loader_package_type_exceptions(DummyNonAbstractResultPackage(), DummyResultPackage())
+
+        self.create_loader_package_type_exceptions(None, DummyNonAbstractResultPackage())
+        self.create_loader_package_type_exceptions(DummyResultPackage(), DummyNonAbstractResultPackage())
+
+    def create_loader_package_type_exceptions(self, val_result_package=None, test_result_package=None):
+        with self.assertRaises(TypeError):
+            TrainLoopEndSave(
+                NetUnifiedBatchFeed(), None, 100, 100, None,
+                None,
+                "project_name", "experiment_name",
+                "local_model_result_folder_path",
+                hyperparams={},
+                val_result_package=val_result_package,
+                test_result_package=test_result_package
+            )
 
 
 class TestTrainLoopCheckpointEndSave(unittest.TestCase):
