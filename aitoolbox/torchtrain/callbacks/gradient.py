@@ -172,20 +172,26 @@ class GradDistributionPlot(AbstractExperimentCallback):
             self.gradient_plotter = GradientPlotter(experiment_grad_results_local_path=grad_plot_dir_path)
 
         model_layers_list = self.model_layers_extract_def(self.train_loop_obj.model)
-        model_layer_gradients = [layer.weight.grad.reshape(-1).cpu().numpy() if layer.weight.grad is not None else None
-                                 for layer in model_layers_list]
+        model_layer_gradients = [
+            layer.weight.grad.reshape(-1).cpu().numpy() if layer.weight.grad is not None else None
+            for layer in model_layers_list
+        ]
 
-        saved_plot_paths = self.gradient_plotter.generate_report(model_layer_gradients, f'epoch_{self.train_loop_obj.epoch}',
-                                                                 file_format=self.file_format)
+        saved_plot_paths = self.gradient_plotter.generate_report(
+            model_layer_gradients, f'epoch_{self.train_loop_obj.epoch}',
+            file_format=self.file_format
+        )
 
         if self.cloud_results_saver is not None:
             self.save_to_cloud(saved_plot_paths)
 
     def save_to_cloud(self, saved_plot_paths):
         experiment_cloud_path = \
-            self.cloud_results_saver.create_experiment_cloud_storage_folder_structure(self.project_name,
-                                                                                      self.experiment_name,
-                                                                                      self.train_loop_obj.experiment_timestamp)
+            self.cloud_results_saver.create_experiment_cloud_storage_folder_structure(
+                self.project_name,
+                self.experiment_name,
+                self.train_loop_obj.experiment_timestamp
+            )
         grad_plots_dir_path = os.path.join(experiment_cloud_path, self.grad_plots_dir_name)
 
         for file_path_in_cloud_grad_results_dir, local_file_path in saved_plot_paths:
@@ -194,10 +200,11 @@ class GradDistributionPlot(AbstractExperimentCallback):
                                                cloud_file_path=plot_file_cloud_path)
 
     def create_plot_dirs(self):
-        experiment_results_local_path = \
-            BaseLocalResultsSaver.create_experiment_local_results_folder(self.project_name, self.experiment_name,
-                                                                         self.train_loop_obj.experiment_timestamp,
-                                                                         self.local_model_result_folder_path)
+        experiment_results_local_path = BaseLocalResultsSaver.create_experiment_local_results_folder(
+            self.project_name, self.experiment_name,
+            self.train_loop_obj.experiment_timestamp,
+            self.local_model_result_folder_path
+        )
         grad_plots_dir_path = os.path.join(experiment_results_local_path, self.grad_plots_dir_name)
         if not os.path.exists(grad_plots_dir_path):
             os.mkdir(grad_plots_dir_path)

@@ -4,8 +4,6 @@ from aitoolbox.cloud.GoogleCloud.results_save import GoogleStorageResultsSaver
 from aitoolbox.experiment.local_save.local_results_save import LocalResultsSaver
 from aitoolbox.experiment.training_history import TrainingHistory
 
-# Removed abstract class definition: https://github.com/mv1388/aitoolbox/pull/306
-
 
 class PyTorchModelPredictor:
     def __init__(self, model, data_loader, callbacks=None):
@@ -25,7 +23,7 @@ class PyTorchModelPredictor:
         self.train_loop.model.to(self.train_loop.device)
 
     def model_predict(self):
-        """Calculate model output predictons
+        """Calculate model output predictions
 
         Returns:
             (torch.Tensor, torch.Tensor, dict): y_pred, y_true, metadata
@@ -36,7 +34,7 @@ class PyTorchModelPredictor:
         """Calculate model's loss on the given dataloader and based on provided loss function
 
         Args:
-            loss_criterion (torch.nn.modules.loss._Loss): criterion criterion during the training procedure
+            loss_criterion (torch.nn.modules.loss._Loss): criterion during the training procedure
 
         Returns:
             float: loss
@@ -68,13 +66,17 @@ class PyTorchModelPredictor:
         Returns:
             None
         """
-        LocalResultsSaver.create_experiment_local_results_folder(project_name, experiment_name,
-                                                                 self.train_loop.experiment_timestamp,
-                                                                 local_model_result_folder_path)
-        result_package.set_experiment_dir_path_for_additional_results(project_name=project_name,
-                                                                      experiment_name=experiment_name,
-                                                                      experiment_timestamp=self.train_loop.experiment_timestamp,
-                                                                      local_model_result_folder_path=local_model_result_folder_path)
+        LocalResultsSaver.create_experiment_local_results_folder(
+            project_name, experiment_name,
+            self.train_loop.experiment_timestamp,
+            local_model_result_folder_path
+        )
+        result_package.set_experiment_dir_path_for_additional_results(
+            project_name=project_name,
+            experiment_name=experiment_name,
+            experiment_timestamp=self.train_loop.experiment_timestamp,
+            local_model_result_folder_path=local_model_result_folder_path
+        )
 
         evaluated_result_package = self.evaluate_result_package(result_package, return_result_package=True)
 
@@ -89,11 +91,13 @@ class PyTorchModelPredictor:
         else:
             results_saver = LocalResultsSaver(local_model_result_folder_path)
 
-        results_saver.save_experiment_results(evaluated_result_package,
-                                              training_history=training_history,
-                                              project_name=project_name, experiment_name=experiment_name,
-                                              experiment_timestamp=self.train_loop.experiment_timestamp,
-                                              save_true_pred_labels=save_true_pred_labels)
+        results_saver.save_experiment_results(
+            evaluated_result_package,
+            training_history=training_history,
+            project_name=project_name, experiment_name=experiment_name,
+            experiment_timestamp=self.train_loop.experiment_timestamp,
+            save_true_pred_labels=save_true_pred_labels
+        )
 
     def evaluate_result_package(self, result_package, return_result_package=True):
         """Evaluate model's performance based on provided Result Package
@@ -109,8 +113,10 @@ class PyTorchModelPredictor:
         """
         y_pred, y_test, additional_results = self.train_loop.predict_on_test_set()
 
-        result_package.prepare_result_package(y_test, y_pred,
-                                              hyperparameters={}, additional_results=additional_results)
+        result_package.prepare_result_package(
+            y_test, y_pred,
+            hyperparameters={}, additional_results=additional_results
+        )
 
         if return_result_package:
             return result_package

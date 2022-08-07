@@ -57,9 +57,11 @@ class ModelLoadContinueTraining(AbstractExperimentCallback):
         self.try_infer_experiment_details(infer_cloud_details=True)
         self.init_model_loader()
 
-        model_representation = self.model_loader.load_model(self.project_name, self.experiment_name,
-                                                            self.saved_experiment_timestamp, self.saved_model_dir,
-                                                            self.epoch_num, **self.local_loader_kwargs)
+        model_representation = self.model_loader.load_model(
+            self.project_name, self.experiment_name,
+            self.saved_experiment_timestamp, self.saved_model_dir,
+            self.epoch_num, **self.local_loader_kwargs
+        )
 
         self.train_loop_obj.model = self.model_loader.init_model(self.train_loop_obj.model,
                                                                  self.used_data_parallel)

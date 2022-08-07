@@ -57,9 +57,11 @@ class WandBTracking(AbstractExperimentCallback):
             local_model_result_folder_path (str or None): root local path where project folder will be created
             **kwargs: additional arguments for ``wandb.init()`` wrapped inside this callback
         """
-        AbstractExperimentCallback.__init__(self, 'WeightsAndBiases Experiment Tracking',
-                                            project_name, experiment_name, local_model_result_folder_path,
-                                            execution_order=97, device_idx_execution=0)
+        AbstractExperimentCallback.__init__(
+            self, 'WeightsAndBiases Experiment Tracking',
+            project_name, experiment_name, local_model_result_folder_path,
+            execution_order=97, device_idx_execution=0
+        )
         self.metric_names = metric_names
         self.batch_log_frequency = batch_log_frequency
         self.hyperparams = hyperparams

@@ -35,10 +35,12 @@ class TensorboardReporterBaseCB(AbstractExperimentCallback):
             cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
             **kwargs: additional arguments for ``torch.utils.tensorboard.SummaryWriter`` wrapped inside this callback
         """
-        AbstractExperimentCallback.__init__(self, callback_name,
-                                            project_name, experiment_name, local_model_result_folder_path,
-                                            cloud_save_mode, bucket_name, cloud_dir_prefix,
-                                            execution_order=97, device_idx_execution=0)
+        AbstractExperimentCallback.__init__(
+            self, callback_name,
+            project_name, experiment_name, local_model_result_folder_path,
+            cloud_save_mode, bucket_name, cloud_dir_prefix,
+            execution_order=97, device_idx_execution=0
+        )
         # Default log_dir
         self.log_dir = 'tensorboard'
         if log_dir is not None:
@@ -93,8 +95,10 @@ class TensorboardReporterBaseCB(AbstractExperimentCallback):
 
             metric_results = self.train_loop_obj.train_history[metric_name]
             if len(metric_results) > 0:
-                self.tb_writer.add_scalar(f'{prefix_name}/{metric_name}', metric_results[-1],
-                                          self.train_loop_obj.epoch)
+                self.tb_writer.add_scalar(
+                    f'{prefix_name}/{metric_name}', metric_results[-1],
+                    self.train_loop_obj.epoch
+                )
 
     def on_train_end(self):
         self.tb_writer.close()
@@ -116,9 +120,11 @@ class TensorboardReporterBaseCB(AbstractExperimentCallback):
         full_log_dir_path = self.log_dir
 
         if self.is_project:
-            experiment_path = FolderCreator.create_base_folder(self.project_name, self.experiment_name,
-                                                               self.train_loop_obj.experiment_timestamp,
-                                                               self.local_model_result_folder_path)
+            experiment_path = FolderCreator.create_base_folder(
+                self.project_name, self.experiment_name,
+                self.train_loop_obj.experiment_timestamp,
+                self.local_model_result_folder_path
+            )
             full_log_dir_path = os.path.join(experiment_path, self.log_dir)
             if not os.path.exists(full_log_dir_path):
                 os.mkdir(full_log_dir_path)
@@ -132,11 +138,15 @@ class TensorboardReporterBaseCB(AbstractExperimentCallback):
 
     def prepare_results_saver(self):
         if self.cloud_save_mode in s3_available_options:
-            self.cloud_results_saver = BaseResultsS3Saver(bucket_name=self.bucket_name,
-                                                          cloud_dir_prefix=self.cloud_dir_prefix)
+            self.cloud_results_saver = BaseResultsS3Saver(
+                bucket_name=self.bucket_name,
+                cloud_dir_prefix=self.cloud_dir_prefix
+            )
         elif self.cloud_save_mode in gcs_available_options:
-            self.cloud_results_saver = BaseResultsGoogleStorageSaver(bucket_name=self.bucket_name,
-                                                                     cloud_dir_prefix=self.cloud_dir_prefix)
+            self.cloud_results_saver = BaseResultsGoogleStorageSaver(
+                bucket_name=self.bucket_name,
+                cloud_dir_prefix=self.cloud_dir_prefix
+            )
         else:
             self.cloud_results_saver = None
 
@@ -167,8 +177,10 @@ class TensorboardReporterBaseCB(AbstractExperimentCallback):
                 for file_name in files:
                     local_file_path = os.path.join(root, file_name)
                     cloud_file_path = os.path.join(experiment_cloud_path, file_name)
-                    self.cloud_results_saver.save_file(local_file_path=local_file_path,
-                                                       cloud_file_path=cloud_file_path)
+                    self.cloud_results_saver.save_file(
+                        local_file_path=local_file_path,
+                        cloud_file_path=cloud_file_path
+                    )
 
 
 class TensorboardTrainBatchLoss(TensorboardReporterBaseCB):
@@ -196,11 +208,13 @@ class TensorboardTrainBatchLoss(TensorboardReporterBaseCB):
             cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
             **kwargs: additional arguments for ``torch.utils.tensorboard.SummaryWriter`` wrapped inside this callback
         """
-        TensorboardReporterBaseCB.__init__(self, 'Tensorboard end of batch report of batch loss',
-                                           log_dir, is_project,
-                                           project_name, experiment_name, local_model_result_folder_path,
-                                           cloud_save_mode, bucket_name, cloud_dir_prefix,
-                                           **kwargs)
+        TensorboardReporterBaseCB.__init__(
+            self, 'Tensorboard end of batch report of batch loss',
+            log_dir, is_project,
+            project_name, experiment_name, local_model_result_folder_path,
+            cloud_save_mode, bucket_name, cloud_dir_prefix,
+            **kwargs
+        )
         self.batch_log_frequency = batch_log_frequency
 
     def on_batch_end(self):
@@ -241,11 +255,13 @@ class TensorboardTrainHistoryMetric(TensorboardReporterBaseCB):
             cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
             **kwargs: additional arguments for ``torch.utils.tensorboard.SummaryWriter`` wrapped inside this callback
         """
-        TensorboardReporterBaseCB.__init__(self, 'Tensorboard end of batch report of batch loss',
-                                           log_dir, is_project,
-                                           project_name, experiment_name, local_model_result_folder_path,
-                                           cloud_save_mode, bucket_name, cloud_dir_prefix,
-                                           **kwargs)
+        TensorboardReporterBaseCB.__init__(
+            self, 'Tensorboard end of batch report of batch loss',
+            log_dir, is_project,
+            project_name, experiment_name, local_model_result_folder_path,
+            cloud_save_mode, bucket_name, cloud_dir_prefix,
+            **kwargs
+        )
         self.metric_names = metric_names
 
     def on_epoch_end(self):
@@ -286,11 +302,13 @@ class TensorboardFullTracking(TensorboardReporterBaseCB):
             cloud_dir_prefix (str): path to the folder inside the bucket where the experiments are going to be saved
             **kwargs: additional arguments for ``torch.utils.tensorboard.SummaryWriter`` wrapped inside this callback
         """
-        TensorboardReporterBaseCB.__init__(self, 'Tensorboard full tracking',
-                                           log_dir, is_project,
-                                           project_name, experiment_name, local_model_result_folder_path,
-                                           cloud_save_mode, bucket_name, cloud_dir_prefix,
-                                           **kwargs)
+        TensorboardReporterBaseCB.__init__(
+            self, 'Tensorboard full tracking',
+            log_dir, is_project,
+            project_name, experiment_name, local_model_result_folder_path,
+            cloud_save_mode, bucket_name, cloud_dir_prefix,
+            **kwargs
+        )
         self.metric_names = metric_names
         self.batch_log_frequency = batch_log_frequency
 

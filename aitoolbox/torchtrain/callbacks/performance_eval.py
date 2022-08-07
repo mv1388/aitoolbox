@@ -120,22 +120,28 @@ class ModelPerformanceEvaluation(AbstractCallback):
         for m_name in evaluated_metrics:
             if self.on_train_data:
                 metric_name = f'{prefix}train_{m_name}'
-                self.train_loop_obj.insert_metric_result_into_history(metric_name,
-                                                                      self.train_result_package.get_results()[m_name])
+                self.train_loop_obj.insert_metric_result_into_history(
+                    metric_name,
+                    self.train_result_package.get_results()[m_name]
+                )
 
             if self.on_val_data:
                 metric_name = f'{prefix}val_{m_name}'
-                self.train_loop_obj.insert_metric_result_into_history(metric_name,
-                                                                      self.result_package.get_results()[m_name])
+                self.train_loop_obj.insert_metric_result_into_history(
+                    metric_name,
+                    self.result_package.get_results()[m_name]
+                )
 
     def on_train_loop_registration(self):
         if self.if_available_output_to_project_dir and \
-            hasattr(self.train_loop_obj, 'project_name') and hasattr(self.train_loop_obj, 'experiment_name') and \
+                hasattr(self.train_loop_obj, 'project_name') and hasattr(self.train_loop_obj, 'experiment_name') and \
                 hasattr(self.train_loop_obj, 'local_model_result_folder_path'):
-            self.result_package.set_experiment_dir_path_for_additional_results(self.train_loop_obj.project_name,
-                                                                               self.train_loop_obj.experiment_name,
-                                                                               self.train_loop_obj.experiment_timestamp,
-                                                                               self.train_loop_obj.local_model_result_folder_path)
+            self.result_package.set_experiment_dir_path_for_additional_results(
+                self.train_loop_obj.project_name,
+                self.train_loop_obj.experiment_name,
+                self.train_loop_obj.experiment_timestamp,
+                self.train_loop_obj.local_model_result_folder_path
+            )
 
         if isinstance(self.result_package, TorchMetricsPackage):
             if self.on_train_data:
@@ -291,27 +297,14 @@ class MetricHistoryRename(TrainHistoryFormatter):
             strict_metric_extract (bool): in case of (quality) problems should exception be raised on just the
                 notification printed to console
         """
-
-        # TODO: decide which of these two options is better
-
-        # if callable(input_metric_path):
-        #     input_metric_getter = input_metric_path
-        # else:
-        #     input_metric_getter = lambda train_history: train_history[input_metric_path]
-
-        # input_metric_getter = input_metric_path if callable(input_metric_path) \
-        #     else lambda train_history: train_history[input_metric_path]
-        # output_metric_setter = lambda input_metric: (new_metric_name, input_metric[-1])
-
-        # TrainHistoryFormatter.__init__(self, input_metric_getter, output_metric_setter,
-        #                                epoch_end=True, train_end=True, strict_metric_extract=strict_metric_extract)
-
-        TrainHistoryFormatter.__init__(self,
-                                       input_metric_getter=input_metric_path if callable(input_metric_path) else
-                                       lambda train_history: train_history[input_metric_path],
-                                       output_metric_setter=lambda input_metric: (new_metric_name, input_metric[-1]),
-                                       epoch_end=epoch_end, train_end=train_end,
-                                       strict_metric_extract=strict_metric_extract)
+        TrainHistoryFormatter.__init__(
+            self,
+            input_metric_getter=input_metric_path if callable(input_metric_path) else
+            lambda train_history: train_history[input_metric_path],
+            output_metric_setter=lambda input_metric: (new_metric_name, input_metric[-1]),
+            epoch_end=epoch_end, train_end=train_end,
+            strict_metric_extract=strict_metric_extract
+        )
 
 
 class ModelTrainHistoryBaseCB(AbstractExperimentCallback):
@@ -357,12 +350,16 @@ class ModelTrainHistoryBaseCB(AbstractExperimentCallback):
             None
         """
         if self.cloud_save_mode in s3_available_options:
-            self.cloud_results_saver = BaseResultsS3Saver(bucket_name=self.bucket_name,
-                                                          cloud_dir_prefix=self.cloud_dir_prefix)
+            self.cloud_results_saver = BaseResultsS3Saver(
+                bucket_name=self.bucket_name,
+                cloud_dir_prefix=self.cloud_dir_prefix
+            )
 
         elif self.cloud_save_mode in gcs_available_options:
-            self.cloud_results_saver = BaseResultsGoogleStorageSaver(bucket_name=self.bucket_name,
-                                                                     cloud_dir_prefix=self.cloud_dir_prefix)
+            self.cloud_results_saver = BaseResultsGoogleStorageSaver(
+                bucket_name=self.bucket_name,
+                cloud_dir_prefix=self.cloud_dir_prefix
+            )
         else:
             self.cloud_results_saver = None
 
@@ -376,8 +373,8 @@ class ModelTrainHistoryPlot(ModelTrainHistoryBaseCB):
         Args:
             epoch_end (bool): should plot after every epoch
             train_end (bool): should plot at the end of the training
-            file_format (str): output file format. Can be either 'png' for saving separate images or 'pdf' for combining
-                all the plots into a single pdf file.
+            file_format (str): output file format. Can be either 'png' for saving separate images or 'pdf'
+                for combining all the plots into a single pdf file.
             project_name (str or None): root name of the project
             experiment_name (str or None): name of the particular experiment
             local_model_result_folder_path (str or None): root local path where project folder will be created
@@ -390,12 +387,14 @@ class ModelTrainHistoryPlot(ModelTrainHistoryBaseCB):
         """
         # execution_order=97 makes sure that any performance calculation callbacks are executed before and the most
         # recent results can already be found in the train_history
-        ModelTrainHistoryBaseCB.__init__(self, 'Model Train history Plot report', execution_order=97,
-                                         epoch_end=epoch_end, train_end=train_end, file_format=file_format,
-                                         project_name=project_name, experiment_name=experiment_name,
-                                         local_model_result_folder_path=local_model_result_folder_path,
-                                         cloud_save_mode=cloud_save_mode, bucket_name=bucket_name,
-                                         cloud_dir_prefix=cloud_dir_prefix)
+        ModelTrainHistoryBaseCB.__init__(
+            self, 'Model Train history Plot report', execution_order=97,
+            epoch_end=epoch_end, train_end=train_end, file_format=file_format,
+            project_name=project_name, experiment_name=experiment_name,
+            local_model_result_folder_path=local_model_result_folder_path,
+            cloud_save_mode=cloud_save_mode, bucket_name=bucket_name,
+            cloud_dir_prefix=cloud_dir_prefix
+        )
         if self.file_format not in ['png', 'pdf']:
             raise ValueError(f"Output format '{self.file_format}' is not supported. "
                              "Select one of the following: 'png' or 'pdf'.")
@@ -422,31 +421,40 @@ class ModelTrainHistoryPlot(ModelTrainHistoryBaseCB):
             None
         """
         experiment_results_local_path = \
-            BaseLocalResultsSaver.create_experiment_local_results_folder(self.project_name, self.experiment_name,
-                                                                         self.train_loop_obj.experiment_timestamp,
-                                                                         self.local_model_result_folder_path)
+            BaseLocalResultsSaver.create_experiment_local_results_folder(
+                self.project_name, self.experiment_name,
+                self.train_loop_obj.experiment_timestamp,
+                self.local_model_result_folder_path
+            )
 
         plotter = TrainingHistoryPlotter(experiment_results_local_path=experiment_results_local_path)
-        saved_local_results_details = \
-            plotter.generate_report(training_history=self.train_loop_obj.train_history,
-                                    plots_folder_name=f'{prefix}plots_epoch_{self.train_loop_obj.epoch}',
-                                    file_format=self.file_format)
+        saved_local_results_details = plotter.generate_report(
+            training_history=self.train_loop_obj.train_history,
+            plots_folder_name=f'{prefix}plots_epoch_{self.train_loop_obj.epoch}',
+            file_format=self.file_format
+        )
 
         results_file_local_paths = [result_local_path for _, result_local_path in saved_local_results_details]
-        self.message_service.write_message('ModelTrainHistoryPlot_results_file_local_paths',
-                                           results_file_local_paths,
-                                           msg_handling_settings=MessageHandling.UNTIL_END_OF_EPOCH)
+        self.message_service.write_message(
+            'ModelTrainHistoryPlot_results_file_local_paths',
+            results_file_local_paths,
+            msg_handling_settings=MessageHandling.UNTIL_END_OF_EPOCH
+        )
 
         if self.cloud_results_saver is not None:
             experiment_cloud_path = \
-                self.cloud_results_saver.create_experiment_cloud_storage_folder_structure(self.project_name,
-                                                                                          self.experiment_name,
-                                                                                          self.train_loop_obj.experiment_timestamp)
+                self.cloud_results_saver.create_experiment_cloud_storage_folder_structure(
+                    self.project_name,
+                    self.experiment_name,
+                    self.train_loop_obj.experiment_timestamp
+                )
 
             for results_file_path_in_cloud_results_dir, results_file_local_path in saved_local_results_details:
                 results_file_s3_path = os.path.join(experiment_cloud_path, results_file_path_in_cloud_results_dir)
-                self.cloud_results_saver.save_file(local_file_path=results_file_local_path,
-                                                   cloud_file_path=results_file_s3_path)
+                self.cloud_results_saver.save_file(
+                    local_file_path=results_file_local_path,
+                    cloud_file_path=results_file_s3_path
+                )
 
 
 class ModelTrainHistoryFileWriter(ModelTrainHistoryBaseCB):
@@ -472,12 +480,14 @@ class ModelTrainHistoryFileWriter(ModelTrainHistoryBaseCB):
         """
         # execution_order=97 makes sure that any performance calculation callbacks are executed before and the most
         # recent results can already be found in the train_history
-        ModelTrainHistoryBaseCB.__init__(self, 'Model Train performance history file writer', execution_order=97,
-                                         epoch_end=epoch_end, train_end=train_end, file_format=file_format,
-                                         project_name=project_name, experiment_name=experiment_name,
-                                         local_model_result_folder_path=local_model_result_folder_path,
-                                         cloud_save_mode=cloud_save_mode, bucket_name=bucket_name,
-                                         cloud_dir_prefix=cloud_dir_prefix)
+        ModelTrainHistoryBaseCB.__init__(
+            self, 'Model Train performance history file writer', execution_order=97,
+            epoch_end=epoch_end, train_end=train_end, file_format=file_format,
+            project_name=project_name, experiment_name=experiment_name,
+            local_model_result_folder_path=local_model_result_folder_path,
+            cloud_save_mode=cloud_save_mode, bucket_name=bucket_name,
+            cloud_dir_prefix=cloud_dir_prefix
+        )
         # experiment_results_local_path will be set when callback is executed inside write_current_train_history()
         self.result_writer = TrainingHistoryWriter(experiment_results_local_path=None)
         if self.file_format not in ['txt', 'tsv', 'csv']:
@@ -506,27 +516,37 @@ class ModelTrainHistoryFileWriter(ModelTrainHistoryBaseCB):
             None
         """
         experiment_results_local_path = \
-            BaseLocalResultsSaver.create_experiment_local_results_folder(self.project_name, self.experiment_name,
-                                                                         self.train_loop_obj.experiment_timestamp,
-                                                                         self.local_model_result_folder_path)
+            BaseLocalResultsSaver.create_experiment_local_results_folder(
+                self.project_name, self.experiment_name,
+                self.train_loop_obj.experiment_timestamp,
+                self.local_model_result_folder_path
+            )
         self.result_writer.experiment_results_local_path = experiment_results_local_path
 
         results_file_path_in_cloud_results_dir, results_file_local_path = \
-            self.result_writer.generate_report(training_history=self.train_loop_obj.train_history,
-                                               epoch=self.train_loop_obj.epoch,
-                                               file_name=f'{prefix}results.{self.file_format}',
-                                               file_format=self.file_format)
+            self.result_writer.generate_report(
+                training_history=self.train_loop_obj.train_history,
+                epoch=self.train_loop_obj.epoch,
+                file_name=f'{prefix}results.{self.file_format}',
+                file_format=self.file_format
+            )
 
-        self.message_service.write_message('ModelTrainHistoryFileWriter_results_file_local_paths',
-                                           [results_file_local_path],
-                                           msg_handling_settings=MessageHandling.UNTIL_END_OF_EPOCH)
+        self.message_service.write_message(
+            'ModelTrainHistoryFileWriter_results_file_local_paths',
+            [results_file_local_path],
+            msg_handling_settings=MessageHandling.UNTIL_END_OF_EPOCH
+        )
 
         if self.cloud_results_saver is not None:
             experiment_cloud_path = \
-                self.cloud_results_saver.create_experiment_cloud_storage_folder_structure(self.project_name,
-                                                                                          self.experiment_name,
-                                                                                          self.train_loop_obj.experiment_timestamp)
+                self.cloud_results_saver.create_experiment_cloud_storage_folder_structure(
+                    self.project_name,
+                    self.experiment_name,
+                    self.train_loop_obj.experiment_timestamp
+                )
 
             results_file_s3_path = os.path.join(experiment_cloud_path, results_file_path_in_cloud_results_dir)
-            self.cloud_results_saver.save_file(local_file_path=results_file_local_path,
-                                               cloud_file_path=results_file_s3_path)
+            self.cloud_results_saver.save_file(
+                local_file_path=results_file_local_path,
+                cloud_file_path=results_file_s3_path
+            )

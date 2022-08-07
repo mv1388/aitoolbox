@@ -73,12 +73,14 @@ class ModelCheckpoint(AbstractCallback):
         if self.train_loop_obj.use_amp:
             model_checkpoint['amp'] = self.train_loop_obj.amp_scaler.state_dict()
 
-        model_paths = self.model_checkpointer.save_model(model=model_checkpoint,
-                                                         project_name=self.project_name,
-                                                         experiment_name=self.experiment_name,
-                                                         experiment_timestamp=self.train_loop_obj.experiment_timestamp,
-                                                         epoch=self.train_loop_obj.epoch,
-                                                         protect_existing_folder=True)
+        model_paths = self.model_checkpointer.save_model(
+            model=model_checkpoint,
+            project_name=self.project_name,
+            experiment_name=self.experiment_name,
+            experiment_timestamp=self.train_loop_obj.experiment_timestamp,
+            epoch=self.train_loop_obj.epoch,
+            protect_existing_folder=True
+        )
 
         if self.rm_subopt_local_models is not False:
             *_, model_local_path = model_paths
@@ -112,9 +114,11 @@ class ModelCheckpoint(AbstractCallback):
 
     def save_hyperparams(self):
         if not self._hyperparams_already_saved:
-            param_reporter = HyperParamSourceReporter(self.project_name, self.experiment_name,
-                                                      self.train_loop_obj.experiment_timestamp,
-                                                      self.local_model_result_folder_path)
+            param_reporter = HyperParamSourceReporter(
+                self.project_name, self.experiment_name,
+                self.train_loop_obj.experiment_timestamp,
+                self.local_model_result_folder_path
+            )
 
             if not os.path.isfile(param_reporter.local_hyperparams_file_path):
                 local_hyperparams_file_path = param_reporter.save_hyperparams_to_text_file(self.hyperparams)
@@ -126,13 +130,17 @@ class ModelCheckpoint(AbstractCallback):
                     param_reporter.copy_to_cloud_storage(local_hyperparams_file_path, self.model_checkpointer)
 
                     if local_experiment_python_file_path is not None:
-                        param_reporter.copy_to_cloud_storage(local_experiment_python_file_path,
-                                                             self.model_checkpointer,
-                                                             file_name=os.path.basename(local_experiment_python_file_path))
+                        param_reporter.copy_to_cloud_storage(
+                            local_experiment_python_file_path,
+                            self.model_checkpointer,
+                            file_name=os.path.basename(local_experiment_python_file_path)
+                        )
                     if local_source_code_zip_path is not None:
-                        param_reporter.copy_to_cloud_storage(local_source_code_zip_path,
-                                                             self.model_checkpointer,
-                                                             file_name=os.path.basename(local_source_code_zip_path))
+                        param_reporter.copy_to_cloud_storage(
+                            local_source_code_zip_path,
+                            self.model_checkpointer,
+                            file_name=os.path.basename(local_source_code_zip_path)
+                        )
 
                 self._hyperparams_already_saved = True
 
@@ -270,9 +278,11 @@ class ModelTrainEndSave(AbstractCallback):
             self.val_result_package.pkg_name += '_VAL'
             if self.val_result_package.requires_loss:
                 additional_results['loss'] = self.train_loop_obj.evaluate_loss_on_validation_set()
-            self.val_result_package.prepare_result_package(y_test, y_pred,
-                                                           hyperparameters=self.hyperparams,
-                                                           additional_results=additional_results)
+            self.val_result_package.prepare_result_package(
+                y_test, y_pred,
+                hyperparameters=self.hyperparams,
+                additional_results=additional_results
+            )
             self.result_package = self.val_result_package
 
         if self.test_result_package is not None:
@@ -280,28 +290,36 @@ class ModelTrainEndSave(AbstractCallback):
             self.test_result_package.pkg_name += '_TEST'
             if self.test_result_package.requires_loss:
                 additional_results_test['loss'] = self.train_loop_obj.evaluate_loss_on_test_set()
-            self.test_result_package.prepare_result_package(y_test_test, y_pred_test,
-                                                            hyperparameters=self.hyperparams,
-                                                            additional_results=additional_results_test)
+            self.test_result_package.prepare_result_package(
+                y_test_test, y_pred_test,
+                hyperparameters=self.hyperparams,
+                additional_results=additional_results_test
+            )
             self.result_package = self.test_result_package + self.result_package if self.result_package is not None \
                 else self.test_result_package
 
         if not self.train_loop_obj.ddp_training_mode or self.train_loop_obj.device.index == 0:
-            self.results_saver.save_experiment(model_final_state, self.result_package,
-                                               self.train_loop_obj.train_history,
-                                               experiment_timestamp=self.train_loop_obj.experiment_timestamp,
-                                               save_true_pred_labels=True)
+            self.results_saver.save_experiment(
+                model_final_state, self.result_package,
+                self.train_loop_obj.train_history,
+                experiment_timestamp=self.train_loop_obj.experiment_timestamp,
+                save_true_pred_labels=True
+            )
 
     def on_train_loop_registration(self):
         if self.val_result_package is not None:
-            self.val_result_package.set_experiment_dir_path_for_additional_results(self.project_name, self.experiment_name,
-                                                                                   self.train_loop_obj.experiment_timestamp,
-                                                                                   self.local_model_result_folder_path)
+            self.val_result_package.set_experiment_dir_path_for_additional_results(
+                self.project_name, self.experiment_name,
+                self.train_loop_obj.experiment_timestamp,
+                self.local_model_result_folder_path
+            )
         if self.test_result_package is not None:
-            self.test_result_package.set_experiment_dir_path_for_additional_results(self.project_name,
-                                                                                    self.experiment_name,
-                                                                                    self.train_loop_obj.experiment_timestamp,
-                                                                                    self.local_model_result_folder_path)
+            self.test_result_package.set_experiment_dir_path_for_additional_results(
+                self.project_name,
+                self.experiment_name,
+                self.train_loop_obj.experiment_timestamp,
+                self.local_model_result_folder_path
+            )
         if not util.function_exists(self.train_loop_obj.optimizer, 'state_dict'):
             raise AttributeError('Provided optimizer does not have the required state_dict() method which is needed'
                                  'for the saving of the model and the optimizer.')
@@ -330,9 +348,11 @@ class ModelTrainEndSave(AbstractCallback):
 
     def save_hyperparams(self):
         if not self._hyperparams_already_saved:
-            param_reporter = HyperParamSourceReporter(self.project_name, self.experiment_name,
-                                                      self.train_loop_obj.experiment_timestamp,
-                                                      self.local_model_result_folder_path)
+            param_reporter = HyperParamSourceReporter(
+                self.project_name, self.experiment_name,
+                self.train_loop_obj.experiment_timestamp,
+                self.local_model_result_folder_path
+            )
 
             if not os.path.isfile(param_reporter.local_hyperparams_file_path):
                 local_hyperparams_file_path = param_reporter.save_hyperparams_to_text_file(self.hyperparams)
@@ -344,13 +364,17 @@ class ModelTrainEndSave(AbstractCallback):
                     param_reporter.copy_to_cloud_storage(local_hyperparams_file_path, self.results_saver.model_saver)
 
                     if local_experiment_python_file_path is not None:
-                        param_reporter.copy_to_cloud_storage(local_experiment_python_file_path,
-                                                             self.results_saver.model_saver,
-                                                             file_name=os.path.basename(local_experiment_python_file_path))
+                        param_reporter.copy_to_cloud_storage(
+                            local_experiment_python_file_path,
+                            self.results_saver.model_saver,
+                            file_name=os.path.basename(local_experiment_python_file_path)
+                        )
                     if local_source_code_zip_path is not None:
-                        param_reporter.copy_to_cloud_storage(local_source_code_zip_path,
-                                                             self.results_saver.model_saver,
-                                                             file_name=os.path.basename(local_source_code_zip_path))
+                        param_reporter.copy_to_cloud_storage(
+                            local_source_code_zip_path,
+                            self.results_saver.model_saver,
+                            file_name=os.path.basename(local_source_code_zip_path)
+                        )
 
                 self._hyperparams_already_saved = True
 

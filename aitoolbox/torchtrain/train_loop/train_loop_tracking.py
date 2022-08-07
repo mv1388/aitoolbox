@@ -75,10 +75,12 @@ class TrainLoopCheckpoint(TrainLoop):
                 * set this parameter to ``True`` to use default AMP ``torch.cuda.amp.GradScaler`` initialization params
                 * provide custom AMP ``torch.cuda.amp.GradScaler`` initialization parameters as a dict as this parameter
         """
-        TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion,
-                           collate_batch_pred_fn, pred_transform_fn,
-                           end_auto_eval, lazy_experiment_save,
-                           gpu_mode, cuda_device_idx, use_amp)
+        TrainLoop.__init__(
+            self, model, train_loader, validation_loader, test_loader, optimizer, criterion,
+            collate_batch_pred_fn, pred_transform_fn,
+            end_auto_eval, lazy_experiment_save,
+            gpu_mode, cuda_device_idx, use_amp
+        )
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
@@ -184,10 +186,12 @@ class TrainLoopEndSave(TrainLoop):
                 * set this parameter to ``True`` to use default AMP ``torch.cuda.amp.GradScaler`` initialization params
                 * provide custom AMP ``torch.cuda.amp.GradScaler`` initialization parameters as a dict as this parameter
         """
-        TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion,
-                           collate_batch_pred_fn, pred_transform_fn,
-                           end_auto_eval, lazy_experiment_save,
-                           gpu_mode, cuda_device_idx, use_amp)
+        TrainLoop.__init__(
+            self, model, train_loader, validation_loader, test_loader, optimizer, criterion,
+            collate_batch_pred_fn, pred_transform_fn,
+            end_auto_eval, lazy_experiment_save,
+            gpu_mode, cuda_device_idx, use_amp
+        )
         self.project_name = project_name
         self.experiment_name = experiment_name
         self.local_model_result_folder_path = os.path.expanduser(local_model_result_folder_path)
@@ -206,10 +210,12 @@ class TrainLoopEndSave(TrainLoop):
         self.check_if_result_packages_possible()
 
         self.callbacks_handler.register_callbacks([
-            ModelTrainEndSave(self.project_name, self.experiment_name, self.local_model_result_folder_path,
-                              self.hyperparams, self.val_result_package, self.test_result_package,
-                              cloud_save_mode=self.cloud_save_mode,
-                              bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix)
+            ModelTrainEndSave(
+                self.project_name, self.experiment_name, self.local_model_result_folder_path,
+                self.hyperparams, self.val_result_package, self.test_result_package,
+                cloud_save_mode=self.cloud_save_mode,
+                bucket_name=bucket_name, cloud_dir_prefix=cloud_dir_prefix
+            )
         ], cache_callbacks=True)
 
     def check_if_result_packages_possible(self):
@@ -310,14 +316,16 @@ class TrainLoopCheckpointEndSave(TrainLoopEndSave):
         if 'source_dirs_paths' not in hyperparams:
             hyperparams['source_dirs_paths'] = source_dirs
 
-        TrainLoopEndSave.__init__(self, model, train_loader, validation_loader, test_loader,
-                                  optimizer, criterion,
-                                  project_name, experiment_name, os.path.expanduser(local_model_result_folder_path),
-                                  hyperparams, val_result_package, test_result_package,
-                                  cloud_save_mode, bucket_name, cloud_dir_prefix, source_dirs,
-                                  collate_batch_pred_fn, pred_transform_fn,
-                                  end_auto_eval, lazy_experiment_save,
-                                  gpu_mode, cuda_device_idx, use_amp)
+        TrainLoopEndSave.__init__(
+            self, model, train_loader, validation_loader, test_loader,
+            optimizer, criterion,
+            project_name, experiment_name, os.path.expanduser(local_model_result_folder_path),
+            hyperparams, val_result_package, test_result_package,
+            cloud_save_mode, bucket_name, cloud_dir_prefix, source_dirs,
+            collate_batch_pred_fn, pred_transform_fn,
+            end_auto_eval, lazy_experiment_save,
+            gpu_mode, cuda_device_idx, use_amp
+        )
         self.rm_subopt_local_models = rm_subopt_local_models
         self.iteration_save_freq = iteration_save_freq
 

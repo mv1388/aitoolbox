@@ -550,8 +550,10 @@ class TrainLoop:
                     if self.batch_model_feed_def is None:
                         loss_batch = self.model.get_loss_eval(batch_data, self.criterion, self.device)
                     else:
-                        loss_batch = self.batch_model_feed_def.get_loss_eval(self.model, batch_data, self.criterion,
-                                                                             self.device)
+                        loss_batch = self.batch_model_feed_def.get_loss_eval(
+                            self.model, batch_data, self.criterion,
+                            self.device
+                        )
 
                 loss_avg.append(loss_batch.item())
 
@@ -575,8 +577,10 @@ class TrainLoop:
                 in the form of dict of lists/torch.Tensors/np.arrays
         """
         if not self.prediction_store.has_train_predictions(self.total_iteration_idx) or force_prediction:
-            predictions = self.predict_with_model(self.train_loader, execute_callbacks,
-                                                  dataset_info={'type': 'train'})
+            predictions = self.predict_with_model(
+                self.train_loader, execute_callbacks,
+                dataset_info={'type': 'train'}
+            )
             self.prediction_store.insert_train_predictions(predictions, self.total_iteration_idx, force_prediction)
         else:
             predictions = self.prediction_store.get_train_predictions(self.total_iteration_idx)
@@ -597,8 +601,10 @@ class TrainLoop:
                 in the form of dict of lists/torch.Tensors/np.arrays
         """
         if not self.prediction_store.has_val_predictions(self.total_iteration_idx) or force_prediction:
-            predictions = self.predict_with_model(self.validation_loader, execute_callbacks,
-                                                  dataset_info={'type': 'validation'})
+            predictions = self.predict_with_model(
+                self.validation_loader, execute_callbacks,
+                dataset_info={'type': 'validation'}
+            )
             self.prediction_store.insert_val_predictions(predictions, self.total_iteration_idx, force_prediction)
         else:
             predictions = self.prediction_store.get_val_predictions(self.total_iteration_idx)
@@ -619,8 +625,10 @@ class TrainLoop:
                 in the form of dict of lists/torch.Tensors/np.arrays
         """
         if not self.prediction_store.has_test_predictions(self.total_iteration_idx) or force_prediction:
-            predictions = self.predict_with_model(self.test_loader, execute_callbacks,
-                                                  dataset_info={'type': 'test'})
+            predictions = self.predict_with_model(
+                self.test_loader, execute_callbacks,
+                dataset_info={'type': 'test'}
+            )
             self.prediction_store.insert_test_predictions(predictions, self.total_iteration_idx, force_prediction)
         else:
             predictions = self.prediction_store.get_test_predictions(self.total_iteration_idx)
@@ -788,11 +796,13 @@ class TrainLoop:
         if isinstance(in_process_data_load, AbstractCallback):
             in_process_data_load = [in_process_data_load]
 
-        mp.spawn(self._spawn_fit,
-                 args=(
-                     ddp_args, num_epochs, num_iterations, callbacks, grad_accumulation, in_process_data_load
-                 ),
-                 nprocs=ddp_args['world_size'])
+        mp.spawn(
+            self._spawn_fit,
+            args=(
+                ddp_args, num_epochs, num_iterations, callbacks, grad_accumulation, in_process_data_load
+            ),
+            nprocs=ddp_args['world_size']
+        )
 
     def _spawn_fit(self, gpu, ddp_args, num_epochs, num_iterations, callbacks, grad_accumulation, in_process_data_load):
         """Helper function that prepares the TrainLoop state inside each of the spawned processes and initiates training

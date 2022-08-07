@@ -311,13 +311,17 @@ class LogUpload(AbstractExperimentCallback):
 
     def upload_log_file(self):
         experiment_results_cloud_path = \
-            self.cloud_saver.create_experiment_cloud_storage_folder_structure(self.project_name,
-                                                                              self.experiment_name,
-                                                                              self.train_loop_obj.experiment_timestamp)
+            self.cloud_saver.create_experiment_cloud_storage_folder_structure(
+                self.project_name,
+                self.experiment_name,
+                self.train_loop_obj.experiment_timestamp
+            )
         experiment_cloud_path = os.path.dirname(experiment_results_cloud_path)
 
-        self.cloud_saver.save_file(local_file_path=self.log_file_path,
-                                   cloud_file_path=os.path.join(experiment_cloud_path, self.log_filename))
+        self.cloud_saver.save_file(
+            local_file_path=self.log_file_path,
+            cloud_file_path=os.path.join(experiment_cloud_path, self.log_filename)
+        )
 
 
 class DataSubsetTestRun(AbstractCallback):
