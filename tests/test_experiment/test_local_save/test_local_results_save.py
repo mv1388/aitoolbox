@@ -247,6 +247,33 @@ class TestLocalResultsSaverSingleFile(unittest.TestCase):
         if os.path.exists(project_path):
             shutil.rmtree(project_path)
 
+    def test_experiment_timestamp_not_provided(self):
+        project_dir_name = 'projectDir'
+        exp_dir_name = 'experimentSubDir'
+        current_time = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
+        file_format = 'pickle'
+        expected_extension = '.p'
+        result_pkg = DummyFullResultPackage({'metric1': 33434, 'acc1': 223.43, 'loss': 4455.6},
+                                            {'epoch': 20, 'lr': 0.334})
+        training_history = DummyTrainingHistory().wrap_pre_prepared_history({})
+        result_file_name_true = f'results_hyperParams_hist_{exp_dir_name}_{current_time}{expected_extension}'
+
+        project_path = os.path.join(THIS_DIR, project_dir_name)
+        exp_path = os.path.join(project_path, f'{exp_dir_name}_{current_time}')
+        results_path = os.path.join(exp_path, 'results')
+        result_file_path_true = os.path.join(results_path, result_file_name_true)
+
+        saver = LocalResultsSaver(local_model_result_folder_path=THIS_DIR, file_format=file_format)
+        experiment_results_paths = saver.save_experiment_results(
+            result_pkg, training_history,
+            project_dir_name, exp_dir_name
+        )
+
+        self.assertEqual(result_file_path_true, experiment_results_paths[0][1])
+
+        if os.path.exists(project_path):
+            shutil.rmtree(project_path)
+
 
 class TestLocalResultsSaverSeparateFiles(unittest.TestCase):
     def test_save_experiment_results_pickle(self):
@@ -342,6 +369,33 @@ class TestLocalResultsSaverSeparateFiles(unittest.TestCase):
             read_labels_dict = read_result_file(labels_file_path)
             self.assertEqual(read_labels_dict['y_true'], result_pkg.y_true)
             self.assertEqual(read_labels_dict['y_predicted'], result_pkg.y_predicted)
+
+        if os.path.exists(project_path):
+            shutil.rmtree(project_path)
+
+    def test_experiment_timestamp_not_provided(self):
+        project_dir_name = 'projectDir'
+        exp_dir_name = 'experimentSubDir'
+        current_time = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
+        file_format = 'pickle'
+        expected_extension = '.p'
+        result_pkg = DummyFullResultPackage({'metric1': 33434, 'acc1': 223.43, 'loss': 4455.6},
+                                            {'epoch': 20, 'lr': 0.334})
+        training_history = DummyTrainingHistory().wrap_pre_prepared_history({})
+        result_file_name_true = f'results_{exp_dir_name}_{current_time}{expected_extension}'
+
+        project_path = os.path.join(THIS_DIR, project_dir_name)
+        exp_path = os.path.join(project_path, f'{exp_dir_name}_{current_time}')
+        results_path = os.path.join(exp_path, 'results')
+        result_file_path_true = os.path.join(results_path, result_file_name_true)
+
+        saver = LocalResultsSaver(local_model_result_folder_path=THIS_DIR, file_format=file_format)
+        experiment_results_paths = saver.save_experiment_results_separate_files(
+            result_pkg, training_history,
+            project_dir_name, exp_dir_name
+        )
+
+        self.assertEqual(result_file_path_true, experiment_results_paths[0][1])
 
         if os.path.exists(project_path):
             shutil.rmtree(project_path)
