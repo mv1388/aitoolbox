@@ -49,7 +49,7 @@ class BERTModel(TTModel):
         return predictions.cpu(), batch["labels"].cpu(), {}
 
 
-class TestIMDBBERTExperimentTrack(unittest.TestCase):
+class TestDPMultiGPUIMDBBERTExperimentTrack(unittest.TestCase):
     def test_trainloop_core_pytorch_compare(self):
         train_data, test_data = self.get_data_sets(ds_subset_size=1000)
 

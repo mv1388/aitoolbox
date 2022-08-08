@@ -24,12 +24,14 @@ class DummyTrainingHistory(TrainingHistory):
 
 
 class DummyFullResultPackage(AbstractResultPackage):
-    def __init__(self, result_dict, hyper_params):
+    def __init__(self, result_dict, hyper_params, additional_results=None):
         AbstractResultPackage.__init__(self, 'dummyFullPkg')
         self.result_dict = result_dict
         self.hyper_params = hyper_params
         self.y_true = [10.0] * 100
         self.y_predicted = [123.4] * 100
+
+        self.additional_results = additional_results
 
     def prepare_results_dict(self):
         return self.result_dict
@@ -39,6 +41,9 @@ class DummyFullResultPackage(AbstractResultPackage):
 
     def get_hyperparameters(self):
         return self.hyper_params
+
+    def list_additional_results_dump_paths(self):
+        return self.additional_results
 
 
 class TestBaseLocalResultsSaver(unittest.TestCase):
@@ -155,6 +160,33 @@ class TestBaseLocalResultsSaver(unittest.TestCase):
         if os.path.exists(project_dir_path_true):
             shutil.rmtree(project_dir_path_true)
 
+    def test_forced_unsupported_file_format_error(self):
+        project_dir_name = 'projectDir'
+        exp_dir_name = 'experimentSubDir'
+        current_time = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
+        file_name = 'test_dump'
+
+        project_dir_path_true = os.path.join(THIS_DIR, project_dir_name)
+        experiment_dir_path_true = os.path.join(project_dir_path_true, f'{exp_dir_name}_{current_time}')
+        experiment_results_dir_path_true = os.path.join(experiment_dir_path_true, 'results')
+
+        result_dict = {'acc': 10, 'loss': 101010.2, 'rogue': 4445.5}
+
+        saver = BaseLocalResultsSaver(local_model_result_folder_path=THIS_DIR, file_format='my_fancy_format')
+
+        self.assertEqual(saver.file_format, 'pickle')
+
+        saver.create_experiment_local_folder_structure(project_dir_name, exp_dir_name, current_time)
+
+        # Force format re-set to unsupported my_fancy_format
+        saver.file_format = 'my_fancy_format'
+
+        with self.assertRaises(ValueError):
+            saver.save_file(result_dict, file_name, f'{experiment_results_dir_path_true}/{file_name}')
+
+        if os.path.exists(project_dir_path_true):
+            shutil.rmtree(project_dir_path_true)
+
 
 class TestLocalResultsSaverSingleFile(unittest.TestCase):
     def test_save_experiment_results_pickle(self):
@@ -216,6 +248,75 @@ class TestLocalResultsSaverSingleFile(unittest.TestCase):
         if save_true_pred_labels:
             self.assertEqual(read_result_dict['y_true'], result_pkg.y_true)
             self.assertEqual(read_result_dict['y_predicted'], result_pkg.y_predicted)
+
+        if os.path.exists(project_path):
+            shutil.rmtree(project_path)
+
+    def test_experiment_timestamp_not_provided(self):
+        project_dir_name = 'projectDir'
+        exp_dir_name = 'experimentSubDir'
+        current_time = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
+        file_format = 'pickle'
+        expected_extension = '.p'
+        result_pkg = DummyFullResultPackage({'metric1': 33434, 'acc1': 223.43, 'loss': 4455.6},
+                                            {'epoch': 20, 'lr': 0.334})
+        training_history = DummyTrainingHistory().wrap_pre_prepared_history({})
+        result_file_name_true = f'results_hyperParams_hist_{exp_dir_name}_{current_time}{expected_extension}'
+
+        project_path = os.path.join(THIS_DIR, project_dir_name)
+        exp_path = os.path.join(project_path, f'{exp_dir_name}_{current_time}')
+        results_path = os.path.join(exp_path, 'results')
+        result_file_path_true = os.path.join(results_path, result_file_name_true)
+
+        saver = LocalResultsSaver(local_model_result_folder_path=THIS_DIR, file_format=file_format)
+        experiment_results_paths = saver.save_experiment_results(
+            result_pkg, training_history,
+            project_dir_name, exp_dir_name
+        )
+
+        self.assertEqual(result_file_path_true, experiment_results_paths[0][1])
+
+        if os.path.exists(project_path):
+            shutil.rmtree(project_path)
+
+    def test_additional_results_dump_paths(self):
+        project_dir_name = 'projectDir'
+        exp_dir_name = 'experimentSubDir'
+        current_time = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
+        file_format = 'pickle'
+        expected_extension = '.p'
+
+        training_history = DummyTrainingHistory().wrap_pre_prepared_history({})
+        result_file_name_true = f'results_hyperParams_hist_{exp_dir_name}_{current_time}{expected_extension}'
+
+        project_path = os.path.join(THIS_DIR, project_dir_name)
+        exp_path = os.path.join(project_path, f'{exp_dir_name}_{current_time}')
+        results_path = os.path.join(exp_path, 'results')
+        result_file_path_true = os.path.join(results_path, result_file_name_true)
+
+        additional_results_paths = [
+            ['BLAAAAA.txt', os.path.join(results_path, 'BLAAAAA.txt')],
+            ['uuuuu.p', os.path.join(results_path, 'uuuuu.p')],
+            ['aaaaaa.json', os.path.join(results_path, 'aaaaaa.json')]
+        ]
+
+        result_pkg = DummyFullResultPackage(
+            {'metric1': 33434, 'acc1': 223.43, 'loss': 4455.6},
+            {'epoch': 20, 'lr': 0.334},
+            additional_results=additional_results_paths
+        )
+
+        saver = LocalResultsSaver(local_model_result_folder_path=THIS_DIR, file_format=file_format)
+        experiment_results_paths = saver.save_experiment_results(
+            result_pkg, training_history,
+            project_dir_name, exp_dir_name,
+            current_time
+        )
+
+        self.assertEqual(
+            [[result_file_name_true, result_file_path_true]] + additional_results_paths,
+            experiment_results_paths
+        )
 
         if os.path.exists(project_path):
             shutil.rmtree(project_path)
@@ -315,6 +416,83 @@ class TestLocalResultsSaverSeparateFiles(unittest.TestCase):
             read_labels_dict = read_result_file(labels_file_path)
             self.assertEqual(read_labels_dict['y_true'], result_pkg.y_true)
             self.assertEqual(read_labels_dict['y_predicted'], result_pkg.y_predicted)
+
+        if os.path.exists(project_path):
+            shutil.rmtree(project_path)
+
+    def test_experiment_timestamp_not_provided(self):
+        project_dir_name = 'projectDir'
+        exp_dir_name = 'experimentSubDir'
+        current_time = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
+        file_format = 'pickle'
+        expected_extension = '.p'
+        result_pkg = DummyFullResultPackage({'metric1': 33434, 'acc1': 223.43, 'loss': 4455.6},
+                                            {'epoch': 20, 'lr': 0.334})
+        training_history = DummyTrainingHistory().wrap_pre_prepared_history({})
+        result_file_name_true = f'results_{exp_dir_name}_{current_time}{expected_extension}'
+
+        project_path = os.path.join(THIS_DIR, project_dir_name)
+        exp_path = os.path.join(project_path, f'{exp_dir_name}_{current_time}')
+        results_path = os.path.join(exp_path, 'results')
+        result_file_path_true = os.path.join(results_path, result_file_name_true)
+
+        saver = LocalResultsSaver(local_model_result_folder_path=THIS_DIR, file_format=file_format)
+        experiment_results_paths = saver.save_experiment_results_separate_files(
+            result_pkg, training_history,
+            project_dir_name, exp_dir_name
+        )
+
+        self.assertEqual(result_file_path_true, experiment_results_paths[0][1])
+
+        if os.path.exists(project_path):
+            shutil.rmtree(project_path)
+
+    def test_additional_results_dump_paths(self):
+        project_dir_name = 'projectDir'
+        exp_dir_name = 'experimentSubDir'
+        file_format = 'pickle'
+        expected_extension = '.p'
+        current_time = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
+
+        training_history = DummyTrainingHistory().wrap_pre_prepared_history({})
+        result_file_name_true = f'results_{exp_dir_name}_{current_time}{expected_extension}'
+        hyper_param_file_name_true = f'hyperparams_{exp_dir_name}_{current_time}{expected_extension}'
+        train_hist_file_name_true = f'train_history_{exp_dir_name}_{current_time}{expected_extension}'
+
+        project_path = os.path.join(THIS_DIR, project_dir_name)
+        exp_path = os.path.join(project_path, f'{exp_dir_name}_{current_time}')
+        results_path = os.path.join(exp_path, 'results')
+        result_file_path_true = os.path.join(results_path, result_file_name_true)
+        hyper_param_file_path_true = os.path.join(results_path, hyper_param_file_name_true)
+        train_hist_file_path_true = os.path.join(results_path, train_hist_file_name_true)
+
+        additional_results_paths = [
+            ['BLAAAAA.txt', os.path.join(results_path, 'BLAAAAA.txt')],
+            ['uuuuu.p', os.path.join(results_path, 'uuuuu.p')],
+            ['aaaaaa.json', os.path.join(results_path, 'aaaaaa.json')]
+        ]
+
+        result_pkg = DummyFullResultPackage(
+            {'metric1': 33434, 'acc1': 223.43, 'loss': 4455.6},
+            {'epoch': 20, 'lr': 0.334},
+            additional_results=additional_results_paths
+        )
+
+        saver = LocalResultsSaver(local_model_result_folder_path=THIS_DIR, file_format=file_format)
+        experiment_results_paths = saver.save_experiment_results_separate_files(
+            result_pkg, training_history,
+            project_dir_name, exp_dir_name,
+            current_time
+        )
+
+        self.assertEqual(
+            [
+                [result_file_name_true, result_file_path_true],
+                [hyper_param_file_name_true, hyper_param_file_path_true],
+                [train_hist_file_name_true, train_hist_file_path_true]
+            ] + additional_results_paths,
+            experiment_results_paths
+        )
 
         if os.path.exists(project_path):
             shutil.rmtree(project_path)

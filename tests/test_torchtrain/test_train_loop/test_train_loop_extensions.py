@@ -4,9 +4,10 @@ import shutil
 
 from aitoolbox.torchtrain import TrainLoopCheckpoint, TrainLoopEndSave, TrainLoopCheckpointEndSave
 from aitoolbox.torchtrain.callbacks.abstract import AbstractCallback
-from aitoolbox.torchtrain.callbacks.model_save import ModelCheckpoint, ModelTrainEndSave
+from aitoolbox.torchtrain.callbacks.model_save import ModelCheckpoint, ModelIterationCheckpoint, ModelTrainEndSave
 from aitoolbox.torchtrain.train_loop.components.callback_handler import CallbacksHandler
-from tests.utils import NetUnifiedBatchFeed, DummyOptimizer, MiniDummyOptimizer, DummyResultPackage
+from tests.utils import NetUnifiedBatchFeed, DummyOptimizer, MiniDummyOptimizer, \
+    DummyResultPackage, DummyNonAbstractResultPackage
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -34,6 +35,14 @@ class TestTrainLoopCheckpoint(unittest.TestCase):
         self.assertIsInstance(train_loop.callbacks_handler, CallbacksHandler)
         self.assertEqual(train_loop.callbacks_handler.train_loop_obj, train_loop)
         self.assertFalse(train_loop.early_stop)
+
+        with self.assertRaises(ValueError):
+            TrainLoopCheckpoint(
+                NetUnifiedBatchFeed(), None, None, None, DummyOptimizer(), None,
+                "project_name", "experiment_name", "local_model_result_folder_path",
+                {},
+                iteration_save_freq=-10
+            )
 
     def test_optimizer_missing_state_dict_exception(self):
         raised = False
@@ -224,6 +233,26 @@ class TestTrainLoopEndSave(unittest.TestCase):
                              test_result_package=None,
                              cloud_save_mode='s3')
 
+    def test_loader_package_type_exceptions(self):
+        self.create_loader_package_type_exceptions(DummyNonAbstractResultPackage(), None)
+        self.create_loader_package_type_exceptions(DummyNonAbstractResultPackage(), DummyNonAbstractResultPackage())
+        self.create_loader_package_type_exceptions(DummyNonAbstractResultPackage(), DummyResultPackage())
+
+        self.create_loader_package_type_exceptions(None, DummyNonAbstractResultPackage())
+        self.create_loader_package_type_exceptions(DummyResultPackage(), DummyNonAbstractResultPackage())
+
+    def create_loader_package_type_exceptions(self, val_result_package=None, test_result_package=None):
+        with self.assertRaises(TypeError):
+            TrainLoopEndSave(
+                NetUnifiedBatchFeed(), None, 100, 100, None,
+                None,
+                "project_name", "experiment_name",
+                "local_model_result_folder_path",
+                hyperparams={},
+                val_result_package=val_result_package,
+                test_result_package=test_result_package
+            )
+
 
 class TestTrainLoopCheckpointEndSave(unittest.TestCase):
     def test_init_values(self):
@@ -261,6 +290,35 @@ class TestTrainLoopCheckpointEndSave(unittest.TestCase):
         self.assertIsInstance(train_loop.callbacks_handler, CallbacksHandler)
         self.assertEqual(train_loop.callbacks_handler.train_loop_obj, train_loop)
         self.assertFalse(train_loop.early_stop)
+
+        with self.assertRaises(ValueError):
+            TrainLoopCheckpointEndSave(
+                NetUnifiedBatchFeed(), None, 100, None, DummyOptimizer(), None,
+                "project_name", "experiment_name", "local_model_result_folder_path",
+                {},
+                val_result_package=DummyResultPackage(),
+                iteration_save_freq=-10
+            )
+
+        train_loop_non_iter = TrainLoopCheckpointEndSave(
+            NetUnifiedBatchFeed(), None, 100, None, DummyOptimizer(), None,
+            "project_name", "experiment_name", "local_model_result_folder_path",
+            {},
+            val_result_package=DummyResultPackage(),
+            iteration_save_freq=0
+        )
+
+        self.assertIsInstance(train_loop_non_iter.callbacks_handler.callbacks_cache[1], ModelCheckpoint)
+
+        train_loop_iter = TrainLoopCheckpointEndSave(
+            NetUnifiedBatchFeed(), None, 100, None, DummyOptimizer(), None,
+            "project_name", "experiment_name", "local_model_result_folder_path",
+            {},
+            val_result_package=DummyResultPackage(),
+            iteration_save_freq=10
+        )
+
+        self.assertIsInstance(train_loop_iter.callbacks_handler.callbacks_cache[1], ModelIterationCheckpoint)
 
     def test_init_val_test_loader_values(self):
         dummy_result_package_val = DummyResultPackage()

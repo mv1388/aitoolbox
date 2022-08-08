@@ -33,6 +33,56 @@ class DummyFullResultPackage(AbstractResultPackage):
         return self.hyper_params
 
 
+class DummyNonAbstractLocalModelSaver:
+    pass
+
+
+class TestBaseFullExperimentLocalSaver(unittest.TestCase):
+    def test_init(self):
+        project_dir_name = 'projectPyTorchLocalModelSaver'
+        exp_dir_name = 'experimentSubDirPT'
+
+        with self.assertRaises(TypeError):
+            BaseFullExperimentLocalSaver(
+                DummyNonAbstractLocalModelSaver(),
+                project_name=project_dir_name, experiment_name=exp_dir_name,
+                local_model_result_folder_path=THIS_DIR
+            )
+
+    def test_save_experiment_experiment_timestamp_not_provided(self):
+        model = Net()
+        project_dir_name = 'projectPyTorchLocalModelSaver'
+        exp_dir_name = 'experimentSubDirPT'
+        current_time = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
+
+        project_path = os.path.join(THIS_DIR, project_dir_name)
+        exp_path = os.path.join(project_path, f'{exp_dir_name}_{current_time}')
+        model_path = os.path.join(exp_path, 'model')
+        model_file_path = os.path.join(model_path, f'model_{exp_dir_name}_{current_time}.pth')
+        results_path = os.path.join(exp_path, 'results')
+        results_file_path = os.path.join(results_path, f'results_hyperParams_hist_{exp_dir_name}_{current_time}.p')
+
+        saver = BaseFullExperimentLocalSaver(
+            PyTorchLocalModelSaver(local_model_result_folder_path=THIS_DIR),
+            project_name=project_dir_name, experiment_name=exp_dir_name,
+            local_model_result_folder_path=THIS_DIR
+        )
+
+        result_pkg = DummyFullResultPackage({'metric1': 33434, 'acc1': 223.43, 'loss': 4455.6},
+                                            {'epoch': 20, 'lr': 0.334})
+        training_history = TrainingHistory().wrap_pre_prepared_history({})
+
+        model_checkpoint = {'model_state_dict': model.state_dict(), 'optimizer_state_dict': None,
+                            'epoch': 10, 'hyperparams': {}}
+
+        saved_paths = saver.save_experiment(model_checkpoint, result_pkg, training_history)
+
+        self.assertEqual(saved_paths, [model_file_path, results_file_path])
+
+        if os.path.exists(project_path):
+            shutil.rmtree(project_path)
+
+
 class TestFullPyTorchExperimentLocalSaver(unittest.TestCase):
     def test_init(self):
         project_dir_name = 'projectPyTorchLocalModelSaver'

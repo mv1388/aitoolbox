@@ -348,9 +348,13 @@ class MultiLossDummy(DummyLoss):
         return self
 
 
+class DummyNonAbstractResultPackage:
+    pass
+
+
 class DummyResultPackage(AbstractResultPackage):
-    def __init__(self):
-        AbstractResultPackage.__init__(self, 'DummyPackage', False)
+    def __init__(self, strict_content_check=False):
+        AbstractResultPackage.__init__(self, 'DummyPackage', strict_content_check)
         self.experiment_path = None
 
     def prepare_results_dict(self):

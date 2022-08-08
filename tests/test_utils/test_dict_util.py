@@ -166,6 +166,23 @@ class TestCombinePredictionMetadataBatches(unittest.TestCase):
             }
         )
 
+    def test_combine_metadata_type_error(self):
+        self.run_type_error_metadata_combination('AAAAAAA')
+        self.run_type_error_metadata_combination(1234)
+        self.run_type_error_metadata_combination(12.34)
+        self.run_type_error_metadata_combination({'aaaa': 'BBBBB'})
+
+    def run_type_error_metadata_combination(self, error_meta_batch):
+        metadata_batches = [
+            {'meta_1': [1, 100, 1000, 10000], 'meta_2': list(range(4)), 'meta_err': error_meta_batch},
+            {'meta_1': [1, 100, 1000, 10000], 'meta_2': list(range(4)), 'meta_err': error_meta_batch},
+            {'meta_1': [1, 100, 1000, 10000], 'meta_2': list(range(4)), 'meta_err': error_meta_batch},
+            {'meta_1': [1, 100, 1000, 10000], 'meta_2': list(range(4)), 'meta_err': error_meta_batch}
+        ]
+
+        with self.assertRaises(TypeError):
+            dict_util.combine_prediction_metadata_batches(metadata_batches)
+
 
 class TestFlattenDict(unittest.TestCase):
     def test_flatten_dict(self):
