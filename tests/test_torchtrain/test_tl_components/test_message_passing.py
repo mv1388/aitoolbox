@@ -124,7 +124,7 @@ class TestMessageService(unittest.TestCase):
                                               ('test_overwrite', [1, 2], [MessageHandling.OVERWRITE])
                                           ]})
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             msg_service.write_message('test_list_float', [1919191, 333], 'unsupported_setting')
 
     def test_write_message_handling_settings(self):
@@ -155,6 +155,18 @@ class TestMessageService(unittest.TestCase):
         with self.assertRaises(ValueError):
             msg_service.write_message('test_list_float', [1919191, 333],
                                       [MessageHandling.UNTIL_END_OF_EPOCH, MessageHandling.UNTIL_READ])
+
+        with self.assertRaises(TypeError):
+            msg_service.write_message('test_list_float', [1919191, 333],
+                                      [MessageHandling.UNTIL_END_OF_EPOCH, 'unsupported_setting'])
+
+        with self.assertRaises(TypeError):
+            msg_service.write_message('test_list_float', [1919191, 333],
+                                      ['unsupported_setting', MessageHandling.UNTIL_END_OF_EPOCH])
+
+        with self.assertRaises(TypeError):
+            msg_service.write_message('test_list_float', [1919191, 333],
+                                      ['unsupported_setting_1', 'unsupported_setting_2'])
 
     def test_end_of_epoch_trigger(self):
         msg_service = MessageService()

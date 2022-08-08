@@ -2,7 +2,18 @@ import unittest
 from random import randint
 
 from torch.utils.data.dataloader import DataLoader
-from aitoolbox.torchtrain.data.dataset import ListDataset
+from aitoolbox.torchtrain.data.dataset import BasicDataset, ListDataset
+
+
+class TestBasicDataset(unittest.TestCase):
+    def test_len(self):
+        ds = BasicDataset(list(range(100)))
+        self.assertEqual(len(ds), 100)
+
+    def test_get_item(self):
+        ds = BasicDataset(list(range(100)))
+        for i in range(100):
+            self.assertEqual(ds[i], i)
 
 
 class TestListDataset(unittest.TestCase):
