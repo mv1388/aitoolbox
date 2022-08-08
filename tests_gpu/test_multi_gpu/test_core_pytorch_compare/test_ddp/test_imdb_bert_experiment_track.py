@@ -54,9 +54,7 @@ class TestIMDBBERTExperimentTrack(unittest.TestCase):
         val_loss_tl, y_pred_tl, y_true_tl = self.train_eval_trainloop(ds_subset_size=1000, num_epochs=2)
         val_loss_pt, y_pred_pt, y_true_pt = self.train_eval_core_pytorch(ds_subset_size=1000, num_epochs=2)
 
-        # TODO: Find a way to more consistently handle loss evaluation precision
-        #   when doing tensor vs numpy vs python float
-        self.assertAlmostEqual(val_loss_tl, val_loss_pt, places=8)
+        self.assertEqual(val_loss_tl, val_loss_pt)
         self.assertEqual(y_pred_tl, y_pred_pt)
         self.assertEqual(y_true_tl, y_true_pt)
 
