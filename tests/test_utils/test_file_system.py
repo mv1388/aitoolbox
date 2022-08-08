@@ -57,9 +57,20 @@ class TestFileSystem(unittest.TestCase):
             shutil.rmtree(os.path.join(THIS_DIR, 'folder_1'))
 
     def test_zip_folder(self):
+        self.zip_folder()
+
+    def test_zip_folder_with_zip_extension(self):
+        self.zip_folder(with_zip_extension=True)
+
+    def zip_folder(self, with_zip_extension=False):
         dummy_dir_path, dummy_files_content = self.prepare_dummy_folder()
 
-        file_system.zip_folder(dummy_dir_path, dummy_dir_path)
+        if with_zip_extension:
+            dummy_zip_path = f'{dummy_dir_path}.zip'
+        else:
+            dummy_zip_path = dummy_dir_path
+
+        file_system.zip_folder(dummy_dir_path, dummy_zip_path)
         self.assertTrue(os.path.exists(dummy_dir_path + '.zip'))
 
         with zipfile.ZipFile(dummy_dir_path + '.zip', 'r') as zip_ref:

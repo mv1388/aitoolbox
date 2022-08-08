@@ -755,7 +755,8 @@ class TrainLoop:
 
     def _train_ddp(self, num_epochs, num_iterations, callbacks=None, grad_accumulation=1,
                    ddp_model_args=None, in_process_data_load=None,
-                   num_nodes=1, node_rank=0, num_gpus=torch.cuda.device_count()):
+                   num_nodes=1, node_rank=0, num_gpus=torch.cuda.device_count(),
+                   backend='nccl', init_method='env://'):
         """Train the model using the train loop in the Distributed Data Parallel setting
 
         During the training, multiple processes will be spawned, one for each of the available GPUs.
@@ -777,6 +778,10 @@ class TrainLoop:
             num_nodes (int): number of nodes in the cluster
             node_rank (int): rank of the current node
             num_gpus (int): number of GPUs in the node
+            backend (str): The backend to use. For more information look up the documentation for
+                ``dist.init_process_group()``. Valid values include ``mpi``, ``gloo``, and ``nccl``.
+            init_method (str): URL specifying how to initialize the process group. For more information look up
+                the documentation for ``dist.init_process_group()``.
         """
         self.ddp_training_mode = True
         os.environ['MASTER_ADDR'] = 'localhost'
@@ -789,6 +794,8 @@ class TrainLoop:
             'node_rank': node_rank,
             'num_gpus': num_gpus,
             'world_size': num_nodes * num_gpus,
+            'backend': backend,
+            'init_method': init_method,
             'ddp_model_args': ddp_model_args if ddp_model_args is not None else {}
         }
 
@@ -821,7 +828,10 @@ class TrainLoop:
                 every spawned training process. This can in turn in cause extensive overall memory consumption.
         """
         rank = ddp_args['node_rank'] * ddp_args['num_gpus'] + gpu
-        dist.init_process_group(backend='nccl', init_method='env://', world_size=ddp_args['world_size'], rank=rank)
+        dist.init_process_group(
+            backend=ddp_args['backend'], init_method=ddp_args['init_method'],
+            world_size=ddp_args['world_size'], rank=rank
+        )
         torch.manual_seed(0)
         torch.cuda.set_device(gpu)
         self.device = torch.device(f"cuda:{gpu}")
