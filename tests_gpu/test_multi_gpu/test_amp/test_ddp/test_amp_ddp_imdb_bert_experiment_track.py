@@ -58,8 +58,8 @@ class TestAMPDDPMultiGPUIMDBBERTExperimentTrack(unittest.TestCase):
     def test_amp_ddp_trainloop_core_pytorch_compare(self):
         os.mkdir(f'{THIS_DIR}/ddp_bert_save')
 
-        val_loss_tl, y_pred_tl, y_true_tl = self.train_eval_trainloop(ds_subset_size=5000, num_epochs=2)
-        val_loss_pt, y_pred_pt, y_true_pt = self.train_eval_core_pytorch(ds_subset_size=5000, num_epochs=2)
+        val_loss_tl, y_pred_tl, y_true_tl = self.train_eval_trainloop(ds_subset_size=1000, num_epochs=2)
+        val_loss_pt, y_pred_pt, y_true_pt = self.train_eval_core_pytorch(ds_subset_size=1000, num_epochs=2)
 
         self.assertEqual(val_loss_tl, val_loss_pt)
         self.assertEqual(y_pred_tl, y_pred_pt)
