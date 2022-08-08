@@ -645,6 +645,74 @@ class TestTrainLoop(unittest.TestCase):
         tl_filtered_schedulers = train_loop.get_schedulers()
         self.assertEqual(tl_filtered_schedulers, schedulers_list)
 
+    def test_get_num_training_steps(self):
+        model = NetUnifiedBatchFeed()
+        dummy_optimizer = DummyOptimizer()
+        dummy_loss = DummyLoss()
+        dummy_train_loader = list(range(100))
+
+        train_loop = TrainLoop(model, dummy_train_loader, None, None, dummy_optimizer, dummy_loss)
+        train_loop.fit(num_epochs=3)
+        self.assertEqual(train_loop.get_num_training_steps(), 300)
+
+        train_loop = TrainLoop(model, dummy_train_loader, None, None, dummy_optimizer, dummy_loss)
+        train_loop.fit(num_epochs=10)
+        self.assertEqual(train_loop.get_num_training_steps(), 1000)
+
+        train_loop = TrainLoop(model, dummy_train_loader, None, None, dummy_optimizer, dummy_loss)
+        train_loop.fit(num_epochs=3, grad_accumulation=5)
+        self.assertEqual(train_loop.get_num_training_steps(), 60)
+
+        train_loop = TrainLoop(model, dummy_train_loader, None, None, dummy_optimizer, dummy_loss)
+        train_loop.fit(num_epochs=3, grad_accumulation=10)
+        self.assertEqual(train_loop.get_num_training_steps(), 30)
+
+        train_loop = TrainLoop(model, dummy_train_loader, None, None, dummy_optimizer, dummy_loss)
+        train_loop.fit(num_epochs=3, grad_accumulation=20)
+        self.assertEqual(train_loop.get_num_training_steps(), 15)
+
+        train_loop = TrainLoop(model, dummy_train_loader, None, None, dummy_optimizer, dummy_loss)
+        train_loop.fit(num_epochs=10, grad_accumulation=5)
+        self.assertEqual(train_loop.get_num_training_steps(), 200)
+
+    def test_get_num_training_steps_num_iterations(self):
+        model = NetUnifiedBatchFeed()
+        dummy_optimizer = DummyOptimizer()
+        dummy_loss = DummyLoss()
+        dummy_train_loader = list(range(4))
+
+        train_loop = TrainLoop(model, dummy_train_loader, None, None, dummy_optimizer, dummy_loss)
+        train_loop.fit(num_iterations=120)
+        self.assertEqual(train_loop.get_num_training_steps(), 120)
+
+        train_loop = TrainLoop(model, dummy_train_loader, None, None, dummy_optimizer, dummy_loss)
+        train_loop.fit(num_iterations=100)
+        self.assertEqual(train_loop.get_num_training_steps(), 100)
+
+        train_loop = TrainLoop(model, dummy_train_loader, None, None, dummy_optimizer, dummy_loss)
+        train_loop.fit(num_iterations=100, grad_accumulation=5)
+        self.assertEqual(train_loop.get_num_training_steps(), 100 / 5)
+
+        train_loop = TrainLoop(model, dummy_train_loader, None, None, dummy_optimizer, dummy_loss)
+        train_loop.fit(num_iterations=100, grad_accumulation=20)
+        self.assertEqual(train_loop.get_num_training_steps(), 100 / 20)
+
+        train_loop = TrainLoop(model, dummy_train_loader, None, None, dummy_optimizer, dummy_loss)
+        train_loop.fit(num_iterations=100, grad_accumulation=21)
+        self.assertEqual(train_loop.get_num_training_steps(), 100 // 21)
+
+    def test_call(self):
+        model = NetUnifiedBatchFeed()
+        dummy_optimizer = DummyOptimizer()
+        dummy_loss = DummyLoss()
+        dummy_train_loader = list(range(100))
+
+        train_loop = TrainLoop(model, dummy_train_loader, None, None, dummy_optimizer, dummy_loss)
+        self.assertEqual(train_loop.epoch, 0)
+        train_loop(num_epochs=3)
+        self.assertEqual(train_loop.epoch, 2)
+        self.assertEqual(train_loop.total_iteration_idx, 100 * 3 - 1)
+
 
 class TestMultiLossOptiTrainLoop(unittest.TestCase):
     def test_multi_loss_in_train_loop(self):

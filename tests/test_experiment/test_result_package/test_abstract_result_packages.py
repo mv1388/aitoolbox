@@ -15,7 +15,29 @@ class TestAbstractResultPackage(unittest.TestCase):
 
         self.assertEqual(str(result_pkg), 'dummy: 111.0\nextended_dummy: 1323123.44')
         self.assertEqual(len(result_pkg), 2)
-        
+
+    def test_get_results_error_trigger(self):
+        result_pkg = DummyResultPackage()
+        self.assertIsNone(result_pkg.get_results())
+
+        result_pkg = DummyResultPackage(strict_content_check=True)
+        with self.assertRaises(ValueError):
+            result_pkg.get_results()
+
+    def test_qa_check_hyperparameters_dict_error_trigger(self):
+        result_pkg = DummyResultPackage(strict_content_check=True)
+
+        with self.assertRaises(ValueError):
+            result_pkg.qa_check_hyperparameters_dict()
+
+    def test_warn_about_result_data_problem(self):
+        result_pkg = DummyResultPackage(strict_content_check=False)
+        result_pkg.warn_about_result_data_problem('aaaaa')
+
+        result_pkg = DummyResultPackage(strict_content_check=True)
+        with self.assertRaises(ValueError):
+            result_pkg.warn_about_result_data_problem('aaaaa')
+
     def test_get_additional_results_dump_paths(self):
         paths_1 = [['filename', 'file/path/filename']]
         result_pkg_1 = DummyResultPackageExtendV2(paths_1)
