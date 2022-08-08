@@ -24,6 +24,12 @@ from tests_gpu.test_multi_gpu.ddp_prediction_saver import DDPPredictionSave
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
+"""
+Training taken from: 
+    https://pytorch-ignite.ai/tutorials/beginner/02-transformers-text-classification/
+    https://colab.research.google.com/github/pytorch-ignite/pytorch-ignite.ai/blob/gh-pages/tutorials/beginner/02-transformers-text-classification.ipynb
+"""
+
 
 class BERTModel(TTModel):
     def __init__(self):
@@ -51,8 +57,8 @@ class TestIMDBBERTExperimentTrack(unittest.TestCase):
     def test_trainloop_core_pytorch_compare(self):
         os.mkdir(f'{THIS_DIR}/ddp_bert_save')
 
-        val_loss_tl, y_pred_tl, y_true_tl = self.train_eval_trainloop(ds_subset_size=5000, num_epochs=3)
-        val_loss_pt, y_pred_pt, y_true_pt = self.train_eval_core_pytorch(ds_subset_size=5000, num_epochs=3)
+        val_loss_tl, y_pred_tl, y_true_tl = self.train_eval_trainloop(ds_subset_size=5000, num_epochs=2)
+        val_loss_pt, y_pred_pt, y_true_pt = self.train_eval_core_pytorch(ds_subset_size=5000, num_epochs=2)
 
         self.assertEqual(val_loss_tl, val_loss_pt)
         self.assertEqual(y_pred_tl, y_pred_pt)
