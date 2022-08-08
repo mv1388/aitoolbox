@@ -6,8 +6,8 @@ import random
 import pickle
 import numpy as np
 import torch
-import torch.optim as optim
 from torch.utils.data import DataLoader
+from transformers import AdamW
 
 import torch.multiprocessing as mp
 import torch.distributed as dist
@@ -26,9 +26,9 @@ THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 class BERTModel(TTModel):
-    def __init__(self, hf_model):
+    def __init__(self):
         super().__init__()
-        self.hf_model = hf_model
+        self.hf_model = AutoModelForSequenceClassification.from_pretrained("bert-base-cased", num_labels=2)
 
     def forward(self, **kwargs):
         return self.hf_model(**kwargs)
@@ -51,14 +51,12 @@ class TestIMDBBERTExperimentTrack(unittest.TestCase):
     def test_trainloop_core_pytorch_compare(self):
         os.mkdir(f'{THIS_DIR}/ddp_bert_save')
 
-        train_data, test_data = self.get_data_sets(ds_subset_size=1000)
-
-        val_loss_tl, y_pred_tl, y_true_tl = self.train_eval_trainloop(train_data, test_data, num_epochs=2)
-        val_loss_pt, y_pred_pt, y_true_pt = self.train_eval_core_pytorch(train_data, test_data, num_epochs=2)
+        val_loss_tl, y_pred_tl, y_true_tl = self.train_eval_trainloop(ds_subset_size=1000, num_epochs=2)
+        val_loss_pt, y_pred_pt, y_true_pt = self.train_eval_core_pytorch(ds_subset_size=1000, num_epochs=2)
 
         # TODO: Find a way to more consistently handle loss evaluation precision
         #   when doing tensor vs numpy vs python float
-        # self.assertAlmostEqual(val_loss_tl, val_loss_pt, places=8)
+        self.assertAlmostEqual(val_loss_tl, val_loss_pt, places=8)
         self.assertEqual(y_pred_tl, y_pred_pt)
         self.assertEqual(y_true_tl, y_true_pt)
 
@@ -69,17 +67,16 @@ class TestIMDBBERTExperimentTrack(unittest.TestCase):
         if os.path.exists(project_path):
             shutil.rmtree(project_path)
 
-    def train_eval_trainloop(self, train_data, test_data, num_epochs):
+    def train_eval_trainloop(self, ds_subset_size, num_epochs):
         self.set_seeds()
+
+        train_data, test_data = self.get_data_sets(ds_subset_size=ds_subset_size)
 
         train_loader = DataLoader(train_data, shuffle=True, batch_size=8)
         val_loader = DataLoader(test_data, batch_size=8)
 
-        hf_model = AutoModelForSequenceClassification.from_pretrained("bert-base-cased", num_labels=2)
-        model = BERTModel(hf_model)
-        # TODO: There is currently a bug in PyTorch 1.12 Adam... replacing temporarily
-        # optimizer = AdamW(model.parameters(), lr=5e-5)
-        optimizer = optim.Adadelta(model.parameters(), lr=5e-5)
+        model = BERTModel()
+        optimizer = AdamW(model.parameters(), lr=5e-5)
 
         callbacks = [
             ModelPerformanceEvaluation(BinaryClassificationResultPackage(), {},
@@ -112,16 +109,16 @@ class TestIMDBBERTExperimentTrack(unittest.TestCase):
 
         return val_loss, y_pred, y_true
 
-    def train_eval_core_pytorch(self, train_data, test_data, num_epochs):
+    def train_eval_core_pytorch(self, ds_subset_size, num_epochs):
         self.set_seeds()
+
+        train_data, test_data = self.get_data_sets(ds_subset_size=ds_subset_size)
 
         train_loader = DataLoader(train_data, shuffle=True, batch_size=8)
         val_loader = DataLoader(test_data, batch_size=8)
 
-        model_pt = AutoModelForSequenceClassification.from_pretrained("bert-base-cased", num_labels=2)
-        # TODO: There is currently a bug in PyTorch 1.12 Adam... replacing temporarily
-        # optimizer_pt = optim.Adam(model_pt.parameters(), lr=0.001, betas=(0.9, 0.999))
-        optimizer_pt = optim.Adadelta(model_pt.parameters(), lr=0.001)
+        model_pt = BERTModel()
+        optimizer_pt = AdamW(model_pt.parameters(), lr=5e-5)
 
         os.environ['MASTER_ADDR'] = 'localhost'
         os.environ['MASTER_PORT'] = '8888'
@@ -206,7 +203,6 @@ class TestIMDBBERTExperimentTrack(unittest.TestCase):
                 val_pred += predictions.cpu().tolist()
                 val_true += batch["labels"].cpu().tolist()
                 val_loss.append(loss_batch)
-            val_loss = np.mean(val_loss)
 
         with open(f'{THIS_DIR}/ddp_bert_save/pt_ddp_predictions_{gpu}.p', 'wb') as f:
             pickle.dump([val_loss, val_pred, val_true], f)
