@@ -20,12 +20,13 @@ class DDPCPUPredictionSave(AbstractCallback):
         val_loss_aitb = self.train_loop_obj.evaluate_loss_on_validation_set(force_prediction=True)
         test_loss_aitb = self.train_loop_obj.evaluate_loss_on_test_set(force_prediction=True)
 
-        train_pred_aitb, _, _ = self.train_loop_obj.predict_on_train_set(force_prediction=True)
-        val_pred_aitb, _, _ = self.train_loop_obj.predict_on_validation_set(force_prediction=True)
-        test_pred_aitb, _, _ = self.train_loop_obj.predict_on_test_set(force_prediction=True)
+        train_pred_aitb, train_true_aitb, _ = self.train_loop_obj.predict_on_train_set(force_prediction=True)
+        val_pred_aitb, val_true_aitb, _ = self.train_loop_obj.predict_on_validation_set(force_prediction=True)
+        test_pred_aitb, test_true_aitb, _ = self.train_loop_obj.predict_on_test_set(force_prediction=True)
 
         with open(f'{self.dir_path}/{self.file_name}', 'wb') as f:
             pickle.dump([
                 train_pred_aitb.tolist(), val_pred_aitb.tolist(), test_pred_aitb.tolist(),
+                train_true_aitb.tolist(), val_true_aitb.tolist(), test_true_aitb.tolist(),
                 train_loss_aitb, val_loss_aitb, test_loss_aitb
             ], f)

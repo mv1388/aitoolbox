@@ -456,13 +456,21 @@ class TestDDPCPUTrainLoopVSCorePyTorch(unittest.TestCase):
         batch_size = 50
         num_epochs = 10
 
-        train_pred_aitb, val_pred_aitb, test_pred_aitb, train_loss_aitb, val_loss_aitb, test_loss_aitb = \
+        train_pred_aitb, val_pred_aitb, test_pred_aitb, \
+            train_true_aitb, val_true_aitb, test_true_aitb, \
+            train_loss_aitb, val_loss_aitb, test_loss_aitb = \
             self.train_eval_trainloop(batch_size, num_epochs)
 
-        train_pred_pt, val_pred_pt, test_pred_pt, train_loss_pt, val_loss_pt, test_loss_pt = \
+        train_pred_pt, val_pred_pt, test_pred_pt, \
+            train_true_pt, val_true_pt, test_true_pt, \
+            train_loss_pt, val_loss_pt, test_loss_pt = \
             self.train_eval_core_pytorch(batch_size, num_epochs)
 
         print('Doing comparison test')
+
+        self.assertEqual(train_true_aitb, train_true_pt)
+        self.assertEqual(val_true_aitb, val_true_pt)
+        self.assertEqual(test_true_aitb, test_true_pt)
 
         self.assertEqual(train_pred_aitb, train_pred_pt)
         self.assertEqual(val_pred_aitb, val_pred_pt)
@@ -506,10 +514,14 @@ class TestDDPCPUTrainLoopVSCorePyTorch(unittest.TestCase):
         )
 
         with open(f'{THIS_DIR}/ddp_temp_save/tl_ddp_predictions.p', 'rb') as f:
-            train_pred_aitb, val_pred_aitb, test_pred_aitb, train_loss_aitb, val_loss_aitb, test_loss_aitb = \
+            train_pred_aitb, val_pred_aitb, test_pred_aitb, \
+                train_true_aitb, val_true_aitb, test_true_aitb, \
+                train_loss_aitb, val_loss_aitb, test_loss_aitb = \
                 pickle.load(f)
 
-        return train_pred_aitb, val_pred_aitb, test_pred_aitb, train_loss_aitb, val_loss_aitb, test_loss_aitb
+        return train_pred_aitb, val_pred_aitb, test_pred_aitb, \
+            train_true_aitb, val_true_aitb, test_true_aitb, \
+            train_loss_aitb, val_loss_aitb, test_loss_aitb
 
     def train_eval_core_pytorch(self, batch_size, num_epochs=10):
         self.set_seeds()
@@ -543,14 +555,20 @@ class TestDDPCPUTrainLoopVSCorePyTorch(unittest.TestCase):
         )
 
         train_pred_pt, val_pred_pt, test_pred_pt, \
-            train_loss_pt, val_loss_pt, test_loss_pt = [], [], [], [], [], []
+            train_true_pt, val_true_pt, test_true_pt, \
+            train_loss_pt, val_loss_pt, test_loss_pt = [], [], [], [], [], [], [], [], []
 
         for idx in range(nprocs):
             with open(f'{THIS_DIR}/ddp_temp_save/pt_ddp_predictions_{idx}.p', 'rb') as f:
-                train_pred_f, val_pred_f, test_pred_f, train_loss_f, val_loss_f, test_loss_f = pickle.load(f)
+                train_pred_f, val_pred_f, test_pred_f, \
+                    train_true_f, val_true_f, test_true_f, \
+                    train_loss_f, val_loss_f, test_loss_f = pickle.load(f)
                 train_pred_pt += train_pred_f
                 val_pred_pt += val_pred_f
                 test_pred_pt += test_pred_f
+                train_true_pt += train_true_f
+                val_true_pt += val_true_f
+                test_true_pt += test_true_f
                 train_loss_pt += train_loss_f
                 val_loss_pt += val_loss_f
                 test_loss_pt += test_loss_f
@@ -559,7 +577,9 @@ class TestDDPCPUTrainLoopVSCorePyTorch(unittest.TestCase):
         val_loss_pt = np.mean(val_loss_pt)
         test_loss_pt = np.mean(test_loss_pt)
 
-        return train_pred_pt, val_pred_pt, test_pred_pt, train_loss_pt, val_loss_pt, test_loss_pt
+        return train_pred_pt, val_pred_pt, test_pred_pt, \
+            train_true_pt, val_true_pt, test_true_pt, \
+            train_loss_pt, val_loss_pt, test_loss_pt
 
     @staticmethod
     def manual_ddp_training(
@@ -612,7 +632,9 @@ class TestDDPCPUTrainLoopVSCorePyTorch(unittest.TestCase):
             for _ in val_loader_ddp:
                 pass
 
-        train_pred_pt, val_pred_pt, test_pred_pt, train_loss_pt, val_loss_pt, test_loss_pt = [], [], [], [], [], []
+        train_pred_pt, val_pred_pt, test_pred_pt, \
+            train_true_pt, val_true_pt, test_true_pt, \
+            train_loss_pt, val_loss_pt, test_loss_pt = [], [], [], [], [], [], [], [], []
 
         print('Evaluating - train')
         model_pt.eval()
@@ -625,6 +647,7 @@ class TestDDPCPUTrainLoopVSCorePyTorch(unittest.TestCase):
                 loss_batch = criterion_pt(predicted, target).cpu().item()
 
                 train_pred_pt += predicted.argmax(dim=1, keepdim=False).cpu().tolist()
+                train_true_pt += target.cpu().tolist()
                 train_loss_pt.append(loss_batch)
 
         print('Evaluating - validation')
@@ -638,6 +661,7 @@ class TestDDPCPUTrainLoopVSCorePyTorch(unittest.TestCase):
                 loss_batch = criterion_pt(predicted, target).cpu().item()
 
                 val_pred_pt += predicted.argmax(dim=1, keepdim=False).cpu().tolist()
+                val_true_pt += target.cpu().tolist()
                 val_loss_pt.append(loss_batch)
 
         print('Evaluating - test')
@@ -651,10 +675,15 @@ class TestDDPCPUTrainLoopVSCorePyTorch(unittest.TestCase):
                 loss_batch = criterion_pt(predicted, target).cpu().item()
 
                 test_pred_pt += predicted.argmax(dim=1, keepdim=False).cpu().tolist()
+                test_true_pt += target.cpu().tolist()
                 test_loss_pt.append(loss_batch)
 
         with open(f'{THIS_DIR}/ddp_temp_save/pt_ddp_predictions_{gpu}.p', 'wb') as f:
-            pickle.dump([train_pred_pt, val_pred_pt, test_pred_pt, train_loss_pt, val_loss_pt, test_loss_pt], f)
+            pickle.dump([
+                train_pred_pt, val_pred_pt, test_pred_pt,
+                train_true_pt, val_true_pt, test_true_pt,
+                train_loss_pt, val_loss_pt, test_loss_pt
+            ], f)
 
     @staticmethod
     def set_seeds():
