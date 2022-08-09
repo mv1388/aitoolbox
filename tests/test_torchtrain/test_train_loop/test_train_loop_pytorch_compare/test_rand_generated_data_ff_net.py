@@ -607,9 +607,9 @@ class TestDDPCPUTrainLoopVSCorePyTorch(unittest.TestCase):
                 optimizer_pt.zero_grad()
 
             # Imitate what happens in auto_execute_end_of_epoch() in TrainLoop
-            for _ in train_loader:
+            for _ in train_loader_ddp:
                 pass
-            for _ in val_loader:
+            for _ in val_loader_ddp:
                 pass
 
         train_pred_pt, val_pred_pt, test_pred_pt, train_loss_pt, val_loss_pt, test_loss_pt = [], [], [], [], [], []
@@ -669,3 +669,7 @@ class TestDDPCPUTrainLoopVSCorePyTorch(unittest.TestCase):
         torch.backends.cudnn.enabled = False
         torch.backends.cudnn.benchmark = False
         torch.backends.cudnn.deterministic = True
+
+        torch.backends.enabled = False
+        torch.backends.benchmark = False
+        torch.backends.deterministic = True
