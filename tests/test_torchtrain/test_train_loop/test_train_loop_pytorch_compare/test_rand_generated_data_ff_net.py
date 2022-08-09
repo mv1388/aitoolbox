@@ -456,18 +456,11 @@ class TestDDPCPUTrainLoopVSCorePyTorch(unittest.TestCase):
         batch_size = 50
         num_epochs = 10
 
-        train_dataset = TensorDataset(torch.randn(1000, 50), torch.randint(low=0, high=10, size=(1000,)))
-        val_dataset = TensorDataset(torch.randn(300, 50), torch.randint(low=0, high=10, size=(300,)))
-        test_dataset = TensorDataset(torch.randn(300, 50), torch.randint(low=0, high=10, size=(300,)))
-        train_dataloader = DataLoader(train_dataset, batch_size=batch_size)
-        val_dataloader = DataLoader(val_dataset, batch_size=batch_size)
-        test_dataloader = DataLoader(test_dataset, batch_size=batch_size)
-
         train_pred_aitb, val_pred_aitb, test_pred_aitb, train_loss_aitb, val_loss_aitb, test_loss_aitb = \
-            self.train_eval_trainloop(train_dataloader, val_dataloader, test_dataloader, num_epochs)
+            self.train_eval_trainloop(batch_size, num_epochs)
 
         train_pred_pt, val_pred_pt, test_pred_pt, train_loss_pt, val_loss_pt, test_loss_pt = \
-            self.train_eval_core_pytorch(train_dataloader, val_dataloader, test_dataloader, num_epochs)
+            self.train_eval_core_pytorch(batch_size, num_epochs)
 
         print('Doing comparison test')
 
@@ -483,8 +476,15 @@ class TestDDPCPUTrainLoopVSCorePyTorch(unittest.TestCase):
         if os.path.exists(project_path):
             shutil.rmtree(project_path)
 
-    def train_eval_trainloop(self, train_dataloader, val_dataloader, test_dataloader, num_epochs=10):
+    def train_eval_trainloop(self, batch_size, num_epochs=10):
         self.set_seeds()
+
+        train_dataset = TensorDataset(torch.randn(1000, 50), torch.randint(low=0, high=10, size=(1000,)))
+        val_dataset = TensorDataset(torch.randn(300, 50), torch.randint(low=0, high=10, size=(300,)))
+        test_dataset = TensorDataset(torch.randn(300, 50), torch.randint(low=0, high=10, size=(300,)))
+        train_dataloader = DataLoader(train_dataset, batch_size=batch_size)
+        val_dataloader = DataLoader(val_dataset, batch_size=batch_size)
+        test_dataloader = DataLoader(test_dataset, batch_size=batch_size)
 
         model_aitb = FFNetAIToolbox()
         optimizer_aitb = optim.Adam(model_aitb.parameters(), lr=0.001, betas=(0.9, 0.999))
@@ -511,8 +511,15 @@ class TestDDPCPUTrainLoopVSCorePyTorch(unittest.TestCase):
 
         return train_pred_aitb, val_pred_aitb, test_pred_aitb, train_loss_aitb, val_loss_aitb, test_loss_aitb
 
-    def train_eval_core_pytorch(self, train_dataloader, val_dataloader, test_dataloader, num_epochs=10):
+    def train_eval_core_pytorch(self, batch_size, num_epochs=10):
         self.set_seeds()
+
+        train_dataset = TensorDataset(torch.randn(1000, 50), torch.randint(low=0, high=10, size=(1000,)))
+        val_dataset = TensorDataset(torch.randn(300, 50), torch.randint(low=0, high=10, size=(300,)))
+        test_dataset = TensorDataset(torch.randn(300, 50), torch.randint(low=0, high=10, size=(300,)))
+        train_dataloader = DataLoader(train_dataset, batch_size=batch_size)
+        val_dataloader = DataLoader(val_dataset, batch_size=batch_size)
+        test_dataloader = DataLoader(test_dataset, batch_size=batch_size)
 
         nprocs = 2
 
@@ -568,7 +575,7 @@ class TestDDPCPUTrainLoopVSCorePyTorch(unittest.TestCase):
         torch.manual_seed(0)
         device = torch.device('cpu')
 
-        train_sampler = DistributedSampler(dataset=train_loader.dataset, shuffle=True,
+        train_sampler = DistributedSampler(dataset=train_loader.dataset, shuffle=False,
                                            num_replicas=nprocs, rank=rank)
         val_sampler = DistributedSampler(dataset=val_loader.dataset, shuffle=False,
                                          num_replicas=nprocs, rank=rank)
