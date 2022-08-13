@@ -4,8 +4,6 @@ from torch.nn.parallel import DistributedDataParallel
 
 from aitoolbox.utils.util import copy_function
 
-# Removed old Parallel wrapper implementations in: https://github.com/mv1388/aitoolbox/pull/583
-
 
 class TTParallelBase:
     def __init__(self, module,
