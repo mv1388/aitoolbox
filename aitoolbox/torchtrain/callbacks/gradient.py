@@ -42,8 +42,9 @@ class GradValueClip(GradientCallbackBase):
 
     def on_after_gradient_update(self, optimizer_idx):
         # if (self.train_loop_obj.iteration + 1) % self.train_loop_obj.grad_accumulation == 0:
-        if (self.train_loop_obj.iteration + 1) % self.train_loop_obj.grad_accumulation == 0 or \
-                self.train_loop_obj.iteration == len(self.train_loop_obj.train_loader) - 1:
+        # if (self.train_loop_obj.iteration + 1) % self.train_loop_obj.grad_accumulation == 0 or \
+        #         self.train_loop_obj.iteration == len(self.train_loop_obj.train_loader) - 1:
+        if self.train_loop_obj.should_execute_optimizer_update():
             optimizer = self.train_loop_obj.optimizer
             if isinstance(optimizer, MultiOptimizer):
                 optimizer = optimizer[optimizer_idx]
@@ -68,7 +69,10 @@ class GradNormClip(GradientCallbackBase):
         self.kwargs = kwargs
 
     def on_after_gradient_update(self, optimizer_idx):
-        if (self.train_loop_obj.iteration + 1) % self.train_loop_obj.grad_accumulation == 0:
+        # if (self.train_loop_obj.iteration + 1) % self.train_loop_obj.grad_accumulation == 0:
+        # if (self.train_loop_obj.iteration + 1) % self.train_loop_obj.grad_accumulation == 0 or \
+        #         self.train_loop_obj.iteration == len(self.train_loop_obj.train_loader) - 1:
+        if self.train_loop_obj.should_execute_optimizer_update():
             optimizer = self.train_loop_obj.optimizer
             if isinstance(optimizer, MultiOptimizer):
                 optimizer = optimizer[optimizer_idx]
