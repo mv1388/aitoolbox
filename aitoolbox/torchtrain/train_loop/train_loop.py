@@ -835,7 +835,11 @@ class TrainLoop:
 
             ddp_args['ddp_model_args']['device_ids'] = [gpu]
 
+        # DDP MP device filter any existing callbacks and add new ones
         self.callbacks_handler.mp_filter_callbacks()
+        self.callbacks_handler.register_callbacks(callbacks)
+        # Set callbacks to None, so they aren't double added/registered later in `_train()` method
+        callbacks = None
 
         # Optionally load data in-process
         self.callbacks_handler.register_callbacks(in_process_data_load)
