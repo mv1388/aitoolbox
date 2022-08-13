@@ -2,8 +2,6 @@ import unittest
 
 import os
 import random
-import shutil
-import pickle
 import numpy as np
 import torch
 import torch.nn as nn
@@ -11,11 +9,6 @@ import torch.nn.functional as F
 import torch.optim as optim
 from torch.utils.data.dataloader import DataLoader
 from torch.utils.data.dataset import TensorDataset
-
-import torch.multiprocessing as mp
-import torch.distributed as dist
-from torch.nn.parallel import DistributedDataParallel
-from torch.utils.data.distributed import DistributedSampler
 
 from aitoolbox.torchtrain.train_loop import TrainLoop
 from aitoolbox.torchtrain.model import TTModel
