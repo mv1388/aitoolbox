@@ -527,6 +527,77 @@ class TestTrainLoop(unittest.TestCase):
                     np.mean(loaders[dataset_type])
                 )
 
+    def test_should_execute_optimizer_update_no_grad_accum(self):
+        model_update_iterations = self.get_model_update_iterations(data_size=1000, batch_size=50, grad_accumulation=1)
+        self.assertEqual(model_update_iterations, list(range(20)))
+
+    def test_should_execute_optimizer_update_grad_accum_no_leftover(self):
+        model_update_iterations = self.get_model_update_iterations(data_size=1000, batch_size=10, grad_accumulation=5)
+        self.assertEqual(
+            model_update_iterations,
+            [4, 9, 14, 19, 24, 29, 34, 39, 44, 49, 54, 59, 64, 69, 74, 79, 84, 89, 94, 99]
+        )
+
+    def test_should_execute_optimizer_update_grad_accum_with_leftover(self):
+        model_update_iterations = self.get_model_update_iterations(data_size=1035,  batch_size=10, grad_accumulation=5)
+        self.assertEqual(
+            model_update_iterations,
+            [4, 9, 14, 19, 24, 29, 34, 39, 44, 49, 54, 59, 64, 69, 74, 79, 84, 89, 94, 99, 103]
+        )
+
+        model_update_iterations = self.get_model_update_iterations(data_size=1049, batch_size=10, grad_accumulation=5)
+        self.assertEqual(
+            model_update_iterations,
+            [4, 9, 14, 19, 24, 29, 34, 39, 44, 49, 54, 59, 64, 69, 74, 79, 84, 89, 94, 99, 104]
+        )
+
+        model_update_iterations = self.get_model_update_iterations(data_size=1051, batch_size=10, grad_accumulation=5)
+        self.assertEqual(
+            model_update_iterations,
+            [4, 9, 14, 19, 24, 29, 34, 39, 44, 49, 54, 59, 64, 69, 74, 79, 84, 89, 94, 99, 104, 105]
+        )
+
+        model_update_iterations = self.get_model_update_iterations(data_size=1003, batch_size=10, grad_accumulation=5)
+        self.assertEqual(
+            model_update_iterations,
+            [4, 9, 14, 19, 24, 29, 34, 39, 44, 49, 54, 59, 64, 69, 74, 79, 84, 89, 94, 99, 100]
+        )
+
+        model_update_iterations = self.get_model_update_iterations(data_size=1010, batch_size=10, grad_accumulation=5)
+        self.assertEqual(
+            model_update_iterations,
+            [4, 9, 14, 19, 24, 29, 34, 39, 44, 49, 54, 59, 64, 69, 74, 79, 84, 89, 94, 99, 100]
+        )
+
+        model_update_iterations = self.get_model_update_iterations(data_size=1011, batch_size=10, grad_accumulation=5)
+        self.assertEqual(
+            model_update_iterations,
+            [4, 9, 14, 19, 24, 29, 34, 39, 44, 49, 54, 59, 64, 69, 74, 79, 84, 89, 94, 99, 101]
+        )
+
+    @staticmethod
+    def get_model_update_iterations(data_size, batch_size=10, grad_accumulation=5):
+        batch_size = batch_size
+        train_dataset = TensorDataset(torch.randn(data_size, 10), torch.randint(low=0, high=10, size=(data_size,)))
+        val_dataset = TensorDataset(torch.randn(300, 10), torch.randint(low=0, high=10, size=(300,)))
+        test_dataset = TensorDataset(torch.randn(300, 10), torch.randint(low=0, high=10, size=(300,)))
+        train_dataloader = DataLoader(train_dataset, batch_size=batch_size)
+        val_dataloader = DataLoader(val_dataset, batch_size=batch_size)
+        test_dataloader = DataLoader(test_dataset, batch_size=batch_size)
+
+        model = NetUnifiedBatchFeed()
+        train_loop = TrainLoop(model, train_dataloader, val_dataloader, test_dataloader, None, None)
+        train_loop.grad_accumulation = grad_accumulation
+
+        model_update_iterations = []
+
+        for iteration, _ in enumerate(train_dataloader):
+            train_loop.iteration = iteration
+            if train_loop.should_execute_optimizer_update():
+                model_update_iterations.append(iteration)
+
+        return model_update_iterations
+
     def test_basic_history_tracking(self):
         num_epochs = 2
         dummy_optimizer = DummyOptimizer()
