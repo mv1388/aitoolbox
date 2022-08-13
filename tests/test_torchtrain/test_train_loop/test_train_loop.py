@@ -539,7 +539,7 @@ class TestTrainLoop(unittest.TestCase):
         )
 
     def test_should_execute_optimizer_update_grad_accum_with_leftover(self):
-        model_update_iterations = self.get_model_update_iterations(data_size=1035,  batch_size=10, grad_accumulation=5)
+        model_update_iterations = self.get_model_update_iterations(data_size=1035, batch_size=10, grad_accumulation=5)
         self.assertEqual(
             model_update_iterations,
             [4, 9, 14, 19, 24, 29, 34, 39, 44, 49, 54, 59, 64, 69, 74, 79, 84, 89, 94, 99, 103]
