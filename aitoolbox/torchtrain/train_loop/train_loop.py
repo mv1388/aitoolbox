@@ -32,7 +32,7 @@ class TrainLoop:
                  train_loader, validation_loader, test_loader,
                  optimizer, criterion,
                  collate_batch_pred_fn=append_predictions, pred_transform_fn=torch_cat_transf,
-                 end_auto_eval=True, lazy_experiment_save=False,
+                 end_auto_eval=True, lazy_experiment_save=False, print_callbacks=False,
                  gpu_mode='single', cuda_device_idx=None, use_amp=False):
         """Core PyTorch TrainLoop supporting the model training and target prediction
 
@@ -58,6 +58,8 @@ class TrainLoop:
             lazy_experiment_save (bool): when in lazy mode experiment tracking components will create the experiment
                 folder only after some training results are available (possibly at the end of the first epoch) instead
                 of at the beginning of training.
+            print_callbacks (bool): at the start of training print the list of registered callbacks
+                which will be executed during the run of the train loop
             gpu_mode (str): GPU training mode selection. TrainLoop supports different GPU training modes by
                 specifying one of the following:
 
@@ -92,6 +94,7 @@ class TrainLoop:
         self.pred_transform_fn = pred_transform_fn
         self.end_auto_eval = end_auto_eval
         self.lazy_experiment_save = lazy_experiment_save
+        self.print_callbacks = print_callbacks
 
         self.num_optimizers = 1 if not isinstance(self.optimizer, MultiOptimizer) else len(self.optimizer)
 
@@ -210,7 +213,7 @@ class TrainLoop:
         self.num_iterations = num_iterations
         self.grad_accumulation = grad_accumulation
 
-        self.callbacks_handler.register_callbacks(callbacks)
+        self.callbacks_handler.register_callbacks(callbacks, print_callbacks=self.print_callbacks)
 
         self.model = self.model.to(self.device)
         if self.criterion is not None:
@@ -756,7 +759,7 @@ class TrainLoop:
     def _train_ddp(self, num_epochs, num_iterations, callbacks=None, grad_accumulation=1,
                    ddp_model_args=None, in_process_data_load=None,
                    num_nodes=1, node_rank=0, num_gpus=torch.cuda.device_count(),
-                   backend='nccl', init_method='env://'):
+                   backend='nccl', init_method='env://', on_gpu=True):
         """Train the model using the train loop in the Distributed Data Parallel setting
 
         During the training, multiple processes will be spawned, one for each of the available GPUs.
@@ -782,6 +785,7 @@ class TrainLoop:
                 ``dist.init_process_group()``. Valid values include ``mpi``, ``gloo``, and ``nccl``.
             init_method (str): URL specifying how to initialize the process group. For more information look up
                 the documentation for ``dist.init_process_group()``.
+            on_gpu (bool): if the DDP training is executed on the GPU or on the CPU
         """
         self.ddp_training_mode = True
         os.environ['MASTER_ADDR'] = 'localhost'
@@ -795,6 +799,7 @@ class TrainLoop:
             'num_gpus': num_gpus,
             'world_size': num_nodes * num_gpus,
             'backend': backend,
+            'on_gpu': on_gpu,
             'init_method': init_method,
             'ddp_model_args': ddp_model_args if ddp_model_args is not None else {}
         }
@@ -828,13 +833,18 @@ class TrainLoop:
                 every spawned training process. This can in turn in cause extensive overall memory consumption.
         """
         rank = ddp_args['node_rank'] * ddp_args['num_gpus'] + gpu
+
         dist.init_process_group(
             backend=ddp_args['backend'], init_method=ddp_args['init_method'],
             world_size=ddp_args['world_size'], rank=rank
         )
+
         torch.manual_seed(0)
-        torch.cuda.set_device(gpu)
-        self.device = torch.device(f"cuda:{gpu}")
+        if ddp_args['on_gpu']:
+            torch.cuda.set_device(gpu)
+            self.device = torch.device(f"cuda:{gpu}")
+
+            ddp_args['ddp_model_args']['device_ids'] = [gpu]
 
         # DDP MP device filter any existing callbacks and add new ones
         self.callbacks_handler.mp_filter_callbacks()
@@ -859,9 +869,9 @@ class TrainLoop:
 
         # Wrap models into DDP module
         if isinstance(self.model, TTModel):
-            self.model = TTDistributedDataParallel(self.model, device_ids=[gpu], **ddp_args['ddp_model_args'])
+            self.model = TTDistributedDataParallel(self.model, **ddp_args['ddp_model_args'])
         else:
-            self.model = DistributedDataParallel(self.model, device_ids=[gpu], **ddp_args['ddp_model_args'])
+            self.model = DistributedDataParallel(self.model, **ddp_args['ddp_model_args'])
 
         self._train(num_epochs, num_iterations, callbacks, grad_accumulation)
 
