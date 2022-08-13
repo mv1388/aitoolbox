@@ -64,6 +64,35 @@ class TestCallbacksHandler(unittest.TestCase):
         self.assertEqual(cb_handler.cbs_on_epoch_begin, [])
         self.assertEqual(cb_handler.cbs_on_epoch_end, [])
 
+    def test_should_enable_callback(self):
+        train_loop = TrainLoop(NetUnifiedBatchFeed(), None, None, None, None, None)
+        cb_handler = CallbacksHandler(train_loop)
+        train_loop.callbacks_handler = cb_handler
+
+        # train_loop device.index is None
+        train_loop.device = torch.device(f"cpu")
+        self.assertTrue(cb_handler.should_enable_callback(AbstractCallback('dummy cb')))
+        self.assertTrue(cb_handler.should_enable_callback(AbstractCallback('dummy cb', device_idx_execution=None)))
+        self.assertTrue(cb_handler.should_enable_callback(AbstractCallback('dummy cb', device_idx_execution=0)))
+        self.assertTrue(cb_handler.should_enable_callback(AbstractCallback('dummy cb', device_idx_execution=2)))
+        self.assertTrue(cb_handler.should_enable_callback(AbstractCallback('dummy cb', device_idx_execution=3)))
+
+        # train_loop device.index is not None
+        train_loop.device = torch.device(f"cuda:0")
+        self.assertTrue(cb_handler.should_enable_callback(AbstractCallback('dummy cb')))
+        self.assertTrue(cb_handler.should_enable_callback(AbstractCallback('dummy cb', device_idx_execution=None)))
+        self.assertTrue(cb_handler.should_enable_callback(AbstractCallback('dummy cb', device_idx_execution=0)))
+        self.assertFalse(cb_handler.should_enable_callback(AbstractCallback('dummy cb', device_idx_execution=2)))
+        self.assertFalse(cb_handler.should_enable_callback(AbstractCallback('dummy cb', device_idx_execution=3)))
+
+        # train_loop device.index is not None
+        train_loop.device = torch.device(f"cuda:3")
+        self.assertTrue(cb_handler.should_enable_callback(AbstractCallback('dummy cb')))
+        self.assertTrue(cb_handler.should_enable_callback(AbstractCallback('dummy cb', device_idx_execution=None)))
+        self.assertFalse(cb_handler.should_enable_callback(AbstractCallback('dummy cb', device_idx_execution=0)))
+        self.assertFalse(cb_handler.should_enable_callback(AbstractCallback('dummy cb', device_idx_execution=2)))
+        self.assertTrue(cb_handler.should_enable_callback(AbstractCallback('dummy cb', device_idx_execution=3)))
+
     def test_enforce_callbacks_quality(self):
         train_loop = TrainLoop(NetUnifiedBatchFeed(), None, None, None, None, None)
         cb_handler = train_loop.callbacks_handler
@@ -294,6 +323,82 @@ class TestCallbacksHandler(unittest.TestCase):
         )
         self.assertEqual(cb_handler.callbacks_cache, [])
 
+    def test_mp_filter_callbacks_device_idx_none(self):
+        train_loop = TrainLoop(NetUnifiedBatchFeed(), None, None, None, None, None)
+        cb_handler = CallbacksHandler(train_loop)
+        train_loop.callbacks_handler = cb_handler
+
+        device_idx_execution = None
+        callbacks = [
+            BatchBeginCB(device_idx_execution=device_idx_execution),
+            BatchBeginTrainBeginCB(device_idx_execution=device_idx_execution),
+            BatchBeginTrainBeginAfterOptiCB(device_idx_execution=device_idx_execution),
+            AfterBatchPredictionCB(True, device_idx_execution=device_idx_execution)
+        ]
+        cb_handler.register_callbacks(callbacks)
+        train_loop.device = torch.device(f"cpu")
+        pre_filtered_reg_cbs = cb_handler.registered_cbs
+        cb_handler.mp_filter_callbacks()
+        self.assertEqual(train_loop.callbacks, callbacks)
+        self.assertEqual(pre_filtered_reg_cbs, cb_handler.registered_cbs)
+
+    def test_mp_filter_callbacks_device_match(self):
+        train_loop = TrainLoop(NetUnifiedBatchFeed(), None, None, None, None, None)
+        cb_handler = CallbacksHandler(train_loop)
+        train_loop.callbacks_handler = cb_handler
+
+        device_idx_execution = 1
+        callbacks = [
+            BatchBeginCB(device_idx_execution=device_idx_execution),
+            BatchBeginTrainBeginCB(device_idx_execution=device_idx_execution),
+            BatchBeginTrainBeginAfterOptiCB(device_idx_execution=device_idx_execution),
+            AfterBatchPredictionCB(True, device_idx_execution=device_idx_execution)
+        ]
+        cb_handler.register_callbacks(callbacks)
+        train_loop.device = torch.device(f"cuda:1")
+        pre_filtered_reg_cbs = cb_handler.registered_cbs
+        cb_handler.mp_filter_callbacks()
+        self.assertEqual(train_loop.callbacks, callbacks)
+        self.assertEqual(pre_filtered_reg_cbs, cb_handler.registered_cbs)
+
+    def test_mp_filter_callbacks_device_mismatch(self):
+        train_loop = TrainLoop(NetUnifiedBatchFeed(), None, None, None, None, None)
+        cb_handler = CallbacksHandler(train_loop)
+        train_loop.callbacks_handler = cb_handler
+
+        device_idx_execution = 1
+        callbacks = [
+            BatchBeginCB(device_idx_execution=device_idx_execution),
+            BatchBeginTrainBeginCB(device_idx_execution=device_idx_execution),
+            BatchBeginTrainBeginAfterOptiCB(device_idx_execution=device_idx_execution),
+            AfterBatchPredictionCB(True, device_idx_execution=device_idx_execution)
+        ]
+        cb_handler.register_callbacks(callbacks)
+        train_loop.device = torch.device(f"cuda:0")
+        cb_handler.mp_filter_callbacks()
+        self.assertEqual(train_loop.callbacks, [])
+        self.assertEqual(cb_handler.registered_cbs, [[], [], [], [], [], [], [], [], [], []])
+
+    def test_mp_filter_callbacks_device_semi_mismatch(self):
+        train_loop = TrainLoop(NetUnifiedBatchFeed(), None, None, None, None, None)
+        cb_handler = CallbacksHandler(train_loop)
+        train_loop.callbacks_handler = cb_handler
+
+        cb_1 = BatchBeginCB(device_idx_execution=0)
+        cb_2 = BatchBeginTrainBeginCB(device_idx_execution=1)
+        cb_3 = BatchBeginTrainBeginAfterOptiCB(device_idx_execution=0)
+        cb_4 = AfterBatchPredictionCB(True, device_idx_execution=1)
+        callbacks = [cb_1, cb_2, cb_3, cb_4]
+
+        cb_handler.register_callbacks(callbacks)
+        train_loop.device = torch.device(f"cuda:0")
+        cb_handler.mp_filter_callbacks()
+        self.assertEqual(
+            train_loop.callbacks,
+            [cb for cb in callbacks if cb.device_idx_execution == train_loop.device.index]
+        )
+        self.assertEqual(cb_handler.registered_cbs, [[], [], [cb_3], [], [cb_1, cb_3], [], [], [cb_3], [], []])
+
     def test_handler_execution_after_batch_prediction(self):
         self.execute_training_with_on_batch_prediction_cb(
             num_epochs=5, train_loader=list(range(4)), val_loader=list(range(3)), test_loader=None
@@ -352,8 +457,8 @@ class TestCallbacksHandler(unittest.TestCase):
 
 
 class BatchBeginCB(AbstractCallback):
-    def __init__(self, execution_order=0):
-        super().__init__('', execution_order)
+    def __init__(self, execution_order=0, device_idx_execution=None):
+        super().__init__('', execution_order, device_idx_execution)
         self.registered_tl = False
 
     def on_train_loop_registration(self):
@@ -364,8 +469,8 @@ class BatchBeginCB(AbstractCallback):
 
 
 class BatchBeginTrainBeginCB(AbstractCallback):
-    def __init__(self, execution_order=0):
-        super().__init__('', execution_order)
+    def __init__(self, execution_order=0, device_idx_execution=None):
+        super().__init__('', execution_order, device_idx_execution)
 
     def on_batch_begin(self):
         print("executed")
@@ -375,8 +480,8 @@ class BatchBeginTrainBeginCB(AbstractCallback):
 
 
 class BatchBeginTrainBeginAfterOptiCB(AbstractCallback):
-    def __init__(self, execution_order=0):
-        super().__init__('', execution_order)
+    def __init__(self, execution_order=0, device_idx_execution=None):
+        super().__init__('', execution_order, device_idx_execution)
         self.exe_on_batch_begin = False
         self.exe_on_train_begin = False
         self.exe_on_after_optimizer_step = False
@@ -392,8 +497,8 @@ class BatchBeginTrainBeginAfterOptiCB(AbstractCallback):
 
 
 class AfterBatchPredictionCB(AbstractCallback):
-    def __init__(self, execute_callbacks, execution_order=0):
-        super().__init__('', execution_order)
+    def __init__(self, execute_callbacks, execution_order=0, device_idx_execution=None):
+        super().__init__('', execution_order, device_idx_execution)
         self.execute_callbacks = execute_callbacks
         self.cb_execution_ctr = 0
         self.cb_execution_ctr_dict = {'train': 0, 'validation': 0, 'test': 0}

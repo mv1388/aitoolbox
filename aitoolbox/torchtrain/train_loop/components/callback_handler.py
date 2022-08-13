@@ -37,7 +37,7 @@ class CallbacksHandler:
         self.registered_cbs = [
             self.cbs_on_epoch_begin, self.cbs_on_epoch_end,
             self.cbs_on_train_begin, self.cbs_on_train_end,
-            self.cbs_on_batch_begin,  self.cbs_on_batch_end,
+            self.cbs_on_batch_begin, self.cbs_on_batch_end,
             self.cbs_on_after_gradient_update, self.cbs_on_after_optimizer_step,
             self.cbs_on_multiprocess_start,
             self.cbs_on_after_batch_prediction
@@ -49,11 +49,13 @@ class CallbacksHandler:
         Normally, this is called from inside the train loop by the TrainLoop itself. Basically train loop "registers"
         itself with each of the provided callbacks.
 
+        Add via append new provided callbacks to the existing ones.
+
         Args:
-            callbacks (list or None): list of callbacks
-            cache_callbacks (bool): should provided callbacks be cached and not yet registered. First subsequent time
-                this method is called without ``cache_callbacks`` enabled all the previously cached callbacks are added
-                and also registered with the current list of callbacks.
+            callbacks (list or None): list of new callbacks to be added (appended)
+            cache_callbacks (bool): should the provided callbacks be cached and not yet registered. First subsequent
+                time this method is called without ``cache_callbacks`` enabled all the previously cached callbacks
+                are added and also registered with the current list of callbacks.
             print_callbacks (bool): after registering the provided callbacks also print the list of registered callbacks
                 which will be executed during the run of the train loop
 
@@ -72,20 +74,48 @@ class CallbacksHandler:
 
             if callbacks is not None and len(callbacks) > 0:
                 self.enforce_callbacks_quality(callbacks)
+
                 self.train_loop_obj.callbacks += [
                     cb.register_train_loop_object(self.train_loop_obj) for cb in callbacks
-                    if self.train_loop_obj.device.index is None or
-                       cb.device_idx_execution is None or
-                       (cb.device_idx_execution is not None and cb.device_idx_execution == self.train_loop_obj.device.index)
+                    if self.should_enable_callback(cb)
                 ]
 
             if not all(0 == cb.execution_order for cb in self.train_loop_obj.callbacks):
                 self.train_loop_obj.callbacks = sorted(self.train_loop_obj.callbacks, key=lambda cb: cb.execution_order)
 
+            # Note: using `callbacks` here instead of `self.train_loop_obj.callbacks` is correct.
+            #   Provide original input `callbacks` to this method instead of `self.train_loop_obj.callbacks`
+            #   which we added new callbacks to above. In case some callbacks were already registered at some earlier
+            #   time this prevents their duplication int the execution-position-split self.registered_cbs.
             self.split_on_execution_position(callbacks, register_train_loop=False)
 
         if print_callbacks:
             self.print_registered_callback_names()
+
+    def should_enable_callback(self, callback):
+        """Determine if callback should be enabled and executed to be in accordance with the GPU device setting
+
+        Always true in case of training on single device (CPU or one GPU).
+
+        In case of multi (GPU) device training such as DDP, this function checks if a callback should be executed on
+        the particular GPU device. If the callback doesn't have any ``device_idx_execution`` set than it is executed
+        on all the GPUs. In case the parameter is set in the callback than this function will only be True when the set
+        ``device_idx_execution`` in the callback and the train loop's GPU device index match. In other words
+        the callback will be executed only in the DDP process which sits on the matching GPU.
+
+        Args:
+            callback (AbstractCallback): callback which will be checked if it should be enabled during the particular
+                train loop run
+
+        Returns:
+            bool: if the provided callback should be enabled or disabled based on (GPU) device index matching.
+        """
+        return self.train_loop_obj.device.index is None or \
+            callback.device_idx_execution is None or \
+            (
+                callback.device_idx_execution is not None and
+                callback.device_idx_execution == self.train_loop_obj.device.index
+            )
 
     def execute_epoch_begin(self):
         for callback in self.cbs_on_epoch_begin:
@@ -130,10 +160,7 @@ class CallbacksHandler:
     def split_on_execution_position(self, callbacks, register_train_loop=False):
         if callbacks is not None and len(callbacks) > 0:
             for callback in callbacks:
-                if self.train_loop_obj.device.index is None or \
-                        callback.device_idx_execution is None or \
-                        (callback.device_idx_execution is not None and
-                         callback.device_idx_execution == self.train_loop_obj.device.index):
+                if self.should_enable_callback(callback):
 
                     if register_train_loop:
                         callback = callback.register_train_loop_object(self.train_loop_obj)
@@ -196,9 +223,7 @@ class CallbacksHandler:
         ]
 
     def _mp_filter_cb_list(self, callbacks_list):
-        return [cb for cb in callbacks_list
-                if cb.device_idx_execution is None or
-                (cb.device_idx_execution is not None and cb.device_idx_execution == self.train_loop_obj.device.index)]
+        return [cb for cb in callbacks_list if self.should_enable_callback(cb)]
 
     def enforce_callbacks_quality(self, callbacks):
         for cb in callbacks:
