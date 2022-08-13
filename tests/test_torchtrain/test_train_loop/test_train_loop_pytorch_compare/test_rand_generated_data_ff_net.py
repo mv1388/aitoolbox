@@ -1,6 +1,5 @@
 import unittest
 
-import os
 import random
 import numpy as np
 import torch
@@ -13,8 +12,6 @@ from torch.utils.data.dataset import TensorDataset
 from aitoolbox.torchtrain.train_loop import TrainLoop
 from aitoolbox.torchtrain.model import TTModel
 from aitoolbox.torchtrain.schedulers.warmup import LinearWithWarmupScheduler
-
-THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 class FFNetAIToolbox(TTModel):
