@@ -43,7 +43,7 @@ class CallbacksHandler:
             self.cbs_on_after_batch_prediction
         ]
 
-    def register_callbacks(self, callbacks, cache_callbacks=False):
+    def register_callbacks(self, callbacks, cache_callbacks=False, print_callbacks=False):
         """Register TrainLoop object reference inside the listed callbacks when the TrainLoop is created
 
         Normally, this is called from inside the train loop by the TrainLoop itself. Basically train loop "registers"
@@ -54,6 +54,8 @@ class CallbacksHandler:
             cache_callbacks (bool): should provided callbacks be cached and not yet registered. First subsequent time
                 this method is called without ``cache_callbacks`` enabled all the previously cached callbacks are added
                 and also registered with the current list of callbacks.
+            print_callbacks (bool): after registering the provided callbacks also print the list of registered callbacks
+                which will be executed during the run of the train loop
 
         Returns:
             None
@@ -81,6 +83,9 @@ class CallbacksHandler:
                 self.train_loop_obj.callbacks = sorted(self.train_loop_obj.callbacks, key=lambda cb: cb.execution_order)
 
             self.split_on_execution_position(callbacks, register_train_loop=False)
+
+        if print_callbacks:
+            self.print_registered_callback_names()
 
     def execute_epoch_begin(self):
         for callback in self.cbs_on_epoch_begin:
@@ -225,6 +230,8 @@ class CallbacksHandler:
                           for callback in callback_list])
 
     def print_registered_callback_names(self):
+        if self.train_loop_obj.ddp_training_mode:
+            print(f'*** On device {self.train_loop_obj.device.index} ({self.train_loop_obj.device}) ***')
         print(self)
 
     def __len__(self):

@@ -32,7 +32,7 @@ class TrainLoop:
                  train_loader, validation_loader, test_loader,
                  optimizer, criterion,
                  collate_batch_pred_fn=append_predictions, pred_transform_fn=torch_cat_transf,
-                 end_auto_eval=True, lazy_experiment_save=False,
+                 end_auto_eval=True, lazy_experiment_save=False, print_callbacks=False,
                  gpu_mode='single', cuda_device_idx=None, use_amp=False):
         """Core PyTorch TrainLoop supporting the model training and target prediction
 
@@ -58,6 +58,8 @@ class TrainLoop:
             lazy_experiment_save (bool): when in lazy mode experiment tracking components will create the experiment
                 folder only after some training results are available (possibly at the end of the first epoch) instead
                 of at the beginning of training.
+            print_callbacks (bool): at the start of training print the list of registered callbacks
+                which will be executed during the run of the train loop
             gpu_mode (str): GPU training mode selection. TrainLoop supports different GPU training modes by
                 specifying one of the following:
 
@@ -92,6 +94,7 @@ class TrainLoop:
         self.pred_transform_fn = pred_transform_fn
         self.end_auto_eval = end_auto_eval
         self.lazy_experiment_save = lazy_experiment_save
+        self.print_callbacks = print_callbacks
 
         self.num_optimizers = 1 if not isinstance(self.optimizer, MultiOptimizer) else len(self.optimizer)
 
@@ -210,7 +213,7 @@ class TrainLoop:
         self.num_iterations = num_iterations
         self.grad_accumulation = grad_accumulation
 
-        self.callbacks_handler.register_callbacks(callbacks)
+        self.callbacks_handler.register_callbacks(callbacks, print_callbacks=self.print_callbacks)
 
         self.model = self.model.to(self.device)
         if self.criterion is not None:
