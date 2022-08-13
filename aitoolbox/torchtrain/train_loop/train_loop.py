@@ -251,7 +251,6 @@ class TrainLoop:
 
                 # Execute AMP scaler update only when optimizer is stepped and grads are zeroed out
                 # https://pytorch.org/docs/stable/notes/amp_examples.html#gradient-accumulation
-                # if (self.iteration + 1) % self.grad_accumulation == 0 or self.iteration == len(self.train_loader) - 1:
                 if self.should_execute_optimizer_update():
                     self.amp_scaler.update()
 
@@ -344,8 +343,6 @@ class TrainLoop:
         Returns:
             None
         """
-        # if (self.iteration + 1) % self.grad_accumulation == 0:
-        # if (self.iteration + 1) % self.grad_accumulation == 0 or self.iteration == len(self.train_loader) - 1:
         if self.should_execute_optimizer_update():
             if not isinstance(self.optimizer, MultiOptimizer):
                 # To step the optimizer always give it to the AMP scaler to keep the code simpler
@@ -369,8 +366,6 @@ class TrainLoop:
         Returns:
             None
         """
-        # if (self.iteration + 1) % self.grad_accumulation == 0:
-        # if (self.iteration + 1) % self.grad_accumulation == 0 or self.iteration == len(self.train_loader) - 1:
         if self.should_execute_optimizer_update():
             if not isinstance(self.optimizer, MultiOptimizer):
                 self.optimizer.zero_grad()
