@@ -19,7 +19,7 @@ from torch.nn.parallel import DistributedDataParallel
 from torch.utils.data.distributed import DistributedSampler
 
 from aitoolbox import TrainLoop, TTModel
-from tests_gpu.test_multi_gpu.ddp_prediction_saver import DDPPredictionSave
+from tests_gpu.test_multi_gpu.ddp_utils import DDPPredictionSave
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 

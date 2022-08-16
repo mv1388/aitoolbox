@@ -19,7 +19,7 @@ from torch.utils.data.distributed import DistributedSampler
 
 from aitoolbox import TrainLoopCheckpointEndSave, TTModel, ModelPerformanceEvaluation, ModelPerformancePrintReport, \
     ModelTrainHistoryPlot, ModelTrainHistoryFileWriter, ClassificationResultPackage
-from tests_gpu.test_multi_gpu.ddp_prediction_saver import DDPPredictionSave
+from tests_gpu.test_multi_gpu.ddp_utils import DDPPredictionSave
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
