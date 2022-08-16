@@ -149,6 +149,7 @@ echo "Waiting for instance create"
 aws ec2 wait instance-status-ok --instance-ids $instance_id
 
 ec2_instance_address=$(aws ec2 describe-instances --instance-ids $instance_id --query 'Reservations[*].Instances[*].PublicDnsName' --output text)
+ec2_instance_ip_address=$(aws ec2 describe-instances --instance-ids $instance_id --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
 
 
 ##############################
@@ -185,7 +186,13 @@ ssh -i $key_path $username@$ec2_instance_address \
     \; \
     pipe-pane 'cat > $logging_path'"
 
-echo "Instance IP: $ec2_instance_address"
+echo "Instance DNS address: $ec2_instance_address"
+echo "Instance IP address: $ec2_instance_ip_address"
+echo "Instance AWS ID: $instance_id"
+echo "To easily ssh connect into the running testing session execute:"
+echo
+echo "    ./ssh_to_instance.sh $ec2_instance_address -s"
+echo
 
 if [[ ${ssh_at_start} == true ]]; then
     ./ssh_to_instance.sh $ec2_instance_address --os-name $username --ssh-tmux
