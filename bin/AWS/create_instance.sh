@@ -35,7 +35,7 @@ local_project_path="None"
 dataset_name="None"
 preproc_dataset="None"
 DL_framework="pytorch"
-AIToolbox_version="1.6.1"
+AIToolbox_version="1.6.2"
 instance_config="default_config.json"
 instance_type=
 run_bootstrap=true
@@ -161,6 +161,7 @@ echo "Waiting for instance create"
 aws ec2 wait instance-status-ok --instance-ids $instance_id
 
 ec2_instance_address=$(aws ec2 describe-instances --instance-ids $instance_id --query 'Reservations[*].Instances[*].PublicDnsName' --output text)
+ec2_instance_ip_address=$(aws ec2 describe-instances --instance-ids $instance_id --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
 
 
 ##############################
@@ -180,7 +181,13 @@ if [ $run_bootstrap == true ]; then
         "source activate $py_env ; tmux new-session -d -s 'training' './finish_prepare_instance.sh'"
 fi
 
-echo "Instance IP: $ec2_instance_address"
+echo "Instance DNS address: $ec2_instance_address"
+echo "Instance IP address: $ec2_instance_ip_address"
+echo "Instance AWS ID: $instance_id"
+echo "To easily ssh connect into the running instance execute:"
+echo
+echo "    ./ssh_to_instance.sh $ec2_instance_address -s"
+echo
 
 if [ $ssh_at_start == true ]; then
     ./ssh_to_instance.sh $ec2_instance_address --os-name $username --ssh-tmux

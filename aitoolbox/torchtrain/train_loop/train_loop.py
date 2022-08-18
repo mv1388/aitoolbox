@@ -32,7 +32,7 @@ class TrainLoop:
                  train_loader, validation_loader, test_loader,
                  optimizer, criterion,
                  collate_batch_pred_fn=append_predictions, pred_transform_fn=torch_cat_transf,
-                 end_auto_eval=True, lazy_experiment_save=False,
+                 end_auto_eval=True, lazy_experiment_save=False, print_callbacks=False,
                  gpu_mode='single', cuda_device_idx=None, use_amp=False):
         """Core PyTorch TrainLoop supporting the model training and target prediction
 
@@ -58,6 +58,8 @@ class TrainLoop:
             lazy_experiment_save (bool): when in lazy mode experiment tracking components will create the experiment
                 folder only after some training results are available (possibly at the end of the first epoch) instead
                 of at the beginning of training.
+            print_callbacks (bool): at the start of training print the list of registered callbacks
+                which will be executed during the run of the train loop
             gpu_mode (str): GPU training mode selection. TrainLoop supports different GPU training modes by
                 specifying one of the following:
 
@@ -92,6 +94,7 @@ class TrainLoop:
         self.pred_transform_fn = pred_transform_fn
         self.end_auto_eval = end_auto_eval
         self.lazy_experiment_save = lazy_experiment_save
+        self.print_callbacks = print_callbacks
 
         self.num_optimizers = 1 if not isinstance(self.optimizer, MultiOptimizer) else len(self.optimizer)
 
@@ -128,6 +131,7 @@ class TrainLoop:
 
         self.ddp_training_mode = False
         self.ddp_handler: Optional[DDPHandler] = None
+        self.ddp_rank = None
 
         self.callbacks = []
         self.callbacks_handler = CallbacksHandler(self)
@@ -210,7 +214,7 @@ class TrainLoop:
         self.num_iterations = num_iterations
         self.grad_accumulation = grad_accumulation
 
-        self.callbacks_handler.register_callbacks(callbacks)
+        self.callbacks_handler.register_callbacks(callbacks, print_callbacks=self.print_callbacks)
 
         self.model = self.model.to(self.device)
         if self.criterion is not None:
@@ -227,7 +231,8 @@ class TrainLoop:
                 print(f'Epoch: {self.epoch}')
             self.callbacks_handler.execute_epoch_begin()
 
-            for self.iteration, batch_data in enumerate(tqdm(self.train_loader)):
+            for self.iteration, batch_data in enumerate(tqdm(self.train_loader,
+                                                             desc='Training', disable=not self.is_main_process())):
                 self.total_iteration_idx += 1
                 self.callbacks_handler.execute_batch_begin()
 
@@ -494,7 +499,7 @@ class TrainLoop:
                 ``torch.Tensor``/``MultiLoss`` vs. ``float``/``dict``
         """
         if not self.prediction_store.has_train_loss(self.total_iteration_idx) or force_prediction:
-            loss = self.evaluate_model_loss(self.train_loader)
+            loss = self.evaluate_model_loss(self.train_loader, dataset_info={'type': 'train'})
             loss = loss.cpu()
             self.prediction_store.insert_train_loss(loss, self.total_iteration_idx, force_prediction)
         else:
@@ -521,7 +526,7 @@ class TrainLoop:
                 ``torch.Tensor``/``MultiLoss`` vs. ``float``/``dict``
         """
         if not self.prediction_store.has_val_loss(self.total_iteration_idx) or force_prediction:
-            loss = self.evaluate_model_loss(self.validation_loader)
+            loss = self.evaluate_model_loss(self.validation_loader, dataset_info={'type': 'validation'})
             loss = loss.cpu()
             self.prediction_store.insert_val_loss(loss, self.total_iteration_idx, force_prediction)
         else:
@@ -548,7 +553,7 @@ class TrainLoop:
                 ``torch.Tensor``/``MultiLoss`` vs. ``float``/``dict``
         """
         if not self.prediction_store.has_test_loss(self.total_iteration_idx) or force_prediction:
-            loss = self.evaluate_model_loss(self.test_loader)
+            loss = self.evaluate_model_loss(self.test_loader, dataset_info={'type': 'test'})
             loss = loss.cpu()
             self.prediction_store.insert_test_loss(loss, self.total_iteration_idx, force_prediction)
         else:
@@ -559,11 +564,15 @@ class TrainLoop:
 
         return loss
 
-    def evaluate_model_loss(self, data_loader):
+    def evaluate_model_loss(self, data_loader, dataset_info=None):
         """Run given dataset through the network without updating the weights and return the loss
 
         Args:
             data_loader (torch.utils.data.DataLoader): dataloader containing the data on which the loss is calculated
+            dataset_info (dict or None): additional information describing the dataset inside the provided dataloader.
+                One such dataset info is the dataset ``type`` (``"train"``, ``"validation"``, or ``"test"``) set by
+                ``evaluate_loss_on_train_set()``, ``evaluate_loss_on_validation_set()`` and
+                ``evaluate_loss_on_test_set()`` methods.
 
         Returns:
             torch.Tensor or MultiLoss: calculated average loss over all the batches. In the case of multi loss,
@@ -572,6 +581,10 @@ class TrainLoop:
                 Important to note: the returned loss tensors are left on the same device as they are computed. Meaning,
                 that the returned values can potentially still be on the GPU.
         """
+        desc = "Loss evaluation"
+        if isinstance(dataset_info, dict) and 'type' in dataset_info:
+            desc = f"{desc} on {dataset_info['type']}"
+
         self.model = self.model.to(self.device)
         if self.criterion is not None:
             self.criterion = self.criterion.to(self.device)
@@ -580,7 +593,7 @@ class TrainLoop:
         loss_avg = []
 
         with torch.no_grad():
-            for batch_data in tqdm(data_loader):
+            for batch_data in tqdm(data_loader, desc=desc, disable=not self.is_main_process()):
                 with amp.autocast(enabled=self.use_amp):
                     if self.batch_model_feed_def is None:
                         loss_batch = self.model.get_loss_eval(batch_data, self.criterion, self.device)
@@ -678,13 +691,17 @@ class TrainLoop:
             (torch.Tensor, torch.Tensor, dict): y_pred, y_true, metadata
                 in the form of dict of lists/torch.Tensors/np.arrays
         """
+        desc = "Making predictions"
+        if isinstance(dataset_info, dict) and 'type' in dataset_info:
+            desc = f"{desc} on {dataset_info['type']}"
+
         self.model = self.model.to(self.device)
 
         self.model.eval()
         y_pred, y_test, metadata_list = [], [], []
 
         with torch.no_grad():
-            for batch_data in tqdm(data_loader):
+            for batch_data in tqdm(data_loader, desc=desc, disable=not self.is_main_process()):
                 with amp.autocast(enabled=self.use_amp):
                     if self.batch_model_feed_def is None:
                         y_pred_batch, y_test_batch, metadata_batch = self.model.get_predictions(batch_data, self.device)
@@ -755,6 +772,17 @@ class TrainLoop:
         else:
             return int(len(self.train_loader) // self.grad_accumulation * self.num_epochs)
 
+    def is_main_process(self):
+        """Is current process the main training process
+
+        In case of single GPU/CPU we have single process so this function is always True. However, for DDP training
+        main process is treated as that which is at rank 0.
+
+        Returns:
+            bool: if current process is the main training process. In case of DDP it is process at rank 0
+        """
+        return not self.ddp_training_mode or self.ddp_rank == 0
+
     @staticmethod
     def convert_loss_to_float_dict_format(loss):
         """Util method for converting loss records in Tensor/MultiLoss format into simpler float/dict format
@@ -802,7 +830,7 @@ class TrainLoop:
     def _train_ddp(self, num_epochs, num_iterations, callbacks=None, grad_accumulation=1,
                    ddp_model_args=None, in_process_data_load=None,
                    num_nodes=1, node_rank=0, num_gpus=torch.cuda.device_count(),
-                   backend='nccl', init_method='env://'):
+                   backend='nccl', init_method='env://', on_gpu=True):
         """Train the model using the train loop in the Distributed Data Parallel setting
 
         During the training, multiple processes will be spawned, one for each of the available GPUs.
@@ -828,6 +856,7 @@ class TrainLoop:
                 ``dist.init_process_group()``. Valid values include ``mpi``, ``gloo``, and ``nccl``.
             init_method (str): URL specifying how to initialize the process group. For more information look up
                 the documentation for ``dist.init_process_group()``.
+            on_gpu (bool): if the DDP training is executed on the GPU or on the CPU
         """
         self.ddp_training_mode = True
         os.environ['MASTER_ADDR'] = 'localhost'
@@ -841,6 +870,7 @@ class TrainLoop:
             'num_gpus': num_gpus,
             'world_size': num_nodes * num_gpus,
             'backend': backend,
+            'on_gpu': on_gpu,
             'init_method': init_method,
             'ddp_model_args': ddp_model_args if ddp_model_args is not None else {}
         }
@@ -873,22 +903,32 @@ class TrainLoop:
                 When using this data loading option bear in mind that loaded dataset will be replicated in memory for
                 every spawned training process. This can in turn in cause extensive overall memory consumption.
         """
-        rank = ddp_args['node_rank'] * ddp_args['num_gpus'] + gpu
+        self.ddp_rank = ddp_args['node_rank'] * ddp_args['num_gpus'] + gpu
+
         dist.init_process_group(
             backend=ddp_args['backend'], init_method=ddp_args['init_method'],
-            world_size=ddp_args['world_size'], rank=rank
+            world_size=ddp_args['world_size'], rank=self.ddp_rank
         )
+
         torch.manual_seed(0)
-        torch.cuda.set_device(gpu)
-        self.device = torch.device(f"cuda:{gpu}")
+        if ddp_args['on_gpu']:
+            torch.cuda.set_device(gpu)
+            self.device = torch.device(f"cuda:{gpu}")
+
+            ddp_args['ddp_model_args']['device_ids'] = [gpu]
+
+        # DDP MP device filter any existing callbacks and add new ones
         self.callbacks_handler.mp_filter_callbacks()
+        self.callbacks_handler.register_callbacks(callbacks)
+        # Set callbacks to None, so they aren't double added/registered later in `_train()` method
+        callbacks = None
 
         # Optionally load data in-process
         self.callbacks_handler.register_callbacks(in_process_data_load)
         self.callbacks_handler.execute_multiprocess_start()
         # Add DistributedSampler to the data loaders
         self.ddp_handler = DDPHandler(self)
-        self.ddp_handler.add_distributed_samplers(ddp_args['world_size'], rank)
+        self.ddp_handler.add_distributed_samplers(ddp_args['world_size'], self.ddp_rank)
 
         # Move to the GPU belonging to the process
         self.model = self.model.to(self.device)
@@ -900,9 +940,9 @@ class TrainLoop:
 
         # Wrap models into DDP module
         if isinstance(self.model, TTModel):
-            self.model = TTDistributedDataParallel(self.model, device_ids=[gpu], **ddp_args['ddp_model_args'])
+            self.model = TTDistributedDataParallel(self.model, **ddp_args['ddp_model_args'])
         else:
-            self.model = DistributedDataParallel(self.model, device_ids=[gpu], **ddp_args['ddp_model_args'])
+            self.model = DistributedDataParallel(self.model, **ddp_args['ddp_model_args'])
 
         self._train(num_epochs, num_iterations, callbacks, grad_accumulation)
 
