@@ -490,7 +490,7 @@ class TrainLoop:
             float or dict: loss, in the case of multi loss, the dict gets returned
         """
         if not self.prediction_store.has_train_loss(self.total_iteration_idx) or force_prediction:
-            loss = self.evaluate_model_loss(self.train_loader)
+            loss = self.evaluate_model_loss(self.train_loader, dataset_info={'type': 'train'})
             self.prediction_store.insert_train_loss(loss, self.total_iteration_idx, force_prediction)
         else:
             loss = self.prediction_store.get_train_loss(self.total_iteration_idx)
@@ -508,7 +508,7 @@ class TrainLoop:
             float or dict: loss, in the case of multi loss, the dict gets returned
         """
         if not self.prediction_store.has_val_loss(self.total_iteration_idx) or force_prediction:
-            loss = self.evaluate_model_loss(self.validation_loader)
+            loss = self.evaluate_model_loss(self.validation_loader, dataset_info={'type': 'validation'})
             self.prediction_store.insert_val_loss(loss, self.total_iteration_idx, force_prediction)
         else:
             loss = self.prediction_store.get_val_loss(self.total_iteration_idx)
@@ -526,22 +526,30 @@ class TrainLoop:
             float or dict: loss, in the case of multi loss, the dict gets returned
         """
         if not self.prediction_store.has_test_loss(self.total_iteration_idx) or force_prediction:
-            loss = self.evaluate_model_loss(self.test_loader)
+            loss = self.evaluate_model_loss(self.test_loader, dataset_info={'type': 'test'})
             self.prediction_store.insert_test_loss(loss, self.total_iteration_idx, force_prediction)
         else:
             loss = self.prediction_store.get_test_loss(self.total_iteration_idx)
 
         return loss
 
-    def evaluate_model_loss(self, data_loader):
+    def evaluate_model_loss(self, data_loader, dataset_info=None):
         """Run given dataset through the network without updating the weights and return the loss
 
         Args:
             data_loader (torch.utils.data.DataLoader): dataloader containing the data on which the loss is calculated
+            dataset_info (dict or None): additional information describing the dataset inside the provided dataloader.
+                One such dataset info is the dataset ``type`` (``"train"``, ``"validation"``, or ``"test"``) set by
+                ``evaluate_loss_on_train_set()``, ``evaluate_loss_on_validation_set()`` and
+                ``evaluate_loss_on_test_set()`` methods.
 
         Returns:
             float or dict: loss, in the case of multi loss, the dict gets returned
         """
+        desc = "Loss evaluation"
+        if isinstance(dataset_info, dict) and 'type' in dataset_info:
+            desc = desc + f" on {dataset_info['type']}"
+
         self.model = self.model.to(self.device)
         if self.criterion is not None:
             self.criterion = self.criterion.to(self.device)
@@ -550,7 +558,7 @@ class TrainLoop:
         loss_avg = []
 
         with torch.no_grad():
-            for batch_data in tqdm(data_loader, desc='Loss evaluation', disable=not self.is_main_process()):
+            for batch_data in tqdm(data_loader, desc=desc, disable=not self.is_main_process()):
                 with amp.autocast(enabled=self.use_amp):
                     if self.batch_model_feed_def is None:
                         loss_batch = self.model.get_loss_eval(batch_data, self.criterion, self.device)
@@ -648,13 +656,17 @@ class TrainLoop:
             (torch.Tensor, torch.Tensor, dict): y_pred, y_true, metadata
                 in the form of dict of lists/torch.Tensors/np.arrays
         """
+        desc = "Making predictions"
+        if isinstance(dataset_info, dict) and 'type' in dataset_info:
+            desc = desc + f" on {dataset_info['type']}"
+
         self.model = self.model.to(self.device)
 
         self.model.eval()
         y_pred, y_test, metadata_list = [], [], []
 
         with torch.no_grad():
-            for batch_data in tqdm(data_loader, desc='Making predictions', disable=not self.is_main_process()):
+            for batch_data in tqdm(data_loader, desc=desc, disable=not self.is_main_process()):
                 with amp.autocast(enabled=self.use_amp):
                     if self.batch_model_feed_def is None:
                         y_pred_batch, y_test_batch, metadata_batch = self.model.get_predictions(batch_data, self.device)
