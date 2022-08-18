@@ -548,7 +548,7 @@ class TrainLoop:
         """
         desc = "Loss evaluation"
         if isinstance(dataset_info, dict) and 'type' in dataset_info:
-            desc = desc + f" on {dataset_info['type']}"
+            desc = f"{desc} on {dataset_info['type']}"
 
         self.model = self.model.to(self.device)
         if self.criterion is not None:
@@ -658,7 +658,7 @@ class TrainLoop:
         """
         desc = "Making predictions"
         if isinstance(dataset_info, dict) and 'type' in dataset_info:
-            desc = desc + f" on {dataset_info['type']}"
+            desc = f"{desc} on {dataset_info['type']}"
 
         self.model = self.model.to(self.device)
 
