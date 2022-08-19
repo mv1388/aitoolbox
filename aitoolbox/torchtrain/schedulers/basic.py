@@ -133,7 +133,7 @@ class LambdaLRScheduler(GeneralLRSchedulerCallback):
 
     def on_batch_end(self):
         if self.execute_batch_end:
-            if (self.train_loop_obj.iteration + 1) % self.train_loop_obj.grad_accumulation == 0:
+            if self.train_loop_obj.should_execute_optimizer_update():
                 self.scheduler.step()
 
 

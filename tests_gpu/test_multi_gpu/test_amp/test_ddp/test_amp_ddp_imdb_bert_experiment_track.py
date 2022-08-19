@@ -21,7 +21,7 @@ from datasets import load_dataset
 
 from aitoolbox import TrainLoopCheckpointEndSave, TTModel, ModelPerformanceEvaluation, ModelPerformancePrintReport, \
     ModelTrainHistoryPlot, ModelTrainHistoryFileWriter, BinaryClassificationResultPackage
-from tests_gpu.test_multi_gpu.ddp_prediction_saver import DDPPredictionSave
+from tests_gpu.test_multi_gpu.ddp_utils import DDPPredictionSave
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -160,8 +160,8 @@ class TestAMPDDPMultiGPUIMDBBERTExperimentTrack(unittest.TestCase):
                                            num_replicas=torch.cuda.device_count(), rank=rank)
         val_sampler = DistributedSampler(dataset=val_loader.dataset, shuffle=False,
                                          num_replicas=torch.cuda.device_count(), rank=rank)
-        train_loader_ddp = DataLoader(train_loader.dataset, batch_size=8, sampler=train_sampler)
-        val_loader_ddp = DataLoader(val_loader.dataset, batch_size=8, sampler=val_sampler)
+        train_loader = DataLoader(train_loader.dataset, batch_size=8, sampler=train_sampler)
+        val_loader = DataLoader(val_loader.dataset, batch_size=8, sampler=val_sampler)
 
         model_pt = model_pt.to(device)
 
@@ -174,7 +174,7 @@ class TestAMPDDPMultiGPUIMDBBERTExperimentTrack(unittest.TestCase):
             print(f'Epoch: {epoch}')
             train_sampler.set_epoch(epoch)
 
-            for i, batch_data in enumerate(train_loader_ddp):
+            for i, batch_data in enumerate(train_loader):
                 with autocast():
                     batch = {k: v.to(device) for k, v in batch_data.items()}
                     outputs = model_pt(**batch)
@@ -204,7 +204,7 @@ class TestAMPDDPMultiGPUIMDBBERTExperimentTrack(unittest.TestCase):
         val_loss, val_pred, val_true = [], [], []
         model_pt.eval()
         with torch.no_grad():
-            for batch_data in val_loader_ddp:
+            for batch_data in val_loader:
                 with autocast():
                     batch = {k: v.to(device) for k, v in batch_data.items()}
                     outputs = model_pt(**batch)

@@ -2,12 +2,12 @@
 
 # Example how to run two most common use-cases:
 #   Single GPU tests:
-#       ./test_core_pytorch_compare.sh
+#       ./test_core_pytorch_compare.sh --instance-type g4dn.xlarge
 #       Or to speed it up:
 #       ./test_core_pytorch_compare.sh --instance-type p3.2xlarge
 #
 #   Multi GPU tests:
-#       ./test_core_pytorch_compare.sh --multi-gpu --instance-type p2.8xlarge
+#       ./test_core_pytorch_compare.sh --multi-gpu --instance-type g4dn.12xlarge
 #       Or to speed it up:
 #       ./test_core_pytorch_compare.sh --multi-gpu --instance-type p3.8xlarge
 

@@ -18,7 +18,7 @@ from torch.nn.parallel import DistributedDataParallel
 from torch.utils.data.distributed import DistributedSampler
 
 from aitoolbox import TrainLoop, TTModel
-from tests_gpu.test_multi_gpu.ddp_prediction_saver import DDPPredictionSave
+from tests_gpu.test_multi_gpu.ddp_utils import DDPPredictionSave, SetSeedInTrainLoop
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -74,9 +74,7 @@ class TestMNISTCNN(unittest.TestCase):
         val_loss_tl, y_pred_tl, y_true_tl = self.train_eval_trainloop(num_epochs=5, use_real_train_data=True)
         val_loss_pt, y_pred_pt, y_true_pt = self.train_eval_core_pytorch(num_epochs=5, use_real_train_data=True)
 
-        # TODO: Find a way to more consistently handle loss evaluation precision
-        #   when doing tensor vs numpy vs python float
-        # self.assertAlmostEqual(val_loss_tl, val_loss_pt, places=8)
+        self.assertEqual(val_loss_tl, val_loss_pt)
         self.assertEqual(y_pred_tl, y_pred_pt)
         self.assertEqual(y_true_tl, y_true_pt)
 
@@ -120,7 +118,8 @@ class TestMNISTCNN(unittest.TestCase):
 
         tl.fit(num_epochs=num_epochs,
                callbacks=[DDPPredictionSave(dir_path=f'{THIS_DIR}/ddp_cnn_save',
-                                            file_name='tl_ddp_predictions.p')])
+                                            file_name='tl_ddp_predictions.p'),
+                          SetSeedInTrainLoop()])
 
         with open(f'{THIS_DIR}/ddp_cnn_save/tl_ddp_predictions.p', 'rb') as f:
             val_loss, y_pred, y_true = pickle.load(f)
@@ -183,20 +182,22 @@ class TestMNISTCNN(unittest.TestCase):
                                            num_replicas=torch.cuda.device_count(), rank=rank)
         val_sampler = DistributedSampler(dataset=val_loader.dataset, shuffle=False,
                                          num_replicas=torch.cuda.device_count(), rank=rank)
-        train_loader_ddp = DataLoader(train_loader.dataset, batch_size=100, sampler=train_sampler)
-        val_loader_ddp = DataLoader(val_loader.dataset, batch_size=100, sampler=val_sampler)
+        train_loader = DataLoader(train_loader.dataset, batch_size=100, sampler=train_sampler)
+        val_loader = DataLoader(val_loader.dataset, batch_size=100, sampler=val_sampler)
 
         model_pt = model_pt.to(device)
         criterion_pt = criterion_pt.to(device)
 
         model_pt = DistributedDataParallel(model_pt, device_ids=[gpu])
 
+        TestMNISTCNN.set_seeds()
+
         model_pt.train()
         for epoch in range(num_epochs):
             print(f'Epoch: {epoch}')
             train_sampler.set_epoch(epoch)
 
-            for i, (input_data, target) in enumerate(train_loader_ddp):
+            for i, (input_data, target) in enumerate(train_loader):
                 input_data = input_data.to(device)
                 target = target.to(device)
 
@@ -216,7 +217,282 @@ class TestMNISTCNN(unittest.TestCase):
         val_loss, val_pred, val_true = [], [], []
         model_pt.eval()
         with torch.no_grad():
-            for input_data, target in val_loader_ddp:
+            for input_data, target in val_loader:
+                input_data = input_data.to(device)
+                target = target.to(device)
+
+                predicted = model_pt(input_data)
+                loss_batch = criterion_pt(predicted, target).cpu().item()
+                val_pred += predicted.argmax(dim=1, keepdim=False).cpu().tolist()
+                val_true += target.cpu().tolist()
+                val_loss.append(loss_batch)
+
+        with open(f'{THIS_DIR}/ddp_cnn_save/pt_ddp_predictions_{gpu}.p', 'wb') as f:
+            pickle.dump([val_loss, val_pred, val_true], f)
+
+    @staticmethod
+    def set_seeds():
+        manual_seed = 0
+        torch.backends.cudnn.enabled = False
+        torch.backends.cudnn.benchmark = False
+        torch.backends.cudnn.deterministic = True
+
+        np.random.seed(manual_seed)
+        random.seed(manual_seed)
+        torch.manual_seed(manual_seed)
+        # if you are suing GPU
+        torch.cuda.manual_seed(manual_seed)
+        torch.cuda.manual_seed_all(manual_seed)
+
+
+class TestGradAccumulationMNISTCNN(unittest.TestCase):
+    def test_gradient_accumulation_trainloop_core_pytorch_compare(self):
+        os.mkdir(f'{THIS_DIR}/ddp_cnn_save')
+
+        val_loss_tl, y_pred_tl, y_true_tl = self.train_eval_trainloop(
+            num_epochs=5,
+            batch_size=20, grad_accumulation=5,
+            use_real_train_data=True
+        )
+        val_loss_pt, y_pred_pt, y_true_pt = self.train_eval_core_pytorch(
+            num_epochs=5,
+            batch_size=20, grad_accumulation=5,
+            use_real_train_data=True
+        )
+
+        self.assertEqual(val_loss_tl, val_loss_pt)
+        self.assertEqual(y_pred_tl, y_pred_pt)
+        self.assertEqual(y_true_tl, y_true_pt)
+
+        project_path = os.path.join(THIS_DIR, 'ddp_cnn_save')
+        if os.path.exists(project_path):
+            shutil.rmtree(project_path)
+        project_path = os.path.join(THIS_DIR, 'data')
+        if os.path.exists(project_path):
+            shutil.rmtree(project_path)
+
+    def test_gradient_accumulation_non_div_grad_accum_steps_trainloop_core_pytorch_compare(self):
+        os.mkdir(f'{THIS_DIR}/ddp_cnn_save')
+
+        val_loss_tl, y_pred_tl, y_true_tl = self.train_eval_trainloop(
+            num_epochs=5,
+            batch_size=20, grad_accumulation=6,
+            use_real_train_data=True
+        )
+        val_loss_pt, y_pred_pt, y_true_pt = self.train_eval_core_pytorch(
+            num_epochs=5,
+            batch_size=20, grad_accumulation=6,
+            use_real_train_data=True
+        )
+
+        self.assertEqual(val_loss_tl, val_loss_pt)
+        self.assertEqual(y_pred_tl, y_pred_pt)
+        self.assertEqual(y_true_tl, y_true_pt)
+
+        project_path = os.path.join(THIS_DIR, 'ddp_cnn_save')
+        if os.path.exists(project_path):
+            shutil.rmtree(project_path)
+        project_path = os.path.join(THIS_DIR, 'data')
+        if os.path.exists(project_path):
+            shutil.rmtree(project_path)
+
+    def test_gradient_accumulation_high_non_div_grad_accum_steps_trainloop_core_pytorch_compare(self):
+        os.mkdir(f'{THIS_DIR}/ddp_cnn_save')
+
+        val_loss_tl, y_pred_tl, y_true_tl = self.train_eval_trainloop(
+            num_epochs=5,
+            batch_size=20, grad_accumulation=8,
+            use_real_train_data=True
+        )
+        val_loss_pt, y_pred_pt, y_true_pt = self.train_eval_core_pytorch(
+            num_epochs=5,
+            batch_size=20, grad_accumulation=8,
+            use_real_train_data=True
+        )
+
+        self.assertEqual(val_loss_tl, val_loss_pt)
+        self.assertEqual(y_pred_tl, y_pred_pt)
+        self.assertEqual(y_true_tl, y_true_pt)
+
+        project_path = os.path.join(THIS_DIR, 'ddp_cnn_save')
+        if os.path.exists(project_path):
+            shutil.rmtree(project_path)
+        project_path = os.path.join(THIS_DIR, 'data')
+        if os.path.exists(project_path):
+            shutil.rmtree(project_path)
+
+    def test_gradient_accumulation_non_div_batch_size_trainloop_core_pytorch_compare(self):
+        os.mkdir(f'{THIS_DIR}/ddp_cnn_save')
+
+        val_loss_tl, y_pred_tl, y_true_tl = self.train_eval_trainloop(
+            num_epochs=5,
+            batch_size=21, grad_accumulation=5,
+            use_real_train_data=True
+        )
+        val_loss_pt, y_pred_pt, y_true_pt = self.train_eval_core_pytorch(
+            num_epochs=5,
+            batch_size=21, grad_accumulation=5,
+            use_real_train_data=True
+        )
+
+        self.assertEqual(val_loss_tl, val_loss_pt)
+        self.assertEqual(y_pred_tl, y_pred_pt)
+        self.assertEqual(y_true_tl, y_true_pt)
+
+        project_path = os.path.join(THIS_DIR, 'ddp_cnn_save')
+        if os.path.exists(project_path):
+            shutil.rmtree(project_path)
+        project_path = os.path.join(THIS_DIR, 'data')
+        if os.path.exists(project_path):
+            shutil.rmtree(project_path)
+
+    def train_eval_trainloop(self, num_epochs, batch_size=100, grad_accumulation=1, use_real_train_data=False):
+        self.set_seeds()
+        train_loader = torch.utils.data.DataLoader(
+            datasets.MNIST(os.path.join(THIS_DIR, 'data'), train=use_real_train_data, download=True,
+                           transform=transforms.Compose([
+                               transforms.ToTensor(),
+                               transforms.Normalize((0.1307,), (0.3081,))
+                           ])),
+            batch_size=batch_size, shuffle=True)
+        val_loader = torch.utils.data.DataLoader(
+            datasets.MNIST(os.path.join(THIS_DIR, 'data'), train=False, transform=transforms.Compose([
+                transforms.ToTensor(),
+                transforms.Normalize((0.1307,), (0.3081,))
+            ])),
+            batch_size=batch_size)
+
+        model = CNNNet()
+        # TODO: There is currently a bug in PyTorch 1.12 Adam... replacing temporarily
+        # optimizer = optim.Adam(model.parameters(), lr=0.001, betas=(0.9, 0.999))
+        optimizer = optim.Adadelta(model.parameters(), lr=0.001)
+        criterion = nn.NLLLoss()
+
+        print('Starting train loop')
+        tl = TrainLoop(
+            model,
+            train_loader, val_loader, None,
+            optimizer, criterion,
+            gpu_mode='ddp'
+        )
+        self.assertEqual(tl.device.type, "cuda")
+
+        tl.fit(
+            num_epochs=num_epochs,
+            grad_accumulation=grad_accumulation,
+            callbacks=[
+                DDPPredictionSave(dir_path=f'{THIS_DIR}/ddp_cnn_save',
+                                  file_name='tl_ddp_predictions.p'),
+                SetSeedInTrainLoop()
+            ]
+        )
+
+        with open(f'{THIS_DIR}/ddp_cnn_save/tl_ddp_predictions.p', 'rb') as f:
+            val_loss, y_pred, y_true = pickle.load(f)
+
+        return val_loss, y_pred, y_true
+
+    def train_eval_core_pytorch(self, num_epochs, batch_size=100, grad_accumulation=1, use_real_train_data=False):
+        self.set_seeds()
+        train_loader = torch.utils.data.DataLoader(
+            datasets.MNIST(os.path.join(THIS_DIR, 'data'), train=use_real_train_data, download=True,
+                           transform=transforms.Compose([
+                               transforms.ToTensor(),
+                               transforms.Normalize((0.1307,), (0.3081,))
+                           ])),
+            batch_size=batch_size)
+        val_loader = torch.utils.data.DataLoader(
+            datasets.MNIST(os.path.join(THIS_DIR, 'data'), train=False, transform=transforms.Compose([
+                transforms.ToTensor(),
+                transforms.Normalize((0.1307,), (0.3081,))
+            ])),
+            batch_size=batch_size)
+
+        model_pt = CNNNet()
+        # TODO: There is currently a bug in PyTorch 1.12 Adam... replacing temporarily
+        # optimizer_pt = optim.Adam(model_pt.parameters(), lr=0.001, betas=(0.9, 0.999))
+        optimizer_pt = optim.Adadelta(model_pt.parameters(), lr=0.001)
+        criterion_pt = nn.NLLLoss()
+
+        os.environ['MASTER_ADDR'] = 'localhost'
+        os.environ['MASTER_PORT'] = '8888'
+
+        print('Starting the manual DDP training')
+
+        mp.spawn(
+            self.manual_ddp_training,
+            args=(
+                num_epochs, batch_size, grad_accumulation,
+                model_pt, optimizer_pt, criterion_pt,
+                train_loader, val_loader
+            ),
+            nprocs=torch.cuda.device_count()
+        )
+
+        val_loss, y_pred, y_true = [], [], []
+        for idx in range(torch.cuda.device_count()):
+            with open(f'{THIS_DIR}/ddp_cnn_save/pt_ddp_predictions_{idx}.p', 'rb') as f:
+                val_loss_f, y_pred_f, y_true_f = pickle.load(f)
+                val_loss += val_loss_f
+                y_pred += y_pred_f
+                y_true += y_true_f
+
+        val_loss = np.mean(val_loss)
+        return val_loss, y_pred, y_true
+
+    @staticmethod
+    def manual_ddp_training(gpu, num_epochs, batch_size, grad_accumulation,
+                            model_pt, optimizer_pt, criterion_pt,
+                            train_loader, val_loader):
+        rank = gpu
+        dist.init_process_group(backend='nccl', init_method='env://', world_size=torch.cuda.device_count(), rank=rank)
+        torch.manual_seed(0)
+        torch.cuda.set_device(gpu)
+        device = torch.device(f"cuda:{gpu}")
+
+        train_sampler = DistributedSampler(dataset=train_loader.dataset, shuffle=True,
+                                           num_replicas=torch.cuda.device_count(), rank=rank)
+        val_sampler = DistributedSampler(dataset=val_loader.dataset, shuffle=False,
+                                         num_replicas=torch.cuda.device_count(), rank=rank)
+        train_loader = DataLoader(train_loader.dataset, batch_size=batch_size, sampler=train_sampler)
+        val_loader = DataLoader(val_loader.dataset, batch_size=batch_size, sampler=val_sampler)
+
+        model_pt = model_pt.to(device)
+        criterion_pt = criterion_pt.to(device)
+
+        model_pt = DistributedDataParallel(model_pt, device_ids=[gpu])
+
+        TestGradAccumulationMNISTCNN.set_seeds()
+
+        model_pt.train()
+        for epoch in range(num_epochs):
+            print(f'Epoch: {epoch}')
+            train_sampler.set_epoch(epoch)
+
+            for i, (input_data, target) in enumerate(train_loader):
+                input_data = input_data.to(device)
+                target = target.to(device)
+
+                predicted = model_pt(input_data)
+                loss = criterion_pt(predicted, target)
+                loss = loss / grad_accumulation
+                loss.backward()
+
+                if (i + 1) % grad_accumulation == 0 or i == len(train_loader) - 1:
+                    optimizer_pt.step()
+                    optimizer_pt.zero_grad()
+
+            # Imitate what happens in auto_execute_end_of_epoch() in TrainLoop
+            for _ in train_loader:
+                pass
+            for _ in val_loader:
+                pass
+
+        print('Evaluating')
+        val_loss, val_pred, val_true = [], [], []
+        model_pt.eval()
+        with torch.no_grad():
+            for input_data, target in val_loader:
                 input_data = input_data.to(device)
                 target = target.to(device)
 
