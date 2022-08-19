@@ -19,7 +19,7 @@ from torch.nn.parallel import DistributedDataParallel
 from torch.utils.data.distributed import DistributedSampler
 
 from aitoolbox import TrainLoop, TTModel
-from tests_gpu.test_multi_gpu.ddp_utils import DDPPredictionSave
+from tests_gpu.test_multi_gpu.ddp_utils import DDPPredictionSave, SetSeedInTrainLoop
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -85,9 +85,7 @@ class TestAMPDDPMNISTCNN(unittest.TestCase):
         val_loss_tl, y_pred_tl, y_true_tl = self.train_eval_trainloop(num_epochs=5, use_real_train_data=True)
         val_loss_pt, y_pred_pt, y_true_pt = self.train_eval_core_pytorch(num_epochs=5, use_real_train_data=True)
 
-        # TODO: Find a way to more consistently handle loss evaluation precision
-        #   when doing tensor vs numpy vs python float
-        # self.assertAlmostEqual(val_loss_tl, val_loss_pt, places=8)
+        self.assertEqual(val_loss_tl, val_loss_pt)
         self.assertEqual(y_pred_tl, y_pred_pt)
         self.assertEqual(y_true_tl, y_true_pt)
 
@@ -132,7 +130,8 @@ class TestAMPDDPMNISTCNN(unittest.TestCase):
 
         tl.fit(num_epochs=num_epochs,
                callbacks=[DDPPredictionSave(dir_path=f'{THIS_DIR}/ddp_cnn_save',
-                                            file_name='tl_ddp_predictions.p')])
+                                            file_name='tl_ddp_predictions.p'),
+                          SetSeedInTrainLoop()])
 
         with open(f'{THIS_DIR}/ddp_cnn_save/tl_ddp_predictions.p', 'rb') as f:
             val_loss, y_pred, y_true = pickle.load(f)
@@ -195,8 +194,8 @@ class TestAMPDDPMNISTCNN(unittest.TestCase):
                                            num_replicas=torch.cuda.device_count(), rank=rank)
         val_sampler = DistributedSampler(dataset=val_loader.dataset, shuffle=False,
                                          num_replicas=torch.cuda.device_count(), rank=rank)
-        train_loader_ddp = DataLoader(train_loader.dataset, batch_size=100, sampler=train_sampler)
-        val_loader_ddp = DataLoader(val_loader.dataset, batch_size=100, sampler=val_sampler)
+        train_loader = DataLoader(train_loader.dataset, batch_size=100, sampler=train_sampler)
+        val_loader = DataLoader(val_loader.dataset, batch_size=100, sampler=val_sampler)
 
         model_pt = model_pt.to(device)
         criterion_pt = criterion_pt.to(device)
@@ -205,12 +204,14 @@ class TestAMPDDPMNISTCNN(unittest.TestCase):
 
         scaler = GradScaler()
 
+        TestAMPDDPMNISTCNN.set_seeds()
+
         model_pt.train()
         for epoch in range(num_epochs):
             print(f'Epoch: {epoch}')
             train_sampler.set_epoch(epoch)
 
-            for i, (input_data, target) in enumerate(train_loader_ddp):
+            for i, (input_data, target) in enumerate(train_loader):
                 with autocast():
                     input_data = input_data.to(device)
                     target = target.to(device)
@@ -240,7 +241,7 @@ class TestAMPDDPMNISTCNN(unittest.TestCase):
         val_loss, val_pred, val_true = [], [], []
         model_pt.eval()
         with torch.no_grad():
-            for input_data, target in val_loader_ddp:
+            for input_data, target in val_loader:
                 with autocast():
                     input_data = input_data.to(device)
                     target = target.to(device)
