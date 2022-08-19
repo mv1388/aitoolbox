@@ -239,11 +239,25 @@ class TestTrainLoopVSCorePyTorch(unittest.TestCase):
         self.assertEqual(test_loss_aitb, test_loss_pt)
 
     def test_grad_accumulate_trainloop_core_pytorch_prediction_loss_compare(self):
-        num_epochs = 10
+        self.run_grad_accumulation_comparison(
+            num_epochs=10, batch_size=10, grad_accumulation=5, train_data_size=1000
+        )
 
-        batch_size = 10
-        grad_accumulation = 5
+    def test_grad_accumulate_non_divisible_dataset_size_use_last_smaller_batch_compare(self):
+        self.run_grad_accumulation_comparison(
+            num_epochs=10, batch_size=10, grad_accumulation=5, train_data_size=1004
+        )
 
+        self.run_grad_accumulation_comparison(
+            num_epochs=10, batch_size=10, grad_accumulation=10, train_data_size=1006
+        )
+
+        self.run_grad_accumulation_comparison(
+            num_epochs=5, batch_size=10, grad_accumulation=10, train_data_size=10026
+        )
+
+    def run_grad_accumulation_comparison(self, num_epochs=10, batch_size=10, grad_accumulation=5,
+                                         train_data_size=1000):
         self.set_seeds()
         model_aitb = FFNetAIToolbox()
         optimizer_aitb = optim.Adam(model_aitb.parameters(), lr=0.001, betas=(0.9, 0.999))
@@ -254,7 +268,10 @@ class TestTrainLoopVSCorePyTorch(unittest.TestCase):
         optimizer_pt = optim.Adam(model_pt.parameters(), lr=0.001, betas=(0.9, 0.999))
         criterion_pt = nn.NLLLoss()
 
-        train_dataset = TensorDataset(torch.randn(1000, 50), torch.randint(low=0, high=10, size=(1000,)))
+        train_dataset = TensorDataset(
+            torch.randn(train_data_size, 50),
+            torch.randint(low=0, high=10, size=(train_data_size,))
+        )
         val_dataset = TensorDataset(torch.randn(300, 50), torch.randint(low=0, high=10, size=(300,)))
         test_dataset = TensorDataset(torch.randn(300, 50), torch.randint(low=0, high=10, size=(300,)))
         train_dataloader = DataLoader(train_dataset, batch_size=batch_size)
@@ -283,7 +300,7 @@ class TestTrainLoopVSCorePyTorch(unittest.TestCase):
                 loss = loss / grad_accumulation
                 loss.backward()
 
-                if (i+1) % grad_accumulation == 0:
+                if (i+1) % grad_accumulation == 0 or i == len(train_dataloader) - 1:
                     optimizer_pt.step()
                     optimizer_pt.zero_grad()
 

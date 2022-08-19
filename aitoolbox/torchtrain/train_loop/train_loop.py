@@ -253,7 +253,7 @@ class TrainLoop:
 
                 # Execute AMP scaler update only when optimizer is stepped and grads are zeroed out
                 # https://pytorch.org/docs/stable/notes/amp_examples.html#gradient-accumulation
-                if (self.iteration + 1) % self.grad_accumulation == 0:
+                if self.should_execute_optimizer_update():
                     self.amp_scaler.update()
 
                 self.callbacks_handler.execute_batch_end()
@@ -345,8 +345,7 @@ class TrainLoop:
         Returns:
             None
         """
-        # if (iteration + 1) % grad_accumulation == 0 or iteration == len(self.train_loader) - 1:
-        if (self.iteration + 1) % self.grad_accumulation == 0:
+        if self.should_execute_optimizer_update():
             if not isinstance(self.optimizer, MultiOptimizer):
                 # To step the optimizer always give it to the AMP scaler to keep the code simpler
                 # If scaler is disabled it will just call normal ``step()`` method
@@ -369,12 +368,33 @@ class TrainLoop:
         Returns:
             None
         """
-        # if (iteration + 1) % grad_accumulation == 0 or iteration == len(self.train_loader) - 1:
-        if (self.iteration + 1) % self.grad_accumulation == 0:
+        if self.should_execute_optimizer_update():
             if not isinstance(self.optimizer, MultiOptimizer):
                 self.optimizer.zero_grad()
             else:
                 self.optimizer.zero_grad(optimizer_idx, self.iteration)
+
+    def should_execute_optimizer_update(self):
+        """Determine if optimizer update based on calculated gradients should be done at the current iteration
+
+        Combined with optimizer update we normally also execute zero_grad as well as different
+        gradient clipping operations.
+
+        This method is especially important in the case when gradient accumulation is used in training. It provides
+        knowledge when model parameter updates via the optimizer are made based on accumulated gradients.
+
+        Note:
+            Switched from a simple condition to better a condition to also cover the final non-complete batch:
+
+            ``if (self.iteration + 1) % self.grad_accumulation == 0``
+
+            ``if (self.iteration + 1) % self.grad_accumulation == 0 or self.iteration == len(self.train_loader) - 1``
+
+        Returns:
+            bool: if in current iteration a model parameter update via the optimizer should be done
+        """
+        return (self.iteration + 1) % self.grad_accumulation == 0 or \
+            self.iteration == len(self.train_loader) - 1
 
     def auto_execute_end_of_epoch(self):
         """Basic performance evaluation executed by default at the end of each epoch
