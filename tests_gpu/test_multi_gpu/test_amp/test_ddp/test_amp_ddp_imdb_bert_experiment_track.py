@@ -145,7 +145,7 @@ class TestAMPDDPMultiGPUIMDBBERTExperimentTrack(unittest.TestCase):
                 y_pred += y_pred_f
                 y_true += y_true_f
 
-        val_loss = np.mean(val_loss)
+        val_loss = torch.mean(torch.DoubleTensor(val_loss))
         return val_loss, y_pred, y_true
 
     @staticmethod
@@ -211,7 +211,7 @@ class TestAMPDDPMultiGPUIMDBBERTExperimentTrack(unittest.TestCase):
                     logits = outputs.logits
                     predictions = torch.argmax(logits, dim=-1)
 
-                    loss_batch = outputs.loss.cpu().item()
+                    loss_batch = outputs.loss.cpu()
 
                 val_pred += predictions.cpu().tolist()
                 val_true += batch["labels"].cpu().tolist()

@@ -179,7 +179,7 @@ class TestAMPDDPMNISTCNN(unittest.TestCase):
                 y_pred += y_pred_f
                 y_true += y_true_f
 
-        val_loss = np.mean(val_loss)
+        val_loss = torch.mean(torch.DoubleTensor(val_loss))
         return val_loss, y_pred, y_true
 
     @staticmethod
@@ -252,7 +252,7 @@ class TestAMPDDPMNISTCNN(unittest.TestCase):
                     predicted = F.log_softmax(x, dim=1)
                     assert predicted.dtype is torch.float32
 
-                    loss_batch = criterion_pt(predicted, target).cpu().item()
+                    loss_batch = criterion_pt(predicted, target).cpu()
 
                     predicted_argmax = predicted.argmax(dim=1, keepdim=False).cpu().tolist()
 
@@ -441,7 +441,7 @@ class TestAMPGradAccumulationDDPMNISTCNN(unittest.TestCase):
                 y_pred += y_pred_f
                 y_true += y_true_f
 
-        val_loss = np.mean(val_loss)
+        val_loss = torch.mean(torch.DoubleTensor(val_loss))
         return val_loss, y_pred, y_true
 
     @staticmethod
@@ -519,7 +519,7 @@ class TestAMPGradAccumulationDDPMNISTCNN(unittest.TestCase):
                     predicted = F.log_softmax(x, dim=1)
                     assert predicted.dtype is torch.float32
 
-                    loss_batch = criterion_pt(predicted, target).cpu().item()
+                    loss_batch = criterion_pt(predicted, target).cpu()
 
                     predicted_argmax = predicted.argmax(dim=1, keepdim=False).cpu().tolist()
 
