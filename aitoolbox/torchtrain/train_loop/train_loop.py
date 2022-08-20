@@ -404,7 +404,7 @@ class TrainLoop:
         Returns:
             None
         """
-        loss_parsed = self.parse_loss(self.loss_batch_accum).cpu().item()
+        loss_parsed = self.parse_loss(self.loss_batch_accum).item()
         self._print_save_loss(loss_parsed,
                               loss_type_name='accumulated_loss',
                               loss_print_description='AVG BATCH ACCUMULATED TRAIN LOSS')
@@ -443,11 +443,11 @@ class TrainLoop:
                 If we used single loss than the ``loss_record`` is a list of Tensors where each element Tensor is
                 loss for a single batch.
 
-                If we used multiple losses wrapped inside MultiLoss() then the _train() function called its
-                detach() method which converted multi-loss representation into the list of dicts, where each dict
-                represents a loss for a single batch:
+                If we used multiple losses wrapped inside MultiLoss(), these behave the same way as normal dicts as
+                MultiLoss subclasses a dict and thus implements dict protocols. Consequently, loss_record
+                can be thought as a list of (MultiLoss) dicts, where each dict represents a loss for a single batch:
 
-                ``[{'loss_1': Tensor(1.), 'loss_2': Tensor(33.)}, { ... }]``
+                ``[MultiLoss({'loss_1': Tensor(1.), 'loss_2': Tensor(33.)}), MultiLoss({ ... })]``
 
         Returns:
             torch.Tensor or MultiLoss: in the case of single loss torch Tensor is returned, otherwise the dict of
@@ -491,7 +491,7 @@ class TrainLoop:
             loss_avg = np.mean(list(loss_parsed.values())) if isinstance(loss_parsed, MultiLoss) else loss_parsed
             print(f'{loss_print_description}: {loss_avg}')
 
-            if isinstance(self.optimizer, MultiOptimizer) and isinstance(loss_parsed, MultiLoss):
+            if isinstance(loss_parsed, MultiLoss):
                 print(f'MULTI-LOSS {loss_print_description}:')
                 for loss_name, loss_val in loss_parsed.items():
                     print(f'\t{loss_name}: {loss_val}')
@@ -514,9 +514,9 @@ class TrainLoop:
                 If false, the standard ``torch.Tensor`` or ``MultiLoss`` get returned.
 
         Returns:
-            torch.Tensor or MultiLoss or float or dict: train set loss. Depending on the set ``float_dict_format``
-                parameter either a standard or simplified loss representation is returned:
-                ``torch.Tensor``/``MultiLoss`` vs. ``float``/``dict``
+            torch.Tensor or MultiLoss or float or dict: train set loss. Returned tensors are on the CPU.
+                Depending on the set ``float_dict_format`` parameter either a standard or simplified
+                loss representation is returned: ``torch.Tensor``/``MultiLoss`` vs. ``float``/``dict``
         """
         if not self.prediction_store.has_train_loss(self.total_iteration_idx) or force_prediction:
             loss = self.evaluate_model_loss(self.train_loader, dataset_info={'type': 'train'})
@@ -541,9 +541,9 @@ class TrainLoop:
                 If false, the standard ``torch.Tensor`` or ``MultiLoss`` get returned.
 
         Returns:
-            torch.Tensor or MultiLoss or float or dict: validation set loss. Depending on the set ``float_dict_format``
-                parameter either a standard or simplified loss representation is returned:
-                ``torch.Tensor``/``MultiLoss`` vs. ``float``/``dict``
+            torch.Tensor or MultiLoss or float or dict: validation set loss. Returned tensors are on the CPU.
+                Depending on the set ``float_dict_format`` parameter either a standard or simplified
+                loss representation is returned: ``torch.Tensor``/``MultiLoss`` vs. ``float``/``dict``
         """
         if not self.prediction_store.has_val_loss(self.total_iteration_idx) or force_prediction:
             loss = self.evaluate_model_loss(self.validation_loader, dataset_info={'type': 'validation'})
@@ -568,9 +568,9 @@ class TrainLoop:
                 If false, the standard ``torch.Tensor`` or ``MultiLoss`` get returned.
 
         Returns:
-            torch.Tensor or MultiLoss or float or dict: test set loss. Depending on the set ``float_dict_format``
-                parameter either a standard or simplified loss representation is returned:
-                ``torch.Tensor``/``MultiLoss`` vs. ``float``/``dict``
+            torch.Tensor or MultiLoss or float or dict: test set loss. Returned tensors are on the CPU.
+                Depending on the set ``float_dict_format`` parameter either a standard or simplified
+                loss representation is returned: ``torch.Tensor``/``MultiLoss`` vs. ``float``/``dict``
         """
         if not self.prediction_store.has_test_loss(self.total_iteration_idx) or force_prediction:
             loss = self.evaluate_model_loss(self.test_loader, dataset_info={'type': 'test'})
@@ -816,7 +816,7 @@ class TrainLoop:
                 of multi-loss it is a dict extracted out from the given MultiLoss wrapper.
         """
         loss = loss.item()
-
+        # Extract a python dict from the already item()'ed MultiLoss
         if isinstance(loss, MultiLoss):
             loss = loss.loss_dict
 
