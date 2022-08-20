@@ -265,6 +265,11 @@ echo "To easily ssh connect into the running job session execute:"
 echo
 echo "    ./ssh_to_instance.sh $ec2_instance_address -s"
 echo
+echo
+echo "To terminate the instance execute:"
+echo
+echo "    aws ec2 terminate-instances --instance-ids $instance_id"
+echo
 
 if [ $ssh_at_start == true ]; then
     ./ssh_to_instance.sh $ec2_instance_address --os-name $username --ssh-tmux
