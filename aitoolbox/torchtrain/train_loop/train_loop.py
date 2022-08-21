@@ -458,13 +458,16 @@ class TrainLoop:
         loss_names = None
 
         if isinstance(loss_record[0], MultiLoss):
+            example_loss_record = loss_record[0][0]
             loss_names = sorted(loss_record[0].keys())
             # loss_record is a list of lists with dimensions: [num_batches, num_losses]
             loss_record = [list(multi_loss.values()) for multi_loss in loss_record]
-
-            loss_device = loss_record[0][0].device
         else:
-            loss_device = loss_record[0].device
+            example_loss_record = loss_record[0]
+
+        loss_device = 'cpu'
+        if isinstance(example_loss_record, torch.Tensor):
+            loss_device = example_loss_record.device
 
         # Create torch.DoubleTensor on the original device (e.g. GPU)
         loss_record = torch.tensor(loss_record, dtype=torch.float64, device=loss_device)
