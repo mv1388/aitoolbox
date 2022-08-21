@@ -103,7 +103,7 @@ class DDPHandler:
         all the processes. This way we can achieve the same state of the data across all the parallel processes.
 
         Args:
-            data (torch.Tensor, list, float, int): data to be synchronized between processes.
+            data (torch.Tensor or numpy.ndarray or list or float or int): data to be synchronized between processes.
                 In case this is torch.Tensor, resulting output the device location will be preserved.
             concat_mp_data (bool): should the returned list of collected tensors be concatenated into a single list
                 of values
@@ -114,7 +114,8 @@ class DDPHandler:
                 across the workers.
 
         Returns:
-            torch.Tensor: list of `data` variable values synced across all the active processes
+            torch.Tensor or numpy.ndarray or list or float or int: ``data`` variable values synced across all
+                the active processes
         """
         input_data_device = 'cpu'
         if not hasattr(data, '__len__'):
