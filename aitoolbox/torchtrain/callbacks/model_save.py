@@ -269,7 +269,7 @@ class ModelTrainEndSave(AbstractCallback):
             y_pred, y_test, additional_results = self.train_loop_obj.predict_on_validation_set()
             self.val_result_package.pkg_name += '_VAL'
             if self.val_result_package.requires_loss:
-                additional_results['loss'] = self.train_loop_obj.evaluate_loss_on_validation_set()
+                additional_results['loss'] = self.train_loop_obj.evaluate_loss_on_validation_set(float_dict_format=True)
             self.val_result_package.prepare_result_package(y_test, y_pred,
                                                            hyperparameters=self.hyperparams,
                                                            additional_results=additional_results)
@@ -279,7 +279,7 @@ class ModelTrainEndSave(AbstractCallback):
             y_pred_test, y_test_test, additional_results_test = self.train_loop_obj.predict_on_test_set()
             self.test_result_package.pkg_name += '_TEST'
             if self.test_result_package.requires_loss:
-                additional_results_test['loss'] = self.train_loop_obj.evaluate_loss_on_test_set()
+                additional_results_test['loss'] = self.train_loop_obj.evaluate_loss_on_test_set(float_dict_format=True)
             self.test_result_package.prepare_result_package(y_test_test, y_pred_test,
                                                             hyperparameters=self.hyperparams,
                                                             additional_results=additional_results_test)
