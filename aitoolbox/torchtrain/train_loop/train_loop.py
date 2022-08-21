@@ -465,7 +465,7 @@ class TrainLoop:
         else:
             example_loss_record = loss_record[0]
 
-        loss_device = 'cpu'
+        loss_device = torch.device('cpu')
         if isinstance(example_loss_record, torch.Tensor):
             loss_device = example_loss_record.device
 
