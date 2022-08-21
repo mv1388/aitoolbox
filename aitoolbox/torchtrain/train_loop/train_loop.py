@@ -833,7 +833,7 @@ class TrainLoop:
         loss = loss.item()
         # Extract a python dict from the already item()'ed MultiLoss
         if isinstance(loss, MultiLoss):
-            loss = loss.loss_dict
+            loss = loss.get_loss_dict()
 
         return loss
 

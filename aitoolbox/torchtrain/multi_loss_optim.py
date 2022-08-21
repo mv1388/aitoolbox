@@ -100,6 +100,9 @@ class MultiLoss(MutableMapping):
     def device(self):
         return {k: loss.device for k, loss in self.loss_dict.items()}
 
+    def get_loss_dict(self):
+        return self.loss_dict
+
     def __getitem__(self, key):
         return self.loss_dict[key]
 
