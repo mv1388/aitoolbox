@@ -458,10 +458,10 @@ class TrainLoop:
         loss_names = None
 
         if isinstance(loss_record[0], MultiLoss):
-            example_loss_record = loss_record[0][0]
             loss_names = sorted(loss_record[0].keys())
             # loss_record is a list of lists with dimensions: [num_batches, num_losses]
             loss_record = [list(multi_loss.values()) for multi_loss in loss_record]
+            example_loss_record = loss_record[0][0]
         else:
             example_loss_record = loss_record[0]
 
