@@ -404,7 +404,7 @@ class TrainLoop:
         Returns:
             None
         """
-        loss_parsed = self.parse_loss(self.loss_batch_accum).item()
+        loss_parsed = self.parse_loss(self.loss_batch_accum)
         self._print_save_loss(loss_parsed,
                               loss_type_name='accumulated_loss',
                               loss_print_description='AVG BATCH ACCUMULATED TRAIN LOSS')
@@ -412,11 +412,11 @@ class TrainLoop:
 
         if (type(self.end_auto_eval) is bool and self.end_auto_eval) or \
                 (type(self.end_auto_eval) is int and self.epoch % self.end_auto_eval == 0):
-            train_loss = self.evaluate_loss_on_train_set().item()
+            train_loss = self.evaluate_loss_on_train_set()
             self._print_save_loss(train_loss, loss_type_name='loss', loss_print_description='TRAIN LOSS')
 
             if self.validation_loader is not None:
-                val_loss = self.evaluate_loss_on_validation_set().item()
+                val_loss = self.evaluate_loss_on_validation_set()
                 self._print_save_loss(val_loss, loss_type_name='val_loss', loss_print_description='VAL LOSS')
 
     def auto_execute_end_of_training(self):
@@ -427,7 +427,7 @@ class TrainLoop:
         """
         if self.test_loader is not None and \
                 ((type(self.end_auto_eval) is bool and self.end_auto_eval) or type(self.end_auto_eval) is int):
-            test_loss = self.evaluate_loss_on_test_set().item()
+            test_loss = self.evaluate_loss_on_test_set()
             # To keep TrainingHistory from complaining due to the non-matching metric result lengths the checking
             # has been turned off
             self._print_save_loss(test_loss, loss_type_name='train_end_test_loss', loss_print_description='TEST LOSS')
@@ -486,7 +486,7 @@ class TrainLoop:
         """Helper function which prints information about parsed loss and saves the loss results into the history
 
         Args:
-            loss_parsed (float or MultiLoss): parsed loss result either as a single value or as MultiLoss
+            loss_parsed (torch.Tensor or MultiLoss): parsed loss result either as a single value or as MultiLoss
                 in case of multiple losses
             loss_type_name (str): type of the provided loss result
             loss_print_description (str): presentation description text of the provided loss result
@@ -494,6 +494,9 @@ class TrainLoop:
         Returns:
             None
         """
+        # Move to the CPU and convert to float
+        loss_parsed = loss_parsed.item()
+
         # Results reporting to terminal
         if not self.ddp_training_mode or self.device.index == 0:
             loss_avg = np.mean(list(loss_parsed.values())) if isinstance(loss_parsed, MultiLoss) else loss_parsed
