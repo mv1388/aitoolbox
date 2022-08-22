@@ -1,7 +1,5 @@
 import types
 import functools
-import numpy as np
-import torch
 
 
 def function_exists(object_to_check, fn_name):
