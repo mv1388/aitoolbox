@@ -203,14 +203,14 @@ class TestMultiLossOptimizerMNISTCNN(unittest.TestCase):
 
                 predicted = model_pt(input_data)
                 output_1, output_2 = predicted
-                loss_batch_1 = criterion_pt(output_1, target).cpu()
-                loss_batch_2 = criterion_pt(output_2, target).cpu()
+                loss_batch_1 = criterion_pt(output_1, target)
+                loss_batch_2 = criterion_pt(output_2, target)
                 val_pred += output_1.argmax(dim=1, keepdim=False).cpu().tolist()
                 val_true += target.cpu().tolist()
                 val_loss_1.append(loss_batch_1)
                 val_loss_2.append(loss_batch_2)
-            val_loss_1 = torch.mean(torch.DoubleTensor(val_loss_1))
-            val_loss_2 = torch.mean(torch.DoubleTensor(val_loss_2))
+            val_loss_1 = torch.mean(torch.stack(val_loss_1).double()).cpu()
+            val_loss_2 = torch.mean(torch.stack(val_loss_2).double()).cpu()
 
         return {'loss_1': val_loss_1, 'loss_2': val_loss_2}, val_pred, val_true
 

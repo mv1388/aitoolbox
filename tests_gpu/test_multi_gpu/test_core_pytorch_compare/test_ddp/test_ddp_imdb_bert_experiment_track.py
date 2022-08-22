@@ -143,7 +143,7 @@ class TestDDPMultiGPUIMDBBERTExperimentTrack(unittest.TestCase):
                 y_pred += y_pred_f
                 y_true += y_true_f
 
-        val_loss = torch.mean(torch.DoubleTensor(val_loss))
+        val_loss = torch.mean(torch.stack(val_loss).double()).cpu()
         return val_loss, y_pred, y_true
 
     @staticmethod

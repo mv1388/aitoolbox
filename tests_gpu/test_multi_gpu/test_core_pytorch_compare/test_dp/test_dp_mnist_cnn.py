@@ -225,11 +225,11 @@ class TestMNISTCNN(unittest.TestCase):
                 target = target.to(device)
 
                 predicted = model_pt(input_data)
-                loss_batch = criterion_pt(predicted, target).cpu()
+                loss_batch = criterion_pt(predicted, target)
                 val_pred += predicted.argmax(dim=1, keepdim=False).cpu().tolist()
                 val_true += target.cpu().tolist()
                 val_loss.append(loss_batch)
-            val_loss = torch.mean(torch.DoubleTensor(val_loss))
+            val_loss = torch.mean(torch.stack(val_loss).double()).cpu()
 
         return val_loss, val_pred, val_true
 
@@ -367,11 +367,11 @@ class TestMNISTCNNAttributeTransfer(unittest.TestCase):
                 target = target.to(device)
 
                 predicted = model_pt(input_data)
-                loss_batch = criterion_pt(predicted, target).cpu()
+                loss_batch = criterion_pt(predicted, target)
                 val_pred += predicted.argmax(dim=1, keepdim=False).cpu().tolist()
                 val_true += target.cpu().tolist()
                 val_loss.append(loss_batch)
-            val_loss = torch.mean(torch.DoubleTensor(val_loss))
+            val_loss = torch.mean(torch.stack(val_loss).double()).cpu()
 
         return val_loss, val_pred, val_true
 
@@ -574,11 +574,11 @@ class TestGradAccumulationMNISTCNN(unittest.TestCase):
                 target = target.to(device)
 
                 predicted = model_pt(input_data)
-                loss_batch = criterion_pt(predicted, target).cpu()
+                loss_batch = criterion_pt(predicted, target)
                 val_pred += predicted.argmax(dim=1, keepdim=False).cpu().tolist()
                 val_true += target.cpu().tolist()
                 val_loss.append(loss_batch)
-            val_loss = torch.mean(torch.DoubleTensor(val_loss))
+            val_loss = torch.mean(torch.stack(val_loss).double()).cpu()
 
         return val_loss, val_pred, val_true
 
