@@ -1,7 +1,12 @@
+from collections.abc import MutableMapping
 
-class MultiLoss:
+
+class MultiLoss(MutableMapping):
     def __init__(self, loss_dict, loss_optimizer_map=None, retain_graph_until_last=True):
         """Multiple loss wrapper for TrainLoop based training
+
+        Internally this class is based on a dict. On the outside it can behave the same as a python dict with several
+        multi-loss specific extensions.
 
         Args:
             loss_dict (dict): dict of loss objects which are used to calculate losses in the TrainLoop
@@ -14,15 +19,16 @@ class MultiLoss:
         self.loss_dict = loss_dict
 
         self.loss_backward_remaining = len(self.loss_dict)
+        self.loss_optimizer_map = loss_optimizer_map
         self.retain_graph_until_last = retain_graph_until_last
 
-        if loss_optimizer_map is None:
+        if self.loss_optimizer_map is None:
             self.optimizer_loss_map = {i: k for i, k in enumerate(loss_dict.keys())}
         else:
-            if len(loss_optimizer_map) != len(self.loss_dict):
+            if len(self.loss_optimizer_map) != len(self.loss_dict):
                 raise ValueError('loss_optimizer_map length not the same as loss_dict')
 
-            self.optimizer_loss_map = {int(v): str(k) for k, v in loss_optimizer_map.items()}
+            self.optimizer_loss_map = {int(v): str(k) for k, v in self.loss_optimizer_map.items()}
 
     def backward(self, optimizer_idx, iteration, amp_grad_scaler):
         """Executes backward() for the specific loss based on provided optimizer_idx
@@ -54,11 +60,63 @@ class MultiLoss:
         self.loss_backward_remaining -= 1
 
     def item(self):
-        return {k: loss.item() for k, loss in self.loss_dict.items()}
+        return self._new_multi_loss_object_from_self({k: loss.item() for k, loss in self.loss_dict.items()})
+
+    def numpy(self):
+        return self._new_multi_loss_object_from_self({k: loss.numpy() for k, loss in self.loss_dict.items()})
+
+    def detach(self):
+        return self._new_multi_loss_object_from_self({k: loss.detach() for k, loss in self.loss_dict.items()})
 
     def __truediv__(self, grad_accumulation):
-        self.loss_dict = {k: loss / grad_accumulation for k, loss in self.loss_dict.items()}
-        return self
+        return self._new_multi_loss_object_from_self(
+            {k: loss / grad_accumulation for k, loss in self.loss_dict.items()}
+        )
+
+    def cpu(self, *args, **kwargs):
+        return self._new_multi_loss_object_from_self(
+            {k: loss.cpu(*args, **kwargs) for k, loss in self.loss_dict.items()}
+        )
+
+    def cuda(self, *args, **kwargs):
+        return self._new_multi_loss_object_from_self(
+            {k: loss.cuda(*args, **kwargs) for k, loss in self.loss_dict.items()}
+        )
+
+    def to(self, *args, **kwargs):
+        return self._new_multi_loss_object_from_self(
+            {k: loss.to(*args, **kwargs) for k, loss in self.loss_dict.items()}
+        )
+
+    def _new_multi_loss_object_from_self(self, loss_dict):
+        multi_loss_self_copy = MultiLoss(
+            loss_dict,
+            self.loss_optimizer_map, self.retain_graph_until_last
+        )
+        multi_loss_self_copy.loss_backward_remaining = self.loss_backward_remaining
+        return multi_loss_self_copy
+
+    @property
+    def device(self):
+        return {k: loss.device for k, loss in self.loss_dict.items()}
+
+    def get_loss_dict(self):
+        return self.loss_dict
+
+    def __getitem__(self, key):
+        return self.loss_dict[key]
+
+    def __setitem__(self, key, value):
+        self.loss_dict[key] = value
+
+    def __delitem__(self, key):
+        del self.loss_dict[key]
+
+    def __iter__(self):
+        return iter(self.loss_dict)
+
+    def __len__(self):
+        return len(self.loss_dict)
 
 
 class MultiOptimizer:

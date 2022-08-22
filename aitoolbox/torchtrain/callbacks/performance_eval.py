@@ -95,7 +95,7 @@ class ModelPerformanceEvaluation(AbstractCallback):
         if self.on_val_data:
             y_pred, y_test, additional_results = self.train_loop_obj.predict_on_validation_set()
             if self.result_package.requires_loss:
-                additional_results['loss'] = self.train_loop_obj.evaluate_loss_on_validation_set()
+                additional_results['loss'] = self.train_loop_obj.evaluate_loss_on_validation_set(float_dict_format=True)
             self.result_package.prepare_result_package(y_test, y_pred,
                                                        hyperparameters=self.args,
                                                        additional_results=additional_results)
