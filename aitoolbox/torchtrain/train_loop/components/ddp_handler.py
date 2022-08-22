@@ -1,10 +1,10 @@
+import numpy as np
 import torch
 import torch.distributed as dist
 from torch.utils.data import DataLoader
 from torch.utils.data.distributed import DistributedSampler
 
 from aitoolbox.torchtrain.callbacks.ddp import DistributedSamplerSetEpoch
-import aitoolbox.utils.util as util
 
 
 class DDPHandler:
@@ -121,15 +121,16 @@ class DDPHandler:
                 the active processes
         """
         input_data_device = 'cpu'
-        if not return_tensor:
-            input_data_type_str = util.get_data_type_str(data)
+        is_input_np_array = isinstance(data, np.ndarray)
         if not hasattr(data, '__len__'):
             data = [data]
 
         if isinstance(data, torch.Tensor):
             input_data_device = data.device.type
         else:
-            data = torch.tensor(data, dtype=torch.float32 if not double_precision else torch.float64)
+            data = torch.tensor(data)
+            if double_precision:
+                data = data.double()
 
         data_tensor_wrap = data.to(self.train_loop_obj.device)
         mp_data = [torch.zeros_like(data_tensor_wrap) for _ in range(dist.get_world_size())]
@@ -141,7 +142,7 @@ class DDPHandler:
         if input_data_device == 'cpu':
             mp_data = mp_data.cpu()
         if not return_tensor:
-            mp_data = util.convert_tensor_to_type(mp_data, input_data_type_str)
+            mp_data = mp_data.cpu().numpy() if is_input_np_array else mp_data.tolist()
 
         return mp_data
 
