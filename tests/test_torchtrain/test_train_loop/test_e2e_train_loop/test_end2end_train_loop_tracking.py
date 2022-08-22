@@ -151,9 +151,15 @@ class TestEnd2EndTrainLoopCheckpointEndSave(unittest.TestCase):
         )
         train_loop.fit(num_epochs=5)
 
-        self.assertAlmostEqual(train_loop.evaluate_loss_on_train_set(), 1.8507084131240845, places=6)
-        self.assertAlmostEqual(train_loop.evaluate_loss_on_validation_set(), 2.4111196994781494, places=6)
-        self.assertAlmostEqual(train_loop.evaluate_loss_on_test_set(), 2.31626296043396, places=6)
+        self.assertAlmostEqual(
+            train_loop.evaluate_loss_on_train_set(float_dict_format=True), 1.8507084131240845, places=6
+        )
+        self.assertAlmostEqual(
+            train_loop.evaluate_loss_on_validation_set(float_dict_format=True), 2.4111196994781494, places=6
+        )
+        self.assertAlmostEqual(
+            train_loop.evaluate_loss_on_test_set(float_dict_format=True), 2.31626296043396, places=6
+        )
 
         project_path = os.path.join(THIS_DIR, 'e2e_train_loop_example')
         if os.path.exists(project_path):
@@ -571,9 +577,15 @@ class TestEnd2EndTrainLoopCheckpoint(unittest.TestCase):
         )
         train_loop.fit(num_epochs=5)
 
-        self.assertAlmostEqual(train_loop.evaluate_loss_on_train_set(), 1.8507084131240845, places=6)
-        self.assertAlmostEqual(train_loop.evaluate_loss_on_validation_set(), 2.4111196994781494, places=6)
-        self.assertAlmostEqual(train_loop.evaluate_loss_on_test_set(), 2.31626296043396, places=6)
+        self.assertAlmostEqual(
+            train_loop.evaluate_loss_on_train_set(float_dict_format=True), 1.8507084131240845, places=6
+        )
+        self.assertAlmostEqual(
+            train_loop.evaluate_loss_on_validation_set(float_dict_format=True), 2.4111196994781494, places=6
+        )
+        self.assertAlmostEqual(
+            train_loop.evaluate_loss_on_test_set(float_dict_format=True), 2.31626296043396, places=6
+        )
 
         project_path = os.path.join(THIS_DIR, 'e2e_train_loop_example')
         if os.path.exists(project_path):
@@ -945,9 +957,15 @@ class TestEnd2EndTrainLoopEndSave(unittest.TestCase):
         )
         train_loop.fit(num_epochs=5)
 
-        self.assertAlmostEqual(train_loop.evaluate_loss_on_train_set(), 1.8507084131240845, places=6)
-        self.assertAlmostEqual(train_loop.evaluate_loss_on_validation_set(), 2.4111196994781494, places=6)
-        self.assertAlmostEqual(train_loop.evaluate_loss_on_test_set(), 2.31626296043396, places=6)
+        self.assertAlmostEqual(
+            train_loop.evaluate_loss_on_train_set(float_dict_format=True), 1.8507084131240845, places=6
+        )
+        self.assertAlmostEqual(
+            train_loop.evaluate_loss_on_validation_set(float_dict_format=True), 2.4111196994781494, places=6
+        )
+        self.assertAlmostEqual(
+            train_loop.evaluate_loss_on_test_set(float_dict_format=True), 2.31626296043396, places=6
+        )
 
         project_path = os.path.join(THIS_DIR, 'e2e_train_loop_example')
         if os.path.exists(project_path):

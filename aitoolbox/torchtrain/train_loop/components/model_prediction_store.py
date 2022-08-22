@@ -126,7 +126,7 @@ class ModelPredictionStore:
         """Insert training dataset loss into the cache
 
         Args:
-            loss (float or dict):  model train dataset loss
+            loss (float or aitoolbox.torchtrain.multi_loss_optim.MultiLoss):  model train dataset loss
             iteration_idx (int): current iteration index of the TrainLoop
             force_prediction (bool): insert the loss value even if it is available in the loss cache.
                 This causes the old cached loss value to be overwritten.
@@ -140,7 +140,7 @@ class ModelPredictionStore:
         """Insert validation dataset loss into the cache
 
         Args:
-            loss (float or dict): model validation dataset loss
+            loss (float or aitoolbox.torchtrain.multi_loss_optim.MultiLoss): model validation dataset loss
             iteration_idx (int): current iteration index of the TrainLoop
             force_prediction (bool): insert the loss value even if it is available in the loss cache.
                 This causes the old cached loss value to be overwritten.
@@ -154,7 +154,7 @@ class ModelPredictionStore:
         """Insert test dataset loss into the cache
 
         Args:
-            loss (float or dict): model test dataset loss
+            loss (float or aitoolbox.torchtrain.multi_loss_optim.MultiLoss): model test dataset loss
             iteration_idx (int): current iteration index of the TrainLoop
             force_prediction (bool): insert the loss value even if it is available in the loss cache.
                 This causes the old cached loss value to be overwritten.
@@ -171,7 +171,7 @@ class ModelPredictionStore:
             iteration_idx (int): current iteration index of the TrainLoop
 
         Returns:
-            float or dict: cached model train dataset loss
+            float or aitoolbox.torchtrain.multi_loss_optim.MultiLoss: cached model train dataset loss
         """
         return self._get_data('train_loss', iteration_idx)
 
@@ -182,7 +182,7 @@ class ModelPredictionStore:
             iteration_idx (int): current iteration index of the TrainLoop
 
         Returns:
-            float or dict: cached model validation dataset loss
+            float or aitoolbox.torchtrain.multi_loss_optim.MultiLoss: cached model validation dataset loss
         """
         return self._get_data('val_loss', iteration_idx)
 
@@ -193,7 +193,7 @@ class ModelPredictionStore:
             iteration_idx (int): current iteration index of the TrainLoop
 
         Returns:
-            float or dict: cached model test dataset loss
+            float or aitoolbox.torchtrain.multi_loss_optim.MultiLoss: cached model test dataset loss
         """
         return self._get_data('test_loss', iteration_idx)
 
@@ -209,7 +209,14 @@ class ModelPredictionStore:
         return self._has_data('train_loss', iteration_idx)
 
     def has_val_loss(self, iteration_idx):
-        """iteration index"""
+        """Is there validation dataset model loss in the cache
+
+        Args:
+            iteration_idx (int): current iteration index of the TrainLoop
+
+        Returns:
+            bool: if loss value is in the cache
+        """
         return self._has_data('val_loss', iteration_idx)
 
     def has_test_loss(self, iteration_idx):

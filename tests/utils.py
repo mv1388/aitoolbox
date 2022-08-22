@@ -273,6 +273,7 @@ class DummyBatch:
     def __init__(self):
         self.back_ctr = 0
         self.item_ctr = 0
+        self.detach_ctr = 0
     
     def backward(self):
         self.back_ctr += 1
@@ -280,6 +281,10 @@ class DummyBatch:
     def item(self):
         self.item_ctr += 1
         return 1.
+
+    def detach(self):
+        self.detach_ctr += 1
+        return torch.tensor(1.)
 
     def __truediv__(self, other):
         return self
@@ -337,7 +342,10 @@ class MultiLossDummy(DummyLoss):
             self.retain_graph_ctr += 1
 
     def item(self):
-        return self.call_ctr
+        return torch.tensor(self.call_ctr)
+
+    def detach(self):
+        return torch.tensor(self.call_ctr)
 
     def __call__(self, predicted, true):
         self.call_ctr += 1

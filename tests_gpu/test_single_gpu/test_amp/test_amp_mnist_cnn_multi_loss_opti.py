@@ -155,7 +155,7 @@ class TestAMPMultiLossOptimizerMNISTCNN(unittest.TestCase):
         val_loss = tl.evaluate_loss_on_validation_set(force_prediction=True)
         y_pred, y_true, _ = tl.predict_on_validation_set(force_prediction=True)
 
-        return val_loss, y_pred.tolist(), y_true.tolist()
+        return val_loss.loss_dict, y_pred.tolist(), y_true.tolist()
 
     def train_eval_core_pytorch(self, num_epochs, use_real_train_data=False):
         self.set_seeds()
@@ -240,16 +240,16 @@ class TestAMPMultiLossOptimizerMNISTCNN(unittest.TestCase):
                     assert output_1.dtype is torch.float32
                     assert output_2.dtype is torch.float32
 
-                    loss_batch_1 = criterion_pt(output_1, target).cpu().item()
-                    loss_batch_2 = criterion_pt(output_2, target).cpu().item()
+                    loss_batch_1 = criterion_pt(output_1, target)
+                    loss_batch_2 = criterion_pt(output_2, target)
                     predicted_argmax = output_1.argmax(dim=1, keepdim=False).cpu().tolist()
 
                 val_pred += predicted_argmax
                 val_true += target.cpu().tolist()
                 val_loss_1.append(loss_batch_1)
                 val_loss_2.append(loss_batch_2)
-            val_loss_1 = np.mean(val_loss_1)
-            val_loss_2 = np.mean(val_loss_2)
+            val_loss_1 = torch.mean(torch.stack(val_loss_1).double()).cpu()
+            val_loss_2 = torch.mean(torch.stack(val_loss_2).double()).cpu()
 
         return {'loss_1': val_loss_1, 'loss_2': val_loss_2}, val_pred, val_true
 
