@@ -138,15 +138,15 @@ class DDPHandler:
 
         return mp_data
 
-    def mp_sync_dict_of_lists(self, dict_list_data):
-        """Multiprocess dict of lists sync
+    def mp_sync_dict(self, dict_data):
+        """Multiprocess sync of a dict
 
-        Convenience wrapper around the `mp_sync()` for the specific case of dict of lists syncing.
+        Convenience wrapper around the ``mp_sync()`` for the specific case of dict syncing.
 
         Args:
-            dict_list_data (dict): dict of lists to be synchronized across the processes
+            dict_data (dict): dict to be synchronized across the processes
 
         Returns:
-            dict: synchronized dict of lists with combined values gathered from all the active processes
+            dict: synchronized dict of tensors with combined values gathered from all the active processes
         """
-        return {k: self.mp_sync(values_list).tolist() for k, values_list in dict_list_data.items()}
+        return {k: self.mp_sync(data) for k, data in dict_data.items()}

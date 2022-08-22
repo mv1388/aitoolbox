@@ -203,14 +203,14 @@ class TestAMPDPMNISTCNN(unittest.TestCase):
                     predicted = F.log_softmax(x, dim=1)
                     assert predicted.dtype is torch.float32
 
-                    loss_batch = criterion_pt(predicted, target).cpu().item()
+                    loss_batch = criterion_pt(predicted, target)
 
                     predicted_argmax = predicted.argmax(dim=1, keepdim=False).cpu().tolist()
 
                 val_pred += predicted_argmax
                 val_true += target.cpu().tolist()
                 val_loss.append(loss_batch)
-            val_loss = np.mean(val_loss)
+            val_loss = torch.mean(torch.stack(val_loss).double()).cpu()
 
         return val_loss, val_pred, val_true
 
