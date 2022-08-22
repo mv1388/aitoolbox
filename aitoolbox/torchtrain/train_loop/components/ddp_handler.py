@@ -104,8 +104,8 @@ class DDPHandler:
         all the processes. This way we can achieve the same state of the data across all the parallel processes.
 
         Args:
-            data (torch.Tensor or numpy.ndarray or list or float or int): data to be synchronized between processes.
-                In case this is torch.Tensor, resulting output the device location will be preserved.
+            data (torch.Tensor or numpy.ndarray or list or float or int or bool): data to be synchronized between
+                processes. In case this is torch.Tensor, resulting output the device location will be preserved.
             double_precision (bool): in case the ``data`` parameter is not already a Tensor, the function wraps given
                 data into a Tensor. By default, it uses PyTorch default 32 bit precision float tensor. If this parameter
                 is set to ``True`` however, the double precision 64 bit tensor will be created. This is useful
