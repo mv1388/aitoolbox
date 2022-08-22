@@ -112,30 +112,30 @@ class TestTrainLoopVSCorePyTorch(unittest.TestCase):
         with torch.no_grad():
             for input_data, target in train_dataloader:
                 predicted = model_pt(input_data)
-                loss_batch = criterion_pt(predicted, target).item()
+                loss_batch = criterion_pt(predicted, target)
                 train_pred_pt += predicted.argmax(dim=1, keepdim=False).tolist()
                 train_loss_pt.append(loss_batch)
-            train_loss_pt = np.mean(train_loss_pt)
+            train_loss_pt = torch.mean(torch.DoubleTensor(train_loss_pt))
 
         val_pred_pt, val_loss_pt = [], []
         model_pt.eval()
         with torch.no_grad():
             for input_data, target in val_dataloader:
                 predicted = model_pt(input_data)
-                loss_batch = criterion_pt(predicted, target).item()
+                loss_batch = criterion_pt(predicted, target)
                 val_pred_pt += predicted.argmax(dim=1, keepdim=False).tolist()
                 val_loss_pt.append(loss_batch)
-            val_loss_pt = np.mean(val_loss_pt)
+            val_loss_pt = torch.mean(torch.DoubleTensor(val_loss_pt))
 
         test_pred_pt, test_loss_pt = [], []
         model_pt.eval()
         with torch.no_grad():
             for input_data, target in test_dataloader:
                 predicted = model_pt(input_data)
-                loss_batch = criterion_pt(predicted, target).item()
+                loss_batch = criterion_pt(predicted, target)
                 test_pred_pt += predicted.argmax(dim=1, keepdim=False).tolist()
                 test_loss_pt.append(loss_batch)
-            test_loss_pt = np.mean(test_loss_pt)
+            test_loss_pt = torch.mean(torch.DoubleTensor(test_loss_pt))
 
         self.assertEqual(train_pred_aitb.tolist(), train_pred_pt)
         self.assertEqual(val_pred_aitb.tolist(), val_pred_pt)
@@ -205,30 +205,30 @@ class TestTrainLoopVSCorePyTorch(unittest.TestCase):
         with torch.no_grad():
             for input_data, target in train_dataloader:
                 predicted = model_pt(input_data)
-                loss_batch = criterion_pt(predicted, target).item()
+                loss_batch = criterion_pt(predicted, target)
                 train_pred_pt += predicted.argmax(dim=1, keepdim=False).tolist()
                 train_loss_pt.append(loss_batch)
-            train_loss_pt = np.mean(train_loss_pt)
+            train_loss_pt = torch.mean(torch.DoubleTensor(train_loss_pt))
 
         val_pred_pt, val_loss_pt = [], []
         model_pt.eval()
         with torch.no_grad():
             for input_data, target in val_dataloader:
                 predicted = model_pt(input_data)
-                loss_batch = criterion_pt(predicted, target).item()
+                loss_batch = criterion_pt(predicted, target)
                 val_pred_pt += predicted.argmax(dim=1, keepdim=False).tolist()
                 val_loss_pt.append(loss_batch)
-            val_loss_pt = np.mean(val_loss_pt)
+            val_loss_pt = torch.mean(torch.DoubleTensor(val_loss_pt))
 
         test_pred_pt, test_loss_pt = [], []
         model_pt.eval()
         with torch.no_grad():
             for input_data, target in test_dataloader:
                 predicted = model_pt(input_data)
-                loss_batch = criterion_pt(predicted, target).item()
+                loss_batch = criterion_pt(predicted, target)
                 test_pred_pt += predicted.argmax(dim=1, keepdim=False).tolist()
                 test_loss_pt.append(loss_batch)
-            test_loss_pt = np.mean(test_loss_pt)
+            test_loss_pt = torch.mean(torch.DoubleTensor(test_loss_pt))
 
         self.assertEqual(train_pred_aitb.tolist(), train_pred_pt)
         self.assertEqual(val_pred_aitb.tolist(), val_pred_pt)
@@ -309,30 +309,30 @@ class TestTrainLoopVSCorePyTorch(unittest.TestCase):
         with torch.no_grad():
             for input_data, target in train_dataloader:
                 predicted = model_pt(input_data)
-                loss_batch = criterion_pt(predicted, target).item()
+                loss_batch = criterion_pt(predicted, target)
                 train_pred_pt += predicted.argmax(dim=1, keepdim=False).tolist()
                 train_loss_pt.append(loss_batch)
-            train_loss_pt = np.mean(train_loss_pt)
+            train_loss_pt = torch.mean(torch.DoubleTensor(train_loss_pt))
 
         val_pred_pt, val_loss_pt = [], []
         model_pt.eval()
         with torch.no_grad():
             for input_data, target in val_dataloader:
                 predicted = model_pt(input_data)
-                loss_batch = criterion_pt(predicted, target).item()
+                loss_batch = criterion_pt(predicted, target)
                 val_pred_pt += predicted.argmax(dim=1, keepdim=False).tolist()
                 val_loss_pt.append(loss_batch)
-            val_loss_pt = np.mean(val_loss_pt)
+            val_loss_pt = torch.mean(torch.DoubleTensor(val_loss_pt))
 
         test_pred_pt, test_loss_pt = [], []
         model_pt.eval()
         with torch.no_grad():
             for input_data, target in test_dataloader:
                 predicted = model_pt(input_data)
-                loss_batch = criterion_pt(predicted, target).item()
+                loss_batch = criterion_pt(predicted, target)
                 test_pred_pt += predicted.argmax(dim=1, keepdim=False).tolist()
                 test_loss_pt.append(loss_batch)
-            test_loss_pt = np.mean(test_loss_pt)
+            test_loss_pt = torch.mean(torch.DoubleTensor(test_loss_pt))
 
         self.assertEqual(train_pred_aitb.tolist(), train_pred_pt)
         self.assertEqual(val_pred_aitb.tolist(), val_pred_pt)
@@ -406,30 +406,30 @@ class TestTrainLoopVSCorePyTorch(unittest.TestCase):
         with torch.no_grad():
             for input_data, target in train_dataloader:
                 predicted = model_pt(input_data)
-                loss_batch = criterion_pt(predicted, target).item()
+                loss_batch = criterion_pt(predicted, target)
                 train_pred_pt += predicted.argmax(dim=1, keepdim=False).tolist()
                 train_loss_pt.append(loss_batch)
-            train_loss_pt = np.mean(train_loss_pt)
+            train_loss_pt = torch.mean(torch.DoubleTensor(train_loss_pt))
 
         val_pred_pt, val_loss_pt = [], []
         model_pt.eval()
         with torch.no_grad():
             for input_data, target in val_dataloader:
                 predicted = model_pt(input_data)
-                loss_batch = criterion_pt(predicted, target).item()
+                loss_batch = criterion_pt(predicted, target)
                 val_pred_pt += predicted.argmax(dim=1, keepdim=False).tolist()
                 val_loss_pt.append(loss_batch)
-            val_loss_pt = np.mean(val_loss_pt)
+            val_loss_pt = torch.mean(torch.DoubleTensor(val_loss_pt))
 
         test_pred_pt, test_loss_pt = [], []
         model_pt.eval()
         with torch.no_grad():
             for input_data, target in test_dataloader:
                 predicted = model_pt(input_data)
-                loss_batch = criterion_pt(predicted, target).item()
+                loss_batch = criterion_pt(predicted, target)
                 test_pred_pt += predicted.argmax(dim=1, keepdim=False).tolist()
                 test_loss_pt.append(loss_batch)
-            test_loss_pt = np.mean(test_loss_pt)
+            test_loss_pt = torch.mean(torch.DoubleTensor(test_loss_pt))
 
         self.assertEqual(train_pred_aitb.tolist(), train_pred_pt)
         self.assertEqual(val_pred_aitb.tolist(), val_pred_pt)

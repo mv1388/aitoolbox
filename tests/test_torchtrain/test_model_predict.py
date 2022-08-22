@@ -70,7 +70,7 @@ class TestAbstractModelPredictor(unittest.TestCase):
         loss = re_runner.model_get_loss(nn.CrossEntropyLoss())
 
         self.assertEqual(loss, 1.0)
-        self.assertEqual(model.dummy_batch.item_ctr, 2)
+        self.assertEqual(model.dummy_batch.detach_ctr, 2)
         self.assertEqual(model.dummy_batch.back_ctr, 0)
 
     def test_get_loss_separate_batch_feed(self):
@@ -84,7 +84,7 @@ class TestAbstractModelPredictor(unittest.TestCase):
         loss = re_runner.model_get_loss(nn.CrossEntropyLoss())
 
         self.assertEqual(loss, 1.0)
-        self.assertEqual(batch_loader.dummy_batch.item_ctr, 2)
+        self.assertEqual(batch_loader.dummy_batch.detach_ctr, 2)
         self.assertEqual(batch_loader.dummy_batch.back_ctr, 0)
         
     def test_evaluate_result_package(self):

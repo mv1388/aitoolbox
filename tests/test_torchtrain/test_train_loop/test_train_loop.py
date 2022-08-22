@@ -180,7 +180,7 @@ class TestTrainLoop(unittest.TestCase):
         self.assertEqual(dummy_loss.device.type, 'cpu')
 
         self.assertEqual(model.dummy_batch.back_ctr, num_epochs*len(dummy_train_loader))
-        self.assertEqual(model.dummy_batch.item_ctr,
+        self.assertEqual(model.dummy_batch.detach_ctr,
                          num_epochs * len(dummy_train_loader) + num_epochs * len(dummy_train_loader) +
                          num_epochs * len(dummy_val_loader) +
                          len(dummy_test_loader))
@@ -246,7 +246,7 @@ class TestTrainLoop(unittest.TestCase):
         self.assertEqual(train_loop.epoch, num_epochs-1)
 
         self.assertEqual(dummy_feed_def.dummy_batch.back_ctr, num_epochs*len(dummy_train_loader))
-        self.assertEqual(dummy_feed_def.dummy_batch.item_ctr,
+        self.assertEqual(dummy_feed_def.dummy_batch.detach_ctr,
                          num_epochs * len(dummy_train_loader) + num_epochs * len(dummy_train_loader) +
                          num_epochs * len(dummy_val_loader) +
                          len(dummy_test_loader))

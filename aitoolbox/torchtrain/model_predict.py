@@ -39,7 +39,7 @@ class PyTorchModelPredictor:
             loss_criterion (torch.nn.modules.loss._Loss): criterion criterion during the training procedure
 
         Returns:
-            float: loss
+            torch.Tensor or MultiLoss: loss
         """
         self.train_loop.criterion = loss_criterion
         return self.train_loop.evaluate_loss_on_test_set()
