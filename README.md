@@ -58,9 +58,11 @@ After the model is created, the simplest way to train it via the TrainLoop abstr
 ```python
 from aitoolbox.torchtrain.train_loop import *
 
-tl = TrainLoop(model,
-               train_loader, val_loader, test_loader,
-               optimizer, criterion)
+tl = TrainLoop(
+    model,
+    train_loader, val_loader, test_loader,
+    optimizer, criterion
+)
 
 model = tl.fit(num_epochs=10)
 ```
