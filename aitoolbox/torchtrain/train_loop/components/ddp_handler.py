@@ -4,6 +4,7 @@ from torch.utils.data import DataLoader
 from torch.utils.data.distributed import DistributedSampler
 
 from aitoolbox.torchtrain.callbacks.ddp import DistributedSamplerSetEpoch
+import aitoolbox.utils.util as util
 
 
 class DDPHandler:
@@ -96,7 +97,7 @@ class DDPHandler:
         data_loader_sampler = DataLoader(**data_loader_args)
         return data_loader_sampler, ddp_sampler
 
-    def mp_sync(self, data, concat_mp_data=True, double_precision=False):
+    def mp_sync(self, data, concat_mp_data=True, double_precision=False, return_tensor=True):
         """Multiprocess data sync
 
         Share input data between all the active processes so that every process has all the values from
@@ -112,12 +113,15 @@ class DDPHandler:
                 is set to ``True`` however, the double precision 64 bit tensor will be created. This is useful
                 for example if input data is in 64 bit, and we want to prevent precision reduction when syncing the data
                 across the workers.
+            return_tensor (bool): should the synced data be returned as a tensor or should it be converted back to
+                the same data type as type of the input data
 
         Returns:
             torch.Tensor or numpy.ndarray or list or float or int: ``data`` variable values synced across all
                 the active processes
         """
         input_data_device = 'cpu'
+        input_data_type_str = util.get_data_type_str(data)
         if not hasattr(data, '__len__'):
             data = [data]
 
@@ -135,6 +139,8 @@ class DDPHandler:
         # at this point all the data in mp_data still on the GPUs, optionally move back to CPU
         if input_data_device == 'cpu':
             mp_data = mp_data.cpu()
+        if not return_tensor:
+            mp_data = util.convert_tensor_to_type(mp_data, input_data_type_str)
 
         return mp_data
 

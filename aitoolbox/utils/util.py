@@ -1,5 +1,7 @@
 import types
 import functools
+import numpy as np
+import torch
 
 
 def function_exists(object_to_check, fn_name):
@@ -94,3 +96,62 @@ def flatten_list_of_lists(nested_list):
         return [item for sublist in nested_list for item in sublist]
     else:
         return None
+
+
+def get_data_type_str(data):
+    """Get a data type as string for the input data
+
+    Args:
+        data (torch.Tensor or numpy.ndarray or list or float or int): supported numeric input data
+
+    Returns:
+        str: type of the input data
+    """
+    if isinstance(data, torch.Tensor):
+        return 'torch.tensor'
+    elif isinstance(data, np.ndarray):
+        return 'np.array'
+    elif isinstance(data, list):
+        return 'list'
+    elif isinstance(data, float):
+        return 'float'
+    elif isinstance(data, int):
+        return 'int'
+    else:
+        raise TypeError(
+            f'Provided input data has a type which is not supported by the function (type: {type(data)}). '
+            f'Function supports the following data types: torch.Tensor and np.array, list, float and int.'
+        )
+
+
+def convert_tensor_to_type(data, target_type):
+    """Convert input data tensor into desired data type
+
+    Args:
+        data (torch.Tensor): input data tensor
+        target_type (str): desired target data type
+
+    Returns:
+        torch.Tensor or numpy.ndarray or list or float or int: input data transformed into the desired data type
+    """
+    if not isinstance(data, torch.Tensor):
+        raise TypeError(
+            f'Provided input data has a type which is not supported by the function (type: {type(data)}). '
+            'Input data must be of the torch.Tensor type.'
+        )
+
+    if target_type == 'torch.tensor':
+        return data
+    elif target_type == 'np.array':
+        return data.cpu().numpy()
+    elif target_type == 'list':
+        return data.tolist()
+    elif target_type == 'float':
+        return data.item()
+    elif target_type == 'int':
+        return int(data.item())
+    else:
+        raise TypeError(
+            f'Provided target_type is not supported by the function (target_type: {target_type}). '
+            "target_type must be one of the following: 'torch.tensor', 'np.array', 'list', 'float' or 'int'."
+        )
