@@ -68,6 +68,6 @@ class AbstractModelFeedDefinition(ABC):
             device: device on which the model is being trained
 
         Returns:
-            torch.Tensor, torch.Tensor, dict: y_pred, y_test, metadata
+            (torch.Tensor, torch.Tensor, dict or None): y_pred, y_test, metadata
         """
         pass
