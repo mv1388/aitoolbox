@@ -1,3 +1,4 @@
+import numpy as np
 import torch
 import torch.distributed as dist
 from torch.utils.data import DataLoader
@@ -96,34 +97,39 @@ class DDPHandler:
         data_loader_sampler = DataLoader(**data_loader_args)
         return data_loader_sampler, ddp_sampler
 
-    def mp_sync(self, data, concat_mp_data=True, double_precision=False):
+    def mp_sync(self, data, double_precision=False, concat_mp_data=True, return_tensor=True):
         """Multiprocess data sync
 
         Share input data between all the active processes so that every process has all the values from
         all the processes. This way we can achieve the same state of the data across all the parallel processes.
 
         Args:
-            data (torch.Tensor, list, float, int): data to be synchronized between processes.
-                In case this is torch.Tensor, resulting output the device location will be preserved.
-            concat_mp_data (bool): should the returned list of collected tensors be concatenated into a single list
-                of values
+            data (torch.Tensor or numpy.ndarray or list or float or int or bool): data to be synchronized between
+                processes. In case this is torch.Tensor, resulting output the device location will be preserved.
             double_precision (bool): in case the ``data`` parameter is not already a Tensor, the function wraps given
                 data into a Tensor. By default, it uses PyTorch default 32 bit precision float tensor. If this parameter
                 is set to ``True`` however, the double precision 64 bit tensor will be created. This is useful
                 for example if input data is in 64 bit, and we want to prevent precision reduction when syncing the data
                 across the workers.
+            concat_mp_data (bool): should the returned list of collected tensors be concatenated into a single list
+                of values
+            return_tensor (bool): should the synced data be returned as a tensor or should it be converted back to
+                the same data type as type of the input data
 
         Returns:
-            torch.Tensor: list of `data` variable values synced across all the active processes
+            torch.Tensor or numpy.ndarray or list: ``data`` variable values synced across all the active processes
         """
         input_data_device = 'cpu'
+        is_input_np_array = isinstance(data, np.ndarray)
         if not hasattr(data, '__len__'):
             data = [data]
 
         if isinstance(data, torch.Tensor):
             input_data_device = data.device.type
         else:
-            data = torch.tensor(data, dtype=torch.float32 if not double_precision else torch.float64)
+            data = torch.tensor(data)
+            if double_precision:
+                data = data.double()
 
         data_tensor_wrap = data.to(self.train_loop_obj.device)
         mp_data = [torch.zeros_like(data_tensor_wrap) for _ in range(dist.get_world_size())]
@@ -134,6 +140,8 @@ class DDPHandler:
         # at this point all the data in mp_data still on the GPUs, optionally move back to CPU
         if input_data_device == 'cpu':
             mp_data = mp_data.cpu()
+        if not return_tensor:
+            mp_data = mp_data.cpu().numpy() if is_input_np_array else mp_data.tolist()
 
         return mp_data
 
