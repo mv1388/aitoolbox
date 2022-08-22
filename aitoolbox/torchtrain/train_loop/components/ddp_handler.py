@@ -117,8 +117,7 @@ class DDPHandler:
                 the same data type as type of the input data
 
         Returns:
-            torch.Tensor or numpy.ndarray or list: ``data`` variable values synced across all
-                the active processes
+            torch.Tensor or numpy.ndarray or list: ``data`` variable values synced across all the active processes
         """
         input_data_device = 'cpu'
         is_input_np_array = isinstance(data, np.ndarray)
