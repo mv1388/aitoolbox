@@ -459,18 +459,14 @@ class TrainLoop:
 
         if isinstance(loss_record[0], MultiLoss):
             loss_names = sorted(loss_record[0].keys())
-            # loss_record is a list of lists with dimensions: [num_batches, num_losses]
-            loss_record = [list(multi_loss.values()) for multi_loss in loss_record]
-            example_loss_record = loss_record[0][0]
+            # loss_record is a list of tensors with dimensions: [num_batches, num_losses]
+            loss_record = [torch.stack(list(multi_loss.values())).unsqueeze(0) for multi_loss in loss_record]
+            loss_record = torch.cat(loss_record)
         else:
-            example_loss_record = loss_record[0]
-
-        loss_device = torch.device('cpu')
-        if isinstance(example_loss_record, torch.Tensor):
-            loss_device = example_loss_record.device
+            loss_record = torch.stack(loss_record)
 
         # Create torch.DoubleTensor on the original device (e.g. GPU)
-        loss_record = torch.tensor(loss_record, dtype=torch.float64, device=loss_device)
+        loss_record = loss_record.double()
 
         if self.ddp_training_mode:
             loss_record = self.ddp_handler.mp_sync(loss_record)
