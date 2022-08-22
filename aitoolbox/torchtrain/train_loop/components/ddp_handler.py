@@ -140,7 +140,7 @@ class DDPHandler:
     def mp_sync_dict(self, dict_data):
         """Multiprocess sync of a dict
 
-        Convenience wrapper around the `mp_sync()` for the specific case of dict syncing.
+        Convenience wrapper around the ``mp_sync()`` for the specific case of dict syncing.
 
         Args:
             dict_data (dict): dict to be synchronized across the processes

@@ -654,8 +654,8 @@ class TrainLoop:
                 in the form of dict of lists/torch.Tensors/np.arrays
         """
         if not self.prediction_store.has_train_predictions(self.total_iteration_idx) or force_prediction:
-            predictions = self.predict_with_model(self.train_loader, execute_callbacks, move_to_cpu=True,
-                                                  dataset_info={'type': 'train'})
+            predictions = self.predict_with_model(self.train_loader, execute_callbacks,
+                                                  move_to_cpu=True, dataset_info={'type': 'train'})
             self.prediction_store.insert_train_predictions(predictions, self.total_iteration_idx, force_prediction)
         else:
             predictions = self.prediction_store.get_train_predictions(self.total_iteration_idx)
@@ -676,8 +676,8 @@ class TrainLoop:
                 in the form of dict of lists/torch.Tensors/np.arrays
         """
         if not self.prediction_store.has_val_predictions(self.total_iteration_idx) or force_prediction:
-            predictions = self.predict_with_model(self.validation_loader, execute_callbacks, move_to_cpu=True,
-                                                  dataset_info={'type': 'validation'})
+            predictions = self.predict_with_model(self.validation_loader, execute_callbacks,
+                                                  move_to_cpu=True, dataset_info={'type': 'validation'})
             self.prediction_store.insert_val_predictions(predictions, self.total_iteration_idx, force_prediction)
         else:
             predictions = self.prediction_store.get_val_predictions(self.total_iteration_idx)
@@ -698,8 +698,8 @@ class TrainLoop:
                 in the form of dict of lists/torch.Tensors/np.arrays
         """
         if not self.prediction_store.has_test_predictions(self.total_iteration_idx) or force_prediction:
-            predictions = self.predict_with_model(self.test_loader, execute_callbacks, move_to_cpu=True,
-                                                  dataset_info={'type': 'test'})
+            predictions = self.predict_with_model(self.test_loader, execute_callbacks,
+                                                  move_to_cpu=True, dataset_info={'type': 'test'})
             self.prediction_store.insert_test_predictions(predictions, self.total_iteration_idx, force_prediction)
         else:
             predictions = self.prediction_store.get_test_predictions(self.total_iteration_idx)
@@ -729,8 +729,8 @@ class TrainLoop:
             desc = f"{desc} on {dataset_info['type']}"
 
         self.model = self.model.to(self.device)
-
         self.model.eval()
+
         y_pred, y_test, metadata_list = [], [], []
 
         with torch.no_grad():
