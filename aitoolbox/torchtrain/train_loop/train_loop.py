@@ -225,7 +225,7 @@ class TrainLoop:
         self.callbacks_handler.execute_train_begin()
 
         for self.epoch in range(self.epoch, num_epochs):
-            if not self.ddp_training_mode or self.device.index == 0:
+            if self.is_main_process():
                 print('\n\n================================================================================')
                 print('================================================================================')
                 print(f'Epoch: {self.epoch}')
@@ -494,7 +494,7 @@ class TrainLoop:
         loss_parsed = loss_parsed.item()
 
         # Results reporting to terminal
-        if not self.ddp_training_mode or self.device.index == 0:
+        if self.is_main_process():
             loss_avg = np.mean(list(loss_parsed.values())) if isinstance(loss_parsed, MultiLoss) else loss_parsed
             print(f'{loss_print_description}: {loss_avg}')
 

@@ -251,7 +251,7 @@ class ModelTrainEndSave(AbstractCallback):
         self.cloud_dir_prefix = cloud_dir_prefix
 
     def on_train_end(self):
-        if not self.train_loop_obj.ddp_training_mode or self.train_loop_obj.device.index == 0:
+        if self.train_loop_obj.is_main_process():
             self.save_hyperparams()
         model_final_state = {
             'model_state_dict': self.train_loop_obj.model.state_dict(),
@@ -286,7 +286,7 @@ class ModelTrainEndSave(AbstractCallback):
             self.result_package = self.test_result_package + self.result_package if self.result_package is not None \
                 else self.test_result_package
 
-        if not self.train_loop_obj.ddp_training_mode or self.train_loop_obj.device.index == 0:
+        if self.train_loop_obj.is_main_process():
             self.results_saver.save_experiment(model_final_state, self.result_package,
                                                self.train_loop_obj.train_history,
                                                experiment_timestamp=self.train_loop_obj.experiment_timestamp,
@@ -324,8 +324,7 @@ class ModelTrainEndSave(AbstractCallback):
                 local_model_result_folder_path=self.local_model_result_folder_path
             )
 
-        if not self.train_loop_obj.lazy_experiment_save and \
-                (not self.train_loop_obj.ddp_training_mode or self.train_loop_obj.device.index == 0):
+        if not self.train_loop_obj.lazy_experiment_save and self.train_loop_obj.is_main_process():
             self.save_hyperparams()
 
     def save_hyperparams(self):
