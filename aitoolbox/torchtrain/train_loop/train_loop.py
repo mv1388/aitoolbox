@@ -655,7 +655,7 @@ class TrainLoop:
         """
         if not self.prediction_store.has_train_predictions(self.total_iteration_idx) or force_prediction:
             predictions = self.predict_with_model(self.train_loader, execute_callbacks,
-                                                  dataset_info={'type': 'train'})
+                                                  move_to_cpu=True, dataset_info={'type': 'train'})
             self.prediction_store.insert_train_predictions(predictions, self.total_iteration_idx, force_prediction)
         else:
             predictions = self.prediction_store.get_train_predictions(self.total_iteration_idx)
@@ -677,7 +677,7 @@ class TrainLoop:
         """
         if not self.prediction_store.has_val_predictions(self.total_iteration_idx) or force_prediction:
             predictions = self.predict_with_model(self.validation_loader, execute_callbacks,
-                                                  dataset_info={'type': 'validation'})
+                                                  move_to_cpu=True, dataset_info={'type': 'validation'})
             self.prediction_store.insert_val_predictions(predictions, self.total_iteration_idx, force_prediction)
         else:
             predictions = self.prediction_store.get_val_predictions(self.total_iteration_idx)
@@ -699,14 +699,14 @@ class TrainLoop:
         """
         if not self.prediction_store.has_test_predictions(self.total_iteration_idx) or force_prediction:
             predictions = self.predict_with_model(self.test_loader, execute_callbacks,
-                                                  dataset_info={'type': 'test'})
+                                                  move_to_cpu=True, dataset_info={'type': 'test'})
             self.prediction_store.insert_test_predictions(predictions, self.total_iteration_idx, force_prediction)
         else:
             predictions = self.prediction_store.get_test_predictions(self.total_iteration_idx)
 
         return predictions
 
-    def predict_with_model(self, data_loader, execute_callbacks=False, dataset_info=None):
+    def predict_with_model(self, data_loader, execute_callbacks=False, move_to_cpu=False, dataset_info=None):
         """Run given dataset through the network and return true target values, target predictions and metadata
 
         Args:
@@ -714,9 +714,11 @@ class TrainLoop:
                 are calculated
             execute_callbacks (bool): If true, prediction loop will execute provided callbacks after prediction for
                 each batch has been made. Otherwise, callbacks at this position are ignored.
+            move_to_cpu (bool): should the predicted returned results be moved to the CPU. Otherwise, the returned
+                results are kept on the original device (which can also be a GPU).
             dataset_info (dict or None): additional information describing the dataset inside the provided dataloader.
                 One such dataset info is the dataset ``type`` (train, validation, or test) set by
-                predict_on_train_set(), predict_on_validation_set() and predict_on_test_set() methods.
+                ``predict_on_train_set()``, ``predict_on_validation_set()`` and ``predict_on_test_set()`` methods.
 
         Returns:
             (torch.Tensor, torch.Tensor, dict): y_pred, y_true, metadata
@@ -727,8 +729,8 @@ class TrainLoop:
             desc = f"{desc} on {dataset_info['type']}"
 
         self.model = self.model.to(self.device)
-
         self.model.eval()
+
         y_pred, y_test, metadata_list = [], [], []
 
         with torch.no_grad():
@@ -757,12 +759,20 @@ class TrainLoop:
             y_pred = self.pred_transform_fn(y_pred)
             y_test = self.pred_transform_fn(y_test)
 
-            metadata = dict_util.combine_prediction_metadata_batches(metadata_list) if len(metadata_list) > 0 else None
+            metadata = {}
+            if len(metadata_list) > 0:
+                metadata = dict_util.combine_prediction_metadata_batches(metadata_list)
 
             if self.ddp_training_mode:
-                y_pred = self.ddp_handler.mp_sync(y_pred).cpu()
-                y_test = self.ddp_handler.mp_sync(y_test).cpu()
-                metadata = self.ddp_handler.mp_sync_dict_of_lists(metadata) if metadata is not None else None
+                y_pred = self.ddp_handler.mp_sync(y_pred)
+                y_test = self.ddp_handler.mp_sync(y_test)
+                if len(metadata) > 0:
+                    metadata = self.ddp_handler.mp_sync_dict(metadata)
+
+            if move_to_cpu:
+                y_pred = y_pred.cpu()
+                y_test = y_test.cpu()
+                metadata = {k: v.cpu() if isinstance(v, torch.Tensor) else v for k, v in metadata.items()}
 
         self.model.train()
 
