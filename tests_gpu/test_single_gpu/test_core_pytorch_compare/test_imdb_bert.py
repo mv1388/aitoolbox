@@ -119,11 +119,11 @@ class TestIMDBBERT(unittest.TestCase):
                 logits = outputs.logits
                 predictions = torch.argmax(logits, dim=-1)
 
-                loss_batch = outputs.loss.cpu()
+                loss_batch = outputs.loss
                 val_pred += predictions.cpu().tolist()
                 val_true += batch["labels"].cpu().tolist()
                 val_loss.append(loss_batch)
-            val_loss = torch.mean(torch.DoubleTensor(val_loss))
+            val_loss = torch.mean(torch.stack(val_loss).double()).cpu()
 
         return val_loss, val_pred, val_true
 
