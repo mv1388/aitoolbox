@@ -97,7 +97,7 @@ class DDPHandler:
         data_loader_sampler = DataLoader(**data_loader_args)
         return data_loader_sampler, ddp_sampler
 
-    def mp_sync(self, data, concat_mp_data=True, double_precision=False, return_tensor=True):
+    def mp_sync(self, data, double_precision=False, concat_mp_data=True, return_tensor=True):
         """Multiprocess data sync
 
         Share input data between all the active processes so that every process has all the values from
@@ -106,13 +106,13 @@ class DDPHandler:
         Args:
             data (torch.Tensor or numpy.ndarray or list or float or int): data to be synchronized between processes.
                 In case this is torch.Tensor, resulting output the device location will be preserved.
-            concat_mp_data (bool): should the returned list of collected tensors be concatenated into a single list
-                of values
             double_precision (bool): in case the ``data`` parameter is not already a Tensor, the function wraps given
                 data into a Tensor. By default, it uses PyTorch default 32 bit precision float tensor. If this parameter
                 is set to ``True`` however, the double precision 64 bit tensor will be created. This is useful
                 for example if input data is in 64 bit, and we want to prevent precision reduction when syncing the data
                 across the workers.
+            concat_mp_data (bool): should the returned list of collected tensors be concatenated into a single list
+                of values
             return_tensor (bool): should the synced data be returned as a tensor or should it be converted back to
                 the same data type as type of the input data
 
@@ -121,7 +121,8 @@ class DDPHandler:
                 the active processes
         """
         input_data_device = 'cpu'
-        input_data_type_str = util.get_data_type_str(data)
+        if not return_tensor:
+            input_data_type_str = util.get_data_type_str(data)
         if not hasattr(data, '__len__'):
             data = [data]
 
