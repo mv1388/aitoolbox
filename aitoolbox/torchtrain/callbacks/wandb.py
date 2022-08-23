@@ -25,8 +25,9 @@ class WandBTracking(AbstractExperimentCallback):
 
         Find more on: https://wandb.ai
 
-        Before this callback can be used you need to have wandb account and be credentialed on the machine.
-        Instructions for this process can be found on wandb GitHub: https://github.com/wandb/client
+        Note:
+            Before this callback can be used you need to have wandb account and be credentialed on the machine.
+            Instructions for this process can be found on wandb GitHub: https://github.com/wandb/client
 
         Args:
             metric_names (list or None): list of metric names tracked in the training history. If left to ``None``,
