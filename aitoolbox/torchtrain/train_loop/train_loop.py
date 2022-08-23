@@ -7,7 +7,7 @@ from typing import Optional
 import numpy as np
 import torch
 import torch.nn as nn
-from torch.nn.modules import Module
+from torch.nn import Module
 import torch.multiprocessing as mp
 import torch.distributed as dist
 from torch.nn.parallel import DistributedDataParallel
@@ -46,7 +46,7 @@ class TrainLoop:
             validation_loader (torch.utils.data.DataLoader or None): data loader for validation data set
             test_loader (torch.utils.data.DataLoader or None): data loader for test data set
             optimizer (torch.optim.Optimizer or MultiOptimizer): optimizer algorithm.
-            criterion (torch.nn.modules.loss._Loss or MultiLoss or None): criterion during the training procedure
+            criterion (torch.nn.loss._Loss or MultiLoss or None): criterion during the training procedure
             collate_batch_pred_fn (callable): collate function transforming batch predictions as they come out from the
                 model
             pred_transform_fn (callable): function transforming all the produced predictions after all the batches have
@@ -208,7 +208,7 @@ class TrainLoop:
             grad_accumulation (int): number of batches the gradients are accumulated before updating weights
 
         Returns:
-            TTModel or torch.nn.modules.Module or TTDataParallel: trained model
+            TTModel or torch.nn.Module or TTDataParallel: trained model
         """
         if num_iterations > 0:
             num_epochs = int(math.ceil(float(num_iterations) / len(self.train_loader)))
@@ -603,15 +603,17 @@ class TrainLoop:
                 is kept on the original device (which can also be a GPU).
             dataset_info (dict or None): additional information describing the dataset inside the provided dataloader.
                 One such dataset info is the dataset ``type`` (``"train"``, ``"validation"``, or ``"test"``) set by
-                ``evaluate_loss_on_train_set()``, ``evaluate_loss_on_validation_set()`` and
-                ``evaluate_loss_on_test_set()`` methods.
+                :meth:`~aitoolbox.torchtrain.train_loop.train_loop.TrainLoop.evaluate_loss_on_train_set`,
+                :meth:`~aitoolbox.torchtrain.train_loop.train_loop.TrainLoop.evaluate_loss_on_validation_set` and
+                :meth:`~aitoolbox.torchtrain.train_loop.train_loop.TrainLoop.evaluate_loss_on_test_set` methods.
 
         Returns:
-            torch.Tensor or MultiLoss: calculated average loss over all the batches. In the case of multi loss,
+            torch.Tensor or MultiLoss: Calculated average loss over all the batches. In the case of multi loss,
             the MultiLoss wrapper gets returned.
 
-            Important to note: by default the returned loss tensors are left on the same device as they are
-            computed. Meaning, that the returned values can potentially still be on the GPU.
+            Note:
+                **Important to note:** by default the returned loss tensors are left on the same device as they are
+                computed. Meaning, that the returned values can potentially still be on the GPU.
         """
         desc = "Loss evaluation"
         if isinstance(dataset_info, dict) and 'type' in dataset_info:
@@ -721,7 +723,9 @@ class TrainLoop:
                 results are kept on the original device (which can also be a GPU).
             dataset_info (dict or None): additional information describing the dataset inside the provided dataloader.
                 One such dataset info is the dataset ``type`` (train, validation, or test) set by
-                ``predict_on_train_set()``, ``predict_on_validation_set()`` and ``predict_on_test_set()`` methods.
+                :meth:`~aitoolbox.torchtrain.train_loop.train_loop.TrainLoop.predict_on_train_set`,
+                :meth:`~aitoolbox.torchtrain.train_loop.train_loop.TrainLoop.predict_on_validation_set` and
+                :meth:`~aitoolbox.torchtrain.train_loop.train_loop.TrainLoop.predict_on_test_set` methods.
 
         Returns:
             (torch.Tensor, torch.Tensor, dict): y_pred, y_true, metadata
@@ -896,9 +900,9 @@ class TrainLoop:
             node_rank (int): rank of the current node
             num_gpus (int): number of GPUs in the node
             backend (str): The backend to use. For more information look up the documentation for
-                :meth:`torch.distributed.init_process_group`. Valid values include ``mpi``, ``gloo``, and ``nccl``.
+                :func:`torch.distributed.init_process_group`. Valid values include ``mpi``, ``gloo``, and ``nccl``.
             init_method (str): URL specifying how to initialize the process group. For more information look up
-                the documentation for :meth:`torch.distributed.init_process_group`.
+                the documentation for :func:`torch.distributed.init_process_group`.
             on_gpu (bool): if the DDP training is executed on the GPU or on the CPU
         """
         self.ddp_training_mode = True
@@ -1002,8 +1006,11 @@ class TrainLoop:
                 specification of the training length than the ``num_epochs`` parameter.
             callbacks (list): callbacks that are executed during the training run
             grad_accumulation (int): number of batches the gradients are accumulated before updating weights
-            **kwargs: additional parameters for ``_train_dp()`` and ``_train_ddp()`` methods.
+            **kwargs: additional parameters for
+            :meth:`~aitoolbox.torchtrain.train_loop.train_loop.TrainLoop._train_dp` and
+            :meth:`~aitoolbox.torchtrain.train_loop.train_loop.TrainLoop._train_ddp` methods.
+
         Returns:
-            TTModel or torch.nn.modules.Module or TTDataParallel: trained model
+            TTModel or torch.nn.Module or TTDataParallel: trained model
         """
         return self.fit(num_epochs, num_iterations, callbacks, grad_accumulation, **kwargs)
