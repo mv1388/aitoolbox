@@ -171,7 +171,8 @@ class ModelWrap:
     def __init__(self, model, batch_model_feed_def):
         """TrainLoop model wrapper combining PyTorch model and model feed definition
 
-        NOTE: especially useful in the case when you want to train on multi-GPU where TTModel abstract functions
+        Note:
+            Especially useful in the case when you want to train on multi-GPU where TTModel abstract functions
             can't be used.
 
         ModelWrap can be used as a replacement of TTModel when using the TrainLoop.

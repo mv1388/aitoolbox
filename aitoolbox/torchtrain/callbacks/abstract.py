@@ -26,14 +26,16 @@ class AbstractCallback:
         self.device_idx_execution = device_idx_execution
 
     def register_train_loop_object(self, train_loop_obj):
-        """Introduce the reference to the encapsulating trainloop so that the callback has access to the
-            low level functionality of the trainloop
+        """Introduce the reference to the encapsulating trainloop
+
+        This way the callback has access to the low level functionality of the trainloop
 
         The registration is normally handled by the callback handler found inside the train loops. The handler is
         responsible for all the callback orchestration of the callbacks inside the trainloops.
 
         Args:
-            train_loop_obj (aitoolbox.torchtrain.train_loop.TrainLoop): reference to the encapsulating trainloop
+            train_loop_obj (aitoolbox.torchtrain.train_loop.train_loop.TrainLoop): reference to the encapsulating
+                trainloop
 
         Returns:
             AbstractCallback: return the reference to the callback after it is registered
@@ -136,12 +138,14 @@ class AbstractCallback:
     def on_after_batch_prediction(self, y_pred_batch, y_test_batch, metadata_batch, dataset_info):
         """Logic executed in the prediction loop after the predictions for the single batch are made
 
-        IMPORTANT: Take care to not unintentionally modify the (predicted) input data when it's passed inside
-                   this function of a callback (you have a reference to the original).
-                   If the data is modified the subsequent steps or evaluations that are executed by the TrainLoop
-                   might get broken or corrupted. With more access/power there needs to be more care!
+        Warning:
+            IMPORTANT: Take care to not unintentionally modify the (predicted) input data when it's passed inside
+            this function of a callback (you have a reference to the original).
+            If the data is modified the subsequent steps or evaluations that are executed by the TrainLoop
+            might get broken or corrupted. With more access/power there needs to be more care!
 
-        All the inputs into this function are the outputs from the model's ``get_predictions()`` method.
+        Warns:
+            All the inputs into this function are the outputs from the model's ``get_predictions()`` method.
 
         Args:
             y_pred_batch: model's predictions for the current batch
