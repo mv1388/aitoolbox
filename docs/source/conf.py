@@ -89,7 +89,8 @@ exclude_patterns = []
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
-    "torch": ("https://pytorch.org/docs/stable/", None)
+    "torch": ("https://pytorch.org/docs/stable/", None),
+    'numpy': ('http://docs.scipy.org/doc/numpy/', None)
 }
 
 
