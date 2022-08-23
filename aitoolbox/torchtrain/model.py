@@ -39,7 +39,7 @@ class TTModel(nn.Module, ABC):
             device (torch.device): device on which the model is being trained
 
         Returns:
-            torch.Tensor or aitoolbox.torchtrain.multi_loss_optim.MultiLoss: loss
+            torch.Tensor or :class:`~aitoolbox.torchtrain.multi_loss_optim.MultiLoss`: loss
         """
         pass
 
@@ -60,7 +60,7 @@ class TTModel(nn.Module, ABC):
             device (torch.device): device on which the model is being trained
 
         Returns:
-            torch.Tensor or aitoolbox.torchtrain.multi_loss_optim.MultiLoss: loss
+            torch.Tensor or :class:`~aitoolbox.torchtrain.multi_loss_optim.MultiLoss`: loss
         """
         return self.get_loss(batch_data, criterion, device)
 

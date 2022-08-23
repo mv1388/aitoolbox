@@ -48,11 +48,11 @@ class TTParallelBase:
 class TTDataParallel(nn.DataParallel, TTParallelBase):
     def __init__(self, module,
                  default_model_methods=('get_loss', 'get_loss_eval', 'get_predictions'), **kwargs):
-        """torchtrain enabled DataParallel
+        """torchtrain-enabled DataParallel
 
-        This DataParallel wrapper works in the same way as the original PyTorch nn.DataParallel. Furthermore, it exposes
-        TTModel batch data feeding definitions (additional abstract methods) to the TrainLoop while still enabling
-        multi GPU training.
+        This DataParallel wrapper works in the same way as the original PyTorch :class:`torch.nn.DataParallel`.
+        Furthermore, it exposes :class:`~aitoolbox.torchtrain.model.TTModel` batch data feeding definitions
+        (additional abstract methods) to the TrainLoop while still enabling multi GPU training.
 
         Args:
             module (aitoolbox.torchtrain.model.TTModel): neural network model
@@ -66,7 +66,12 @@ class TTDataParallel(nn.DataParallel, TTParallelBase):
 class TTDistributedDataParallel(TTParallelBase, DistributedDataParallel):
     def __init__(self, module,
                  default_model_methods=('get_loss', 'get_loss_eval', 'get_predictions'), **kwargs):
-        """torchtrain enabled DistributedDataParallel
+        """torchtrain-enabled DistributedDataParallel
+
+        This DistributedDataParallel wrapper works in the same way as the original PyTorch
+        :class:`torch.nn.parallel.DistributedDataParallel`.
+        Furthermore, it exposes :class:`~aitoolbox.torchtrain.model.TTModel` batch data feeding definitions
+        (additional abstract methods) to the TrainLoop while still enabling multi GPU training.
 
         Args:
             module (aitoolbox.torchtrain.model.TTModel): neural network model
