@@ -15,7 +15,7 @@ class AbstractModelFeedDefinition(ABC):
         :class:`aitoolbox.torchtrain.model.TTModel`
 
     Use of the ``AbstractModelFeedDefinition`` is the legacy way of defining the model. However, in certain scenarios
-    where the :class:`aitoolbox.torchtrain.model.TTModel` might prove to increase complexity,
+    where the :class:`~aitoolbox.torchtrain.model.TTModel` might prove to increase complexity,
     ModelFeedDefinition still is useful for augmenting the :class:`torch.nn.Module` with the logic to calculate
     loss and predictions.
     """

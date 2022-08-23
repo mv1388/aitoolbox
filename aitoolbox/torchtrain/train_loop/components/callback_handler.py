@@ -18,7 +18,8 @@ class CallbacksHandler:
         their respective callback methods are left as ``pass`` and aren't overridden with some desired code logic.
 
         Args:
-            train_loop_obj (aitoolbox.torchtrain.train_loop.TrainLoop): reference to the encapsulating TrainLoop
+            train_loop_obj (aitoolbox.torchtrain.train_loop.train_loop.TrainLoop): reference to the encapsulating
+                TrainLoop
         """
         self.train_loop_obj = train_loop_obj
         self.callbacks_cache = []

@@ -45,7 +45,7 @@ class TrainLoop:
             train_loader (torch.utils.data.DataLoader): data loader for train data set
             validation_loader (torch.utils.data.DataLoader or None): data loader for validation data set
             test_loader (torch.utils.data.DataLoader or None): data loader for test data set
-            optimizer (torch.optim.optimizer.Optimizer or MultiOptimizer): optimizer algorithm.
+            optimizer (torch.optim.Optimizer or MultiOptimizer): optimizer algorithm.
             criterion (torch.nn.modules.loss._Loss or MultiLoss or None): criterion during the training procedure
             collate_batch_pred_fn (callable): collate function transforming batch predictions as they come out from the
                 model
@@ -175,7 +175,7 @@ class TrainLoop:
                 ``gpu_mode`` parameter.
 
         Returns:
-            TTModel or torch.nn.modules.Module or TTDataParallel: trained model
+            TTModel or torch.nn.Module or TTDataParallel: trained model
         """
         if num_epochs > 0 and num_iterations > 0:
             raise ValueError('Both num_epochs and num_iterations are set. '
