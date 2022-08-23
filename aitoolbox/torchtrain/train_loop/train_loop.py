@@ -168,7 +168,6 @@ class TrainLoop:
             callbacks (list or None): callbacks that are executed during the training run
             grad_accumulation (int): number of batches the gradients are accumulated before updating weights
             **kwargs: additional parameters for training methods:
-
                 * :meth:`aitoolbox.torchtrain.train_loop.TrainLoop._train_dp`
                 * :meth:`aitoolbox.torchtrain.train_loop.TrainLoop._train_ddp`
 
