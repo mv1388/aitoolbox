@@ -8,7 +8,7 @@ class TTModel(nn.Module, ABC):
     """
     TTModel is an extension of core PyTorch nn.Module
 
-    TT in TTModel --> TorchTrain Model
+    *TT in TTModel --> TorchTrain Model*
 
     In addition to the common :meth:`~torch.nn.Module.forward` method required by the base :class:`torch.nn.Module`,
     the user also needs to implement the additional AIToolbox specific
@@ -115,7 +115,7 @@ class TTBasicMultiGPUModel(TTBasicModel):
     In the case of the get_loss() the inout into the model's forward() function will also provide `targets` and
     `criterion` arguments in order to enable calculation of the loss inside forward() function.
 
-    The forward() function should have the following parameter signature and should finish with:::
+    The forward() function should have the following parameter signature and should finish with::
 
         def forward(*batch_input_data, targets=None, criterion=None):
             ... predictions calculation via the computational graph ...
