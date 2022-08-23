@@ -151,8 +151,8 @@ class AbstractCallback:
             y_test_batch: reference ground truth targets for the current batch
             metadata_batch: additional results/metadata returned by the model for the current batch
             dataset_info (dict or None): additional information describing the dataset inside the provided dataloader.
-                One such dataset info is the dataset ``type`` (train, validation, or test) set by TrainLoop's
-                predict_on_train_set(), predict_on_validation_set() and predict_on_test_set() methods.
+                One such dataset info is the dataset ``type`` ("train", "validation", or "test") set by TrainLoop's
+                ``predict_on_train_set()``, ``predict_on_validation_set()`` and ``predict_on_test_set()`` methods.
 
         Returns:
             None
@@ -204,9 +204,11 @@ class AbstractExperimentCallback(AbstractCallback):
         This details inference function should only be called after the callback has already been registered in the
         TrainLoop, e.g. in the on_train_loop_registration().
 
-        General rule:
-            take details from the TrainLoop -> for this option where experiment details are inferred from TrainLoop
-                            all of the cloud_save_mode, bucket_name and cloud_dir_prefix should be set to None
+        Note:
+            **General rule:**
+
+            Take details from the TrainLoop -> for this option where experiment details are inferred from TrainLoop
+            all of the cloud_save_mode, bucket_name and cloud_dir_prefix should be set to None
 
             Based on `self.cloud_save_mode` the inference decision is made as follows:
                 - ['s3', 'aws_s3', 'aws'] --> AWS S3
@@ -217,7 +219,7 @@ class AbstractExperimentCallback(AbstractCallback):
             infer_cloud_details (bool): should infer only local project folder details or also cloud project destination
 
         Raises:
-            AttributeError
+            AttributeError: If current TrainLoop doesn't support auto project tracking.
 
         Returns:
             None
