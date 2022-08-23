@@ -294,7 +294,7 @@ class TrainLoop:
             batch_data (torch.Tensor): input data batch
 
         Returns:
-            loss (torch.Tensor): loss calculated on current batch
+            loss (torch.Tensor or MultiLoss): loss calculated on current batch
         """
         with amp.autocast(enabled=self.use_amp):
             if self.batch_model_feed_def is None:
@@ -315,7 +315,7 @@ class TrainLoop:
         """Execute backward pass from the current batch loss
 
         Args:
-            loss_batch (torch.Tensor): loss calculated on current batch
+            loss_batch (torch.Tensor or MultiLoss): loss calculated on current batch
             optimizer_idx (int): index of the current optimizer. Mostly useful when using multiple optimizers. When
                 only a single optimizer is used this parameter can be ignored.
 

@@ -105,7 +105,7 @@ class PyTorchModelPredictor:
 
         Returns:
             aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or dict: calculated
-                result package or results dict
+            result package or results dict
         """
         y_pred, y_test, additional_results = self.train_loop.predict_on_test_set()
 
@@ -152,7 +152,7 @@ class PyTorchModelPredictor:
 
         Returns:
             aitoolbox.experiment.core_metrics.abstract_metric.AbstractBaseMetric or dict: calculated performance metric
-                or result dict
+            or result dict
         """
         y_pred, y_test, additional_results = self.train_loop.predict_on_test_set()
 

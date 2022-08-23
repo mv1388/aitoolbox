@@ -4,7 +4,6 @@ import torch.nn as nn
 from aitoolbox.torchtrain.data.batch_model_feed_defs import AbstractModelFeedDefinition
 
 
-
 class TTModel(nn.Module, ABC):
     """
     TTModel is an extension of core PyTorch nn.Module
