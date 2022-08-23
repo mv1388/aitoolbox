@@ -211,9 +211,10 @@ class AbstractExperimentCallback(AbstractCallback):
             all of the cloud_save_mode, bucket_name and cloud_dir_prefix should be set to None
 
             Based on `self.cloud_save_mode` the inference decision is made as follows:
-                - ['s3', 'aws_s3', 'aws'] --> AWS S3
-                - ['gcs', 'google_storage', 'google storage'] --> Google Cloud Storage
-                - 'local' or whatever value -> local only
+
+            - ['s3', 'aws_s3', 'aws'] --> AWS S3
+            - ['gcs', 'google_storage', 'google storage'] --> Google Cloud Storage
+            - 'local' or whatever value -> local only
 
         Args:
             infer_cloud_details (bool): should infer only local project folder details or also cloud project destination
