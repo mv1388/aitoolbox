@@ -69,7 +69,6 @@ class TrainLoop:
 
             cuda_device_idx (int or None): CUDA device index used when training on multiple GPUs
             use_amp (bool or dict): use 16-bit Automatic Mixed Precision (AMP)
-
                 To switch to AMP mode either:
 
                 * set this parameter to ``True`` to use default AMP :class:`~torch.cuda.amp.GradScaler`
