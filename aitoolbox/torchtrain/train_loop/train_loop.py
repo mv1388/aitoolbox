@@ -290,10 +290,10 @@ class TrainLoop:
         """Push batch data through the model and calculate the batch loss
 
         Args:
-            batch_data: input data batch
+            batch_data (torch.Tensor): input data batch
 
         Returns:
-            loss: loss calculated on current batch
+            loss (torch.Tensor): loss calculated on current batch
         """
         with amp.autocast(enabled=self.use_amp):
             if self.batch_model_feed_def is None:
@@ -314,7 +314,7 @@ class TrainLoop:
         """Execute backward pass from the current batch loss
 
         Args:
-            loss_batch: loss calculated on current batch
+            loss_batch (torch.Tensor): loss calculated on current batch
             optimizer_idx (int): index of the current optimizer. Mostly useful when using multiple optimizers. When
                 only a single optimizer is used this parameter can be ignored.
 
@@ -452,9 +452,10 @@ class TrainLoop:
 
         Returns:
             torch.DoubleTensor or MultiLoss: in the case of single loss torch Tensor is returned, otherwise the dict of
-                multiple losses is returned where each value is again a torch Tensor
+            multiple losses is returned where each value is again a torch Tensor
 
-                Important to note: all the returned loss Tensors are left on the original device (e.g. a GPU).
+            Note:
+                **Important to note:** all the returned loss Tensors are left on the original device (e.g. a GPU).
         """
         loss_names = None
 
@@ -523,8 +524,8 @@ class TrainLoop:
 
         Returns:
             torch.Tensor or MultiLoss or float or dict: train set loss. Returned tensors are on the CPU.
-                Depending on the set ``float_dict_format`` parameter either a standard or simplified
-                loss representation is returned: ``torch.Tensor``/``MultiLoss`` vs. ``float``/``dict``
+            Depending on the set ``float_dict_format`` parameter either a standard or simplified
+            loss representation is returned: ``torch.Tensor``/``MultiLoss`` vs. ``float``/``dict``
         """
         if not self.prediction_store.has_train_loss(self.total_iteration_idx) or force_prediction:
             loss = self.evaluate_model_loss(self.train_loader,
@@ -550,8 +551,8 @@ class TrainLoop:
 
         Returns:
             torch.Tensor or MultiLoss or float or dict: validation set loss. Returned tensors are on the CPU.
-                Depending on the set ``float_dict_format`` parameter either a standard or simplified
-                loss representation is returned: ``torch.Tensor``/``MultiLoss`` vs. ``float``/``dict``
+            Depending on the set ``float_dict_format`` parameter either a standard or simplified
+            loss representation is returned: ``torch.Tensor``/``MultiLoss`` vs. ``float``/``dict``
         """
         if not self.prediction_store.has_val_loss(self.total_iteration_idx) or force_prediction:
             loss = self.evaluate_model_loss(self.validation_loader,
@@ -577,8 +578,8 @@ class TrainLoop:
 
         Returns:
             torch.Tensor or MultiLoss or float or dict: test set loss. Returned tensors are on the CPU.
-                Depending on the set ``float_dict_format`` parameter either a standard or simplified
-                loss representation is returned: ``torch.Tensor``/``MultiLoss`` vs. ``float``/``dict``
+            Depending on the set ``float_dict_format`` parameter either a standard or simplified
+            loss representation is returned: ``torch.Tensor``/``MultiLoss`` vs. ``float``/``dict``
         """
         if not self.prediction_store.has_test_loss(self.total_iteration_idx) or force_prediction:
             loss = self.evaluate_model_loss(self.test_loader,
@@ -606,10 +607,10 @@ class TrainLoop:
 
         Returns:
             torch.Tensor or MultiLoss: calculated average loss over all the batches. In the case of multi loss,
-                the MultiLoss wrapper gets returned.
+            the MultiLoss wrapper gets returned.
 
-                Important to note: by default the returned loss tensors are left on the same device as they are
-                computed. Meaning, that the returned values can potentially still be on the GPU.
+            Important to note: by default the returned loss tensors are left on the same device as they are
+            computed. Meaning, that the returned values can potentially still be on the GPU.
         """
         desc = "Loss evaluation"
         if isinstance(dataset_info, dict) and 'type' in dataset_info:
