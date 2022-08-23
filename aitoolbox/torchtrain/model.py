@@ -4,6 +4,7 @@ import torch.nn as nn
 from aitoolbox.torchtrain.data.batch_model_feed_defs import AbstractModelFeedDefinition
 
 
+
 class TTModel(nn.Module, ABC):
     """
     TTModel is an extension of core PyTorch nn.Module
@@ -13,7 +14,8 @@ class TTModel(nn.Module, ABC):
     In addition to the common :meth:`~torch.nn.Module.forward` method required by the base :class:`torch.nn.Module`,
     the user also needs to implement the additional AIToolbox specific
     :meth:`~aitoolbox.torchtrain.model.TTModel.get_loss` and :meth:`~aitoolbox.torchtrain.model.TTModel.get_predictions`
-    methods.
+    methods. Optionally, the user can also implement a desired :meth:`~aitoolbox.torchtrain.model.TTModel.get_loss_eval`
+    method for specific loss calculation when in evaluation mode.
 
     ``transfer_model_attributes`` (list or tuple): additional TTModel attributes which need to be transferred to
     the TTDataParallel level to enable their use in the transferred/exposed class methods. When coding
@@ -38,7 +40,7 @@ class TTModel(nn.Module, ABC):
             device (torch.device): device on which the model is being trained
 
         Returns:
-            torch.Tensor: loss
+            torch.Tensor or aitoolbox.torchtrain.multi_loss_optim.MultiLoss: loss
         """
         pass
 
@@ -50,7 +52,8 @@ class TTModel(nn.Module, ABC):
         The difference compared with get_loss() is that here the backprop weight update is not done.
         This function is executed in the evaluation stage not training.
 
-        For simple examples this function can just call the get_loss() and return its result.
+        For simple examples this function can just call the :meth:`~aitoolbox.torchtrain.model.TTModel.get_loss`
+        and return its result.
 
         Args:
             batch_data (torch.Tensor or list or tuple or dict): model input data batch
@@ -58,7 +61,7 @@ class TTModel(nn.Module, ABC):
             device (torch.device): device on which the model is being trained
 
         Returns:
-            torch.Tensor: loss
+            torch.Tensor or aitoolbox.torchtrain.multi_loss_optim.MultiLoss: loss
         """
         return self.get_loss(batch_data, criterion, device)
 
@@ -112,8 +115,9 @@ class TTBasicMultiGPUModel(TTBasicModel):
     except the last one as an input to the model. The last data source from the data loader will be treated as
     the target variable. (*batch_input_data, targets = batch_data)
 
-    In the case of the get_loss() the inout into the model's forward() function will also provide `targets` and
-    `criterion` arguments in order to enable calculation of the loss inside forward() function.
+    In the case of the :meth:`~aitoolbox.torchtrain.model.TTModel.get_loss` the input into the model's
+    :meth:`~torch.nn.Module.forward` function will also provide `targets` and `criterion` arguments in order to enable
+    calculation of the loss inside :meth:`~torch.nn.Module.forward` function.
 
     The forward() function should have the following parameter signature and should finish with::
 
@@ -125,7 +129,7 @@ class TTBasicMultiGPUModel(TTBasicModel):
             else:
                 return predictions
 
-    This base class is mainly meant to be used for simple models. TTBasicModel removes the need to constantly
+    This base class is mainly meant to be used for simple models. TTBasicMultiGPUModel removes the need to constantly
     duplicate code in get_loss and get_predictions.
     """
     def get_loss(self, batch_data, criterion, device):
@@ -140,7 +144,7 @@ class MultiGPUModelWrap(TTBasicMultiGPUModel):
         """Model wrapper optimizing the model for multi-GPU training by moving the loss calculation to the GPUs
 
         Args:
-            model (nn.Module or TTModel): neural network model. The model should follow the basic PyTorch model
+            model (torch.nn.Module or TTModel): neural network model. The model should follow the basic PyTorch model
                 definition where the forward() function returns predictions
         """
         TTBasicMultiGPUModel.__init__(self)
@@ -180,7 +184,7 @@ class ModelWrap:
         ModelWrap can be used as a replacement of TTModel when using the TrainLoop.
 
         Args:
-            model (nn.Module): neural network model
+            model (torch.nn.Module): neural network model
             batch_model_feed_def (AbstractModelFeedDefinition or None): data
                 prep definition for batched data. This definition prepares the data for each batch that gets than fed
                 into the neural network.
