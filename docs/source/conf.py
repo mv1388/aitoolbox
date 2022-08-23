@@ -90,7 +90,10 @@ exclude_patterns = []
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
     "torch": ("https://pytorch.org/docs/stable/", None),
-    'numpy': ('https://numpy.org/doc/stable/', None)
+    'numpy': ('https://numpy.org/doc/stable/', None),
+    'transformers': ('https://huggingface.co/docs/transformers/master/en/', None),
+    'evaluate': ('https://huggingface.co/docs/evaluate/master/en/', None),
+    'torchmetrics': ('https://torchmetrics.readthedocs.io/en/stable/', None)
 }
 
 
