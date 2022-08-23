@@ -3,6 +3,7 @@ import os
 import time
 import math
 import datetime
+from contextlib import nullcontext
 from typing import Optional
 import numpy as np
 import torch
@@ -237,12 +238,14 @@ class TrainLoop:
                 self.callbacks_handler.execute_batch_begin()
 
                 # Feed batch into the model
-                loss_batch = self._calculate_batch_loss(batch_data)
+                with self._ddp_sync_context():
+                    loss_batch = self._calculate_batch_loss(batch_data)
 
                 # Iterate over potentially multiple optimizers
                 for optimizer_idx in range(self.num_optimizers):
                     # Backward pass through the model
-                    self._backward_pass(loss_batch, optimizer_idx)
+                    with self._ddp_sync_context():
+                        self._backward_pass(loss_batch, optimizer_idx)
                     if self.grad_cb_used:
                         self.callbacks_handler.execute_gradient_update(optimizer_idx)
 
@@ -823,6 +826,17 @@ class TrainLoop:
             bool: if current process is the main training process. In case of DDP it is process at rank 0
         """
         return not self.ddp_training_mode or self.ddp_rank == 0
+
+    def _ddp_sync_context(self):
+        """Provide DDP no_sync() context manager for grad accumulation training, otherwise provide blank context manager
+
+        Returns:
+            AbstractContextManager: either DDP ``no_sync()`` context manager or blank ``nullcontext`` context manager
+        """
+        context = nullcontext()
+        if self.ddp_training_mode and not self.should_execute_optimizer_update():
+            context = self.model.no_sync()
+        return context
 
     @staticmethod
     def convert_loss_to_float_dict_format(loss):
