@@ -10,8 +10,10 @@ class TTModel(nn.Module, ABC):
 
     TT in TTModel --> TorchTrain Model
 
-    In addition to the common ``forward()`` method required by the base nn.Module, the user also needs to implement
-    the additional AIToolbox specific ``get_loss()`` and ``get_predictions()`` methods.
+    In addition to the common :meth:`~torch.nn.Module.forward` method required by the base :class:`torch.nn.Module`,
+    the user also needs to implement the additional AIToolbox specific
+    :meth:`~aitoolbox.torchtrain.model.TTModel.get_loss` and :meth:`~aitoolbox.torchtrain.model.TTModel.get_predictions`
+    methods.
 
     ``transfer_model_attributes`` (list or tuple): additional TTModel attributes which need to be transferred to
     the TTDataParallel level to enable their use in the transferred/exposed class methods. When coding
@@ -31,12 +33,12 @@ class TTModel(nn.Module, ABC):
         Executed during training stage where model weights are updated based on the loss returned from this function.
 
         Args:
-            batch_data: model input data batch
-            criterion: loss criterion
-            device: device on which the model is being trained
+            batch_data (torch.Tensor or list or tuple or dict): model input data batch
+            criterion (torch.nn.Module): loss criterion
+            device (torch.device): device on which the model is being trained
 
         Returns:
-            PyTorch loss
+            torch.Tensor: loss
         """
         pass
 
@@ -51,12 +53,12 @@ class TTModel(nn.Module, ABC):
         For simple examples this function can just call the get_loss() and return its result.
 
         Args:
-            batch_data: model input data batch
-            criterion: loss criterion
-            device: device on which the model is being trained
+            batch_data (torch.Tensor or list or tuple or dict): model input data batch
+            criterion (torch.nn.Module): loss criterion
+            device (torch.device): device on which the model is being trained
 
         Returns:
-            PyTorch loss
+            torch.Tensor: loss
         """
         return self.get_loss(batch_data, criterion, device)
 
@@ -65,12 +67,12 @@ class TTModel(nn.Module, ABC):
         """Get predictions during evaluation stage
 
         Args:
-            batch_data: model input data batch
-            device: device on which the model is making the prediction
+            batch_data (torch.Tensor or list or tuple or dict): model input data batch
+            device (torch.device): device on which the model is making the prediction
 
         Returns:
             (torch.Tensor, torch.Tensor, dict or None): y_pred, y_test, metadata
-                in the form of dict of lists/torch.Tensors/np.arrays
+            in the form of dict of lists/torch.Tensors/np.arrays
         """
         pass
 
@@ -113,7 +115,7 @@ class TTBasicMultiGPUModel(TTBasicModel):
     In the case of the get_loss() the inout into the model's forward() function will also provide `targets` and
     `criterion` arguments in order to enable calculation of the loss inside forward() function.
 
-    The forward() function should have the following parameter signature and should finish with:
+    The forward() function should have the following parameter signature and should finish with:::
 
         def forward(*batch_input_data, targets=None, criterion=None):
             ... predictions calculation via the computational graph ...
