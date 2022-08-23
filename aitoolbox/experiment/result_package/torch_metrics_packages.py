@@ -8,7 +8,7 @@ class TorchMetricsPackage(AbstractResultPackage):
         https://github.com/Lightning-AI/metrics
 
         Args:
-            torch_metrics (torchmetrics.Metric or torchmetrics.MetricCollection): single torchmetrics metric object or
+            torch_metrics (torchmetrics.Metric or torchmetrics.collections.MetricCollection or torchmetrics.MetricCollection): single torchmetrics metric object or
                 a collection of such metrics wrapped inside the MetricCollection
         """
         AbstractResultPackage.__init__(self, pkg_name='Torch Metrics', np_array=False)
