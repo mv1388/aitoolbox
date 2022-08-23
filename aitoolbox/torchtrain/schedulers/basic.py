@@ -1,6 +1,8 @@
+import torch
 from torch.optim.lr_scheduler import ReduceLROnPlateau, LambdaLR, StepLR, MultiStepLR
 
 from aitoolbox.torchtrain.callbacks.abstract import AbstractCallback
+from aitoolbox.torchtrain.multi_loss_optim import MultiLoss
 
 
 class AbstractScheduler:
@@ -70,17 +72,25 @@ class GeneralLRSchedulerCallback(AbstractScheduler, AbstractCallback):
 
 
 class ReduceLROnPlateauScheduler(GeneralLRSchedulerCallback):
-    def __init__(self, **kwargs):
+    def __init__(self, main_multi_loss=None, **kwargs):
         """Learning rate scheduler which reduces the rate if the loss performance stops improving
 
         Args:
+            main_multi_loss (str or None): name of the main loss to follow in the scheduler when using MultiLoss setup.
+                If ``None`` is provided, then the mean of all the MultiLosses is taken.
             **kwargs: learning rate scheduler additional parameters
         """
         GeneralLRSchedulerCallback.__init__(self, ReduceLROnPlateau, **kwargs)
         self.callback_name = 'Reduce learn rate if the model hits the plateau'
+        self.main_multi_loss = main_multi_loss
 
     def on_epoch_end(self):
         val_loss_avg = self.train_loop_obj.evaluate_loss_on_validation_set()
+        if isinstance(val_loss_avg, MultiLoss):
+            if self.main_multi_loss is None:
+                val_loss_avg = torch.mean(torch.Tensor(list(val_loss_avg.values())))
+            else:
+                val_loss_avg = val_loss_avg[self.main_multi_loss]
         self.scheduler.step(val_loss_avg)
 
 

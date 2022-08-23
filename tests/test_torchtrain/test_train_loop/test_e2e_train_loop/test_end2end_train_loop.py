@@ -156,9 +156,15 @@ class TestEnd2EndTrainLoop(unittest.TestCase):
         )
         train_loop.fit(num_epochs=5)
 
-        self.assertAlmostEqual(train_loop.evaluate_loss_on_train_set(), 1.8507084131240845, places=6)
-        self.assertAlmostEqual(train_loop.evaluate_loss_on_validation_set(), 2.4111196994781494, places=6)
-        self.assertAlmostEqual(train_loop.evaluate_loss_on_test_set(), 2.31626296043396, places=6)
+        self.assertAlmostEqual(
+            train_loop.evaluate_loss_on_train_set(float_dict_format=True), 1.8507084131240845, places=6
+        )
+        self.assertAlmostEqual(
+            train_loop.evaluate_loss_on_validation_set(float_dict_format=True), 2.4111196994781494, places=6
+        )
+        self.assertAlmostEqual(
+            train_loop.evaluate_loss_on_test_set(float_dict_format=True), 2.31626296043396, places=6
+        )
 
     def test_e2e_ff_net_train_loop_predictions(self):
         self.set_seeds()
@@ -370,13 +376,13 @@ class TestEnd2EndTrainLoop(unittest.TestCase):
         self.assertEqual(val_pred.argmax(dim=1).tolist(), val_pred_grad_acc.argmax(dim=1).tolist())
         self.assertEqual(test_pred.argmax(dim=1).tolist(), test_pred_grad_acc.argmax(dim=1).tolist())
 
-        train_loss = train_loop.evaluate_loss_on_train_set()
-        val_loss = train_loop.evaluate_loss_on_validation_set()
-        test_loss = train_loop.evaluate_loss_on_test_set()
+        train_loss = train_loop.evaluate_loss_on_train_set(float_dict_format=True)
+        val_loss = train_loop.evaluate_loss_on_validation_set(float_dict_format=True)
+        test_loss = train_loop.evaluate_loss_on_test_set(float_dict_format=True)
 
-        train_loss_grad_acc = train_loop_grad_acc.evaluate_loss_on_train_set()
-        val_loss_grad_acc = train_loop_grad_acc.evaluate_loss_on_validation_set()
-        test_loss_grad_acc = train_loop_grad_acc.evaluate_loss_on_test_set()
+        train_loss_grad_acc = train_loop_grad_acc.evaluate_loss_on_train_set(float_dict_format=True)
+        val_loss_grad_acc = train_loop_grad_acc.evaluate_loss_on_validation_set(float_dict_format=True)
+        test_loss_grad_acc = train_loop_grad_acc.evaluate_loss_on_test_set(float_dict_format=True)
 
         self.assertAlmostEqual(train_loss, train_loss_grad_acc, places=6)
         self.assertAlmostEqual(val_loss, val_loss_grad_acc, places=6)

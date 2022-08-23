@@ -44,7 +44,7 @@ local_project_path="None"
 dataset_name="None"
 preproc_dataset="None"
 DL_framework="pytorch"
-AIToolbox_version="1.7.0"
+AIToolbox_version="1.8.0"
 instance_config="default_config.json"
 instance_type=
 experiment_script_file="aws_run_experiments_project.sh"
@@ -264,6 +264,11 @@ echo "Instance AWS ID: $instance_id"
 echo "To easily ssh connect into the running job session execute:"
 echo
 echo "    ./ssh_to_instance.sh $ec2_instance_address -s"
+echo
+echo
+echo "To terminate the instance execute:"
+echo
+echo "    aws ec2 terminate-instances --instance-ids $instance_id"
 echo
 
 if [ $ssh_at_start == true ]; then

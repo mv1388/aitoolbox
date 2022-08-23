@@ -226,7 +226,7 @@ class TrainLoop:
         self.callbacks_handler.execute_train_begin()
 
         for self.epoch in range(self.epoch, num_epochs):
-            if not self.ddp_training_mode or self.device.index == 0:
+            if self.is_main_process():
                 print('\n\n================================================================================')
                 print('================================================================================')
                 print(f'Epoch: {self.epoch}')
@@ -308,7 +308,7 @@ class TrainLoop:
             # Need to divide by the number of accumulation steps if our loss is averaged over the training samples
             loss_batch = loss_batch / self.grad_accumulation
 
-        self.loss_batch_accum.append(loss_batch_log.item())
+        self.loss_batch_accum.append(loss_batch_log.detach())
 
         return loss_batch
 
@@ -441,133 +441,177 @@ class TrainLoop:
         Primarily useful for parsing between single loss representation and the multi-loss representation.
 
         Args:
-            loss_record (list): list of losses from each processed batch.
+            loss_record (list): list of Tensor losses from each processed batch.
 
-                If we used single loss than the ``loss_record`` is a list of floats where each element float is
-                loss for a single batch which has been transformed from torch Tensor into the float via .item()
+                If we used single loss than the ``loss_record`` is a list of Tensors where each element Tensor is
+                loss for a single batch.
 
-                If we used multiple losses wrapped inside MultiLoss() then the _train() function called its
-                item() method which converted multi-loss representation into the list of dicts, where each dict
-                represents a loss for a single batch:
+                If we used multiple losses wrapped inside MultiLoss(), these behave the same way as normal dicts as
+                MultiLoss subclasses a dict and thus implements dict protocols. Consequently, loss_record
+                can be thought as a list of (MultiLoss) dicts, where each dict represents a loss for a single batch:
 
-                ``[{'loss_1': 1., 'loss_2': 33.}, { ... }]``
+                ``[MultiLoss({'loss_1': Tensor(1.), 'loss_2': Tensor(33.)}), MultiLoss({ ... })]``
 
         Returns:
-            np.array or dict: in the case of single loss numpy array is returned, otherwise the dict of multiple losses
-                is returned
+            torch.DoubleTensor or MultiLoss: in the case of single loss torch Tensor is returned, otherwise the dict of
+                multiple losses is returned where each value is again a torch Tensor
+
+                Important to note: all the returned loss Tensors are left on the original device (e.g. a GPU).
         """
         loss_names = None
 
-        if isinstance(self.optimizer, MultiOptimizer):
+        if isinstance(loss_record[0], MultiLoss):
             loss_names = sorted(loss_record[0].keys())
-            # loss_record is a list of lists with dimensions: [num_batches, num_losses]
-            loss_record = [[loss_dict[k] for k in loss_names] for loss_dict in loss_record]
+            # loss_record is a list of tensors with dimensions: [num_batches, num_losses]
+            loss_record = [torch.stack(list(multi_loss.values())).unsqueeze(0) for multi_loss in loss_record]
+            loss_record = torch.cat(loss_record)
+        else:
+            loss_record = torch.stack(loss_record)
+
+        # Create torch.DoubleTensor on the original device (e.g. GPU)
+        loss_record = loss_record.double()
 
         if self.ddp_training_mode:
-            loss_record = self.ddp_handler.mp_sync(loss_record, double_precision=True)
-            loss_record = loss_record.numpy()
+            loss_record = self.ddp_handler.mp_sync(loss_record)
 
-        loss_avg = np.mean(loss_record, axis=0)
+        loss_avg = torch.mean(loss_record, dim=0)
 
         if loss_names is None:
             return loss_avg
         else:
-            return dict(zip(loss_names, loss_avg))
+            return MultiLoss(dict(zip(loss_names, loss_avg)))
 
     def _print_save_loss(self, loss_parsed, loss_type_name, loss_print_description):
         """Helper function which prints information about parsed loss and saves the loss results into the history
 
         Args:
-            loss_parsed (np.array or dict): parsed loss result either as a single value or as a dict of multiple losses
+            loss_parsed (torch.Tensor or MultiLoss): parsed loss result either as a single value or as MultiLoss
+                in case of multiple losses
             loss_type_name (str): type of the provided loss result
             loss_print_description (str): presentation description text of the provided loss result
 
         Returns:
             None
         """
+        # Move to the CPU and convert to float
+        loss_parsed = loss_parsed.item()
+
         # Results reporting to terminal
-        if not self.ddp_training_mode or self.device.index == 0:
-            loss_avg = np.mean(list(loss_parsed.values())) if isinstance(loss_parsed, dict) else loss_parsed
+        if self.is_main_process():
+            loss_avg = np.mean(list(loss_parsed.values())) if isinstance(loss_parsed, MultiLoss) else loss_parsed
             print(f'{loss_print_description}: {loss_avg}')
 
-            if isinstance(self.optimizer, MultiOptimizer) and isinstance(loss_parsed, dict):
+            if isinstance(loss_parsed, MultiLoss):
                 print(f'MULTI-LOSS {loss_print_description}:')
                 for loss_name, loss_val in loss_parsed.items():
                     print(f'\t{loss_name}: {loss_val}')
 
         # Insert results into history
-        if isinstance(self.optimizer, MultiOptimizer) and isinstance(loss_parsed, dict):
+        if isinstance(loss_parsed, MultiLoss):
             for loss_name, loss_val in loss_parsed.items():
                 self.insert_metric_result_into_history(f'{loss_type_name}_{loss_name}', loss_val)
         else:
             self.insert_metric_result_into_history(loss_type_name, loss_parsed)
 
-    def evaluate_loss_on_train_set(self, force_prediction=False):
+    def evaluate_loss_on_train_set(self, force_prediction=False, float_dict_format=False):
         """Run train dataset through the network without updating the weights and return the loss
 
         Args:
             force_prediction (bool): recompute the loss even if it is available in the prediction cache. This causes
                 the old cached value to be overwritten.
+            float_dict_format (bool): if true, simplified loss representation is returned. In case of single loss,
+                a float is returned, while in case of multi-loss a dict extracted from MultiLoss wrapper is returned.
+                If false, the standard ``torch.Tensor`` or ``MultiLoss`` get returned.
 
         Returns:
-            float or dict: loss, in the case of multi loss, the dict gets returned
+            torch.Tensor or MultiLoss or float or dict: train set loss. Returned tensors are on the CPU.
+                Depending on the set ``float_dict_format`` parameter either a standard or simplified
+                loss representation is returned: ``torch.Tensor``/``MultiLoss`` vs. ``float``/``dict``
         """
         if not self.prediction_store.has_train_loss(self.total_iteration_idx) or force_prediction:
-            loss = self.evaluate_model_loss(self.train_loader, dataset_info={'type': 'train'})
+            loss = self.evaluate_model_loss(self.train_loader,
+                                            move_to_cpu=True, dataset_info={'type': 'train'})
             self.prediction_store.insert_train_loss(loss, self.total_iteration_idx, force_prediction)
         else:
             loss = self.prediction_store.get_train_loss(self.total_iteration_idx)
 
+        if float_dict_format:
+            loss = self.convert_loss_to_float_dict_format(loss)
+
         return loss
 
-    def evaluate_loss_on_validation_set(self, force_prediction=False):
+    def evaluate_loss_on_validation_set(self, force_prediction=False, float_dict_format=False):
         """Run validation dataset through the network without updating the weights and return the loss
 
         Args:
             force_prediction (bool): recompute the loss even if it is available in the prediction cache. This causes
                 the old cached value to be overwritten.
+            float_dict_format (bool): if true, simplified loss representation is returned. In case of single loss,
+                a float is returned, while in case of multi-loss a dict extracted from MultiLoss wrapper is returned.
+                If false, the standard ``torch.Tensor`` or ``MultiLoss`` get returned.
 
         Returns:
-            float or dict: loss, in the case of multi loss, the dict gets returned
+            torch.Tensor or MultiLoss or float or dict: validation set loss. Returned tensors are on the CPU.
+                Depending on the set ``float_dict_format`` parameter either a standard or simplified
+                loss representation is returned: ``torch.Tensor``/``MultiLoss`` vs. ``float``/``dict``
         """
         if not self.prediction_store.has_val_loss(self.total_iteration_idx) or force_prediction:
-            loss = self.evaluate_model_loss(self.validation_loader, dataset_info={'type': 'validation'})
+            loss = self.evaluate_model_loss(self.validation_loader,
+                                            move_to_cpu=True, dataset_info={'type': 'validation'})
             self.prediction_store.insert_val_loss(loss, self.total_iteration_idx, force_prediction)
         else:
             loss = self.prediction_store.get_val_loss(self.total_iteration_idx)
 
+        if float_dict_format:
+            loss = self.convert_loss_to_float_dict_format(loss)
+
         return loss
 
-    def evaluate_loss_on_test_set(self, force_prediction=False):
+    def evaluate_loss_on_test_set(self, force_prediction=False, float_dict_format=False):
         """Run test dataset through the network without updating the weights and return the loss
 
         Args:
             force_prediction (bool): recompute the loss even if it is available in the prediction cache. This causes
                 the old cached value to be overwritten.
+            float_dict_format (bool): if true, simplified loss representation is returned. In case of single loss,
+                a float is returned, while in case of multi-loss a dict extracted from MultiLoss wrapper is returned.
+                If false, the standard ``torch.Tensor`` or ``MultiLoss`` get returned.
 
         Returns:
-            float or dict: loss, in the case of multi loss, the dict gets returned
+            torch.Tensor or MultiLoss or float or dict: test set loss. Returned tensors are on the CPU.
+                Depending on the set ``float_dict_format`` parameter either a standard or simplified
+                loss representation is returned: ``torch.Tensor``/``MultiLoss`` vs. ``float``/``dict``
         """
         if not self.prediction_store.has_test_loss(self.total_iteration_idx) or force_prediction:
-            loss = self.evaluate_model_loss(self.test_loader, dataset_info={'type': 'test'})
+            loss = self.evaluate_model_loss(self.test_loader,
+                                            move_to_cpu=True, dataset_info={'type': 'test'})
             self.prediction_store.insert_test_loss(loss, self.total_iteration_idx, force_prediction)
         else:
             loss = self.prediction_store.get_test_loss(self.total_iteration_idx)
 
+        if float_dict_format:
+            loss = self.convert_loss_to_float_dict_format(loss)
+
         return loss
 
-    def evaluate_model_loss(self, data_loader, dataset_info=None):
+    def evaluate_model_loss(self, data_loader, move_to_cpu=False, dataset_info=None):
         """Run given dataset through the network without updating the weights and return the loss
 
         Args:
             data_loader (torch.utils.data.DataLoader): dataloader containing the data on which the loss is calculated
+            move_to_cpu (bool): should the loss result be moved to the CPU. Otherwise, the returned loss
+                is kept on the original device (which can also be a GPU).
             dataset_info (dict or None): additional information describing the dataset inside the provided dataloader.
                 One such dataset info is the dataset ``type`` (``"train"``, ``"validation"``, or ``"test"``) set by
                 ``evaluate_loss_on_train_set()``, ``evaluate_loss_on_validation_set()`` and
                 ``evaluate_loss_on_test_set()`` methods.
 
         Returns:
-            float or dict: loss, in the case of multi loss, the dict gets returned
+            torch.Tensor or MultiLoss: calculated average loss over all the batches. In the case of multi loss,
+                the MultiLoss wrapper gets returned.
+
+                Important to note: by default the returned loss tensors are left on the same device as they are
+                computed. Meaning, that the returned values can potentially still be on the GPU.
         """
         desc = "Loss evaluation"
         if isinstance(dataset_info, dict) and 'type' in dataset_info:
@@ -589,9 +633,11 @@ class TrainLoop:
                         loss_batch = self.batch_model_feed_def.get_loss_eval(self.model, batch_data, self.criterion,
                                                                              self.device)
 
-                loss_avg.append(loss_batch.item())
+                loss_avg.append(loss_batch.detach())
 
             loss_avg = self.parse_loss(loss_avg)
+            if move_to_cpu:
+                loss_avg = loss_avg.cpu()
 
         self.model.train()
 
@@ -612,7 +658,7 @@ class TrainLoop:
         """
         if not self.prediction_store.has_train_predictions(self.total_iteration_idx) or force_prediction:
             predictions = self.predict_with_model(self.train_loader, execute_callbacks,
-                                                  dataset_info={'type': 'train'})
+                                                  move_to_cpu=True, dataset_info={'type': 'train'})
             self.prediction_store.insert_train_predictions(predictions, self.total_iteration_idx, force_prediction)
         else:
             predictions = self.prediction_store.get_train_predictions(self.total_iteration_idx)
@@ -634,7 +680,7 @@ class TrainLoop:
         """
         if not self.prediction_store.has_val_predictions(self.total_iteration_idx) or force_prediction:
             predictions = self.predict_with_model(self.validation_loader, execute_callbacks,
-                                                  dataset_info={'type': 'validation'})
+                                                  move_to_cpu=True, dataset_info={'type': 'validation'})
             self.prediction_store.insert_val_predictions(predictions, self.total_iteration_idx, force_prediction)
         else:
             predictions = self.prediction_store.get_val_predictions(self.total_iteration_idx)
@@ -656,14 +702,14 @@ class TrainLoop:
         """
         if not self.prediction_store.has_test_predictions(self.total_iteration_idx) or force_prediction:
             predictions = self.predict_with_model(self.test_loader, execute_callbacks,
-                                                  dataset_info={'type': 'test'})
+                                                  move_to_cpu=True, dataset_info={'type': 'test'})
             self.prediction_store.insert_test_predictions(predictions, self.total_iteration_idx, force_prediction)
         else:
             predictions = self.prediction_store.get_test_predictions(self.total_iteration_idx)
 
         return predictions
 
-    def predict_with_model(self, data_loader, execute_callbacks=False, dataset_info=None):
+    def predict_with_model(self, data_loader, execute_callbacks=False, move_to_cpu=False, dataset_info=None):
         """Run given dataset through the network and return true target values, target predictions and metadata
 
         Args:
@@ -671,9 +717,11 @@ class TrainLoop:
                 are calculated
             execute_callbacks (bool): If true, prediction loop will execute provided callbacks after prediction for
                 each batch has been made. Otherwise, callbacks at this position are ignored.
+            move_to_cpu (bool): should the predicted returned results be moved to the CPU. Otherwise, the returned
+                results are kept on the original device (which can also be a GPU).
             dataset_info (dict or None): additional information describing the dataset inside the provided dataloader.
                 One such dataset info is the dataset ``type`` (train, validation, or test) set by
-                predict_on_train_set(), predict_on_validation_set() and predict_on_test_set() methods.
+                ``predict_on_train_set()``, ``predict_on_validation_set()`` and ``predict_on_test_set()`` methods.
 
         Returns:
             (torch.Tensor, torch.Tensor, dict): y_pred, y_true, metadata
@@ -684,8 +732,8 @@ class TrainLoop:
             desc = f"{desc} on {dataset_info['type']}"
 
         self.model = self.model.to(self.device)
-
         self.model.eval()
+
         y_pred, y_test, metadata_list = [], [], []
 
         with torch.no_grad():
@@ -714,12 +762,20 @@ class TrainLoop:
             y_pred = self.pred_transform_fn(y_pred)
             y_test = self.pred_transform_fn(y_test)
 
-            metadata = dict_util.combine_prediction_metadata_batches(metadata_list) if len(metadata_list) > 0 else None
+            metadata = {}
+            if len(metadata_list) > 0:
+                metadata = dict_util.combine_prediction_metadata_batches(metadata_list)
 
             if self.ddp_training_mode:
-                y_pred = self.ddp_handler.mp_sync(y_pred).cpu()
-                y_test = self.ddp_handler.mp_sync(y_test).cpu()
-                metadata = self.ddp_handler.mp_sync_dict_of_lists(metadata) if metadata is not None else None
+                y_pred = self.ddp_handler.mp_sync(y_pred)
+                y_test = self.ddp_handler.mp_sync(y_test)
+                if len(metadata) > 0:
+                    metadata = self.ddp_handler.mp_sync_dict(metadata)
+
+            if move_to_cpu:
+                y_pred = y_pred.cpu()
+                y_test = y_test.cpu()
+                metadata = {k: v.cpu() if isinstance(v, torch.Tensor) else v for k, v in metadata.items()}
 
         self.model.train()
 
@@ -781,6 +837,25 @@ class TrainLoop:
         if self.ddp_training_mode and not self.should_execute_optimizer_update():
             context = self.model.no_sync()
         return context
+
+    @staticmethod
+    def convert_loss_to_float_dict_format(loss):
+        """Util method for converting loss records in Tensor/MultiLoss format into simpler float/dict format
+
+        Args:
+            loss (torch.Tensor or MultiLoss): more complex loss representation. In case of single loss it is
+                torch Tensor. In case of multi-loss it is MultiLoss wrapper.
+
+        Returns:
+            float or dict: simplified loss representation. In case of single loss it is a single float value. In case
+                of multi-loss it is a dict extracted out from the given MultiLoss wrapper.
+        """
+        loss = loss.item()
+        # Extract a python dict from the already item()'ed MultiLoss
+        if isinstance(loss, MultiLoss):
+            loss = loss.get_loss_dict()
+
+        return loss
 
     def _train_dp(self, num_epochs, num_iterations, callbacks=None, grad_accumulation=1, dp_model_args=None):
         """Train the model on multi-GPU with DataParallel auto wrapping

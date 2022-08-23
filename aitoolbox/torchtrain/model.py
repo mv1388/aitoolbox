@@ -69,7 +69,7 @@ class TTModel(nn.Module, ABC):
             device: device on which the model is making the prediction
 
         Returns:
-            torch.Tensor, torch.Tensor, dict: y_pred.cpu(), y_test.cpu(), metadata
+            (torch.Tensor, torch.Tensor, dict or None): y_pred, y_test, metadata
                 in the form of dict of lists/torch.Tensors/np.arrays
         """
         pass
@@ -99,7 +99,7 @@ class TTBasicModel(TTModel):
 
         predictions = self(*batch_input_data)
 
-        return predictions.cpu(), targets, {}
+        return predictions, targets, {}
 
 
 class TTBasicMultiGPUModel(TTBasicModel):
