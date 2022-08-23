@@ -73,9 +73,9 @@ class TrainLoop:
                 To switch to AMP mode either:
 
                 * set this parameter to ``True`` to use default AMP :class:`~torch.cuda.amp.GradScaler`
-                    initialization params
+                  initialization params
                 * provide custom AMP :class:`~torch.cuda.amp.GradScaler` initialization parameters as a dict as
-                    this parameter
+                  this parameter
         """
         if isinstance(model, TTModel) or isinstance(model, TTDataParallel):
             self.model = model
@@ -856,7 +856,7 @@ class TrainLoop:
             callbacks (list or None): callbacks that are executed during the training run
             grad_accumulation (int): number of batches the gradients are accumulated before updating weights
             dp_model_args (dict or None): parameters for :class:`aitoolbox.torchtrain.parallel.TTDataParallel` /
-                ``nn.DataParallel`` DP model wrap.
+                :class:`torch.nn.DataParallel` DP model wrap.
 
         Returns:
             TTDataParallel or torch.nn.DataParallel: trained model
@@ -896,9 +896,9 @@ class TrainLoop:
             node_rank (int): rank of the current node
             num_gpus (int): number of GPUs in the node
             backend (str): The backend to use. For more information look up the documentation for
-                ``dist.init_process_group()``. Valid values include ``mpi``, ``gloo``, and ``nccl``.
+                :meth:`torch.distributed.init_process_group`. Valid values include ``mpi``, ``gloo``, and ``nccl``.
             init_method (str): URL specifying how to initialize the process group. For more information look up
-                the documentation for ``dist.init_process_group()``.
+                the documentation for :meth:`torch.distributed.init_process_group`.
             on_gpu (bool): if the DDP training is executed on the GPU or on the CPU
         """
         self.ddp_training_mode = True
@@ -942,7 +942,9 @@ class TrainLoop:
             callbacks (list or None): callbacks that are executed during the training run
             grad_accumulation (int): number of batches the gradients are accumulated before updating weights
             in_process_data_load (list or None): in-process data loading logic implemented as a torchtrain callback.
-                The logic should be placed inside the on_multiprocess_start() callback function.
+                The logic should be placed inside the
+                :meth:`~aitoolbox.torchtrain.callbacks.abstract.AbstractCallback.on_multiprocess_start`
+                callback function.
                 When using this data loading option bear in mind that loaded dataset will be replicated in memory for
                 every spawned training process. This can in turn in cause extensive overall memory consumption.
         """
