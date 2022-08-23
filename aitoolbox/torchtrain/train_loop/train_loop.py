@@ -46,7 +46,7 @@ class TrainLoop:
             validation_loader (torch.utils.data.DataLoader or None): data loader for validation data set
             test_loader (torch.utils.data.DataLoader or None): data loader for test data set
             optimizer (torch.optim.Optimizer or MultiOptimizer): optimizer algorithm.
-            criterion (torch.nn.loss._Loss or MultiLoss or None): criterion during the training procedure
+            criterion (torch.nn.Module or MultiLoss or None): criterion during the training procedure
             collate_batch_pred_fn (callable): collate function transforming batch predictions as they come out from the
                 model
             pred_transform_fn (callable): function transforming all the produced predictions after all the batches have
