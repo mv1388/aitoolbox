@@ -7,7 +7,7 @@ from typing import Optional
 import numpy as np
 import torch
 import torch.nn as nn
-from torch.nn.modules import Module
+from torch.nn import Module
 import torch.multiprocessing as mp
 import torch.distributed as dist
 from torch.nn.parallel import DistributedDataParallel
@@ -45,8 +45,8 @@ class TrainLoop:
             train_loader (torch.utils.data.DataLoader): data loader for train data set
             validation_loader (torch.utils.data.DataLoader or None): data loader for validation data set
             test_loader (torch.utils.data.DataLoader or None): data loader for test data set
-            optimizer (torch.optim.optimizer.Optimizer or MultiOptimizer): optimizer algorithm.
-            criterion (torch.nn.modules.loss._Loss or MultiLoss or None): criterion during the training procedure
+            optimizer (torch.optim.Optimizer or MultiOptimizer): optimizer algorithm.
+            criterion (torch.nn.Module or MultiLoss or None): criterion during the training procedure
             collate_batch_pred_fn (callable): collate function transforming batch predictions as they come out from the
                 model
             pred_transform_fn (callable): function transforming all the produced predictions after all the batches have
@@ -68,12 +68,14 @@ class TrainLoop:
                 * ``'ddp'``: multi-GPU training via DistributedDataParallel
 
             cuda_device_idx (int or None): CUDA device index used when training on multiple GPUs
-            use_amp (bool or dict): use 16-bit Automatic Mixed Precision (AMP)
+            use_amp (bool or dict): Use 16-bit Automatic Mixed Precision (AMP).
 
                 To switch to AMP mode either:
 
-                * set this parameter to ``True`` to use default AMP ``torch.cuda.amp.GradScaler`` initialization params
-                * provide custom AMP ``torch.cuda.amp.GradScaler`` initialization parameters as a dict as this parameter
+                * set this parameter to ``True`` to use default AMP :class:`~torch.cuda.amp.GradScaler`
+                  initialization params
+                * provide custom AMP :class:`~torch.cuda.amp.GradScaler` initialization parameters as a dict as
+                  this parameter
         """
         if isinstance(model, TTModel) or isinstance(model, TTDataParallel):
             self.model = model
@@ -175,7 +177,7 @@ class TrainLoop:
                 ``gpu_mode`` parameter.
 
         Returns:
-            TTModel or torch.nn.modules.Module or TTDataParallel: trained model
+            TTModel or torch.nn.Module or TTDataParallel: trained model
         """
         if num_epochs > 0 and num_iterations > 0:
             raise ValueError('Both num_epochs and num_iterations are set. '
@@ -206,7 +208,7 @@ class TrainLoop:
             grad_accumulation (int): number of batches the gradients are accumulated before updating weights
 
         Returns:
-            TTModel or torch.nn.modules.Module or TTDataParallel: trained model
+            TTModel or torch.nn.Module or TTDataParallel: trained model
         """
         if num_iterations > 0:
             num_epochs = int(math.ceil(float(num_iterations) / len(self.train_loader)))
@@ -289,10 +291,10 @@ class TrainLoop:
         """Push batch data through the model and calculate the batch loss
 
         Args:
-            batch_data: input data batch
+            batch_data (torch.Tensor): input data batch
 
         Returns:
-            loss: loss calculated on current batch
+            loss (torch.Tensor or MultiLoss): loss calculated on current batch
         """
         with amp.autocast(enabled=self.use_amp):
             if self.batch_model_feed_def is None:
@@ -313,7 +315,7 @@ class TrainLoop:
         """Execute backward pass from the current batch loss
 
         Args:
-            loss_batch: loss calculated on current batch
+            loss_batch (torch.Tensor or MultiLoss): loss calculated on current batch
             optimizer_idx (int): index of the current optimizer. Mostly useful when using multiple optimizers. When
                 only a single optimizer is used this parameter can be ignored.
 
@@ -451,9 +453,10 @@ class TrainLoop:
 
         Returns:
             torch.DoubleTensor or MultiLoss: in the case of single loss torch Tensor is returned, otherwise the dict of
-                multiple losses is returned where each value is again a torch Tensor
+            multiple losses is returned where each value is again a torch Tensor
 
-                Important to note: all the returned loss Tensors are left on the original device (e.g. a GPU).
+            Note:
+                **Important to note:** all the returned loss Tensors are left on the original device (e.g. a GPU).
         """
         loss_names = None
 
@@ -522,8 +525,8 @@ class TrainLoop:
 
         Returns:
             torch.Tensor or MultiLoss or float or dict: train set loss. Returned tensors are on the CPU.
-                Depending on the set ``float_dict_format`` parameter either a standard or simplified
-                loss representation is returned: ``torch.Tensor``/``MultiLoss`` vs. ``float``/``dict``
+            Depending on the set ``float_dict_format`` parameter either a standard or simplified
+            loss representation is returned: ``torch.Tensor``/``MultiLoss`` vs. ``float``/``dict``
         """
         if not self.prediction_store.has_train_loss(self.total_iteration_idx) or force_prediction:
             loss = self.evaluate_model_loss(self.train_loader,
@@ -549,8 +552,8 @@ class TrainLoop:
 
         Returns:
             torch.Tensor or MultiLoss or float or dict: validation set loss. Returned tensors are on the CPU.
-                Depending on the set ``float_dict_format`` parameter either a standard or simplified
-                loss representation is returned: ``torch.Tensor``/``MultiLoss`` vs. ``float``/``dict``
+            Depending on the set ``float_dict_format`` parameter either a standard or simplified
+            loss representation is returned: ``torch.Tensor``/``MultiLoss`` vs. ``float``/``dict``
         """
         if not self.prediction_store.has_val_loss(self.total_iteration_idx) or force_prediction:
             loss = self.evaluate_model_loss(self.validation_loader,
@@ -576,8 +579,8 @@ class TrainLoop:
 
         Returns:
             torch.Tensor or MultiLoss or float or dict: test set loss. Returned tensors are on the CPU.
-                Depending on the set ``float_dict_format`` parameter either a standard or simplified
-                loss representation is returned: ``torch.Tensor``/``MultiLoss`` vs. ``float``/``dict``
+            Depending on the set ``float_dict_format`` parameter either a standard or simplified
+            loss representation is returned: ``torch.Tensor``/``MultiLoss`` vs. ``float``/``dict``
         """
         if not self.prediction_store.has_test_loss(self.total_iteration_idx) or force_prediction:
             loss = self.evaluate_model_loss(self.test_loader,
@@ -600,14 +603,16 @@ class TrainLoop:
                 is kept on the original device (which can also be a GPU).
             dataset_info (dict or None): additional information describing the dataset inside the provided dataloader.
                 One such dataset info is the dataset ``type`` (``"train"``, ``"validation"``, or ``"test"``) set by
-                ``evaluate_loss_on_train_set()``, ``evaluate_loss_on_validation_set()`` and
-                ``evaluate_loss_on_test_set()`` methods.
+                :meth:`~aitoolbox.torchtrain.train_loop.train_loop.TrainLoop.evaluate_loss_on_train_set`,
+                :meth:`~aitoolbox.torchtrain.train_loop.train_loop.TrainLoop.evaluate_loss_on_validation_set` and
+                :meth:`~aitoolbox.torchtrain.train_loop.train_loop.TrainLoop.evaluate_loss_on_test_set` methods.
 
         Returns:
-            torch.Tensor or MultiLoss: calculated average loss over all the batches. In the case of multi loss,
-                the MultiLoss wrapper gets returned.
+            torch.Tensor or MultiLoss: Calculated average loss over all the batches. In the case of multi loss,
+            the MultiLoss wrapper gets returned.
 
-                Important to note: by default the returned loss tensors are left on the same device as they are
+            Note:
+                **Important to note:** by default the returned loss tensors are left on the same device as they are
                 computed. Meaning, that the returned values can potentially still be on the GPU.
         """
         desc = "Loss evaluation"
@@ -651,7 +656,7 @@ class TrainLoop:
 
         Returns:
             (torch.Tensor, torch.Tensor, dict): y_pred, y_true, metadata
-                in the form of dict of lists/torch.Tensors/np.arrays
+            in the form of dict of lists/torch.Tensors/np.arrays
         """
         if not self.prediction_store.has_train_predictions(self.total_iteration_idx) or force_prediction:
             predictions = self.predict_with_model(self.train_loader, execute_callbacks,
@@ -673,7 +678,7 @@ class TrainLoop:
 
         Returns:
             (torch.Tensor, torch.Tensor, dict): y_pred, y_true, metadata
-                in the form of dict of lists/torch.Tensors/np.arrays
+            in the form of dict of lists/torch.Tensors/np.arrays
         """
         if not self.prediction_store.has_val_predictions(self.total_iteration_idx) or force_prediction:
             predictions = self.predict_with_model(self.validation_loader, execute_callbacks,
@@ -695,7 +700,7 @@ class TrainLoop:
 
         Returns:
             (torch.Tensor, torch.Tensor, dict): y_pred, y_true, metadata
-                in the form of dict of lists/torch.Tensors/np.arrays
+            in the form of dict of lists/torch.Tensors/np.arrays
         """
         if not self.prediction_store.has_test_predictions(self.total_iteration_idx) or force_prediction:
             predictions = self.predict_with_model(self.test_loader, execute_callbacks,
@@ -718,11 +723,13 @@ class TrainLoop:
                 results are kept on the original device (which can also be a GPU).
             dataset_info (dict or None): additional information describing the dataset inside the provided dataloader.
                 One such dataset info is the dataset ``type`` (train, validation, or test) set by
-                ``predict_on_train_set()``, ``predict_on_validation_set()`` and ``predict_on_test_set()`` methods.
+                :meth:`~aitoolbox.torchtrain.train_loop.train_loop.TrainLoop.predict_on_train_set`,
+                :meth:`~aitoolbox.torchtrain.train_loop.train_loop.TrainLoop.predict_on_validation_set` and
+                :meth:`~aitoolbox.torchtrain.train_loop.train_loop.TrainLoop.predict_on_test_set` methods.
 
         Returns:
             (torch.Tensor, torch.Tensor, dict): y_pred, y_true, metadata
-                in the form of dict of lists/torch.Tensors/np.arrays
+            in the form of dict of lists/torch.Tensors/np.arrays
         """
         desc = "Making predictions"
         if isinstance(dataset_info, dict) and 'type' in dataset_info:
@@ -834,7 +841,7 @@ class TrainLoop:
 
         Returns:
             float or dict: simplified loss representation. In case of single loss it is a single float value. In case
-                of multi-loss it is a dict extracted out from the given MultiLoss wrapper.
+            of multi-loss it is a dict extracted out from the given MultiLoss wrapper.
         """
         loss = loss.item()
         # Extract a python dict from the already item()'ed MultiLoss
@@ -853,10 +860,10 @@ class TrainLoop:
             callbacks (list or None): callbacks that are executed during the training run
             grad_accumulation (int): number of batches the gradients are accumulated before updating weights
             dp_model_args (dict or None): parameters for :class:`aitoolbox.torchtrain.parallel.TTDataParallel` /
-                ``nn.DataParallel`` DP model wrap.
+                :class:`torch.nn.DataParallel` DP model wrap.
 
         Returns:
-            TTDataParallel or nn.DataParallel: trained model
+            TTDataParallel or torch.nn.DataParallel: trained model
         """
         dp_model_args = dp_model_args if dp_model_args is not None else {}
 
@@ -882,9 +889,8 @@ class TrainLoop:
                 specification of the training length than the ``num_epochs`` parameter.
             callbacks (list or None): callbacks that are executed during the training run
             grad_accumulation (int): number of batches the gradients are accumulated before updating weights
-            ddp_model_args (dict or None): parameters for DistributedDataParallel model
-                Available parameters for DistributedDataParallel:
-                    https://pytorch.org/docs/master/nn.html#torch.nn.parallel.DistributedDataParallel
+            ddp_model_args (dict or None): parameters for underlying PyTorch
+                :class:`~torch.nn.parallel.DistributedDataParallel` model
             in_process_data_load (AbstractCallback or list or None):
                 in-process data loading logic implemented as a torchtrain callback. The logic should be placed inside
                 the on_multiprocess_start() callback function.
@@ -894,9 +900,9 @@ class TrainLoop:
             node_rank (int): rank of the current node
             num_gpus (int): number of GPUs in the node
             backend (str): The backend to use. For more information look up the documentation for
-                ``dist.init_process_group()``. Valid values include ``mpi``, ``gloo``, and ``nccl``.
+                :func:`torch.distributed.init_process_group`. Valid values include ``mpi``, ``gloo``, and ``nccl``.
             init_method (str): URL specifying how to initialize the process group. For more information look up
-                the documentation for ``dist.init_process_group()``.
+                the documentation for :func:`torch.distributed.init_process_group`.
             on_gpu (bool): if the DDP training is executed on the GPU or on the CPU
         """
         self.ddp_training_mode = True
@@ -940,7 +946,9 @@ class TrainLoop:
             callbacks (list or None): callbacks that are executed during the training run
             grad_accumulation (int): number of batches the gradients are accumulated before updating weights
             in_process_data_load (list or None): in-process data loading logic implemented as a torchtrain callback.
-                The logic should be placed inside the on_multiprocess_start() callback function.
+                The logic should be placed inside the
+                :meth:`~aitoolbox.torchtrain.callbacks.abstract.AbstractCallback.on_multiprocess_start`
+                callback function.
                 When using this data loading option bear in mind that loaded dataset will be replicated in memory for
                 every spawned training process. This can in turn in cause extensive overall memory consumption.
         """
@@ -998,8 +1006,11 @@ class TrainLoop:
                 specification of the training length than the ``num_epochs`` parameter.
             callbacks (list): callbacks that are executed during the training run
             grad_accumulation (int): number of batches the gradients are accumulated before updating weights
-            **kwargs: additional parameters for ``_train_dp()`` and ``_train_ddp()`` methods.
+            **kwargs: additional parameters for
+                :meth:`~aitoolbox.torchtrain.train_loop.train_loop.TrainLoop._train_dp` and
+                :meth:`~aitoolbox.torchtrain.train_loop.train_loop.TrainLoop._train_ddp` methods.
+
         Returns:
-            TTModel or torch.nn.modules.Module or TTDataParallel: trained model
+            TTModel or torch.nn.Module or TTDataParallel: trained model
         """
         return self.fit(num_epochs, num_iterations, callbacks, grad_accumulation, **kwargs)

@@ -26,14 +26,16 @@ class AbstractCallback:
         self.device_idx_execution = device_idx_execution
 
     def register_train_loop_object(self, train_loop_obj):
-        """Introduce the reference to the encapsulating trainloop so that the callback has access to the
-            low level functionality of the trainloop
+        """Introduce the reference to the encapsulating trainloop
+
+        This way the callback has access to the low level functionality of the trainloop
 
         The registration is normally handled by the callback handler found inside the train loops. The handler is
         responsible for all the callback orchestration of the callbacks inside the trainloops.
 
         Args:
-            train_loop_obj (aitoolbox.torchtrain.train_loop.TrainLoop): reference to the encapsulating trainloop
+            train_loop_obj (aitoolbox.torchtrain.train_loop.train_loop.TrainLoop): reference to the encapsulating
+                trainloop
 
         Returns:
             AbstractCallback: return the reference to the callback after it is registered
@@ -136,20 +138,21 @@ class AbstractCallback:
     def on_after_batch_prediction(self, y_pred_batch, y_test_batch, metadata_batch, dataset_info):
         """Logic executed in the prediction loop after the predictions for the single batch are made
 
-        IMPORTANT: Take care to not unintentionally modify the (predicted) input data when it's passed inside
-                   this function of a callback (you have a reference to the original).
-                   If the data is modified the subsequent steps or evaluations that are executed by the TrainLoop
-                   might get broken or corrupted. With more access/power there needs to be more care!
-
         All the inputs into this function are the outputs from the model's ``get_predictions()`` method.
+
+        Warning:
+            **IMPORTANT:** Take care to not unintentionally modify the (predicted) input data when it's passed inside
+            this function of a callback (you have a reference to the original).
+            If the data is modified the subsequent steps or evaluations that are executed by the TrainLoop
+            might get broken or corrupted. With more access/power there needs to be more care!
 
         Args:
             y_pred_batch: model's predictions for the current batch
             y_test_batch: reference ground truth targets for the current batch
             metadata_batch: additional results/metadata returned by the model for the current batch
             dataset_info (dict or None): additional information describing the dataset inside the provided dataloader.
-                One such dataset info is the dataset ``type`` (train, validation, or test) set by TrainLoop's
-                predict_on_train_set(), predict_on_validation_set() and predict_on_test_set() methods.
+                One such dataset info is the dataset ``type`` ("train", "validation", or "test") set by TrainLoop's
+                ``predict_on_train_set()``, ``predict_on_validation_set()`` and ``predict_on_test_set()`` methods.
 
         Returns:
             None
@@ -201,20 +204,23 @@ class AbstractExperimentCallback(AbstractCallback):
         This details inference function should only be called after the callback has already been registered in the
         TrainLoop, e.g. in the on_train_loop_registration().
 
-        General rule:
-            take details from the TrainLoop -> for this option where experiment details are inferred from TrainLoop
-                            all of the cloud_save_mode, bucket_name and cloud_dir_prefix should be set to None
+        Note:
+            **General rule:**
 
-            Based on `self.cloud_save_mode` the inference decision is made as follows:
-                - ['s3', 'aws_s3', 'aws'] --> AWS S3
-                - ['gcs', 'google_storage', 'google storage'] --> Google Cloud Storage
-                - 'local' or whatever value -> local only
+            Take details from the TrainLoop -> for this option where experiment details are inferred from TrainLoop
+            all of the cloud_save_mode, bucket_name and cloud_dir_prefix should be set to None
+
+            Based on ``self.cloud_save_mode`` the inference decision is made as follows:
+
+            - ['s3', 'aws_s3', 'aws'] --> AWS S3
+            - ['gcs', 'google_storage', 'google storage'] --> Google Cloud Storage
+            - 'local' or whatever value -> local only
 
         Args:
             infer_cloud_details (bool): should infer only local project folder details or also cloud project destination
 
         Raises:
-            AttributeError
+            AttributeError: If current TrainLoop doesn't support auto project tracking.
 
         Returns:
             None

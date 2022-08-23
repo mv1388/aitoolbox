@@ -55,6 +55,7 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.mathjax',
     'sphinx.ext.viewcode',
+    "sphinx.ext.intersphinx",
     'sphinxcontrib.apidoc'  # Using https://github.com/sphinx-contrib/apidoc
 ]
 
@@ -81,6 +82,19 @@ templates_path = ['_templates', '_templates/apidoc']
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = []
+
+
+# -- Options for intersphinx extension ---------------------------------------
+
+# Example configuration for intersphinx: refer to the Python standard library.
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/3", None),
+    "torch": ("https://pytorch.org/docs/stable/", None),
+    'numpy': ('https://numpy.org/doc/stable/', None),
+    'transformers': ('https://huggingface.co/docs/transformers/master/en/', None),
+    'evaluate': ('https://huggingface.co/docs/evaluate/master/en/', None),
+    'torchmetrics': ('https://torchmetrics.readthedocs.io/en/stable/', None)
+}
 
 
 # -- Options for HTML output -------------------------------------------------

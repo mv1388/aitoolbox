@@ -10,12 +10,14 @@ class AbstractModelFeedDefinition(ABC):
     """
     Model Feed Definition
 
-    The primary way of defining the model for TrainLoop training is to utilize:
-        aitoolbox.torchtrain.model.TTModel
+    Note:
+        The primary way of defining the model for TrainLoop training is to utilize:
+        :class:`aitoolbox.torchtrain.model.TTModel`
 
-    Use of the ModelFeedDefinition is the legacy way of defining the model. However, in certain scenarios where the
-    TTModel might prove to increase complexity, ModelFeedDefinition still is useful for augmenting the nn.Module with
-    the logic to calculate loss and predictions.
+    Use of the ``AbstractModelFeedDefinition`` is the legacy way of defining the model. However, in certain scenarios
+    where the :class:`~aitoolbox.torchtrain.model.TTModel` might prove to increase complexity,
+    ModelFeedDefinition still is useful for augmenting the :class:`torch.nn.Module` with the logic to calculate
+    loss and predictions.
     """
 
     @abstractmethod
@@ -27,10 +29,10 @@ class AbstractModelFeedDefinition(ABC):
         Executed during training stage where model weights are updated based on the loss returned from this function.
 
         Args:
-            model (nn.Module): neural network model
-            batch_data: model input data batch
+            model (torch.nn.Module): neural network model
+            batch_data (torch.Tensor): model input data batch
             criterion: loss criterion
-            device: device on which the model is being trained
+            device (torch.device): device on which the model is being trained
 
         Returns:
             PyTorch loss
@@ -48,10 +50,10 @@ class AbstractModelFeedDefinition(ABC):
         For simple examples this function can just call the get_loss() and return its result.
 
         Args:
-            model (nn.Module): neural network model
-            batch_data: model input data batch
+            model (torch.nn.Module): neural network model
+            batch_data (torch.Tensor): model input data batch
             criterion: loss criterion
-            device: device on which the model is being trained
+            device (torch.device): device on which the model is being trained
 
         Returns:
             PyTorch loss
@@ -63,9 +65,9 @@ class AbstractModelFeedDefinition(ABC):
         """Get predictions during evaluation stage
 
         Args:
-            model (nn.Module): neural network model
-            batch_data: model input data batch
-            device: device on which the model is being trained
+            model (torch.nn.Module): neural network model
+            batch_data (torch.Tensor): model input data batch
+            device (torch.device): device on which the model is being trained
 
         Returns:
             (torch.Tensor, torch.Tensor, dict or None): y_pred, y_test, metadata

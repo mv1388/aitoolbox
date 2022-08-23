@@ -9,7 +9,8 @@ class AbstractScheduler:
     def __init__(self):
         """Scheduler (callback) base class
 
-        All the scheduler callbacks should in addition to ``AbstractCallback`` also inherit from this base class.
+        All the scheduler callbacks should in addition to
+        :class:`~aitoolbox.torchtrain.callbacks.abstract.AbstractCallback` also inherit from this base class.
         This class serves to indicate to torchtrain components which used callbacks are schedulers and which are just
         normal callbacks which have nothing to do with learning rate scheduling.
 

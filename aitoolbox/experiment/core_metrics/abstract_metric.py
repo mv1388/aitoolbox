@@ -80,7 +80,7 @@ class AbstractBaseMetric(ABC):
         """Metric comparison prep util
 
         Args:
-            other (aitoolbox.experiment.core_metrics.abstract_metric.AbstractBaseMetric or float or int): other compared
+            other (AbstractBaseMetric or float or int): other compared
                 metric
 
         Returns:

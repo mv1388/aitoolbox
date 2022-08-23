@@ -105,7 +105,7 @@ in AIToolbox is supported and can be done very easily.
 
 The new result package can be implemented as a new class which is inheriting from the base abstract result package
 :class:`aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage` and implements
-the abstract method :meth:`aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.prepare_results_dict`.
+the abstract method :meth:`~aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.prepare_results_dict`.
 
 Inside the ``prepare_results_dict()`` the user needs to implement the logic to evaluate the performance on desired
 performance metrics forming the result package. In order to perform the evaluation the predicted and ground truth values

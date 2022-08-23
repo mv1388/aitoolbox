@@ -10,6 +10,7 @@ class HFEvaluateResultPackage(AbstractResultPackage):
         All the metric result names will have the '_HFEvaluate' appended at the end to help distinguish them.
 
         Github: https://github.com/huggingface/evaluate
+
         More info on how to use the metrics: https://huggingface.co/docs/evaluate/index
 
         Args:

@@ -8,7 +8,7 @@ Current version of AIToolbox already supports the use of built-in PyTorch AMP.
 
 The user only has to set the TrainLoop parameter ``use_amp`` to ``use_amp=True`` in order to use the default
 AMP initialization and start training the model in the mixed precision mode. If the user wants to specify
-custom AMP ``GradScaler`` initialization parameters, these should be provided as a dict parameter
+custom AMP :class:`~torch.cuda.amp.GradScaler` initialization parameters, these should be provided as a dict parameter
 ``use_amp={'init_scale': 2.**16, 'growth_factor': 2.0, ...}`` to the TrainLoop.
 All AMP initializations and training related steps are then handled automatically by the TrainLoop.
 

@@ -21,7 +21,8 @@ def function_exists(object_to_check, fn_name):
 def copy_function(fn):
     """Deep copy a function
 
-    Based on http://stackoverflow.com/a/6528148/190597 (Glenn Maynard)
+    Note:
+        Based on http://stackoverflow.com/a/6528148/190597 (Glenn Maynard)
 
     Args:
         fn (callable): original function
@@ -40,8 +41,8 @@ def copy_function(fn):
 def is_empty_function(fn):
     """Returns true if f is an empty function
 
-    Taken from StackOverflow:
-        https://stackoverflow.com/a/58973125
+    Note:
+        Taken from StackOverflow: https://stackoverflow.com/a/58973125
 
     Args:
         fn: function to be evaluated if it is empty or not

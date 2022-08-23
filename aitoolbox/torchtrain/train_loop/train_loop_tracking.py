@@ -26,8 +26,8 @@ class TrainLoopCheckpoint(TrainLoop):
             train_loader (torch.utils.data.DataLoader): data loader for train data set
             validation_loader (torch.utils.data.DataLoader or None): data loader for validation data set
             test_loader (torch.utils.data.DataLoader or None): data loader for test data set
-            optimizer (torch.optim.optimizer.Optimizer or MultiOptimizer): optimizer algorithm.
-            criterion (torch.nn.modules.loss._Loss or MultiLoss or None): criterion during the training procedure
+            optimizer (torch.optim.Optimizer or MultiOptimizer): optimizer algorithm.
+            criterion (torch.nn.Module or MultiLoss or None): criterion during the training procedure
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             local_model_result_folder_path (str): root local path where project folder will be created
@@ -70,12 +70,14 @@ class TrainLoopCheckpoint(TrainLoop):
                 * ``'ddp'``: multi-GPU training via DistributedDataParallel
 
             cuda_device_idx (int or None): CUDA device index used when training on multiple GPUs
-            use_amp (bool or dict): use 16-bit Automatic Mixed Precision (AMP)
+            use_amp (bool or dict): Use 16-bit Automatic Mixed Precision (AMP).
 
                 To switch to AMP mode either:
 
-                * set this parameter to ``True`` to use default AMP ``torch.cuda.amp.GradScaler`` initialization params
-                * provide custom AMP ``torch.cuda.amp.GradScaler`` initialization parameters as a dict as this parameter
+                * set this parameter to ``True`` to use default AMP :class:`~torch.cuda.amp.GradScaler`
+                  initialization params
+                * provide custom AMP :class:`~torch.cuda.amp.GradScaler` initialization parameters as a dict as
+                  this parameter
         """
         TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion,
                            collate_batch_pred_fn, pred_transform_fn,
@@ -140,8 +142,8 @@ class TrainLoopEndSave(TrainLoop):
             train_loader (torch.utils.data.DataLoader): data loader for train data set
             validation_loader (torch.utils.data.DataLoader or None): data loader for validation data set
             test_loader (torch.utils.data.DataLoader or None): data loader for test data set
-            optimizer (torch.optim.optimizer.Optimizer or MultiOptimizer): optimizer algorithm.
-            criterion (torch.nn.modules.loss._Loss or MultiLoss or None): criterion during the training procedure
+            optimizer (torch.optim.Optimizer or MultiOptimizer): optimizer algorithm.
+            criterion (torch.nn.Module or MultiLoss or None): criterion during the training procedure
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             local_model_result_folder_path (str): root local path where project folder will be created
@@ -181,12 +183,14 @@ class TrainLoopEndSave(TrainLoop):
                 * ``'ddp'``: multi-GPU training via DistributedDataParallel
 
             cuda_device_idx (int or None): CUDA device index used when training on multiple GPUs
-            use_amp (bool or dict): use 16-bit Automatic Mixed Precision (AMP)
+            use_amp (bool or dict): Use 16-bit Automatic Mixed Precision (AMP).
 
                 To switch to AMP mode either:
 
-                * set this parameter to ``True`` to use default AMP ``torch.cuda.amp.GradScaler`` initialization params
-                * provide custom AMP ``torch.cuda.amp.GradScaler`` initialization parameters as a dict as this parameter
+                * set this parameter to ``True`` to use default AMP :class:`~torch.cuda.amp.GradScaler`
+                  initialization params
+                * provide custom AMP :class:`~torch.cuda.amp.GradScaler` initialization parameters as a dict as
+                  this parameter
         """
         TrainLoop.__init__(self, model, train_loader, validation_loader, test_loader, optimizer, criterion,
                            collate_batch_pred_fn, pred_transform_fn,
@@ -256,8 +260,8 @@ class TrainLoopCheckpointEndSave(TrainLoopEndSave):
             train_loader (torch.utils.data.DataLoader): data loader for train data set
             validation_loader (torch.utils.data.DataLoader or None): data loader for validation data set
             test_loader (torch.utils.data.DataLoader or None): data loader for test data set
-            optimizer (torch.optim.optimizer.Optimizer or MultiOptimizer): optimizer algorithm.
-            criterion (torch.nn.modules.loss._Loss or MultiLoss or None): criterion during the training procedure
+            optimizer (torch.optim.Optimizer or MultiOptimizer): optimizer algorithm.
+            criterion (torch.nn.Module or MultiLoss or None): criterion during the training procedure
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             local_model_result_folder_path (str): root local path where project folder will be created
@@ -304,12 +308,14 @@ class TrainLoopCheckpointEndSave(TrainLoopEndSave):
                 * ``'ddp'``: multi-GPU training via DistributedDataParallel
 
             cuda_device_idx (int or None): CUDA device index used when training on multiple GPUs
-            use_amp (bool or dict): use 16-bit Automatic Mixed Precision (AMP)
+            use_amp (bool or dict): Use 16-bit Automatic Mixed Precision (AMP).
 
                 To switch to AMP mode either:
 
-                * set this parameter to ``True`` to use default AMP ``torch.cuda.amp.GradScaler`` initialization params
-                * provide custom AMP ``torch.cuda.amp.GradScaler`` initialization parameters as a dict as this parameter
+                * set this parameter to ``True`` to use default AMP :class:`~torch.cuda.amp.GradScaler`
+                  initialization params
+                * provide custom AMP :class:`~torch.cuda.amp.GradScaler` initialization parameters as a dict as
+                  this parameter
         """
         if 'experiment_file_path' not in hyperparams:
             hyperparams['experiment_file_path'] = inspect.getframeinfo(inspect.currentframe().f_back).filename

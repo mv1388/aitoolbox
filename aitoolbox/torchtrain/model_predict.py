@@ -25,7 +25,7 @@ class PyTorchModelPredictor:
         self.train_loop.model.to(self.train_loop.device)
 
     def model_predict(self):
-        """Calculate model output predictons
+        """Calculate model output predictions
 
         Returns:
             (torch.Tensor, torch.Tensor, dict): y_pred, y_true, metadata
@@ -36,7 +36,7 @@ class PyTorchModelPredictor:
         """Calculate model's loss on the given dataloader and based on provided loss function
 
         Args:
-            loss_criterion (torch.nn.modules.loss._Loss): criterion criterion during the training procedure
+            loss_criterion (torch.nn.Module): criterion criterion during the training procedure
 
         Returns:
             torch.Tensor or MultiLoss: loss
@@ -105,7 +105,7 @@ class PyTorchModelPredictor:
 
         Returns:
             aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or dict: calculated
-                result package or results dict
+            result package or results dict
         """
         y_pred, y_test, additional_results = self.train_loop.predict_on_test_set()
 
@@ -152,7 +152,7 @@ class PyTorchModelPredictor:
 
         Returns:
             aitoolbox.experiment.core_metrics.abstract_metric.AbstractBaseMetric or dict: calculated performance metric
-                or result dict
+            or result dict
         """
         y_pred, y_test, additional_results = self.train_loop.predict_on_test_set()
 

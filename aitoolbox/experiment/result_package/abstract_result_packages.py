@@ -12,9 +12,9 @@ class AbstractResultPackage(ABC):
 
         Functions which the user should potentially override in a specific result package:
 
-            * :meth:`aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.prepare_results_dict`
-            * :meth:`aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.list_additional_results_dump_paths`
-            * :meth:`aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.set_experiment_dir_path_for_additional_results`
+            * :meth:`~aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.prepare_results_dict`
+            * :meth:`~aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.list_additional_results_dump_paths`
+            * :meth:`~aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.set_experiment_dir_path_for_additional_results`
 
         Args:
             pkg_name (str or None): result package name used just for clarity
@@ -48,7 +48,8 @@ class AbstractResultPackage(ABC):
 
         Mostly this consists of executing calculation of selected performance metrics and returning their result dicts.
         If you want to use multiple performance metrics you have to combine them in the single self.results_dict
-        at the end by doing this:
+        at the end by doing this::
+
             return {**metric_dict_1, **metric_dict_2}
 
         Returns:
@@ -64,8 +65,8 @@ class AbstractResultPackage(ABC):
         the implemented result package where the metrics evaluation logic is implemented.
 
         Args:
-            y_true (numpy.array or list): ground truth targets
-            y_predicted (numpy.array or list): predicted targets
+            y_true (numpy.ndarray or list): ground truth targets
+            y_predicted (numpy.ndarray or list): predicted targets
             hyperparameters (dict or None): dictionary filled with the set hyperparameters
             **kwargs (dict): additional results for the result package
 
@@ -147,7 +148,7 @@ class AbstractResultPackage(ABC):
 
         Returns:
             list or None: list of lists of string paths if it is not None.
-                Each element of the list should be list of: [[results_file_name, results_file_local_path], ... [,]]
+            Each element of the list should be list of: [[results_file_name, results_file_local_path], ... [,]]
         """
         self.additional_results_dump_paths = self.list_additional_results_dump_paths()
         self.qa_check_additional_results_dump_paths()
@@ -169,7 +170,7 @@ class AbstractResultPackage(ABC):
 
         Returns:
             list or None: list of lists of string paths if it is not None.
-                Each element of the list should be list of: [[results_file_name, results_file_local_path], ... [,]]
+            Each element of the list should be list of: [[results_file_name, results_file_local_path], ... [,]]
         """
         return None
 
@@ -285,14 +286,13 @@ class AbstractResultPackage(ABC):
     def __add__(self, other):
         """Concatenate result packages
 
-        Combines results from both result packages into a single one.
+        Combine results from both result packages into a single one.
 
         Args:
-            other (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or dict): another
-                result package to be concatenated
+            other (AbstractResultPackage or dict): another result package to be concatenated
 
         Returns:
-            aitoolbox.experiment.result_package.MultipleResultPackageWrapper: merged result package
+            MultipleResultPackageWrapper: merged result package
         """
         return self.add_merge_multi_pkg_wrap(other)
 
@@ -300,11 +300,10 @@ class AbstractResultPackage(ABC):
         """Concatenate result package
 
         Args:
-            other (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or dict): another
-                result package to be concatenated
+            other (AbstractResultPackage or dict): another result package to be concatenated
 
         Returns:
-            aitoolbox.experiment.result_package.MultipleResultPackageWrapper: merged result package
+            MultipleResultPackageWrapper: merged result package
         """
         return self.add_merge_multi_pkg_wrap(other)
 
@@ -312,12 +311,10 @@ class AbstractResultPackage(ABC):
         """Result package merge
 
         Args:
-            other_object (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or dict):
-                another result package to be merged with the current package
+            other_object (AbstractResultPackage or dict): another result package to be merged with the current package
 
         Returns:
-            aitoolbox.experiment.result_package.abstract_result_packages.MultipleResultPackageWrapper: merged result
-                package
+            MultipleResultPackageWrapper: merged result package
         """
         self.warn_if_results_dict_not_defined()
         other_object_pkg = self._create_other_object_pkg(other_object)
@@ -334,12 +331,11 @@ class AbstractResultPackage(ABC):
         """Util to deep copy and wrap results into the simple result package
 
         Args:
-            other_object (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or dict):
-                results package or results dict
+            other_object (AbstractResultPackage or dict): results package or results dict
 
         Returns:
-            AbstractResultPackage | MultipleResultPackageWrapper: deep copy of results wrapped in the simple result
-                package
+            AbstractResultPackage or MultipleResultPackageWrapper: deep copy of results wrapped in the simple result
+            package
         """
         if isinstance(other_object, AbstractResultPackage):
             other_object.warn_if_results_dict_not_defined()
@@ -357,11 +353,10 @@ class AbstractResultPackage(ABC):
         """Append result package
 
         Args:
-            other (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or dict): another
-                result package to be appended to the current package
+            other (AbstractResultPackage or dict): another result package to be appended to the current package
 
         Returns:
-            aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage: merged result package
+            AbstractResultPackage: merged result package
         """
         return self.add_merge_dicts(other)
 
@@ -369,11 +364,10 @@ class AbstractResultPackage(ABC):
         """Append result package to the current one
 
         Args:
-            other (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or dict): another
-                result package to be appended to the current package
+            other (AbstractResultPackage or dict): another result package to be appended to the current package
 
         Returns:
-            aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage: merged result package
+            AbstractResultPackage: merged result package
         """
         self.warn_if_results_dict_not_defined()
 
@@ -393,7 +387,7 @@ class AbstractResultPackage(ABC):
                 package
 
         Returns:
-            aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage: merged result package
+            AbstractResultPackage: merged result package
         """
         def results_duplicated(self_results_dict, other_results_dict_dup):
             for result_name in other_results_dict_dup:
@@ -467,8 +461,8 @@ class MultipleResultPackageWrapper(AbstractResultPackage):
             result_packages (list): list of result packages where each of them is object inherited from
                 aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.
                 If you want to add raw results in dict form, this dict first needs to be wrapped into
-                aitoolbox.experiment.result_package.abstract_result_packages.PreCalculatedResultPackage to satisfy
-                the result package object requirement.
+                :class:`~aitoolbox.experiment.result_package.abstract_result_packages.PreCalculatedResultPackage`
+                to satisfy the result package object requirement.
             hyperparameters (dict or None): hyperparameters dict
             **kwargs: result package additional meta-data
 

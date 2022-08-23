@@ -1,14 +1,14 @@
 Train Loop
 ==========
 
-``TrainLoop`` and it's module :mod:`aitoolbox.torchtrain.train_loop.train_loop` is at the core of and probably most important
+:class:`~aitoolbox.torchtrain.train_loop.train_loop.TrainLoop` inside module :mod:`aitoolbox.torchtrain.train_loop.train_loop` is at the core of and most important
 component of the entire *AIToolbox* package.
 
 Common to all available TrainLoops is the *PyTorch* model training loop engine which automatically handles the
 deep learning training process. As part of this it does the batch feeding of data into the model, calculating loss
 and updating parameters for a specified number of epochs.
 
-``torchtrain`` and by extension ``TrainLoop``
+:mod:`~aitoolbox.torchtrain` and by extension ``TrainLoop``
 has been designed with the ease of use in mind. One of the main design principles was to keep as much
 training code as possible exactly the same as would be used in normally *PyTorch*. Consequently, the user can define
 the dataset, dataloader and models in exactly the same way as it would be done when training directly with core *PyTorch*.
@@ -20,8 +20,8 @@ To train the model, all the user has to do is provide the TrainLoop with the mod
 loss function and the optimizer. That's it.
 
 Once the TrainLoop with all the necessary components has been created all that's left is to start training the model.
-Common to all the available TrainLoops is the :meth:`aitoolbox.torchtrain.train_loop.train_loop.TrainLoop.fit` method which
-initiates the training process. The ``.fit()`` method will train the provided model on the given training dataset in
+Common to all the available TrainLoops is the :meth:`~aitoolbox.torchtrain.train_loop.train_loop.TrainLoop.fit` method which
+initiates the training process. The ``fit()`` method will train the provided model on the given training dataset in
 the training dataloader for the specified number of epochs.
 
 .. note:: In order to use the :mod:`aitoolbox.torchtrain.train_loop` the user has to define their models as a
@@ -35,13 +35,13 @@ TrainLoop Variations
 --------------------
 
 :mod:`aitoolbox.torchtrain.train_loop` module consists of submodules
-:mod:`aitoolbox.torchtrain.train_loop.train_loop` and :mod:`aitoolbox.torchtrain.train_loop.train_loop_tracking`
+:mod:`~aitoolbox.torchtrain.train_loop.train_loop` and :mod:`~aitoolbox.torchtrain.train_loop.train_loop_tracking`
 which implement four different ``TrainLoop`` variations:
 
-* :class:`aitoolbox.torchtrain.train_loop.train_loop.TrainLoop`
-* :class:`aitoolbox.torchtrain.train_loop.train_loop_tracking.TrainLoopCheckpoint`
-* :class:`aitoolbox.torchtrain.train_loop.train_loop_tracking.TrainLoopEndSave`
-* :class:`aitoolbox.torchtrain.train_loop.train_loop_tracking.TrainLoopCheckpointEndSave`
+* :class:`~aitoolbox.torchtrain.train_loop.train_loop.TrainLoop`
+* :class:`~aitoolbox.torchtrain.train_loop.train_loop_tracking.TrainLoopCheckpoint`
+* :class:`~aitoolbox.torchtrain.train_loop.train_loop_tracking.TrainLoopEndSave`
+* :class:`~aitoolbox.torchtrain.train_loop.train_loop_tracking.TrainLoopCheckpointEndSave`
 
 The above listed TrainLoop options can be distinguished based on the varying extent of the automatic experiment tracking
 they do on top of the core training loop functionality. The available TrainLoops follow this naming convention:
@@ -56,7 +56,7 @@ TrainLoop
 The simplest TrainLoop version which only performs the model training and does no experiment tracking and
 performance evaluation.
 
-The API can be found in: :class:`aitoolbox.torchtrain.train_loop.train_loop.TrainLoop`.
+The API can be found in: :class:`~aitoolbox.torchtrain.train_loop.train_loop.TrainLoop`.
 
 Example of the ``TrainLoop`` used to train the model:
 
@@ -73,9 +73,11 @@ Example of the ``TrainLoop`` used to train the model:
     optimizer = optim.Adam(model.parameters(), lr=0.001, betas=(0.9, 0.999))
     criterion = nn.NLLLoss()
 
-    tl = TrainLoop(model,
-                   train_loader, val_loader, test_loader,
-                   optimizer, criterion)
+    tl = TrainLoop(
+        model,
+        train_loader, val_loader, test_loader,
+        optimizer, criterion
+    )
 
     model = tl.fit(num_epochs=10)
 
@@ -85,7 +87,7 @@ TrainLoopCheckpoint
 Same training process as in TrainLoop with additional automatic model checkpointing (saving) after every epoch. Model
 saving can be done only to the local disk or also to the cloud storage such as AWS S3.
 
-The API can be found in: :class:`aitoolbox.torchtrain.train_loop.train_loop_tracking.TrainLoopCheckpoint`.
+The API can be found in: :class:`~aitoolbox.torchtrain.train_loop.train_loop_tracking.TrainLoopCheckpoint`.
 
 .. code-block:: python
 
@@ -127,7 +129,7 @@ evaluation at the end of the training process. This way the TrainLoop ensures ex
 the training. Model and experiment results saving can be done only to the local disk or also to the cloud storage
 such as AWS S3.
 
-The API can be found in: :class:`aitoolbox.torchtrain.train_loop.train_loop_tracking.TrainLoopEndSave`.
+The API can be found in: :class:`~aitoolbox.torchtrain.train_loop.train_loop_tracking.TrainLoopEndSave`.
 
 For information about the ``ResultPackage`` used in this example, have a look at the :doc:`../experiment/result_package`
 section.
@@ -174,7 +176,7 @@ each epoch as well as automatic model checkpointing and model performance evalua
 This way the TrainLoop ensures full experiment tracking with the maximum extent. Model and experiment results saving
 can be done only to the local disk or also to the cloud storage such as AWS S3.
 
-The API can be found in: :class:`aitoolbox.torchtrain.train_loop.train_loop_tracking.TrainLoopCheckpointEndSave`.
+The API can be found in: :class:`~aitoolbox.torchtrain.train_loop.train_loop_tracking.TrainLoopCheckpointEndSave`.
 
 For information about the ``ResultPackage`` used in this example, have a look at the :doc:`../experiment/result_package`
 section.

@@ -8,8 +8,8 @@ class MeanSquaredErrorMetric(AbstractBaseMetric):
         """Model prediction MSE
 
         Args:
-            y_true (numpy.array or list): ground truth targets
-            y_predicted (numpy.array or list): predicted targets
+            y_true (numpy.ndarray or list): ground truth targets
+            y_predicted (numpy.ndarray or list): predicted targets
         """
         AbstractBaseMetric.__init__(self, y_true, y_predicted, metric_name='Mean_squared_error')
 
@@ -22,8 +22,8 @@ class MeanAbsoluteErrorMetric(AbstractBaseMetric):
         """Model prediction MAE
 
         Args:
-            y_true (numpy.array or list): ground truth targets
-            y_predicted (numpy.array or list): predicted targets
+            y_true (numpy.ndarray or list): ground truth targets
+            y_predicted (numpy.ndarray or list): predicted targets
         """
         AbstractBaseMetric.__init__(self, y_true, y_predicted, metric_name='Mean_absolute_error')
 

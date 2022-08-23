@@ -9,8 +9,8 @@ class AccuracyMetric(AbstractBaseMetric):
         """Model prediction accuracy
 
         Args:
-            y_true (numpy.array or list): ground truth targets
-            y_predicted (numpy.array or list): predicted targets
+            y_true (numpy.ndarray or list): ground truth targets
+            y_predicted (numpy.ndarray or list): predicted targets
             positive_class_thresh (float or None): predicted probability positive class threshold.
                 Set it to None when dealing with multi-class labels.
         """
@@ -38,8 +38,8 @@ class ROCAUCMetric(AbstractBaseMetric):
         """Model prediction ROC-AUC
 
         Args:
-            y_true (numpy.array or list): ground truth targets
-            y_predicted (numpy.array or list): predicted targets
+            y_true (numpy.ndarray or list): ground truth targets
+            y_predicted (numpy.ndarray or list): predicted targets
         """
         AbstractBaseMetric.__init__(self, y_true, y_predicted, metric_name='ROC_AUC')
 
@@ -52,8 +52,8 @@ class PrecisionRecallCurveAUCMetric(AbstractBaseMetric):
         """Model prediction PR-AUC
 
         Args:
-            y_true (numpy.array or list): ground truth targets
-            y_predicted (numpy.array or list): predicted targets
+            y_true (numpy.ndarray or list): ground truth targets
+            y_predicted (numpy.ndarray or list): predicted targets
         """
         AbstractBaseMetric.__init__(self, y_true, y_predicted, metric_name='PrecisionRecall_AUC')
 
@@ -67,8 +67,8 @@ class F1ScoreMetric(AbstractBaseMetric):
         """Model prediction F1 score
 
         Args:
-            y_true (numpy.array or list): ground truth targets
-            y_predicted (numpy.array or list): predicted targets
+            y_true (numpy.ndarray or list): ground truth targets
+            y_predicted (numpy.ndarray or list): predicted targets
             positive_class_thresh (float): predicted probability positive class threshold
         """
         self.positive_class_thresh = positive_class_thresh
@@ -84,8 +84,8 @@ class PrecisionMetric(AbstractBaseMetric):
         """Model prediction precision
 
         Args:
-            y_true (numpy.array or list): ground truth targets
-            y_predicted (numpy.array or list): predicted targets
+            y_true (numpy.ndarray or list): ground truth targets
+            y_predicted (numpy.ndarray or list): predicted targets
             positive_class_thresh (float): predicted probability positive class threshold
         """
         self.positive_class_thresh = positive_class_thresh
@@ -101,8 +101,8 @@ class RecallMetric(AbstractBaseMetric):
         """Model prediction recall score
 
         Args:
-            y_true (numpy.array or list): ground truth targets
-            y_predicted (numpy.array or list): predicted targets
+            y_true (numpy.ndarray or list): ground truth targets
+            y_predicted (numpy.ndarray or list): predicted targets
             positive_class_thresh (float): predicted probability positive class threshold
         """
         self.positive_class_thresh = positive_class_thresh

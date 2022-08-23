@@ -12,7 +12,8 @@ class DDPHandler:
         """Distributed Data Parallel process handler for the TrainLoop
 
         Args:
-            train_loop_obj (aitoolbox.torchtrain.train_loop.TrainLoop): reference to the encapsulating TrainLoop
+            train_loop_obj (aitoolbox.torchtrain.train_loop.train_loop.TrainLoop): reference to the encapsulating
+                TrainLoop
         """
         self.train_loop_obj = train_loop_obj
 
@@ -70,7 +71,8 @@ class DDPHandler:
         """Replicate given data loader with added distributed sampler
 
         Args:
-            data_loader (DataLoader): original single process data loader without the distributed sampler
+            data_loader (torch.utils.data.DataLoader): original single process data loader without
+                the distributed sampler
             shuffle (bool): should the added sampler be returning examples in the shuffled order
             world_size (int): world size of for the distributed training
             rank (int): rank of the current process

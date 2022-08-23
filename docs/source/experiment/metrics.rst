@@ -8,8 +8,8 @@ the encapsulating :doc:`result_package`.
 AIToolbox comes out of the box with implemented several commonly used performance evaluation metrics implemented as
 result metrics. These can be found in:
 
-* :mod:`aitoolbox.experiment.core_metrics.classification`
-* :mod:`aitoolbox.experiment.core_metrics.regression`
+* :mod:`~aitoolbox.experiment.core_metrics.classification`
+* :mod:`~aitoolbox.experiment.core_metrics.regression`
 
 
 Use of Result Metrics inside Result Packages
@@ -49,7 +49,7 @@ their own new metrics. The approach is very similar to that of the new result pa
 In order to implement
 a new result metric, the user has to create a new metric class which inherits from the base abstract result metric
 :class:`aitoolbox.experiment.core_metrics.abstract_metric.AbstractBaseMetric` and implements the abstract method
-:meth:`aitoolbox.experiment.core_metrics.abstract_metric.AbstractBaseMetric.calculate_metric`.
+:meth:`~aitoolbox.experiment.core_metrics.abstract_metric.AbstractBaseMetric.calculate_metric`.
 
 As part of the ``calculate_metric()`` the user has to implement the logic for the performance metric calculation and
 return the metric result from the method. Predicted values and ground truth values normally needed for the performance

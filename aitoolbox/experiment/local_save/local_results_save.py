@@ -18,7 +18,8 @@ class AbstractLocalResultsSaver(ABC):
         
         Args:
             result_package (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
-            training_history (aitoolbox.experiment.training_history.TrainingHistory):
+                evaluated result package
+            training_history (aitoolbox.experiment.training_history.TrainingHistory): train loop's training history
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             experiment_timestamp (str or None): time stamp at the start of training
@@ -27,9 +28,9 @@ class AbstractLocalResultsSaver(ABC):
 
         Returns:
             list: list of list with this format: [[results_file_name, results_file_local_path], ... [ , ]] 
-                Each file should be a new list specifying the file name and its full path
+            Each file should be a new list specifying the file name and its full path
                 
-                The first file path should be pointing to the main experiment results file.
+            The first file path should be pointing to the main experiment results file.
         """
         pass
 
@@ -41,7 +42,8 @@ class AbstractLocalResultsSaver(ABC):
         
         Args:
             result_package (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
-            training_history (aitoolbox.experiment.training_history.TrainingHistory):
+                evaluated result package
+            training_history (aitoolbox.experiment.training_history.TrainingHistory): train loop's training history
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             experiment_timestamp (str or None): time stamp at the start of training
@@ -50,9 +52,9 @@ class AbstractLocalResultsSaver(ABC):
 
         Returns:
             list: list of list with this format: [[results_file_name, results_file_local_path], ... [ , ]] 
-                Each file should be a new list specifying the file name and its full path
-                
-                The first file path should be pointing to the main experiment results file.
+            Each file should be a new list specifying the file name and its full path
+
+            The first file path should be pointing to the main experiment results file.
         """
         pass
 
@@ -176,7 +178,8 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
 
         Args:
             result_package (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
-            training_history (aitoolbox.experiment.training_history.TrainingHistory):
+                evaluated result package
+            training_history (aitoolbox.experiment.training_history.TrainingHistory): train loop's training history
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             experiment_timestamp (str or None): time stamp at the start of training
@@ -236,7 +239,8 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
 
         Args:
             result_package (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
-            training_history (aitoolbox.experiment.training_history.TrainingHistory):
+                evaluated result package
+            training_history (aitoolbox.experiment.training_history.TrainingHistory): train loop's training history
             project_name (str): root name of the project
             experiment_name (str): name of the particular experiment
             experiment_timestamp (str or None): time stamp at the start of training
@@ -245,9 +249,9 @@ class LocalResultsSaver(AbstractLocalResultsSaver, BaseLocalResultsSaver):
 
         Returns:
             list: list of list with this format: [[results_file_path_inside_results_dir, results_file_local_path], ... [ , ]]
-                Each file should be a new list specifying the file name and its full path.
-                
-                The first file path should be pointing to the main experiment results file.
+            Each file should be a new list specifying the file name and its full path.
+
+            The first file path should be pointing to the main experiment results file.
         """
         if experiment_timestamp is None:
             experiment_timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
