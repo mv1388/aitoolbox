@@ -68,7 +68,8 @@ class TrainLoop:
                 * ``'ddp'``: multi-GPU training via DistributedDataParallel
 
             cuda_device_idx (int or None): CUDA device index used when training on multiple GPUs
-            use_amp (bool or dict): use 16-bit Automatic Mixed Precision (AMP)
+            use_amp (bool or dict): Use 16-bit Automatic Mixed Precision (AMP).
+
                 To switch to AMP mode either:
 
                 * set this parameter to ``True`` to use default AMP :class:`~torch.cuda.amp.GradScaler`
@@ -168,6 +169,7 @@ class TrainLoop:
             callbacks (list or None): callbacks that are executed during the training run
             grad_accumulation (int): number of batches the gradients are accumulated before updating weights
             **kwargs: additional parameters for training methods:
+
                 * :meth:`aitoolbox.torchtrain.train_loop.TrainLoop._train_dp`
                 * :meth:`aitoolbox.torchtrain.train_loop.TrainLoop._train_ddp`
 
@@ -652,7 +654,7 @@ class TrainLoop:
 
         Returns:
             (torch.Tensor, torch.Tensor, dict): y_pred, y_true, metadata
-                in the form of dict of lists/torch.Tensors/np.arrays
+            in the form of dict of lists/torch.Tensors/np.arrays
         """
         if not self.prediction_store.has_train_predictions(self.total_iteration_idx) or force_prediction:
             predictions = self.predict_with_model(self.train_loader, execute_callbacks,
@@ -674,7 +676,7 @@ class TrainLoop:
 
         Returns:
             (torch.Tensor, torch.Tensor, dict): y_pred, y_true, metadata
-                in the form of dict of lists/torch.Tensors/np.arrays
+            in the form of dict of lists/torch.Tensors/np.arrays
         """
         if not self.prediction_store.has_val_predictions(self.total_iteration_idx) or force_prediction:
             predictions = self.predict_with_model(self.validation_loader, execute_callbacks,
@@ -696,7 +698,7 @@ class TrainLoop:
 
         Returns:
             (torch.Tensor, torch.Tensor, dict): y_pred, y_true, metadata
-                in the form of dict of lists/torch.Tensors/np.arrays
+            in the form of dict of lists/torch.Tensors/np.arrays
         """
         if not self.prediction_store.has_test_predictions(self.total_iteration_idx) or force_prediction:
             predictions = self.predict_with_model(self.test_loader, execute_callbacks,
@@ -723,7 +725,7 @@ class TrainLoop:
 
         Returns:
             (torch.Tensor, torch.Tensor, dict): y_pred, y_true, metadata
-                in the form of dict of lists/torch.Tensors/np.arrays
+            in the form of dict of lists/torch.Tensors/np.arrays
         """
         desc = "Making predictions"
         if isinstance(dataset_info, dict) and 'type' in dataset_info:
@@ -835,7 +837,7 @@ class TrainLoop:
 
         Returns:
             float or dict: simplified loss representation. In case of single loss it is a single float value. In case
-                of multi-loss it is a dict extracted out from the given MultiLoss wrapper.
+            of multi-loss it is a dict extracted out from the given MultiLoss wrapper.
         """
         loss = loss.item()
         # Extract a python dict from the already item()'ed MultiLoss
@@ -857,7 +859,7 @@ class TrainLoop:
                 ``nn.DataParallel`` DP model wrap.
 
         Returns:
-            TTDataParallel or nn.DataParallel: trained model
+            TTDataParallel or torch.nn.DataParallel: trained model
         """
         dp_model_args = dp_model_args if dp_model_args is not None else {}
 
@@ -883,9 +885,8 @@ class TrainLoop:
                 specification of the training length than the ``num_epochs`` parameter.
             callbacks (list or None): callbacks that are executed during the training run
             grad_accumulation (int): number of batches the gradients are accumulated before updating weights
-            ddp_model_args (dict or None): parameters for DistributedDataParallel model
-                Available parameters for DistributedDataParallel:
-                    https://pytorch.org/docs/master/nn.html#torch.nn.parallel.DistributedDataParallel
+            ddp_model_args (dict or None): parameters for underlying PyTorch
+                :class:`~torch.nn.parallel.DistributedDataParallel` model
             in_process_data_load (AbstractCallback or list or None):
                 in-process data loading logic implemented as a torchtrain callback. The logic should be placed inside
                 the on_multiprocess_start() callback function.
