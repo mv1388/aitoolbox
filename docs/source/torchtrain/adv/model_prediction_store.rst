@@ -18,15 +18,15 @@ with the clean prediction cache.
 
 To most users this caching is visible as part of the TrainLoop's loss calculation methods:
 
-* :meth:`aitoolbox.torchtrain.train_loop.train_loop.TrainLoop.evaluate_loss_on_train_set`
-* :meth:`aitoolbox.torchtrain.train_loop.train_loop.TrainLoop.evaluate_loss_on_validation_set`
-* :meth:`aitoolbox.torchtrain.train_loop.train_loop.TrainLoop.evaluate_loss_on_test_set`
+* :meth:`~aitoolbox.torchtrain.train_loop.train_loop.TrainLoop.evaluate_loss_on_train_set`
+* :meth:`~aitoolbox.torchtrain.train_loop.train_loop.TrainLoop.evaluate_loss_on_validation_set`
+* :meth:`~aitoolbox.torchtrain.train_loop.train_loop.TrainLoop.evaluate_loss_on_test_set`
 
 and as part of the TrainLoop's model prediction calculation methods:
 
-* :meth:`aitoolbox.torchtrain.train_loop.train_loop.TrainLoop.predict_on_train_set`
-* :meth:`aitoolbox.torchtrain.train_loop.train_loop.TrainLoop.predict_on_validation_set`
-* :meth:`aitoolbox.torchtrain.train_loop.train_loop.TrainLoop.predict_on_test_set`
+* :meth:`~aitoolbox.torchtrain.train_loop.train_loop.TrainLoop.predict_on_train_set`
+* :meth:`~aitoolbox.torchtrain.train_loop.train_loop.TrainLoop.predict_on_validation_set`
+* :meth:`~aitoolbox.torchtrain.train_loop.train_loop.TrainLoop.predict_on_test_set`
 
 Important to note here, is that by default TrainLoop will try to save compute time and cache model outputs when possible
 instead of recomputing them. However, if for a particular use case the user wants to get fresh recomputed loss or model

@@ -3,7 +3,7 @@ Callbacks
 
 For advanced model training experiments the basic logic offered in available TrainLoops might not be enough.
 Additional needed logic can be injected into the training procedure by using *callbacks* and providing them as
-a parameter list to :meth:`aitoolbox.torchtrain.train_loop.TrainLoop.fit` function found in all TrainLoops.
+a parameter list to :meth:`~aitoolbox.torchtrain.train_loop.TrainLoop.fit` function found in all TrainLoops.
 
 
 Available Callbacks
@@ -13,13 +13,13 @@ AIToolbox by default already offers a wide selection of different useful callbac
 the base training procedure. These out of the box callbacks can be found in :mod:`aitoolbox.torchtrain.callbacks`
 module. There are several general categories of available callbacks:
 
-* :mod:`aitoolbox.torchtrain.callbacks.basic` - general training augmentation
-* :mod:`aitoolbox.torchtrain.callbacks.performance_eval` - model performance evaluation
-* :mod:`aitoolbox.torchtrain.callbacks.model_save` - local / cloud based model saving
-* :mod:`aitoolbox.torchtrain.callbacks.gradient` - model gradient reporting
-* :mod:`aitoolbox.torchtrain.callbacks.model_load` - existing model loading at train start
-* :mod:`aitoolbox.torchtrain.callbacks.tensorboard` - tensorboard training tracking
-* :mod:`aitoolbox.torchtrain.callbacks.wandb` - Weights & Biases training tracking
+* :mod:`~aitoolbox.torchtrain.callbacks.basic` - general training augmentation
+* :mod:`~aitoolbox.torchtrain.callbacks.performance_eval` - model performance evaluation
+* :mod:`~aitoolbox.torchtrain.callbacks.model_save` - local / cloud based model saving
+* :mod:`~aitoolbox.torchtrain.callbacks.gradient` - model gradient reporting
+* :mod:`~aitoolbox.torchtrain.callbacks.model_load` - existing model loading at train start
+* :mod:`~aitoolbox.torchtrain.callbacks.tensorboard` - tensorboard training tracking
+* :mod:`~aitoolbox.torchtrain.callbacks.wandb` - Weights & Biases training tracking
 
 
 Example of the several basic callbacks used to infuse additional logic into the model training process:
@@ -67,7 +67,7 @@ AbstractCallback
 ^^^^^^^^^^^^^^^^
 
 The new callback can be implemented as a new class which is inheriting from the base callback
-:class:`aitoolbox.torchtrain.callbacks.abstract.AbstractCallback`. All that the user has to do is to override and
+:class:`~aitoolbox.torchtrain.callbacks.abstract.AbstractCallback`. All that the user has to do is to override and
 implement the methods corresponding to positions in the TrainLoop training process at which the newly developed callback
 should be executed. If a certain callback method is left unimplemented and thus left to the default from
 the parent ``AbstractCallback`` the callback has no effect on the TrainLoop at the corresponding position in
@@ -75,27 +75,27 @@ the training process.
 
 Callback execution is currently supported at the following positions in the TrainLoop via the following methods:
 
-* :meth:`aitoolbox.torchtrain.callbacks.abstract.AbstractCallback.on_train_begin`
-* :meth:`aitoolbox.torchtrain.callbacks.abstract.AbstractCallback.on_epoch_begin`
-* :meth:`aitoolbox.torchtrain.callbacks.abstract.AbstractCallback.on_batch_begin`
-* :meth:`aitoolbox.torchtrain.callbacks.abstract.AbstractCallback.on_after_gradient_update`
-* :meth:`aitoolbox.torchtrain.callbacks.abstract.AbstractCallback.on_after_optimizer_step`
-* :meth:`aitoolbox.torchtrain.callbacks.abstract.AbstractCallback.on_batch_end`
-* :meth:`aitoolbox.torchtrain.callbacks.abstract.AbstractCallback.on_epoch_end`
-* :meth:`aitoolbox.torchtrain.callbacks.abstract.AbstractCallback.on_train_end`
-* :meth:`aitoolbox.torchtrain.callbacks.abstract.AbstractCallback.on_train_loop_registration`
-* :meth:`aitoolbox.torchtrain.callbacks.abstract.AbstractCallback.on_multiprocess_start`
-* :meth:`aitoolbox.torchtrain.callbacks.abstract.AbstractCallback.on_after_batch_prediction`
+* :meth:`~aitoolbox.torchtrain.callbacks.abstract.AbstractCallback.on_train_begin`
+* :meth:`~aitoolbox.torchtrain.callbacks.abstract.AbstractCallback.on_epoch_begin`
+* :meth:`~aitoolbox.torchtrain.callbacks.abstract.AbstractCallback.on_batch_begin`
+* :meth:`~aitoolbox.torchtrain.callbacks.abstract.AbstractCallback.on_after_gradient_update`
+* :meth:`~aitoolbox.torchtrain.callbacks.abstract.AbstractCallback.on_after_optimizer_step`
+* :meth:`~aitoolbox.torchtrain.callbacks.abstract.AbstractCallback.on_batch_end`
+* :meth:`~aitoolbox.torchtrain.callbacks.abstract.AbstractCallback.on_epoch_end`
+* :meth:`~aitoolbox.torchtrain.callbacks.abstract.AbstractCallback.on_train_end`
+* :meth:`~aitoolbox.torchtrain.callbacks.abstract.AbstractCallback.on_train_loop_registration`
+* :meth:`~aitoolbox.torchtrain.callbacks.abstract.AbstractCallback.on_multiprocess_start`
+* :meth:`~aitoolbox.torchtrain.callbacks.abstract.AbstractCallback.on_after_batch_prediction`
 
 train_loop_obj
 ^^^^^^^^^^^^^^
 
 The most usable and thus important aspect of every callback is its ability to communicate and modify the encapsulating
 running TrainLoop. Every callback has a special attribute
-:attr:`aitoolbox.torchtrain.callbacks.abstract.AbstractCallback.train_loop_obj` which at the start of the TrainLoop
+:attr:`~aitoolbox.torchtrain.callbacks.abstract.AbstractCallback.train_loop_obj` which at the start of the TrainLoop
 training process gets assigned the reference (pointer) to the encapsulating TrainLoop object. In AIToolbox the process
 is called *TrainLoop registration* and is automatically done under the hood by the TrainLoop by calling the
-:meth:`aitoolbox.torchtrain.callbacks.abstract.AbstractCallback.register_train_loop_object`.
+:meth:`~aitoolbox.torchtrain.callbacks.abstract.AbstractCallback.register_train_loop_object`.
 
 Via the ``train_loop_obj`` the callback can thus have a complete access to and control of every aspect of the TrainLoop.
 While maybe dangerous for inexperienced users, this extensive low level control is especially welcome for the advanced
@@ -166,14 +166,14 @@ AbstractExperimentCallback
 
 In case of the developed callback is aimed at experiment tracking where information about the created experiment
 details such as project name, experiment name and path of the local experiment folder would be needed there is
-available also available the :class:`aitoolbox.torchtrain.callbacks.abstract.AbstractExperimentCallback`.
+available also available the :class:`~aitoolbox.torchtrain.callbacks.abstract.AbstractExperimentCallback`.
 ``AbstractExperimentCallback`` has all the same properties as basic ``AbstractCallback`` and is extended with
 the convenience method
-:meth:`aitoolbox.torchtrain.callbacks.abstract.AbstractExperimentCallback.try_infer_experiment_details` which extracts
+:meth:`~aitoolbox.torchtrain.callbacks.abstract.AbstractExperimentCallback.try_infer_experiment_details` which extracts
 the experiment details from the running ``TrainLoop`` and infuses our callback with this additional needed information.
 
-For the example of the ``try_infer_experiment_details()`` use in practice check this implementation:
-:meth:`aitoolbox.torchtrain.callbacks.performance_eval.ModelTrainHistoryPlot.on_train_loop_registration`.
+For the example of the ``try_infer_experiment_details()`` use in practice check this implementation
+:meth:`this implementation <aitoolbox.torchtrain.callbacks.performance_eval.ModelTrainHistoryPlot.on_train_loop_registration>`.
 
 
 DDP Multi-Processing Callbacks
@@ -185,7 +185,7 @@ in certain situations the opposite is required and the callback should only be e
 
 When developing such a callback which is intended to be executed only in one of the spawned processes the torchtrain
 callbacks framework enables this via the ``device_idx_execution`` parameter which is part of every callback inherited
-from the ``AbstractCallback``. It tells the TrainLoop engine as part of which process and corresponding
+from the :class:`~aitoolbox.torchtrain.callbacks.abstract.AbstractCallback`. It tells the TrainLoop engine as part of which process and corresponding
 *GPU device id* the callback should be executed. For exmaple if the callback has ``device_idx_execution`` set to 0,
 this means that the callback will only be executed as part of the process which is running on the first GPU. When
 ``device_idx_execution`` is set to ``None`` which is the default, the callback is executed inside every running process.

@@ -15,9 +15,9 @@ in the training mode and when making the predictions in the evaluation mode.
 
 In total the user has to implement the following three methods when building a new model inherited from ``TTModel``:
 
-* :meth:`aitoolbox.torchtrain.model.TTModel.forward` (inherited from :meth:`torch.nn.Module.forward`)
-* :meth:`aitoolbox.torchtrain.model.TTModel.get_loss`
-* :meth:`aitoolbox.torchtrain.model.TTModel.get_predictions`
+* :meth:`~aitoolbox.torchtrain.model.TTModel.forward` (inherited from :meth:`torch.nn.Module.forward`)
+* :meth:`~aitoolbox.torchtrain.model.TTModel.get_loss`
+* :meth:`~aitoolbox.torchtrain.model.TTModel.get_predictions`
 
 The code below shows the general skeleton all the TTModels have to follow to enable them to be trained with
 the TrainLoop:

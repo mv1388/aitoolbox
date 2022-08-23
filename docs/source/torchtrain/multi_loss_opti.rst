@@ -13,7 +13,8 @@ Multi-Loss Training
 -------------------
 
 To implement training with multiple losses use :class:`aitoolbox.torchtrain.multi_loss_optim.MultiLoss`
-to wrap different calculated losses together and return them from model's ``get_loss()`` function.
+to wrap different calculated losses together and return them from model's
+:meth:`~aitoolbox.torchtrain.model.TTModel.get_loss` function.
 Train loop will then automatically know to correctly execute backprop through each of the losses.
 
 Multiple losses need to be provided to the MultiLoss as a dict:

@@ -45,10 +45,10 @@ DistributedDataParallel
 -----------------------
 
 Distributed training on multiple GPUs via ``DistributedDataParallel`` is enabled by the TrainLoop itself under the hood
-by wrapping the :doc:`model`-based model into :class:`aitoolbox.torchtrain.parallel.TTDistributedDataParallel`.
+by wrapping the :doc:`model`-based model into :class:`~aitoolbox.torchtrain.parallel.TTDistributedDataParallel`.
 TrainLoop also automatically spawns multiple processes and initializes them. Inside each spawned process the model and
 all other necessary training components are moved to the correct GPU belonging to a specific process.
-Lastly, TrainLoop also automatically adds the *PyTorch* ``DistributedSampler`` to each of the provided data loaders
+Lastly, TrainLoop also automatically adds the *PyTorch* :class:`~torch.utils.data.distributed.DistributedSampler` to each of the provided data loaders
 in order to ensure different data batches go to different GPUs and there is no overlap.
 
 To enable distributed training via DistributedDataParallel, the user has to set the TrainLoop's ``gpu_mode``
