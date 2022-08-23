@@ -55,7 +55,7 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.mathjax',
     'sphinx.ext.viewcode',
-    "sphinx.ext.intersphinx",
+    # "sphinx.ext.intersphinx",
     'sphinxcontrib.apidoc'  # Using https://github.com/sphinx-contrib/apidoc
 ]
 
@@ -87,10 +87,10 @@ exclude_patterns = []
 # -- Options for intersphinx extension ---------------------------------------
 
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {
-    "python": ("https://docs.python.org/3", None),
-    "torch": ("https://pytorch.org/docs/stable/", None)
-}
+# intersphinx_mapping = {
+#     "python": ("https://docs.python.org/3", None),
+#     "torch": ("https://pytorch.org/docs/stable/", None)
+# }
 
 
 # -- Options for HTML output -------------------------------------------------

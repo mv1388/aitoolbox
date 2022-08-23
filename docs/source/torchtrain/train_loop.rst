@@ -1,7 +1,7 @@
 Train Loop
 ==========
 
-``TrainLoop`` and it's module :mod:`aitoolbox.torchtrain.train_loop.train_loop` is at the core of and probably most important
+``:class:`~aitoolbox.torchtrain.train_loop.train_loop.TrainLoop``` and it's module :mod:`aitoolbox.torchtrain.train_loop.train_loop` is at the core of and probably most important
 component of the entire *AIToolbox* package.
 
 Common to all available TrainLoops is the *PyTorch* model training loop engine which automatically handles the
@@ -20,7 +20,7 @@ To train the model, all the user has to do is provide the TrainLoop with the mod
 loss function and the optimizer. That's it.
 
 Once the TrainLoop with all the necessary components has been created all that's left is to start training the model.
-Common to all the available TrainLoops is the :meth:`~aitoolbox.torchtrain.train_loop.train_loop.TrainLoop.fit` method which
+Common to all the available TrainLoops is the :meth:`aitoolbox.torchtrain.train_loop.train_loop.TrainLoop.fit` method which
 initiates the training process. The ``.fit()`` method will train the provided model on the given training dataset in
 the training dataloader for the specified number of epochs.
 
