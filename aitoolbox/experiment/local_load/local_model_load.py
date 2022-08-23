@@ -93,7 +93,7 @@ class PyTorchLocalModelLoader(AbstractLocalModelLoader):
         For this function to work, load_model() must be first called to read the model representation into memory.
 
         Args:
-            model (TTModel or nn.Module): PyTorch model
+            model (TTModel or torch.nn.Module): PyTorch model
             used_data_parallel (bool): if the saved model was nn.DataParallel or normal model
 
         Returns:
