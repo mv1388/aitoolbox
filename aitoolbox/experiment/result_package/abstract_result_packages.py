@@ -288,7 +288,7 @@ class AbstractResultPackage(ABC):
         Combine results from both result packages into a single one.
 
         Args:
-            other (:class:`~aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage` or dict):
+            other (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or dict):
                 another result package to be concatenated
 
         Returns:
