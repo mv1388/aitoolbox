@@ -144,7 +144,7 @@ class MultiGPUModelWrap(TTBasicMultiGPUModel):
 
         Args:
             model (torch.nn.Module or TTModel): neural network model. The model should follow the basic PyTorch model
-                definition where the forward() function returns predictions
+                definition where the ``forward()`` function returns predictions
         """
         TTBasicMultiGPUModel.__init__(self)
         if not isinstance(model, nn.Module):
@@ -162,7 +162,7 @@ class MultiGPUModelWrap(TTBasicMultiGPUModel):
 
         Returns:
             PyTorch loss or model output predictions. If loss function criterion is provided this function returns the
-                calculated loss, otherwise the model output predictions are returned
+            calculated loss, otherwise the model output predictions are returned
         """
         predictions = self.model(*input_data)
 
