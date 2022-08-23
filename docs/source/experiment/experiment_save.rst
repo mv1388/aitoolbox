@@ -28,21 +28,21 @@ after all the locally produced results are deleted when the instance is terminat
 
 Cloud enabled experiment savers:
 
-* :class:`aitoolbox.experiment.experiment_saver.FullPyTorchExperimentS3Saver`
-* :class:`aitoolbox.experiment.experiment_saver.FullKerasExperimentS3Saver`
-* :class:`aitoolbox.experiment.experiment_saver.FullPyTorchExperimentGoogleStorageSaver`
-* :class:`aitoolbox.experiment.experiment_saver.FullKerasExperimentGoogleStorageSaver`
+* :class:`~aitoolbox.experiment.experiment_saver.FullPyTorchExperimentS3Saver`
+* :class:`~aitoolbox.experiment.experiment_saver.FullKerasExperimentS3Saver`
+* :class:`~aitoolbox.experiment.experiment_saver.FullPyTorchExperimentGoogleStorageSaver`
+* :class:`~aitoolbox.experiment.experiment_saver.FullKerasExperimentGoogleStorageSaver`
 
 Local-only experiment savers:
 
-* :class:`aitoolbox.experiment.local_experiment_saver.FullPyTorchExperimentLocalSaver`
-* :class:`aitoolbox.experiment.local_experiment_saver.FullKerasExperimentLocalSaver`
+* :class:`~aitoolbox.experiment.local_experiment_saver.FullPyTorchExperimentLocalSaver`
+* :class:`~aitoolbox.experiment.local_experiment_saver.FullKerasExperimentLocalSaver`
 
 A very convenient property all the experiment savers have is that they all implement the same user facing API
 which makes them ideal for easy use as part of the larger system. Due to the unified API different experiment saver
 types can be easily dynamically exchanged according to desired training scenarios without any need to modify
 the surrounding code. The core API function that is common to all the experiment savers used to initiate the experiment
-snapshot saving is :meth:`aitoolbox.experiment.experiment_saver.AbstractExperimentSaver.save_experiment`.
+snapshot saving is :meth:`~aitoolbox.experiment.experiment_saver.AbstractExperimentSaver.save_experiment`.
 
 
 Local Save
@@ -62,17 +62,17 @@ Local Model Save
 
 Implementations of model saving logic to the local drive. Currently available model savers:
 
-* :class:`aitoolbox.experiment.local_save.local_model_save.PyTorchLocalModelSaver`
-* :class:`aitoolbox.experiment.local_save.local_model_save.KerasLocalModelSaver`
+* :class:`~aitoolbox.experiment.local_save.local_model_save.PyTorchLocalModelSaver`
+* :class:`~aitoolbox.experiment.local_save.local_model_save.KerasLocalModelSaver`
 
 Local Results Save
 ^^^^^^^^^^^^^^^^^^
 
 Implementation of training results saving logic to the local drive available in
-:class:`aitoolbox.experiment.local_save.local_results_save.LocalResultsSaver`. This class offers two main options to
+:class:`~aitoolbox.experiment.local_save.local_results_save.LocalResultsSaver`. This class offers two main options to
 save produced experiment results:
 
 * saving all results into the single (potentially large) file via
-  :class:`aitoolbox.experiment.local_save.local_results_save.LocalResultsSaver.save_experiment_results`
+  :class:`~aitoolbox.experiment.local_save.local_results_save.LocalResultsSaver.save_experiment_results`
 * saving results into the single multiple separate files via
-  :class:`aitoolbox.experiment.local_save.local_results_save.LocalResultsSaver.save_experiment_results_separate_files`
+  :class:`~aitoolbox.experiment.local_save.local_results_save.LocalResultsSaver.save_experiment_results_separate_files`
