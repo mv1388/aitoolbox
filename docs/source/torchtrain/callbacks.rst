@@ -173,8 +173,7 @@ the convenience method
 the experiment details from the running ``TrainLoop`` and infuses our callback with this additional needed information.
 
 For the example of the ``try_infer_experiment_details()`` use in practice check this implementation
-:meth:`this implementation <aitoolbox.torchtrain.callbacks.performance_eval.ModelTrainHistoryPlot.on_train_loop_registration>`.
-
+:meth:`aitoolbox.torchtrain.callbacks.performance_eval.ModelTrainHistoryPlot.on_train_loop_registration`.
 
 DDP Multi-Processing Callbacks
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

@@ -73,6 +73,6 @@ Implementation of training results saving logic to the local drive available in
 save produced experiment results:
 
 * saving all results into the single (potentially large) file via
-  :class:`~aitoolbox.experiment.local_save.local_results_save.LocalResultsSaver.save_experiment_results`
+  :meth:`~aitoolbox.experiment.local_save.local_results_save.LocalResultsSaver.save_experiment_results`
 * saving results into the single multiple separate files via
-  :class:`~aitoolbox.experiment.local_save.local_results_save.LocalResultsSaver.save_experiment_results_separate_files`
+  :meth:`~aitoolbox.experiment.local_save.local_results_save.LocalResultsSaver.save_experiment_results_separate_files`
