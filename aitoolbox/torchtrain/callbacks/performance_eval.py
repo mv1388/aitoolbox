@@ -24,7 +24,8 @@ class ModelPerformanceEvaluation(AbstractCallback):
         construction.
 
         Args:
-            result_package (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage):
+            result_package (:class:`~aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage`):
+                result package to be evaluated
             args (dict): used hyper-parameters
             on_each_epoch (bool): calculate performance results just at the end of training or at the end of each epoch
             on_train_data (bool): should the evaluation be done on the training dataset

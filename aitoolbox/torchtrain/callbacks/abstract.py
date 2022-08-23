@@ -210,7 +210,7 @@ class AbstractExperimentCallback(AbstractCallback):
             Take details from the TrainLoop -> for this option where experiment details are inferred from TrainLoop
             all of the cloud_save_mode, bucket_name and cloud_dir_prefix should be set to None
 
-            Based on `self.cloud_save_mode` the inference decision is made as follows:
+            Based on ``self.cloud_save_mode`` the inference decision is made as follows:
 
             - ['s3', 'aws_s3', 'aws'] --> AWS S3
             - ['gcs', 'google_storage', 'google storage'] --> Google Cloud Storage
