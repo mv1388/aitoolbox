@@ -12,9 +12,9 @@ class AbstractResultPackage(ABC):
 
         Functions which the user should potentially override in a specific result package:
 
-            * :meth:`aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.prepare_results_dict`
-            * :meth:`aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.list_additional_results_dump_paths`
-            * :meth:`aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.set_experiment_dir_path_for_additional_results`
+            * :meth:`~aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.prepare_results_dict`
+            * :meth:`~aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.list_additional_results_dump_paths`
+            * :meth:`~aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage.set_experiment_dir_path_for_additional_results`
 
         Args:
             pkg_name (str or None): result package name used just for clarity
@@ -285,14 +285,15 @@ class AbstractResultPackage(ABC):
     def __add__(self, other):
         """Concatenate result packages
 
-        Combines results from both result packages into a single one.
+        Combine results from both result packages into a single one.
 
         Args:
-            other (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or dict): another
-                result package to be concatenated
+            other (:class:`~aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage` or dict):
+                another result package to be concatenated
 
         Returns:
-            aitoolbox.experiment.result_package.MultipleResultPackageWrapper: merged result package
+            aitoolbox.experiment.result_package.abstract_result_packages.MultipleResultPackageWrapper: merged result
+                package
         """
         return self.add_merge_multi_pkg_wrap(other)
 
@@ -300,11 +301,12 @@ class AbstractResultPackage(ABC):
         """Concatenate result package
 
         Args:
-            other (aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or dict): another
+            other (~aitoolbox.experiment.result_package.abstract_result_packages.AbstractResultPackage or dict): another
                 result package to be concatenated
 
         Returns:
-            aitoolbox.experiment.result_package.MultipleResultPackageWrapper: merged result package
+            aitoolbox.experiment.result_package.abstract_result_packages.MultipleResultPackageWrapper: merged result
+                package
         """
         return self.add_merge_multi_pkg_wrap(other)
 
