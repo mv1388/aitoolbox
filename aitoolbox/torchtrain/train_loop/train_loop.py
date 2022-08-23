@@ -72,8 +72,10 @@ class TrainLoop:
 
                 To switch to AMP mode either:
 
-                * set this parameter to ``True`` to use default AMP ``torch.cuda.amp.GradScaler`` initialization params
-                * provide custom AMP ``torch.cuda.amp.GradScaler`` initialization parameters as a dict as this parameter
+                * set this parameter to ``True`` to use default AMP :class:`~torch.cuda.amp.GradScaler`
+                    initialization params
+                * provide custom AMP :class:`~torch.cuda.amp.GradScaler` initialization parameters as a dict as
+                    this parameter
         """
         if isinstance(model, TTModel) or isinstance(model, TTDataParallel):
             self.model = model
