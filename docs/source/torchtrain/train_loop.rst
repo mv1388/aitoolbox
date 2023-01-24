@@ -21,8 +21,8 @@ loss function and the optimizer. That's it.
 
 Once the TrainLoop with all the necessary components has been created all that's left is to start training the model.
 Common to all the available TrainLoops is the :meth:`~aitoolbox.torchtrain.train_loop.train_loop.TrainLoop.fit` method which
-initiates the training process. The ``fit()`` method will train the provided model on the given training dataset in
-the training dataloader for the specified number of epochs.
+initiates the training process. The :meth:`~aitoolbox.torchtrain.train_loop.train_loop.TrainLoop.fit` method
+will train the provided model on the given training dataset in the training dataloader for the specified number of epochs.
 
 .. note:: In order to use the :mod:`aitoolbox.torchtrain.train_loop` the user has to define their models as a
           :class:`aitoolbox.torchtrain.model.TTModel` which is a slightly modified AIToolbox specific variation of

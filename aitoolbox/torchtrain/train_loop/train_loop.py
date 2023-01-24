@@ -170,8 +170,8 @@ class TrainLoop:
             grad_accumulation (int): number of batches the gradients are accumulated before updating weights
             **kwargs: additional parameters for training methods:
 
-                * :meth:`aitoolbox.torchtrain.train_loop.TrainLoop._train_dp`
-                * :meth:`aitoolbox.torchtrain.train_loop.TrainLoop._train_ddp`
+                * :meth:`~aitoolbox.torchtrain.train_loop.train_loop.TrainLoop._train_dp`
+                * :meth:`~aitoolbox.torchtrain.train_loop.train_loop.TrainLoop._train_ddp`
 
                 These training methods are called by the TrainLoop depending on the specified setting of the TrainLoop's
                 ``gpu_mode`` parameter.
