@@ -12,7 +12,7 @@ from aitoolbox.cloud import s3_available_options, gcs_available_options
 
 
 class GradientCallbackBase(AbstractCallback):
-    def __init__(self, callback_name, execution_order=0):
+    def __init__(self, callback_name, **kwargs):
         """Base abstract class for gradient related callbacks
 
         It has not implemented logic except for the turning enabling of the grad_cb_used inside TrainLoop as part of
@@ -21,10 +21,9 @@ class GradientCallbackBase(AbstractCallback):
 
         Args:
             callback_name (str): name of the callback
-            execution_order (int): order of the callback execution. If all the used callbacks have the orders set to 0,
-                then the callbacks are executed in the order they were registered.
+            kwargs: AbstractCallback parameters
         """
-        AbstractCallback.__init__(self, callback_name, execution_order)
+        AbstractCallback.__init__(self, callback_name, **kwargs)
 
     def on_train_loop_registration(self):
         self.train_loop_obj.grad_cb_used = True
@@ -78,30 +77,27 @@ class GradNormClip(GradientCallbackBase):
             torch.nn.utils.clip_grad_norm_(self.train_loop_obj.model.parameters(), self.max_grad_norm, **self.kwargs)
 
 
-class GradientStatsPrint(AbstractCallback):
-    def __init__(self, model_layers_extract_def, on_every_grad_update=False):
+class GradientStatsPrint(GradientCallbackBase):
+    def __init__(self, model_layers_extract_def, stats_eval_freq=1):
         """Model gradients statistics reporting
 
         Args:
             model_layers_extract_def (lambda or function): lambda/function accepting model as the input and returning
                 a list of all the layers in the model for which the gradient stats should be calculated
-            on_every_grad_update (bool): should the gradient stats be calculated on every gradient update, e.g. after
-                every batch or only at the end of the epoch
+            stats_eval_freq (int): frequency of gradient statistics evaluations during the training iterations
         """
-        AbstractCallback.__init__(self, 'Print model gradient stats', device_idx_execution=0)
+        GradientCallbackBase.__init__(self, 'Print model gradient stats', device_idx_execution=0)
         self.model_layers_extract_def = model_layers_extract_def
-        self.on_every_grad_update = on_every_grad_update
+        self.stats_eval_freq = stats_eval_freq
 
-    def on_train_loop_registration(self):
-        if self.on_every_grad_update:
-            self.train_loop_obj.grad_cb_used = True
+        self.weights_update_counter = 0
 
     def on_after_gradient_update(self, optimizer_idx):
-        if self.on_every_grad_update and optimizer_idx == 0:
-            self.gradients_report()
+        if self.train_loop_obj.should_execute_optimizer_update() and optimizer_idx == 0:
+            self.weights_update_counter += 1
 
-    def on_epoch_end(self):
-        self.gradients_report()
+            if self.weights_update_counter % self.stats_eval_freq == 0:
+                self.gradients_report()
 
     def gradients_report(self):
         model_layers_list = self.model_layers_extract_def(self.train_loop_obj.model)
@@ -116,10 +112,10 @@ class GradientStatsPrint(AbstractCallback):
                 mu = np.mean(gradients)
                 std = np.std(gradients)
 
-                print(f'Layer {i} grads: Mean: {mu}; Std {std}')
-                print(f'\tRatio of zero gradients: {float(np.count_nonzero(gradients == 0)) / gradients.size}')
+                print(f'\tLayer {i} grads: Mean: {mu}; Std {std}')
+                print(f'\t\tRatio of zero gradients: {float(np.count_nonzero(gradients == 0)) / gradients.size}')
             else:
-                print(f'Layer {i} grad are None')
+                print(f'\tLayer {i} grad are None')
 
 
 class GradDistributionPlot(AbstractExperimentCallback):
